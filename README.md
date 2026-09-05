@@ -4,7 +4,7 @@ Watermark photographs at scale, beautifully. Bulk jobs, a reusable watermark
 library, smart placement that keeps the mark off the subject, auto-contrast, an
 editor with crop and resize, storage, sharing, multi-format export, and
 role-based access control. A spiritual competitor to eZy Watermark, MIT
-licensed, hosted on Cloudflare Workers.
+licensed, hosted on Cloudflare Workers at `watermark.blowmoney.net`.
 
 **Status:** milestone M0 (scaffold and quality gates) is complete. No product
 features are implemented yet. See [PLAN.md](PLAN.md) for the roadmap and
@@ -54,7 +54,7 @@ npm ci
 npm run dev        # Vite dev server; Worker runs in workerd with HMR
 npm run preview    # serve the production build through workerd
 npm run build      # production build into dist/
-npm run deploy     # build, then `wrangler deploy` to <name>.<account>.workers.dev
+npm run deploy     # build, then `wrangler deploy` to watermark.blowmoney.net
 npm run cf-typegen # regenerate worker-configuration.d.ts after editing wrangler.jsonc
 ```
 
@@ -128,10 +128,12 @@ npx wrangler login
 npm run deploy
 ```
 
-The Worker is named `watermark-pro` in `wrangler.jsonc` and deploys to the
-`workers.dev` subdomain of the logged-in account. No custom domain is
-configured. Bindings for D1, R2, and rate limiting are added in milestone M1
-together with the commands to create them.
+The Worker is named `watermark-pro` in `wrangler.jsonc` and is routed to the
+Custom Domain `watermark.blowmoney.net`; wrangler creates the DNS record and
+certificate on the first deploy, provided the `blowmoney.net` zone is in the
+logged-in account. The `workers.dev` subdomain is disabled. Bindings for D1,
+R2, and rate limiting are added in milestone M1 together with the commands to
+create them.
 
 These two commands are the only ones in this file that have not been executed
 yet: deployment needs the owner's Cloudflare login and is certified in

@@ -7,6 +7,13 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Changed
+
+- Production hostname is now the Custom Domain `watermark.blowmoney.net`
+  (`routes` in `wrangler.jsonc`); the `workers.dev` subdomain is disabled.
+  The owner supplied the domain after the 0.1.0 scaffold, which had assumed
+  no custom domain.
+
 ## [0.1.0] - 2026-09-05
 
 Milestone M0: scaffold and quality gates. No product features yet.

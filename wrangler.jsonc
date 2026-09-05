@@ -1,10 +1,20 @@
 {
   // Cloudflare Worker configuration. One Worker serves the SPA from Static
-  // Assets and the API from src/worker. Deploys to <name>.<account>.workers.dev;
-  // no custom domain (PLAN.md R15).
+  // Assets and the API from src/worker. Served at watermark.blowmoney.net
+  // (PLAN.md R15); the workers.dev subdomain is disabled so the app has exactly
+  // one origin for cookies, CSP, and share links.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "watermark-pro",
   "main": "src/worker/index.ts",
+  "workers_dev": false,
+  "routes": [
+    {
+      // Custom Domain: wrangler creates the DNS record and certificate on
+      // deploy. The zone must live in the same Cloudflare account.
+      "pattern": "watermark.blowmoney.net",
+      "custom_domain": true,
+    },
+  ],
   // Pin the runtime behaviour to a date. Bump deliberately, never silently.
   // Must not exceed the newest date supported by the workerd bundled with
   // @cloudflare/vitest-pool-workers (2026-08-22 as of pool 0.22.0), or the
