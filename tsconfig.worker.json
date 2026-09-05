@@ -1,0 +1,13 @@
+{
+  // Cloudflare Worker: no DOM. Runtime types come from the generated
+  // worker-configuration.d.ts (`npm run cf-typegen`), which also declares the
+  // `Env` interface from wrangler.jsonc bindings. `cloudflare:test` types come
+  // from the vitest pool package for *.workers.test.ts files.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["@cloudflare/vitest-pool-workers/types"],
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo"
+  },
+  "include": ["src/worker", "src/shared", "worker-configuration.d.ts"]
+}

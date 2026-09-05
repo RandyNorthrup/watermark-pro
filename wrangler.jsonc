@@ -1,0 +1,32 @@
+{
+  // Cloudflare Worker configuration. One Worker serves the SPA from Static
+  // Assets and the API from src/worker. Deploys to <name>.<account>.workers.dev;
+  // no custom domain (PLAN.md R15).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "watermark-pro",
+  "main": "src/worker/index.ts",
+  // Pin the runtime behaviour to a date. Bump deliberately, never silently.
+  // Must not exceed the newest date supported by the workerd bundled with
+  // @cloudflare/vitest-pool-workers (2026-08-22 as of pool 0.22.0), or the
+  // Workers test project fails to start.
+  "compatibility_date": "2026-08-22",
+  // Better Auth (M1) needs the Node compatibility layer; enabling it from day
+  // one keeps the runtime identical between M0 and M1 tests.
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    // Everything that is not an API route is served from the asset store
+    // without invoking the Worker; unknown paths fall back to index.html so
+    // client-side routing works on a hard refresh.
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "vars": {
+    // Non-secret configuration. Secrets go in .dev.vars locally and
+    // `wrangler secret put` in production. Every entry here is validated by
+    // src/worker/env.ts on the first request an isolate handles.
+    "APP_ENV": "development",
+  },
+}

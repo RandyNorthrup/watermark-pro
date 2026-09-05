@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Tailwind v4 reads this @theme block and generates utilities
+ * (bg-brand-600, text-ink, rounded-card, …) from it, so the palette is defined
+ * exactly once. Semantic tokens (surface, ink, line) switch with the colour
+ * scheme; brand tokens do not.
+ */
+@theme {
+  --font-sans:
+    'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', menlo, consolas, monospace;
+  --color-brand-50: oklch(97% 0.02 285deg);
+  --color-brand-100: oklch(93% 0.05 285deg);
+  --color-brand-200: oklch(87% 0.09 285deg);
+  --color-brand-300: oklch(79% 0.14 285deg);
+  --color-brand-400: oklch(70% 0.19 285deg);
+  --color-brand-500: oklch(62% 0.22 285deg);
+  --color-brand-600: oklch(55% 0.23 285deg);
+  --color-brand-700: oklch(48% 0.21 285deg);
+  --color-brand-800: oklch(40% 0.17 285deg);
+  --color-brand-900: oklch(33% 0.13 285deg);
+  --color-accent-400: oklch(75% 0.18 320deg);
+  --color-accent-500: oklch(67% 0.22 320deg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px oklch(0% 0 0deg / 6%), 0 12px 32px -12px oklch(0% 0 0deg / 18%);
+}
+
+:root {
+  --surface: oklch(99% 0.004 285deg);
+  --surface-raised: oklch(100% 0 0deg);
+  --ink: oklch(20% 0.02 285deg);
+  --ink-muted: oklch(48% 0.02 285deg);
+  --line: oklch(90% 0.01 285deg);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: oklch(16% 0.015 285deg);
+    --surface-raised: oklch(21% 0.018 285deg);
+    --ink: oklch(95% 0.01 285deg);
+    --ink-muted: oklch(70% 0.015 285deg);
+    --line: oklch(30% 0.015 285deg);
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+}

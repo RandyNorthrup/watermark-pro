@@ -1,0 +1,51 @@
+{
+  // Shared strict compiler options. Every project tsconfig extends this file.
+  // `strict: true` is the well-known flag but it is NOT the strictest setting —
+  // the options after it are deliberately excluded from `strict` because they
+  // break lazy code. They are the ones that actually catch bugs.
+  "compilerOptions": {
+    "strict": true,
+
+    // --- not included in `strict` ---
+    // arr[i] is T | undefined, not T.
+    "noUncheckedIndexedAccess": true,
+    // `{a?: string}` and `{a: string | undefined}` stop being interchangeable.
+    "exactOptionalPropertyTypes": true,
+    // Subclass members that override must say `override`.
+    "noImplicitOverride": true,
+    // obj.foo is an error when foo only exists via an index signature.
+    "noPropertyAccessFromIndexSignature": true,
+
+    // --- unused code (dead-code gate at the compiler level) ---
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    // --- correctness ---
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "forceConsistentCasingInFileNames": true,
+    "useUnknownInCatchVariables": true,
+
+    // --- module hygiene ---
+    // Type-only imports must be written as such; no accidental runtime imports.
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    // Bans enums, namespaces and parameter properties: every TypeScript-only
+    // construct must be erasable so any bundler can strip types without a
+    // type checker. Use `as const` objects and literal unions instead of enums.
+    "erasableSyntaxOnly": true,
+    "moduleDetection": "force",
+    // The one deliberate loosening: type-checking all of node_modules' .d.ts
+    // files is slow and fails on third-party bugs we cannot fix.
+    "skipLibCheck": true,
+
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noEmit": true
+  }
+}

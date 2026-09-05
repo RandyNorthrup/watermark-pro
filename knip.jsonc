@@ -1,0 +1,56 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+
+  // Dead-code gate. Knip reasons across the whole project graph and finds what
+  // ESLint and tsc structurally cannot: unused files, unused exports, and
+  // unused package.json dependencies.
+  //
+  // Run as a gate with `knip --treat-config-hints-as-errors`. Do NOT add
+  // `--strict`: in knip 6 that flag implies `--production`, which drops every
+  // entry that lacks a `!` production suffix and silently analyses almost
+  // nothing (verified 2026-09-05: with --strict only the two entry files were
+  // parsed and a real `zod` import went unseen).
+  //
+  // This file is .jsonc on purpose: knip 6 validates its config strictly and
+  // rejects unknown keys, so pseudo-comment keys are a hard error.
+
+  "entry": [
+    // Route modules are discovered by the router plugin, not imported by hand.
+    "src/client/routes/**/*.tsx",
+  ],
+
+  // CSS is included so `@import` inside stylesheets is followed.
+  "project": ["src/**/*.{ts,tsx,css}", "e2e/**/*.ts"],
+
+  // Packages no source file imports directly. Every entry is a hole in the
+  // unused-dependency check, so each one says why it is here.
+  "ignoreDependencies": [
+    // `import … from 'cloudflare:workers'` is a workerd virtual module; knip
+    // reads the scheme as a package named "cloudflare".
+    "cloudflare",
+  ],
+
+  // System binaries invoked from package.json scripts that are not npm packages.
+  "ignoreBinaries": ["gitleaks", "semgrep"],
+
+  "ignoreExportsUsedInFile": true,
+
+  // Every issue type fails the run (knip exits non-zero on any issue by
+  // default; `rules` documents that nothing is downgraded to a warning).
+  //
+  // `cycles` is deliberately absent. knip 6 has the rule, but against a
+  // deliberately circular pair of modules it reported nothing. dpdm is the
+  // cycle gate (`npm run lint:cycles`).
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "devDependencies": "error",
+    "unlisted": "error",
+    "unresolved": "error",
+    "exports": "error",
+    "types": "error",
+    "duplicates": "error",
+    "binaries": "error",
+    "enumMembers": "error",
+  },
+}

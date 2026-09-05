@@ -1,0 +1,11 @@
+{
+  // Solution-style root: no files of its own, just references. `tsc -b` walks
+  // every referenced project; editors use this file to find the right project
+  // for each source file.
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.client.json" },
+    { "path": "./tsconfig.worker.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}

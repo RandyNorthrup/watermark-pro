@@ -1,0 +1,8 @@
+# Local overrides for Worker variables and secrets. Copy to `.dev.vars`
+# (git-ignored) and fill in real values. Production values are set with
+# `wrangler secret put <NAME>`; non-secret vars live in wrangler.jsonc.
+#
+# Every variable listed here is validated by src/worker/env.ts.
+
+# One of: development | test | staging | production
+APP_ENV=development

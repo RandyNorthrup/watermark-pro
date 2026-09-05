@@ -1,0 +1,19 @@
+{
+  "threshold": 0,
+  "minLines": 8,
+  "minTokens": 60,
+  "reporters": ["console"],
+  "gitignore": true,
+  "absolute": false,
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/.wrangler/**",
+    "**/*.gen.ts",
+    "**/worker-configuration.d.ts",
+    "**/package-lock.json",
+    "**/migrations/**"
+  ],
+  "format": ["typescript", "tsx", "javascript", "css", "json", "yaml"]
+}

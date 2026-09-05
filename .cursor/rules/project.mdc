@@ -1,0 +1,19 @@
+---
+description: Watermark Pro project rules (applies to every file)
+globs: ["**/*"]
+alwaysApply: true
+---
+
+Read AGENTS.md and PLAN.md before changing anything. Summary of the rules:
+
+- Work in PLAN.md milestone order; certify each milestone before the next.
+- Run `npm run quality` before declaring work done; report results honestly.
+- Pin dependencies exactly after checking peer ranges; record in PLAN.md §3.1.
+- No `any`, `!`, `@ts-ignore`, blanket eslint-disable, lowered thresholds, or
+  `--legacy-peer-deps`. Suppressions need an inline reason and a PLAN.md §9 row.
+- No dead code, no magic literals outside `src/shared/constants.ts`, no silent
+  fallbacks, no mock data outside tests and e2e.
+- Validate every boundary input with a Zod schema from `src/shared`.
+- `erasableSyntaxOnly`: no enums, namespaces, or parameter properties.
+- Update CHANGELOG.md (and PLAN.md when decisions change) with the code.
+- Never modify global editor or agent settings from this repository.

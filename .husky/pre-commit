@@ -1,0 +1,4 @@
+# Secrets never reach a commit: scan the staged diff before anything else.
+gitleaks git --pre-commit --staged --redact --no-banner
+# Format and lint only what is staged; the full gate set runs in CI.
+npx lint-staged
