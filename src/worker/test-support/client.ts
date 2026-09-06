@@ -89,6 +89,24 @@ export class TestClient {
       throw new Error(`verification failed: ${String(verify.status)} ${await verify.text()}`)
     }
   }
+
+  /** Creates an organization through Better Auth and returns its id. */
+  async createOrganization(name: string, slug: string): Promise<string> {
+    const response = await this.post('/api/auth/organization/create', { name, slug })
+    if (!response.ok) {
+      throw new Error(`organization create failed: ${String(response.status)}`)
+    }
+    const body: unknown = await response.json()
+    if (
+      typeof body !== 'object' ||
+      body === null ||
+      !('id' in body) ||
+      typeof body.id !== 'string'
+    ) {
+      throw new TypeError('organization create returned no id')
+    }
+    return body.id
+  }
 }
 
 /** Extracts the first URL containing `pathFragment` from the newest mail to `to`. */

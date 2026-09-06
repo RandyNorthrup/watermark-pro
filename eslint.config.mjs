@@ -219,6 +219,13 @@ export default defineEslintConfig(
   },
 
   {
+    // Catalogue data tables (fonts, symbols): every entry is a literal record
+    // and the numbers in it (font weights, glyph geometry) are the data.
+    files: ['src/client/**/catalogue.ts'],
+    rules: { '@typescript-eslint/no-magic-numbers': 'off' },
+  },
+
+  {
     // Test files: assertions and non-null access are idiomatic there, and the
     // expected values in an assertion *are* the meaning — naming them would
     // move the assertion into a constant and make the test a tautology.

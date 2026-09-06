@@ -28,6 +28,13 @@
     // `import … from 'cloudflare:workers'` is a workerd virtual module; knip
     // reads the scheme as a package named "cloudflare".
     "cloudflare",
+    // Font packages are reached through `import.meta.glob` in
+    // src/client/fonts/load.ts, which knip cannot follow. Every catalogue
+    // entry is checked against the installed package on disk by
+    // catalogue.audit.test.ts and actually loaded by preview.browser.test.ts,
+    // so an unused or missing font package still fails the test gate.
+    // (knip compiles any entry containing regex metacharacters as a RegExp.)
+    "^@fontsource(-variable)?/",
   ],
 
   // System binaries invoked from package.json scripts that are not npm packages.

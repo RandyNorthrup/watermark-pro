@@ -18,7 +18,6 @@ const stranger = {
   password: 'strangers password 1',
 }
 
-const createdOrganizationSchema = z.object({ id: z.string() })
 const acceptedInvitationSchema = z.object({
   member: z.object({ id: z.string(), role: z.string() }),
 })
@@ -33,9 +32,7 @@ let harness: TestHarness
 let ownerClient: TestClient
 
 async function createOrganization(client: TestClient, name: string, slug: string) {
-  const response = await client.post('/api/auth/organization/create', { name, slug })
-  expect(response.status).toBe(HTTP_STATUS.ok)
-  return createdOrganizationSchema.parse(await response.json()).id
+  return await client.createOrganization(name, slug)
 }
 
 async function inviteAndAccept(

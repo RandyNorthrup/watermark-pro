@@ -1,0 +1,10 @@
+| Page | Performance | Accessibility | Best practices |
+| --- | --- | --- | --- |
+| `/` | 98 | 100 | 96 |
+| `/login` | 98 | 100 | 96 |
+| `/signup` | 98 | 100 | 96 |
+| `/app` | 96 | 100 | 96 |
+| `/app/members` | 96 | 100 | 96 |
+| `/app/audit` | 97 | 100 | 96 |
+| `/app/library` | 96 | 100 | 96 |
+| `/app/library/new` | 95 | 100 | 96 |

@@ -23,6 +23,14 @@ Object.assign(Element.prototype, {
   scrollIntoView: noop,
 })
 
+// Radix measures trigger sizes with ResizeObserver, which jsdom lacks.
+class ResizeObserverStub {
+  observe = noop
+  unobserve = noop
+  disconnect = noop
+}
+Object.defineProperty(globalThis, 'ResizeObserver', { value: ResizeObserverStub, writable: true })
+
 // Vitest globals are off, so Testing Library cannot register this itself.
 afterEach(() => {
   cleanup()

@@ -59,6 +59,13 @@ export const SENSITIVE_AUTH_PATHS = [
   '/change-password',
 ] as const
 
+/** Library limits. */
+export const MAX_PRESET_NAME_LENGTH = 60
+export const BYTES_PER_MEGABYTE = 1024 * 1024
+export const MAX_LOGO_BYTES = 5 * BYTES_PER_MEGABYTE
+export const MAX_LOGOS_PER_ORGANIZATION = 50
+export const LOGO_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const
+
 /** Font weights the watermark designer offers; variable fonts cover the range. */
 export const FONT_WEIGHTS = [300, 400, 500, 600, 700, 800] as const
 
@@ -74,11 +81,16 @@ export const DEV_MAILBOX_CAPACITY = 20
 /** HTTP status codes used by the API. Named so handlers never carry bare numbers. */
 export const HTTP_STATUS = {
   ok: 200,
+  created: 201,
+  noContent: 204,
   found: 302,
   badRequest: 400,
   unauthorized: 401,
   forbidden: 403,
   notFound: 404,
+  conflict: 409,
+  payloadTooLarge: 413,
+  unsupportedMediaType: 415,
   tooManyRequests: 429,
   internalServerError: 500,
 } as const
@@ -92,6 +104,10 @@ export const API_ERROR_CODE = {
   forbidden: 'forbidden',
   validation: 'validation_failed',
   rateLimited: 'rate_limited',
+  conflict: 'conflict',
+  payloadTooLarge: 'payload_too_large',
+  unsupportedMedia: 'unsupported_media_type',
+  quotaExceeded: 'quota_exceeded',
 } as const
 
 /** One year in seconds; the HSTS max-age recommended by hstspreload.org. */

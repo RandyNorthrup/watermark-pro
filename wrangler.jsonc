@@ -50,6 +50,12 @@
       "migrations_dir": "migrations",
     },
   ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "watermark-pro",
+    },
+  ],
   "ratelimits": [
     // Authoritative limits. src/shared/constants.ts mirrors them so Better
     // Auth reports an accurate Retry-After; keep both in sync.
@@ -98,6 +104,12 @@
           "database_name": "watermark-pro",
           "database_id": "e142b088-c663-4276-bd39-5ded21775fb1",
           "migrations_dir": "migrations",
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "BUCKET",
+          "bucket_name": "watermark-pro",
         },
       ],
       "ratelimits": [

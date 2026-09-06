@@ -1,0 +1,318 @@
+import { beforeEach, describe, expect, it } from 'vitest'
+import { z } from 'zod'
+
+import { findLink, TestClient } from './test-support/client'
+import { createTestHarness, type TestHarness } from './test-support/test-app'
+import {
+  assetDtoSchema,
+  assetListResponseSchema,
+  watermarkDtoSchema,
+  watermarkListResponseSchema,
+} from '../shared/api'
+import {
+  API_ERROR_CODE,
+  HTTP_STATUS,
+  MAX_LOGO_BYTES,
+  MAX_LOGOS_PER_ORGANIZATION,
+} from '../shared/constants'
+import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC, type WatermarkSpec } from '../shared/watermark'
+
+const owner = {
+  name: 'Olivia Owner',
+  email: 'olivia@example.test',
+  password: 'correct horse battery',
+}
+const viewer = {
+  name: 'Vera Viewer',
+  email: 'vera@example.test',
+  password: 'viewers long password',
+}
+const outsider = {
+  name: 'Oscar Outsider',
+  email: 'oscar@example.test',
+  password: 'outsiders long password',
+}
+
+const errorSchema = z.object({ error: z.string() })
+
+/** Smallest valid PNG signature followed by padding; the route only sniffs the prefix. */
+const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0])
+const GIF_BYTES = new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0, 0, 0, 0, 0, 0])
+const TEXT_BYTES = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>')
+
+let harness: TestHarness
+let ownerClient: TestClient
+let organizationId: string
+
+function base(path = ''): string {
+  return `/api/orgs/${organizationId}${path}`
+}
+
+function logoForm(bytes: Uint8Array, name = 'logo.png'): FormData {
+  const form = new FormData()
+  form.append('file', new File([bytes], name, { type: 'image/png' }))
+  form.append('name', 'Brand mark')
+  form.append('width', '64')
+  form.append('height', '32')
+  return form
+}
+
+async function upload(client: TestClient, form: FormData): Promise<Response> {
+  return await client.request(base('/assets'), { method: 'POST', body: form })
+}
+
+async function inviteAndJoin(user: typeof viewer, role: string): Promise<TestClient> {
+  const invite = await ownerClient.post('/api/auth/organization/invite-member', {
+    email: user.email,
+    role,
+    organizationId,
+  })
+  expect(invite.status).toBe(HTTP_STATUS.ok)
+  const acceptPath = findLink(harness.mailbox, user.email, '/accept-invitation/')
+  const client = new TestClient(harness.app, harness.env)
+  await client.signUpAndVerify(harness.mailbox, user)
+  const accept = await client.post('/api/auth/organization/accept-invitation', {
+    invitationId: acceptPath.split('/').at(-1),
+  })
+  expect(accept.status).toBe(HTTP_STATUS.ok)
+  return client
+}
+
+async function getStatus(client: TestClient, path: string): Promise<number> {
+  const response = await client.get(base(path))
+  return response.status
+}
+
+async function uploadStatus(client: TestClient): Promise<number> {
+  const response = await upload(client, logoForm(PNG_BYTES))
+  return response.status
+}
+
+async function errorCode(response: Response): Promise<string> {
+  return errorSchema.parse(await response.json()).error
+}
+
+beforeEach(async () => {
+  harness = createTestHarness()
+  ownerClient = new TestClient(harness.app, harness.env)
+  await ownerClient.signUpAndVerify(harness.mailbox, owner)
+  organizationId = await ownerClient.createOrganization('Acme Studio', 'acme-studio')
+})
+
+describe('watermark presets', () => {
+  it('creates, lists, updates and deletes a preset with an audit trail', async () => {
+    const created = await ownerClient.post(base('/watermarks'), {
+      name: 'Default text',
+      spec: DEFAULT_TEXT_SPEC,
+    })
+    expect(created.status).toBe(HTTP_STATUS.created)
+    const dto = watermarkDtoSchema.parse(await created.json())
+    expect(dto.spec).toEqual(DEFAULT_TEXT_SPEC)
+    expect(dto.organizationId).toBe(organizationId)
+
+    const listed = await ownerClient.get(base('/watermarks'))
+    expect(watermarkListResponseSchema.parse(await listed.json()).watermarks).toHaveLength(1)
+
+    const renamed = await ownerClient.request(base(`/watermarks/${dto.id}`), {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Renamed', spec: DEFAULT_TEXT_SPEC }),
+    })
+    expect(renamed.status).toBe(HTTP_STATUS.ok)
+    expect(watermarkDtoSchema.parse(await renamed.json()).name).toBe('Renamed')
+
+    const removed = await ownerClient.request(base(`/watermarks/${dto.id}`), { method: 'DELETE' })
+    expect(removed.status).toBe(HTTP_STATUS.noContent)
+    const missing = await ownerClient.request(base(`/watermarks/${dto.id}`), { method: 'DELETE' })
+    expect(missing.status).toBe(HTTP_STATUS.notFound)
+
+    const records = await harness.audit.listForOrganization(organizationId)
+    const actions = records.map((record) => record.action)
+    expect(actions).toEqual(
+      expect.arrayContaining(['watermark.created', 'watermark.updated', 'watermark.deleted']),
+    )
+  })
+
+  it('rejects malformed bodies and specs', async () => {
+    const notJson = await ownerClient.request(base('/watermarks'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{not json',
+    })
+    expect(notJson.status).toBe(HTTP_STATUS.badRequest)
+
+    const badSpec = await ownerClient.post(base('/watermarks'), {
+      name: 'Broken',
+      spec: { ...DEFAULT_TEXT_SPEC, style: { ...DEFAULT_STYLE, opacity: 7 } },
+    })
+    expect(badSpec.status).toBe(HTTP_STATUS.badRequest)
+    expect(await errorCode(badSpec)).toBe(API_ERROR_CODE.validation)
+
+    const emptyName = await ownerClient.post(base('/watermarks'), {
+      name: ' '.repeat(3),
+      spec: DEFAULT_TEXT_SPEC,
+    })
+    expect(emptyName.status).toBe(HTTP_STATUS.badRequest)
+  })
+
+  it('refuses image presets that point at logos the organization does not own', async () => {
+    const spec: WatermarkSpec = {
+      kind: 'image',
+      assetId: 'not-ours',
+      placement: { mode: 'smart' },
+      contrast: { mode: 'auto' },
+      style: DEFAULT_STYLE,
+    }
+    const response = await ownerClient.post(base('/watermarks'), { name: 'Logo', spec })
+    expect(response.status).toBe(HTTP_STATUS.badRequest)
+  })
+
+  it('returns 404 when updating a preset that does not exist', async () => {
+    const response = await ownerClient.request(base('/watermarks/nope'), {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'x', spec: DEFAULT_TEXT_SPEC }),
+    })
+    expect(response.status).toBe(HTTP_STATUS.notFound)
+  })
+})
+
+describe('logo assets', () => {
+  it('stores a sniffed image, serves it back, and refuses to delete it while referenced', async () => {
+    const uploaded = await upload(ownerClient, logoForm(PNG_BYTES, 'anything.bin'))
+    expect(uploaded.status).toBe(HTTP_STATUS.created)
+    const asset = assetDtoSchema.parse(await uploaded.json())
+    expect(asset.contentType).toBe('image/png')
+    expect(asset.size).toBe(PNG_BYTES.byteLength)
+    expect(asset.width).toBe(64)
+    expect(harness.objects.keys()).toEqual([`org/${organizationId}/logos/${asset.id}`])
+
+    const listed = await ownerClient.get(base('/assets'))
+    expect(assetListResponseSchema.parse(await listed.json()).assets).toHaveLength(1)
+
+    const file = await ownerClient.get(base(`/assets/${asset.id}/file`))
+    expect(file.status).toBe(HTTP_STATUS.ok)
+    expect(file.headers.get('content-type')).toBe('image/png')
+    expect(file.headers.get('cache-control')).toContain('private')
+    expect(new Uint8Array(await file.arrayBuffer())).toEqual(PNG_BYTES)
+
+    const spec: WatermarkSpec = {
+      kind: 'image',
+      assetId: asset.id,
+      placement: { mode: 'smart' },
+      contrast: { mode: 'auto' },
+      style: DEFAULT_STYLE,
+    }
+    const preset = await ownerClient.post(base('/watermarks'), { name: 'Logo', spec })
+    expect(preset.status).toBe(HTTP_STATUS.created)
+
+    const blocked = await ownerClient.request(base(`/assets/${asset.id}`), { method: 'DELETE' })
+    expect(blocked.status).toBe(HTTP_STATUS.conflict)
+    expect(await errorCode(blocked)).toBe(API_ERROR_CODE.conflict)
+
+    const presetId = watermarkDtoSchema.parse(await preset.json()).id
+    await ownerClient.request(base(`/watermarks/${presetId}`), { method: 'DELETE' })
+    const removed = await ownerClient.request(base(`/assets/${asset.id}`), { method: 'DELETE' })
+    expect(removed.status).toBe(HTTP_STATUS.noContent)
+    expect(harness.objects.keys()).toEqual([])
+    const gone = await ownerClient.get(base(`/assets/${asset.id}/file`))
+    expect(gone.status).toBe(HTTP_STATUS.notFound)
+  })
+
+  it('rejects non-image bytes and unsupported image types regardless of declared type', async () => {
+    const svg = await upload(ownerClient, logoForm(TEXT_BYTES, 'logo.png'))
+    expect(svg.status).toBe(HTTP_STATUS.unsupportedMediaType)
+    const gif = await upload(ownerClient, logoForm(GIF_BYTES, 'logo.png'))
+    expect(gif.status).toBe(HTTP_STATUS.unsupportedMediaType)
+    expect(harness.objects.keys()).toEqual([])
+  })
+
+  it('rejects oversized files and malformed forms', async () => {
+    const declared = await ownerClient.request(base('/assets'), {
+      method: 'POST',
+      headers: { 'content-length': String(MAX_LOGO_BYTES + 1) },
+      body: logoForm(PNG_BYTES),
+    })
+    expect(declared.status).toBe(HTTP_STATUS.payloadTooLarge)
+
+    const big = new Uint8Array(MAX_LOGO_BYTES + 1)
+    big.set(PNG_BYTES)
+    const oversized = await upload(ownerClient, logoForm(big))
+    expect(oversized.status).toBe(HTTP_STATUS.payloadTooLarge)
+
+    const noFile = new FormData()
+    noFile.append('name', 'x')
+    const missing = await upload(ownerClient, noFile)
+    expect(missing.status).toBe(HTTP_STATUS.badRequest)
+
+    const notMultipart = await ownerClient.post(base('/assets'), { file: 'nope' })
+    expect(notMultipart.status).toBe(HTTP_STATUS.badRequest)
+
+    const badDimensions = logoForm(PNG_BYTES)
+    badDimensions.set('width', '-3')
+    const dimensions = await upload(ownerClient, badDimensions)
+    expect(dimensions.status).toBe(HTTP_STATUS.badRequest)
+  })
+
+  it('caps the number of logos per organization', async () => {
+    for (let index = 0; index < MAX_LOGOS_PER_ORGANIZATION; index += 1) {
+      const response = await upload(ownerClient, logoForm(PNG_BYTES))
+      expect(response.status).toBe(HTTP_STATUS.created)
+    }
+    const overflow = await upload(ownerClient, logoForm(PNG_BYTES))
+    expect(overflow.status).toBe(HTTP_STATUS.badRequest)
+    expect(await errorCode(overflow)).toBe(API_ERROR_CODE.quotaExceeded)
+  })
+
+  it('returns 404 for unknown assets', async () => {
+    const file = await ownerClient.get(base('/assets/nope/file'))
+    expect(file.status).toBe(HTTP_STATUS.notFound)
+    const removed = await ownerClient.request(base('/assets/nope'), { method: 'DELETE' })
+    expect(removed.status).toBe(HTTP_STATUS.notFound)
+  })
+})
+
+describe('library access control', () => {
+  it('lets viewers read but not write, and keeps outsiders out entirely', async () => {
+    const viewerClient = await inviteAndJoin(viewer, 'viewer')
+    const outsiderClient = new TestClient(harness.app, harness.env)
+    await outsiderClient.signUpAndVerify(harness.mailbox, outsider)
+    const anonymous = new TestClient(harness.app, harness.env)
+
+    const seeded = await ownerClient.post(base('/watermarks'), {
+      name: 'Seed',
+      spec: DEFAULT_TEXT_SPEC,
+    })
+    const presetId = watermarkDtoSchema.parse(await seeded.json()).id
+
+    expect(await getStatus(viewerClient, '/watermarks')).toBe(HTTP_STATUS.ok)
+    expect(await getStatus(viewerClient, '/assets')).toBe(HTTP_STATUS.ok)
+    const viewerCreate = await viewerClient.post(base('/watermarks'), {
+      name: 'Nope',
+      spec: DEFAULT_TEXT_SPEC,
+    })
+    expect(viewerCreate.status).toBe(HTTP_STATUS.forbidden)
+    expect(await uploadStatus(viewerClient)).toBe(HTTP_STATUS.forbidden)
+    const viewerDelete = await viewerClient.request(base(`/watermarks/${presetId}`), {
+      method: 'DELETE',
+    })
+    expect(viewerDelete.status).toBe(HTTP_STATUS.forbidden)
+
+    expect(await getStatus(outsiderClient, '/watermarks')).toBe(HTTP_STATUS.forbidden)
+    expect(await getStatus(anonymous, '/watermarks')).toBe(HTTP_STATUS.unauthorized)
+    expect(await getStatus(anonymous, '/assets')).toBe(HTTP_STATUS.unauthorized)
+  })
+
+  it('lets editors manage presets and logos', async () => {
+    const editorClient = await inviteAndJoin(
+      { name: 'Eddie Editor', email: 'eddie@example.test', password: 'editors long password' },
+      'editor',
+    )
+    const created = await editorClient.post(base('/watermarks'), {
+      name: 'Editor preset',
+      spec: DEFAULT_TEXT_SPEC,
+    })
+    expect(created.status).toBe(HTTP_STATUS.created)
+    expect(await uploadStatus(editorClient)).toBe(HTTP_STATUS.created)
+  })
+})

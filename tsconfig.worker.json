@@ -5,7 +5,7 @@
   // from the vitest pool package for *.workers.test.ts files.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2023"],
+    "lib": ["ES2025"],
     "types": ["@cloudflare/vitest-pool-workers/types"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo"
   },

@@ -3,8 +3,8 @@ import { HTTPException } from 'hono/http-exception'
 import type { ApiError } from '../shared/api'
 import { API_ERROR_CODE, HTTP_STATUS } from '../shared/constants'
 
-function jsonError(status: number, error: ApiError['error']): Response {
-  const body: ApiError = { error }
+function jsonError(status: number, error: ApiError['error'], details?: unknown): Response {
+  const body: ApiError = details === undefined ? { error } : { error, details }
   return Response.json(body, { status })
 }
 
@@ -21,5 +21,25 @@ export const apiErrors = {
   notFound: () =>
     new HTTPException(HTTP_STATUS.notFound, {
       res: jsonError(HTTP_STATUS.notFound, API_ERROR_CODE.notFound),
+    }),
+  validation: (details: unknown) =>
+    new HTTPException(HTTP_STATUS.badRequest, {
+      res: jsonError(HTTP_STATUS.badRequest, API_ERROR_CODE.validation, details),
+    }),
+  conflict: () =>
+    new HTTPException(HTTP_STATUS.conflict, {
+      res: jsonError(HTTP_STATUS.conflict, API_ERROR_CODE.conflict),
+    }),
+  payloadTooLarge: () =>
+    new HTTPException(HTTP_STATUS.payloadTooLarge, {
+      res: jsonError(HTTP_STATUS.payloadTooLarge, API_ERROR_CODE.payloadTooLarge),
+    }),
+  unsupportedMedia: () =>
+    new HTTPException(HTTP_STATUS.unsupportedMediaType, {
+      res: jsonError(HTTP_STATUS.unsupportedMediaType, API_ERROR_CODE.unsupportedMedia),
+    }),
+  quotaExceeded: () =>
+    new HTTPException(HTTP_STATUS.badRequest, {
+      res: jsonError(HTTP_STATUS.badRequest, API_ERROR_CODE.quotaExceeded),
     }),
 }

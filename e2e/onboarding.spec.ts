@@ -6,8 +6,9 @@
  * Emails are read from the development mailbox endpoint that exists only
  * with the console email provider (never in production).
  */
-import { AxeBuilder } from '@axe-core/playwright'
-import { type APIRequestContext, expect, type Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+
+import { expectAccessible, latestLinkFor, signIn, signUpAndVerify } from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -22,66 +23,12 @@ const viewer = {
 }
 const organizationName = `Acme ${runId}`
 
-interface MailboxMessage {
-  to: string
-  subject: string
-  text: string
-}
-
-async function latestLinkFor(
-  request: APIRequestContext,
-  to: string,
-  fragment: string,
-): Promise<string> {
-  await expect
-    .poll(async () => {
-      const response = await request.get('/api/dev/mailbox')
-      const { messages } = (await response.json()) as { messages: MailboxMessage[] }
-      const match = messages.find((message) => message.to === to && message.text.includes(fragment))
-      return match?.text.match(/https?:\/\/\S+/g)?.find((url) => url.includes(fragment)) ?? null
-    })
-    .not.toBeNull()
-  const response = await request.get('/api/dev/mailbox')
-  const { messages } = (await response.json()) as { messages: MailboxMessage[] }
-  const match = messages.find((message) => message.to === to && message.text.includes(fragment))
-  const url = match?.text
-    .match(/https?:\/\/\S+/g)
-    ?.find((candidate) => candidate.includes(fragment))
-  if (url === undefined) {
-    throw new Error(`no link with ${fragment} for ${to}`)
-  }
-  const parsed = new URL(url)
-  return `${parsed.pathname}${parsed.search}`
-}
-
-async function expectAccessible(page: Page) {
-  const results = await new AxeBuilder({ page }).analyze()
-  expect(results.violations).toEqual([])
-}
-
-async function signUpAndVerify(
-  page: Page,
-  request: APIRequestContext,
-  person: { name: string; email: string; password: string },
-) {
-  await page.goto('/signup')
-  await expectAccessible(page)
-  await page.getByLabel('Name').fill(person.name)
-  await page.getByLabel('Email').fill(person.email)
-  await page.getByLabel('Password').fill(person.password)
-  await page.getByRole('button', { name: 'Create account' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Check your inbox')
-  await expectAccessible(page)
-
-  const verifyPath = await latestLinkFor(request, person.email, '/api/auth/verify-email')
-  await page.goto(verifyPath)
-}
-
 test.describe.configure({ mode: 'serial' })
 
 test('owner signs up, verifies, and creates an organization', async ({ page, request }) => {
   await signUpAndVerify(page, request, owner)
   await expect(page).toHaveURL(/\/app\/organizations\/new/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your first organization')
   await expectAccessible(page)
 
   await page.getByLabel('Name').fill(organizationName)
@@ -103,10 +50,7 @@ test('owner invites a viewer who accepts and is limited to reading', async ({
 }) => {
   await page.goto('/login')
   await expectAccessible(page)
-  await page.getByLabel('Email').fill(owner.email)
-  await page.getByLabel('Password').fill(owner.password)
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(organizationName)
+  await signIn(page, owner, organizationName)
 
   await page.getByRole('link', { name: 'Members' }).first().click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Members')

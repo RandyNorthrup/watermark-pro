@@ -8,6 +8,7 @@ import {
   makeOrganization,
   OWNER,
   seedOwnerWorkspace,
+  seedViewerWorkspace,
   VIEWER,
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
@@ -143,14 +144,7 @@ describe('members page', () => {
   })
 
   it('hides management controls from a viewer', async () => {
-    const organization = makeOrganization('org-1', 'Acme Studio', 'acme-studio')
-    organization.members.push(
-      makeMember(organization.id, OWNER, 'owner'),
-      makeMember(organization.id, VIEWER, 'viewer'),
-    )
-    client().state.user = VIEWER
-    client().state.organizations = [organization]
-    client().state.activeOrganizationId = organization.id
+    seedViewerWorkspace(client())
 
     renderApp('/app/members')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Members')

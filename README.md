@@ -7,9 +7,11 @@ role-based access control. A spiritual competitor to eZy Watermark, MIT
 licensed, hosted on Cloudflare Workers at `watermark.blowmoney.net`.
 
 **Status:** milestones M1 (foundation: accounts, organizations, roles, audit
-trail, design system) and M2 (watermark engine: smart placement, auto
-contrast, tiling, PNG/JPEG/WebP output in a Web Worker) are complete. The
-library, editor, bulk processing, storage and sharing follow. See [PLAN.md](PLAN.md) for the roadmap and
+trail, design system), M2 (watermark engine: smart placement, auto contrast,
+tiling, PNG/JPEG/WebP output in a Web Worker) and M3 (watermark library:
+preset designer with live preview, 51 bundled font families, glyph and icon
+catalogue, logo uploads) are complete. The editor, bulk processing, storage
+and sharing follow. See [PLAN.md](PLAN.md) for the roadmap and
 [CHANGELOG.md](CHANGELOG.md) for what has actually shipped.
 
 ## Stack
@@ -114,17 +116,18 @@ mode; includes the throughput benchmark recorded in `docs/benchmarks.md`),
 
 ## Environment variables and bindings
 
-| Name                 | Kind       | Where                                | Purpose                                                          |
-| -------------------- | ---------- | ------------------------------------ | ---------------------------------------------------------------- |
-| `APP_ENV`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                   |
-| `APP_URL`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard              |
-| `EMAIL_PROVIDER`     | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                        |
-| `EMAIL_FROM`         | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                 |
-| `BETTER_AUTH_SECRET` | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters         |
-| `DB`                 | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log            |
-| `AUTH_RATE_LIMITER`  | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                |
-| `API_RATE_LIMITER`   | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints               |
-| `SEND_EMAIL`         | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare` |
+| Name                 | Kind       | Where                                | Purpose                                                           |
+| -------------------- | ---------- | ------------------------------------ | ----------------------------------------------------------------- |
+| `APP_ENV`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                    |
+| `APP_URL`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard               |
+| `EMAIL_PROVIDER`     | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                         |
+| `EMAIL_FROM`         | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                  |
+| `BETTER_AUTH_SECRET` | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters          |
+| `DB`                 | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log, presets    |
+| `BUCKET`             | R2         | `wrangler.jsonc` `r2_buckets`        | Logo files (and, from M6, photos); never public, streamed via API |
+| `AUTH_RATE_LIMITER`  | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                 |
+| `API_RATE_LIMITER`   | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints                |
+| `SEND_EMAIL`         | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare`  |
 
 Every variable and binding is validated on the first request an isolate
 handles (`src/worker/env.ts`); a misconfigured Worker answers 500 with
@@ -146,16 +149,44 @@ Permissions are declared once in `src/shared/permissions.ts` and enforced by
 the Worker (`requirePermission`); the client uses the same table only to hide
 controls.
 
+## Watermark library
+
+Presets belong to an organization and are shared by all of its members. A
+preset is a mark plus placement, contrast and style settings
+(`src/shared/watermark.ts`):
+
+- **Marks:** text in any of 51 bundled font families (Fontsource, OFL or
+  Apache licensed, latin subset, loaded only when chosen); a Unicode glyph
+  from eight groups (legal, stars, arrows, shapes, checks, nature, objects,
+  currency); one of 70 lucide icons; or an uploaded logo.
+- **Placement:** smart (the engine scores each corner and edge of every
+  photo), a fixed corner, or a custom position.
+- **Contrast:** automatic light or dark ink with an outline that only appears
+  on mid-tone backgrounds, or a manual variant and outline strength.
+- **Style:** opacity, size relative to the photo width, rotation, margin, and
+  tiling with adjustable spacing.
+
+Logos are PNG, JPEG or WebP up to 5 MB, at most 50 per organization. The
+Worker checks the file signature rather than the declared type, stores the
+bytes in R2 under a key that includes the organization id, serves them only
+to signed-in members through `/api/orgs/:orgId/assets/:id/file`, and refuses
+to delete a logo while a preset still references it (HTTP 409).
+
+The designer previews every change through the same Web Worker that will
+process real photos, on a bundled sample scene or on a photo you pick; the
+photo never leaves the browser.
+
 ## Project structure
 
 ```
-src/client/       React SPA: routes/ (file-based), components/ (ui/ primitives), lib/, styles/,
+src/client/       React SPA: routes/ (file-based), components/ (ui/ primitives, designer/),
+                  lib/, styles/, fonts/ (catalogue + loader), symbols/ (glyphs + icons),
                   engine/ (watermark engine: pure analysis + canvas rendering, runs in a Web Worker)
 src/worker/       Hono API on Workers: auth/ (Better Auth), db/ (drizzle schema, D1 stores),
                   email/ (providers), middleware/, routes/, services.ts, env.ts
 src/shared/       constants, permissions, validation and API schemas used by both sides
 migrations/       D1 migrations generated by drizzle-kit
-e2e/              Playwright specs (smoke + onboarding journey)
+e2e/              Playwright specs (smoke, onboarding and library journeys)
 scripts/          Lighthouse and screenshot audits
 docs/             lighthouse/ reports and screenshots/ per milestone
 public/           static files, including _headers for security headers

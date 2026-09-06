@@ -25,6 +25,7 @@ const AUTHENTICATED_PAGES = [
   ['members', '/app/members'],
   ['audit', '/app/audit'],
   ['new-organization', '/app/organizations/new'],
+  ['library', '/app/library'],
 ]
 
 const outputDir = path.join('docs', 'screenshots', MILESTONE)
@@ -77,6 +78,20 @@ try {
     await page.getByLabel('Email').fill('teammate@example.test')
     await page.getByRole('button', { name: 'Send invitation' }).click()
     await page.getByText('Invitation sent to teammate@example.test.').waitFor()
+
+    // A saved preset so the library has content, then the designer with a live preview.
+    await page.goto(`${BASE_URL}/app/library/new`)
+    await page.getByRole('textbox', { name: 'Text' }).fill(`© ${organizationName}`)
+    await page.getByLabel('Font').selectOption('Playfair Display Variable')
+    await page.getByLabel('Preset name').fill('Studio signature')
+    await page.getByRole('img', { name: 'Watermark preview on the subject photo' }).waitFor()
+    await page.waitForLoadState('networkidle')
+    await page.screenshot({
+      path: path.join(outputDir, `designer-${colorScheme}.png`),
+      fullPage: true,
+    })
+    await page.getByRole('button', { name: 'Save preset' }).click()
+    await page.getByRole('link', { name: 'Studio signature' }).waitFor()
 
     for (const [name, pathname] of AUTHENTICATED_PAGES) {
       await page.goto(`${BASE_URL}${pathname}`, { waitUntil: 'networkidle' })
