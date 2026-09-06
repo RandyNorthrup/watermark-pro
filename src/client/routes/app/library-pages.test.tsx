@@ -14,12 +14,7 @@ import { renderApp } from '../../test-support/render-app'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
-vi.mock('../../lib/image-size', () => ({
-  readImageSize: (file: Blob) =>
-    file.type === 'text/plain'
-      ? Promise.reject(new Error('not an image'))
-      : Promise.resolve({ width: 120, height: 60 }),
-}))
+vi.mock('../../lib/image-size', () => import('../../test-support/fake-image-size'))
 
 const client = fakeAuth
 

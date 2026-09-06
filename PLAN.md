@@ -373,12 +373,20 @@ green. No milestone starts before the previous one is certified.
   - [x] every library route has positive and negative RBAC tests
   - [x] bugs found by tests fixed before certification (see §8)
 
-### M4 — Editor
+### M4 — Editor — certified 2026-09-06
 
 - **Goal:** single-image editor with crop, resize, watermark placement, live preview, contrast slider, and apply-from-library.
-- **Scope:** canvas editor component, crop tool with aspect presets, resize with constraint lock, drag/rotate/scale watermark handles, keyboard accessibility, undo/redo.
-- **Tests:** unit tests for crop/resize math; component tests for handles; e2e with axe.
-- **Certification:** gates + Lighthouse on `/editor` + manual visual check recorded.
+- **Scope delivered:** `/app/editor` (optional `?preset=` search, validated with Zod) reachable from the navigation and from every library card. `src/client/editor/geometry.ts` (pure crop and resize arithmetic: clamping, eight aspect presets including the photo's own ratio, handle drags with ratio lock anchored at the opposite corner, minimum crop side, locked and free resize, percentage and long-edge fits, output side limits) and `src/client/editor/state.ts` (document + undo history with `checkpoint` / `set` / `commit` so a drag is one undo step; limit 50). `PreviewRenderer` gained `sourceSize`, `subjectScale`, source-pixel transforms scaled to the preview, and `exportFull` for full-resolution downloads; the engine now reports the mark's box and rotation so handles can be drawn. Components under `src/client/components/editor/`: `MarkOverlay` (drag to move, corner handle to scale, top handle to rotate; arrows, Shift, `+`/`-`, `[`/`]` on the keyboard), `CropOverlay` (eight handles, dimmed surround, thirds grid, arrow keys), watermark panel (preset select, "adjusted for this photo" with revert, placement and style panels shared with the designer), crop panel (aspect presets and numeric fields), resize panel (width/height with proportion lock, 25/50/75 %, fit 1080/2048/4096), export panel (PNG/JPEG/WebP, quality, download). Photos open from disk or by drag-and-drop and never leave the browser; the sample scene is the default subject. Ctrl/Cmd+Z, Ctrl+Shift+Z and Ctrl+Y undo and redo outside form fields.
+- **Tests delivered:** 12 pure tests for geometry and history, 8 overlay tests with synthetic pointer and keyboard events at a non-1:1 display scale, 6 editor page tests through the real router (preset from URL, keyboard placement, undo/redo/revert, square crop and locked resize producing the expected transform, PNG export with the transform, photo open/reject/reset, drag-and-drop, tiled marks hiding the frame, export failure, keyboard shortcuts, empty library), 1 download helper test, 2 more Chromium tests (transforms scaled to a half-size preview and full-size export at 640×400 and 2560×1600), and a Playwright journey that places by keyboard and mouse, crops to 1:1, resizes to 50 %, downloads a real PNG and checks its IHDR is 320×320, with axe on every tool. Total 263 unit/browser tests + 7 workerd + 9 e2e; coverage 93.8 % lines / 85.2 % branches / 90.9 % functions.
+- **Security checks delivered:** no new server surface; photos and exports stay client-side; downloads use a same-origin object URL released immediately.
+- **Performance:** Lighthouse desktop `/app/editor` 95 / 100 / 96 (`docs/lighthouse/m4/summary.md`); preview renders are debounced and stale frames discarded; export re-decodes the original once.
+- **Docs:** README (editor section), CHANGELOG 0.5.0, screenshots under `docs/screenshots/m4/` (editor and crop tool, light and dark).
+- **Certification checklist:**
+  - [x] all gates in §3.2 pass (`npm run quality`, `security:sast`, `test:e2e`)
+  - [x] Lighthouse desktop on all nine pages within §5.5 budgets
+  - [x] visual check: `docs/screenshots/m4/editor-*.png` and `editor-crop-*.png` reviewed (mark frame with handles, crop frame with thirds grid, panels in both themes)
+  - [x] keyboard-only operation of both overlays covered by tests and axe
+  - [x] bugs found by tests fixed before certification (see §8)
 
 ### M5 — Bulk processing and export
 
@@ -487,6 +495,20 @@ Tests that failed first and drove a fix:
 | knip regex entries are compiled with `new RegExp(value)` directly, so the documented `/…/` form never matched                                       | knip configuration hint        | bare pattern `^@fontsource(-variable)?/` with a comment                                                                             |
 
 Gate fire checks in M3: coverage floors refused the first cut (74 % functions, 83.9 % branches) and were satisfied by restructuring rather than lowering; jscpd flagged four real duplicates (shared `parseSaveRequest`, `deleteScoped`, `seedViewerWorkspace`, `TestClient.createOrganization`); knip flagged `FONT_CATEGORY_LABELS`, `DEFAULT_ICON` and three DTO types before they were used; `no-magic-numbers` pushed file signatures into readable Latin-1 strings; `prefer-iterator-to-array` moved the TypeScript `lib` to ES2025 (Iterator helpers are shipped by every supported runtime); axe caught two real accessibility defects listed above.
+
+### M4 (2026-09-06)
+
+Tests that failed first and drove a fix:
+
+| Defect                                                                                                                                         | Caught by                            | Fix                                                                                                |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `useElementSize` took a ref object, so an image that mounted after the first effect run was never measured; overlays stayed hidden             | editor page tests (no overlay found) | hook takes the element from a callback ref and (re)measures whenever it changes                    |
+| jsdom's `ResizeObserver` stub never reported, so the first measurement depended on a synchronous `setState` in an effect (React compiler lint) | React hooks lint + page tests        | stub delivers one entry on `observe`, as the real API does; the hook relies on that first delivery |
+| Page test read the last rendered spec before the preset render replaced the photo-only render (opacity 0) and was flaky under load             | full-suite coverage run              | assertion waits for the preset's opacity                                                           |
+| Resize labels used CSS `capitalize` on lowercase text, so the accessible name was "width (px)"                                                 | page test query                      | explicit label text                                                                                |
+| Playwright `getByRole('link', { name })` matched both the card title and the "Open … in the editor" link                                       | e2e strict-mode violation            | `exact: true` on card title lookups                                                                |
+
+Gate fire checks in M4: coverage refused the first cut at 84.7 % branches and was satisfied with tests for drag, drop, tiled marks and export failure rather than a lower floor; jscpd flagged the duplicated `image-size` mock factory and the crop setup in the editor page test (extracted to `fake-image-size.ts` and a helper); the React compiler lint refused a synchronous `setState` in an effect; unicorn refused an event handler named `useSample` as a hook-like name.
 
 ---
 

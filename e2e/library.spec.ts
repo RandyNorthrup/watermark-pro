@@ -112,7 +112,7 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await page.getByRole('button', { name: 'Save preset' }).click()
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
-  await expect(page.getByRole('link', { name: 'Script signature' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Script signature', exact: true })).toBeVisible()
   await expect(page.getByText(`“© ${organizationName}” in Pacifico`)).toBeVisible()
   await expect(page.getByText('bottom left')).toBeVisible()
 
@@ -134,19 +134,19 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await expectAccessible(page)
   await page.getByLabel('Preset name').fill('Corner logo')
   await page.getByRole('button', { name: 'Save preset' }).click()
-  await expect(page.getByRole('link', { name: 'Corner logo' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
 
-  await page.getByRole('link', { name: 'Script signature' }).click()
+  await page.getByRole('link', { name: 'Script signature', exact: true }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Script signature')
   await expect(page.getByRole('textbox', { name: 'Text' })).toHaveValue(`© ${organizationName}`)
   await expectPreviewRendered(page)
   await page.getByLabel('Preset name').fill('Script signature v2')
   await page.getByRole('button', { name: 'Save changes' }).click()
-  await expect(page.getByRole('link', { name: 'Script signature v2' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Script signature v2', exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: 'Delete Script signature v2' }).click()
-  await expect(page.getByRole('link', { name: 'Script signature v2' })).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Corner logo' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Script signature v2', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
 
   await page.getByRole('link', { name: 'Audit log' }).first().click()
   await expect(page.getByText('watermark.created').first()).toBeVisible()
@@ -171,12 +171,12 @@ test('a viewer can browse presets but cannot change them', async ({ browser, pag
   await viewerPage.getByRole('button', { name: 'Accept invitation' }).click()
   await viewerPage.getByRole('link', { name: 'Library' }).first().click()
   await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
-  await expect(viewerPage.getByRole('link', { name: 'Corner logo' })).toBeVisible()
+  await expect(viewerPage.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
   await expect(viewerPage.getByRole('link', { name: 'New preset' })).toHaveCount(0)
   await expect(viewerPage.getByRole('button', { name: /^Delete / })).toHaveCount(0)
   await expectAccessible(viewerPage)
 
-  await viewerPage.getByRole('link', { name: 'Corner logo' }).click()
+  await viewerPage.getByRole('link', { name: 'Corner logo', exact: true }).click()
   await expect(viewerPage.getByText('Read-only view.')).toBeVisible()
   await expect(viewerPage.getByRole('button', { name: 'Save changes' })).toHaveCount(0)
   await expectPreviewRendered(viewerPage)

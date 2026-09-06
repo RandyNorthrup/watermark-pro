@@ -5,6 +5,7 @@ import {
   ChevronsUpDown,
   LayoutDashboard,
   LogOut,
+  PencilRuler,
   Plus,
   ScrollText,
   Stamp,
@@ -30,6 +31,7 @@ import {
 const NAV_ITEMS = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { to: '/app/library', label: 'Library', icon: Stamp, exact: false },
+  { to: '/app/editor', label: 'Editor', icon: PencilRuler, exact: false },
   { to: '/app/members', label: 'Members', icon: Users, exact: false },
   { to: '/app/audit', label: 'Audit log', icon: ScrollText, exact: false },
 ] as const
