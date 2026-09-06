@@ -53,7 +53,7 @@ the design system. No watermarking yet; that begins in M2.
 - Same-origin guard on every state-changing `/api` request, closing the gap
   left by form-only CSRF checks for JSON bodies.
 - Transactional email behind a provider interface: Cloudflare Email Sending
-  (`send_email` binding, `no-reply@blowmoney.net`) or a console provider for
+  (`send_email` binding, `no-reply@watermark.blowmoney.net`) or a console provider for
   development and tests that also exposes `GET /api/dev/mailbox`. Configuration
   validation refuses the console provider in production.
 - Fail-closed validation of every variable and binding (`APP_URL`,
@@ -82,7 +82,7 @@ the design system. No watermarking yet; that begins in M2.
 
 - Target Cloudflare plan is Workers Paid (owner upgraded on 2026-09-05), which
   lifts the CPU constraint on password hashing and includes Email Sending from
-  `no-reply@blowmoney.net`. PLAN.md A5, A6, A13, Q7, Q8 updated.
+  `no-reply@watermark.blowmoney.net`. PLAN.md A5, A6, A13, Q7, Q8 updated.
 - Production hostname is now the Custom Domain `watermark.blowmoney.net`
   (`routes` in `wrangler.jsonc`); the `workers.dev` subdomain is disabled.
   The owner supplied the domain after the 0.1.0 scaffold, which had assumed

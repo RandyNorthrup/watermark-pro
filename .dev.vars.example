@@ -12,4 +12,4 @@ BETTER_AUTH_SECRET=
 # APP_ENV=development            # development | test | staging | production
 # APP_URL=http://localhost:5173  # public origin used in auth links
 # EMAIL_PROVIDER=console         # console | cloudflare (console is refused in production)
-# EMAIL_FROM=no-reply@blowmoney.net
+# EMAIL_FROM=no-reply@watermark.blowmoney.net

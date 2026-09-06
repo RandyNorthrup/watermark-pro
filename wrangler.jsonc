@@ -37,7 +37,7 @@
     "APP_ENV": "development",
     "APP_URL": "http://localhost:5173",
     "EMAIL_PROVIDER": "console",
-    "EMAIL_FROM": "no-reply@blowmoney.net",
+    "EMAIL_FROM": "no-reply@watermark.blowmoney.net",
   },
   "d1_databases": [
     {
@@ -90,7 +90,7 @@
         "APP_ENV": "production",
         "APP_URL": "https://watermark.blowmoney.net",
         "EMAIL_PROVIDER": "cloudflare",
-        "EMAIL_FROM": "no-reply@blowmoney.net",
+        "EMAIL_FROM": "no-reply@watermark.blowmoney.net",
       },
       "d1_databases": [
         {
