@@ -194,9 +194,11 @@ npx wrangler tail --env production --format pretty
 npx wrangler d1 migrations list watermark-pro --remote --env production
 ```
 
-Email Sending must be authorized for the sender's domain in the Cloudflare
-account (`wrangler email sending list`); until it is, sign-ups succeed but
-verification emails are logged as rejected instead of delivered.
+Email Sending is enabled for `watermark.blowmoney.net`
+(`wrangler email sending list blowmoney.net`); the sender is
+`no-reply@watermark.blowmoney.net`. If a sender domain is ever changed it must
+be enabled the same way first, otherwise sign-ups still succeed but the
+verification email is logged as rejected instead of delivered.
 
 ## Security
 

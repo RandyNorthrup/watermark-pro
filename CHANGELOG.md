@@ -23,11 +23,13 @@ what was planned; superseded entries stay.
 - The top-level wrangler configuration is renamed `watermark-pro-dev` so an
   accidental environment-less deploy cannot overwrite production.
 
-### Known limitation
-
-- Verification emails are not delivered yet: Email Sending is not authorized
-  for `blowmoney.net` in the account (only `projects.blowmoney.net` is). The
-  sender domain decision is open (PLAN.md Q9).
+- Email Sending enabled on `watermark.blowmoney.net` (records created under
+  that subdomain only); sender changed to `no-reply@watermark.blowmoney.net`.
+  Delivery verified against the live Worker.
+- First organization ("Blow Money") and its owner and admin were provisioned
+  directly in the production database on 2026-09-06, each with a verified
+  email and no password; both received a password-setup link. The audit log
+  records the bootstrap as `organization.provisioned`.
 
 ## [0.2.0] - 2026-09-06
 
