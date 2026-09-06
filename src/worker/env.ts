@@ -26,6 +26,7 @@ const envSchema = z
     /** Sender address for transactional email; must belong to a zone in the Cloudflare account. */
     EMAIL_FROM: z.email(),
     DB: bindingSchema<D1Database>('DB'),
+    BUCKET: bindingSchema<R2Bucket>('BUCKET'),
     AUTH_RATE_LIMITER: bindingSchema<RateLimit>('AUTH_RATE_LIMITER'),
     API_RATE_LIMITER: bindingSchema<RateLimit>('API_RATE_LIMITER'),
     SEND_EMAIL: bindingSchema<SendEmail>('SEND_EMAIL').optional(),

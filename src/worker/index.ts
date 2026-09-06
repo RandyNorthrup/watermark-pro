@@ -18,6 +18,7 @@ import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '
 import { requireSameOrigin } from './middleware/same-origin'
 import { auditRoutes } from './routes/audit'
 import { devRoutes } from './routes/dev'
+import { libraryRoutes } from './routes/library'
 import { getServices, type Services } from './services'
 
 export interface CreateAppOptions {
@@ -80,6 +81,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   })
 
   app.route('/api', auditRoutes)
+  app.route('/api', libraryRoutes)
   app.route('/api', devRoutes)
 
   app.notFound((c) => {

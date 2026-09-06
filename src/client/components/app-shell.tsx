@@ -7,6 +7,7 @@ import {
   LogOut,
   Plus,
   ScrollText,
+  Stamp,
   Users,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -28,6 +29,7 @@ import {
 
 const NAV_ITEMS = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { to: '/app/library', label: 'Library', icon: Stamp, exact: false },
   { to: '/app/members', label: 'Members', icon: Users, exact: false },
   { to: '/app/audit', label: 'Audit log', icon: ScrollText, exact: false },
 ] as const

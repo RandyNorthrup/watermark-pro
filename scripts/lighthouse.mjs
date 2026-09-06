@@ -26,7 +26,13 @@ const BASE_URL = process.env.APP_URL ?? 'http://localhost:5173'
 const MILESTONE = process.argv[2] ?? 'm1'
 const BUDGETS = { performance: 0.9, accessibility: 0.95, 'best-practices': 0.95 }
 const PUBLIC_PAGES = ['/', '/login', '/signup']
-const AUTHENTICATED_PAGES = ['/app', '/app/members', '/app/audit']
+const AUTHENTICATED_PAGES = [
+  '/app',
+  '/app/members',
+  '/app/audit',
+  '/app/library',
+  '/app/library/new',
+]
 
 async function api(pathname, init = {}, cookie = '') {
   const response = await fetch(`${BASE_URL}${pathname}`, {
@@ -169,5 +175,12 @@ try {
     process.exitCode = 1
   }
 } finally {
-  await chrome.kill()
+  try {
+    await chrome.kill()
+  } catch (error) {
+    // chrome-launcher removes its temp profile after killing Chrome; on
+    // Windows the process can still hold the directory for a moment. The
+    // audit results are already written, so a cleanup failure is a warning.
+    console.warn(`chrome cleanup failed: ${error instanceof Error ? error.message : String(error)}`)
+  }
 }

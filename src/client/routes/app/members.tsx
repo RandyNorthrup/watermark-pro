@@ -8,7 +8,6 @@ import {
   type AssignableRole,
   isOrganizationRole,
   type OrganizationRole,
-  roles,
 } from '../../../shared/permissions'
 import { inviteMemberSchema } from '../../../shared/validation'
 import { Alert } from '../../components/ui/alert'
@@ -30,6 +29,7 @@ import {
   activeOrganizationQueryOptions,
   ORGANIZATION_QUERY_KEY,
 } from '../../lib/queries'
+import { canRole } from '../../lib/roles'
 import { useAuthMutation } from '../../lib/use-auth-mutation'
 import { useFormErrors } from '../../lib/use-form-errors'
 
@@ -47,14 +47,6 @@ const ROLE_OPTIONS: readonly SelectOption<AssignableRole>[] = ASSIGNABLE_ROLES.m
 
 type InviteValues = z.infer<typeof inviteMemberSchema>
 
-/** Client-side mirror of the server rule set; hides controls, never authorises. */
-function canManageMembers(role: string | null | undefined): boolean {
-  if (role === undefined || role === null || !isOrganizationRole(role)) {
-    return false
-  }
-  return roles[role].authorize({ member: ['update'] }).success
-}
-
 function MembersPage() {
   const { session } = Route.useRouteContext()
   const membership = Route.useLoaderData()
@@ -67,7 +59,7 @@ function MembersPage() {
     return <Alert tone="info">Create or join an organization to manage members.</Alert>
   }
 
-  const isManager = canManageMembers(membership?.role)
+  const isManager = canRole(membership?.role, { member: ['update'] })
   const pendingInvitations = organization.invitations.filter(
     (invitation) => invitation.status === 'pending',
   )

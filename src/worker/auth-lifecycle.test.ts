@@ -16,7 +16,6 @@ const invitee = {
   password: 'editors long password',
 }
 
-const createdOrganizationSchema = z.object({ id: z.string() })
 const invitationSchema = z.object({ id: z.string() })
 const memberSchema = z.object({ member: z.object({ id: z.string() }) })
 
@@ -28,11 +27,7 @@ beforeEach(async () => {
   harness = createTestHarness()
   ownerClient = new TestClient(harness.app, harness.env)
   await ownerClient.signUpAndVerify(harness.mailbox, owner)
-  const created = await ownerClient.post('/api/auth/organization/create', {
-    name: 'Acme Studio',
-    slug: 'acme-studio',
-  })
-  organizationId = createdOrganizationSchema.parse(await created.json()).id
+  organizationId = await ownerClient.createOrganization('Acme Studio', 'acme-studio')
 })
 
 async function actions() {

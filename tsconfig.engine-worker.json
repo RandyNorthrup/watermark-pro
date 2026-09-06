@@ -4,7 +4,7 @@
   // checked under the client project.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2023", "WebWorker"],
+    "lib": ["ES2025", "WebWorker"],
     "types": ["vite/client"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.engine-worker.tsbuildinfo"
   },

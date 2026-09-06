@@ -6,7 +6,8 @@
  */
 import { z } from 'zod'
 
-import { API_ERROR_CODE, APP_ENVIRONMENTS } from './constants'
+import { API_ERROR_CODE, APP_ENVIRONMENTS, MAX_PRESET_NAME_LENGTH } from './constants'
+import { watermarkSpecSchema } from './watermark'
 
 export const healthResponseSchema = z.object({
   status: z.literal('ok'),
@@ -24,6 +25,10 @@ export const apiErrorSchema = z.object({
     API_ERROR_CODE.forbidden,
     API_ERROR_CODE.validation,
     API_ERROR_CODE.rateLimited,
+    API_ERROR_CODE.conflict,
+    API_ERROR_CODE.payloadTooLarge,
+    API_ERROR_CODE.unsupportedMedia,
+    API_ERROR_CODE.quotaExceeded,
   ]),
   details: z.unknown().optional(),
 })
@@ -59,3 +64,54 @@ export const devMailboxResponseSchema = z.object({
 })
 
 export type DevMailboxResponse = z.infer<typeof devMailboxResponseSchema>
+
+export const presetNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Give the preset a name')
+  .max(MAX_PRESET_NAME_LENGTH)
+
+export const saveWatermarkRequestSchema = z.object({
+  name: presetNameSchema,
+  spec: watermarkSpecSchema,
+})
+
+export type SaveWatermarkRequest = z.infer<typeof saveWatermarkRequestSchema>
+
+export const watermarkDtoSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  spec: watermarkSpecSchema,
+  createdBy: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+})
+
+export type WatermarkDto = z.infer<typeof watermarkDtoSchema>
+
+export const watermarkListResponseSchema = z.object({ watermarks: z.array(watermarkDtoSchema) })
+
+export const assetDtoSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  kind: z.literal('logo'),
+  name: z.string(),
+  contentType: z.string(),
+  size: z.number().int().nonnegative(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  createdBy: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+})
+
+export type AssetDto = z.infer<typeof assetDtoSchema>
+
+export const assetListResponseSchema = z.object({ assets: z.array(assetDtoSchema) })
+
+/** Form fields accompanying an upload; dimensions are client-reported. */
+export const assetUploadFieldsSchema = z.object({
+  name: z.string().trim().min(1).max(MAX_PRESET_NAME_LENGTH),
+  width: z.coerce.number().int().positive(),
+  height: z.coerce.number().int().positive(),
+})

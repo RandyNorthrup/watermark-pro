@@ -8,6 +8,8 @@
  */
 import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
+import type { WatermarkSpec } from '../../shared/watermark'
+
 const now = () => new Date()
 
 /** Millisecond timestamp set on insert. */
@@ -177,4 +179,44 @@ export const auditLog = sqliteTable(
   (table) => [
     index('audit_log_organization_id_created_at_idx').on(table.organizationId, table.createdAt),
   ],
+)
+
+/** Saved watermark presets (PLAN.md R3). */
+export const watermark = sqliteTable(
+  'watermark',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    spec: text('spec', { mode: 'json' }).$type<WatermarkSpec>().notNull(),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAtColumn(),
+    updatedAt: updatedAtColumn({ hasInsertDefault: true }),
+  },
+  (table) => [index('watermark_organization_id_idx').on(table.organizationId)],
+)
+
+/** Binary assets owned by an organization; bytes live in R2 under `key`. */
+export const asset = sqliteTable(
+  'asset',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    /** `logo` for watermark images; photos arrive in M6 with their own table. */
+    kind: text('kind').notNull(),
+    name: text('name').notNull(),
+    key: text('key').notNull(),
+    contentType: text('content_type').notNull(),
+    size: integer('size').notNull(),
+    /** Pixel dimensions as reported by the uploading client (display only). */
+    width: integer('width').notNull(),
+    height: integer('height').notNull(),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAtColumn(),
+  },
+  (table) => [index('asset_organization_id_kind_idx').on(table.organizationId, table.kind)],
 )

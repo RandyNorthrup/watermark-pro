@@ -14,6 +14,11 @@ import { validateEnv } from '../env'
 import { createApp } from '../index'
 import type { Services } from '../services'
 import { createMemoryAuditStore } from './memory-audit-store'
+import {
+  createMemoryAssetStore,
+  createMemoryObjectStore,
+  createMemoryWatermarkStore,
+} from './memory-stores'
 
 export const TEST_APP_URL = 'http://localhost:5173'
 export const TEST_SECRET = 'test-secret-with-at-least-thirty-two-characters'
@@ -36,6 +41,7 @@ export function createTestEnv(overrides: Partial<Env> = {}): Env {
     EMAIL_PROVIDER: 'console',
     EMAIL_FROM: 'no-reply@example.test',
     DB: notABinding(),
+    BUCKET: notABinding(),
     SEND_EMAIL: notABinding(),
     AUTH_RATE_LIMITER: notABinding(),
     API_RATE_LIMITER: notABinding(),
@@ -49,6 +55,7 @@ export interface TestHarness {
   services: Services
   mailbox: DevMailbox
   audit: ReturnType<typeof createMemoryAuditStore>
+  objects: ReturnType<typeof createMemoryObjectStore>
 }
 
 export function createTestHarness(): TestHarness {
@@ -73,14 +80,18 @@ export function createTestHarness(): TestHarness {
     rateLimit: unlimitedRateLimitStorage,
     rateLimitEnabled: false,
   })
+  const objects = createMemoryObjectStore()
   const services: Services = {
     config,
     db: notABinding(),
     auth,
     email: mailbox,
     audit,
+    watermarks: createMemoryWatermarkStore(),
+    assets: createMemoryAssetStore(),
+    objects,
     devMailbox: mailbox,
   }
   const app = createApp({ resolveServices: () => services })
-  return { app, env, services, mailbox, audit }
+  return { app, env, services, mailbox, audit, objects }
 }

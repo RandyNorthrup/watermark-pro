@@ -10,11 +10,17 @@ import { type Auth, createAuth } from './auth/auth'
 import { createBindingRateLimitStorage } from './auth/rate-limit'
 import { createDrizzleAuditStore } from './db/audit-store'
 import { createDatabase, type Database } from './db/client'
+import {
+  createDrizzleAssetStore,
+  createDrizzleWatermarkStore,
+  createR2ObjectStore,
+} from './db/library-stores'
 import * as schema from './db/schema'
 import { createCloudflareEmailSender } from './email/cloudflare'
 import { createConsoleEmailSender, type DevMailbox } from './email/console'
 import type { EmailSender } from './email/sender'
 import { validateEnv, type ValidatedEnv } from './env'
+import type { AssetStore, ObjectStore, WatermarkStore } from './stores'
 
 export interface Services {
   config: ValidatedEnv
@@ -22,6 +28,9 @@ export interface Services {
   auth: Auth
   email: EmailSender
   audit: AuditStore
+  watermarks: WatermarkStore
+  assets: AssetStore
+  objects: ObjectStore
   /** Present only with the console email provider (development and test). */
   devMailbox: DevMailbox | undefined
 }
@@ -64,7 +73,17 @@ export function buildServices(config: ValidatedEnv): Services {
     rateLimit: createBindingRateLimitStorage(config.AUTH_RATE_LIMITER, config.API_RATE_LIMITER),
     rateLimitEnabled: true,
   })
-  return { config, db, auth, email, audit, devMailbox }
+  return {
+    config,
+    db,
+    auth,
+    email,
+    audit,
+    watermarks: createDrizzleWatermarkStore(db),
+    assets: createDrizzleAssetStore(db),
+    objects: createR2ObjectStore(config.BUCKET),
+    devMailbox,
+  }
 }
 
 /**

@@ -17,7 +17,7 @@ an acknowledgement within three business days.
 
 Only the `main` branch and the latest tagged release receive fixes.
 
-## Controls in place (milestones M0 and M1)
+## Controls in place (milestones M0 to M3)
 
 - Response headers: CSP, HSTS, `Referrer-Policy`, `Permissions-Policy`,
   `X-Content-Type-Options`, `X-Frame-Options` on both API and static responses.
@@ -45,10 +45,18 @@ Only the `main` branch and the latest tagged release receive fixes.
 - Exact dependency pinning, `min-release-age=7` in `.npmrc`, GitHub Actions
   pinned to commit SHAs, semgrep container pinned by digest.
 - No third-party runtime origins: fonts, scripts, and styles are self-hosted.
+- Logo uploads (M3): type decided by file signature, never by the declared
+  MIME type or extension; size limited before the body is read; per-organization
+  quota; objects stored in R2 under organization-scoped keys, never public,
+  streamed only to signed-in members with `Cache-Control: private`; deletion
+  refused while a preset references the file. Every preset and logo change is
+  audited.
+- Preview rendering happens in the browser's Web Worker; a chosen photo is
+  never uploaded to preview a preset.
 
 ## Controls planned (see `PLAN.md` milestones)
 
-- Upload validation by magic bytes, size, and dimensions (M6).
+- Photo uploads with the same signature, size and quota validation as logos, plus dimension limits (M6).
 - Signed, expiring, revocable share links (M7).
 - Turnstile bot protection on sign-up and an admin console (M8).
 - Production wrangler environment with `APP_ENV=production` (M8).

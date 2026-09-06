@@ -305,6 +305,21 @@ export const VIEWER: FakeUser = {
   image: null,
 }
 
+/** A signed-in viewer in an organization owned by someone else. */
+export function seedViewerWorkspace(
+  client: ReturnType<typeof createFakeAuthClient>,
+): FakeOrganization {
+  const organization = makeOrganization('org-1', 'Acme Studio', 'acme-studio')
+  organization.members.push(
+    makeMember(organization.id, OWNER, 'owner'),
+    makeMember(organization.id, VIEWER, 'viewer'),
+  )
+  client.state.user = VIEWER
+  client.state.organizations = [organization]
+  client.state.activeOrganizationId = organization.id
+  return organization
+}
+
 /** A signed-in owner with one organization that also has a viewer and a pending invitation. */
 export function seedOwnerWorkspace(
   client: ReturnType<typeof createFakeAuthClient>,

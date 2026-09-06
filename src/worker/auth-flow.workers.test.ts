@@ -7,7 +7,6 @@
 import { env } from 'cloudflare:workers'
 
 import { beforeAll, describe, expect, it } from 'vitest'
-import { z } from 'zod'
 
 import { createApp } from './index'
 import { getServices } from './services'
@@ -37,12 +36,7 @@ describe('Better Auth over D1', () => {
   beforeAll(async () => {
     client = new TestClient(app, env)
     await client.signUpAndVerify(mailbox(), owner)
-    const created = await client.post('/api/auth/organization/create', {
-      name: 'D1 Studio',
-      slug: 'd1-studio',
-    })
-    expect(created.status).toBe(HTTP_STATUS.ok)
-    organizationId = z.object({ id: z.string() }).parse(await created.json()).id
+    organizationId = await client.createOrganization('D1 Studio', 'd1-studio')
   })
 
   it('persists the user, session and organization in D1', async () => {

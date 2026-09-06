@@ -7,6 +7,40 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-06
+
+Milestone M3: watermark library, fonts, and symbols.
+
+### Added
+
+- Preset and logo storage: D1 tables `watermark` and `asset` (migration
+  `0001_library.sql`), an R2 bucket binding, and organization-scoped routes
+  under `/api/orgs/:orgId/watermarks` and `/api/orgs/:orgId/assets`, all
+  behind the `watermark` permission (viewers read; editors, admins and
+  owners write) and recorded in the audit log.
+- Logo uploads validated by file signature rather than the declared type,
+  limited to 5 MB and 50 logos per organization, served privately through
+  the Worker, and protected from deletion while a preset references them.
+- Font catalogue of 51 open-licensed Fontsource families across sans,
+  serif, display, script and monospace, loaded on demand per family and
+  weight; a symbol catalogue of eight glyph groups and 70 lucide icons.
+- The preset designer: text, symbol and logo marks; smart, corner or custom
+  placement; automatic or manual contrast; opacity, size, rotation, margin
+  and tiling; a live preview rendered by the engine worker on a bundled
+  sample scene or a photo of the user's choosing; draft retention when
+  switching mark types.
+- Library page listing presets with their kind, placement and contrast, with
+  create, edit and delete for editing roles and a read-only view for viewers.
+- `scripts/lighthouse.mjs` and `scripts/screenshots.mjs` now cover the
+  library and designer.
+
+### Changed
+
+- TypeScript `lib` raised to ES2025 (Iterator helpers) for all projects.
+- `fetchJson` now surfaces the Worker's error code and a user-facing message
+  on `ApiRequestError`; `sendNoContent` handles 204 responses.
+- The members page shares the `canRole` helper with the library.
+
 ## [0.3.0] - 2026-09-06
 
 Milestone M2: watermark engine.
