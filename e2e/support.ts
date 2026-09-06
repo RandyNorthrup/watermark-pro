@@ -5,7 +5,7 @@
 import { deflateSync } from 'node:zlib'
 
 import { AxeBuilder } from '@axe-core/playwright'
-import { type APIRequestContext, expect, type Page } from '@playwright/test'
+import { type APIRequestContext, type Download, expect, type Page } from '@playwright/test'
 
 export interface Person {
   name: string
@@ -130,6 +130,16 @@ export function pngFixture(width: number, height: number, rgb: [number, number, 
     pngChunk('IDAT', deflateSync(raw)),
     pngChunk('IEND', new Uint8Array(0)),
   ])
+}
+
+/** Collects a Playwright download into memory. */
+export async function downloadBytes(download: Download): Promise<Buffer> {
+  const stream = await download.createReadStream()
+  const chunks: Uint8Array[] = []
+  for await (const piece of stream) {
+    chunks.push(new Uint8Array(piece as Uint8Array))
+  }
+  return Buffer.concat(chunks)
 }
 
 /** Width and height from a PNG's IHDR chunk. */

@@ -8,7 +8,7 @@
 import { memoryAdapter } from 'better-auth/adapters/memory'
 
 import { createAuth } from '../auth/auth'
-import { unlimitedRateLimitStorage } from '../auth/rate-limit'
+import { type RateLimitStorage, unlimitedRateLimitStorage } from '../auth/rate-limit'
 import { createConsoleEmailSender, type DevMailbox } from '../email/console'
 import { validateEnv } from '../env'
 import { createApp } from '../index'
@@ -18,6 +18,7 @@ import {
   createMemoryAssetStore,
   createMemoryObjectStore,
   createMemoryPhotoStore,
+  createMemoryShareStore,
   createMemoryWatermarkStore,
 } from './memory-stores'
 
@@ -59,7 +60,12 @@ export interface TestHarness {
   objects: ReturnType<typeof createMemoryObjectStore>
 }
 
-export function createTestHarness(): TestHarness {
+export interface TestHarnessOptions {
+  /** Replaces the never-limiting default, for tests that exercise 429 paths. */
+  rateLimit?: RateLimitStorage | undefined
+}
+
+export function createTestHarness(options: TestHarnessOptions = {}): TestHarness {
   const env = createTestEnv()
   const config = validateEnv(env)
   const mailbox = createConsoleEmailSender()
@@ -91,7 +97,9 @@ export function createTestHarness(): TestHarness {
     watermarks: createMemoryWatermarkStore(),
     assets: createMemoryAssetStore(),
     photos: createMemoryPhotoStore(),
+    shares: createMemoryShareStore(),
     objects,
+    rateLimit: options.rateLimit ?? unlimitedRateLimitStorage,
     devMailbox: mailbox,
   }
   const app = createApp({ resolveServices: () => services })

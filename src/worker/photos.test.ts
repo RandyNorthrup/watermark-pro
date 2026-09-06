@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { errorCodeOf, findLink, signUpOwner, TestClient } from './test-support/client'
+import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
 import {
   photoDeleteResponseSchema,
@@ -261,18 +261,7 @@ describe('photo storage', () => {
 describe('photo access control', () => {
   it('lets viewers read but not upload or delete, and keeps outsiders out', async () => {
     const photo = await uploadPhoto('Seed')
-    const invite = await ownerClient.post('/api/auth/organization/invite-member', {
-      email: viewer.email,
-      role: 'viewer',
-      organizationId,
-    })
-    expect(invite.status).toBe(HTTP_STATUS.ok)
-    const acceptPath = findLink(harness.mailbox, viewer.email, '/accept-invitation/')
-    const viewerClient = new TestClient(harness.app, harness.env)
-    await viewerClient.signUpAndVerify(harness.mailbox, viewer)
-    await viewerClient.post('/api/auth/organization/accept-invitation', {
-      invitationId: acceptPath.split('/').at(-1),
-    })
+    const viewerClient = await joinAsMember(harness, ownerClient, organizationId, viewer, 'viewer')
 
     const listed = await viewerClient.get(base('/photos'))
     expect(listed.status).toBe(HTTP_STATUS.ok)

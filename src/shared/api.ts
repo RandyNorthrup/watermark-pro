@@ -13,6 +13,8 @@ import {
   MAX_CURSOR_LENGTH,
   MAX_PHOTO_NAME_LENGTH,
   MAX_PHOTO_SIDE,
+  MAX_SHARE_PHOTOS,
+  SHARE_EXPIRY_DAYS,
   MAX_PRESET_NAME_LENGTH,
 } from './constants'
 import { watermarkSpecSchema } from './watermark'
@@ -172,3 +174,46 @@ export const storageUsageSchema = z.object({
   maxCount: z.number().int().positive(),
   maxBytes: z.number().int().positive(),
 })
+
+export const shareCreateRequestSchema = z.object({
+  title: z.string().trim().min(1).max(MAX_PHOTO_NAME_LENGTH),
+  photoIds: z.array(z.string().min(1)).min(1).max(MAX_SHARE_PHOTOS),
+  /** Days until the link expires; omitted means never. */
+  expiresInDays: z.union(SHARE_EXPIRY_DAYS.map((days) => z.literal(days))).optional(),
+})
+
+export type ShareCreateRequest = z.infer<typeof shareCreateRequestSchema>
+
+export const shareDtoSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  title: z.string(),
+  photoCount: z.number().int().nonnegative(),
+  expiresAt: z.iso.datetime().nullable(),
+  revokedAt: z.iso.datetime().nullable(),
+  createdBy: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+  /** Absolute public URL of the link. */
+  url: z.url(),
+})
+
+export type ShareDto = z.infer<typeof shareDtoSchema>
+
+export const shareListResponseSchema = z.object({ shares: z.array(shareDtoSchema) })
+
+const sharedPhotoSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  contentType: z.string(),
+})
+
+/** What a visitor with a valid token can see. */
+export const publicShareSchema = z.object({
+  title: z.string(),
+  expiresAt: z.iso.datetime().nullable(),
+  photos: z.array(sharedPhotoSchema),
+})
+
+export type PublicShare = z.infer<typeof publicShareSchema>

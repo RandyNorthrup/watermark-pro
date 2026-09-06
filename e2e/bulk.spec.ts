@@ -7,7 +7,7 @@
 import { expect, test } from '@playwright/test'
 import { unzipSync } from 'fflate'
 
-import { createWorkspace, expectAccessible, pngFixture, pngSize } from './support'
+import { createWorkspace, downloadBytes, expectAccessible, pngFixture, pngSize } from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -65,12 +65,7 @@ test('watermarks twenty photos and downloads them as a ZIP', async ({ page, requ
   await page.getByRole('button', { name: `Download ${String(FIXTURES)} as ZIP` }).click()
   const download = await downloadPromise
   expect(download.suggestedFilename()).toBe(`watermarked-${String(FIXTURES)}-photos.zip`)
-  const stream = await download.createReadStream()
-  const chunks: Uint8Array[] = []
-  for await (const piece of stream) {
-    chunks.push(new Uint8Array(piece as Uint8Array))
-  }
-  const files = unzipSync(Buffer.concat(chunks))
+  const files = unzipSync(await downloadBytes(download))
   const names = Object.keys(files).toSorted((a, b) => a.localeCompare(b))
   expect(names).toHaveLength(FIXTURES)
   expect(names[0]).toBe('shot-01-watermarked.png')

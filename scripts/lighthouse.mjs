@@ -104,12 +104,47 @@ async function createSession() {
   if (refreshed !== '') {
     cookie = refreshed
   }
-  return cookie
+  return { cookie, organizationId: id }
+}
+
+/** Smallest valid PNG: 1×1 opaque pixel; enough for the signature check and a thumbnail. */
+const TINY_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'base64',
+)
+
+/** Stores one photo and publishes it, so the public share page has content to audit. */
+async function createSharePath(cookie, organizationId) {
+  const form = new FormData()
+  form.append('file', new Blob([TINY_PNG], { type: 'image/png' }), 'audit.png')
+  form.append('thumbnail', new Blob([TINY_PNG], { type: 'image/png' }), 'thumb.png')
+  form.append('name', 'Lighthouse photo')
+  form.append('width', '1')
+  form.append('height', '1')
+  const uploaded = await fetch(`${BASE_URL}/api/orgs/${organizationId}/photos`, {
+    method: 'POST',
+    headers: { origin: BASE_URL, cookie },
+    body: form,
+  })
+  if (!uploaded.ok) {
+    throw new Error(`photo upload failed: ${uploaded.status}`)
+  }
+  const photo = await uploaded.json()
+  const shared = await api(
+    `/api/orgs/${organizationId}/shares`,
+    { method: 'POST', body: JSON.stringify({ title: 'Lighthouse album', photoIds: [photo.id] }) },
+    cookie,
+  )
+  if (!shared.ok) {
+    throw new Error(`share create failed: ${shared.status}`)
+  }
+  const share = await shared.json()
+  return new URL(share.url).pathname
 }
 
 const MAX_ATTEMPTS = 3
 
-async function audit(chrome, pathname, cookie, attempt = 1) {
+async function audit(chrome, pathname, cookie, attempt = 1, slugOverride = null) {
   // PLAN.md §5.5 budgets are desktop numbers: Lighthouse's desktop preset
   // (40 ms RTT, 10 Mbps, no CPU slowdown) rather than the default mobile one.
   const result = await lighthouse(
@@ -130,14 +165,15 @@ async function audit(chrome, pathname, cookie, attempt = 1) {
     // Trace capture occasionally fails (NO_NAVSTART); Lighthouse itself says to rerun.
     if (attempt < MAX_ATTEMPTS) {
       console.warn(`retrying ${pathname}: ${result.lhr.runtimeError.code}`)
-      return await audit(chrome, pathname, cookie, attempt + 1)
+      return await audit(chrome, pathname, cookie, attempt + 1, slugOverride)
     }
     throw new Error(`${pathname}: ${result.lhr.runtimeError.message}`)
   }
   const scores = Object.fromEntries(
     Object.entries(result.lhr.categories).map(([key, category]) => [key, category.score ?? 0]),
   )
-  const slug = pathname === '/' ? 'home' : pathname.replaceAll('/', '-').replace(/^-/, '')
+  const slug =
+    slugOverride ?? (pathname === '/' ? 'home' : pathname.replaceAll('/', '-').replace(/^-/, ''))
   const reportDir = path.join('docs', 'lighthouse', MILESTONE)
   await mkdir(reportDir, { recursive: true })
   await writeFile(path.join(reportDir, `${slug}.html`), result.report)
@@ -148,7 +184,7 @@ const chrome = await launch({
   chromeFlags: ['--headless=new', '--no-first-run', '--disable-gpu'],
 })
 try {
-  const cookie = await createSession()
+  const { cookie, organizationId } = await createSession()
   const rows = []
   let hasFailure = false
   for (const pathname of PUBLIC_PAGES) {
@@ -157,6 +193,8 @@ try {
   for (const pathname of AUTHENTICATED_PAGES) {
     rows.push([pathname, await audit(chrome, pathname, cookie)])
   }
+  const sharePath = await createSharePath(cookie, organizationId)
+  rows.push(['/share/<token>', await audit(chrome, sharePath, '', 1, 'share-token')])
   const summary = [
     '| Page | Performance | Accessibility | Best practices |',
     '| --- | --- | --- | --- |',

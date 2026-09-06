@@ -251,3 +251,28 @@ export const photo = sqliteTable(
     index('photo_organization_id_preset_id_idx').on(table.organizationId, table.presetId),
   ],
 )
+
+/**
+ * Share links (PLAN.md R7): a set of photo ids published under a signed
+ * token. The token is derived from `id` and `expiresAt`, so nothing secret
+ * is stored; `revokedAt` closes the link regardless of the token.
+ */
+export const share = sqliteTable(
+  'share',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    photoIds: text('photo_ids', { mode: 'json' }).$type<string[]>().notNull(),
+    /** Unix seconds; 0 means the link never expires. */
+    expiresAt: integer('expires_at').notNull(),
+    revokedAt: integer('revoked_at', { mode: 'timestamp_ms' }),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAtColumn(),
+  },
+  (table) => [
+    index('share_organization_id_created_at_idx').on(table.organizationId, table.createdAt),
+  ],
+)

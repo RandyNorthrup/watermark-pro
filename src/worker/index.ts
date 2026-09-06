@@ -20,6 +20,7 @@ import { auditRoutes } from './routes/audit'
 import { devRoutes } from './routes/dev'
 import { libraryRoutes } from './routes/library'
 import { photoRoutes } from './routes/photos'
+import { shareRoutes } from './routes/shares'
 import { getServices, type Services } from './services'
 
 export interface CreateAppOptions {
@@ -84,6 +85,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   app.route('/api', auditRoutes)
   app.route('/api', libraryRoutes)
   app.route('/api', photoRoutes)
+  app.route('/api', shareRoutes)
   app.route('/api', devRoutes)
 
   app.notFound((c) => {

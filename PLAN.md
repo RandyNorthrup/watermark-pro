@@ -419,12 +419,20 @@ green. No milestone starts before the previous one is certified.
   - [x] screenshots in light and dark under `docs/screenshots/m6/`
   - [x] bugs found by tests fixed before certification (see §8)
 
-### M7 — Sharing
+### M7 — Sharing — certified 2026-09-06
 
 - **Goal:** share individual photos or albums via revocable, expiring links and the Web Share API.
-- **Scope:** share-link table, signed token, public view route with its own strict CSP, revoke UI, audit entries.
-- **Tests:** expired/revoked/tampered token negatives; role tests.
-- **Certification:** gates + Lighthouse on the public share page.
+- **Scope delivered:** D1 table `share` (migration `0003_shares.sql`: title, photo ids, `expires_at` in unix seconds with 0 for never, `revoked_at`). `src/worker/share-token.ts`: tokens are `<id>.<expiresAt>.<HMAC-SHA-256>` signed with a key derived from the application secret, so nothing secret is stored, the link can be shown again later, expiry is checked before the database, and revocation is a database check on the id. `src/worker/routes/shares.ts`: `GET/POST /api/orgs/:orgId/shares` and `POST …/shares/:id/revoke` behind the `share` permission (owners, admins and editors; photo ids must belong to the organization, at most 200, expiry 1/7/30 days or never), and the public `GET /api/share/:token`, `…/photos/:photoId/file` and `…/thumbnail`, which carry no session, are rate limited per address through the shared limiter (429 with `Retry-After`), serve only photos inside the share, and answer every refusal (expired, revoked, tampered, unknown, foreign photo) with the same 404. Audit entries `share.created` and `share.revoked`. Client: the gallery's Share button for a selection and the lightbox's Share for one photo open a dialog (title, expiry, Create link, Copy link, Share… through `navigator.share` with clipboard fallback); `/app/shares` lists links with active / expired / revoked status, copy, share and revoke; the public `/share/:token` page (no session, neutral "not available" message) shows the album with thumbnails, a lightbox with download, and a "Share this link" button. The public page is served by the same SPA under the global CSP (`public/_headers`), which already forbids inline and third-party script; a per-route CSP is not possible for a single-page app and not needed.
+- **Tests delivered:** 3 token tests (round trip and determinism, expired / tampered id / tampered expiry / tampered signature / extra part / bad expiry / bad id / bad base64 / empty, malformed claims), 5 route tests (publish and anonymous view, file and thumbnail, foreign photo refused, list, audit; unknown photos, empty, oversized, bad expiry and bad JSON; expired, extended-expiry, tampered, unknown and revoked tokens plus double revoke; per-address rate limiting with `Retry-After`; viewer and anonymous access), 1 workerd test over real D1 (create, public view and file, revoke), 7 page tests (create a link for a selection with 30-day expiry and copy it, single-photo never-expiring link from the lightbox, sharing hidden from viewers, shares page statuses / copy / revoke, empty state and viewer block, public album with lightbox and share button, unavailable link), and a Playwright journey (publish from the gallery, visitor in a cookie-less context views and downloads the PNG, cannot reach other routes or a tampered token, owner revokes, visitor is shut out, audit) with axe on the dialog, the shares page and the public page in both states. Total 304 unit/browser + 9 workerd + 12 e2e; coverage 94.0 % lines / 85.6 % branches / 92.2 % functions.
+- **Security checks delivered:** HMAC-signed tokens with constant-time verification, expiry in the token and revocation in the database, one 404 for every refusal, per-address rate limiting on public routes, photos served only when listed in the share, `no-store` on the album JSON, RBAC negatives for create / list / revoke, audit entries.
+- **Performance:** Lighthouse desktop on the public page 97 / 100 / 96 (`docs/lighthouse/m7/summary.md`); album JSON is one query plus a `findMany` on the listed ids.
+- **Docs:** README (sharing section), CHANGELOG 0.8.0, SECURITY.md, screenshots under `docs/screenshots/m7/` (share dialog, shares page, public album, light and dark).
+- **Certification checklist:**
+  - [x] all gates in §3.2 pass (`npm run quality`, `security:sast`, `test:e2e`)
+  - [x] expired / revoked / tampered token negatives and role tests
+  - [x] Lighthouse desktop on all twelve pages within §5.5 budgets
+  - [x] screenshots in light and dark under `docs/screenshots/m7/`
+  - [x] bugs found by tests fixed before certification (see §8)
 
 ### M8 — Enterprise hardening and release
 
@@ -554,6 +562,20 @@ Tests that failed first and drove a fix:
 | `formatBytes` duplicated between the bulk tool and the gallery                                        | lint (magic numbers) + jscpd | `lib/format-bytes.ts`                                                     |
 
 Gate fire checks in M6: knip flagged `StorageUsageDto`, `PhotoListResponse` and `PhotoPresetRef` as unused (removed) and a duplicate constant expression; the quota test proved uploads are refused at the byte limit without touching R2; the viewer test proved uploads and deletes are refused while reads succeed.
+
+### M7 (2026-09-06)
+
+Tests that failed first and drove a fix:
+
+| Defect                                                                                                      | Caught by                    | Fix                                                     |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------- |
+| The share dialog's title input overrode the `Field` id, so the label pointed at nothing                     | page test (`getByLabelText`) | id comes from `Field`                                   |
+| `user-event` installs its own clipboard stub on setup, hiding the test's spy                                | page tests                   | the spy is installed after `userEvent.setup()`          |
+| Headless Chromium denies clipboard writes, so "Copy link" reported an error in e2e                          | share e2e                    | clipboard permissions granted in `playwright.config.ts` |
+| `getByLabel('Link')` and `getByLabel('Title')` matched "Copy link" and "Preset name"                        | share e2e strict mode        | `exact: true`                                           |
+| Download readers, the viewer-join fixture and the newest-first sort were duplicated across specs and stores | jscpd                        | `downloadBytes`, `joinAsMember`, `newestFirst` helpers  |
+
+Gate fire checks in M7: the token test proved a signature over a different expiry is refused even though it verifies, the route test proved the rate limiter answers 429 with `Retry-After` for a blocked address and 200 for another, and the e2e proved a cookie-less visitor cannot reach organization routes or a tampered token.
 
 ---
 

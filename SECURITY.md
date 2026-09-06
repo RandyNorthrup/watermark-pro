@@ -58,6 +58,13 @@ Only the `main` branch and the latest tagged release receive fixes.
   per-organization photo and byte quotas; objects live under
   organization-scoped R2 keys, are served only to signed-in members with
   `Cache-Control: private`, and every upload and deletion is audited.
+- Share links (M7): tokens are `<id>.<expiry>.<HMAC-SHA-256>` signed with a
+  key derived from the application secret and verified in constant time;
+  expiry is enforced from the token and revocation from the database; the
+  public routes carry no session, are rate limited per address, serve only
+  the photos listed in the share, return one neutral 404 for expired,
+  revoked, tampered and unknown tokens, and mark the album JSON `no-store`.
+  Creating and revoking links needs the `share` permission and is audited.
 - The editor (M4) and bulk tool (M5) keep photos and exports on the device:
   files are decoded in the browser, rendered in workers, zipped in memory,
   and downloaded through a same-origin object URL that is revoked
@@ -65,7 +72,6 @@ Only the `main` branch and the latest tagged release receive fixes.
 
 ## Controls planned (see `PLAN.md` milestones)
 
-- Signed, expiring, revocable share links (M7).
 - Turnstile bot protection on sign-up and an admin console (M8).
 - Production wrangler environment with `APP_ENV=production` (M8).
 

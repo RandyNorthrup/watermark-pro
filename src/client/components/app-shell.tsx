@@ -10,6 +10,7 @@ import {
   PencilRuler,
   Plus,
   ScrollText,
+  Share2,
   Stamp,
   Users,
 } from 'lucide-react'
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
   { to: '/app/editor', label: 'Editor', icon: PencilRuler, exact: false },
   { to: '/app/bulk', label: 'Bulk', icon: Layers, exact: false },
   { to: '/app/gallery', label: 'Gallery', icon: Images, exact: false },
+  { to: '/app/shares', label: 'Shares', icon: Share2, exact: false },
   { to: '/app/members', label: 'Members', icon: Users, exact: false },
   { to: '/app/audit', label: 'Audit log', icon: ScrollText, exact: false },
 ] as const
