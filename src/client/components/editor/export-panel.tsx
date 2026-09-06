@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { Download, Images } from 'lucide-react'
 import { useState } from 'react'
 
 import { FORMAT_OPTIONS } from './formats'
@@ -13,6 +13,9 @@ interface ExportPanelProps {
   isReady: boolean
   isExporting: boolean
   onExport: (options: EncodeOptions) => void
+  /** Present when the user may store photos in the gallery. */
+  onSave?: ((options: EncodeOptions) => void) | undefined
+  isSaving?: boolean | undefined
 }
 
 const DEFAULT_QUALITY = 0.9
@@ -25,7 +28,14 @@ function isOutputFormat(value: string): value is OutputFormat {
 }
 
 /** Format and quality for the download. */
-export function ExportPanel({ outputSize, isReady, isExporting, onExport }: ExportPanelProps) {
+export function ExportPanel({
+  outputSize,
+  isReady,
+  isExporting,
+  onExport,
+  onSave,
+  isSaving = false,
+}: ExportPanelProps) {
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
   const isLossy = format !== 'image/png'
@@ -60,18 +70,33 @@ export function ExportPanel({ outputSize, isReady, isExporting, onExport }: Expo
         {String(outputSize.width)} × {String(outputSize.height)} px
         {isLossy ? '' : '; PNG is lossless'}. Rendered in your browser at full resolution.
       </p>
-      <Button
-        type="button"
-        isPending={isExporting}
-        disabled={!isReady}
-        className="self-start"
-        onClick={() => {
-          onExport({ format, quality })
-        }}
-      >
-        {isExporting ? null : <Download aria-hidden="true" className="size-4" />}
-        Download
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          isPending={isExporting}
+          disabled={!isReady || isSaving}
+          onClick={() => {
+            onExport({ format, quality })
+          }}
+        >
+          {isExporting ? null : <Download aria-hidden="true" className="size-4" />}
+          Download
+        </Button>
+        {onSave === undefined ? null : (
+          <Button
+            type="button"
+            variant="secondary"
+            isPending={isSaving}
+            disabled={!isReady || isExporting}
+            onClick={() => {
+              onSave({ format, quality })
+            }}
+          >
+            {isSaving ? null : <Images aria-hidden="true" className="size-4" />}
+            Save to gallery
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

@@ -10,7 +10,13 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { createApp } from './index'
 import { getServices } from './services'
-import { assetDtoSchema, watermarkDtoSchema, watermarkListResponseSchema } from '../shared/api'
+import {
+  assetDtoSchema,
+  photoDtoSchema,
+  photoListResponseSchema,
+  watermarkDtoSchema,
+  watermarkListResponseSchema,
+} from '../shared/api'
 import { HTTP_STATUS } from '../shared/constants'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC } from '../shared/watermark'
 import { TestClient } from './test-support/client'
@@ -103,5 +109,48 @@ describe('library over D1 and R2', () => {
     })
     expect(removed.status).toBe(HTTP_STATUS.noContent)
     expect(await env.BUCKET.get(`org/${organizationId}/logos/${asset.id}`)).toBeNull()
+  })
+
+  it('stores photos with thumbnails, pages and searches them, and deletes in bulk', async () => {
+    const ids: string[] = []
+    for (const name of ['Alpha shot', 'Beta shot', 'Gamma 100%']) {
+      const form = new FormData()
+      form.append('file', new File([PNG_BYTES], 'photo.png', { type: 'image/png' }))
+      form.append('thumbnail', new File([PNG_BYTES], 'thumb.png', { type: 'image/png' }))
+      form.append('name', name)
+      form.append('width', '20')
+      form.append('height', '10')
+      const uploaded = await client.request(`/api/orgs/${organizationId}/photos`, {
+        method: 'POST',
+        body: form,
+      })
+      expect(uploaded.status).toBe(HTTP_STATUS.created)
+      ids.push(photoDtoSchema.parse(await uploaded.json()).id)
+    }
+    const rows = await getServices(env).db.query.photo.findMany()
+    expect(rows).toHaveLength(3)
+    const first = ids[0] ?? ''
+    expect(await env.BUCKET.get(`org/${organizationId}/photos/${first}`)).not.toBeNull()
+    expect(await env.BUCKET.get(`org/${organizationId}/thumbnails/${first}`)).not.toBeNull()
+
+    const listed = await client.get(`/api/orgs/${organizationId}/photos`)
+    const page = photoListResponseSchema.parse(await listed.json())
+    expect(page.photos.map((photo) => photo.name)).toEqual([
+      'Gamma 100%',
+      'Beta shot',
+      'Alpha shot',
+    ])
+
+    const searched = await client.get(`/api/orgs/${organizationId}/photos?search=100%25`)
+    expect(photoListResponseSchema.parse(await searched.json()).photos.map((p) => p.name)).toEqual([
+      'Gamma 100%',
+    ])
+
+    const removed = await client.post(`/api/orgs/${organizationId}/photos/delete`, {
+      ids: ids.slice(0, 2),
+    })
+    expect(removed.status).toBe(HTTP_STATUS.ok)
+    expect(await env.BUCKET.get(`org/${organizationId}/photos/${first}`)).toBeNull()
+    expect(await getServices(env).db.query.photo.findMany()).toHaveLength(1)
   })
 })

@@ -12,6 +12,7 @@ import { createDrizzleAuditStore } from './db/audit-store'
 import { createDatabase, type Database } from './db/client'
 import {
   createDrizzleAssetStore,
+  createDrizzlePhotoStore,
   createDrizzleWatermarkStore,
   createR2ObjectStore,
 } from './db/library-stores'
@@ -20,7 +21,7 @@ import { createCloudflareEmailSender } from './email/cloudflare'
 import { createConsoleEmailSender, type DevMailbox } from './email/console'
 import type { EmailSender } from './email/sender'
 import { validateEnv, type ValidatedEnv } from './env'
-import type { AssetStore, ObjectStore, WatermarkStore } from './stores'
+import type { AssetStore, ObjectStore, PhotoStore, WatermarkStore } from './stores'
 
 export interface Services {
   config: ValidatedEnv
@@ -30,6 +31,7 @@ export interface Services {
   audit: AuditStore
   watermarks: WatermarkStore
   assets: AssetStore
+  photos: PhotoStore
   objects: ObjectStore
   /** Present only with the console email provider (development and test). */
   devMailbox: DevMailbox | undefined
@@ -81,6 +83,7 @@ export function buildServices(config: ValidatedEnv): Services {
     audit,
     watermarks: createDrizzleWatermarkStore(db),
     assets: createDrizzleAssetStore(db),
+    photos: createDrizzlePhotoStore(db),
     objects: createR2ObjectStore(config.BUCKET),
     devMailbox,
   }

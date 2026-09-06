@@ -10,17 +10,14 @@ import {
   resetFakeBulkRuntime,
   runs,
 } from '../../test-support/fake-bulk-runtime'
+import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../bulk/runtime', () => import('../../test-support/fake-bulk-runtime'))
-const downloadBlob = vi.fn<(blob: Blob, fileName: string) => void>()
-vi.mock('../../lib/download', () => ({
-  downloadBlob: (blob: Blob, fileName: string) => {
-    downloadBlob(blob, fileName)
-  },
-}))
+vi.mock('../../lib/thumbnail', () => import('../../test-support/fake-thumbnail'))
+vi.mock('../../lib/download', () => import('../../test-support/fake-download'))
 const zipEntries = vi.fn((entries: { name: string }[]) =>
   Promise.resolve(
     new Blob([entries.map((entry) => entry.name).join(',')], { type: 'application/zip' }),
@@ -39,7 +36,7 @@ function photo(name: string, size = 2048): File {
 beforeEach(() => {
   installFakeAuth()
   resetFakeBulkRuntime()
-  downloadBlob.mockClear()
+  downloads.mockClear()
   zipEntries.mockClear()
 })
 
@@ -88,18 +85,18 @@ describe('bulk page', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Download one-watermarked.jpg' }))
-    expect(downloadBlob).toHaveBeenLastCalledWith(expect.any(Blob), 'one-watermarked.jpg')
+    expect(downloads).toHaveBeenLastCalledWith(expect.any(Blob), 'one-watermarked.jpg')
 
     await user.click(screen.getByRole('button', { name: 'Retry 1' }))
     await waitFor(() => expect(screen.getByText(/2 of 2 finished, 1 failed/)).toBeInTheDocument())
     expect(runs).toHaveLength(3)
 
     await user.click(screen.getByRole('button', { name: 'Download 1 as ZIP' }))
-    await waitFor(() => expect(downloadBlob).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(downloads).toHaveBeenCalledTimes(2))
     expect(zipEntries.mock.calls[0]?.[0].map((entry) => entry.name)).toEqual([
       'one-watermarked.jpg',
     ])
-    expect(downloadBlob.mock.calls[1]?.[1]).toBe('watermarked-1-photos.zip')
+    expect(downloads.mock.calls[1]?.[1]).toBe('watermarked-1-photos.zip')
   })
 
   it('cancels a running batch, keeps finished results, and reports ZIP failures', async () => {
@@ -147,6 +144,32 @@ describe('bulk page', () => {
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
     unmount()
     expect(disposed.count).toBe(1)
+  })
+
+  it('saves a finished batch to the gallery, counting failures', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/bulk')
+    await screen.findByLabelText('Add photos')
+    await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg'), photo('b.jpg')])
+    await user.selectOptions(screen.getByLabelText('Preset'), 'wm-1')
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
+
+    await user.click(screen.getByRole('button', { name: 'Save 2 to gallery' }))
+    expect(await screen.findByText(/All saved to the/)).toBeInTheDocument()
+    expect(api.gallery.photos.map((stored) => stored.name)).toEqual([
+      'a-watermarked.jpg',
+      'b-watermarked.jpg',
+    ])
+    expect(api.gallery.photos[0]?.presetId).toBe('wm-1')
+
+    api.gallery.uploadFailsWith = 'quotaExceeded'
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: 'Save 2 to gallery' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('2 could not be saved')
   })
 
   it('accepts dropped files and points at the library when there are no presets', async () => {

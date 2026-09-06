@@ -404,12 +404,20 @@ green. No milestone starts before the previous one is certified.
   - [x] screenshots in light and dark under `docs/screenshots/m5/`
   - [x] bugs found by tests fixed before certification (see §8)
 
-### M6 — Storage and gallery
+### M6 — Storage and gallery — certified 2026-09-06
 
 - **Goal:** watermarked outputs persisted to R2 with thumbnails and metadata, browsable gallery with filters and bulk delete.
-- **Scope:** multipart upload routes with quota enforcement, thumbnail generation client-side, gallery routes and UI, storage quota display.
-- **Tests:** quota negative test; role tests; e2e gallery with axe.
-- **Certification:** gates + Lighthouse on `/gallery`.
+- **Scope delivered:** D1 table `photo` (migration `0002_photos.sql`; `preset_id` is `ON DELETE SET NULL` and the preset name is copied so photos outlive their preset). `src/worker/routes/photos.ts`: `GET /api/orgs/:orgId/photos` (newest first, cursor pagination of 60 on `(created_at, id)`, `presetId` filter, case-insensitive `search` with LIKE escaping), `GET …/photos/usage`, `POST …/photos` (multipart `file` + `thumbnail` + name, dimensions, optional preset; declared and actual size limits of 40 MB / 1 MB, signature sniffing for PNG/JPEG/WebP on both files, 10 000 photos and 2 GB per organization checked before any byte is read, unknown preset ids ignored), `GET …/photos/:id/file` and `…/thumbnail` (private cache, inline disposition), `POST …/photos/delete` (up to 200 ids, R2 objects removed first, one audit entry with the count). Client: `lib/thumbnail.ts` (400 px JPEG built in the browser), `lib/gallery.ts` (infinite query, usage query, upload with thumbnail, bulk delete), the gallery page (usage bar, search with deferred value, preset filter, lazy thumbnails, "Load more", per-photo checkboxes with select all, confirm dialog for bulk delete, lightbox with download and delete), "Save to gallery" in the editor's export panel and "Save n to gallery" after a bulk run (sequential uploads, failures counted). `MarkResources`, `formatBytes` and `PresetGate` are shared across tools; "Gallery" in the navigation.
+- **Tests delivered:** 6 Node route tests (upload with preset and audit, unknown preset, GIF rejection, missing thumbnail, oversized and declared-oversized, dimension limit, non-multipart, byte quota via seeded records, pagination across 63 photos with a stable cursor, preset filter, search, bad cursor, bulk delete with unknown ids and limits, viewer / anonymous access), 1 workerd test over real D1 and R2 (three uploads, ordering, `%`-escaped search, bulk delete removing objects), 1 Chromium thumbnail test, 4 gallery page tests (usage, paging, filters, lightbox; select and confirm bulk delete plus lightbox delete; viewer restrictions and empty filter; failed load), 2 editor and 1 bulk page tests for saving to the gallery including quota failure, and a Playwright journey (save from the editor, browse, search, filter, open, download and check the PNG, delete, audit) with axe on the gallery and the lightbox. Total 289 unit/browser + 8 workerd + 11 e2e; coverage 94.1 % lines / 86.2 % branches / 91.9 % functions.
+- **Security checks delivered:** signature sniffing of both uploaded files, size limits before reading bodies, count and byte quotas, organization-scoped R2 keys, private cache headers, RBAC negatives for upload and delete, audit entries for uploads and deletions. Client-reported dimensions are display-only and bounded (≤ 8192 per side); the Worker never decodes images.
+- **Performance:** Lighthouse desktop `/app/gallery` 96 / 100 / 96 (`docs/lighthouse/m6/summary.md`); thumbnails are 400 px JPEGs, list pages are 60 rows with an index on `(organization_id, created_at)`.
+- **Docs:** README (gallery section, bindings, limits), CHANGELOG 0.7.0, SECURITY.md, screenshots under `docs/screenshots/m6/`.
+- **Certification checklist:**
+  - [x] all gates in §3.2 pass (`npm run quality`, `security:sast`, `test:e2e`)
+  - [x] quota negative tests (count and bytes) and role tests for every photo route
+  - [x] Lighthouse desktop on all eleven pages within §5.5 budgets
+  - [x] screenshots in light and dark under `docs/screenshots/m6/`
+  - [x] bugs found by tests fixed before certification (see §8)
 
 ### M7 — Sharing
 
@@ -531,6 +539,21 @@ Tests that failed first and drove a fix:
 | `Array#sort()` without a comparator in tests                                                                                      | unicorn                    | `toSorted` with `localeCompare`                                            |
 
 Gate fire checks in M5: the page test proved cancellation keeps finished outputs and that the runtime is disposed on unmount; the e2e test proved the ZIP contains twenty decodable PNGs of the expected size; `min-release-age` accepted `fflate@0.8.3` (published 2024).
+
+### M6 (2026-09-06)
+
+Tests that failed first and drove a fix:
+
+| Defect                                                                                                | Caught by                    | Fix                                                                       |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------- |
+| `LIKE` search escaped wildcards but had no `ESCAPE` clause, so a search for "100%" matched everything | workerd search test          | `LIKE … ESCAPE '\\'` in raw SQL; memory store mirrors substring semantics |
+| Usage summary was split across elements, so screen readers and tests saw fragments                    | gallery page test            | one text node with a test id                                              |
+| "Preset" label lookup matched "Preset name" in Playwright                                             | gallery e2e strict mode      | `exact: true`                                                             |
+| The success alert's "gallery" link collided with the navigation link of the same name                 | gallery e2e strict mode      | link scoped to the status region                                          |
+| `errorCode` helper and owner sign-up fixture duplicated across route tests                            | jscpd                        | `errorCodeOf` and `signUpOwner` in `test-support/client.ts`               |
+| `formatBytes` duplicated between the bulk tool and the gallery                                        | lint (magic numbers) + jscpd | `lib/format-bytes.ts`                                                     |
+
+Gate fire checks in M6: knip flagged `StorageUsageDto`, `PhotoListResponse` and `PhotoPresetRef` as unused (removed) and a duplicate constant expression; the quota test proved uploads are refused at the byte limit without touching R2; the viewer test proved uploads and deletes are refused while reads succeed.
 
 ---
 

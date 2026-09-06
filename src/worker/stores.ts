@@ -66,3 +66,47 @@ export interface ObjectStore {
   get(key: string): Promise<StoredObject | null>
   delete(key: string): Promise<void>
 }
+
+export interface PhotoRecord {
+  id: string
+  organizationId: string
+  name: string
+  key: string
+  thumbnailKey: string
+  contentType: string
+  size: number
+  width: number
+  height: number
+  presetId: string | null
+  presetName: string | null
+  createdBy: string | null
+  createdAt: Date
+}
+
+export interface PhotoPage {
+  photos: PhotoRecord[]
+  /** Opaque cursor for the next page; null on the last page. */
+  nextCursor: string | null
+}
+
+export interface PhotoQuery {
+  presetId?: string | undefined
+  /** Case-insensitive substring of the name. */
+  search?: string | undefined
+  cursor?: string | undefined
+  limit: number
+}
+
+export interface StorageUsage {
+  count: number
+  bytes: number
+}
+
+export interface PhotoStore {
+  list(organizationId: string, query: PhotoQuery): Promise<PhotoPage>
+  find(organizationId: string, id: string): Promise<PhotoRecord | null>
+  findMany(organizationId: string, ids: readonly string[]): Promise<PhotoRecord[]>
+  create(input: Omit<PhotoRecord, 'createdAt'>): Promise<PhotoRecord>
+  deleteMany(organizationId: string, ids: readonly string[]): Promise<number>
+  usage(organizationId: string): Promise<StorageUsage>
+}

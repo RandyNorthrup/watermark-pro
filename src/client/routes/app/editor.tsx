@@ -3,6 +3,8 @@ import { z } from 'zod'
 
 import { Editor } from '../../components/editor/editor'
 import { Alert } from '../../components/ui/alert'
+import { activeMemberRoleQueryOptions } from '../../lib/queries'
+import { canRole } from '../../lib/roles'
 
 const appRoute = getRouteApi('/app')
 
@@ -13,11 +15,13 @@ const editorSearchSchema = z.object({
 
 export const Route = createFileRoute('/app/editor')({
   validateSearch: editorSearchSchema,
+  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
   component: EditorPage,
 })
 
 function EditorPage() {
   const organization = appRoute.useLoaderData()
+  const membership = Route.useLoaderData()
   const { preset } = Route.useSearch()
   if (organization === null) {
     return <Alert tone="info">Create or join an organization to use the editor.</Alert>
@@ -31,7 +35,11 @@ function EditorPage() {
           download. Nothing leaves your browser.
         </p>
       </header>
-      <Editor organizationId={organization.id} initialPresetId={preset ?? null} />
+      <Editor
+        organizationId={organization.id}
+        initialPresetId={preset ?? null}
+        canSave={canRole(membership?.role, { photo: ['upload'] })}
+      />
     </div>
   )
 }

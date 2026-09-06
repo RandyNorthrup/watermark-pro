@@ -7,6 +7,29 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-06
+
+Milestone M6: storage and gallery.
+
+### Added
+
+- Stored photos: D1 table `photo` (migration `0002_photos.sql`) and routes
+  under `/api/orgs/:orgId/photos` for listing (newest first, cursor pages of
+  60, preset filter, name search), usage, upload, file and thumbnail
+  streaming, and bulk delete of up to 200 photos, all behind the `photo`
+  permission and recorded in the audit log.
+- Upload limits: 40 MB per photo, 1 MB per thumbnail, 10 000 photos and 2 GB
+  per organization, PNG/JPEG/WebP by file signature.
+- `/app/gallery`: storage usage bar, search, preset filter, thumbnail grid
+  with "Load more", multi-select with confirmed bulk delete, and a lightbox
+  with download and delete.
+- "Save to gallery" in the editor and "Save n to gallery" after a bulk run;
+  thumbnails are built in the browser.
+
+### Changed
+
+- Photos remember the preset's name after the preset is deleted.
+
 ## [0.6.0] - 2026-09-06
 
 Milestone M5: bulk processing and export.

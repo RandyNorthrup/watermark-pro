@@ -34,6 +34,7 @@ const AUTHENTICATED_PAGES = [
   '/app/library/new',
   '/app/editor',
   '/app/bulk',
+  '/app/gallery',
 ]
 
 async function api(pathname, init = {}, cookie = '') {

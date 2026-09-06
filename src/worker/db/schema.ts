@@ -220,3 +220,34 @@ export const asset = sqliteTable(
   },
   (table) => [index('asset_organization_id_kind_idx').on(table.organizationId, table.kind)],
 )
+
+/**
+ * Watermarked photos stored by an organization (PLAN.md R6). The full-size
+ * output and its thumbnail both live in R2; `presetId` records which preset
+ * produced it and survives the preset's deletion.
+ */
+export const photo = sqliteTable(
+  'photo',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    key: text('key').notNull(),
+    thumbnailKey: text('thumbnail_key').notNull(),
+    contentType: text('content_type').notNull(),
+    size: integer('size').notNull(),
+    /** Pixel dimensions as reported by the uploading client (display only). */
+    width: integer('width').notNull(),
+    height: integer('height').notNull(),
+    presetId: text('preset_id').references(() => watermark.id, { onDelete: 'set null' }),
+    presetName: text('preset_name'),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAtColumn(),
+  },
+  (table) => [
+    index('photo_organization_id_created_at_idx').on(table.organizationId, table.createdAt),
+    index('photo_organization_id_preset_id_idx').on(table.organizationId, table.presetId),
+  ],
+)

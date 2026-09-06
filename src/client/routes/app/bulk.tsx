@@ -2,15 +2,19 @@ import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 
 import { BulkTool } from '../../components/bulk/bulk-tool'
 import { Alert } from '../../components/ui/alert'
+import { activeMemberRoleQueryOptions } from '../../lib/queries'
+import { canRole } from '../../lib/roles'
 
 const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/bulk')({
+  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
   component: BulkPage,
 })
 
 function BulkPage() {
   const organization = appRoute.useLoaderData()
+  const membership = Route.useLoaderData()
   if (organization === null) {
     return <Alert tone="info">Create or join an organization to watermark in bulk.</Alert>
   }
@@ -23,7 +27,10 @@ function BulkPage() {
           downloaded as a ZIP or one by one.
         </p>
       </header>
-      <BulkTool organizationId={organization.id} />
+      <BulkTool
+        organizationId={organization.id}
+        canSave={canRole(membership?.role, { photo: ['upload'] })}
+      />
     </div>
   )
 }

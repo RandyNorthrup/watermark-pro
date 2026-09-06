@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { z } from 'zod'
 
-import { findLink, TestClient } from './test-support/client'
+import { errorCodeOf, findLink, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
 import {
   assetDtoSchema,
@@ -32,8 +31,6 @@ const outsider = {
   email: 'oscar@example.test',
   password: 'outsiders long password',
 }
-
-const errorSchema = z.object({ error: z.string() })
 
 /** Smallest valid PNG signature followed by padding; the route only sniffs the prefix. */
 const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0])
@@ -88,15 +85,12 @@ async function uploadStatus(client: TestClient): Promise<number> {
   return response.status
 }
 
-async function errorCode(response: Response): Promise<string> {
-  return errorSchema.parse(await response.json()).error
-}
-
 beforeEach(async () => {
   harness = createTestHarness()
-  ownerClient = new TestClient(harness.app, harness.env)
-  await ownerClient.signUpAndVerify(harness.mailbox, owner)
-  organizationId = await ownerClient.createOrganization('Acme Studio', 'acme-studio')
+  ;({ client: ownerClient, organizationId } = await signUpOwner(harness, owner, {
+    name: 'Acme Studio',
+    slug: 'acme-studio',
+  }))
 })
 
 describe('watermark presets', () => {
@@ -146,7 +140,7 @@ describe('watermark presets', () => {
       spec: { ...DEFAULT_TEXT_SPEC, style: { ...DEFAULT_STYLE, opacity: 7 } },
     })
     expect(badSpec.status).toBe(HTTP_STATUS.badRequest)
-    expect(await errorCode(badSpec)).toBe(API_ERROR_CODE.validation)
+    expect(await errorCodeOf(badSpec)).toBe(API_ERROR_CODE.validation)
 
     const emptyName = await ownerClient.post(base('/watermarks'), {
       name: ' '.repeat(3),
@@ -208,7 +202,7 @@ describe('logo assets', () => {
 
     const blocked = await ownerClient.request(base(`/assets/${asset.id}`), { method: 'DELETE' })
     expect(blocked.status).toBe(HTTP_STATUS.conflict)
-    expect(await errorCode(blocked)).toBe(API_ERROR_CODE.conflict)
+    expect(await errorCodeOf(blocked)).toBe(API_ERROR_CODE.conflict)
 
     const presetId = watermarkDtoSchema.parse(await preset.json()).id
     await ownerClient.request(base(`/watermarks/${presetId}`), { method: 'DELETE' })
@@ -261,7 +255,7 @@ describe('logo assets', () => {
     }
     const overflow = await upload(ownerClient, logoForm(PNG_BYTES))
     expect(overflow.status).toBe(HTTP_STATUS.badRequest)
-    expect(await errorCode(overflow)).toBe(API_ERROR_CODE.quotaExceeded)
+    expect(await errorCodeOf(overflow)).toBe(API_ERROR_CODE.quotaExceeded)
   })
 
   it('returns 404 for unknown assets', async () => {
