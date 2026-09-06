@@ -19,6 +19,9 @@ what was planned; superseded entries stay.
   no force pushes, no deletion; repository admins may bypass.
 - Runbook: the enable/disable order for Turnstile and the short
   `invalid_configuration` window between `secret put` and the deploy.
+- Tag-driven deploys are live: with `CLOUDFLARE_API_TOKEN` and
+  `CLOUDFLARE_ACCOUNT_ID` in the repository secrets, the v1.0.1 Deploy
+  workflow ran gates, migrations, deploy and the smoke check successfully.
 - CSP allows Cloudflare's Web Analytics beacon (`static.cloudflareinsights.com`,
   `cloudflareinsights.com`), which the `blowmoney.net` zone injects into every
   HTML response and the policy had been blocking with a console error on
