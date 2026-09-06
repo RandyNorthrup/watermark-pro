@@ -1,8 +1,9 @@
 name: Set up Node and gitleaks
 description: >-
   Installs the pinned Node version from .nvmrc with the npm cache, the pinned
-  gitleaks binary that `npm run security:secrets` needs, and the locked
-  dependencies. Shared by the CI and Deploy workflows so the two never drift.
+  gitleaks binary that `npm run security:secrets` needs, the locked
+  dependencies and the Chromium build the browser tests use. Shared by the
+  CI and Deploy workflows so the two never drift.
 
 runs:
   using: composite
@@ -23,3 +24,8 @@ runs:
 
     - shell: bash
       run: npm ci
+
+    # The Vitest `browser` project and the Playwright suite both run in
+    # Chromium; installing it here keeps every job that runs tests identical.
+    - shell: bash
+      run: npx playwright install --with-deps chromium

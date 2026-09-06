@@ -32,7 +32,6 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node-gitleaks
       - run: npm run quality:ci
-      - run: npx playwright install --with-deps chromium
       # The preview Worker validates its configuration like production does,
       # so it needs a session secret. A random one per run is never committed
       # and never leaves the runner.
