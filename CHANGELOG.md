@@ -7,6 +7,34 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-06
+
+Milestone M4: editor.
+
+### Added
+
+- `/app/editor`: watermark one photo with a library preset, then adjust the
+  preset for that photo only (placement, contrast, opacity, size, rotation,
+  margin, tiling) without touching the library. Drag the mark, scale it from
+  the corner handle, rotate it from the top handle, or use the keyboard
+  (arrows, Shift, `+`/`-`, `[`/`]`).
+- Crop tool with free, original, 1:1, 4:3, 3:2, 16:9, 4:5 and 9:16 ratios,
+  draggable frame and handles, thirds grid, and numeric fields.
+- Resize tool with a proportion lock, 25/50/75 % and fit-to-1080/2048/4096
+  shortcuts, and an 8192 px output ceiling.
+- Export to PNG, JPEG or WebP with a quality slider; rendered at full
+  resolution in the browser and downloaded, so photos never leave the device.
+- Undo and redo for every step (Ctrl/Cmd+Z, Ctrl+Shift+Z, Ctrl+Y), with a
+  drag counted as one step.
+- Photos open from disk or by drag-and-drop; the sample scene is the default.
+- "Open in editor" on every library card; "Editor" in the navigation.
+
+### Changed
+
+- The engine reports the mark's box and rotation with each result.
+- `PreviewRenderer` accepts source-pixel crop and resize transforms, exposes
+  the subject's size and scale, and exports at full size.
+
 ## [0.4.0] - 2026-09-06
 
 Milestone M3: watermark library, fonts, and symbols.

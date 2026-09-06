@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from 'vitest'
 
-import { PreviewRenderer } from './preview'
+import { PreviewRenderer, scaleTransform } from './preview'
 import { createSamplePhoto, SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from './sample-photo'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC, type WatermarkSpec } from '../../shared/watermark'
 import { FONT_CATALOGUE } from '../fonts/catalogue'
@@ -158,4 +158,68 @@ describe('PreviewRenderer', () => {
     },
     PREVIEW_TIMEOUT_MS,
   )
+
+  it(
+    'scales source-pixel transforms to the preview and exports at full size',
+    async () => {
+      const renderer = new PreviewRenderer(() => Promise.reject(new Error('no logos')))
+      try {
+        // A 2560×1600 subject previews at half size (1280 max side).
+        const big = new OffscreenCanvas(2560, 1600)
+        const ctx = big.getContext('2d')
+        if (ctx === null) {
+          throw new Error('no 2d context')
+        }
+        ctx.fillStyle = '#4488cc'
+        ctx.fillRect(0, 0, 2560, 1600)
+        await renderer.setSubject(await big.convertToBlob({ type: 'image/png' }))
+        expect(renderer.sourceSize).toEqual({ width: 2560, height: 1600 })
+        expect(renderer.subjectScale).toBeCloseTo(0.5)
+
+        const transform = {
+          crop: { x: 640, y: 400, width: 1280, height: 800 },
+          resize: { width: 640, height: 400 },
+        }
+        const preview = await renderer.render(DEFAULT_TEXT_SPEC, { transform })
+        expect(preview).not.toBeNull()
+        expect(await decodedSize(preview?.url ?? '')).toEqual({ width: 320, height: 200 })
+        expect(preview?.placement.width).toBeGreaterThan(0)
+        expect(preview?.placement.height).toBeGreaterThan(0)
+
+        const full = await renderer.exportFull(
+          DEFAULT_TEXT_SPEC,
+          { format: 'image/png', quality: 1 },
+          transform,
+        )
+        expect(full.type).toBe('image/png')
+        expect(await decodedSize(URL.createObjectURL(full))).toEqual({ width: 640, height: 400 })
+
+        const untouched = await renderer.exportFull(DEFAULT_TEXT_SPEC, {
+          format: 'image/webp',
+          quality: 0.8,
+        })
+        expect(await decodedSize(URL.createObjectURL(untouched))).toEqual({
+          width: 2560,
+          height: 1600,
+        })
+      } finally {
+        renderer.dispose()
+      }
+    },
+    PREVIEW_TIMEOUT_MS,
+  )
+
+  it('scales transforms only when the subject is downscaled', () => {
+    const transform = {
+      crop: { x: 10, y: 20, width: 30, height: 40 },
+      resize: { width: 3, height: 4 },
+    }
+    expect(scaleTransform(transform, 1)).toBe(transform)
+    expect(scaleTransform(undefined, 0.5)).toBeUndefined()
+    expect(scaleTransform(transform, 0.5)).toEqual({
+      crop: { x: 5, y: 10, width: 15, height: 20 },
+      resize: { width: 2, height: 2 },
+    })
+    expect(scaleTransform({ crop: transform.crop }, 0.01)?.crop?.width).toBe(1)
+  })
 })

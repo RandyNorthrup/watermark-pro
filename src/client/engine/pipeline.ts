@@ -34,11 +34,21 @@ export interface ApplyRequest {
   transform?: Transform
 }
 
+/** Where the (single, untiled) mark landed, in output pixels; the editor draws its handles from this. */
+export interface MarkPlacement {
+  centreX: number
+  centreY: number
+  anchor: Anchor | null
+  width: number
+  height: number
+  rotation: number
+}
+
 export interface ApplyResult {
   blob: Blob
   width: number
   height: number
-  placement: { centreX: number; centreY: number; anchor: Anchor | null }
+  placement: MarkPlacement
   contrast: ResolvedContrast
 }
 
@@ -117,7 +127,14 @@ export function composeMark(
     )
   }
   return {
-    placement: { centreX: placement.centreX, centreY: placement.centreY, anchor: placement.anchor },
+    placement: {
+      centreX: placement.centreX,
+      centreY: placement.centreY,
+      anchor: placement.anchor,
+      width: size.width,
+      height: size.height,
+      rotation,
+    },
     contrast,
   }
 }

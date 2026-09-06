@@ -54,7 +54,7 @@ describe('WatermarkWorker', () => {
       blob: new Blob(),
       width: 1,
       height: 1,
-      placement: { centreX: 0, centreY: 0, anchor: null },
+      placement: { centreX: 0, centreY: 0, anchor: null, width: 1, height: 1, rotation: 0 },
       contrast: { variant: 'dark', outline: 0, isAuto: true },
     })
     expect(client.busy).toBe(2)
@@ -66,7 +66,7 @@ describe('WatermarkWorker', () => {
       blob: new Blob(),
       width: 3,
       height: 4,
-      placement: { centreX: 1, centreY: 2, anchor: 'center' },
+      placement: { centreX: 1, centreY: 2, anchor: 'center', width: 1, height: 1, rotation: 0 },
       contrast: { variant: 'light', outline: 0.5, isAuto: false },
     })
     await expect(first).resolves.toMatchObject({

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
-import { Image, Plus, Stamp, Trash2, Type } from 'lucide-react'
+import { Image, PencilRuler, Plus, Stamp, Trash2, Type } from 'lucide-react'
 
 import type { WatermarkDto } from '../../../../shared/api'
 import type { WatermarkSpec } from '../../../../shared/watermark'
@@ -172,21 +172,31 @@ function PresetCard({ preset, organizationId, canManage }: PresetCardProps) {
               <p className="truncate text-sm text-ink-muted">{describeSpec(preset.spec)}</p>
             </div>
           </div>
-          {canManage ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label={`Delete ${preset.name}`}
-              disabled={remove.isPending}
-              onClick={() => {
-                remove.mutate()
-              }}
-              className="text-ink-muted hover:text-rose-600"
+          <div className="flex shrink-0 items-center gap-1">
+            <Link
+              to="/app/editor"
+              search={{ preset: preset.id }}
+              aria-label={`Open ${preset.name} in the editor`}
+              className={buttonVariants({ variant: 'ghost', size: 'icon' })}
             >
-              <Trash2 aria-hidden="true" className="size-4" />
-            </Button>
-          ) : null}
+              <PencilRuler aria-hidden="true" className="size-4" />
+            </Link>
+            {canManage ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={`Delete ${preset.name}`}
+                disabled={remove.isPending}
+                onClick={() => {
+                  remove.mutate()
+                }}
+                className="text-ink-muted hover:text-rose-600"
+              >
+                <Trash2 aria-hidden="true" className="size-4" />
+              </Button>
+            ) : null}
+          </div>
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-2 text-xs text-ink-muted">
           <Badge>{preset.spec.kind === 'image' ? 'logo' : preset.spec.kind}</Badge>

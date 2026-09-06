@@ -25,9 +25,20 @@ Object.assign(Element.prototype, {
 
 // Radix measures trigger sizes with ResizeObserver, which jsdom lacks.
 class ResizeObserverStub {
-  observe = noop
+  readonly #callback: ResizeObserverCallback
+
   unobserve = noop
+
   disconnect = noop
+
+  constructor(callback: ResizeObserverCallback) {
+    this.#callback = callback
+  }
+
+  /** The real observer reports once on observe; components rely on that first delivery. */
+  observe(target: Element): void {
+    this.#callback([{ target } as ResizeObserverEntry], this)
+  }
 }
 Object.defineProperty(globalThis, 'ResizeObserver', { value: ResizeObserverStub, writable: true })
 

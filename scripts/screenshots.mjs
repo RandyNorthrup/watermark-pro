@@ -15,6 +15,7 @@ import { waitForLink } from './lib/dev-mailbox.mjs'
 const BASE_URL = process.env.APP_URL ?? 'http://localhost:5173'
 const MILESTONE = process.argv[2] ?? 'm1'
 const VIEWPORT = { width: 1440, height: 900 }
+const PREVIEW_SETTLE_MS = 600
 const PUBLIC_PAGES = [
   ['home', '/'],
   ['login', '/login'],
@@ -91,7 +92,25 @@ try {
       fullPage: true,
     })
     await page.getByRole('button', { name: 'Save preset' }).click()
-    await page.getByRole('link', { name: 'Studio signature' }).waitFor()
+    await page.getByRole('link', { name: 'Studio signature', exact: true }).waitFor()
+
+    // The editor with the preset loaded, then with the crop tool open.
+    await page.getByRole('link', { name: 'Open Studio signature in the editor' }).click()
+    await page.getByRole('group', { name: /Watermark position/ }).waitFor()
+    await page.waitForLoadState('networkidle')
+    await page.screenshot({
+      path: path.join(outputDir, `editor-${colorScheme}.png`),
+      fullPage: true,
+    })
+    await page.getByRole('tab', { name: 'Crop' }).click()
+    await page.getByRole('button', { name: '4:3' }).click()
+    await page.getByRole('group', { name: /Crop area/ }).waitFor()
+    // The preview re-renders through the worker after a short debounce.
+    await page.waitForTimeout(PREVIEW_SETTLE_MS)
+    await page.screenshot({
+      path: path.join(outputDir, `editor-crop-${colorScheme}.png`),
+      fullPage: true,
+    })
 
     for (const [name, pathname] of AUTHENTICATED_PAGES) {
       await page.goto(`${BASE_URL}${pathname}`, { waitUntil: 'networkidle' })
