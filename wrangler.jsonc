@@ -1,28 +1,24 @@
 {
   // Cloudflare Worker configuration. One Worker serves the SPA from Static
-  // Assets and the API from src/worker. Served at watermark.blowmoney.net
-  // (PLAN.md R15); the workers.dev subdomain is disabled so the app has exactly
-  // one origin for cookies, CSP, and share links.
+  // Assets and the API from src/worker.
+  //
+  // The top level is the LOCAL DEVELOPMENT configuration: `vite dev`, `vite
+  // preview` and the test projects read it. It is deliberately named
+  // `watermark-pro-dev`, has no routes and no workers.dev subdomain, so an
+  // accidental `wrangler deploy` without an environment cannot overwrite
+  // production. Production lives under `env.production` and is served at
+  // watermark.blowmoney.net (PLAN.md R15); deploy it with `npm run deploy`.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "watermark-pro",
+  "name": "watermark-pro-dev",
   "main": "src/worker/index.ts",
-  "workers_dev": false,
-  "routes": [
-    {
-      // Custom Domain: wrangler creates the DNS record and certificate on
-      // deploy. The zone must live in the same Cloudflare account.
-      "pattern": "watermark.blowmoney.net",
-      "custom_domain": true,
-    },
-  ],
   // Pin the runtime behaviour to a date. Bump deliberately, never silently.
   // Must not exceed the newest date supported by the workerd bundled with
   // @cloudflare/vitest-pool-workers (2026-08-22 as of pool 0.22.0), or the
   // Workers test project fails to start.
   "compatibility_date": "2026-08-22",
-  // Better Auth (M1) needs the Node compatibility layer; enabling it from day
-  // one keeps the runtime identical between M0 and M1 tests.
+  // Better Auth needs the Node compatibility layer.
   "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
   "assets": {
     // Everything that is not an API route is served from the asset store
     // without invoking the Worker; unknown paths fall back to index.html so
@@ -35,10 +31,9 @@
   },
   "vars": {
     // Non-secret configuration. Secrets (BETTER_AUTH_SECRET) go in .dev.vars
-    // locally and `wrangler secret put` in production. Every entry here is
-    // validated by src/worker/env.ts on the first request an isolate handles.
-    // These are the local-development values; production overrides them in
-    // the `production` environment introduced in M8.
+    // locally and `wrangler secret put --env production` in production. Every
+    // entry here is validated by src/worker/env.ts on the first request an
+    // isolate handles.
     "APP_ENV": "development",
     "APP_URL": "http://localhost:5173",
     "EMAIL_PROVIDER": "console",
@@ -48,11 +43,10 @@
     {
       "binding": "DB",
       "database_name": "watermark-pro",
-      // Local development and tests use an embedded SQLite regardless of this
-      // value. Before the first production deploy run
-      //   npx wrangler d1 create watermark-pro
-      // and paste the returned id here; deploying with the zero id fails.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      // Local development and tests use an embedded SQLite keyed by this id;
+      // the same id is the real production database (`wrangler d1 create
+      // watermark-pro`, 2026-09-06).
+      "database_id": "e142b088-c663-4276-bd39-5ded21775fb1",
       "migrations_dir": "migrations",
     },
   ],
@@ -77,4 +71,52 @@
       "name": "SEND_EMAIL",
     },
   ],
+  "env": {
+    "production": {
+      "name": "watermark-pro",
+      "workers_dev": false,
+      "routes": [
+        {
+          // Custom Domain: wrangler creates the DNS record and certificate on
+          // deploy. The zone must live in the same Cloudflare account.
+          "pattern": "watermark.blowmoney.net",
+          "custom_domain": true,
+        },
+      ],
+      "observability": {
+        "enabled": true,
+      },
+      "vars": {
+        "APP_ENV": "production",
+        "APP_URL": "https://watermark.blowmoney.net",
+        "EMAIL_PROVIDER": "cloudflare",
+        "EMAIL_FROM": "no-reply@blowmoney.net",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "watermark-pro",
+          "database_id": "e142b088-c663-4276-bd39-5ded21775fb1",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "ratelimits": [
+        {
+          "name": "AUTH_RATE_LIMITER",
+          "namespace_id": "1001",
+          "simple": { "limit": 10, "period": 60 },
+        },
+        {
+          "name": "API_RATE_LIMITER",
+          "namespace_id": "1002",
+          "simple": { "limit": 120, "period": 60 },
+        },
+      ],
+      "send_email": [
+        {
+          "name": "SEND_EMAIL",
+        },
+      ],
+    },
+  },
 }

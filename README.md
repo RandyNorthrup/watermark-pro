@@ -169,23 +169,34 @@ router plugin on every dev/build/test run and is git-ignored.
 
 ## Deployment
 
+Production is the `production` environment in `wrangler.jsonc`, deployed
+with:
+
 ```bash
-npx wrangler login
-npx wrangler d1 create watermark-pro      # paste the returned id into wrangler.jsonc
-npx wrangler secret put BETTER_AUTH_SECRET
-npm run deploy                            # build, apply remote migrations, deploy
+npm run deploy   # CLOUDFLARE_ENV=production vite build → remote D1 migrations → wrangler deploy
 ```
 
-The Worker is named `watermark-pro` in `wrangler.jsonc` and is routed to the
-Custom Domain `watermark.blowmoney.net`; wrangler creates the DNS record and
-certificate on the first deploy, provided the `blowmoney.net` zone is in the
-logged-in account. The `workers.dev` subdomain is disabled.
+One-time setup, already done for this account on 2026-09-06: `wrangler d1
+create watermark-pro` (id in `wrangler.jsonc`) and
+`wrangler secret put BETTER_AUTH_SECRET --env production`. The Worker is
+routed to the Custom Domain `watermark.blowmoney.net`; wrangler created the
+DNS record and certificate on the first deploy. The `workers.dev` subdomain is
+disabled.
 
-Not yet executed: the commands above need the owner's Cloudflare login. A
-`production` wrangler environment that sets `APP_ENV=production`,
-`APP_URL=https://watermark.blowmoney.net` and `EMAIL_PROVIDER=cloudflare`
-is scheduled for milestone M8, which certifies deployment end to end. Until
-then the committed defaults are the local-development values.
+The top-level configuration is the local-development one and is named
+`watermark-pro-dev` on purpose: a stray `wrangler deploy` without the
+environment creates an unrouted Worker instead of overwriting production.
+
+Useful production commands:
+
+```bash
+npx wrangler tail --env production --format pretty
+npx wrangler d1 migrations list watermark-pro --remote --env production
+```
+
+Email Sending must be authorized for the sender's domain in the Cloudflare
+account (`wrangler email sending list`); until it is, sign-ups succeed but
+verification emails are logged as rejected instead of delivered.
 
 ## Security
 

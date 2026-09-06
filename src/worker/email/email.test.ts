@@ -19,6 +19,7 @@ describe('createCloudflareEmailSender', () => {
     const sender = createCloudflareEmailSender(binding, 'no-reply@blowmoney.net')
     await expect(sender.send(message)).rejects.toBeInstanceOf(EmailDeliveryError)
     await expect(sender.send(message)).rejects.toMatchObject({
+      message: expect.stringContaining('quota exceeded'),
       cause: expect.objectContaining({ message: 'quota exceeded' }),
     })
   })

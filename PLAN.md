@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-09-06 (M1 certified)
+Last updated: 2026-09-06 (M1 certified; first production deployment)
 
 ---
 
@@ -201,7 +201,7 @@ watermark-pro/
 | Q4  | ~~GitHub?~~ **Answered 2026-09-05: yes, public.**                                                                                                | A2 updated.                                                                                   |
 | Q5  | ~~Cloudflare plan?~~ **Answered 2026-09-05: Free.**                                                                                              | A13 added; see Q7 and Q8 for the two consequences that need a decision.                       |
 | Q6  | ~~Turnstile?~~ **Answered 2026-09-05: yes.**                                                                                                     | Enabled in M8 behind an env flag; needs site key + secret.                                    |
-| Q7  | ~~Email needs a domain.~~ **Resolved 2026-09-05:** `blowmoney.net` is a zone in the account; sender is `no-reply@blowmoney.net`.                 | M1 enables Email Sending on the zone.                                                         |
+| Q7  | ~~Email needs a domain.~~ **Resolved 2026-09-05** (`blowmoney.net` zone) but superseded by Q9: the zone is not authorized for Email Sending.     | —                                                                                             |
 | Q8  | ~~Password hashing on the Free plan.~~ **Resolved 2026-09-05:** the owner upgraded to Workers Paid, so the CPU budget is no longer a constraint. | M1 uses Better Auth's default password hash and records its measured CPU cost for the record. |
 
 ---
@@ -391,7 +391,7 @@ green. No milestone starts before the previous one is certified.
 ### M8 — Enterprise hardening and release
 
 - **Goal:** production deployment at `watermark.blowmoney.net`, admin console, hardening, documentation.
-- **Scope:** admin console (users, orgs, bans, audit log viewer), Turnstile on sign-up, rate limit tuning, CSP report-only → enforce review, threat model document, dependency review, a wrangler `production` environment that sets `APP_ENV=production` (the top-level default is `development` and must never be what gets deployed), `wrangler deploy` from CI on tags, runbook.
+- **Scope:** admin console (users, orgs, bans, audit log viewer), Turnstile on sign-up, rate limit tuning, CSP report-only → enforce review, threat model document, dependency review, `wrangler deploy` from CI on tags, runbook. (The `production` wrangler environment and the first deployment were pulled forward to 2026-09-06, right after M1; see CHANGELOG.)
 - **Tests:** full e2e regression; semgrep clean; `npm audit` clean at high.
 - **Certification:** every gate, every Lighthouse target, SECURITY.md complete, README deployment section executed end to end.
 

@@ -7,6 +7,28 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Added
+
+- `production` wrangler environment (`APP_ENV=production`,
+  `APP_URL=https://watermark.blowmoney.net`, `EMAIL_PROVIDER=cloudflare`,
+  own routes and bindings) and `scripts/deploy.mjs`, which builds with
+  `CLOUDFLARE_ENV=production`, applies remote D1 migrations and deploys.
+- First production deployment on 2026-09-06: D1 database created, secret set,
+  `https://watermark.blowmoney.net` serving with the expected headers.
+- Cloudflare email delivery errors now carry Cloudflare's reason in the
+  logged message, since Better Auth logs rather than fails on delivery errors.
+
+### Changed
+
+- The top-level wrangler configuration is renamed `watermark-pro-dev` so an
+  accidental environment-less deploy cannot overwrite production.
+
+### Known limitation
+
+- Verification emails are not delivered yet: Email Sending is not authorized
+  for `blowmoney.net` in the account (only `projects.blowmoney.net` is). The
+  sender domain decision is open (PLAN.md Q9).
+
 ## [0.2.0] - 2026-09-06
 
 Milestone M1: foundation. Accounts, organizations, roles, audit trail, and

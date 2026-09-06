@@ -16,9 +16,13 @@ export function createCloudflareEmailSender(binding: SendEmail, from: string): E
           html: message.html,
         })
       } catch (error) {
-        throw new EmailDeliveryError(`Email to ${message.to} was rejected by Cloudflare`, {
-          cause: error,
-        })
+        // Better Auth logs delivery failures instead of failing the request,
+        // so the reason has to travel in the message itself to reach the logs.
+        const reason = error instanceof Error ? error.message : String(error)
+        throw new EmailDeliveryError(
+          `Email to ${message.to} was rejected by Cloudflare: ${reason}`,
+          { cause: error },
+        )
       }
     },
   }
