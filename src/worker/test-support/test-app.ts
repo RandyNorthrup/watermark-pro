@@ -37,7 +37,15 @@ function notABinding(): never {
 }
 
 /** Env plus the optional Turnstile variables, which wrangler.jsonc leaves unset by default. */
-export type TestEnv = Env & { TURNSTILE_SITE_KEY?: string; TURNSTILE_SECRET_KEY?: string }
+/**
+ * The generated `Env` carries only the non-secret vars from wrangler.jsonc
+ * (typegen deliberately ignores .dev.vars); tests add the secrets they set.
+ */
+export type TestEnv = Env & {
+  BETTER_AUTH_SECRET: string
+  TURNSTILE_SITE_KEY?: string
+  TURNSTILE_SECRET_KEY?: string
+}
 
 export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
   return {
@@ -57,7 +65,7 @@ export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
 
 export interface TestHarness {
   app: ReturnType<typeof createApp>
-  env: Env
+  env: TestEnv
   services: Services
   mailbox: DevMailbox
   audit: ReturnType<typeof createMemoryAuditStore>

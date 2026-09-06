@@ -52,6 +52,10 @@ Milestone M8: enterprise hardening and release. First stable release.
 - The "not a platform administrator" refusal on `/app/admin` rendered
   without a page heading (axe `page-has-heading-one`); the heading now
   precedes the refusal.
+- `npm run cf-typegen` now passes `--env-file .env.example`, so the
+  committed Worker types no longer depend on the secrets in a developer's
+  `.dev.vars`; the CI typegen check had failed on the first GitHub run for
+  that reason.
 
 ## [0.8.0] - 2026-09-06
 
