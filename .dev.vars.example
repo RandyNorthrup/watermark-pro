@@ -13,3 +13,11 @@ BETTER_AUTH_SECRET=
 # APP_URL=http://localhost:5173  # public origin used in auth links
 # EMAIL_PROVIDER=console         # console | cloudflare (console is refused in production)
 # EMAIL_FROM=no-reply@watermark.blowmoney.net
+
+# Optional Cloudflare Turnstile bot protection for sign-up and password reset.
+# Both must be set together; leave both empty to run without a challenge.
+# Create a widget at https://dash.cloudflare.com/?to=/:account/turnstile with the
+# site's hostname. The site key is public (set it as a plain var in production);
+# the secret key is a Worker secret.
+# TURNSTILE_SITE_KEY=
+# TURNSTILE_SECRET_KEY=

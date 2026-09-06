@@ -109,6 +109,8 @@ export interface PhotoStore {
   create(input: Omit<PhotoRecord, 'createdAt'>): Promise<PhotoRecord>
   deleteMany(organizationId: string, ids: readonly string[]): Promise<number>
   usage(organizationId: string): Promise<StorageUsage>
+  /** Usage of every organization that has photos, keyed by organization id. */
+  usageByOrganization(): Promise<Map<string, StorageUsage>>
 }
 
 export interface ShareRecord {
@@ -130,4 +132,22 @@ export interface ShareStore {
   findById(id: string): Promise<ShareRecord | null>
   create(input: Omit<ShareRecord, 'createdAt' | 'revokedAt'>): Promise<ShareRecord>
   revoke(organizationId: string, id: string): Promise<ShareRecord | null>
+}
+
+/** One tenant as the platform admin console sees it. */
+export interface OrganizationSummary {
+  id: string
+  name: string
+  slug: string | null
+  createdAt: Date
+  memberCount: number
+}
+
+export interface OrganizationStore {
+  /**
+   * Newest first, capped at `ADMIN_ORGANIZATION_PAGE_SIZE`. Member counts
+   * are aggregated in the store so no row limit can silently truncate them
+   * (Better Auth's adapter `findMany` stops at 100 rows by default).
+   */
+  listSummaries(): Promise<OrganizationSummary[]>
 }

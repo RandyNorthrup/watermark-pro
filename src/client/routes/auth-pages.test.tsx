@@ -103,6 +103,7 @@ describe('sign up', () => {
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Check your inbox')
     expect(client().signUp.email).toHaveBeenCalledWith(
       expect.objectContaining({ email: 'new@example.test', callbackURL: '/app' }),
+      { headers: {} },
     )
   })
 
@@ -137,10 +138,10 @@ describe('password reset', () => {
     await user.type(await screen.findByLabelText('Email'), 'whoever@example.test')
     await user.click(screen.getByRole('button', { name: 'Send reset link' }))
     expect(await screen.findByText('Check your inbox')).toBeInTheDocument()
-    expect(client().requestPasswordReset).toHaveBeenCalledWith({
-      email: 'whoever@example.test',
-      redirectTo: '/reset-password',
-    })
+    expect(client().requestPasswordReset).toHaveBeenCalledWith(
+      { email: 'whoever@example.test', redirectTo: '/reset-password' },
+      { headers: {} },
+    )
   })
 
   it('rejects mismatched passwords and completes a valid reset', async () => {

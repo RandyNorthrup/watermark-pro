@@ -13,9 +13,11 @@ preset designer with live preview, 51 bundled font families, glyph and icon
 catalogue, logo uploads) M4 (single-photo editor with crop, resize,
 hand placement, undo and download) M5 (bulk processing with a worker
 pool, progress, cancel, retry and ZIP export) M6 (stored photos with a
-searchable gallery) and M7 (revocable share links with the Web Share API)
-are complete. M8, the enterprise hardening and release milestone, follows. See [PLAN.md](PLAN.md) for the roadmap and
-[CHANGELOG.md](CHANGELOG.md) for what has actually shipped.
+searchable gallery), M7 (revocable share links with the Web Share API) and
+M8 (platform admin console, Turnstile bot protection, threat model, runbook,
+dependency review and tag-driven deploys) are complete: 1.0.0. See
+[PLAN.md](PLAN.md) for the roadmap and [CHANGELOG.md](CHANGELOG.md) for what
+has actually shipped.
 
 ## Stack
 
@@ -119,18 +121,20 @@ mode; includes the throughput benchmark recorded in `docs/benchmarks.md`),
 
 ## Environment variables and bindings
 
-| Name                 | Kind       | Where                                | Purpose                                                          |
-| -------------------- | ---------- | ------------------------------------ | ---------------------------------------------------------------- |
-| `APP_ENV`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                   |
-| `APP_URL`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard              |
-| `EMAIL_PROVIDER`     | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                        |
-| `EMAIL_FROM`         | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                 |
-| `BETTER_AUTH_SECRET` | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters         |
-| `DB`                 | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log, presets   |
-| `BUCKET`             | R2         | `wrangler.jsonc` `r2_buckets`        | Logos, photos and thumbnails; never public, streamed via the API |
-| `AUTH_RATE_LIMITER`  | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                |
-| `API_RATE_LIMITER`   | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints               |
-| `SEND_EMAIL`         | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare` |
+| Name                   | Kind       | Where                                | Purpose                                                                |
+| ---------------------- | ---------- | ------------------------------------ | ---------------------------------------------------------------------- |
+| `APP_ENV`              | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                         |
+| `APP_URL`              | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard                    |
+| `EMAIL_PROVIDER`       | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                              |
+| `EMAIL_FROM`           | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                       |
+| `BETTER_AUTH_SECRET`   | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters               |
+| `TURNSTILE_SITE_KEY`   | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Optional; Turnstile widget key, served to the client via `/api/config` |
+| `TURNSTILE_SECRET_KEY` | secret     | `.dev.vars`, `wrangler secret put`   | Optional; must be set together with the site key                       |
+| `DB`                   | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log, presets         |
+| `BUCKET`               | R2         | `wrangler.jsonc` `r2_buckets`        | Logos, photos and thumbnails; never public, streamed via the API       |
+| `AUTH_RATE_LIMITER`    | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                      |
+| `API_RATE_LIMITER`     | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints                     |
+| `SEND_EMAIL`           | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare`       |
 
 Every variable and binding is validated on the first request an isolate
 handles (`src/worker/env.ts`); a misconfigured Worker answers 500 with
@@ -151,6 +155,37 @@ Organizations are the tenancy boundary. Each member has one role:
 Permissions are declared once in `src/shared/permissions.ts` and enforced by
 the Worker (`requirePermission`); the client uses the same table only to hide
 controls.
+
+### Platform administrators
+
+Separate from organization roles, a user whose Better Auth `role` is `admin`
+is a platform administrator. The first one is promoted with a single D1
+update (see [docs/runbook.md](docs/runbook.md)); after that the console at
+`/app/admin` can:
+
+- search users by email, ban and unban them with a reason (a banned user's
+  sessions are revoked and sign-in is refused), grant or remove the platform
+  role, and sign a user out everywhere;
+- list every organization with its member count, photo count and storage;
+- browse the global audit trail, including the admin actions themselves.
+
+Every admin action is recorded in the audit log with the administrator as
+the actor. The Worker enforces the role on its own admin routes
+(`requirePlatformAdmin`) and Better Auth's admin plugin enforces it on user
+management.
+
+### Bot protection
+
+When `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are both set, sign-up
+and password-reset requests must carry a Cloudflare Turnstile token in the
+`x-captcha-response` header; the Worker verifies it with Cloudflare before
+Better Auth handles the request. The sign-up and forgot-password pages render
+the widget and keep their submit button disabled until it produces a token.
+Without the keys the deployment runs without a challenge and the pages show
+nothing extra. Create a widget for `watermark.blowmoney.net` in the Cloudflare
+dashboard under Turnstile, put the site key in `wrangler.jsonc`
+(`env.production.vars`) and the secret in
+`wrangler secret put TURNSTILE_SECRET_KEY --env production`.
 
 ## Watermark library
 
@@ -242,9 +277,9 @@ src/worker/       Hono API on Workers: auth/ (Better Auth), db/ (drizzle schema,
                   email/ (providers), middleware/, routes/, services.ts, env.ts
 src/shared/       constants, permissions, validation and API schemas used by both sides
 migrations/       D1 migrations generated by drizzle-kit
-e2e/              Playwright specs (smoke, onboarding, library, editor, bulk, gallery and sharing journeys)
-scripts/          Lighthouse and screenshot audits
-docs/             lighthouse/ reports and screenshots/ per milestone
+e2e/              Playwright specs (smoke, onboarding, library, editor, bulk, gallery, sharing and admin journeys)
+scripts/          deploy, Lighthouse and screenshot audits
+docs/             threat-model.md, runbook.md, benchmarks.md, lighthouse/ reports and screenshots/ per milestone
 public/           static files, including _headers for security headers
 ```
 
@@ -259,12 +294,28 @@ router plugin on every dev/build/test run and is git-ignored.
 
 ## Deployment
 
-Production is the `production` environment in `wrangler.jsonc`, deployed
-with:
+Production is the `production` environment in `wrangler.jsonc`. Releases
+are deployed from CI when a version tag is pushed:
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
+
+`.github/workflows/deploy.yml` runs the full quality chain and the Playwright
+suite on the tagged commit, then `npm run deploy` in the `production` GitHub
+environment. It needs two repository secrets: `CLOUDFLARE_API_TOKEN` (Workers
+Scripts, D1, R2, Email Sending and Zone DNS edit rights for the account) and
+`CLOUDFLARE_ACCOUNT_ID`. The same command works from an authenticated
+workstation:
 
 ```bash
 npm run deploy   # CLOUDFLARE_ENV=production vite build → remote D1 migrations → wrangler deploy
 ```
+
+The deploy script applies migrations non-interactively and refuses to upload
+the Worker while any migration is still pending, so the schema is never
+behind the code that needs it. Rollback, secret rotation, D1 Time Travel, log
+tailing and the incident playbook are in [docs/runbook.md](docs/runbook.md).
 
 One-time setup, already done for this account on 2026-09-06: `wrangler d1
 create watermark-pro` (id in `wrangler.jsonc`) and
@@ -293,13 +344,17 @@ verification email is logged as rejected instead of delivered.
 ## Security
 
 See [SECURITY.md](SECURITY.md) for the reporting process and the list of
-controls. Headline items: strict CSP on both API and static responses, a
-same-origin guard on every state-changing request, HttpOnly SameSite session
-cookies, mandatory email verification, rate limiting on credential endpoints,
-server-side RBAC on every route, an append-only audit trail, fail-closed
-configuration validation, secret scanning in the hook and in CI, dependency
-audit, semgrep, exact pins with a seven-day release age, and GitHub Actions
-pinned to commit SHAs.
+controls, and [docs/threat-model.md](docs/threat-model.md) for the STRIDE
+review of every trust boundary. Headline items: strict CSP on both API and
+static responses (the only third-party origin is `challenges.cloudflare.com`
+for Turnstile), a same-origin guard on every state-changing request, HttpOnly
+SameSite session cookies, mandatory email verification, rate limiting on
+credential and public share endpoints, optional Turnstile on sign-up and
+password reset, server-side RBAC on every route, a platform admin role with
+audited bans and role changes, an append-only audit trail, signed share
+tokens, fail-closed configuration validation, secret scanning in the hook and
+in CI, dependency audit and dependency review on pull requests, semgrep, exact
+pins with a seven-day release age, and GitHub Actions pinned to commit SHAs.
 
 ## Troubleshooting
 

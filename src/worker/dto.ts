@@ -1,3 +1,4 @@
+import type { AuditRecord } from './audit'
 import { NEVER_EXPIRES } from './share-token'
 import type { AssetRecord, PhotoRecord, ShareRecord, WatermarkRecord } from './stores'
 import { MILLISECONDS_PER_SECOND } from '../shared/constants'
@@ -35,5 +36,19 @@ export function shareToDto(record: ShareRecord, url: string) {
     createdBy: record.createdBy,
     createdAt: record.createdAt.toISOString(),
     url,
+  }
+}
+
+export function auditToDto(record: AuditRecord) {
+  return {
+    id: record.id,
+    organizationId: record.organizationId ?? null,
+    actorUserId: record.actorUserId ?? null,
+    actorName: record.actorName ?? null,
+    action: record.action,
+    targetType: record.targetType,
+    targetId: record.targetId ?? null,
+    metadata: record.metadata ?? null,
+    createdAt: record.createdAt.toISOString(),
   }
 }

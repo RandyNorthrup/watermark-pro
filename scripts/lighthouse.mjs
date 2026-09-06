@@ -21,6 +21,7 @@ import lighthouse from 'lighthouse'
 import desktopConfig from 'lighthouse/core/config/desktop-config.js'
 
 import { waitForLink } from './lib/dev-mailbox.mjs'
+import { promoteToPlatformAdmin } from './lib/local-admin.ts'
 
 const BASE_URL = process.env.APP_URL ?? 'http://localhost:5173'
 const MILESTONE = process.argv[2] ?? 'm1'
@@ -35,6 +36,7 @@ const AUTHENTICATED_PAGES = [
   '/app/editor',
   '/app/bulk',
   '/app/gallery',
+  '/app/admin',
 ]
 
 async function api(pathname, init = {}, cookie = '') {
@@ -104,6 +106,9 @@ async function createSession() {
   if (refreshed !== '') {
     cookie = refreshed
   }
+  // The admin console is part of the audited surface; the role is read from
+  // the database on every request, so the promotion applies to this session.
+  promoteToPlatformAdmin(email)
   return { cookie, organizationId: id }
 }
 

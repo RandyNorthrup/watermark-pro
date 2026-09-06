@@ -49,6 +49,8 @@ test('owner invites a viewer who accepts and is limited to reading', async ({
   request,
 }) => {
   await page.goto('/login')
+  // Route chunks load after the document; axe must see the rendered page.
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back')
   await expectAccessible(page)
   await signIn(page, owner, organizationName)
 

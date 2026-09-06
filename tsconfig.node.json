@@ -13,6 +13,8 @@
     "playwright.config.ts",
     "drizzle.config.ts",
     "e2e",
+    // Shared by the audit scripts (Node type stripping) and the e2e suite.
+    "scripts/lib/local-admin.ts",
     // Filesystem audit of the bundled font packages; imports the catalogue only.
     "src/client/fonts/catalogue.audit.test.ts"
   ]

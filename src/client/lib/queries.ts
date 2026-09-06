@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { ApiRequestError, fetchJson } from './api'
 import { authClient } from './auth-client'
-import { auditListResponseSchema } from '../../shared/api'
+import { auditListResponseSchema, publicConfigSchema } from '../../shared/api'
 
 /**
  * Query definitions shared by route loaders and components. Better Auth
@@ -61,3 +61,10 @@ export function auditQueryOptions(organizationId: string) {
 
 /** Query keys to drop after anything that changes membership or the active organization. */
 export const ORGANIZATION_QUERY_KEY = ['organization'] as const
+
+/** Turnstile site key and other pre-sign-in settings; static for the life of a deployment. */
+export const publicConfigQueryOptions = queryOptions({
+  queryKey: ['public-config'],
+  queryFn: () => fetchJson('/api/config', publicConfigSchema),
+  staleTime: Infinity,
+})

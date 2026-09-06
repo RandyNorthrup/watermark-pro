@@ -8,6 +8,7 @@ import { ShareDialog } from './share-dialog'
 import type { PhotoDto } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
+import { dateTimeFormatter } from '../../lib/format-date'
 import {
   deletePhotos,
   galleryQueryKey,
@@ -31,11 +32,6 @@ interface GalleryProps {
 }
 
 const PERCENT = 100
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-})
-
 const selectClassName =
   'h-10 rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
 
@@ -395,7 +391,7 @@ function Lightbox({
                   <Dialog.Description className="text-xs text-ink-muted">
                     {String(photo.width)} × {String(photo.height)} · {formatBytes(photo.size)}
                     {photo.presetName === null ? '' : ` · ${photo.presetName}`} ·{' '}
-                    {dateFormatter.format(new Date(photo.createdAt))}
+                    {dateTimeFormatter.format(new Date(photo.createdAt))}
                   </Dialog.Description>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">

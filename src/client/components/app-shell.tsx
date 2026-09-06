@@ -11,6 +11,7 @@ import {
   Plus,
   ScrollText,
   Share2,
+  ShieldCheck,
   Stamp,
   Users,
 } from 'lucide-react'
@@ -18,6 +19,7 @@ import type { ReactNode } from 'react'
 
 import { BrandMark } from './brand-mark'
 import { ThemeToggle } from './theme-toggle'
+import { isPlatformAdmin } from '../lib/admin'
 import { type ActiveOrganization, authClient, type SessionData } from '../lib/auth-client'
 import { cn } from '../lib/cn'
 import { Avatar } from './ui/avatar'
@@ -42,6 +44,20 @@ const NAV_ITEMS = [
   { to: '/app/audit', label: 'Audit log', icon: ScrollText, exact: false },
 ] as const
 
+const ADMIN_NAV_ITEM = {
+  to: '/app/admin',
+  label: 'Admin',
+  icon: ShieldCheck,
+  exact: false,
+} as const
+
+type NavItem = (typeof NAV_ITEMS)[number] | typeof ADMIN_NAV_ITEM
+
+/** Platform administrators get one more entry; everyone else never sees it. */
+function navItemsFor(session: SessionData): readonly NavItem[] {
+  return isPlatformAdmin(session.user) ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS
+}
+
 interface AppShellProps {
   session: SessionData
   organization: ActiveOrganization | null
@@ -54,6 +70,7 @@ interface AppShellProps {
  * menu, theme toggle. Rendered by the `/app` layout route.
  */
 export function AppShell({ session, organization, organizations, children }: AppShellProps) {
+  const navItems = navItemsFor(session)
   return (
     <div className="flex min-h-svh">
       <a
@@ -68,7 +85,7 @@ export function AppShell({ session, organization, organizations, children }: App
           <OrganizationSwitcher organization={organization} organizations={organizations} />
         </div>
         <nav aria-label="Primary" className="mt-6 flex flex-col gap-1">
-          {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
+          {navItems.map(({ to, label, icon: Icon, exact }) => (
             <Link
               key={to}
               to={to}
@@ -90,7 +107,7 @@ export function AppShell({ session, organization, organizations, children }: App
             <BrandMark to="/app" />
           </div>
           <nav aria-label="Primary (compact)" className="flex gap-1 md:hidden">
-            {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
+            {navItems.map(({ to, label, icon: Icon, exact }) => (
               <Link
                 key={to}
                 to={to}

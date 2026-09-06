@@ -13,6 +13,7 @@ import {
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { renderApp } from '../../test-support/render-app'
+import { requestUrl } from '../../test-support/request-url'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 
@@ -42,13 +43,6 @@ const auditEntries = [
     createdAt: '2026-09-05T11:00:00.000Z',
   },
 ]
-
-function requestUrl(input: RequestInfo | URL): string {
-  if (typeof input === 'string') {
-    return input
-  }
-  return input instanceof URL ? input.href : input.url
-}
 
 function stubAuditApi(status: number) {
   vi.stubGlobal(

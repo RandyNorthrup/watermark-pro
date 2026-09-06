@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 
 import { type FakeGalleryState, handleGallery } from './fake-gallery-api'
 import { type FakeShareState, handleShares } from './fake-share-api'
+import { requestUrl } from './request-url'
 import { type AssetDto, saveWatermarkRequestSchema, type WatermarkDto } from '../../shared/api'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
 
@@ -38,13 +39,6 @@ function readBody(init: RequestInit): string {
     throw new TypeError('expected a JSON string body')
   }
   return init.body
-}
-
-function requestUrl(input: RequestInfo | URL): string {
-  if (typeof input === 'string') {
-    return input
-  }
-  return input instanceof URL ? input.href : input.url
 }
 
 function formText(form: FormData, key: string): string | null {
