@@ -1,0 +1,8 @@
+/**
+ * Must be the first import of the client entry. Zod would otherwise probe
+ * `new Function` while Better Auth builds its schemas at module load, which
+ * the strict Content-Security-Policy reports as a violation on every page.
+ */
+import { z } from 'zod'
+
+z.config({ jitless: true })

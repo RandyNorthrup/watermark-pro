@@ -1,27 +1,32 @@
-import { type HealthResponse, healthResponseSchema } from '../../shared/api'
-import { HEALTH_PATH } from '../../shared/constants'
+import type { ZodType } from 'zod'
 
 export class ApiRequestError extends Error {
   override readonly name = 'ApiRequestError'
   readonly path: string
   readonly status: number
 
-  constructor(path: string, status: number) {
-    super(`Request to ${path} failed with HTTP ${String(status)}`)
+  constructor(path: string, status: number, message?: string) {
+    super(message ?? `Request to ${path} failed with HTTP ${String(status)}`)
     this.path = path
     this.status = status
   }
 }
 
 /**
- * Fetches the Worker health endpoint. The response is validated against the
- * shared schema so a malformed or spoofed payload surfaces as an error rather
- * than propagating undefined fields into the UI.
+ * Same-origin JSON request with schema validation. A malformed or spoofed
+ * payload surfaces as an error rather than propagating undefined fields
+ * into the UI.
  */
-export async function fetchHealth(): Promise<HealthResponse> {
-  const response = await fetch(HEALTH_PATH, { headers: { accept: 'application/json' } })
+export async function fetchJson<T>(
+  path: string,
+  schema: ZodType<T>,
+  init: RequestInit = {},
+): Promise<T> {
+  const headers = new Headers(init.headers)
+  headers.set('accept', 'application/json')
+  const response = await fetch(path, { ...init, headers })
   if (!response.ok) {
-    throw new ApiRequestError(HEALTH_PATH, response.status)
+    throw new ApiRequestError(path, response.status)
   }
-  return healthResponseSchema.parse(await response.json())
+  return schema.parse(await response.json())
 }

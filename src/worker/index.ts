@@ -11,22 +11,26 @@ import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { EnvValidationError, type ValidatedEnv, validateEnv } from './env'
+import type { AppContext } from './app-context'
+import { EnvValidationError } from './env'
 import type { ApiError, HealthResponse } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '../shared/constants'
+import { requireSameOrigin } from './middleware/same-origin'
+import { auditRoutes } from './routes/audit'
+import { devRoutes } from './routes/dev'
+import { getServices, type Services } from './services'
 
-interface AppContext {
-  Bindings: Env
-  Variables: {
-    config: ValidatedEnv
-  }
+export interface CreateAppOptions {
+  /** Resolves the service container for a request env. Tests inject fakes here. */
+  resolveServices?: (env: Env) => Services
 }
 
 /**
  * Builds the Hono application. Exported as a factory so tests can construct
  * isolated instances; the module's default export is the production instance.
  */
-export function createApp(): Hono<AppContext> {
+export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
+  const resolveServices = options.resolveServices ?? getServices
   const app = new Hono<AppContext>()
 
   app.use(
@@ -52,21 +56,31 @@ export function createApp(): Hono<AppContext> {
 
   // Rejects state-changing requests whose Origin header does not match the
   // request host. Combined with SameSite cookies this is the CSRF baseline
-  // that every later route inherits.
+  // that every later route inherits. Better Auth performs its own origin
+  // check on top of this for its endpoints.
   app.use(csrf())
 
   app.use(async (c, next) => {
-    c.set('config', validateEnv(c.env))
+    c.set('services', resolveServices(c.env))
     await next()
   })
+
+  app.use(requireSameOrigin)
 
   app.get(HEALTH_PATH, (c) => {
     const body: HealthResponse = {
       status: 'ok',
-      environment: c.get('config').APP_ENV,
+      environment: c.get('services').config.APP_ENV,
     }
     return c.json(body, HTTP_STATUS.ok)
   })
+
+  app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
+    return await c.get('services').auth.handler(c.req.raw)
+  })
+
+  app.route('/api', auditRoutes)
+  app.route('/api', devRoutes)
 
   app.notFound((c) => {
     const body: ApiError = { error: API_ERROR_CODE.notFound }
@@ -74,8 +88,8 @@ export function createApp(): Hono<AppContext> {
   })
 
   app.onError((error, c) => {
-    // Deliberate HTTP errors raised by middleware (CSRF 403, body limits,
-    // future auth 401s) already carry the right status and body.
+    // Deliberate HTTP errors raised by middleware (CSRF 403, auth 401/403,
+    // validation 400) already carry the right status and body.
     if (error instanceof HTTPException) {
       return error.getResponse()
     }

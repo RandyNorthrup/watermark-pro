@@ -90,6 +90,20 @@ export default defineEslintConfig(
       ],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
+      // `onClick={() => setOpen(true)}` is the idiomatic React handler; the
+      // rule's other cases (returning void from a block, void in a ternary)
+      // stay on.
+      '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
+      // TanStack Router signals redirects and not-found by throwing plain
+      // Response objects; those are the framework's contract, not errors.
+      '@typescript-eslint/only-throw-error': [
+        'error',
+        {
+          allow: [{ from: 'lib', name: 'Response' }],
+          allowThrowingAny: false,
+          allowThrowingUnknown: false,
+        },
+      ],
 
       // --- strictness beyond the presets ---
       '@typescript-eslint/switch-exhaustiveness-check': [
@@ -121,7 +135,9 @@ export default defineEslintConfig(
           devDependencies: [
             '**/*.test.{ts,tsx}',
             '**/test-setup.ts',
+            '**/test-support/**',
             'e2e/**',
+            'scripts/**',
             '*.config.ts',
             'eslint.config.mjs',
           ],
@@ -206,11 +222,14 @@ export default defineEslintConfig(
     // Test files: assertions and non-null access are idiomatic there, and the
     // expected values in an assertion *are* the meaning — naming them would
     // move the assertion into a constant and make the test a tautology.
-    files: ['**/*.test.{ts,tsx}', 'e2e/**/*.ts'],
+    files: ['**/*.test.{ts,tsx}', '**/test-support/**', 'e2e/**/*.ts'],
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-magic-numbers': 'off',
+      // Vitest fixtures are assigned in beforeEach and read by every test in
+      // the file; that is the framework's documented pattern.
+      'unicorn/no-top-level-assignment-in-function': 'off',
     },
   },
 

@@ -34,9 +34,47 @@
     "enabled": true,
   },
   "vars": {
-    // Non-secret configuration. Secrets go in .dev.vars locally and
-    // `wrangler secret put` in production. Every entry here is validated by
-    // src/worker/env.ts on the first request an isolate handles.
+    // Non-secret configuration. Secrets (BETTER_AUTH_SECRET) go in .dev.vars
+    // locally and `wrangler secret put` in production. Every entry here is
+    // validated by src/worker/env.ts on the first request an isolate handles.
+    // These are the local-development values; production overrides them in
+    // the `production` environment introduced in M8.
     "APP_ENV": "development",
+    "APP_URL": "http://localhost:5173",
+    "EMAIL_PROVIDER": "console",
+    "EMAIL_FROM": "no-reply@blowmoney.net",
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "watermark-pro",
+      // Local development and tests use an embedded SQLite regardless of this
+      // value. Before the first production deploy run
+      //   npx wrangler d1 create watermark-pro
+      // and paste the returned id here; deploying with the zero id fails.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "ratelimits": [
+    // Authoritative limits. src/shared/constants.ts mirrors them so Better
+    // Auth reports an accurate Retry-After; keep both in sync.
+    {
+      "name": "AUTH_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 },
+    },
+    {
+      "name": "API_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": { "limit": 120, "period": 60 },
+    },
+  ],
+  "send_email": [
+    {
+      // Cloudflare Email Sending. Unused while EMAIL_PROVIDER is "console";
+      // required when it is "cloudflare".
+      "name": "SEND_EMAIL",
+    },
+  ],
 }

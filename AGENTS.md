@@ -20,7 +20,9 @@ machine-wide instructions from this repository.
   (`npm info <pkg> peerDependencies`), pin the exact version, and record the
   decision in `PLAN.md` §3.1 with the source of the verification.
 - Run `npm run quality` before declaring anything done. Run `npm run test:e2e`
-  and `npm run security:sast` for UI and security-relevant changes.
+  and `npm run security:sast` for UI and security-relevant changes, and
+  `npm run audit:lighthouse` plus `npm run audit:screenshots` when certifying a
+  UI milestone.
 - Never pass `--legacy-peer-deps`, never use `--no-verify`, never lower a
   coverage threshold or disable a rule to get green. Fix the code.
 - If a gate cannot run on your machine, say so explicitly. A gate reported as
@@ -56,7 +58,9 @@ machine-wide instructions from this repository.
 - New behaviour ships with tests that fail without the change.
 - Assert behaviour, not downstream symptoms. Give assertions a case that must
   come back negative so a broken check is distinguishable from a passing one.
-- API routes get positive and negative tests per role once RBAC exists (M1+).
+- API routes get positive and negative tests per role: owner, admin, editor,
+  viewer, non-member, anonymous. The Node harness in `src/worker/test-support`
+  runs real Better Auth on the memory adapter; use it rather than mocking auth.
 - Coverage thresholds (lines 90, statements 90, functions 90, branches 85) are
   load-bearing. If a branch is unreachable, delete it rather than lowering the
   bar.

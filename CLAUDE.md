@@ -10,8 +10,12 @@ is specific to working in this repository from Claude Code.
 npm run quality          # every local gate; must pass before "done"
 npm run test:e2e         # Playwright + axe against the production build
 npm run security:sast    # semgrep (needs semgrep on PATH)
+npm run audit:lighthouse # UI milestones: desktop budgets against `npm run preview`
+npm run audit:screenshots# UI milestones: every screen, light and dark
 npm run cf-typegen       # after editing wrangler.jsonc; commit the result
-npm run dev              # local dev server on :5173
+npm run db:generate      # after editing src/worker/db/schema.ts
+npm run db:migrate:local # apply migrations to the local D1 database
+npm run dev              # local dev server on :5173 (needs .dev.vars + migrations)
 ```
 
 ## Non-negotiables
@@ -39,6 +43,14 @@ npm run dev              # local dev server on :5173
 - `src/client/routeTree.gen.ts` is generated and git-ignored; tests generate it
   through the router plugin in `vitest.config.ts`.
 - Coverage is collected only for the jsdom and Node projects; workerd cannot be
-  instrumented, so worker modules earn coverage from `*.test.ts` files.
+  instrumented, so worker modules earn coverage from `*.test.ts` files. Node
+  tests run real Better Auth on the memory adapter (`src/worker/test-support`);
+  D1-only wiring is verified by `*.workers.test.ts`.
+- Page tests replace `src/client/lib/auth-client` with the fake in
+  `src/client/test-support/fake-auth-module.ts` and render the real router.
+- Never `(await response.json()) as T` in worker tests: Cloudflare types make
+  `json<T>()` generic, so ESLint's fixer deletes the assertion. Parse with Zod.
+- `vite dev` and `vite preview` must both serve on :5173 (the `APP_URL`
+  origin); the same-origin guard rejects other origins.
 - TypeScript `erasableSyntaxOnly` is on: no enums, namespaces, or constructor
   parameter properties.

@@ -22,13 +22,61 @@ export const HEALTH_PATH = `${API_PREFIX}/health`
 /** Deployment environments the Worker accepts in `APP_ENV`. */
 export const APP_ENVIRONMENTS = ['development', 'test', 'staging', 'production'] as const
 
+/** Transactional email backends. `console` logs instead of sending and is refused in production. */
+export const EMAIL_PROVIDERS = ['console', 'cloudflare'] as const
+
+/** Minimum length of BETTER_AUTH_SECRET; 32 characters of a random string is the Better Auth recommendation. */
+export const AUTH_SECRET_MIN_LENGTH = 32
+
+/** Password policy enforced by Better Auth and mirrored in client-side validation. */
+export const PASSWORD_MIN_LENGTH = 12
+export const PASSWORD_MAX_LENGTH = 128
+
+/** Session lifetime and refresh cadence, in seconds. */
+export const SESSION_EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
+export const SESSION_UPDATE_AGE_SECONDS = 60 * 60 * 24
+
+/** Lifetime of email verification, password reset, and invitation tokens, in seconds. */
+export const VERIFICATION_TOKEN_TTL_SECONDS = 60 * 60
+export const INVITATION_TTL_SECONDS = 60 * 60 * 24 * 7
+
+/**
+ * Rate limiting. The Workers Rate Limiting bindings in wrangler.jsonc carry
+ * the authoritative limits; these values describe them to Better Auth so its
+ * Retry-After headers are accurate. Keep the two in sync.
+ */
+export const AUTH_RATE_LIMIT = { windowSeconds: 60, max: 10 } as const
+export const API_RATE_LIMIT = { windowSeconds: 60, max: 120 } as const
+
+/** Auth endpoints that get the strict limiter; everything else under /api/auth gets the general one. */
+export const SENSITIVE_AUTH_PATHS = [
+  '/sign-in/email',
+  '/sign-up/email',
+  '/forget-password',
+  '/reset-password',
+  '/send-verification-email',
+  '/verify-email',
+  '/change-password',
+] as const
+
+/** Radix for hex encoding of hash digests. */
+export const HEX_RADIX = 16
+
+/** Upper bound on audit log rows returned by one request. */
+export const AUDIT_PAGE_SIZE = 50
+
+/** Ring buffer size for the console email provider's captured messages (dev/test only). */
+export const DEV_MAILBOX_CAPACITY = 20
+
 /** HTTP status codes used by the API. Named so handlers never carry bare numbers. */
 export const HTTP_STATUS = {
   ok: 200,
+  found: 302,
   badRequest: 400,
   unauthorized: 401,
   forbidden: 403,
   notFound: 404,
+  tooManyRequests: 429,
   internalServerError: 500,
 } as const
 
@@ -37,6 +85,10 @@ export const API_ERROR_CODE = {
   notFound: 'not_found',
   internalError: 'internal_error',
   invalidConfiguration: 'invalid_configuration',
+  unauthenticated: 'unauthenticated',
+  forbidden: 'forbidden',
+  validation: 'validation_failed',
+  rateLimited: 'rate_limited',
 } as const
 
 /** One year in seconds; the HSTS max-age recommended by hstspreload.org. */

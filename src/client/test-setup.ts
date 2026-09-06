@@ -11,6 +11,18 @@ Object.defineProperty(window, 'scrollTo', {
   writable: true,
 })
 
+function noop(): void {
+  // jsdom stand-in; nothing to do.
+}
+
+// jsdom lacks the pointer-capture and scrolling APIs Radix primitives call.
+Object.assign(Element.prototype, {
+  hasPointerCapture: () => false,
+  setPointerCapture: noop,
+  releasePointerCapture: noop,
+  scrollIntoView: noop,
+})
+
 // Vitest globals are off, so Testing Library cannot register this itself.
 afterEach(() => {
   cleanup()

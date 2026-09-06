@@ -3,8 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createApp } from './index'
 import { apiErrorSchema, healthResponseSchema } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HTTP_STATUS } from '../shared/constants'
-
-const validEnv: Env = { APP_ENV: 'test' }
+import { createTestEnv, createTestHarness } from './test-support/test-app'
 
 function silenceConsoleError() {
   return vi.spyOn(console, 'error').mockImplementation(() => {
@@ -14,7 +13,8 @@ function silenceConsoleError() {
 
 describe('GET /api/health', () => {
   it('returns ok with the validated environment', async () => {
-    const response = await createApp().request(HEALTH_PATH, {}, validEnv)
+    const { app, env } = createTestHarness()
+    const response = await app.request(HEALTH_PATH, {}, env)
 
     expect(response.status).toBe(HTTP_STATUS.ok)
     expect(healthResponseSchema.parse(await response.json())).toEqual({
@@ -24,7 +24,8 @@ describe('GET /api/health', () => {
   })
 
   it('sets hardened security headers on every response', async () => {
-    const response = await createApp().request(HEALTH_PATH, {}, validEnv)
+    const { app, env } = createTestHarness()
+    const response = await app.request(HEALTH_PATH, {}, env)
 
     expect(response.headers.get('content-security-policy')).toContain("default-src 'none'")
     expect(response.headers.get('content-security-policy')).toContain("frame-ancestors 'none'")
@@ -39,7 +40,8 @@ describe('GET /api/health', () => {
 
 describe('error handling', () => {
   it('returns a JSON 404 for unknown API routes', async () => {
-    const response = await createApp().request('/api/does-not-exist', {}, validEnv)
+    const { app, env } = createTestHarness()
+    const response = await app.request('/api/does-not-exist', {}, env)
 
     expect(response.status).toBe(HTTP_STATUS.notFound)
     expect(apiErrorSchema.parse(await response.json())).toEqual({ error: API_ERROR_CODE.notFound })
@@ -47,7 +49,7 @@ describe('error handling', () => {
 
   it('fails closed with a 500 when the environment is invalid', async () => {
     const consoleError = silenceConsoleError()
-    const invalidEnv: Env = { APP_ENV: 'not-a-real-environment' }
+    const invalidEnv = createTestEnv({ APP_ENV: 'not-a-real-environment' })
 
     const response = await createApp().request(HEALTH_PATH, {}, invalidEnv)
 
@@ -59,8 +61,9 @@ describe('error handling', () => {
     consoleError.mockRestore()
   })
 
-  it('rejects cross-origin state-changing requests (CSRF baseline)', async () => {
-    const response = await createApp().request(
+  it('rejects cross-origin form posts (CSRF baseline)', async () => {
+    const { app, env } = createTestHarness()
+    const response = await app.request(
       HEALTH_PATH,
       {
         method: 'POST',
@@ -69,7 +72,7 @@ describe('error handling', () => {
           'content-type': 'application/x-www-form-urlencoded',
         },
       },
-      validEnv,
+      env,
     )
 
     expect(response.status).toBe(HTTP_STATUS.forbidden)
@@ -77,12 +80,13 @@ describe('error handling', () => {
 
   it('converts unexpected exceptions into a JSON 500 without leaking details', async () => {
     const consoleError = silenceConsoleError()
-    const app = createApp()
+    const { services, env } = createTestHarness()
+    const app = createApp({ resolveServices: () => services })
     app.get('/api/boom', () => {
       throw new Error('secret internal detail')
     })
 
-    const response = await app.request('/api/boom', {}, validEnv)
+    const response = await app.request('/api/boom', {}, env)
 
     expect(response.status).toBe(HTTP_STATUS.internalServerError)
     expect(apiErrorSchema.parse(await response.clone().json())).toEqual({

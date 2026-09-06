@@ -1,6 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PREVIEW_PORT = 4173
+/**
+ * Must match APP_URL in wrangler.jsonc: the Worker only accepts state-changing
+ * requests from that origin, so the preview has to be served from it.
+ */
+const PREVIEW_PORT = 5173
 const BASE_URL = `http://localhost:${String(PREVIEW_PORT)}`
 const CI_RETRIES = 2
 const SERVER_START_TIMEOUT_MS = 180_000
@@ -21,9 +25,11 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: `npm run build && npm run preview -- --port ${String(PREVIEW_PORT)} --strictPort`,
+    command: 'npm run build && npm run db:migrate:local && npm run preview',
     url: BASE_URL,
-    reuseExistingServer: process.env['CI'] === undefined,
+    // Always build fresh: a running dev server on this port would serve
+    // unbuilt code and the test would no longer be about the production build.
+    reuseExistingServer: false,
     timeout: SERVER_START_TIMEOUT_MS,
   },
 })

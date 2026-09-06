@@ -6,22 +6,24 @@ editor with crop and resize, storage, sharing, multi-format export, and
 role-based access control. A spiritual competitor to eZy Watermark, MIT
 licensed, hosted on Cloudflare Workers at `watermark.blowmoney.net`.
 
-**Status:** milestone M0 (scaffold and quality gates) is complete. No product
-features are implemented yet. See [PLAN.md](PLAN.md) for the roadmap and
+**Status:** milestone M1 (foundation) is complete: accounts with email
+verification and password reset, organizations, invitations, four enforced
+roles, an audit trail, and the design system. Watermarking itself starts in
+milestone M2. See [PLAN.md](PLAN.md) for the roadmap and
 [CHANGELOG.md](CHANGELOG.md) for what has actually shipped.
 
 ## Stack
 
-| Layer           | Choice                                                               |
-| --------------- | -------------------------------------------------------------------- |
-| Runtime         | Cloudflare Workers (one Worker: Static Assets for the SPA, Hono API) |
-| Language        | TypeScript 6.0.3 (pinned; see PLAN.md §3.1)                          |
-| Frontend        | React 19, Vite 8, TanStack Router, Tailwind CSS 4                    |
-| API             | Hono 4, Zod 4                                                        |
-| Data (M1+)      | Cloudflare D1 via Drizzle ORM, Cloudflare R2                         |
-| Auth (M1+)      | Better Auth with organization roles                                  |
-| Tests           | Vitest 4 (jsdom, Node, and real workerd), Playwright + axe           |
-| Package manager | npm 11                                                               |
+| Layer           | Choice                                                                 |
+| --------------- | ---------------------------------------------------------------------- |
+| Runtime         | Cloudflare Workers (one Worker: Static Assets for the SPA, Hono API)   |
+| Language        | TypeScript 6.0.3 (pinned; see PLAN.md §3.1)                            |
+| Frontend        | React 19, Vite 8, TanStack Router + Query, Tailwind CSS 4, Radix UI    |
+| API             | Hono 4, Zod 4                                                          |
+| Auth and RBAC   | Better Auth 1.7 (organization + admin plugins) on Cloudflare D1        |
+| Data            | Cloudflare D1 via Drizzle ORM; Workers Rate Limiting; Email Sending    |
+| Tests           | Vitest 4 (jsdom, Node, and real workerd), Playwright + axe, Lighthouse |
+| Package manager | npm 11                                                                 |
 
 ## Requirements
 
@@ -36,6 +38,7 @@ features are implemented yet. See [PLAN.md](PLAN.md) for the roadmap and
   `curl` and unpack it under `%LOCALAPPDATA%\ms-playwright\` with an empty
   `INSTALLATION_COMPLETE` marker file; that is what was done on the original
   development machine.
+- Google Chrome (or set `CHROME_PATH`) for `npm run audit:lighthouse`.
 - A Cloudflare account for deployment (`wrangler login`). Development and
   tests run fully offline in workerd.
 
@@ -43,73 +46,116 @@ features are implemented yet. See [PLAN.md](PLAN.md) for the roadmap and
 
 ```bash
 npm ci
+cp .dev.vars.example .dev.vars   # then set BETTER_AUTH_SECRET (see the file)
+npm run db:migrate:local         # creates the local D1 database
 ```
 
-`npm ci` also installs the Husky pre-commit hook. Copy `.dev.vars.example` to
-`.dev.vars` if you need to override any Worker variable locally.
+`npm ci` also installs the Husky pre-commit hook.
 
 ## Development
 
 ```bash
-npm run dev        # Vite dev server; Worker runs in workerd with HMR
-npm run preview    # serve the production build through workerd
-npm run build      # production build into dist/
-npm run deploy     # build, then `wrangler deploy` to watermark.blowmoney.net
-npm run cf-typegen # regenerate worker-configuration.d.ts after editing wrangler.jsonc
+npm run dev              # Vite dev server on :5173; Worker runs in workerd with HMR
+npm run preview          # serve the production build through workerd on :5173
+npm run build            # production build into dist/
+npm run cf-typegen       # regenerate worker-configuration.d.ts after editing wrangler.jsonc
+npm run db:generate      # write a new migration after editing src/worker/db/schema.ts
+npm run db:migrate:local # apply migrations to the local D1 database
 ```
 
-The dev server listens on `http://localhost:5173`; preview on `:4173`.
+Both the dev server and the preview use port 5173 because the Worker only
+accepts state-changing requests from the origin in `APP_URL`. Stop one before
+starting the other.
+
+With the default `EMAIL_PROVIDER=console`, verification, reset, and invitation
+emails are printed to the Worker log (the terminal running `npm run dev`), so
+copy the link from there. Under `npm run preview` the same messages are also
+kept in memory and exposed at `GET /api/dev/mailbox`, which the e2e suite and
+the audit scripts use; in `vite dev` the plugin rebuilds the Worker's
+environment per request, so that in-memory mailbox does not accumulate. The
+route exists only with the console provider, which configuration validation
+refuses in production.
 
 ## Quality gates
 
 Every command exits non-zero on a finding. Each one was deliberately broken
 and observed to fail before being trusted; the log is in PLAN.md §8.
 
-| Command                    | Gate                                                          |
-| -------------------------- | ------------------------------------------------------------- |
-| `npm run format:check`     | Prettier (with Tailwind class sorting)                        |
-| `npm run lint`             | ESLint, type-checked, zero warnings                           |
-| `npm run lint:css`         | stylelint, zero warnings                                      |
-| `npm run typecheck`        | `tsc -b` over client, worker, and tooling projects            |
-| `npm run deadcode`         | knip: unused files, exports, dependencies                     |
-| `npm run lint:cycles`      | dpdm: circular imports                                        |
-| `npm run lint:dup`         | jscpd: copy-paste, zero tolerance                             |
-| `npm run security:secrets` | gitleaks over git history                                     |
-| `npm run security:audit`   | `npm audit --audit-level=high`                                |
-| `npm run security:sast`    | semgrep (`p/default`, `p/typescript`, `p/react`, `p/secrets`) |
-| `npm run test`             | Vitest with coverage thresholds, then the workerd project     |
-| `npm run test:e2e`         | Playwright against the production build, with axe             |
-| `npm run build`            | Vite production build                                         |
-| `npm run quality`          | All of the above except `security:sast` and `test:e2e`        |
+| Command                     | Gate                                                                |
+| --------------------------- | ------------------------------------------------------------------- |
+| `npm run format:check`      | Prettier (with Tailwind class sorting)                              |
+| `npm run lint`              | ESLint, type-checked, zero warnings                                 |
+| `npm run lint:css`          | stylelint, zero warnings                                            |
+| `npm run typecheck`         | `tsc -b` over client, worker, and tooling projects                  |
+| `npm run deadcode`          | knip: unused files, exports, dependencies                           |
+| `npm run lint:cycles`       | dpdm: circular imports                                              |
+| `npm run lint:dup`          | jscpd: copy-paste, zero tolerance                                   |
+| `npm run security:secrets`  | gitleaks over git history                                           |
+| `npm run security:audit`    | `npm audit --audit-level=high`                                      |
+| `npm run security:sast`     | semgrep (`p/default`, `p/typescript`, `p/react`, `p/secrets`)       |
+| `npm run test`              | Vitest with coverage thresholds, then the workerd project           |
+| `npm run test:e2e`          | Playwright against the production build, axe on every page          |
+| `npm run audit:lighthouse`  | Lighthouse desktop budgets (PLAN.md §5.5) against a running preview |
+| `npm run audit:screenshots` | Visual record of every screen in both themes                        |
+| `npm run build`             | Vite production build                                               |
+| `npm run quality`           | All gates except `security:sast`, `test:e2e`, and the audits        |
 
-`npm run quality` omits semgrep and Playwright so it stays runnable on a
-machine without those tools installed. CI runs all three (`quality:ci`, the
-e2e job, and the semgrep job) on every push and pull request.
+`npm run quality` omits the tools that need a browser or a machine install so
+it stays runnable anywhere. CI runs `quality:ci`, the e2e job, and the semgrep
+job on every push and pull request. The Lighthouse and screenshot audits are
+run at UI milestones against `npm run preview`; their output is committed
+under `docs/lighthouse/` and `docs/screenshots/`.
 
 Other test commands: `npm run test:unit` (jsdom + Node projects),
-`npm run test:workers` (workerd only), `npm run test:watch`.
+`npm run test:workers` (workerd with real D1 and rate-limit bindings),
+`npm run test:watch`.
 
-## Environment variables
+## Environment variables and bindings
 
-| Name      | Where                                | Values                                         |
-| --------- | ------------------------------------ | ---------------------------------------------- |
-| `APP_ENV` | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production` |
+| Name                 | Kind       | Where                                | Purpose                                                          |
+| -------------------- | ---------- | ------------------------------------ | ---------------------------------------------------------------- |
+| `APP_ENV`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                   |
+| `APP_URL`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard              |
+| `EMAIL_PROVIDER`     | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                        |
+| `EMAIL_FROM`         | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                 |
+| `BETTER_AUTH_SECRET` | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters         |
+| `DB`                 | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log            |
+| `AUTH_RATE_LIMITER`  | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                |
+| `API_RATE_LIMITER`   | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints               |
+| `SEND_EMAIL`         | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare` |
 
-Every variable is validated on the first request an isolate handles
-(`src/worker/env.ts`). Secrets, when they exist, go in `.dev.vars` locally and
-`wrangler secret put` in production. `.dev.vars.example` is the authoritative
-list.
+Every variable and binding is validated on the first request an isolate
+handles (`src/worker/env.ts`); a misconfigured Worker answers 500 with
+`invalid_configuration` and logs the reason. `.dev.vars.example` is the
+authoritative list of local overrides.
+
+## Roles
+
+Organizations are the tenancy boundary. Each member has one role:
+
+| Role   | Watermarks, photos, jobs, sharing | Members and invitations | Organization settings | Audit log |
+| ------ | --------------------------------- | ----------------------- | --------------------- | --------- |
+| owner  | full                              | full                    | update and delete     | read      |
+| admin  | full                              | full                    | update                | read      |
+| editor | full                              | none                    | none                  | none      |
+| viewer | read                              | none                    | none                  | none      |
+
+Permissions are declared once in `src/shared/permissions.ts` and enforced by
+the Worker (`requirePermission`); the client uses the same table only to hide
+controls.
 
 ## Project structure
 
 ```
-src/client/       React SPA (routes/, components/, lib/, styles/)
-src/worker/       Hono API on Workers (index.ts entry, env.ts validation)
-src/shared/       constants and Zod schemas used by both sides
-e2e/              Playwright specs
+src/client/       React SPA: routes/ (file-based), components/ (ui/ primitives), lib/, styles/
+src/worker/       Hono API on Workers: auth/ (Better Auth), db/ (drizzle schema, D1 stores),
+                  email/ (providers), middleware/, routes/, services.ts, env.ts
+src/shared/       constants, permissions, validation and API schemas used by both sides
+migrations/       D1 migrations generated by drizzle-kit
+e2e/              Playwright specs (smoke + onboarding journey)
+scripts/          Lighthouse and screenshot audits
+docs/             lighthouse/ reports and screenshots/ per milestone
 public/           static files, including _headers for security headers
-.github/          CI workflow and Copilot instructions
-.husky/           pre-commit hook
 ```
 
 TypeScript is split into three projects (`tsconfig.client.json`,
@@ -125,28 +171,32 @@ router plugin on every dev/build/test run and is git-ignored.
 
 ```bash
 npx wrangler login
-npm run deploy
+npx wrangler d1 create watermark-pro      # paste the returned id into wrangler.jsonc
+npx wrangler secret put BETTER_AUTH_SECRET
+npm run deploy                            # build, apply remote migrations, deploy
 ```
 
 The Worker is named `watermark-pro` in `wrangler.jsonc` and is routed to the
 Custom Domain `watermark.blowmoney.net`; wrangler creates the DNS record and
 certificate on the first deploy, provided the `blowmoney.net` zone is in the
-logged-in account. The `workers.dev` subdomain is disabled. Bindings for D1,
-R2, and rate limiting are added in milestone M1 together with the commands to
-create them.
+logged-in account. The `workers.dev` subdomain is disabled.
 
-These two commands are the only ones in this file that have not been executed
-yet: deployment needs the owner's Cloudflare login and is certified in
-milestone M8. Everything up to `wrangler deploy` (the build and the workerd
-preview of the built artefact) has been run.
+Not yet executed: the commands above need the owner's Cloudflare login. A
+`production` wrangler environment that sets `APP_ENV=production`,
+`APP_URL=https://watermark.blowmoney.net` and `EMAIL_PROVIDER=cloudflare`
+is scheduled for milestone M8, which certifies deployment end to end. Until
+then the committed defaults are the local-development values.
 
 ## Security
 
 See [SECURITY.md](SECURITY.md) for the reporting process and the list of
-controls. Headline items: strict CSP on both API and static responses, CSRF
-origin checks, fail-closed configuration validation, secret scanning in the
-hook and in CI, dependency audit, semgrep, exact pins with a seven-day release
-age, and GitHub Actions pinned to commit SHAs.
+controls. Headline items: strict CSP on both API and static responses, a
+same-origin guard on every state-changing request, HttpOnly SameSite session
+cookies, mandatory email verification, rate limiting on credential endpoints,
+server-side RBAC on every route, an append-only audit trail, fail-closed
+configuration validation, secret scanning in the hook and in CI, dependency
+audit, semgrep, exact pins with a seven-day release age, and GitHub Actions
+pinned to commit SHAs.
 
 ## Troubleshooting
 
@@ -155,6 +205,11 @@ age, and GitHub Actions pinned to commit SHAs.
 - **The `workers` test project fails with "compatibility date not supported".**
   `compatibility_date` in `wrangler.jsonc` must not exceed the newest date the
   Workers pool's bundled workerd supports (2026-08-22 for pool 0.22.0).
+- **Sign-up returns 403 locally.** The request origin must equal `APP_URL`;
+  serve the app from `http://localhost:5173`.
+- **Sign-up returns 500 `invalid_configuration`.** `.dev.vars` is missing or
+  `BETTER_AUTH_SECRET` is shorter than 32 characters.
+- **Tables do not exist.** Run `npm run db:migrate:local`.
 - **`npm run security:sast` says semgrep is not found.** Add your Python
   `Scripts` directory to `PATH` (on Windows,
   `%APPDATA%\Python\Python3xx\Scripts`).
@@ -162,3 +217,5 @@ age, and GitHub Actions pinned to commit SHAs.
   `min-release-age=7` in `.npmrc` doing its job; wait, or pin an older version.
 - **knip reports nothing at all.** Do not add `--strict`; in knip 6 it implies
   `--production` and skips everything without a production suffix.
+- **Playwright says port 5173 is in use.** A previous preview is still running;
+  stop it (the e2e suite never reuses an existing server on purpose).

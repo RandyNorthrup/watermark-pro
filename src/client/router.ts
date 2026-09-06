@@ -1,3 +1,4 @@
+import type { QueryClient } from '@tanstack/react-query'
 import { createRouter, type RouterHistory } from '@tanstack/react-router'
 
 import { routeTree } from './routeTree.gen'
@@ -6,9 +7,10 @@ import { routeTree } from './routeTree.gen'
  * Builds the application router. Production passes no history and gets the
  * browser history; tests pass a memory history to drive navigation headlessly.
  */
-export function createAppRouter(history?: RouterHistory) {
+export function createAppRouter(queryClient: QueryClient, history?: RouterHistory) {
   return createRouter({
     routeTree,
+    context: { queryClient },
     defaultPreload: 'intent',
     scrollRestoration: true,
     ...(history !== undefined && { history }),

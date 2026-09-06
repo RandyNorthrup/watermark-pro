@@ -7,6 +7,55 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-06
+
+Milestone M1: foundation. Accounts, organizations, roles, audit trail, and
+the design system. No watermarking yet; that begins in M2.
+
+### Added
+
+- Better Auth 1.7 on Cloudflare D1 via Drizzle: email + password sign-up
+  with mandatory email verification, sign-in, password reset, sessions in
+  HttpOnly SameSite=Lax cookies (Secure on https origins).
+- Organizations with owner, admin, editor and viewer roles declared once in
+  `src/shared/permissions.ts` (Better Auth access control) and enforced by
+  `requireSession` / `requirePermission` middleware on every custom route.
+  Invitations by email, role changes, member removal, and organization
+  update/delete through Better Auth's organization endpoints.
+- Append-only `audit_log` table written from Better Auth hooks for sign-ups
+  and every organization, invitation and membership change, with the actor's
+  name snapshotted; `GET /api/orgs/:orgId/audit` for owners and admins.
+- Rate limiting through two Workers Rate Limiting bindings (strict for
+  credential endpoints, general for the rest), with Better Auth reporting an
+  accurate `X-Retry-After`.
+- Same-origin guard on every state-changing `/api` request, closing the gap
+  left by form-only CSRF checks for JSON bodies.
+- Transactional email behind a provider interface: Cloudflare Email Sending
+  (`send_email` binding, `no-reply@blowmoney.net`) or a console provider for
+  development and tests that also exposes `GET /api/dev/mailbox`. Configuration
+  validation refuses the console provider in production.
+- Fail-closed validation of every variable and binding (`APP_URL`,
+  `BETTER_AUTH_SECRET`, `EMAIL_PROVIDER`, `EMAIL_FROM`, `DB`,
+  `AUTH_RATE_LIMITER`, `API_RATE_LIMITER`, `SEND_EMAIL`).
+- Client: landing page, sign-up, check-your-inbox, sign-in with redirect
+  target, forgot/reset password, invitation acceptance, authenticated shell
+  with sidebar navigation, organization switcher, account menu and theme
+  toggle (system/light/dark, persisted), dashboard, members management, audit
+  log viewer, organization creation with slug derivation.
+- Design system on Tailwind CSS 4 tokens (brand and semantic colours, Inter
+  Variable self-hosted) with Radix-based primitives: button, input, field,
+  card, alert, badge, avatar, dropdown menu, select, spinner.
+- Schema drift guard: a test compares the drizzle schema with the tables
+  Better Auth derives from the runtime options.
+- Node test harness running the real Hono app and real Better Auth on the
+  in-memory adapter; Workers test project applying D1 migrations per file and
+  exercising real D1 and rate-limit bindings; Playwright onboarding journey
+  (sign-up → verify → organization → invite → accept → viewer denied) with axe
+  on every page; Lighthouse and screenshot audit scripts.
+- npm scripts `db:generate`, `db:migrate:local`, `db:migrate:remote`,
+  `audit:lighthouse`, `audit:screenshots`; `deploy` now applies remote
+  migrations first.
+
 ### Changed
 
 - Target Cloudflare plan is Workers Paid (owner upgraded on 2026-09-05), which
@@ -16,6 +65,30 @@ what was planned; superseded entries stay.
   (`routes` in `wrangler.jsonc`); the `workers.dev` subdomain is disabled.
   The owner supplied the domain after the 0.1.0 scaffold, which had assumed
   no custom domain.
+- `npm run preview` serves on port 5173 so the preview origin matches
+  `APP_URL`; Playwright never reuses an existing server.
+- `/api/health` answers 500 `invalid_configuration` until every binding is
+  present, so a partially configured deployment is visible immediately.
+
+### Fixed
+
+- Switching organizations from the shell did not refresh cached queries or
+  the parent route context (caught by a shell test and the e2e journey).
+- `eslint --fix` had stripped `as` assertions on `Response.json()` results
+  because Cloudflare's types make `json<T>()` generic; tests now parse
+  responses with Zod instead of asserting.
+- Zod's JIT probe (`new Function`) was reported as a CSP violation on every
+  page; Zod now runs in `jitless` mode from the first client import.
+
+### Decisions recorded
+
+- Node unit tests run Better Auth on the memory adapter; D1-only wiring
+  (`src/worker/db/**`, `services.ts`) is excluded from coverage and verified
+  by the Workers project instead, because the Workers pool cannot instrument.
+- The Better Auth CLI (1.4.21) is older than Better Auth 1.7 and would have
+  generated a schema without `account.issuer`; the drift test replaces it.
+- `--config auto` for semgrep requires telemetry and is not used; explicit
+  rulesets are.
 
 ## [0.1.0] - 2026-09-05
 

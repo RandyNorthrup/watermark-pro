@@ -46,10 +46,18 @@ export default defineConfig({
       include: ['src/**'],
       exclude: [
         'src/**/*.test.{ts,tsx}',
+        'src/**/test-support/**',
+        'src/client/test-setup.ts',
         // Bootstraps the DOM; exercised by the Playwright smoke test instead.
         'src/client/main.tsx',
         'src/client/routeTree.gen.ts',
-        'src/client/test-setup.ts',
+        // Instantiates the Better Auth browser client; page tests replace the
+        // module with a fake, so its one statement runs only in Playwright.
+        'src/client/lib/auth-client.ts',
+        // D1 and binding wiring that only executes inside workerd. Covered
+        // functionally by the `workers` project, which cannot report coverage.
+        'src/worker/db/**',
+        'src/worker/services.ts',
       ],
       thresholds: COVERAGE_THRESHOLDS,
     },

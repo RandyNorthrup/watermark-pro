@@ -1,0 +1,63 @@
+import { queryOptions } from '@tanstack/react-query'
+
+import { ApiRequestError, fetchJson } from './api'
+import { authClient } from './auth-client'
+import { auditListResponseSchema } from '../../shared/api'
+
+/**
+ * Query definitions shared by route loaders and components. Better Auth
+ * client calls return `{ data, error }`; the helpers below turn `error` into
+ * a thrown `ApiRequestError` so TanStack Query and the router error boundaries
+ * see one failure shape.
+ */
+
+interface AuthResult<T> {
+  data: T | null
+  error: { status?: number | undefined; message?: string | undefined } | null
+}
+
+function unwrap<T>(path: string, result: AuthResult<T>): T | null {
+  if (result.error !== null) {
+    throw new ApiRequestError(path, result.error.status ?? 0, result.error.message)
+  }
+  return result.data
+}
+
+export const sessionQueryOptions = queryOptions({
+  queryKey: ['session'],
+  queryFn: async () => unwrap('/api/auth/get-session', await authClient.getSession()),
+})
+
+export const organizationsQueryOptions = queryOptions({
+  queryKey: ['organizations'],
+  queryFn: async () =>
+    unwrap('/api/auth/organization/list', await authClient.organization.list()) ?? [],
+})
+
+export const activeOrganizationQueryOptions = queryOptions({
+  queryKey: ['organization', 'active'],
+  queryFn: async () =>
+    unwrap(
+      '/api/auth/organization/get-full-organization',
+      await authClient.organization.getFullOrganization(),
+    ),
+})
+
+export const activeMemberRoleQueryOptions = queryOptions({
+  queryKey: ['organization', 'active', 'role'],
+  queryFn: async () =>
+    unwrap(
+      '/api/auth/organization/get-active-member-role',
+      await authClient.organization.getActiveMemberRole(),
+    ),
+})
+
+export function auditQueryOptions(organizationId: string) {
+  return queryOptions({
+    queryKey: ['organization', organizationId, 'audit'],
+    queryFn: () => fetchJson(`/api/orgs/${organizationId}/audit`, auditListResponseSchema),
+  })
+}
+
+/** Query keys to drop after anything that changes membership or the active organization. */
+export const ORGANIZATION_QUERY_KEY = ['organization'] as const

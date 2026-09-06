@@ -9,3 +9,4 @@ worker-configuration.d.ts
 src/client/routeTree.gen.ts
 migrations/meta/
 CHANGELOG.md
+docs/lighthouse/

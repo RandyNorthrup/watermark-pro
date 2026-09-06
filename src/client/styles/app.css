@@ -1,6 +1,14 @@
 @import 'tailwindcss';
 
 /*
+ * Dark mode. src/client/lib/theme.ts resolves the preference (system, light
+ * or dark) to a data-theme attribute on <html> before the app renders, so
+ * utilities only need to look at that attribute. The media query below keeps
+ * the first paint correct until the script runs.
+ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
  * Design tokens. Tailwind v4 reads this @theme block and generates utilities
  * (bg-brand-600, text-ink, rounded-card, …) from it, so the palette is defined
  * exactly once. Semantic tokens (surface, ink, line) switch with the colour

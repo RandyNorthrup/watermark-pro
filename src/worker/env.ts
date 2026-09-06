@@ -8,11 +8,36 @@
  */
 import { z } from 'zod'
 
-import { APP_ENVIRONMENTS } from '../shared/constants'
+import { APP_ENVIRONMENTS, AUTH_SECRET_MIN_LENGTH, EMAIL_PROVIDERS } from '../shared/constants'
 
-const envSchema = z.object({
-  APP_ENV: z.enum(APP_ENVIRONMENTS),
-})
+const bindingSchema = <T>(name: string) =>
+  z.custom<T>((value) => typeof value === 'object' && value !== null, {
+    message: `${name} binding is missing; check wrangler.jsonc`,
+  })
+
+const envSchema = z
+  .object({
+    APP_ENV: z.enum(APP_ENVIRONMENTS),
+    /** Public origin of the app, e.g. https://watermark.blowmoney.net. Used for auth links and origin checks. */
+    APP_URL: z.url({ protocol: /^https?$/ }),
+    /** At least 32 characters; signs session cookies and tokens. Set with `wrangler secret put`. */
+    BETTER_AUTH_SECRET: z.string().min(AUTH_SECRET_MIN_LENGTH),
+    EMAIL_PROVIDER: z.enum(EMAIL_PROVIDERS),
+    /** Sender address for transactional email; must belong to a zone in the Cloudflare account. */
+    EMAIL_FROM: z.email(),
+    DB: bindingSchema<D1Database>('DB'),
+    AUTH_RATE_LIMITER: bindingSchema<RateLimit>('AUTH_RATE_LIMITER'),
+    API_RATE_LIMITER: bindingSchema<RateLimit>('API_RATE_LIMITER'),
+    SEND_EMAIL: bindingSchema<SendEmail>('SEND_EMAIL').optional(),
+  })
+  .refine((env) => env.APP_ENV !== 'production' || env.EMAIL_PROVIDER !== 'console', {
+    message: 'EMAIL_PROVIDER=console is not allowed in production',
+    path: ['EMAIL_PROVIDER'],
+  })
+  .refine((env) => env.EMAIL_PROVIDER !== 'cloudflare' || env.SEND_EMAIL !== undefined, {
+    message: 'EMAIL_PROVIDER=cloudflare requires the SEND_EMAIL binding',
+    path: ['SEND_EMAIL'],
+  })
 
 export type ValidatedEnv = z.infer<typeof envSchema>
 
