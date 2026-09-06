@@ -53,9 +53,10 @@ Only the `main` branch and the latest tagged release receive fixes.
   audited.
 - Preview rendering happens in the browser's Web Worker; a chosen photo is
   never uploaded to preview a preset.
-- The editor (M4) keeps photos and exports on the device: files are decoded
-  in the browser, rendered in the worker, and downloaded through a
-  same-origin object URL that is revoked immediately.
+- The editor (M4) and bulk tool (M5) keep photos and exports on the device:
+  files are decoded in the browser, rendered in workers, zipped in memory,
+  and downloaded through a same-origin object URL that is revoked
+  immediately.
 
 ## Controls planned (see `PLAN.md` milestones)
 

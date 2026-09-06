@@ -5,7 +5,7 @@
  */
 import { expect, type Page, test } from '@playwright/test'
 
-import { createWorkspace, expectAccessible } from './support'
+import { createWorkspace, expectAccessible, pngSize } from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -21,11 +21,6 @@ async function expectRendered(page: Page, name: RegExp) {
   await expect
     .poll(async () => await image.evaluate((img: { naturalWidth: number }) => img.naturalWidth))
     .toBeGreaterThan(0)
-}
-
-/** Width and height from a PNG's IHDR chunk. */
-function pngSize(bytes: Buffer): { width: number; height: number } {
-  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) }
 }
 
 test('edits a photo end to end and downloads the result', async ({ page, request }) => {

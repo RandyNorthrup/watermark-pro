@@ -7,6 +7,29 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-06
+
+Milestone M5: bulk processing and export.
+
+### Added
+
+- `/app/bulk`: apply a library preset to up to 500 photos at once. Photos
+  are decoded in the browser and rendered in parallel by a pool of engine
+  workers sized to the machine; smart placement and auto contrast are
+  computed for every photo separately.
+- Progress bar with a live summary and throughput, per-file status, error
+  message and download, Cancel (finished results are kept), Retry for
+  failed or cancelled photos, and Clear.
+- Output as PNG, JPEG or WebP with a quality slider and an optional
+  fit-to-long-edge resize (1080, 2048 or 4096 px).
+- "Download n as ZIP": a streaming, stored ZIP built with fflate.
+- Bulk throughput measurement in `docs/benchmarks.md`.
+
+### Changed
+
+- Font, icon and logo resolution for a spec lives in `MarkResources`, shared
+  by the designer preview, the editor and the bulk tool.
+
 ## [0.5.0] - 2026-09-06
 
 Milestone M4: editor.

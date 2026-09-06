@@ -87,6 +87,7 @@ and expensive to block on. If any is wrong, say so and the plan will be revised.
 | UI kit         | Radix UI unified package, lucide-react, class-variance-authority, clsx, tailwind-merge            | 1.6.7 / 1.37.0 / 0.7.1 / 2.1.1 / 3.6.0          | lucide-react 1.41.0 was refused by `min-release-age=7`; 1.37.0 is the newest release older than seven days on 2026-09-06.                                                              |
 | Fonts          | `@fontsource-variable/inter` (self-hosted)                                                        | 5.3.0                                           | OFL licence; no third-party font origin, so `font-src 'self'` holds.                                                                                                                   |
 | Test tooling   | `@testing-library/user-event`, `@better-auth/core` (drift test only), lighthouse, chrome-launcher | 14.6.1 / 1.7.2 / 13.4.1 / 1.2.0                 | `@better-auth/core` is pinned to the better-auth version it ships with.                                                                                                                |
+| ZIP            | fflate                                                                                            | **0.8.3**                                       | MIT, zero dependencies, streaming `Zip` with stored entries; also used in tests to unpack downloads.                                                                                   |
 
 ### 3.2 Quality gates
 
@@ -388,12 +389,20 @@ green. No milestone starts before the previous one is certified.
   - [x] keyboard-only operation of both overlays covered by tests and axe
   - [x] bugs found by tests fixed before certification (see §8)
 
-### M5 — Bulk processing and export
+### M5 — Bulk processing and export — certified 2026-09-06
 
 - **Goal:** apply a preset to many photos with progress, cancel, retry, and download as ZIP in PNG/JPEG/WebP (AVIF stretch).
-- **Scope:** browser job queue with worker pool, progress UI, per-file error reporting, fflate streaming ZIP, quality/size settings per format.
-- **Tests:** queue unit tests (ordering, concurrency, cancel, failure isolation); e2e bulk of 20 fixtures.
-- **Certification:** gates + throughput benchmark.
+- **Scope delivered:** `/app/bulk` ("Bulk" in the navigation). `src/client/bulk/queue.ts`: a generic concurrency-limited job queue (submission order, `AbortSignal` cancellation that keeps finished results, retry of failed and cancelled jobs, per-job duration, failure isolation, `onChange` snapshots). `worker-pool.ts`: a pool of engine workers sized to `hardwareConcurrency − 1` (max 8), least-busy dispatch. `processor.ts`: decode on the main thread, optional fit-to-long-edge resize, render and encode in a worker, output naming. `zip.ts`: fflate streaming ZIP with stored (uncompressed) entries and duplicate-name suffixes. `runtime.ts` ties them together behind one factory so the page can be tested with a fake. The bulk tool: multi-file picker and drag-and-drop with de-duplication and a 500-file cap, preset select, format, quality (disabled for PNG), size (original or fit 1080/2048/4096), Start / Cancel / Retry n, a `<progress>` bar with a live summary and throughput, per-file status, error and download, "Download n as ZIP", clear. `MarkResources` was extracted from the preview renderer so the editor, designer and bulk tool resolve fonts, icons and logos the same way. AVIF output was not attempted: Chromium cannot encode it through `canvas.convertToBlob`, and the engine verifies the encoded type, so it stays a stretch goal.
+- **Tests delivered:** 5 queue tests in Node with a controllable runner (ordering and concurrency, failure isolation, cancel/retry, a runner that ignores the signal, non-Error rejections and clear); 4 Chromium tests (pool sizing, ZIP round trip through `unzipSync` with duplicate names, processor output naming / WebP and PNG output / long-edge resize / cancellation / undecodable input, and the 20-fixture throughput measurement); 3 page tests through the real router with a fake runtime (batch with a failure, per-file and ZIP downloads, retry; cancel mid-batch with finished results kept, ZIP failure, retry to completion, clear and disposal on unmount; drag-and-drop and the empty-library state); a Playwright journey that uploads twenty generated PNGs, runs the batch with axe on every state, downloads the ZIP and checks all twenty entries in Node. Total 275 unit/browser + 7 workerd + 10 e2e; coverage 93.9 % lines / 85.8 % branches / 91.2 % functions.
+- **Performance:** `docs/benchmarks.md`: 20 × 1600×1200 JPEG through 8 workers in 0.18 s = 109.9 images/s end to end (budget ≥ 2 images/s). Lighthouse desktop `/app/bulk` 95 / 100 / 96 (`docs/lighthouse/m5/summary.md`).
+- **Security checks delivered:** no new server surface; everything runs in the browser; the ZIP is built in memory from the batch's own outputs and downloaded through a revoked object URL.
+- **Docs:** README (bulk section), CHANGELOG 0.6.0, `docs/benchmarks.md`, screenshots under `docs/screenshots/m5/`.
+- **Certification checklist:**
+  - [x] all gates in §3.2 pass (`npm run quality`, `security:sast`, `test:e2e`)
+  - [x] throughput benchmark within budget and recorded
+  - [x] Lighthouse desktop on all ten pages within §5.5 budgets
+  - [x] screenshots in light and dark under `docs/screenshots/m5/`
+  - [x] bugs found by tests fixed before certification (see §8)
 
 ### M6 — Storage and gallery
 
@@ -509,6 +518,19 @@ Tests that failed first and drove a fix:
 | Playwright `getByRole('link', { name })` matched both the card title and the "Open … in the editor" link                                       | e2e strict-mode violation            | `exact: true` on card title lookups                                                                |
 
 Gate fire checks in M4: coverage refused the first cut at 84.7 % branches and was satisfied with tests for drag, drop, tiled marks and export failure rather than a lower floor; jscpd flagged the duplicated `image-size` mock factory and the crop setup in the editor page test (extracted to `fake-image-size.ts` and a helper); the React compiler lint refused a synchronous `setState` in an effect; unicorn refused an event handler named `useSample` as a hook-like name.
+
+### M5 (2026-09-06)
+
+Tests that failed first and drove a fix:
+
+| Defect                                                                                                                            | Caught by                  | Fix                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------- |
+| TypeScript narrowed `signal.aborted` to `false` across an `await`, so the post-render cancellation check was flagged as dead code | `no-unnecessary-condition` | `isAborted(signal)` helper read through a function call                    |
+| Throughput was computed from `performance.now()` during render (impure under the React compiler)                                  | `react-hooks/purity`       | start and finish times recorded in state when the batch starts and settles |
+| The preset loading / error / empty block was duplicated between the editor's watermark panel and the bulk tool                    | jscpd                      | `PresetGate` render-prop component                                         |
+| `Array#sort()` without a comparator in tests                                                                                      | unicorn                    | `toSorted` with `localeCompare`                                            |
+
+Gate fire checks in M5: the page test proved cancellation keeps finished outputs and that the runtime is disposed on unmount; the e2e test proved the ZIP contains twenty decodable PNGs of the expected size; `min-release-age` accepted `fflate@0.8.3` (published 2024).
 
 ---
 
