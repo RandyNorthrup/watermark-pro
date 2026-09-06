@@ -3,11 +3,15 @@
 # src/worker/index.ts. Keep the two in sync when adding origins.
 #
 # style-src allows inline styles because UI primitives position popovers with
-# style attributes. The only third-party origin is challenges.cloudflare.com,
-# which serves the Turnstile widget (script and frame) when bot protection is
-# enabled; every other script stays self-hosted. Tracked in PLAN.md §9.
+# style attributes. Third-party origins, both Cloudflare's: challenges.cloudflare.com
+# serves the Turnstile widget (script and frame) when bot protection is enabled;
+# static.cloudflareinsights.com / cloudflareinsights.com is the cookie-less Web
+# Analytics beacon the blowmoney.net zone injects into HTML ("automatic setup").
+# Turn that off in the dashboard (Analytics & Logs -> Web Analytics) and remove
+# the two insights entries to drop it. Every other script stays self-hosted.
+# Tracked in PLAN.md §9.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

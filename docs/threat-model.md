@@ -61,14 +61,14 @@ added (a new binding, a new public route, a new third-party origin).
 
 ### Information disclosure
 
-| Threat                                    | Mitigation                                                                                                                              | Evidence                                     |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Reading another organization's data       | Every organization route resolves membership and role through Better Auth on each call; non-members and insufficient roles both get 403 | RBAC matrices in every route test file       |
-| Enumerating organizations or shares       | 403/404 responses do not distinguish "does not exist" from "not yours"; share failures are one neutral 404                              | `shares.test.ts`                             |
-| Public objects in R2                      | Bucket is private; every byte is streamed through the Worker after an authorization or token check; `Cache-Control: private`            | `photos.test.ts`, `library.test.ts`          |
-| Photos leaving the device unintentionally | Editor and bulk rendering happen in Web Workers in the browser; uploads only on explicit "Save to gallery"                              | design; `bulk.browser.test.ts`               |
-| Leaked stack traces                       | API errors are typed envelopes; unexpected errors become `internal_error`; the client shows only known messages                         | `index.test.ts`                              |
-| Third-party scripts                       | CSP allows scripts from self and, when enabled, only `challenges.cloudflare.com`; fonts and icons are bundled                           | `public/_headers`, Lighthouse best-practices |
+| Threat                                    | Mitigation                                                                                                                                                                          | Evidence                                     |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Reading another organization's data       | Every organization route resolves membership and role through Better Auth on each call; non-members and insufficient roles both get 403                                             | RBAC matrices in every route test file       |
+| Enumerating organizations or shares       | 403/404 responses do not distinguish "does not exist" from "not yours"; share failures are one neutral 404                                                                          | `shares.test.ts`                             |
+| Public objects in R2                      | Bucket is private; every byte is streamed through the Worker after an authorization or token check; `Cache-Control: private`                                                        | `photos.test.ts`, `library.test.ts`          |
+| Photos leaving the device unintentionally | Editor and bulk rendering happen in Web Workers in the browser; uploads only on explicit "Save to gallery"                                                                          | design; `bulk.browser.test.ts`               |
+| Leaked stack traces                       | API errors are typed envelopes; unexpected errors become `internal_error`; the client shows only known messages                                                                     | `index.test.ts`                              |
+| Third-party scripts                       | CSP allows scripts from self, `challenges.cloudflare.com` (Turnstile) and `static.cloudflareinsights.com` (the zone's SRI-pinned Web Analytics beacon); fonts and icons are bundled | `public/_headers`, Lighthouse best-practices |
 
 ### Denial of service
 

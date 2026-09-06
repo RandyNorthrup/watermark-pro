@@ -19,6 +19,10 @@ what was planned; superseded entries stay.
   no force pushes, no deletion; repository admins may bypass.
 - Runbook: the enable/disable order for Turnstile and the short
   `invalid_configuration` window between `secret put` and the deploy.
+- CSP allows Cloudflare's Web Analytics beacon (`static.cloudflareinsights.com`,
+  `cloudflareinsights.com`), which the `blowmoney.net` zone injects into every
+  HTML response and the policy had been blocking with a console error on
+  every page. Documented as a zone-level choice in PLAN.md §9.
 
 ## [1.0.0] - 2026-09-06
 

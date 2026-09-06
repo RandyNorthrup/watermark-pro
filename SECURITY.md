@@ -44,9 +44,12 @@ Only the `main` branch and the latest tagged release receive fixes.
   `p/secrets`) locally and in CI.
 - Exact dependency pinning, `min-release-age=7` in `.npmrc`, GitHub Actions
   pinned to commit SHAs, semgrep container pinned by digest.
-- One third-party runtime origin: `https://challenges.cloudflare.com`, allowed
-  in `script-src` and `frame-src` only for the optional Turnstile widget.
-  Fonts, styles and everything else are self-hosted.
+- Two third-party runtime origins, both Cloudflare's:
+  `https://challenges.cloudflare.com` in `script-src` and `frame-src` for the
+  Turnstile widget, and `https://static.cloudflareinsights.com` /
+  `https://cloudflareinsights.com` for the cookie-less Web Analytics beacon
+  the zone injects (SRI-pinned by Cloudflare; disable "automatic setup" on
+  the zone to drop it). Fonts, styles and everything else are self-hosted.
 - Logo uploads (M3): type decided by file signature, never by the declared
   MIME type or extension; size limited before the body is read; per-organization
   quota; objects stored in R2 under organization-scoped keys, never public,
