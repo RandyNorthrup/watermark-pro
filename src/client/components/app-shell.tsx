@@ -3,6 +3,7 @@ import { Link, useNavigate, useRouter } from '@tanstack/react-router'
 import {
   Building2,
   ChevronsUpDown,
+  Layers,
   LayoutDashboard,
   LogOut,
   PencilRuler,
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { to: '/app/library', label: 'Library', icon: Stamp, exact: false },
   { to: '/app/editor', label: 'Editor', icon: PencilRuler, exact: false },
+  { to: '/app/bulk', label: 'Bulk', icon: Layers, exact: false },
   { to: '/app/members', label: 'Members', icon: Users, exact: false },
   { to: '/app/audit', label: 'Audit log', icon: ScrollText, exact: false },
 ] as const

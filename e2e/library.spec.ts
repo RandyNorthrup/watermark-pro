@@ -4,14 +4,13 @@
  * saves a logo preset, edits and deletes from the library, and a viewer
  * sees the library read-only.
  */
-import { deflateSync } from 'node:zlib'
-
 import { expect, type Page, test } from '@playwright/test'
 
 import {
   createWorkspace,
   expectAccessible,
   latestLinkFor,
+  pngFixture,
   signIn,
   signUpAndVerify,
 } from './support'
@@ -28,52 +27,8 @@ const viewer = {
   password: 'viewers long password',
 }
 const organizationName = `Library ${runId}`
-
-/**
- * Smallest useful PNG, hand-assembled in Node: a 48×24 opaque pink image
- * (one IDAT built from a zlib stream of raw scanlines). Real bytes, so the
- * Worker's signature sniffing and the browser's decoder both accept it.
- */
 const LOGO_WIDTH = 48
 const LOGO_HEIGHT = 24
-
-function crc32(bytes: Uint8Array): number {
-  let crc = ~0
-  for (const byte of bytes) {
-    crc ^= byte
-    for (let bit = 0; bit < 8; bit += 1) {
-      crc = (crc >>> 1) ^ (0xed_b8_83_20 & -(crc & 1))
-    }
-  }
-  return ~crc >>> 0
-}
-
-function chunk(type: string, data: Uint8Array): Buffer {
-  const typeBytes = Buffer.from(type, 'ascii')
-  const length = Buffer.alloc(4)
-  length.writeUInt32BE(data.length)
-  const crc = Buffer.alloc(4)
-  crc.writeUInt32BE(crc32(Buffer.concat([typeBytes, data])))
-  return Buffer.concat([length, typeBytes, data, crc])
-}
-
-function pngBuffer(): Buffer {
-  const header = Buffer.alloc(13)
-  header.writeUInt32BE(LOGO_WIDTH, 0)
-  header.writeUInt32BE(LOGO_HEIGHT, 4)
-  header.set([8, 2, 0, 0, 0], 8) // 8-bit RGB, no interlace
-  const row = Buffer.concat([
-    Buffer.from([0]),
-    Buffer.from(Array.from({ length: LOGO_WIDTH }, () => [0xff, 0x33, 0x66]).flat()),
-  ])
-  const raw = Buffer.concat(Array.from({ length: LOGO_HEIGHT }, () => row))
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', header),
-    chunk('IDAT', deflateSync(raw)),
-    chunk('IEND', new Uint8Array(0)),
-  ])
-}
 
 async function expectPreviewRendered(page: Page) {
   const preview = page.getByRole('img', { name: 'Watermark preview on the subject photo' })
@@ -123,7 +78,7 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await page.getByLabel('Upload a logo file').setInputFiles({
     name: 'brand-mark.png',
     mimeType: 'image/png',
-    buffer: pngBuffer(),
+    buffer: pngFixture(LOGO_WIDTH, LOGO_HEIGHT, [0xff, 0x33, 0x66]),
   })
   await expect(page.getByRole('button', { name: 'Logo brand-mark', exact: true })).toHaveAttribute(
     'aria-pressed',

@@ -12,3 +12,14 @@ smart placement and auto contrast, JPEG output at quality 0.9.
 | Date       | Machine                             | Single worker | Pooled                   | Budget (PLAN.md §5.5) |
 | ---------- | ----------------------------------- | ------------- | ------------------------ | --------------------- |
 | 2026-09-06 | Windows 11, Chromium headless shell | 0.15 s/image  | 8 workers: 22.8 images/s | ≥ 2 images/s          |
+
+## Bulk queue throughput (M5)
+
+Twenty synthetic 1600×1200 JPEG files decoded from `File` objects on the main
+thread and pushed through `JobQueue` + `WorkerPool` with the default text
+preset, JPEG output at quality 0.9 (`src/client/bulk/bulk.browser.test.ts`).
+Includes decode, transfer, render, encode and result collection.
+
+| Date       | Machine                             | Workers | Throughput     | Budget (PLAN.md §5.5) |
+| ---------- | ----------------------------------- | ------- | -------------- | --------------------- |
+| 2026-09-06 | Windows 11, Chromium headless shell | 8       | 109.9 images/s | ≥ 2 images/s          |

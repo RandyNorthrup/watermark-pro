@@ -1,17 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import { useId } from 'react'
 
 import type { WatermarkDto } from '../../../shared/api'
 import type { WatermarkSpec } from '../../../shared/watermark'
-import { describeError } from '../../lib/errors'
 import { watermarksQueryOptions } from '../../lib/library'
 import { withPlacement } from '../../lib/spec-edit'
 import { PlacementPanel } from '../designer/placement-panel'
 import { StylePanel } from '../designer/style-panel'
-import { Alert } from '../ui/alert'
+import { PresetGate } from '../presets/preset-gate'
 import { Button } from '../ui/button'
-import { Spinner } from '../ui/spinner'
 
 interface WatermarkPanelProps {
   organizationId: string
@@ -39,27 +36,36 @@ export function WatermarkPanel({
   const selectId = useId()
   const presets = useQuery(watermarksQueryOptions(organizationId))
 
-  if (presets.isPending) {
-    return <Spinner className="size-5" label="Loading presets" />
-  }
-  if (presets.isError) {
-    return (
-      <Alert tone="error" title="Could not load presets">
-        {describeError(presets.error)}
-      </Alert>
-    )
-  }
-  if (presets.data.length === 0) {
-    return (
-      <Alert tone="info" title="No presets yet">
-        <Link to="/app/library/new" className="font-medium underline">
-          Create a preset in the library
-        </Link>{' '}
-        to apply it here.
-      </Alert>
-    )
-  }
-  const preset = presets.data.find((candidate) => candidate.id === presetId)
+  return (
+    <PresetGate query={presets} emptyHint="to apply it here.">
+      {(list) => (
+        <PanelBody
+          list={list}
+          selectId={selectId}
+          presetId={presetId}
+          spec={spec}
+          onPresetChange={onPresetChange}
+          onSpecChange={onSpecChange}
+        />
+      )}
+    </PresetGate>
+  )
+}
+
+interface PanelBodyProps extends Omit<WatermarkPanelProps, 'organizationId'> {
+  list: WatermarkDto[]
+  selectId: string
+}
+
+function PanelBody({
+  list,
+  selectId,
+  presetId,
+  spec,
+  onPresetChange,
+  onSpecChange,
+}: PanelBodyProps) {
+  const preset = list.find((candidate) => candidate.id === presetId)
   const isModified = preset !== undefined && spec !== null && !isSameSpec(preset.spec, spec)
 
   return (
@@ -73,7 +79,7 @@ export function WatermarkPanel({
           value={presetId ?? ''}
           onChange={(event) => {
             const { value } = event.currentTarget
-            const chosen = presets.data.find((candidate) => candidate.id === value)
+            const chosen = list.find((candidate) => candidate.id === value)
             if (chosen !== undefined) {
               onPresetChange(chosen)
             }
@@ -83,7 +89,7 @@ export function WatermarkPanel({
           <option value="" disabled>
             Choose a preset
           </option>
-          {presets.data.map((candidate) => (
+          {list.map((candidate) => (
             <option key={candidate.id} value={candidate.id}>
               {candidate.name}
             </option>

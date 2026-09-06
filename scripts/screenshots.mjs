@@ -27,6 +27,7 @@ const AUTHENTICATED_PAGES = [
   ['audit', '/app/audit'],
   ['new-organization', '/app/organizations/new'],
   ['library', '/app/library'],
+  ['bulk', '/app/bulk'],
 ]
 
 const outputDir = path.join('docs', 'screenshots', MILESTONE)
