@@ -93,6 +93,8 @@ export const HEX_RADIX = 16
 
 /** Upper bound on audit log rows returned by one request. */
 export const AUDIT_PAGE_SIZE = 50
+/** Organizations shown to a platform admin, newest first. */
+export const ADMIN_ORGANIZATION_PAGE_SIZE = 200
 
 /** Ring buffer size for the console email provider's captured messages (dev/test only). */
 export const DEV_MAILBOX_CAPACITY = 20

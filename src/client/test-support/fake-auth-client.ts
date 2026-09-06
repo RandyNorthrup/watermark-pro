@@ -14,6 +14,11 @@ export interface FakeUser {
   email: string
   emailVerified: boolean
   image: string | null
+  /** Platform role; `admin` unlocks the administration page. */
+  role?: 'admin' | 'user'
+  banned?: boolean
+  banReason?: string | null
+  createdAt?: string
 }
 
 export interface FakeMember {
@@ -52,6 +57,8 @@ export interface FakeAuthState {
   organizations: FakeOrganization[]
   /** Error to return from the next sign-in attempt, if any. */
   nextSignInError: { code: string; message: string } | null
+  /** Every account on the platform, for the admin console. */
+  allUsers: FakeUser[]
 }
 
 type Result<T> = Promise<{
@@ -74,6 +81,7 @@ export function createFakeAuthClient() {
     activeOrganizationId: null,
     organizations: [],
     nextSignInError: null,
+    allUsers: [],
   }
 
   const activeOrganization = () =>
@@ -122,6 +130,46 @@ export function createFakeAuthClient() {
           ? fail('User already exists', 'USER_ALREADY_EXISTS', 422)
           : ok({ user: { id: 'user-new', name: input.name, email: input.email } }),
       ),
+    },
+    admin: {
+      listUsers: vi.fn((input: { query: { searchValue?: string } }) => {
+        const needle = input.query.searchValue?.toLowerCase() ?? ''
+        const users = state.allUsers
+          .filter((user) => user.email.toLowerCase().includes(needle))
+          .map((user) => ({
+            ...user,
+            role: user.role ?? 'user',
+            banned: user.banned ?? false,
+            banReason: user.banReason ?? null,
+            createdAt: user.createdAt ?? '2026-09-01T00:00:00.000Z',
+          }))
+        return ok({ users, total: users.length })
+      }),
+      banUser: vi.fn((input: { userId: string; banReason?: string }) => {
+        const user = state.allUsers.find((candidate) => candidate.id === input.userId)
+        if (user === undefined) {
+          return fail('User not found', 'USER_NOT_FOUND', 404)
+        }
+        user.banned = true
+        user.banReason = input.banReason ?? null
+        return ok({ user })
+      }),
+      unbanUser: vi.fn((input: { userId: string }) => {
+        const user = state.allUsers.find((candidate) => candidate.id === input.userId)
+        if (user !== undefined) {
+          user.banned = false
+          user.banReason = null
+        }
+        return ok({ user })
+      }),
+      setRole: vi.fn((input: { userId: string; role: 'admin' | 'user' }) => {
+        const user = state.allUsers.find((candidate) => candidate.id === input.userId)
+        if (user !== undefined) {
+          user.role = input.role
+        }
+        return ok({ user })
+      }),
+      revokeUserSessions: vi.fn(() => ok({ success: true })),
     },
     sendVerificationEmail: vi.fn(() => ok({ status: true })),
     requestPasswordReset: vi.fn(() => ok({ status: true })),

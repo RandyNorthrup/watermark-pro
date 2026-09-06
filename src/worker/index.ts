@@ -16,6 +16,7 @@ import { EnvValidationError } from './env'
 import type { ApiError, HealthResponse } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '../shared/constants'
 import { requireSameOrigin } from './middleware/same-origin'
+import { adminRoutes } from './routes/admin'
 import { auditRoutes } from './routes/audit'
 import { devRoutes } from './routes/dev'
 import { libraryRoutes } from './routes/library'
@@ -86,6 +87,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   app.route('/api', libraryRoutes)
   app.route('/api', photoRoutes)
   app.route('/api', shareRoutes)
+  app.route('/api', adminRoutes)
   app.route('/api', devRoutes)
 
   app.notFound((c) => {

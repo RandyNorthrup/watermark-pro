@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import type { AuditListResponse } from '../../shared/api'
 import { HTTP_STATUS } from '../../shared/constants'
 import type { AppContext } from '../app-context'
+import { auditToDto } from '../dto'
 import { requirePermission } from '../middleware/permission'
 import { requireSession } from '../middleware/session'
 
@@ -14,19 +15,7 @@ export const auditRoutes = new Hono<AppContext>().get(
   async (c) => {
     const organizationId = c.req.param('orgId')
     const records = await c.get('services').audit.listForOrganization(organizationId)
-    const body: AuditListResponse = {
-      entries: records.map((record) => ({
-        id: record.id,
-        organizationId: record.organizationId ?? null,
-        actorUserId: record.actorUserId ?? null,
-        actorName: record.actorName ?? null,
-        action: record.action,
-        targetType: record.targetType,
-        targetId: record.targetId ?? null,
-        metadata: record.metadata ?? null,
-        createdAt: record.createdAt.toISOString(),
-      })),
-    }
+    const body: AuditListResponse = { entries: records.map((record) => auditToDto(record)) }
     return c.json(body, HTTP_STATUS.ok)
   },
 )

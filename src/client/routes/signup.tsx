@@ -6,12 +6,14 @@ import { PASSWORD_MIN_LENGTH } from '../../shared/constants'
 import { signUpSchema } from '../../shared/validation'
 import { EmailField, PasswordField } from '../components/auth-fields'
 import { AuthLayout } from '../components/auth-layout'
+import { Turnstile } from '../components/turnstile'
 import { Alert } from '../components/ui/alert'
 import { Button } from '../components/ui/button'
 import { Field } from '../components/ui/field'
 import { Input } from '../components/ui/input'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError } from '../lib/errors'
+import { useCaptcha } from '../lib/use-captcha'
 import { useFormErrors } from '../lib/use-form-errors'
 
 export const Route = createFileRoute('/signup')({
@@ -26,6 +28,7 @@ function SignUpPage() {
   const [isPending, setIsPending] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const { errors, validate } = useFormErrors<SignUpValues>()
+  const captcha = useCaptcha()
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -35,7 +38,10 @@ function SignUpPage() {
     }
     setIsPending(true)
     setServerError(null)
-    const result = await authClient.signUp.email({ ...parsed, callbackURL: '/app' })
+    const result = await authClient.signUp.email(
+      { ...parsed, callbackURL: '/app' },
+      { headers: captcha.headers },
+    )
     setIsPending(false)
     if (result.error !== null) {
       setServerError(describeAuthError(result.error))
@@ -91,7 +97,15 @@ function SignUpPage() {
             setValues({ ...values, password })
           }}
         />
-        <Button type="submit" isPending={isPending} className="self-end">
+        {captcha.siteKey === null ? null : (
+          <Turnstile siteKey={captcha.siteKey} onToken={captcha.onToken} />
+        )}
+        <Button
+          type="submit"
+          isPending={isPending}
+          disabled={!captcha.isReady}
+          className="self-end"
+        >
           Create account
         </Button>
       </form>

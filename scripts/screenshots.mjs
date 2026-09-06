@@ -11,6 +11,7 @@ import path from 'node:path'
 import { chromium } from '@playwright/test'
 
 import { waitForLink } from './lib/dev-mailbox.mjs'
+import { promoteToPlatformAdmin } from './lib/local-admin.ts'
 
 const BASE_URL = process.env.APP_URL ?? 'http://localhost:5173'
 const MILESTONE = process.argv[2] ?? 'm1'
@@ -134,6 +135,28 @@ try {
       fullPage: true,
     })
     await page.keyboard.press('Escape')
+
+    // The admin console: users, organizations and the global audit trail.
+    promoteToPlatformAdmin(email)
+    await page.goto(`${BASE_URL}/app/admin`, { waitUntil: 'networkidle' })
+    await page.getByRole('heading', { level: 1, name: 'Administration' }).waitFor()
+    await page.getByText(/\d+ users?[,.]/).waitFor()
+    await page.screenshot({
+      path: path.join(outputDir, `admin-users-${colorScheme}.png`),
+      fullPage: true,
+    })
+    await page.getByRole('tab', { name: 'Organizations' }).click()
+    await page.getByRole('table', { name: /Organizations/ }).waitFor()
+    await page.screenshot({
+      path: path.join(outputDir, `admin-organizations-${colorScheme}.png`),
+      fullPage: true,
+    })
+    await page.getByRole('tab', { name: 'Audit trail' }).click()
+    await page.getByRole('table', { name: /Audit entries/ }).waitFor()
+    await page.screenshot({
+      path: path.join(outputDir, `admin-audit-${colorScheme}.png`),
+      fullPage: true,
+    })
 
     for (const [name, pathname] of AUTHENTICATED_PAGES) {
       await page.goto(`${BASE_URL}${pathname}`, { waitUntil: 'networkidle' })

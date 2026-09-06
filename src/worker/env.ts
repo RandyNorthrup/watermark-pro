@@ -30,7 +30,17 @@ const envSchema = z
     AUTH_RATE_LIMITER: bindingSchema<RateLimit>('AUTH_RATE_LIMITER'),
     API_RATE_LIMITER: bindingSchema<RateLimit>('API_RATE_LIMITER'),
     SEND_EMAIL: bindingSchema<SendEmail>('SEND_EMAIL').optional(),
+    /** Cloudflare Turnstile: set both keys to protect sign-up and password reset; leave both unset to disable. */
+    TURNSTILE_SITE_KEY: z.string().min(1).optional(),
+    TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
   })
+  .refine(
+    (env) => (env.TURNSTILE_SITE_KEY === undefined) === (env.TURNSTILE_SECRET_KEY === undefined),
+    {
+      message: 'TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY must be set together',
+      path: ['TURNSTILE_SECRET_KEY'],
+    },
+  )
   .refine((env) => env.APP_ENV !== 'production' || env.EMAIL_PROVIDER !== 'console', {
     message: 'EMAIL_PROVIDER=console is not allowed in production',
     path: ['EMAIL_PROVIDER'],

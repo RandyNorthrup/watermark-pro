@@ -26,6 +26,8 @@ export interface AuditStore {
   append(entry: AuditEntry): Promise<void>
   /** Newest first, capped at `AUDIT_PAGE_SIZE`. */
   listForOrganization(organizationId: string): Promise<AuditRecord[]>
+  /** Every organization plus platform-level entries; newest first, same cap. Platform admins only. */
+  listAll(): Promise<AuditRecord[]>
 }
 
 /**

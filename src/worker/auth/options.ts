@@ -9,6 +9,8 @@
  */
 import type { BetterAuthOptions } from 'better-auth'
 import type { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { createAuthMiddleware } from 'better-auth/api'
+import { captcha } from 'better-auth/plugins'
 import { admin } from 'better-auth/plugins/admin'
 import { organization } from 'better-auth/plugins/organization'
 
@@ -31,6 +33,17 @@ import type { EmailSender } from '../email/sender'
 /** Adapter factory shape shared by every Better Auth adapter package. */
 export type DatabaseAdapter = ReturnType<typeof drizzleAdapter>
 
+/** Better Auth endpoints that must carry a Turnstile token when captcha is enabled. */
+export const CAPTCHA_PROTECTED_ENDPOINTS = ['/sign-up/email', '/request-password-reset']
+
+const ADMIN_AUDIT_ACTIONS: Record<string, string> = {
+  '/admin/ban-user': 'admin.user_banned',
+  '/admin/unban-user': 'admin.user_unbanned',
+  '/admin/set-role': 'admin.role_set',
+  '/admin/remove-user': 'admin.user_removed',
+  '/admin/revoke-user-sessions': 'admin.sessions_revoked',
+}
+
 export interface AuthDependencies {
   /** Better Auth database adapter: drizzle over D1 in production, memory in Node tests. */
   database: DatabaseAdapter
@@ -39,6 +52,8 @@ export interface AuthDependencies {
   appUrl: string
   email: EmailSender
   rateLimit: RateLimitStorage
+  /** Present when Turnstile is configured; verification runs before sign-up and password reset. */
+  captcha?: { secretKey: string; siteVerifyUrl?: string | undefined } | undefined
   audit: AuditStore
   /** Rate limiting is disabled only for the Node unit tests, which have no binding. */
   rateLimitEnabled: boolean
@@ -214,6 +229,51 @@ export function buildAuthOptions(deps: AuthDependencies) {
         defaultRole: 'user',
         adminRoles: ['admin'],
       }),
+      ...(deps.captcha === undefined
+        ? []
+        : [
+            captcha({
+              provider: 'cloudflare-turnstile',
+              secretKey: deps.captcha.secretKey,
+              endpoints: CAPTCHA_PROTECTED_ENDPOINTS,
+              ...(deps.captcha.siteVerifyUrl !== undefined && {
+                siteVerifyURLOverride: deps.captcha.siteVerifyUrl,
+              }),
+            }),
+          ]),
     ],
+    hooks: {
+      // Platform-admin actions are not covered by the organization hooks; record them here.
+      after: createAuthMiddleware(async (ctx) => {
+        const action = ADMIN_AUDIT_ACTIONS[ctx.path]
+        const actor = ctx.context.session?.user
+        if (action === undefined || actor === undefined) {
+          return
+        }
+        const body: unknown = ctx.body
+        const target =
+          typeof body === 'object' &&
+          body !== null &&
+          'userId' in body &&
+          typeof body.userId === 'string'
+            ? body.userId
+            : ''
+        const role =
+          typeof body === 'object' &&
+          body !== null &&
+          'role' in body &&
+          typeof body.role === 'string'
+            ? body.role
+            : undefined
+        await deps.audit.append({
+          actorUserId: actor.id,
+          actorName: actor.name,
+          action,
+          targetType: 'user',
+          targetId: target,
+          ...(role !== undefined && { metadata: { role } }),
+        })
+      }),
+    },
   } satisfies BetterAuthOptions
 }

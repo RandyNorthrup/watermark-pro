@@ -17,7 +17,7 @@ an acknowledgement within three business days.
 
 Only the `main` branch and the latest tagged release receive fixes.
 
-## Controls in place (milestones M0 to M3)
+## Controls in place
 
 - Response headers: CSP, HSTS, `Referrer-Policy`, `Permissions-Policy`,
   `X-Content-Type-Options`, `X-Frame-Options` on both API and static responses.
@@ -44,7 +44,9 @@ Only the `main` branch and the latest tagged release receive fixes.
   `p/secrets`) locally and in CI.
 - Exact dependency pinning, `min-release-age=7` in `.npmrc`, GitHub Actions
   pinned to commit SHAs, semgrep container pinned by digest.
-- No third-party runtime origins: fonts, scripts, and styles are self-hosted.
+- One third-party runtime origin: `https://challenges.cloudflare.com`, allowed
+  in `script-src` and `frame-src` only for the optional Turnstile widget.
+  Fonts, styles and everything else are self-hosted.
 - Logo uploads (M3): type decided by file signature, never by the declared
   MIME type or extension; size limited before the body is read; per-organization
   quota; objects stored in R2 under organization-scoped keys, never public,
@@ -70,10 +72,25 @@ Only the `main` branch and the latest tagged release receive fixes.
   and downloaded through a same-origin object URL that is revoked
   immediately.
 
-## Controls planned (see `PLAN.md` milestones)
-
-- Turnstile bot protection on sign-up and an admin console (M8).
-- Production wrangler environment with `APP_ENV=production` (M8).
+- Bot protection (M8): when `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
+  are configured, sign-up and password-reset requests must carry a Turnstile
+  token that the Worker verifies with Cloudflare before Better Auth runs;
+  a missing token is a 400 and a rejected one a 403. The two variables must
+  be set together or the configuration is refused.
+- Platform administration (M8): a separate `admin` role checked server-side
+  by `requirePlatformAdmin` on the organization and audit listing routes and
+  by Better Auth's admin plugin on user management. Bans (with a mandatory
+  reason), unbans, role changes and forced sign-outs are written to the audit
+  trail with the administrator as the actor. Banned users cannot sign in and
+  lose their sessions.
+- Supply chain (M8): GitHub dependency review blocks pull requests that add a
+  dependency with a high or critical advisory or a licence outside the
+  allow-list; production deploys run only from version tags after the full
+  gate chain and the end-to-end suite pass on that commit.
+- The threat model in [docs/threat-model.md](docs/threat-model.md) lists the
+  assets, trust boundaries, mitigations and accepted residual risks; the
+  operational playbook (rollback, secret rotation, Time Travel restores,
+  bans, share revocation) is in [docs/runbook.md](docs/runbook.md).
 
 ## Handling secrets
 

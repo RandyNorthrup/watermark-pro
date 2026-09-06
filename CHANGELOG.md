@@ -7,6 +7,52 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-06
+
+Milestone M8: enterprise hardening and release. First stable release.
+
+### Added
+
+- Platform administration at `/app/admin` for users with the Better Auth
+  `admin` role: search users by email, ban and unban with a mandatory reason
+  (sessions revoked, sign-in refused), grant or remove the platform role,
+  sign a user out everywhere, list every organization with member, photo and
+  storage counts, and browse the global audit trail. Worker routes
+  `GET /api/admin/organizations` and `GET /api/admin/audit` behind
+  `requirePlatformAdmin`; Better Auth's admin plugin handles user management
+  and every admin action is written to the audit log (`admin.user_banned`,
+  `admin.user_unbanned`, `admin.role_set`, `admin.user_removed`,
+  `admin.sessions_revoked`).
+- Optional Cloudflare Turnstile on sign-up and password reset: when
+  `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are set the forms render the
+  widget, hold their submit until it produces a token, and the Worker verifies
+  the `x-captcha-response` header with Cloudflare before Better Auth runs.
+  `GET /api/config` publishes the site key; the CSP allows
+  `https://challenges.cloudflare.com` for scripts and frames.
+- Tag-driven production deploys: `.github/workflows/deploy.yml` runs the
+  quality chain and the Playwright suite on a `v*` tag, then `npm run deploy`
+  in the `production` GitHub environment. GitHub dependency review on pull
+  requests fails on high-severity advisories and disallowed licences. Both
+  workflows share a composite action for Node, gitleaks and `npm ci`.
+- `docs/threat-model.md` (assets, trust boundaries, STRIDE mitigations with
+  the tests that prove them, accepted residual risks) and `docs/runbook.md`
+  (deploy, rollback, secrets and rotation, logs, D1 Time Travel, R2, first
+  admin promotion, incident playbook, rate limits).
+- End-to-end admin journey (`e2e/admin.spec.ts`) and Lighthouse and
+  screenshot coverage of the admin console; the audit scripts promote their
+  throwaway user through `wrangler d1 execute --local`, the same operation
+  the runbook prescribes.
+
+### Fixed
+
+- The admin organization overview counted members through Better Auth's
+  adapter, whose `findMany` stops at 100 rows, so tenants created after the
+  hundredth member showed zero members. Counts now come from a grouped D1
+  query (`OrganizationStore.listSummaries`), proven in workerd.
+- The "not a platform administrator" refusal on `/app/admin` rendered
+  without a page heading (axe `page-has-heading-one`); the heading now
+  precedes the refusal.
+
 ## [0.8.0] - 2026-09-06
 
 Milestone M7: sharing.

@@ -217,3 +217,23 @@ export const publicShareSchema = z.object({
 })
 
 export type PublicShare = z.infer<typeof publicShareSchema>
+
+/** Configuration the browser may know before signing in. */
+export const publicConfigSchema = z.object({
+  /** Turnstile site key when bot protection is enabled; null otherwise. */
+  turnstileSiteKey: z.string().nullable(),
+})
+
+export const adminOrganizationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+  memberCount: z.number().int().nonnegative(),
+  photoCount: z.number().int().nonnegative(),
+  storageBytes: z.number().int().nonnegative(),
+})
+
+export const adminOrganizationListSchema = z.object({
+  organizations: z.array(adminOrganizationSchema),
+})

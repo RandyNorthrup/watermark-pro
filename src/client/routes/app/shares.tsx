@@ -11,6 +11,7 @@ import { buttonVariants } from '../../components/ui/button-variants'
 import { Card } from '../../components/ui/card'
 import { Spinner } from '../../components/ui/spinner'
 import { describeError } from '../../lib/errors'
+import { dateTimeFormatter } from '../../lib/format-date'
 import { activeMemberRoleQueryOptions } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
 import {
@@ -26,11 +27,6 @@ const appRoute = getRouteApi('/app')
 export const Route = createFileRoute('/app/shares')({
   loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
   component: SharesPage,
-})
-
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: 'medium',
-  timeStyle: 'short',
 })
 
 type ShareStatus = 'active' | 'expired' | 'revoked'
@@ -139,10 +135,10 @@ function ShareRow({
             <h2 className="truncate text-base font-semibold">{share.title}</h2>
             <p className="text-sm text-ink-muted">
               {String(share.photoCount)} photo{share.photoCount === 1 ? '' : 's'} · created{' '}
-              {dateFormatter.format(new Date(share.createdAt))}
+              {dateTimeFormatter.format(new Date(share.createdAt))}
               {share.expiresAt === null
                 ? ' · never expires'
-                : ` · expires ${dateFormatter.format(new Date(share.expiresAt))}`}
+                : ` · expires ${dateTimeFormatter.format(new Date(share.expiresAt))}`}
             </p>
           </div>
           <Badge className={STATUS_STYLES[status]}>{status}</Badge>

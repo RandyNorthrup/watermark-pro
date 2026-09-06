@@ -241,6 +241,19 @@ export function createDrizzlePhotoStore(db: Database): PhotoStore {
         .where(eq(photo.organizationId, organizationId))
       return { count: row?.count ?? 0, bytes: row?.bytes ?? 0 }
     },
+    async usageByOrganization() {
+      const rows = await db
+        .select({
+          organizationId: photo.organizationId,
+          count: count(),
+          bytes: sql<number>`coalesce(sum(${photo.size}), 0)`,
+        })
+        .from(photo)
+        .groupBy(photo.organizationId)
+      return new Map(
+        rows.map((row) => [row.organizationId, { count: row.count, bytes: row.bytes }]),
+      )
+    },
   }
 }
 

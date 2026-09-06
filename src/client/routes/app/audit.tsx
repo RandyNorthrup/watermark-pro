@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 
 import { HTTP_STATUS } from '../../../shared/constants'
+import { AuditTable } from '../../components/audit-table'
 import { Alert } from '../../components/ui/alert'
 import { Card } from '../../components/ui/card'
 import { Spinner } from '../../components/ui/spinner'
@@ -13,11 +14,6 @@ const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/audit')({
   component: AuditPage,
-})
-
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: 'medium',
-  timeStyle: 'short',
 })
 
 function useAuditQuery(organizationId: string) {
@@ -63,43 +59,16 @@ function AuditBody({ query }: { query: ReturnType<typeof useAuditQuery> }) {
     )
   }
   return (
-    <Card className="overflow-x-auto p-0">
-      <table className="w-full text-sm">
-        <caption className="sr-only">Audit entries, newest first</caption>
-        <thead className="text-left text-xs text-ink-muted uppercase">
-          <tr>
-            <th scope="col" className="px-4 py-3">
-              When
-            </th>
-            <th scope="col" className="px-4 py-3">
-              Who
-            </th>
-            <th scope="col" className="px-4 py-3">
-              Action
-            </th>
-            <th scope="col" className="px-4 py-3">
-              Details
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {query.data.entries.map((entry) => (
-            <tr key={entry.id} className="border-t border-line">
-              <td className="px-4 py-3 whitespace-nowrap">
-                <time dateTime={entry.createdAt}>
-                  {dateFormatter.format(new Date(entry.createdAt))}
-                </time>
-              </td>
-              <td className="px-4 py-3">{entry.actorName ?? 'System'}</td>
-              <td className="px-4 py-3 font-mono text-xs">{entry.action}</td>
-              <td className="px-4 py-3 text-ink-muted">
-                {entry.metadata === null ? '' : formatMetadata(entry.metadata)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Card>
+    <AuditTable
+      caption="Audit entries, newest first"
+      entries={query.data.entries}
+      detailHeading="Details"
+      renderDetail={(entry) => (
+        <td className="px-4 py-3 text-ink-muted">
+          {entry.metadata === null ? '' : formatMetadata(entry.metadata)}
+        </td>
+      )}
+    />
   )
 }
 

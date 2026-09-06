@@ -18,5 +18,8 @@ export function createMemoryAuditStore(): AuditStore & { records: AuditRecord[] 
           .slice(0, AUDIT_PAGE_SIZE),
       )
     },
+    listAll() {
+      return Promise.resolve(records.toReversed().slice(0, AUDIT_PAGE_SIZE))
+    },
   }
 }

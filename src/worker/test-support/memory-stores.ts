@@ -1,7 +1,9 @@
+import { ADMIN_ORGANIZATION_PAGE_SIZE } from '../../shared/constants'
 import type {
   AssetRecord,
   AssetStore,
   ObjectStore,
+  OrganizationStore,
   PhotoRecord,
   PhotoStore,
   ShareRecord,
@@ -182,6 +184,17 @@ export function createMemoryPhotoStore(): PhotoStore {
         bytes: rows.reduce((total, record) => total + record.size, 0),
       })
     },
+    usageByOrganization() {
+      const usage = new Map<string, { count: number; bytes: number }>()
+      for (const record of records.values()) {
+        const current = usage.get(record.organizationId) ?? { count: 0, bytes: 0 }
+        usage.set(record.organizationId, {
+          count: current.count + 1,
+          bytes: current.bytes + record.size,
+        })
+      }
+      return Promise.resolve(usage)
+    },
   }
 }
 
@@ -207,6 +220,34 @@ export function createMemoryShareStore(): ShareStore {
       const revoked = { ...existing, revokedAt: new Date() }
       records.set(id, revoked)
       return Promise.resolve(revoked)
+    },
+  }
+}
+
+/** The rows Better Auth's memory adapter keeps for tenants; shared by reference. */
+export interface MemoryTenantTables {
+  organization: { id: string; name: string; slug: string; createdAt: Date }[]
+  member: { organizationId: string }[]
+}
+
+/**
+ * Reads tenants straight out of the arrays handed to Better Auth's memory
+ * adapter, so the admin routes see the organizations the auth flows created.
+ */
+export function createMemoryOrganizationStore(tables: MemoryTenantTables): OrganizationStore {
+  return {
+    listSummaries() {
+      const summaries = tables.organization
+        .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .slice(0, ADMIN_ORGANIZATION_PAGE_SIZE)
+        .map((row) => ({
+          id: row.id,
+          name: row.name,
+          slug: row.slug,
+          createdAt: row.createdAt,
+          memberCount: tables.member.filter((entry) => entry.organizationId === row.id).length,
+        }))
+      return Promise.resolve(summaries)
     },
   }
 }

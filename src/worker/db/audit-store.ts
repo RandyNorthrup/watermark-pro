@@ -1,7 +1,7 @@
 import { desc, eq } from 'drizzle-orm'
 
 import { AUDIT_PAGE_SIZE } from '../../shared/constants'
-import type { AuditStore } from '../audit'
+import type { AuditRecord, AuditStore } from '../audit'
 import type { Database } from './client'
 import { auditLog } from './schema'
 
@@ -29,19 +29,31 @@ export function createDrizzleAuditStore(db: Database): AuditStore {
         .where(eq(auditLog.organizationId, organizationId))
         .orderBy(desc(auditLog.createdAt))
         .limit(AUDIT_PAGE_SIZE)
-      return rows.map((row) => ({
-        id: row.id,
-        createdAt: row.createdAt,
-        action: row.action,
-        targetType: row.targetType,
-        ...(row.organizationId !== null && { organizationId: row.organizationId }),
-        ...(row.actorUserId !== null && { actorUserId: row.actorUserId }),
-        ...(row.actorName !== null && { actorName: row.actorName }),
-        ...(row.targetId !== null && { targetId: row.targetId }),
-        ...(row.ipHash !== null && { ipHash: row.ipHash }),
-        ...(row.userAgent !== null && { userAgent: row.userAgent }),
-        ...(row.metadata !== null && { metadata: row.metadata }),
-      }))
+      return rows.map((row) => toRecord(row))
     },
+    async listAll() {
+      const rows = await db
+        .select()
+        .from(auditLog)
+        .orderBy(desc(auditLog.createdAt))
+        .limit(AUDIT_PAGE_SIZE)
+      return rows.map((row) => toRecord(row))
+    },
+  }
+}
+
+function toRecord(row: typeof auditLog.$inferSelect): AuditRecord {
+  return {
+    id: row.id,
+    createdAt: row.createdAt,
+    action: row.action,
+    targetType: row.targetType,
+    ...(row.organizationId !== null && { organizationId: row.organizationId }),
+    ...(row.actorUserId !== null && { actorUserId: row.actorUserId }),
+    ...(row.actorName !== null && { actorName: row.actorName }),
+    ...(row.targetId !== null && { targetId: row.targetId }),
+    ...(row.ipHash !== null && { ipHash: row.ipHash }),
+    ...(row.userAgent !== null && { userAgent: row.userAgent }),
+    ...(row.metadata !== null && { metadata: row.metadata }),
   }
 }

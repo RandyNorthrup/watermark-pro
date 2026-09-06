@@ -1,0 +1,25 @@
+name: Set up Node and gitleaks
+description: >-
+  Installs the pinned Node version from .nvmrc with the npm cache, the pinned
+  gitleaks binary that `npm run security:secrets` needs, and the locked
+  dependencies. Shared by the CI and Deploy workflows so the two never drift.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version-file: .nvmrc
+        cache: npm
+
+    - name: Install gitleaks
+      shell: bash
+      env:
+        GITLEAKS_VERSION: 8.30.1
+      run: |
+        curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+          | tar -xz -C /usr/local/bin gitleaks
+        gitleaks version
+
+    - shell: bash
+      run: npm ci

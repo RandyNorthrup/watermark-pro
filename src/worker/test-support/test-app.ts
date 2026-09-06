@@ -17,6 +17,7 @@ import { createMemoryAuditStore } from './memory-audit-store'
 import {
   createMemoryAssetStore,
   createMemoryObjectStore,
+  createMemoryOrganizationStore,
   createMemoryPhotoStore,
   createMemoryShareStore,
   createMemoryWatermarkStore,
@@ -35,7 +36,10 @@ function notABinding(): never {
   return {} as never
 }
 
-export function createTestEnv(overrides: Partial<Env> = {}): Env {
+/** Env plus the optional Turnstile variables, which wrangler.jsonc leaves unset by default. */
+export type TestEnv = Env & { TURNSTILE_SITE_KEY?: string; TURNSTILE_SECRET_KEY?: string }
+
+export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
   return {
     APP_ENV: 'test',
     APP_URL: TEST_APP_URL,
@@ -63,29 +67,45 @@ export interface TestHarness {
 export interface TestHarnessOptions {
   /** Replaces the never-limiting default, for tests that exercise 429 paths. */
   rateLimit?: RateLimitStorage | undefined
+  /** Enables Turnstile with the given secret; verification calls go to `siteVerifyUrl`. */
+  captcha?: { secretKey: string; siteVerifyUrl: string; siteKey: string } | undefined
 }
 
 export function createTestHarness(options: TestHarnessOptions = {}): TestHarness {
-  const env = createTestEnv()
+  const env = createTestEnv(
+    options.captcha === undefined
+      ? {}
+      : {
+          TURNSTILE_SITE_KEY: options.captcha.siteKey,
+          TURNSTILE_SECRET_KEY: options.captcha.secretKey,
+        },
+  )
   const config = validateEnv(env)
   const mailbox = createConsoleEmailSender()
   const audit = createMemoryAuditStore()
+  const tables = {
+    user: [],
+    session: [],
+    account: [],
+    verification: [],
+    organization: [],
+    member: [],
+    invitation: [],
+  }
   const auth = createAuth({
-    database: memoryAdapter({
-      user: [],
-      session: [],
-      account: [],
-      verification: [],
-      organization: [],
-      member: [],
-      invitation: [],
-    }),
+    database: memoryAdapter(tables),
     secret: config.BETTER_AUTH_SECRET,
     appUrl: config.APP_URL,
     email: mailbox,
     audit,
     rateLimit: unlimitedRateLimitStorage,
     rateLimitEnabled: false,
+    ...(options.captcha !== undefined && {
+      captcha: {
+        secretKey: options.captcha.secretKey,
+        siteVerifyUrl: options.captcha.siteVerifyUrl,
+      },
+    }),
   })
   const objects = createMemoryObjectStore()
   const services: Services = {
@@ -98,6 +118,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     assets: createMemoryAssetStore(),
     photos: createMemoryPhotoStore(),
     shares: createMemoryShareStore(),
+    organizations: createMemoryOrganizationStore(tables),
     objects,
     rateLimit: options.rateLimit ?? unlimitedRateLimitStorage,
     devMailbox: mailbox,

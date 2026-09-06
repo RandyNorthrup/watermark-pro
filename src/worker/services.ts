@@ -17,12 +17,20 @@ import {
   createDrizzleWatermarkStore,
   createR2ObjectStore,
 } from './db/library-stores'
+import { createDrizzleOrganizationStore } from './db/organization-store'
 import * as schema from './db/schema'
 import { createCloudflareEmailSender } from './email/cloudflare'
 import { createConsoleEmailSender, type DevMailbox } from './email/console'
 import type { EmailSender } from './email/sender'
 import { validateEnv, type ValidatedEnv } from './env'
-import type { AssetStore, ObjectStore, PhotoStore, ShareStore, WatermarkStore } from './stores'
+import type {
+  AssetStore,
+  ObjectStore,
+  OrganizationStore,
+  PhotoStore,
+  ShareStore,
+  WatermarkStore,
+} from './stores'
 
 export interface Services {
   config: ValidatedEnv
@@ -34,6 +42,7 @@ export interface Services {
   assets: AssetStore
   photos: PhotoStore
   shares: ShareStore
+  organizations: OrganizationStore
   objects: ObjectStore
   /** Per-address limiter shared with Better Auth; public routes consume it too. */
   rateLimit: RateLimitStorage
@@ -79,6 +88,9 @@ export function buildServices(config: ValidatedEnv): Services {
     audit,
     rateLimit,
     rateLimitEnabled: true,
+    ...(config.TURNSTILE_SECRET_KEY !== undefined && {
+      captcha: { secretKey: config.TURNSTILE_SECRET_KEY },
+    }),
   })
   return {
     config,
@@ -90,6 +102,7 @@ export function buildServices(config: ValidatedEnv): Services {
     assets: createDrizzleAssetStore(db),
     photos: createDrizzlePhotoStore(db),
     shares: createDrizzleShareStore(db),
+    organizations: createDrizzleOrganizationStore(db),
     objects: createR2ObjectStore(config.BUCKET),
     rateLimit,
     devMailbox,
