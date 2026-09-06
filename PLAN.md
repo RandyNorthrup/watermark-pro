@@ -575,6 +575,8 @@ Tests that failed first and drove a fix:
 | `getByLabel('Link')` and `getByLabel('Title')` matched "Copy link" and "Preset name"                        | share e2e strict mode        | `exact: true`                                           |
 | Download readers, the viewer-join fixture and the newest-first sort were duplicated across specs and stores | jscpd                        | `downloadBytes`, `joinAsMember`, `newestFirst` helpers  |
 
+Post-merge: the first production deploy of M7 left `0003_shares.sql` unapplied because wrangler treated the closed stdin of `npm run deploy` as a declined confirmation and exited 0; the migration was applied by hand and `scripts/deploy.mjs` now runs the apply step with `CI=true` (wrangler skips the prompt) and fails the deploy if `wrangler d1 migrations list --remote` still shows pending migrations, so a Worker can no longer ship ahead of its schema.
+
 Gate fire checks in M7: the token test proved a signature over a different expiry is refused even though it verifies, the route test proved the rate limiter answers 429 with `Retry-After` for a blocked address and 200 for another, and the e2e proved a cookie-less visitor cannot reach organization routes or a tampered token.
 
 ---

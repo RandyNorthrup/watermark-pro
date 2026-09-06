@@ -26,6 +26,12 @@ Milestone M7: sharing.
   lightbox, downloads and a "Share this link" button.
 - Audit entries `share.created` and `share.revoked`.
 
+### Fixed
+
+- `npm run deploy` runs the migration step non-interactively and refuses to
+  deploy while remote migrations are pending; previously a closed stdin could
+  skip the migration and deploy the Worker ahead of its schema.
+
 ## [0.7.0] - 2026-09-06
 
 Milestone M6: storage and gallery.

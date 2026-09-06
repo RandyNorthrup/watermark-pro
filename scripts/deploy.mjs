@@ -44,10 +44,40 @@ function run(tool, args, extraEnv = {}) {
   }
 }
 
+/**
+ * `wrangler d1 migrations list` prints a table of migrations that have NOT
+ * been applied; an empty list means the remote database is current. Deploying
+ * a Worker ahead of its schema would fail every request that touches the new
+ * tables, so this is fatal.
+ */
+function assertNoPendingMigrations() {
+  const result = spawnSync(
+    process.execPath,
+    [TOOLS.wrangler, 'd1', 'migrations', 'list', DATABASE, '--remote', '--env', ENVIRONMENT],
+    { encoding: 'utf8', env: { ...process.env, CI: 'true' } },
+  )
+  if (result.status !== 0) {
+    console.error(result.stderr)
+    process.exit(result.status ?? 1)
+  }
+  const pending = result.stdout.match(/^\s*│\s*(\d{4}_[^\s│]+)\s*│/gm) ?? []
+  if (pending.length > 0) {
+    console.error(`migrations still pending on ${DATABASE}: ${pending.join(', ')}`)
+    process.exit(1)
+  }
+  console.info('remote database is current')
+}
+
 // The Cloudflare Vite plugin resolves wrangler.jsonc for the environment named
 // by CLOUDFLARE_ENV and writes the resolved config next to the build output.
 run('vite', ['build'], { CLOUDFLARE_ENV: ENVIRONMENT })
-run('wrangler', ['d1', 'migrations', 'apply', DATABASE, '--remote', '--env', ENVIRONMENT])
+// CI=true makes wrangler skip its confirmation prompt instead of treating a
+// closed stdin as "no", which once left a migration unapplied while the
+// Worker that needed it deployed anyway.
+run('wrangler', ['d1', 'migrations', 'apply', DATABASE, '--remote', '--env', ENVIRONMENT], {
+  CI: 'true',
+})
+assertNoPendingMigrations()
 // No --env here: `wrangler deploy` follows the plugin's deploy redirect to the
 // already-resolved production config in dist/.
 run('wrangler', ['deploy'])
