@@ -109,9 +109,10 @@ and observed to fail before being trusted; the log is in PLAN.md §8.
 
 `npm run quality` omits the tools that need a browser or a machine install so
 it stays runnable anywhere. CI runs `quality:ci`, the e2e job, and the semgrep
-job on every push and pull request. The Lighthouse and screenshot audits are
-run at UI milestones against `npm run preview`; their output is committed
-under `docs/lighthouse/` and `docs/screenshots/`.
+job on every push and pull request, plus GitHub dependency review on pull
+requests. The Lighthouse and screenshot audits are run at UI milestones
+against `npm run preview`; their output is committed under `docs/lighthouse/`
+and `docs/screenshots/`.
 
 Other test commands: `npm run test:unit` (jsdom + Node projects),
 `npm run test:browser` (engine tests in real Chromium via Vitest browser
@@ -373,6 +374,10 @@ pins with a seven-day release age, and GitHub Actions pinned to commit SHAs.
   `%APPDATA%\Python\Python3xx\Scripts`).
 - **`npm install` refuses a brand-new package version.** That is
   `min-release-age=7` in `.npmrc` doing its job; wait, or pin an older version.
+- **CI fails on "Verify generated Worker types are current".** Run
+  `npm run cf-typegen` and commit `worker-configuration.d.ts`. The command
+  reads `.env.example` instead of `.dev.vars`, so local secrets never change
+  the generated file.
 - **knip reports nothing at all.** Do not add `--strict`; in knip 6 it implies
   `--production` and skips everything without a production suffix.
 - **Playwright says port 5173 is in use.** A previous preview is still running;
