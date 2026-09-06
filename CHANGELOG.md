@@ -52,6 +52,10 @@ Milestone M8: enterprise hardening and release. First stable release.
 - The "not a platform administrator" refusal on `/app/admin` rendered
   without a page heading (axe `page-has-heading-one`); the heading now
   precedes the refusal.
+- `src/client/routeTree.gen.ts` is committed (it was git-ignored), because
+  ESLint and `tsc` run before the build in the quality chain and a fresh
+  checkout had no route tree; CI verifies the committed copy matches the
+  build's output.
 - `npm run cf-typegen` now passes `--env-file .env.example`, so the
   committed Worker types no longer depend on the secrets in a developer's
   `.dev.vars`; the CI typegen check had failed on the first GitHub run for

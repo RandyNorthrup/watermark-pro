@@ -34,6 +34,11 @@ jobs:
       - name: Format, lint, types, dead code, cycles, duplication, secrets, audit, tests, build
         run: npm run quality:ci
 
+      # The router plugin rewrites the route tree during the build above; the
+      # committed copy must match so a fresh checkout lints and type-checks.
+      - name: Verify the committed route tree is current
+        run: git diff --exit-code -- src/client/routeTree.gen.ts
+
       - name: Upload coverage
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
