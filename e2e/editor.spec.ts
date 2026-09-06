@@ -5,7 +5,7 @@
  */
 import { expect, type Page, test } from '@playwright/test'
 
-import { createWorkspace, expectAccessible, pngSize } from './support'
+import { createWorkspace, downloadBytes, expectAccessible, pngSize } from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -79,12 +79,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   await page.getByRole('button', { name: 'Download' }).click()
   const download = await downloadPromise
   expect(download.suggestedFilename()).toBe('sample-photo-watermarked.png')
-  const stream = await download.createReadStream()
-  const chunks: Uint8Array[] = []
-  for await (const chunk of stream) {
-    chunks.push(new Uint8Array(chunk as Uint8Array))
-  }
-  const bytes = Buffer.concat(chunks)
+  const bytes = await downloadBytes(download)
   expect(bytes.subarray(1, 4).toString('ascii')).toBe('PNG')
   expect(pngSize(bytes)).toEqual({ width: 320, height: 320 })
 

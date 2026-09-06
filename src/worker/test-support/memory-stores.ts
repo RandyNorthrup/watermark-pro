@@ -4,6 +4,8 @@ import type {
   ObjectStore,
   PhotoRecord,
   PhotoStore,
+  ShareRecord,
+  ShareStore,
   StoredObject,
   WatermarkRecord,
   WatermarkStore,
@@ -113,15 +115,22 @@ export function createMemoryObjectStore(): ObjectStore & { keys(): string[] } {
   }
 }
 
+/** Records of one organization, newest first with the id as a tie-break (D1 ordering). */
+function newestFirst<T extends { id: string; organizationId: string; createdAt: Date }>(
+  records: Map<string, T>,
+  organizationId: string,
+): T[] {
+  return records
+    .values()
+    .filter((record) => record.organizationId === organizationId)
+    .toArray()
+    .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime() || b.id.localeCompare(a.id))
+}
+
 /** In-memory photo store for Node tests; mirrors the D1 ordering and cursor. */
 export function createMemoryPhotoStore(): PhotoStore {
   const records = new Map<string, PhotoRecord>()
-  const scoped = (organizationId: string) =>
-    records
-      .values()
-      .filter((record) => record.organizationId === organizationId)
-      .toArray()
-      .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime() || b.id.localeCompare(a.id))
+  const scoped = (organizationId: string) => newestFirst(records, organizationId)
   return {
     list(organizationId, query) {
       let rows = scoped(organizationId)
@@ -172,6 +181,32 @@ export function createMemoryPhotoStore(): PhotoStore {
         count: rows.length,
         bytes: rows.reduce((total, record) => total + record.size, 0),
       })
+    },
+  }
+}
+
+/** In-memory share store for Node tests. */
+export function createMemoryShareStore(): ShareStore {
+  const records = new Map<string, ShareRecord>()
+  const scoped = (organizationId: string) => newestFirst(records, organizationId)
+  return {
+    listForOrganization: (organizationId) => Promise.resolve(scoped(organizationId)),
+    find: (organizationId, id) =>
+      Promise.resolve(scoped(organizationId).find((record) => record.id === id) ?? null),
+    findById: (id) => Promise.resolve(records.get(id) ?? null),
+    create(input) {
+      const record: ShareRecord = { ...input, revokedAt: null, createdAt: new Date() }
+      records.set(record.id, record)
+      return Promise.resolve(record)
+    },
+    revoke(organizationId, id) {
+      const existing = scoped(organizationId).find((record) => record.id === id)
+      if (existing?.revokedAt !== null) {
+        return Promise.resolve(null)
+      }
+      const revoked = { ...existing, revokedAt: new Date() }
+      records.set(id, revoked)
+      return Promise.resolve(revoked)
     },
   }
 }

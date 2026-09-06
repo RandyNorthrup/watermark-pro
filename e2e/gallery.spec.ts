@@ -5,7 +5,7 @@
  */
 import { expect, test } from '@playwright/test'
 
-import { createWorkspace, expectAccessible, pngSize } from './support'
+import { createWorkspace, downloadBytes, expectAccessible, pngSize } from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -62,12 +62,7 @@ test('saves from the editor, browses, searches, downloads and deletes', async ({
   const downloadPromise = page.waitForEvent('download')
   await dialog.getByRole('link', { name: 'Download' }).click()
   const download = await downloadPromise
-  const stream = await download.createReadStream()
-  const chunks: Uint8Array[] = []
-  for await (const piece of stream) {
-    chunks.push(new Uint8Array(piece as Uint8Array))
-  }
-  expect(pngSize(Buffer.concat(chunks))).toEqual({ width: 960, height: 640 })
+  expect(pngSize(await downloadBytes(download))).toEqual({ width: 960, height: 640 })
 
   await dialog.getByRole('button', { name: 'Delete' }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)

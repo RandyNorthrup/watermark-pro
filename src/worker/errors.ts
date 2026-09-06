@@ -38,6 +38,16 @@ export const apiErrors = {
     new HTTPException(HTTP_STATUS.unsupportedMediaType, {
       res: jsonError(HTTP_STATUS.unsupportedMediaType, API_ERROR_CODE.unsupportedMedia),
     }),
+  rateLimited: (retryAfterSeconds: number) =>
+    new HTTPException(HTTP_STATUS.tooManyRequests, {
+      res: Response.json(
+        { error: API_ERROR_CODE.rateLimited },
+        {
+          status: HTTP_STATUS.tooManyRequests,
+          headers: { 'retry-after': String(retryAfterSeconds) },
+        },
+      ),
+    }),
   quotaExceeded: () =>
     new HTTPException(HTTP_STATUS.badRequest, {
       res: jsonError(HTTP_STATUS.badRequest, API_ERROR_CODE.quotaExceeded),

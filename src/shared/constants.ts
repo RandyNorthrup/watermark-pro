@@ -76,6 +76,13 @@ export const PHOTO_PAGE_SIZE = 60
 export const MAX_BULK_DELETE = 200
 export const MAX_PHOTO_NAME_LENGTH = 200
 export const MAX_CURSOR_LENGTH = 100
+
+/** Share links (M7). */
+export const MAX_SHARE_PHOTOS = 200
+export const SHARE_PATH_PREFIX = '/share/'
+/** Expiry choices offered when creating a link, in days. */
+export const SHARE_EXPIRY_DAYS = [1, 7, 30] as const
+export const MILLISECONDS_PER_SECOND = 1000
 export const LOGO_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const
 
 /** Font weights the watermark designer offers; variable fonts cover the range. */

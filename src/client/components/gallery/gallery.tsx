@@ -1,9 +1,10 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { CheckSquare, Download, Images, Search, Square, Trash2, X } from 'lucide-react'
+import { CheckSquare, Download, Images, Search, Share2, Square, Trash2, X } from 'lucide-react'
 import { AlertDialog, Dialog } from 'radix-ui'
 import { useDeferredValue, useId, useMemo, useState } from 'react'
 
+import { ShareDialog } from './share-dialog'
 import type { PhotoDto } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
@@ -60,6 +61,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
   const usage = useQuery(storageUsageQueryOptions(organizationId))
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const canDelete = canRole(role, { photo: ['delete'] })
+  const canShare = canRole(role, { share: ['create'] })
 
   const remove = useMutation({
     mutationFn: (ids: readonly string[]) => deletePhotos(organizationId, ids),
@@ -154,7 +156,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
             ))}
           </select>
         </div>
-        {canDelete && items.length > 0 ? (
+        {(canDelete || canShare) && items.length > 0 ? (
           <div className="ml-auto flex items-center gap-2">
             <Button
               type="button"
@@ -173,13 +175,33 @@ export function Gallery({ organizationId, role }: GalleryProps) {
               )}
               {selected.size === items.length ? 'Clear selection' : 'Select all'}
             </Button>
-            <DeleteDialog
-              count={selected.size}
-              isPending={remove.isPending}
-              onConfirm={() => {
-                remove.mutate([...selected])
-              }}
-            />
+            {canShare ? (
+              <ShareDialog
+                organizationId={organizationId}
+                photoIds={[...selected]}
+                defaultTitle={`${String(selected.size)} photo${selected.size === 1 ? '' : 's'}`}
+                trigger={
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    disabled={selected.size === 0}
+                  >
+                    <Share2 aria-hidden="true" className="size-4" />
+                    Share {selected.size === 0 ? '' : String(selected.size)}
+                  </Button>
+                }
+              />
+            ) : null}
+            {canDelete ? (
+              <DeleteDialog
+                count={selected.size}
+                isPending={remove.isPending}
+                onConfirm={() => {
+                  remove.mutate([...selected])
+                }}
+              />
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -240,7 +262,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                     {photo.presetName === null ? '' : ` · ${photo.presetName}`}
                   </span>
                 </button>
-                {canDelete ? (
+                {canDelete || canShare ? (
                   <label className="absolute top-2.5 left-2.5 flex size-6 cursor-pointer items-center justify-center rounded-md border border-line bg-surface-raised shadow">
                     <input
                       type="checkbox"
@@ -277,6 +299,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
         organizationId={organizationId}
         photo={open}
         canDelete={canDelete}
+        canShare={canShare}
         isDeleting={remove.isPending}
         onClose={() => {
           setOpen(null)
@@ -335,6 +358,7 @@ interface LightboxProps {
   organizationId: string
   photo: PhotoDto | null
   canDelete: boolean
+  canShare: boolean
   isDeleting: boolean
   onClose: () => void
   onDelete: (photo: PhotoDto) => void
@@ -344,6 +368,7 @@ function Lightbox({
   organizationId,
   photo,
   canDelete,
+  canShare,
   isDeleting,
   onClose,
   onDelete,
@@ -382,6 +407,19 @@ function Lightbox({
                     <Download aria-hidden="true" className="size-4" />
                     Download
                   </a>
+                  {canShare ? (
+                    <ShareDialog
+                      organizationId={organizationId}
+                      photoIds={[photo.id]}
+                      defaultTitle={photo.name}
+                      trigger={
+                        <Button type="button" variant="secondary" size="sm">
+                          <Share2 aria-hidden="true" className="size-4" />
+                          Share
+                        </Button>
+                      }
+                    />
+                  ) : null}
                   {canDelete ? (
                     <Button
                       type="button"

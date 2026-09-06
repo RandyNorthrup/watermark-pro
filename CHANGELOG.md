@@ -7,6 +7,25 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-06
+
+Milestone M7: sharing.
+
+### Added
+
+- Share links: publish selected gallery photos (or one photo from the
+  lightbox) under a signed, expiring (1, 7, 30 days or never), revocable
+  link. Table `share` (migration `0003_shares.sql`), routes under
+  `/api/orgs/:orgId/shares` behind the `share` permission, and public routes
+  under `/api/share/:token` that carry no session, are rate limited per
+  address, serve only the photos in the link, and refuse expired, revoked
+  and tampered tokens with one neutral 404.
+- Share dialog with Copy link and Share… (the platform share sheet through
+  the Web Share API, clipboard fallback); `/app/shares` to review, copy,
+  share and revoke links; the public `/share/:token` album page with a
+  lightbox, downloads and a "Share this link" button.
+- Audit entries `share.created` and `share.revoked`.
+
 ## [0.7.0] - 2026-09-06
 
 Milestone M6: storage and gallery.

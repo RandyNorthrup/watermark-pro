@@ -14,12 +14,19 @@ import {
   assetDtoSchema,
   photoDtoSchema,
   photoListResponseSchema,
+  publicShareSchema,
+  shareDtoSchema,
   watermarkDtoSchema,
   watermarkListResponseSchema,
 } from '../shared/api'
-import { HTTP_STATUS } from '../shared/constants'
+import { HTTP_STATUS, SHARE_PATH_PREFIX } from '../shared/constants'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC } from '../shared/watermark'
 import { TestClient } from './test-support/client'
+
+async function statusOf(client: TestClient, path: string): Promise<number> {
+  const response = await client.get(path)
+  return response.status
+}
 
 const app = createApp()
 const owner = {
@@ -152,5 +159,30 @@ describe('library over D1 and R2', () => {
     expect(removed.status).toBe(HTTP_STATUS.ok)
     expect(await env.BUCKET.get(`org/${organizationId}/photos/${first}`)).toBeNull()
     expect(await getServices(env).db.query.photo.findMany()).toHaveLength(1)
+  })
+
+  it('publishes a share link through the share table and revokes it', async () => {
+    const [remaining] = await getServices(env).db.query.photo.findMany()
+    expect(remaining).toBeDefined()
+    const created = await client.post(`/api/orgs/${organizationId}/shares`, {
+      title: 'Client preview',
+      photoIds: [remaining?.id ?? ''],
+      expiresInDays: 1,
+    })
+    expect(created.status).toBe(HTTP_STATUS.created)
+    const share = shareDtoSchema.parse(await created.json())
+    const token = new URL(share.url).pathname.slice(SHARE_PATH_PREFIX.length)
+    const anonymous = new TestClient(app, env)
+    const view = await anonymous.get(`/api/share/${token}`)
+    expect(view.status).toBe(HTTP_STATUS.ok)
+    expect(publicShareSchema.parse(await view.json()).photos).toHaveLength(1)
+    const file = await anonymous.get(`/api/share/${token}/photos/${remaining?.id ?? ''}/file`)
+    expect(file.status).toBe(HTTP_STATUS.ok)
+
+    const revoked = await client.post(`/api/orgs/${organizationId}/shares/${share.id}/revoke`, {})
+    expect(revoked.status).toBe(HTTP_STATUS.ok)
+    expect(await statusOf(anonymous, `/api/share/${token}`)).toBe(HTTP_STATUS.notFound)
+    const rows = await getServices(env).db.query.share.findMany()
+    expect(rows[0]?.revokedAt).not.toBeNull()
   })
 })

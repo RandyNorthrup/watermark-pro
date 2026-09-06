@@ -109,6 +109,34 @@ export class TestClient {
   }
 }
 
+/** Invites `member` with `role`, signs them up and accepts; returns their client. */
+export async function joinAsMember(
+  harness: { app: Hono<AppContext>; env: Env; mailbox: DevMailbox },
+  owner: TestClient,
+  organizationId: string,
+  member: { name: string; email: string; password: string },
+  role: string,
+): Promise<TestClient> {
+  const invite = await owner.post('/api/auth/organization/invite-member', {
+    email: member.email,
+    role,
+    organizationId,
+  })
+  if (!invite.ok) {
+    throw new Error(`invite failed: ${String(invite.status)}`)
+  }
+  const acceptPath = findLink(harness.mailbox, member.email, '/accept-invitation/')
+  const client = new TestClient(harness.app, harness.env)
+  await client.signUpAndVerify(harness.mailbox, member)
+  const accept = await client.post('/api/auth/organization/accept-invitation', {
+    invitationId: acceptPath.split('/').at(-1),
+  })
+  if (!accept.ok) {
+    throw new Error(`accept failed: ${String(accept.status)}`)
+  }
+  return client
+}
+
 /** The `error` code of a standard error envelope. */
 export async function errorCodeOf(response: Response): Promise<string> {
   const body: unknown = await response.json()

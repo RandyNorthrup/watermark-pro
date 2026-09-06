@@ -1,4 +1,6 @@
-import type { AssetRecord, PhotoRecord, WatermarkRecord } from './stores'
+import { NEVER_EXPIRES } from './share-token'
+import type { AssetRecord, PhotoRecord, ShareRecord, WatermarkRecord } from './stores'
+import { MILLISECONDS_PER_SECOND } from '../shared/constants'
 
 /** Serialisation shared by routes: dates become ISO strings, storage keys stay private. */
 export function watermarkToDto(record: WatermarkRecord) {
@@ -17,4 +19,21 @@ export function assetToDto(record: AssetRecord) {
 export function photoToDto(record: PhotoRecord) {
   const { key: _key, thumbnailKey: _thumbnailKey, ...rest } = record
   return { ...rest, createdAt: record.createdAt.toISOString() }
+}
+
+export function shareToDto(record: ShareRecord, url: string) {
+  return {
+    id: record.id,
+    organizationId: record.organizationId,
+    title: record.title,
+    photoCount: record.photoIds.length,
+    expiresAt:
+      record.expiresAt === NEVER_EXPIRES
+        ? null
+        : new Date(record.expiresAt * MILLISECONDS_PER_SECOND).toISOString(),
+    revokedAt: record.revokedAt?.toISOString() ?? null,
+    createdBy: record.createdBy,
+    createdAt: record.createdAt.toISOString(),
+    url,
+  }
 }

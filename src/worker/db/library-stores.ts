@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, lt, or, sql } from 'drizzle-orm'
+import { and, count, desc, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm'
 
 import type {
   AssetKind,
@@ -7,10 +7,11 @@ import type {
   ObjectStore,
   PhotoRecord,
   PhotoStore,
+  ShareStore,
   WatermarkStore,
 } from '../stores'
 import type { Database } from './client'
-import { asset, photo, watermark } from './schema'
+import { asset, photo, share, watermark } from './schema'
 
 /** D1-backed preset store. Exercised by the Workers test project. */
 export function createDrizzleWatermarkStore(db: Database): WatermarkStore {
@@ -246,4 +247,46 @@ export function createDrizzlePhotoStore(db: Database): PhotoStore {
 /** Escapes LIKE wildcards so a search for "100%" matches literally. */
 function escapeLike(value: string): string {
   return value.replaceAll(/[\\%_]/g, (match) => `\\${match}`)
+}
+
+/** D1-backed share-link store. */
+export function createDrizzleShareStore(db: Database): ShareStore {
+  return {
+    async listForOrganization(organizationId) {
+      return await db
+        .select()
+        .from(share)
+        .where(eq(share.organizationId, organizationId))
+        .orderBy(desc(share.createdAt), desc(share.id))
+    },
+    async find(organizationId, id) {
+      const [row] = await db
+        .select()
+        .from(share)
+        .where(and(eq(share.organizationId, organizationId), eq(share.id, id)))
+        .limit(1)
+      return row ?? null
+    },
+    async findById(id) {
+      const [row] = await db.select().from(share).where(eq(share.id, id)).limit(1)
+      return row ?? null
+    },
+    async create(input) {
+      const [row] = await db.insert(share).values(input).returning()
+      if (row === undefined) {
+        throw new Error('insert returned no row')
+      }
+      return row
+    },
+    async revoke(organizationId, id) {
+      const [row] = await db
+        .update(share)
+        .set({ revokedAt: new Date() })
+        .where(
+          and(eq(share.organizationId, organizationId), eq(share.id, id), isNull(share.revokedAt)),
+        )
+        .returning()
+      return row ?? null
+    },
+  }
 }

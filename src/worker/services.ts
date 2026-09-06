@@ -7,12 +7,13 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 
 import type { AuditStore } from './audit'
 import { type Auth, createAuth } from './auth/auth'
-import { createBindingRateLimitStorage } from './auth/rate-limit'
+import { createBindingRateLimitStorage, type RateLimitStorage } from './auth/rate-limit'
 import { createDrizzleAuditStore } from './db/audit-store'
 import { createDatabase, type Database } from './db/client'
 import {
   createDrizzleAssetStore,
   createDrizzlePhotoStore,
+  createDrizzleShareStore,
   createDrizzleWatermarkStore,
   createR2ObjectStore,
 } from './db/library-stores'
@@ -21,7 +22,7 @@ import { createCloudflareEmailSender } from './email/cloudflare'
 import { createConsoleEmailSender, type DevMailbox } from './email/console'
 import type { EmailSender } from './email/sender'
 import { validateEnv, type ValidatedEnv } from './env'
-import type { AssetStore, ObjectStore, PhotoStore, WatermarkStore } from './stores'
+import type { AssetStore, ObjectStore, PhotoStore, ShareStore, WatermarkStore } from './stores'
 
 export interface Services {
   config: ValidatedEnv
@@ -32,7 +33,10 @@ export interface Services {
   watermarks: WatermarkStore
   assets: AssetStore
   photos: PhotoStore
+  shares: ShareStore
   objects: ObjectStore
+  /** Per-address limiter shared with Better Auth; public routes consume it too. */
+  rateLimit: RateLimitStorage
   /** Present only with the console email provider (development and test). */
   devMailbox: DevMailbox | undefined
 }
@@ -66,13 +70,14 @@ export function buildServices(config: ValidatedEnv): Services {
   const db = createDatabase(config.DB)
   const audit = createDrizzleAuditStore(db)
   const { email, devMailbox } = createEmailSender(config)
+  const rateLimit = createBindingRateLimitStorage(config.AUTH_RATE_LIMITER, config.API_RATE_LIMITER)
   const auth = createAuth({
     database: drizzleAdapter(db, { provider: 'sqlite', schema }),
     secret: config.BETTER_AUTH_SECRET,
     appUrl: config.APP_URL,
     email,
     audit,
-    rateLimit: createBindingRateLimitStorage(config.AUTH_RATE_LIMITER, config.API_RATE_LIMITER),
+    rateLimit,
     rateLimitEnabled: true,
   })
   return {
@@ -84,7 +89,9 @@ export function buildServices(config: ValidatedEnv): Services {
     watermarks: createDrizzleWatermarkStore(db),
     assets: createDrizzleAssetStore(db),
     photos: createDrizzlePhotoStore(db),
+    shares: createDrizzleShareStore(db),
     objects: createR2ObjectStore(config.BUCKET),
+    rateLimit,
     devMailbox,
   }
 }

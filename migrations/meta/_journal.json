@@ -22,6 +22,13 @@
       "when": 1788672845791,
       "tag": "0002_photos",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1788674716288,
+      "tag": "0003_shares",
+      "breakpoints": true
     }
   ]
 }

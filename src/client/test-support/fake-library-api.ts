@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 
 import { type FakeGalleryState, handleGallery } from './fake-gallery-api'
+import { type FakeShareState, handleShares } from './fake-share-api'
 import { type AssetDto, saveWatermarkRequestSchema, type WatermarkDto } from '../../shared/api'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
 
@@ -15,6 +16,7 @@ export interface FakeLibraryState {
   /** When set, every request fails with this code. */
   failWith: keyof typeof API_ERROR_CODE | null
   gallery: FakeGalleryState
+  shares: FakeShareState
 }
 
 const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
@@ -110,6 +112,10 @@ function handle(state: FakeLibraryState, url: string, init: RequestInit): Respon
   if (gallery !== null) {
     return gallery
   }
+  const shared = handleShares(state.shares, state.gallery, url, init)
+  if (shared !== null) {
+    return shared
+  }
   const method = init.method ?? 'GET'
   const match = ROUTE.exec(new URL(url, 'http://localhost').pathname)
   if (match?.groups === undefined) {
@@ -194,6 +200,7 @@ export function installLibraryApi(initial: Partial<FakeLibraryState> = {}): Fake
     assets: [],
     failWith: null,
     gallery: { photos: [], maxBytes: 2 * 1024 * 1024 * 1024, uploadFailsWith: null },
+    shares: { shares: [] },
     ...initial,
   }
   vi.stubGlobal(

@@ -110,3 +110,24 @@ export interface PhotoStore {
   deleteMany(organizationId: string, ids: readonly string[]): Promise<number>
   usage(organizationId: string): Promise<StorageUsage>
 }
+
+export interface ShareRecord {
+  id: string
+  organizationId: string
+  title: string
+  photoIds: string[]
+  /** Unix seconds; 0 means the link never expires. */
+  expiresAt: number
+  revokedAt: Date | null
+  createdBy: string | null
+  createdAt: Date
+}
+
+export interface ShareStore {
+  listForOrganization(organizationId: string): Promise<ShareRecord[]>
+  find(organizationId: string, id: string): Promise<ShareRecord | null>
+  /** Lookup by id alone, for the public route (the token proves the id). */
+  findById(id: string): Promise<ShareRecord | null>
+  create(input: Omit<ShareRecord, 'createdAt' | 'revokedAt'>): Promise<ShareRecord>
+  revoke(organizationId: string, id: string): Promise<ShareRecord | null>
+}

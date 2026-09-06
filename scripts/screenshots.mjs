@@ -29,6 +29,7 @@ const AUTHENTICATED_PAGES = [
   ['library', '/app/library'],
   ['bulk', '/app/bulk'],
   ['gallery', '/app/gallery'],
+  ['shares', '/app/shares'],
 ]
 
 const outputDir = path.join('docs', 'screenshots', MILESTONE)
@@ -118,6 +119,22 @@ try {
       fullPage: true,
     })
 
+    // Publish the saved photo and capture the link dialog and the visitor's page.
+    await page.goto(`${BASE_URL}/app/gallery`, { waitUntil: 'networkidle' })
+    await page
+      .getByRole('checkbox', { name: /^Select / })
+      .first()
+      .check()
+    await page.getByRole('button', { name: 'Share 1' }).click()
+    await page.getByRole('dialog').getByLabel('Title', { exact: true }).fill('Client preview')
+    await page.getByRole('dialog').getByRole('button', { name: 'Create link' }).click()
+    const shareUrl = await page.getByRole('dialog').getByLabel('Link', { exact: true }).inputValue()
+    await page.screenshot({
+      path: path.join(outputDir, `share-dialog-${colorScheme}.png`),
+      fullPage: true,
+    })
+    await page.keyboard.press('Escape')
+
     for (const [name, pathname] of AUTHENTICATED_PAGES) {
       await page.goto(`${BASE_URL}${pathname}`, { waitUntil: 'networkidle' })
       await page.screenshot({
@@ -126,6 +143,16 @@ try {
       })
     }
     await context.close()
+
+    const visitorContext = await browser.newContext({ viewport: VIEWPORT, colorScheme })
+    const visitor = await visitorContext.newPage()
+    await visitor.goto(shareUrl, { waitUntil: 'networkidle' })
+    await visitor.getByRole('heading', { level: 1, name: 'Client preview' }).waitFor()
+    await visitor.screenshot({
+      path: path.join(outputDir, `share-public-${colorScheme}.png`),
+      fullPage: true,
+    })
+    await visitorContext.close()
   }
   console.info(`screenshots written to ${outputDir}`)
 } finally {

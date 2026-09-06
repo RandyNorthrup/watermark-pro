@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { errorCodeOf, findLink, signUpOwner, TestClient } from './test-support/client'
+import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
 import {
   assetDtoSchema,
@@ -58,21 +58,8 @@ async function upload(client: TestClient, form: FormData): Promise<Response> {
   return await client.request(base('/assets'), { method: 'POST', body: form })
 }
 
-async function inviteAndJoin(user: typeof viewer, role: string): Promise<TestClient> {
-  const invite = await ownerClient.post('/api/auth/organization/invite-member', {
-    email: user.email,
-    role,
-    organizationId,
-  })
-  expect(invite.status).toBe(HTTP_STATUS.ok)
-  const acceptPath = findLink(harness.mailbox, user.email, '/accept-invitation/')
-  const client = new TestClient(harness.app, harness.env)
-  await client.signUpAndVerify(harness.mailbox, user)
-  const accept = await client.post('/api/auth/organization/accept-invitation', {
-    invitationId: acceptPath.split('/').at(-1),
-  })
-  expect(accept.status).toBe(HTTP_STATUS.ok)
-  return client
+function inviteAndJoin(user: typeof viewer, role: string): Promise<TestClient> {
+  return joinAsMember(harness, ownerClient, organizationId, user, role)
 }
 
 async function getStatus(client: TestClient, path: string): Promise<number> {
