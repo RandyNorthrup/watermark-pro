@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { Crop, Download, ImagePlus, Redo2, RotateCcw, Scaling, Stamp, Undo2 } from 'lucide-react'
 import { Tabs } from 'radix-ui'
 import { type DragEvent, useEffect, useReducer, useRef, useState } from 'react'
@@ -32,6 +33,7 @@ import type { Size } from '../../engine/layout'
 import type { Transform } from '../../engine/pipeline'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
+import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { readImageSize } from '../../lib/image-size'
 import { watermarksQueryOptions } from '../../lib/library'
 import { SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from '../../lib/sample-photo'
@@ -46,6 +48,8 @@ interface EditorProps {
   organizationId: string
   /** Preset to load when the editor opens (from the library's "Open in editor"). */
   initialPresetId?: string | null | undefined
+  /** Whether the current member may store photos in the gallery. */
+  canSave?: boolean | undefined
 }
 
 type Tool = 'watermark' | 'crop' | 'resize' | 'export'
@@ -114,7 +118,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
  * preset, adjust its placement and style for this photo, crop, resize, and
  * download. Every step is undoable.
  */
-export function Editor({ organizationId, initialPresetId }: EditorProps) {
+export function Editor({ organizationId, initialPresetId, canSave = false }: EditorProps) {
   const [history, dispatch] = useReducer(editorReducer, undefined, () => createHistory())
   const document = history.present
   const [tool, setTool] = useState<Tool>('watermark')
@@ -123,6 +127,35 @@ export function Editor({ organizationId, initialPresetId }: EditorProps) {
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [isExporting, setIsExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
+  const [saved, setSaved] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+  const save = useMutation({
+    mutationFn: async (options: EncodeOptions) => {
+      const current = renderer.current
+      if (current === null || document.spec === null) {
+        throw new Error('choose a preset first')
+      }
+      const blob = await current.exportFull(document.spec, options, transformOf(document))
+      return await uploadPhoto(organizationId, {
+        blob,
+        name: exportFileName(options.format),
+        width: outputSize.width,
+        height: outputSize.height,
+        presetId: document.presetId,
+      })
+    },
+    onMutate: () => {
+      setExportError(null)
+      setSaved(null)
+    },
+    onSuccess: async (stored) => {
+      setSaved(stored.name)
+      await queryClient.invalidateQueries({ queryKey: galleryQueryKey(organizationId) })
+    },
+    onError: (error) => {
+      setExportError(describeError(error))
+    },
+  })
   const inputRef = useRef<HTMLInputElement>(null)
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
   const displaySize = useElementSize(imageElement)
@@ -244,13 +277,17 @@ export function Editor({ organizationId, initialPresetId }: EditorProps) {
     setExportError(null)
     try {
       const blob = await current.exportFull(document.spec, options, transformOf(document))
-      const name = photo === null ? 'sample-photo' : baseName(photo.file.name)
-      downloadBlob(blob, `${name}-watermarked.${FORMAT_EXTENSIONS[options.format]}`)
+      downloadBlob(blob, exportFileName(options.format))
     } catch (error_) {
       setExportError(describeError(error_))
     } finally {
       setIsExporting(false)
     }
+  }
+
+  function exportFileName(format: EncodeOptions['format']): string {
+    const name = photo === null ? 'sample-photo' : baseName(photo.file.name)
+    return `${name}-watermarked.${FORMAT_EXTENSIONS[format]}`
   }
 
   function onDrop(event: DragEvent<HTMLDivElement>) {
@@ -468,10 +505,21 @@ export function Editor({ organizationId, initialPresetId }: EditorProps) {
               onExport={(options) => {
                 void exportPhoto(options)
               }}
+              onSave={canSave ? save.mutate : undefined}
+              isSaving={save.isPending}
             />
             {exportError === null ? null : (
               <Alert tone="error" title="Export failed" className="mt-3">
                 {exportError}
+              </Alert>
+            )}
+            {saved === null ? null : (
+              <Alert tone="success" className="mt-3">
+                Saved {saved} to the{' '}
+                <Link to="/app/gallery" className="font-medium underline">
+                  gallery
+                </Link>
+                .
               </Alert>
             )}
           </Tabs.Content>

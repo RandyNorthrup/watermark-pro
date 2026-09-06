@@ -11,9 +11,9 @@ trail, design system), M2 (watermark engine: smart placement, auto contrast,
 tiling, PNG/JPEG/WebP output in a Web Worker) M3 (watermark library:
 preset designer with live preview, 51 bundled font families, glyph and icon
 catalogue, logo uploads) M4 (single-photo editor with crop, resize,
-hand placement, undo and download) and M5 (bulk processing with a worker
-pool, progress, cancel, retry and ZIP export) are complete. Storage and
-sharing follow. See [PLAN.md](PLAN.md) for the roadmap and
+hand placement, undo and download) M5 (bulk processing with a worker
+pool, progress, cancel, retry and ZIP export) and M6 (stored photos with a
+searchable gallery) are complete. Sharing follows. See [PLAN.md](PLAN.md) for the roadmap and
 [CHANGELOG.md](CHANGELOG.md) for what has actually shipped.
 
 ## Stack
@@ -118,18 +118,18 @@ mode; includes the throughput benchmark recorded in `docs/benchmarks.md`),
 
 ## Environment variables and bindings
 
-| Name                 | Kind       | Where                                | Purpose                                                           |
-| -------------------- | ---------- | ------------------------------------ | ----------------------------------------------------------------- |
-| `APP_ENV`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                    |
-| `APP_URL`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard               |
-| `EMAIL_PROVIDER`     | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                         |
-| `EMAIL_FROM`         | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                  |
-| `BETTER_AUTH_SECRET` | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters          |
-| `DB`                 | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log, presets    |
-| `BUCKET`             | R2         | `wrangler.jsonc` `r2_buckets`        | Logo files (and, from M6, photos); never public, streamed via API |
-| `AUTH_RATE_LIMITER`  | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                 |
-| `API_RATE_LIMITER`   | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints                |
-| `SEND_EMAIL`         | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare`  |
+| Name                 | Kind       | Where                                | Purpose                                                          |
+| -------------------- | ---------- | ------------------------------------ | ---------------------------------------------------------------- |
+| `APP_ENV`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                   |
+| `APP_URL`            | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard              |
+| `EMAIL_PROVIDER`     | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                        |
+| `EMAIL_FROM`         | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                 |
+| `BETTER_AUTH_SECRET` | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters         |
+| `DB`                 | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log, presets   |
+| `BUCKET`             | R2         | `wrangler.jsonc` `r2_buckets`        | Logos, photos and thumbnails; never public, streamed via the API |
+| `AUTH_RATE_LIMITER`  | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                |
+| `API_RATE_LIMITER`   | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints               |
+| `SEND_EMAIL`         | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare` |
 
 Every variable and binding is validated on the first request an isolate
 handles (`src/worker/env.ts`); a misconfigured Worker answers 500 with
@@ -200,12 +200,26 @@ optionally a maximum long edge, then press Start. The browser decodes each
 photo and a pool of engine workers (one per core, up to eight) renders them
 in parallel with smart placement and auto contrast worked out per photo.
 Cancel keeps what has finished, Retry re-queues failures, and the results
-download one by one or as a single ZIP. Nothing is uploaded.
+download one by one or as a single ZIP. Nothing is uploaded unless you save
+the results to the gallery.
+
+## Gallery
+
+`/app/gallery` keeps watermarked photos in the organization's storage. Save a
+photo from the editor's Export tab or a whole batch from the bulk tool; the
+browser builds a thumbnail and uploads both. Photos are listed newest first
+with search, a preset filter and paging; select several and delete them after
+a confirmation, or open one to download or delete it. Viewers can browse and
+download; editors and above can save and delete.
+
+Limits: 40 MB per photo, PNG, JPEG or WebP, 10 000 photos and 2 GB per
+organization. Files live in R2 under organization-scoped keys and are served
+only to signed-in members.
 
 ## Project structure
 
 ```
-src/client/       React SPA: routes/ (file-based), components/ (ui/ primitives, designer/, editor/, bulk/),
+src/client/       React SPA: routes/ (file-based), components/ (ui/ primitives, designer/, editor/, bulk/, gallery/),
                   editor/ (crop, resize and undo logic), bulk/ (job queue, worker pool, ZIP), lib/, styles/,
                   fonts/ (catalogue + loader), symbols/ (glyphs + icons),
                   engine/ (watermark engine: pure analysis + canvas rendering, runs in a Web Worker)
@@ -213,7 +227,7 @@ src/worker/       Hono API on Workers: auth/ (Better Auth), db/ (drizzle schema,
                   email/ (providers), middleware/, routes/, services.ts, env.ts
 src/shared/       constants, permissions, validation and API schemas used by both sides
 migrations/       D1 migrations generated by drizzle-kit
-e2e/              Playwright specs (smoke, onboarding, library, editor and bulk journeys)
+e2e/              Playwright specs (smoke, onboarding, library, editor, bulk and gallery journeys)
 scripts/          Lighthouse and screenshot audits
 docs/             lighthouse/ reports and screenshots/ per milestone
 public/           static files, including _headers for security headers

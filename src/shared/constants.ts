@@ -64,6 +64,18 @@ export const MAX_PRESET_NAME_LENGTH = 60
 export const BYTES_PER_MEGABYTE = 1024 * 1024
 export const MAX_LOGO_BYTES = 5 * BYTES_PER_MEGABYTE
 export const MAX_LOGOS_PER_ORGANIZATION = 50
+
+/** Stored photos (M6): per-file, per-organization and page limits. */
+export const MAX_PHOTO_BYTES = 40 * BYTES_PER_MEGABYTE
+export const MAX_THUMBNAIL_BYTES = 1 * BYTES_PER_MEGABYTE
+export const MAX_PHOTOS_PER_ORGANIZATION = 10_000
+export const MAX_STORAGE_BYTES_PER_ORGANIZATION = 2 * 1024 * BYTES_PER_MEGABYTE
+export const MAX_PHOTO_SIDE = 8192
+export const PHOTO_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const
+export const PHOTO_PAGE_SIZE = 60
+export const MAX_BULK_DELETE = 200
+export const MAX_PHOTO_NAME_LENGTH = 200
+export const MAX_CURSOR_LENGTH = 100
 export const LOGO_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const
 
 /** Font weights the watermark designer offers; variable fonts cover the range. */

@@ -2,6 +2,8 @@ import type {
   AssetRecord,
   AssetStore,
   ObjectStore,
+  PhotoRecord,
+  PhotoStore,
   StoredObject,
   WatermarkRecord,
   WatermarkStore,
@@ -107,6 +109,69 @@ export function createMemoryObjectStore(): ObjectStore & { keys(): string[] } {
     delete(key) {
       objects.delete(key)
       return Promise.resolve()
+    },
+  }
+}
+
+/** In-memory photo store for Node tests; mirrors the D1 ordering and cursor. */
+export function createMemoryPhotoStore(): PhotoStore {
+  const records = new Map<string, PhotoRecord>()
+  const scoped = (organizationId: string) =>
+    records
+      .values()
+      .filter((record) => record.organizationId === organizationId)
+      .toArray()
+      .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime() || b.id.localeCompare(a.id))
+  return {
+    list(organizationId, query) {
+      let rows = scoped(organizationId)
+      if (query.presetId !== undefined) {
+        rows = rows.filter((record) => record.presetId === query.presetId)
+      }
+      if (query.search !== undefined && query.search !== '') {
+        const needle = query.search.toLowerCase()
+        rows = rows.filter((record) => record.name.toLowerCase().includes(needle))
+      }
+      if (query.cursor !== undefined) {
+        const index = rows.findIndex(
+          (record) => `${String(record.createdAt.getTime())}:${record.id}` === query.cursor,
+        )
+        rows = index === -1 ? [] : rows.slice(index + 1)
+      }
+      const page = rows.slice(0, query.limit)
+      const last = page.at(-1)
+      return Promise.resolve({
+        photos: page,
+        nextCursor:
+          last !== undefined && rows.length > query.limit
+            ? `${String(last.createdAt.getTime())}:${last.id}`
+            : null,
+      })
+    },
+    find: (organizationId, id) =>
+      Promise.resolve(scoped(organizationId).find((record) => record.id === id) ?? null),
+    findMany: (organizationId, ids) =>
+      Promise.resolve(scoped(organizationId).filter((record) => ids.includes(record.id))),
+    create(input) {
+      const record: PhotoRecord = { ...input, createdAt: new Date() }
+      records.set(record.id, record)
+      return Promise.resolve(record)
+    },
+    async deleteMany(organizationId, ids) {
+      let count = 0
+      for (const id of ids) {
+        if (await deleteScoped(records, organizationId, id)) {
+          count += 1
+        }
+      }
+      return count
+    },
+    usage(organizationId) {
+      const rows = scoped(organizationId)
+      return Promise.resolve({
+        count: rows.length,
+        bytes: rows.reduce((total, record) => total + record.size, 0),
+      })
     },
   }
 }

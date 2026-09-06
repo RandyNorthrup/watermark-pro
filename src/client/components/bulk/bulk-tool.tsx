@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import {
   AlertTriangle,
   CheckCircle2,
   Download,
   FolderArchive,
   ImagePlus,
+  Images,
   Loader2,
   RotateCcw,
   Trash2,
@@ -21,6 +23,8 @@ import { LONG_EDGE_PRESETS } from '../../editor/constants'
 import { type EncodeOptions, OUTPUT_FORMATS, type OutputFormat } from '../../engine/encode'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
+import { formatBytes } from '../../lib/format-bytes'
+import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { watermarksQueryOptions } from '../../lib/library'
 import { FORMAT_OPTIONS } from '../editor/formats'
 import { PresetGate } from '../presets/preset-gate'
@@ -32,6 +36,14 @@ import { SliderField } from '../ui/slider-field'
 
 interface BulkToolProps {
   organizationId: string
+  /** Whether the current member may store photos in the gallery. */
+  canSave?: boolean | undefined
+}
+
+interface SaveProgress {
+  done: number
+  total: number
+  failed: number
 }
 
 const ACCEPTED_PHOTO_TYPES = 'image/png,image/jpeg,image/webp,image/avif,image/gif'
@@ -76,14 +88,6 @@ function elapsedOf(timing: Timing | null): number | null {
     return null
   }
   return (finishedAt - timing.startedAt) / MILLISECONDS
-}
-
-function formatBytes(bytes: number): string {
-  const kilobyte = 1024
-  if (bytes < kilobyte * kilobyte) {
-    return `${String(Math.round(bytes / kilobyte))} kB`
-  }
-  return `${(bytes / (kilobyte * kilobyte)).toFixed(1)} MB`
 }
 
 function dedupe(existing: readonly File[], incoming: readonly File[]): File[] {
@@ -134,7 +138,7 @@ const STATUS_LABELS: Record<JobState<File, BulkResult>['status'], string> = {
  * through the worker pool with progress, cancel and retry, then download
  * everything as one ZIP or file by file.
  */
-export function BulkTool({ organizationId }: BulkToolProps) {
+export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const { snapshot, workers, add, start, cancel, retry, clear } = useBulkQueue(organizationId)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -146,6 +150,8 @@ export function BulkTool({ organizationId }: BulkToolProps) {
   const [size, setSize] = useState<SizeChoice>('original')
   const [isZipping, setIsZipping] = useState(false)
   const [zipError, setZipError] = useState<string | null>(null)
+  const [saving, setSaving] = useState<SaveProgress | null>(null)
+  const queryClient = useQueryClient()
   const [timing, setTiming] = useState<Timing | null>(null)
 
   const spec: WatermarkSpec | null =
@@ -185,6 +191,7 @@ export function BulkTool({ organizationId }: BulkToolProps) {
     const startedAt = performance.now()
     setTiming({ startedAt, finishedAt: null })
     setZipError(null)
+    setSaving(null)
     await start(spec, settings())
     setTiming({ startedAt, finishedAt: performance.now() })
   }
@@ -195,6 +202,30 @@ export function BulkTool({ organizationId }: BulkToolProps) {
     }
     retry()
     await start(spec, settings())
+  }
+
+  /** Uploads every finished result one at a time; a failure does not stop the rest. */
+  async function saveAll() {
+    const outputs = results.flatMap((job) => (job.output === null ? [] : [job.output]))
+    const progress: SaveProgress = { done: 0, total: outputs.length, failed: 0 }
+    setSaving({ ...progress })
+    setZipError(null)
+    for (const output of outputs) {
+      try {
+        await uploadPhoto(organizationId, {
+          blob: output.blob,
+          name: output.fileName,
+          width: output.width,
+          height: output.height,
+          presetId,
+        })
+      } catch {
+        progress.failed += 1
+      }
+      progress.done += 1
+      setSaving({ ...progress })
+    }
+    await queryClient.invalidateQueries({ queryKey: galleryQueryKey(organizationId) })
   }
 
   async function downloadZip() {
@@ -475,6 +506,33 @@ export function BulkTool({ organizationId }: BulkToolProps) {
                   {isZipping ? null : <FolderArchive aria-hidden="true" className="size-4" />}
                   Download {String(results.length)} as ZIP
                 </Button>
+                {canSave ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    isPending={saving !== null && saving.done < saving.total}
+                    disabled={saving !== null && saving.done === saving.total}
+                    onClick={() => {
+                      void saveAll()
+                    }}
+                  >
+                    {saving === null ? <Images aria-hidden="true" className="size-4" /> : null}
+                    {saving === null
+                      ? `Save ${String(results.length)} to gallery`
+                      : `Saved ${String(saving.done - saving.failed)} of ${String(saving.total)}`}
+                  </Button>
+                ) : null}
+                {saving !== null && saving.done === saving.total ? (
+                  <Alert tone={saving.failed === 0 ? 'success' : 'error'}>
+                    {saving.failed === 0
+                      ? 'All saved to the '
+                      : `${String(saving.failed)} could not be saved (storage quota or limits). The rest are in the `}
+                    <Link to="/app/gallery" className="font-medium underline">
+                      gallery
+                    </Link>
+                    .
+                  </Alert>
+                ) : null}
                 {zipError === null ? null : <Alert tone="error">{zipError}</Alert>}
               </div>
             ) : null}

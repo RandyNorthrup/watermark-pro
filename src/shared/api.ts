@@ -6,7 +6,15 @@
  */
 import { z } from 'zod'
 
-import { API_ERROR_CODE, APP_ENVIRONMENTS, MAX_PRESET_NAME_LENGTH } from './constants'
+import {
+  API_ERROR_CODE,
+  APP_ENVIRONMENTS,
+  MAX_BULK_DELETE,
+  MAX_CURSOR_LENGTH,
+  MAX_PHOTO_NAME_LENGTH,
+  MAX_PHOTO_SIDE,
+  MAX_PRESET_NAME_LENGTH,
+} from './constants'
 import { watermarkSpecSchema } from './watermark'
 
 export const healthResponseSchema = z.object({
@@ -114,4 +122,53 @@ export const assetUploadFieldsSchema = z.object({
   name: z.string().trim().min(1).max(MAX_PRESET_NAME_LENGTH),
   width: z.coerce.number().int().positive(),
   height: z.coerce.number().int().positive(),
+})
+
+export const photoDtoSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  name: z.string(),
+  contentType: z.string(),
+  size: z.number().int().nonnegative(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  presetId: z.string().nullable(),
+  presetName: z.string().nullable(),
+  createdBy: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+})
+
+export type PhotoDto = z.infer<typeof photoDtoSchema>
+
+export const photoListResponseSchema = z.object({
+  photos: z.array(photoDtoSchema),
+  nextCursor: z.string().nullable(),
+})
+
+/** Query string of the photo list; everything optional but bounded. */
+export const photoListQuerySchema = z.object({
+  presetId: z.string().min(1).max(MAX_PRESET_NAME_LENGTH).optional(),
+  search: z.string().trim().max(MAX_PRESET_NAME_LENGTH).optional(),
+  cursor: z.string().max(MAX_CURSOR_LENGTH).optional(),
+})
+
+/** Form fields accompanying a photo upload; dimensions are client-reported. */
+export const photoUploadFieldsSchema = z.object({
+  name: z.string().trim().min(1).max(MAX_PHOTO_NAME_LENGTH),
+  width: z.coerce.number().int().positive().max(MAX_PHOTO_SIDE),
+  height: z.coerce.number().int().positive().max(MAX_PHOTO_SIDE),
+  presetId: z.string().min(1).optional(),
+})
+
+export const photoDeleteRequestSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(MAX_BULK_DELETE),
+})
+
+export const photoDeleteResponseSchema = z.object({ deleted: z.number().int().nonnegative() })
+
+export const storageUsageSchema = z.object({
+  count: z.number().int().nonnegative(),
+  bytes: z.number().int().nonnegative(),
+  maxCount: z.number().int().positive(),
+  maxBytes: z.number().int().positive(),
 })

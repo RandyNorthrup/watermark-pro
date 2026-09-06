@@ -2,8 +2,9 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { seedOwnerWorkspace } from '../../test-support/fake-auth-client'
+import { seedOwnerWorkspace, seedViewerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
+import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import {
   exports,
@@ -16,12 +17,8 @@ import { renderApp } from '../../test-support/render-app'
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
 vi.mock('../../lib/image-size', () => import('../../test-support/fake-image-size'))
-const downloadBlob = vi.fn<(blob: Blob, fileName: string) => void>()
-vi.mock('../../lib/download', () => ({
-  downloadBlob: (blob: Blob, fileName: string) => {
-    downloadBlob(blob, fileName)
-  },
-}))
+vi.mock('../../lib/thumbnail', () => import('../../test-support/fake-thumbnail'))
+vi.mock('../../lib/download', () => import('../../test-support/fake-download'))
 
 const client = fakeAuth
 
@@ -43,7 +40,7 @@ async function openSquareCrop(user: ReturnType<typeof userEvent.setup>) {
 beforeEach(() => {
   installFakeAuth()
   resetFakePreview()
-  downloadBlob.mockClear()
+  downloads.mockClear()
   Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:unused'), revokeObjectURL: vi.fn() })
   // jsdom has no layout; give the preview image a size so the overlays render.
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
@@ -124,8 +121,8 @@ describe('editor page', () => {
     await user.click(screen.getByRole('combobox', { name: 'Format' }))
     await user.click(await screen.findByRole('option', { name: 'PNG' }))
     await user.click(screen.getByRole('button', { name: 'Download' }))
-    await waitFor(() => expect(downloadBlob).toHaveBeenCalledTimes(1))
-    expect(downloadBlob.mock.calls[0]?.[1]).toBe('sample-photo-watermarked.png')
+    await waitFor(() => expect(downloads).toHaveBeenCalledTimes(1))
+    expect(downloads.mock.calls[0]?.[1]).toBe('sample-photo-watermarked.png')
     expect(exports[0]?.output.format).toBe('image/png')
     expect(exports[0]?.transform).toEqual({
       crop: { x: 170, y: 0, width: 640, height: 640 },
@@ -213,7 +210,44 @@ describe('editor page', () => {
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     await user.click(screen.getByRole('button', { name: 'Download' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('encoder exploded')
-    expect(downloadBlob).not.toHaveBeenCalled()
+    expect(downloads).not.toHaveBeenCalled()
+  })
+
+  it('saves the export to the gallery and reports quota failures', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/editor?preset=wm-1')
+    await screen.findByLabelText('Preset')
+    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    expect(
+      await screen.findByText(/Saved sample-photo-watermarked\.jpg to the/),
+    ).toBeInTheDocument()
+    expect(api.gallery.photos).toHaveLength(1)
+    expect(api.gallery.photos[0]).toMatchObject({
+      name: 'sample-photo-watermarked.jpg',
+      width: 960,
+      height: 640,
+      presetId: 'wm-1',
+    })
+
+    api.gallery.uploadFailsWith = 'quotaExceeded'
+    await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The limit for this organization has been reached.',
+    )
+  })
+
+  it('hides saving from viewers', async () => {
+    const user = userEvent.setup()
+    seedViewerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/editor?preset=wm-1')
+    await screen.findByLabelText('Preset')
+    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled()
+    expect(screen.queryByRole('button', { name: 'Save to gallery' })).not.toBeInTheDocument()
   })
 
   it('points at the library when there are no presets', async () => {

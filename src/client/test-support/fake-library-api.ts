@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 
+import { type FakeGalleryState, handleGallery } from './fake-gallery-api'
 import { type AssetDto, saveWatermarkRequestSchema, type WatermarkDto } from '../../shared/api'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
 
@@ -13,6 +14,7 @@ export interface FakeLibraryState {
   assets: AssetDto[]
   /** When set, every request fails with this code. */
   failWith: keyof typeof API_ERROR_CODE | null
+  gallery: FakeGalleryState
 }
 
 const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
@@ -101,13 +103,17 @@ const ROUTE =
 let nextId = 1
 
 function handle(state: FakeLibraryState, url: string, init: RequestInit): Response {
+  if (state.failWith !== null) {
+    return errorResponse(state.failWith)
+  }
+  const gallery = handleGallery(state.gallery, url, init)
+  if (gallery !== null) {
+    return gallery
+  }
   const method = init.method ?? 'GET'
   const match = ROUTE.exec(new URL(url, 'http://localhost').pathname)
   if (match?.groups === undefined) {
     throw new Error(`unexpected fetch ${method} ${url}`)
-  }
-  if (state.failWith !== null) {
-    return errorResponse(state.failWith)
   }
   const { resource, id, file } = match.groups
   if (resource === 'watermarks') {
@@ -187,6 +193,7 @@ export function installLibraryApi(initial: Partial<FakeLibraryState> = {}): Fake
     watermarks: [],
     assets: [],
     failWith: null,
+    gallery: { photos: [], maxBytes: 2 * 1024 * 1024 * 1024, uploadFailsWith: null },
     ...initial,
   }
   vi.stubGlobal(

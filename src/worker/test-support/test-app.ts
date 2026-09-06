@@ -17,6 +17,7 @@ import { createMemoryAuditStore } from './memory-audit-store'
 import {
   createMemoryAssetStore,
   createMemoryObjectStore,
+  createMemoryPhotoStore,
   createMemoryWatermarkStore,
 } from './memory-stores'
 
@@ -89,6 +90,7 @@ export function createTestHarness(): TestHarness {
     audit,
     watermarks: createMemoryWatermarkStore(),
     assets: createMemoryAssetStore(),
+    photos: createMemoryPhotoStore(),
     objects,
     devMailbox: mailbox,
   }

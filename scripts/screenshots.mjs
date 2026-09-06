@@ -28,6 +28,7 @@ const AUTHENTICATED_PAGES = [
   ['new-organization', '/app/organizations/new'],
   ['library', '/app/library'],
   ['bulk', '/app/bulk'],
+  ['gallery', '/app/gallery'],
 ]
 
 const outputDir = path.join('docs', 'screenshots', MILESTONE)
@@ -103,6 +104,10 @@ try {
       path: path.join(outputDir, `editor-${colorScheme}.png`),
       fullPage: true,
     })
+    // A saved photo so the gallery has content.
+    await page.getByRole('tab', { name: 'Export' }).click()
+    await page.getByRole('button', { name: 'Save to gallery' }).click()
+    await page.getByText(/Saved .* to the/).waitFor()
     await page.getByRole('tab', { name: 'Crop' }).click()
     await page.getByRole('button', { name: '4:3' }).click()
     await page.getByRole('group', { name: /Crop area/ }).waitFor()

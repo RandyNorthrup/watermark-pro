@@ -109,6 +109,32 @@ export class TestClient {
   }
 }
 
+/** The `error` code of a standard error envelope. */
+export async function errorCodeOf(response: Response): Promise<string> {
+  const body: unknown = await response.json()
+  if (
+    typeof body !== 'object' ||
+    body === null ||
+    !('error' in body) ||
+    typeof body.error !== 'string'
+  ) {
+    throw new TypeError('response is not an error envelope')
+  }
+  return body.error
+}
+
+/** Signs up a verified owner and creates an organization; the common fixture for route tests. */
+export async function signUpOwner(
+  harness: { app: Hono<AppContext>; env: Env; mailbox: DevMailbox },
+  owner: { name: string; email: string; password: string },
+  organization: { name: string; slug: string },
+): Promise<{ client: TestClient; organizationId: string }> {
+  const client = new TestClient(harness.app, harness.env)
+  await client.signUpAndVerify(harness.mailbox, owner)
+  const organizationId = await client.createOrganization(organization.name, organization.slug)
+  return { client, organizationId }
+}
+
 /** Extracts the first URL containing `pathFragment` from the newest mail to `to`. */
 export function findLink(mailbox: DevMailbox, to: string, pathFragment: string): string {
   const message = mailbox.messages().find((candidate) => candidate.to === to)

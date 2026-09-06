@@ -53,6 +53,11 @@ Only the `main` branch and the latest tagged release receive fixes.
   audited.
 - Preview rendering happens in the browser's Web Worker; a chosen photo is
   never uploaded to preview a preset.
+- Stored photos (M6): both the photo and its thumbnail are typed by file
+  signature, size-limited before the body is read, and counted against
+  per-organization photo and byte quotas; objects live under
+  organization-scoped R2 keys, are served only to signed-in members with
+  `Cache-Control: private`, and every upload and deletion is audited.
 - The editor (M4) and bulk tool (M5) keep photos and exports on the device:
   files are decoded in the browser, rendered in workers, zipped in memory,
   and downloaded through a same-origin object URL that is revoked
@@ -60,7 +65,6 @@ Only the `main` branch and the latest tagged release receive fixes.
 
 ## Controls planned (see `PLAN.md` milestones)
 
-- Photo uploads with the same signature, size and quota validation as logos, plus dimension limits (M6).
 - Signed, expiring, revocable share links (M7).
 - Turnstile bot protection on sign-up and an admin console (M8).
 - Production wrangler environment with `APP_ENV=production` (M8).
