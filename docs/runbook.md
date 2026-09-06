@@ -87,7 +87,13 @@ ship with the next deploy. The Turnstile site key is public and belongs there:
 
 The Worker validates its environment on the first request an isolate handles
 (`src/worker/env.ts`). Setting only one of the two Turnstile variables makes
-every request fail with a configuration error, so set both or neither.
+every request fail with a configuration error, so set both or neither. That
+also means enabling Turnstile has a short window: `wrangler secret put` takes
+effect on running isolates at once, while the site key only arrives with the
+next deploy, so run the two commands back to back (the 2026-09-06 rollout
+answered `500 invalid_configuration` for about a minute in between). To
+disable, remove the var from `wrangler.jsonc`, deploy, then
+`wrangler secret delete TURNSTILE_SECRET_KEY --env production`.
 
 ### Rotating `BETTER_AUTH_SECRET`
 

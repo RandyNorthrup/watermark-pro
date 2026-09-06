@@ -7,6 +7,19 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-06
+
+### Changed
+
+- Turnstile is enabled in production: the `watermark-pro` widget (managed
+  mode) protects sign-up and password reset at `watermark.blowmoney.net`.
+  Verified live: sign-up without a token answers 400, with a bad token 403,
+  reset without a token 400, sign-in untouched.
+- `main` is protected by a GitHub ruleset: the three CI checks must pass,
+  no force pushes, no deletion; repository admins may bypass.
+- Runbook: the enable/disable order for Turnstile and the short
+  `invalid_configuration` window between `secret put` and the deploy.
+
 ## [1.0.0] - 2026-09-06
 
 Milestone M8: enterprise hardening and release. First stable release.
