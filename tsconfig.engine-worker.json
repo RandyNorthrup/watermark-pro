@@ -1,0 +1,13 @@
+{
+  // The watermark Web Worker: WebWorker library instead of DOM. The engine
+  // modules it imports are DOM-free by design (PLAN.md §5.2) and are also
+  // checked under the client project.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "WebWorker"],
+    "types": ["vite/client"],
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.engine-worker.tsbuildinfo"
+  },
+  "include": ["src/client/engine/worker.ts", "src/client/engine/**/*.ts", "src/shared"],
+  "exclude": ["src/client/engine/**/*.test.ts", "src/client/engine/**/*.browser.test.ts"]
+}

@@ -26,8 +26,8 @@
     "lint:dup": "jscpd .",
     "typecheck": "tsc -b",
     "deadcode": "knip --treat-config-hints-as-errors",
-    "test": "vitest run --coverage --project unit-client --project unit-worker && vitest run --project workers",
-    "test:unit": "vitest run --project unit",
+    "test": "vitest run --coverage --project unit-client --project unit-worker --project browser && vitest run --project workers",
+    "test:unit": "vitest run --project unit-client --project unit-worker",
     "test:workers": "vitest run --project workers",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -38,7 +38,8 @@
     "security:sast": "semgrep scan --config p/default --config p/typescript --config p/react --config p/secrets --error --metrics=off",
     "quality": "npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run deadcode && npm run lint:cycles && npm run lint:dup && npm run security:secrets && npm run security:audit && npm run test && npm run build",
     "quality:ci": "npm run quality",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:browser": "vitest run --project browser"
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",
@@ -73,6 +74,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "@vitejs/plugin-react": "6.1.1",
+    "@vitest/browser-playwright": "4.1.11",
     "@vitest/coverage-v8": "4.1.11",
     "chrome-launcher": "1.2.0",
     "dpdm": "4.3.0",

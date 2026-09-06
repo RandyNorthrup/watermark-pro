@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-09-06 (M1 certified; production live with email delivery)
+Last updated: 2026-09-06 (M2 certified)
 
 ---
 
@@ -346,13 +346,16 @@ green. No milestone starts before the previous one is certified.
   - [x] bugs found by tests fixed before certification (see §8)
 - **Not in M1 (deferred to M8 by design):** production wrangler environment, admin console, Turnstile, actual deployment.
 
-### M2 — Watermark engine
+### M2 — Watermark engine — certified 2026-09-06
 
 - **Goal:** deterministic engine that renders text/symbol/image watermarks with smart placement and auto contrast.
-- **Scope:** `src/client/engine/` (spec types, luminance map, Sobel, region scoring, contrast chooser, renderer, format encoder), Web Worker wrapper with a typed message protocol.
-- **Tests:** ≥ 95 % line coverage on the engine; fixtures with known best-region answers; snapshot tests of placement metadata; property test that opacity/rotation never produce out-of-bounds boxes.
-- **Performance:** benchmark script recorded in `docs/benchmarks.md`.
-- **Certification:** gates + benchmark within budget.
+- **Scope delivered:** `src/shared/watermark.ts` (Zod spec: text / symbol (glyph or icon) / image marks, placement anchor|smart|custom, contrast auto|manual, style with opacity, rotation, scale, margin, tiling); `src/client/engine/` with `analysis.ts` (Rec. 709 luminance, Sobel, integral images, region statistics), `placement.ts` (nine anchors plus a 3×3 interior grid scored on edge density, variance, centre/contrast saliency and a convention prior), `contrast.ts` (variant and outline from the luminance under the mark), `layout.ts` (size, placement resolution, brick-pattern tiling), `render.ts` (canvas drawing for text, glyphs, icon paths and bitmaps), `encode.ts` (PNG/JPEG/WebP with verified MIME), `pipeline.ts` (crop → resize → analyse → place → draw → encode), `worker.ts` + `worker-client.ts` (typed Web Worker protocol, transferred bitmaps, font loading in the worker).
+- **Tests delivered:** 36 engine tests: pure-math tests in Node with synthetic maps (busy-vs-flat placement, convention tie-break, subject avoidance, luminance readings, tiling), plus 13 tests in real Chromium via Vitest browser mode (pixels change only under the mark, ink variant flips with background, smart placement lands on the flat half, crop/resize, tiling, icons, image marks, WebP/JPEG/PNG encoding, worker round trip, worker failure and termination). Engine coverage 100 % lines except the worker thread script, which coverage cannot instrument.
+- **Performance:** `docs/benchmarks.md`: 0.15 s per 4000×3000 image on one worker, 22.8 images/s with 8 workers (budget ≥ 2 images/s).
+- **Certification checklist:**
+  - [x] all gates in §3.2 pass
+  - [x] benchmark within budget and recorded
+  - [x] engine modules import nothing from React or the DOM (checked by the WebWorker-lib TypeScript project `tsconfig.engine-worker.json`)
 
 ### M3 — Watermark library, fonts, and symbols
 

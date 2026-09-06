@@ -59,6 +59,9 @@ export const SENSITIVE_AUTH_PATHS = [
   '/change-password',
 ] as const
 
+/** Font weights the watermark designer offers; variable fonts cover the range. */
+export const FONT_WEIGHTS = [300, 400, 500, 600, 700, 800] as const
+
 /** Radix for hex encoding of hash digests. */
 export const HEX_RADIX = 16
 

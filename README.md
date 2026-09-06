@@ -6,10 +6,10 @@ editor with crop and resize, storage, sharing, multi-format export, and
 role-based access control. A spiritual competitor to eZy Watermark, MIT
 licensed, hosted on Cloudflare Workers at `watermark.blowmoney.net`.
 
-**Status:** milestone M1 (foundation) is complete: accounts with email
-verification and password reset, organizations, invitations, four enforced
-roles, an audit trail, and the design system. Watermarking itself starts in
-milestone M2. See [PLAN.md](PLAN.md) for the roadmap and
+**Status:** milestones M1 (foundation: accounts, organizations, roles, audit
+trail, design system) and M2 (watermark engine: smart placement, auto
+contrast, tiling, PNG/JPEG/WebP output in a Web Worker) are complete. The
+library, editor, bulk processing, storage and sharing follow. See [PLAN.md](PLAN.md) for the roadmap and
 [CHANGELOG.md](CHANGELOG.md) for what has actually shipped.
 
 ## Stack
@@ -107,6 +107,8 @@ run at UI milestones against `npm run preview`; their output is committed
 under `docs/lighthouse/` and `docs/screenshots/`.
 
 Other test commands: `npm run test:unit` (jsdom + Node projects),
+`npm run test:browser` (engine tests in real Chromium via Vitest browser
+mode; includes the throughput benchmark recorded in `docs/benchmarks.md`),
 `npm run test:workers` (workerd with real D1 and rate-limit bindings),
 `npm run test:watch`.
 
@@ -147,7 +149,8 @@ controls.
 ## Project structure
 
 ```
-src/client/       React SPA: routes/ (file-based), components/ (ui/ primitives), lib/, styles/
+src/client/       React SPA: routes/ (file-based), components/ (ui/ primitives), lib/, styles/,
+                  engine/ (watermark engine: pure analysis + canvas rendering, runs in a Web Worker)
 src/worker/       Hono API on Workers: auth/ (Better Auth), db/ (drizzle schema, D1 stores),
                   email/ (providers), middleware/, routes/, services.ts, env.ts
 src/shared/       constants, permissions, validation and API schemas used by both sides

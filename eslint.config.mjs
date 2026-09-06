@@ -212,9 +212,9 @@ export default defineEslintConfig(
   },
 
   {
-    // The constants module is the one place literals belong; the rule would be
-    // unsatisfiable here.
-    files: ['src/shared/constants.ts'],
+    // Constants modules are the one place literals belong; the rule would be
+    // unsatisfiable there.
+    files: ['src/shared/constants.ts', 'src/**/constants.ts'],
     rules: { '@typescript-eslint/no-magic-numbers': 'off' },
   },
 

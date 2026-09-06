@@ -7,6 +7,27 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-06
+
+Milestone M2: watermark engine.
+
+### Added
+
+- Serialisable watermark specification (`src/shared/watermark.ts`): text,
+  symbol (Unicode glyph or bundled icon) and image marks; anchor, smart or
+  custom placement; automatic or manual contrast; opacity, rotation, scale,
+  margin and tiling.
+- Client-side engine in `src/client/engine/`: luminance and Sobel analysis on
+  a 256px map, smart placement scored on edge density, texture, centre and
+  scene-contrast saliency plus photographer convention, auto contrast with
+  an outline that strengthens on mid-tones, brick-pattern tiling, canvas
+  rendering, PNG/JPEG/WebP encoding with MIME verification, and a typed Web
+  Worker with transferred bitmaps and in-worker font loading.
+- Vitest browser project (real Chromium) for rendering, encoding and worker
+  tests, included in coverage; `npm run test:browser`.
+- `docs/benchmarks.md` with the M2 throughput measurement.
+
+
 ### Added
 
 - `production` wrangler environment (`APP_ENV=production`,
