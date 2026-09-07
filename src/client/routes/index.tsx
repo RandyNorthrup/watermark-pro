@@ -118,8 +118,14 @@ function LandingPage() {
           </ul>
         </section>
       </main>
-      <footer className="border-t border-line px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center text-sm text-ink-muted">
-        Watermark Pro is open source under the MIT licence.
+      <footer className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-line px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center text-sm text-ink-muted">
+        <span>Watermark Pro is open source under the MIT licence.</span>
+        <Link to="/privacy" className="hover:text-ink hover:underline">
+          Privacy
+        </Link>
+        <Link to="/terms" className="hover:text-ink hover:underline">
+          Terms
+        </Link>
       </footer>
     </div>
   )

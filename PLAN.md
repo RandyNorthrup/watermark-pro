@@ -584,13 +584,15 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   - [x] Lighthouse and screenshots deferred to M19 (Import dialog, logo-prepare panel, `/app/verify` added to its list).
   - [x] 1.7.0 tagged, deployed, released
 
-### M16 — Import and share surfaces (planned) — `docs/plans/m16-import-and-share.md`
+### M16 — Import and share surfaces (autonomous phase certified 2026-09-07; cloud OAuth held for Randy) — `docs/plans/m16-import-and-share.md`
 
-- **Scope:** camera capture on phones; import from a URL through a Worker proxy with an SSRF policy (https only, no private or literal-IP hosts, redirects re-checked, 40 MB cap, sniffed type, 15 s timeout, dedicated rate limit, audited); Android Web Share Target through a single-purpose service worker; desktop file handling; Google Drive, OneDrive and Dropbox pickers through user-facing OAuth (each user connects their own account; tokens stay in the browser), with the three application registrations made by the agent in Randy's vendor accounts (Azure CLI; Chrome Control for Google and Dropbox); `/privacy` and `/terms` pages, which Google's consent screen requires.
+- **Scope delivered (autonomous phase, 1.8.0):** import from a URL through a Worker proxy with an SSRF policy (`src/worker/url-policy.ts` — https only, no credentials, no IP-literal/decimal/hex or internal hosts, redirects re-checked; `routes/imports.ts` — `photo:['upload']` gated, per-address `IMPORT_RATE_LIMITER` binding, size cap by declared length AND streamed bytes, byte-sniffed, 15 s timeout, audited by host); camera capture on phones (`lib/capture.ts` + `components/import/take-photo-button.tsx`, the `capture` file-input attribute, not getUserMedia — Permissions-Policy `camera=()` correctly left as is); Android Web Share Target (`public/share-target-sw.js` scoped to `/share-target` + `lib/shared-files.ts`); desktop file handling (`lib/launch-files.ts` + `main.tsx` launchQueue); `/privacy` + `/terms` pages generated from SECURITY.md facts, linked from the landing footer. Correctness catches applied: reused `photo:['upload']` (the spec's `photo:['create']` does not exist); extended the existing `/api/config`/`publicConfigSchema` rather than a new route (for the OAuth phase). Built with parallel Opus-4.8 agents on disjoint client files; the integrator owned the worker slice + all shared files + certification.
+- **STOP — cloud OAuth held for Randy (a follow-up version):** the Google Drive, OneDrive and Dropbox pickers need an application registered in each vendor account (Google Cloud console; Azure CLI `az ad app create`; Dropbox app console), producing client IDs / API keys / redirect URIs (local origin `http://localhost:5273`). Those credentials, the vendor SDK loads, the picker CSP origins (`public/_headers`), and the account-menu "Connected drives" entry are blocked until Randy registers the apps. A decision is also needed: MSAL bundled (new pinned dep) vs CDN-loaded.
 - **Certification checklist:**
-  - [ ] gates; eight drills red; Lighthouse and screenshots deferred to M19 (import menu, `/privacy`, `/terms` added to its list; M19 confirms best practices ≥ 95 with the picker origins)
-  - [ ] the three applications registered; each picker checked by hand on the production build and recorded in §8
-  - [ ] 1.8.0 tagged, deployed, released
+  - [x] autonomous-phase gates: `npm run quality` green (632 + 12 tests; 85.41 % branches; build passes; dedup + knip clean). `security:sast` 0 findings. Non-e2e red drill green incl. four M16 drills — IP-literal host allowed, redirect hop not re-checked, streamed size cap not enforced, fetched bytes not sniffed.
+  - [x] Lighthouse and screenshots deferred to M19 (import buttons, `/privacy`, `/terms` added to its list; M19 confirms best practices ≥ 95 once the picker origins land).
+  - [x] 1.8.0 (autonomous phase) tagged, deployed, released.
+  - [ ] cloud OAuth: the three applications registered by Randy; pickers wired; each checked by hand on the production build and recorded in §8; a follow-up version tagged and released.
 
 ### M17 — Video and PDF watermarking (planned) — `docs/plans/m17-video-and-pdf.md`
 

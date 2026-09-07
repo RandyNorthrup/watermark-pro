@@ -231,7 +231,10 @@ and flows it introduced to this list so nothing is missed:
   per-photo **override** dialog (full editor embedded, "Custom" badge) and the
   desktop **watch-folder** card (delivered in 1.6.1 — see PLAN.md M14).
 - M15: library Import dialog; the designer logo-prepare panel; `/app/verify`.
-- M16: the import menu (camera, link, cloud); `/privacy` and `/terms`.
+- M16: the import buttons (camera, "From a link") on the editor and bulk tools;
+  `/privacy` and `/terms`. (The cloud pickers land in a follow-up with the OAuth
+  registration; add them to this list then, and confirm best practices ≥ 95 with
+  the picker CSP origins.)
 - M17: `/app/video` and `/app/documents`.
 - M18: every page in `ar` (right-to-left) at three widths, plus the language
   menu.

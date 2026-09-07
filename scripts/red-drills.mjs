@@ -537,6 +537,35 @@ export const DRILLS = [
     replace: 'if (colourDistance(data, neighbour * CHANNELS, seedOffset) >= 0) {',
     ...unitClient('src/client/lib/logo-cleanup.test.ts'),
   },
+  // --- M16: SSRF policy and the import route -------------------------------
+  {
+    name: 'Import SSRF: an IP-literal host is allowed',
+    file: 'src/worker/url-policy.ts',
+    find: "host.includes(':') || host.startsWith('[') || IPV4_LITERAL.test(host) || NUMERIC_HOST.test(host)",
+    replace: 'false',
+    ...unitWorker('src/worker/url-policy.test.ts'),
+  },
+  {
+    name: 'Import SSRF: a redirect hop is not re-checked',
+    file: 'src/worker/routes/imports.ts',
+    find: 'current = assertImportableUrl(new URL(location, current).href)',
+    replace: 'current = new URL(location, current)',
+    ...unitWorker('src/worker/imports.test.ts'),
+  },
+  {
+    name: 'Import: the streamed size cap is not enforced',
+    file: 'src/worker/routes/imports.ts',
+    find: 'if (total > MAX_PHOTO_BYTES) {',
+    replace: 'if (false) {',
+    ...unitWorker('src/worker/imports.test.ts'),
+  },
+  {
+    name: 'Import: the fetched bytes are not sniffed',
+    file: 'src/worker/routes/imports.ts',
+    find: 'if (type === null) {\n      throw apiErrors.unsupportedMedia()',
+    replace: 'if (false) {\n      throw apiErrors.unsupportedMedia()',
+    ...unitWorker('src/worker/imports.test.ts'),
+  },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
     name: 'Gate: ESLint rejects `any`',

@@ -4,6 +4,7 @@ import {
   Crop,
   Download,
   ImagePlus,
+  Link2,
   Redo2,
   RotateCcw,
   Scaling,
@@ -63,6 +64,7 @@ import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { readImageSize } from '../../lib/image-size'
+import { takeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
 import { readPhotoMetadata } from '../../lib/photo-metadata'
 import { SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from '../../lib/sample-photo'
@@ -70,6 +72,8 @@ import { shareFile } from '../../lib/share-file'
 import { withPlacement, withStyle } from '../../lib/spec-edit'
 import { baseName, SAMPLE_FILE_NAME } from '../../lib/spec-tokens'
 import { useElementSize } from '../../lib/use-element-size'
+import { TakePhotoButton } from '../import/take-photo-button'
+import { UrlImportDialog } from '../import/url-import-dialog'
 import { SampleScene } from '../sample-scene'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -298,6 +302,20 @@ export function Editor({
       live.current = false
     }
   }, [embeddedFile, setSubject])
+
+  // A single photo opened through the OS (installed-PWA file handling) loads
+  // into the standalone editor once, on mount.
+  useEffect(() => {
+    if (embedded !== undefined) {
+      return
+    }
+    const [launched] = takeLaunchFiles()
+    if (launched !== undefined) {
+      void choosePhoto(launched)
+    }
+    // Runs once to drain the launch queue; choosePhoto and embedded are read once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -529,6 +547,27 @@ export function Editor({
             <ImagePlus aria-hidden="true" className="size-4" />
             Open photo
           </Button>
+          {embedded === undefined ? (
+            <>
+              <TakePhotoButton
+                onCapture={(file) => {
+                  void choosePhoto(file)
+                }}
+              />
+              <UrlImportDialog
+                organizationId={organizationId}
+                onImport={(file) => {
+                  void choosePhoto(file)
+                }}
+                trigger={
+                  <Button type="button" variant="secondary" size="sm">
+                    <Link2 aria-hidden="true" className="size-4" />
+                    From a link
+                  </Button>
+                }
+              />
+            </>
+          ) : null}
           {photo === null ? null : (
             <Button
               type="button"

@@ -69,6 +69,13 @@
       "namespace_id": "1002",
       "simple": { "limit": 120, "period": 60 },
     },
+    {
+      // Import-from-a-URL (M16): the Worker fetches on the user's behalf, so it
+      // is rate limited per client. Mirrors IMPORT_RATE_LIMIT in constants.ts.
+      "name": "IMPORT_RATE_LIMITER",
+      "namespace_id": "1003",
+      "simple": { "limit": 10, "period": 60 },
+    },
   ],
   "send_email": [
     {
@@ -125,6 +132,11 @@
           "name": "API_RATE_LIMITER",
           "namespace_id": "1002",
           "simple": { "limit": 120, "period": 60 },
+        },
+        {
+          "name": "IMPORT_RATE_LIMITER",
+          "namespace_id": "1003",
+          "simple": { "limit": 10, "period": 60 },
         },
       ],
       "send_email": [

@@ -12,7 +12,7 @@ import { type RateLimitStorage, unlimitedRateLimitStorage } from '../auth/rate-l
 import { createConsoleEmailSender, type DevMailbox } from '../email/console'
 import { validateEnv } from '../env'
 import { createApp } from '../index'
-import type { Services } from '../services'
+import type { ImportLimiter, Services } from '../services'
 import { createMemoryAuditStore } from './memory-audit-store'
 import {
   createMemoryAssetStore,
@@ -60,6 +60,7 @@ export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
     SEND_EMAIL: notABinding(),
     AUTH_RATE_LIMITER: notABinding(),
     API_RATE_LIMITER: notABinding(),
+    IMPORT_RATE_LIMITER: notABinding(),
     ...overrides,
   }
 }
@@ -76,6 +77,8 @@ export interface TestHarness {
 export interface TestHarnessOptions {
   /** Replaces the never-limiting default, for tests that exercise 429 paths. */
   rateLimit?: RateLimitStorage | undefined
+  /** Replaces the always-allow import limiter, for tests that exercise the 429 path. */
+  importLimiter?: ImportLimiter | undefined
   /** Enables Turnstile with the given secret; verification calls go to `siteVerifyUrl`. */
   captcha?: { secretKey: string; siteVerifyUrl: string; siteKey: string } | undefined
 }
@@ -131,6 +134,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     users: createMemoryUserStore(tables),
     objects,
     rateLimit: options.rateLimit ?? unlimitedRateLimitStorage,
+    importLimiter: options.importLimiter ?? (() => Promise.resolve(true)),
     devMailbox: mailbox,
   }
   const app = createApp({ resolveServices: () => services })

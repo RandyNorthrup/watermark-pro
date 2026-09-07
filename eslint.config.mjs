@@ -266,4 +266,12 @@ export default defineEslintConfig(
     languageOptions: { globals: globals.node },
     rules: { '@typescript-eslint/no-magic-numbers': 'off' },
   },
+  {
+    // Plain-JS service workers under public/ are not in the TypeScript program
+    // (they ship as-is, no bundler), so type-aware rules cannot run on them.
+    files: ['public/**/*.js'],
+    extends: [tseslintConfigs.disableTypeChecked],
+    languageOptions: { globals: { ...globals.serviceworker, ...globals.browser } },
+    rules: { '@typescript-eslint/no-magic-numbers': 'off' },
+  },
 )

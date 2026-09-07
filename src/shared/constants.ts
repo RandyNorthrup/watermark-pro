@@ -148,6 +148,7 @@ export const API_ERROR_CODE = {
   payloadTooLarge: 'payload_too_large',
   unsupportedMedia: 'unsupported_media_type',
   quotaExceeded: 'quota_exceeded',
+  unsupportedUrl: 'unsupported_url',
 } as const
 
 /** One year in seconds; the HSTS max-age recommended by hstspreload.org. */
@@ -179,3 +180,23 @@ export const INVISIBLE_MAGIC = 'WMP1'
 export const MAX_INVISIBLE_MESSAGE_LENGTH = 64
 export const INVISIBLE_MARK_SEED = 2_654_435_769
 export const INVISIBLE_STRIDE_PRIMES = [7919, 104_729, 1_299_709, 15_485_863] as const
+
+/**
+ * Import from a URL (M16): the Worker fetches the photo server-side under an
+ * SSRF policy. A dedicated rate limit, a short timeout, and a small redirect
+ * cap (each hop re-checked) bound the request; the size cap is `MAX_PHOTO_BYTES`.
+ */
+export const IMPORT_RATE_LIMIT = { windowSeconds: 60, max: 10 } as const
+export const IMPORT_TIMEOUT_MS = 15_000
+export const IMPORT_MAX_REDIRECTS = 3
+
+/** Camera capture (M16): the OS camera app, launched by the file input's `capture` attribute. */
+export const CAMERA_ACCEPT = 'image/*'
+
+/**
+ * Web Share Target (M16, Android): the service worker stashes shared files in
+ * IndexedDB for the bulk page to pick up, discarding anything older than the TTL.
+ */
+export const SHARED_FILES_DB = 'watermark-pro-shared'
+export const SHARED_FILES_STORE = 'pending'
+export const SHARED_FILES_TTL_MS = 10 * 60 * MILLISECONDS_PER_SECOND

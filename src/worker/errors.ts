@@ -38,6 +38,10 @@ export const apiErrors = {
     new HTTPException(HTTP_STATUS.unsupportedMediaType, {
       res: jsonError(HTTP_STATUS.unsupportedMediaType, API_ERROR_CODE.unsupportedMedia),
     }),
+  unsupportedUrl: (reason: string) =>
+    new HTTPException(HTTP_STATUS.badRequest, {
+      res: jsonError(HTTP_STATUS.badRequest, API_ERROR_CODE.unsupportedUrl, reason),
+    }),
   rateLimited: (retryAfterSeconds: number) =>
     new HTTPException(HTTP_STATUS.tooManyRequests, {
       res: Response.json(

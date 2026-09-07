@@ -7,6 +7,42 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-09-07
+
+M16 (autonomous phase): more ways to get a photo into the app. The cloud
+pickers (Google Drive, OneDrive, Dropbox) are held for a follow-up because they
+need vendor app registrations in the owner's accounts.
+
+### Added
+
+- **Import from a URL**: paste a link in the editor or bulk tool and the Worker
+  fetches the image on your behalf, under an SSRF policy — https only, no
+  credentials in the link, no IP-literal or internal hosts, every redirect hop
+  re-checked, a size cap enforced by both the declared length and the streamed
+  bytes, the type sniffed from the bytes, a 15 s timeout and a dedicated
+  per-address rate limit. Gated by the upload permission and audited by host.
+- **Camera capture** on phones: a "Take photo" button (shown only on
+  coarse-pointer devices) opens the OS camera through the file input's
+  `capture` attribute — no `getUserMedia`, no camera permission prompt.
+- **Web Share Target** (Android): share photos from any app into Watermark Pro;
+  a single-purpose service worker (scoped to `/share-target`) stashes them and
+  the bulk tool picks them up.
+- **Desktop file handling** (installed PWA): open image files with the app; one
+  goes to the editor, several to the bulk tool.
+- **/privacy** and **/terms** pages, generated honestly from the project's
+  data-handling facts, linked from the landing footer.
+
+### Notes
+
+- The SSRF policy (`src/worker/url-policy.ts`) and the import route are covered
+  by Node tests against a mocked upstream plus a workerd test of the real
+  rate-limit binding; four red drills guard the policy, the redirect re-check,
+  the streamed size cap and the byte sniff.
+- **Deferred to a follow-up (needs the owner):** the Google Drive, OneDrive and
+  Dropbox pickers require registering an application in each vendor's account.
+  Those credentials, the vendor SDK loads and the picker CSP origins are not in
+  this release.
+
 ## [1.7.0] - 2026-09-07
 
 M15: preset files, logo tools and an invisible mark.

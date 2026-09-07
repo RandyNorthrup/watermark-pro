@@ -7,6 +7,7 @@ import {
   FolderArchive,
   ImagePlus,
   Images,
+  Link2,
   Loader2,
   RotateCcw,
   Share2,
@@ -56,14 +57,18 @@ import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
+import { takeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
 import { canShareFiles, shareFile } from '../../lib/share-file'
+import { clearSharedFiles, readSharedFiles } from '../../lib/shared-files'
 import { baseName } from '../../lib/spec-tokens'
 import { AdjustPanel } from '../editor/adjust-panel'
 import { FORMAT_OPTIONS } from '../editor/formats'
 import { FrameControls } from '../editor/frame-controls'
 import { MetadataPolicyField } from '../editor/metadata-policy'
 import { OrientationControls } from '../editor/orientation-controls'
+import { TakePhotoButton } from '../import/take-photo-button'
+import { UrlImportDialog } from '../import/url-import-dialog'
 import { PresetGate } from '../presets/preset-gate'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -200,6 +205,20 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   // `webkitdirectory` is not a typed React attribute; set it on the element.
   useEffect(() => {
     folderInputRef.current?.setAttribute('webkitdirectory', '')
+  }, [])
+  // Consume photos shared to the app (Android share target) or opened through
+  // the OS (installed-PWA file handling), once, when the bulk page mounts.
+  useEffect(() => {
+    void (async () => {
+      const shared = await readSharedFiles()
+      await clearSharedFiles()
+      const incoming = [...shared, ...takeLaunchFiles()]
+      if (incoming.length === 0) {
+        return
+      }
+      const scan = collectImages(incoming)
+      setFiles((previous) => dedupe(previous, scan.files))
+    })()
   }, [])
   /** Chosen presets in the order they were ticked, which is the order they are drawn. */
   const [presetIds, setPresetIds] = useState<string[]>([])
@@ -543,6 +562,28 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     Add a folder
                   </Button>
                 ) : null}
+                <TakePhotoButton
+                  onCapture={(file) => {
+                    addFiles([file])
+                  }}
+                />
+                <UrlImportDialog
+                  organizationId={organizationId}
+                  onImport={(file) => {
+                    addFiles([file])
+                  }}
+                  trigger={
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={snapshot.isRunning}
+                    >
+                      <Link2 aria-hidden="true" className="size-4" />
+                      From a link
+                    </Button>
+                  }
+                />
               </p>
               <p className="text-xs text-ink-muted">
                 Up to {String(MAX_BULK_FILES)} photos per batch. Processing happens in your browser

@@ -49,9 +49,13 @@ export interface Services {
   objects: ObjectStore
   /** Per-address limiter shared with Better Auth; public routes consume it too. */
   rateLimit: RateLimitStorage
+  /** Checks and increments the per-address import-from-URL limit; true when the request may proceed. */
+  importLimiter: ImportLimiter
   /** Present only with the console email provider (development and test). */
   devMailbox: DevMailbox | undefined
 }
+
+export type ImportLimiter = (key: string) => Promise<boolean>
 
 const cache = new WeakMap<object, Services>()
 
@@ -109,6 +113,10 @@ export function buildServices(config: ValidatedEnv): Services {
     users: createDrizzleUserStore(db),
     objects: createR2ObjectStore(config.BUCKET),
     rateLimit,
+    importLimiter: async (key) => {
+      const { success } = await config.IMPORT_RATE_LIMITER.limit({ key })
+      return success
+    },
     devMailbox,
   }
 }

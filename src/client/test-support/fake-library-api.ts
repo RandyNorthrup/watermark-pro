@@ -32,6 +32,7 @@ const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
   payloadTooLarge: HTTP_STATUS.payloadTooLarge,
   unsupportedMedia: HTTP_STATUS.unsupportedMediaType,
   quotaExceeded: HTTP_STATUS.badRequest,
+  unsupportedUrl: HTTP_STATUS.badRequest,
 }
 
 function readBody(init: RequestInit): string {

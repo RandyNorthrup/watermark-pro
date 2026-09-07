@@ -29,6 +29,7 @@ const envSchema = z
     BUCKET: bindingSchema<R2Bucket>('BUCKET'),
     AUTH_RATE_LIMITER: bindingSchema<RateLimit>('AUTH_RATE_LIMITER'),
     API_RATE_LIMITER: bindingSchema<RateLimit>('API_RATE_LIMITER'),
+    IMPORT_RATE_LIMITER: bindingSchema<RateLimit>('IMPORT_RATE_LIMITER'),
     SEND_EMAIL: bindingSchema<SendEmail>('SEND_EMAIL').optional(),
     /** Cloudflare Turnstile: set both keys to protect sign-up and password reset; leave both unset to disable. */
     TURNSTILE_SITE_KEY: z.string().min(1).optional(),
