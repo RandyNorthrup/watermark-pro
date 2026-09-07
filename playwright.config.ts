@@ -13,6 +13,7 @@ const SERVER_START_TIMEOUT_MS = 180_000
 const TEST_TIMEOUT_MS = 60_000
 const EXPECT_TIMEOUT_MS = 10_000
 const MAX_WORKERS = 4
+const CI_WORKERS = 2
 
 /**
  * The share flows write links to the clipboard; headless Chromium denies that
@@ -31,7 +32,8 @@ export default defineConfig({
   fullyParallel: true,
   timeout: TEST_TIMEOUT_MS,
   expect: { timeout: EXPECT_TIMEOUT_MS },
-  workers: MAX_WORKERS,
+  // GitHub's hosted runner has two cores; four browsers on it time out.
+  workers: process.env['CI'] === undefined ? MAX_WORKERS : CI_WORKERS,
   forbidOnly: process.env['CI'] !== undefined,
   retries: process.env['CI'] === undefined ? 0 : CI_RETRIES,
   reporter: process.env['CI'] === undefined ? 'list' : 'github',

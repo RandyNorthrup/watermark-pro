@@ -64,6 +64,10 @@ stays free.
   default overflowed cmd.exe on a milestone-sized commit. Generated drill
   reports are excluded from Prettier, and Vitest's failed-test screenshots
   from git.
+- CI runs Playwright with two workers (the hosted runner has two cores; four
+  browsers on it timed out) and uploads `test-results/` (traces, screenshots
+  and page snapshots) when the end-to-end job fails; the GitHub reporter
+  writes no HTML report, so the old upload never had anything to upload.
 
 ### Fixed
 
