@@ -226,6 +226,14 @@ export default defineEslintConfig(
   },
 
   {
+    // Byte-format code (JPEG segments, PNG chunks, TIFF/Exif edits): the marker
+    // bytes, chunk-type codes and field offsets are the file format itself;
+    // naming every `+2`/`+4` offset would obscure, not clarify. See PLAN.md §9.
+    files: ['src/client/engine/metadata/**/*.ts'],
+    rules: { '@typescript-eslint/no-magic-numbers': 'off' },
+  },
+
+  {
     // Test files: assertions and non-null access are idiomatic there, and the
     // expected values in an assertion *are* the meaning — naming them would
     // move the assertion into a constant and make the test a tautology.

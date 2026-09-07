@@ -83,13 +83,19 @@ Only the `main` branch and the latest tagged release receive fixes.
   files are decoded in the browser, rendered in workers, zipped in memory,
   and downloaded through a same-origin object URL that is revoked
   immediately.
-- Metadata policy (M10): every export is re-encoded from pixels by the
-  canvas, so the source's EXIF block (camera, GPS position, capture time,
-  embedded thumbnail) never reaches the output, the share sheet or the
-  gallery. The orientation tag is applied to the pixels before it is
-  dropped. There is no option to keep metadata. A browser test feeds a
-  tagged JPEG through the bulk processor and checks the result for an Exif
-  header.
+- Metadata policy (M10, extended M13): every export is re-encoded from pixels
+  by the canvas, so no metadata is carried unless the user chooses to. The
+  default is **strip** — no camera data and no location reaches the output,
+  the share sheet or the gallery. Two explicit per-export keep modes exist:
+  **keep except location** copies the source's Exif with the GPS IFD emptied
+  and its pointer zeroed (and the orientation tag reset to 1, since the pixels
+  are already upright), and **keep everything** copies the Exif and XMP as-is.
+  WebP is always stripped. GPS is named in the "keep everything" label, and
+  the `{location}` token is opt-in by typing it. Metadata is read and written
+  in the browser; nothing is uploaded for it. GPS removal in keep-except-
+  location is proven by a unit test (`exif-edit.test`), a browser test
+  (`metadata.browser.test`) and a red drill; an untrusted-input fuzz test runs
+  400 random mutations through the scanners without a throw.
 - Sharing an export through the Web Share API (M10) hands the file to the
   operating system's share sheet; the browser only offers the button where
   `navigator.canShare({ files })` accepts the output type, and the app

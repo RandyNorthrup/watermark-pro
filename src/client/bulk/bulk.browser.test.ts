@@ -6,12 +6,13 @@
 import { unzipSync } from 'fflate'
 import { describe, expect, it } from 'vitest'
 
-import { BulkProcessor, outputFileName } from './processor'
+import { type BatchPosition, BulkProcessor, outputFileName } from './processor'
 import { CancelledError, JobQueue } from './queue'
 import { createBulkRuntime } from './runtime'
 import { defaultPoolSize, MAX_POOL_SIZE, WorkerPool } from './worker-pool'
 import { uniqueNames, zipEntries } from './zip'
 import { IDENTITY_ADJUSTMENTS } from '../../shared/adjustments'
+import { EMPTY_PHOTO_METADATA } from '../../shared/metadata'
 import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
 import { MarkResources } from '../lib/mark-resources'
 
@@ -21,6 +22,10 @@ const BULK_EXTRA = {
   adjust: IDENTITY_ADJUSTMENTS,
   border: null,
 } as const
+
+/** No source metadata and a single-photo batch, the shape most cases use. */
+const NO_METADATA = EMPTY_PHOTO_METADATA
+const FIRST: BatchPosition = { index: 1, count: 1 }
 
 const FIXTURES = 20
 const FIXTURE_WIDTH = 1600
@@ -152,8 +157,10 @@ describe('BulkProcessor', () => {
       const file = await photoFile('holiday.JPG', 200)
       const kept = await processor.process(
         file,
+        NO_METADATA,
         [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/webp', quality: 0.8 }, fitLongestSide: null, ...BULK_EXTRA },
+        FIRST,
         new AbortController().signal,
       )
       expect(kept.fileName).toBe('holiday-watermarked.webp')
@@ -162,8 +169,10 @@ describe('BulkProcessor', () => {
 
       const small = await processor.process(
         file,
+        NO_METADATA,
         [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/png', quality: 1 }, fitLongestSide: 800, ...BULK_EXTRA },
+        FIRST,
         new AbortController().signal,
       )
       expect(await decodedSize(small.blob)).toEqual({ width: 800, height: 600 })
@@ -174,8 +183,10 @@ describe('BulkProcessor', () => {
       await expect(
         processor.process(
           file,
+          NO_METADATA,
           [DEFAULT_TEXT_SPEC],
           { output: { format: 'image/png', quality: 1 }, fitLongestSide: null, ...BULK_EXTRA },
+          FIRST,
           aborted.signal,
         ),
       ).rejects.toBeInstanceOf(CancelledError)
@@ -183,8 +194,10 @@ describe('BulkProcessor', () => {
       await expect(
         processor.process(
           new File(['not an image'], 'notes.txt', { type: 'text/plain' }),
+          NO_METADATA,
           [DEFAULT_TEXT_SPEC],
           { output: { format: 'image/png', quality: 1 }, fitLongestSide: null, ...BULK_EXTRA },
+          FIRST,
           new AbortController().signal,
         ),
       ).rejects.toThrow(/notes\.txt is not an image/)
@@ -208,8 +221,10 @@ describe('BulkProcessor', () => {
 
       const result = await processor.process(
         file,
+        NO_METADATA,
         [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null, ...BULK_EXTRA },
+        FIRST,
         new AbortController().signal,
       )
       // The orientation tag was applied to the pixels, so nothing is lost by dropping it.
@@ -234,8 +249,10 @@ describe('bulk throughput', () => {
         run: (file, signal) =>
           runtime.run(
             file,
+            NO_METADATA,
             [DEFAULT_TEXT_SPEC],
             { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null, ...BULK_EXTRA },
+            FIRST,
             signal,
           ),
       })

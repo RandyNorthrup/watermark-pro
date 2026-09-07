@@ -296,13 +296,47 @@ results to the gallery.
 ## Exports and metadata
 
 Every export, from the editor or the bulk tool, is re-encoded from pixels by
-the browser's canvas. The source file's EXIF block, and with it the camera
-model, GPS position, capture time and any embedded thumbnail, is not copied
-into the output; the orientation tag is applied to the pixels first, so
-photos from a phone come out upright. This is the only mode: there is no
-option to keep metadata. The gallery stores the exported file, so stored
-photos carry none either. `src/client/bulk/bulk.browser.test.ts` proves it
-with a tagged JPEG.
+the browser's canvas. A **Metadata** setting under the format chooses what of
+the source's EXIF/XMP travels with the file:
+
+- **Strip** (default): no camera data and no location. Safest for sharing.
+- **Keep except location**: camera, lens, capture time and settings stay; the
+  GPS position is removed.
+- **Keep everything**: including the GPS position, if the photo has one.
+
+| Output | strip |          keep-except-location           |          keep           |
+| ------ | :---: | :-------------------------------------: | :---------------------: |
+| JPEG   |   ✓   | ✓ (APP1 Exif, GPS emptied; XMP dropped) |   ✓ (APP1 Exif + XMP)   |
+| PNG    |   ✓   |            ✓ (`eXIf` chunk)             | ✓ (`eXIf` + `iTXt` XMP) |
+| WebP   |   ✓   |  — (WebP exports are always stripped)   |            —            |
+
+In both keep modes the orientation tag is reset to 1 (the pixels are already
+upright, so phone photos come out right) and the pixel-dimension tags are
+rewritten to the output size. Print density (DPI) is preserved in every mode
+— JPEG through a JFIF APP0, PNG through a `pHYs` chunk — because it is not
+personal. Metadata is read and written entirely in the browser (`exifr` plus
+`src/client/engine/metadata/`); nothing is uploaded for it. The gallery stores
+whatever the export carried.
+
+### Tokens
+
+Text marks can print per-photo details. Insert a token from the "Insert
+detail" menu in the designer, or type it:
+
+| Token                                         | Value                                                         |
+| --------------------------------------------- | ------------------------------------------------------------- |
+| `{date}`, `{time}`                            | capture date/time, else the file's modified time              |
+| `{taken}`                                     | capture date and time (empty when the photo has no EXIF date) |
+| `{filename}`                                  | file name without its extension                               |
+| `{camera}`, `{lens}`                          | camera model and lens                                         |
+| `{iso}`, `{aperture}`, `{shutter}`, `{focal}` | exposure settings                                             |
+| `{location}`                                  | GPS position, e.g. `51.5074° N, 0.1278° W`                    |
+| `{index}`, `{count}`                          | position in the batch and batch size                          |
+| `{width}`, `{height}`                         | output pixel size                                             |
+
+A token with no value is removed and any separator it left behind is tidied.
+`{location}` prints the photo's GPS position onto the picture; it is opt-in by
+typing the token, and no default preset uses it.
 
 ## Gallery
 

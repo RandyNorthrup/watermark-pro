@@ -220,8 +220,11 @@ and flows it introduced to this list so nothing is missed:
   shape / frame / random journey. Confirm the `/app/library/new` JS grew
   ≤ 5 kB gz. (Icon search and the Shuffle button were carried forward, see
   PLAN.md M12.)
-- M13: editor Export tab with the metadata policy group; the designer token
-  menu.
+- M13: the editor Export tab and the bulk output settings with the **Metadata**
+  policy radio group (strip / keep-except-location / keep, WebP disabled); the
+  designer **Insert detail** token menu. e2e: upload the EXIF fixture, stamp
+  `{camera} {iso}`, export JPEG "keep except location", and confirm in Node
+  (via `exifr`) that Model is present and GPS is gone.
 - M14: the bulk per-photo override dialog (phone and desktop); the
   watch-folder card; the batch report.
 - M15: library Import dialog; the designer logo-prepare panel; `/app/verify`.

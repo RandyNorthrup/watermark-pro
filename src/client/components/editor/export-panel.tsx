@@ -2,7 +2,15 @@ import { Download, Images, Share2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { FORMAT_OPTIONS } from './formats'
-import { type EncodeOptions, OUTPUT_FORMATS, type OutputFormat } from '../../engine/encode'
+import { MetadataPolicyField } from './metadata-policy'
+import {
+  DEFAULT_METADATA_POLICY,
+  effectivePolicy,
+  type EncodeOptions,
+  type MetadataPolicy,
+  OUTPUT_FORMATS,
+  type OutputFormat,
+} from '../../engine/encode'
 import type { Size } from '../../engine/layout'
 import { canShareFiles } from '../../lib/share-file'
 import { Button } from '../ui/button'
@@ -44,9 +52,15 @@ export function ExportPanel({
 }: ExportPanelProps) {
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
+  const [policy, setPolicy] = useState<MetadataPolicy>(DEFAULT_METADATA_POLICY)
   const isLossy = format !== 'image/png'
   const isBusy = isExporting || isSharing || isSaving
   const isShareable = canShareFiles(format)
+  const options = (): EncodeOptions => ({
+    format,
+    quality,
+    metadata: effectivePolicy(policy, format),
+  })
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
@@ -74,6 +88,7 @@ export function ExportPanel({
         disabled={!isLossy}
         onChange={setQuality}
       />
+      <MetadataPolicyField policy={policy} format={format} onChange={setPolicy} />
       <p className="text-xs text-ink-muted">
         {String(outputSize.width)} × {String(outputSize.height)} px
         {isLossy ? '' : '; PNG is lossless'}. Rendered in your browser at full resolution
@@ -85,7 +100,7 @@ export function ExportPanel({
           isPending={isExporting}
           disabled={!isReady || (isBusy && !isExporting)}
           onClick={() => {
-            onExport({ format, quality })
+            onExport(options())
           }}
         >
           {isExporting ? null : <Download aria-hidden="true" className="size-4" />}
@@ -98,7 +113,7 @@ export function ExportPanel({
             isPending={isSharing}
             disabled={!isReady || (isBusy && !isSharing)}
             onClick={() => {
-              onShare({ format, quality })
+              onShare(options())
             }}
           >
             {isSharing ? null : <Share2 aria-hidden="true" className="size-4" />}
@@ -112,7 +127,7 @@ export function ExportPanel({
             isPending={isSaving}
             disabled={!isReady || (isBusy && !isSaving)}
             onClick={() => {
-              onSave({ format, quality })
+              onSave(options())
             }}
           >
             {isSaving ? null : <Images aria-hidden="true" className="size-4" />}

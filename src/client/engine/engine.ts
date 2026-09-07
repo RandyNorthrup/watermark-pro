@@ -34,6 +34,7 @@ export function toApplyRequest(input: ApplyInput): ApplyRequest {
     })),
     output: input.output,
     ...(input.transform !== undefined && { transform: input.transform }),
+    ...(input.metadata !== undefined && { metadata: input.metadata }),
   }
 }
 

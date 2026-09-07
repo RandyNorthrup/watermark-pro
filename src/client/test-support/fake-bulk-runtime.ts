@@ -3,12 +3,20 @@ import { type BulkResult, type BulkSettings, outputFileName } from '../bulk/proc
 import { CancelledError } from '../bulk/queue'
 import type { BulkRuntime } from '../bulk/runtime'
 
+interface RunRecord {
+  name: string
+  specs: readonly WatermarkSpec[]
+  settings: BulkSettings
+  index: number
+  count: number
+}
+
 /**
  * Replacement for `bulk/runtime` in jsdom. Jobs resolve on the next macrotask
  * unless the file name says otherwise: `fail-*` rejects, `slow-*` waits for
  * the abort signal or `releaseSlow()`.
  */
-export const runs: { name: string; specs: readonly WatermarkSpec[]; settings: BulkSettings }[] = []
+export const runs: RunRecord[] = []
 export const disposed = { count: 0 }
 const slowReleases: (() => void)[] = []
 
@@ -29,8 +37,8 @@ const FAKE_WORKERS = 2
 export function createBulkRuntime(): BulkRuntime {
   return {
     workers: FAKE_WORKERS,
-    run(file, specs, settings, signal) {
-      runs.push({ name: file.name, specs, settings })
+    run(file, _metadata, specs, settings, position, signal) {
+      runs.push({ name: file.name, specs, settings, index: position.index, count: position.count })
       return new Promise<BulkResult>((resolve, reject) => {
         const finish = () => {
           resolve({

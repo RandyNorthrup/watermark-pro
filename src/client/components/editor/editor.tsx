@@ -64,6 +64,7 @@ import { describeError } from '../../lib/errors'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { readImageSize } from '../../lib/image-size'
 import { watermarksQueryOptions } from '../../lib/library'
+import { readPhotoMetadata } from '../../lib/photo-metadata'
 import { SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from '../../lib/sample-photo'
 import { shareFile } from '../../lib/share-file'
 import { withPlacement, withStyle } from '../../lib/spec-edit'
@@ -121,6 +122,15 @@ function applyMarkPatch(spec: WatermarkSpec, patch: MarkPatch): WatermarkSpec {
 
 function layerSpecs(document: EditorDocument): WatermarkSpec[] {
   return document.layers.map((layer) => layer.spec)
+}
+
+/** The output size after an optional matte frame is added around the photo. */
+function framedSize(photo: Size, border: Border | null): Size {
+  if (border === null || border.width <= 0) {
+    return photo
+  }
+  const offset = Math.round(border.width * Math.min(photo.width, photo.height))
+  return { width: photo.width + offset * 2, height: photo.height + offset * 2 }
 }
 
 /** The oriented, straightened frame the crop is drawn in, floored to whole pixels. */
@@ -182,6 +192,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
         layerSpecs(document),
         options,
         documentTransform(document),
+        outputSize,
       )
       return await uploadPhoto(organizationId, {
         blob,
@@ -213,10 +224,13 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
   const cropBaseSize = cropSpace(sourceSize, document.orientation)
   const renderSpecs = isCropping ? [] : layerSpecs(document)
   const renderTransform = previewTransform(document, isCropping)
+  const cropBase = croppedSize(cropBaseSize, document.crop)
+  const outputSize = framedSize(document.resize ?? cropBase, document.border)
   const { result, isRendering, error, renderer, setSubject } = useRenderer(
     organizationId,
     renderSpecs,
     renderTransform,
+    outputSize,
   )
 
   // Load the preset named in the URL once the library has arrived.
@@ -255,7 +269,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
 
   async function choosePhoto(file: File) {
     try {
-      const size = await readImageSize(file)
+      const [size, metadata] = await Promise.all([readImageSize(file), readPhotoMetadata(file)])
       setPhoto({ file, size })
       setPhotoError(null)
       setAspectId('free')
@@ -270,7 +284,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
           border: null,
         },
       })
-      await setSubject(file)
+      await setSubject(file, metadata)
     } catch {
       setPhotoError('That file is not an image the browser can read.')
     }
@@ -385,6 +399,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
         layerSpecs(document),
         options,
         documentTransform(document),
+        outputSize,
       )
       await deliver(blob, exportFileName(options.format))
     } catch (error_) {
@@ -418,8 +433,6 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
     }
   }
 
-  const cropBase = croppedSize(cropBaseSize, document.crop)
-  const outputSize = document.resize ?? cropBase
   const crop: CropRect = document.crop ?? fullCrop(cropBaseSize)
   const aspectPreset = ASPECT_PRESETS.find((candidate) => candidate.id === aspectId)
   const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, cropBaseSize)

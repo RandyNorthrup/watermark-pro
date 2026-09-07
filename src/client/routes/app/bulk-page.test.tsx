@@ -79,7 +79,7 @@ describe('bulk page', () => {
     await waitFor(() => expect(screen.getByText(/2 of 2 finished, 1 failed/)).toBeInTheDocument())
     expect(runs.map((run) => run.name)).toEqual(['one.jpg', 'fail-three.jpg'])
     expect(runs[0]?.settings).toEqual({
-      output: { format: 'image/jpeg', quality: 0.9 },
+      output: { format: 'image/jpeg', quality: 0.9, metadata: 'strip' },
       fitLongestSide: 2048,
       orientation: { turns: 0, flipX: false, flipY: false },
       adjust: IDENTITY_ADJUSTMENTS,

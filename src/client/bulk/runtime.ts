@@ -3,8 +3,9 @@
  * tests can swap in a fake: the worker pool, resource resolution, and the
  * per-file processor.
  */
-import { BulkProcessor, type BulkResult, type BulkSettings } from './processor'
+import { type BatchPosition, BulkProcessor, type BulkResult, type BulkSettings } from './processor'
 import { defaultPoolSize, WorkerPool } from './worker-pool'
+import type { PhotoMetadata } from '../../shared/metadata'
 import type { WatermarkSpec } from '../../shared/watermark'
 import { hasOffscreenCanvas } from '../lib/canvas-backend'
 import { type LogoLoader, MarkResources } from '../lib/mark-resources'
@@ -14,8 +15,10 @@ export interface BulkRuntime {
   workers: number
   run(
     file: File,
+    metadata: PhotoMetadata,
     specs: readonly WatermarkSpec[],
     settings: BulkSettings,
+    position: BatchPosition,
     signal: AbortSignal,
   ): Promise<BulkResult>
   dispose(): void
@@ -32,7 +35,8 @@ export function createBulkRuntime(loadLogo: LogoLoader, workers = runtimePoolSiz
   const processor = new BulkProcessor(pool, resources)
   return {
     workers,
-    run: (file, specs, settings, signal) => processor.process(file, specs, settings, signal),
+    run: (file, metadata, specs, settings, position, signal) =>
+      processor.process(file, metadata, specs, settings, position, signal),
     dispose: () => {
       pool.terminate()
       resources.clear()

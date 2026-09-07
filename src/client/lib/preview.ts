@@ -9,12 +9,14 @@
 import { createEngine, mainThreadBackend } from './canvas-backend'
 import { type LogoLoader, MarkResources } from './mark-resources'
 import { createSamplePhoto } from './sample-photo'
-import { specForPhoto } from './spec-tokens'
+import { type PhotoContext, specForPhoto } from './spec-tokens'
+import type { PhotoMetadata } from '../../shared/metadata'
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { CanvasBackend, EngineCanvas } from '../engine/canvas'
 import type { EncodeOptions } from '../engine/encode'
 import type { WatermarkEngine } from '../engine/engine'
 import type { Size } from '../engine/layout'
+import type { RawMetadata } from '../engine/metadata/segments'
 import type { MarkOutcome, Transform } from '../engine/pipeline'
 import { seedFor } from '../engine/random'
 
@@ -40,6 +42,8 @@ function specList(input: SpecInput): readonly WatermarkSpec[] {
 export interface RenderOptions {
   /** Crop and resize in source pixels; scaled to the preview automatically. */
   transform?: Transform | undefined
+  /** Final output size for `{width}` / `{height}` tokens; the source size otherwise. */
+  output?: Size | undefined
 }
 
 export type { LogoLoader } from './mark-resources'
@@ -103,6 +107,7 @@ export class PreviewRenderer {
   readonly #resources: MarkResources
   #subject: EngineCanvas | null = null
   #original: File | null = null
+  #metadata: PhotoMetadata | null = null
   #sourceSize: Size | null = null
   #sequence = 0
 
@@ -116,9 +121,19 @@ export class PreviewRenderer {
     this.#backend = backend
   }
 
-  /** The marks the engine should draw for the current subject. */
-  #marksFor(input: SpecInput): readonly WatermarkSpec[] {
-    return specList(input).map((spec) => specForPhoto(spec, this.#original))
+  /** The marks the engine should draw for the current subject, tokens filled. */
+  #marksFor(input: SpecInput, output?: Size): readonly WatermarkSpec[] {
+    const context: PhotoContext = {
+      metadata: this.#metadata,
+      ...(output !== undefined && { output }),
+    }
+    return specList(input).map((spec) => specForPhoto(spec, this.#original, context))
+  }
+
+  /** The raw metadata bytes the engine writes back, or null for a photo with none. */
+  #rawMetadata(): RawMetadata | null {
+    const meta = this.#metadata
+    return meta === null ? null : { exif: meta.exif, xmp: meta.xmp, density: meta.density }
   }
 
   /** A stable seed for random placement: the photo's, or 1 for the sample. */
@@ -144,14 +159,15 @@ export class PreviewRenderer {
     return this.#subject.width / this.#sourceSize.width
   }
 
-  /** Replaces the subject photo; `null` restores the built-in sample. */
-  async setSubject(file: File | null): Promise<void> {
+  /** Replaces the subject photo; `null` restores the built-in sample. Metadata fills tokens and export policy. */
+  async setSubject(file: File | null, metadata: PhotoMetadata | null = null): Promise<void> {
     const bitmap = await this.#decode(file)
     const size = { width: bitmap.width, height: bitmap.height }
     this.#subject = drawScaled(bitmap, fitWithin(size, PREVIEW_MAX_SIDE), this.#backend)
     bitmap.close()
     this.#sourceSize = size
     this.#original = file
+    this.#metadata = metadata
   }
 
   /** Forget a cached logo, for example after it was replaced. */
@@ -175,7 +191,7 @@ export class PreviewRenderer {
     this.#sequence += 1
     const ticket = this.#sequence
     const [resources, source] = await Promise.all([
-      this.#resources.resolve(this.#marksFor(input), this.#seed()),
+      this.#resources.resolve(this.#marksFor(input, options.output), this.#seed()),
       subject.toBitmap(),
     ])
     const transform = scaleTransform(options.transform, this.subjectScale)
@@ -200,14 +216,24 @@ export class PreviewRenderer {
    * Full-resolution render of the original photo (or the sample scene when
    * none was chosen) for download.
    */
-  async exportFull(input: SpecInput, output: EncodeOptions, transform?: Transform): Promise<Blob> {
+  async exportFull(
+    input: SpecInput,
+    output: EncodeOptions,
+    transform?: Transform,
+    tokenOutput?: Size,
+  ): Promise<Blob> {
     const source = await this.#decode(this.#original)
-    const resources = await this.#resources.resolve(this.#marksFor(input), this.#seed())
+    const resources = await this.#resources.resolve(
+      this.#marksFor(input, tokenOutput),
+      this.#seed(),
+    )
+    const metadata = this.#rawMetadata()
     const result = await this.#engine.apply({
       ...resources,
       source,
       output,
       ...(transform !== undefined && { transform }),
+      ...(metadata !== null && { metadata }),
     })
     return result.blob
   }

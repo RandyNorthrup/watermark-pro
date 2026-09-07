@@ -27,7 +27,14 @@ import type { BulkSettings, BulkResult } from '../../bulk/processor'
 import type { JobState } from '../../bulk/queue'
 import { zipEntries } from '../../bulk/zip'
 import { LONG_EDGE_PRESETS } from '../../editor/constants'
-import { type EncodeOptions, OUTPUT_FORMATS, type OutputFormat } from '../../engine/encode'
+import {
+  DEFAULT_METADATA_POLICY,
+  effectivePolicy,
+  type EncodeOptions,
+  type MetadataPolicy,
+  OUTPUT_FORMATS,
+  type OutputFormat,
+} from '../../engine/encode'
 import type { Border } from '../../engine/pipeline'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
@@ -38,6 +45,7 @@ import { canShareFiles, shareFile } from '../../lib/share-file'
 import { AdjustPanel } from '../editor/adjust-panel'
 import { FORMAT_OPTIONS } from '../editor/formats'
 import { FrameControls } from '../editor/frame-controls'
+import { MetadataPolicyField } from '../editor/metadata-policy'
 import { OrientationControls } from '../editor/orientation-controls'
 import { PresetGate } from '../presets/preset-gate'
 import { Alert } from '../ui/alert'
@@ -157,6 +165,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const [presetIds, setPresetIds] = useState<string[]>([])
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
+  const [policy, setPolicy] = useState<MetadataPolicy>(DEFAULT_METADATA_POLICY)
   const [size, setSize] = useState<SizeChoice>('original')
   const [orientation, setOrientation] = useState<Orientation>(IDENTITY_ORIENTATION)
   const [adjust, setAdjust] = useState<Adjustments>(IDENTITY_ADJUSTMENTS)
@@ -198,7 +207,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   }
 
   function settings(): BulkSettings {
-    const output: EncodeOptions = { format, quality }
+    const output: EncodeOptions = { format, quality, metadata: effectivePolicy(policy, format) }
     return {
       output,
       fitLongestSide: size === 'original' ? null : Number(size),
@@ -522,6 +531,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
               disabled={format === 'image/png' || snapshot.isRunning}
               onChange={setQuality}
             />
+            <MetadataPolicyField policy={policy} format={format} onChange={setPolicy} />
             <div className="flex flex-col gap-1.5">
               <span className="text-sm font-medium">Size</span>
               <Select

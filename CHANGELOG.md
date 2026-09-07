@@ -7,6 +7,47 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-07
+
+M13: photo metadata — EXIF tokens, a keep/strip export policy, and preserved DPI.
+
+### Added
+
+- Text marks can print camera metadata through new tokens: `{taken}`,
+  `{camera}`, `{lens}`, `{iso}`, `{aperture}`, `{shutter}`, `{focal}`,
+  `{location}` (GPS), plus `{index}`, `{count}`, `{width}` and `{height}`.
+  `{date}` and `{time}` now prefer the capture date when the photo has one.
+  An "Insert detail" menu in the designer inserts a token at the caret. When a
+  token has no value it is removed and any separator it left behind is tidied
+  (`{camera} · {lens}` with no lens becomes `Canon EOS R6`).
+- An export **Metadata** policy in the editor's Export tab and the bulk output
+  settings: **Strip** (default — no camera data, no location), **Keep except
+  location** (camera, lens and capture time stay; GPS removed) and **Keep
+  everything**. WebP is always stripped (its keep modes are disabled with a
+  note). In both keep modes the Orientation tag is reset to 1 (the pixels are
+  already upright) and the pixel-dimension tags are rewritten to the output
+  size; GPS is emptied for keep-except-location.
+- Print density (DPI) is preserved on JPEG (JFIF APP0) and PNG (`pHYs`)
+  regardless of policy — it is not personal.
+- Metadata is read in the browser with `exifr` (never uploaded); the raw
+  Exif/XMP/density bytes are written back by our own byte code
+  (`src/client/engine/metadata/`). Untrusted input never throws: a fuzz test
+  runs 400 random mutations of a fixture through the scanners.
+
+### Security
+
+- The default export policy stays **strip**. Keep modes are an explicit
+  per-export choice, GPS is named in the "keep everything" option, and
+  `{location}` is opt-in by typing the token. GPS removal in
+  keep-except-location is proven by test and by a red drill.
+
+### Notes
+
+- `exifr` 7.1.3 added (MIT, no dependencies). Icon search, the editor Shuffle
+  button and the "Any character" input from M12 remain carried forward.
+- Per-milestone certification runs `npm run quality`, semgrep and the red
+  drill; e2e, Lighthouse and screenshots are deferred to M19.
+
 ## [1.4.0] - 2026-09-07
 
 M12: richer marks — text effects, shapes, frames and random placement.

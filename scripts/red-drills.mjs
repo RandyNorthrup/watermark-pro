@@ -390,6 +390,66 @@ export const DRILLS = [
     replace: '    const x = base.x + offsetX * 20',
     ...unitClient('src/client/engine/layout.test.ts'),
   },
+  // --- M13: metadata tokens and the export keep/strip policy ----------------
+  {
+    name: 'Metadata: GPS survives keep-except-location',
+    file: 'src/client/engine/metadata/exif-edit.ts',
+    find: '  if (pointer === null) {\n    return\n  }\n  const gpsIfd = ctx.view.getUint32(pointer.fieldOffset, ctx.isLittleEndian)',
+    replace:
+      '  if (pointer === null) {\n    return\n  }\n  return\n  const gpsIfd = ctx.view.getUint32(pointer.fieldOffset, ctx.isLittleEndian)',
+    ...unitClient('src/client/engine/metadata/exif-edit.test.ts'),
+  },
+  {
+    name: 'Metadata: orientation not reset to 1',
+    file: 'src/client/engine/metadata/write.ts',
+    find: '  setOrientation(copy, UPRIGHT)',
+    replace: '  void UPRIGHT',
+    ...browser('src/client/engine/metadata/metadata.browser.test.ts'),
+  },
+  {
+    name: 'Metadata: strip still copies Exif',
+    file: 'src/client/engine/metadata/write.ts',
+    find: "  if (policy !== 'strip' && source.exif !== null) {\n    segments.push(app1Segment(EXIF_IDENTIFIER, editedExif(source.exif, policy, size)))",
+    replace:
+      '  if (source.exif !== null) {\n    segments.push(app1Segment(EXIF_IDENTIFIER, editedExif(source.exif, policy, size)))',
+    ...browser('src/client/engine/metadata/metadata.browser.test.ts'),
+  },
+  {
+    name: 'Metadata: APP1 inserted before APP0',
+    file: 'src/client/engine/metadata/segments.ts',
+    find: '  return concat([jpeg.slice(0, 2), ...segments, jpeg.slice(bodyStart)])',
+    replace: '  return concat([jpeg.slice(0, 2), ...segments.toReversed(), jpeg.slice(bodyStart)])',
+    ...unitClient('src/client/engine/metadata/segments.test.ts'),
+  },
+  {
+    name: 'DPI: density dropped on strip',
+    file: 'src/client/engine/metadata/write.ts',
+    find: '  if (source.density !== null) {\n    segments.push(jfifSegment(source.density))',
+    replace:
+      "  if (source.density !== null && policy !== 'strip') {\n    segments.push(jfifSegment(source.density))",
+    ...browser('src/client/engine/metadata/metadata.browser.test.ts'),
+  },
+  {
+    name: 'PNG: CRC not recomputed',
+    file: 'src/client/engine/metadata/segments.ts',
+    find: 'data.setUint32(PNG_CHUNK_HEADER + chunkData.length, crc32(crcInput), false)',
+    replace: 'data.setUint32(PNG_CHUNK_HEADER + chunkData.length, 0, false)',
+    ...unitClient('src/client/engine/metadata/segments.test.ts'),
+  },
+  {
+    name: 'Tokens: {date} ignores the capture date',
+    file: 'src/shared/watermark.ts',
+    find: '  const when = meta.takenAt ?? context.date',
+    replace: '  const when = context.date',
+    ...unitClient('src/shared/watermark-tokens.test.ts'),
+  },
+  {
+    name: 'Tokens: empty values leave the token in place',
+    file: 'src/shared/watermark.ts',
+    find: '  return tidyResolvedText(resolved)',
+    replace: '  return resolved',
+    ...unitClient('src/shared/watermark-tokens.test.ts'),
+  },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
     name: 'Gate: ESLint rejects `any`',

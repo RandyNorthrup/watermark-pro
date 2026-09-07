@@ -6,6 +6,7 @@ import { JobQueue, type QueueSnapshot } from '../../bulk/queue'
 import { type BulkRuntime, createBulkRuntime } from '../../bulk/runtime'
 import { apiRequest } from '../../lib/api'
 import { assetFileUrl } from '../../lib/library'
+import { readPhotoMetadata } from '../../lib/photo-metadata'
 
 export type BulkSnapshot = QueueSnapshot<File, BulkResult>
 
@@ -21,6 +22,8 @@ export function useBulkQueue(organizationId: string) {
   const queueRef = useRef<JobQueue<File, BulkResult> | null>(null)
   const specsRef = useRef<readonly WatermarkSpec[] | null>(null)
   const settingsRef = useRef<BulkSettings | null>(null)
+  // Submission order of every file added, for the `{index}` / `{count}` tokens.
+  const filesRef = useRef<File[]>([])
   const [snapshot, setSnapshot] = useState<BulkSnapshot>(EMPTY)
   const [workers, setWorkers] = useState(1)
 
@@ -31,13 +34,26 @@ export function useBulkQueue(organizationId: string) {
     })
     const queue = new JobQueue<File, BulkResult>({
       concurrency: runtime.workers,
-      run: (file, signal) => {
+      run: async (file, signal) => {
         const specs = specsRef.current
         const settings = settingsRef.current
         if (settings === null || specs === null || specs.length === 0) {
-          return Promise.reject(new Error('choose a preset before starting'))
+          throw new Error('choose a preset before starting')
         }
-        return runtime.run(file, specs, settings, signal)
+        // Reading EXIF here is bounded by the queue's concurrency; the position
+        // is the file's place in the whole batch.
+        const files = filesRef.current
+        const found = files.indexOf(file)
+        const index = (found === -1 ? files.length : found) + 1
+        const metadata = await readPhotoMetadata(file)
+        return await runtime.run(
+          file,
+          metadata,
+          specs,
+          settings,
+          { index, count: files.length },
+          signal,
+        )
       },
       onChange: setSnapshot,
     })
@@ -53,6 +69,7 @@ export function useBulkQueue(organizationId: string) {
   }, [organizationId])
 
   const add = useCallback((files: readonly File[]) => {
+    filesRef.current = [...filesRef.current, ...files]
     queueRef.current?.add(files)
   }, [])
 
@@ -71,6 +88,7 @@ export function useBulkQueue(organizationId: string) {
   }, [])
 
   const clear = useCallback(() => {
+    filesRef.current = []
     queueRef.current?.clear()
   }, [])
 

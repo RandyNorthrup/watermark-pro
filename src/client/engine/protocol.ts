@@ -4,6 +4,7 @@
  * stays free of main-thread imports.
  */
 import type { EncodeOptions } from './encode'
+import type { RawMetadata } from './metadata/segments'
 import type { MarkOutcome, Transform } from './pipeline'
 import type { WatermarkSpec } from '../../shared/watermark'
 
@@ -34,6 +35,8 @@ export interface ApplyMessage {
   fonts: FontResource[]
   output: EncodeOptions
   transform?: Transform
+  /** Source Exif/XMP/density to write back per `output.metadata`; null strips. */
+  metadata?: RawMetadata | null
 }
 
 export interface ApplyDoneMessage {

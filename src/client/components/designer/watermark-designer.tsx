@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Tabs } from 'radix-ui'
-import { type SubmitEvent, useState } from 'react'
+import { type SubmitEvent, useRef, useState } from 'react'
 
 import { FontPicker } from './font-picker'
 import { LogoPicker } from './logo-picker'
@@ -10,12 +10,13 @@ import { ShapePanel } from './shape-panel'
 import { StylePanel } from './style-panel'
 import { SymbolPicker } from './symbol-picker'
 import { TextEffects } from './text-effects'
+import { TokenMenu } from './token-menu'
 import { presetNameSchema, type WatermarkDto } from '../../../shared/api'
 import {
   MAX_QR_CONTENT_LENGTH,
   MAX_TEXT_LENGTH,
   MAX_TEXT_LINES,
-  TEXT_TOKENS,
+  type TextToken,
   type WatermarkSpec,
 } from '../../../shared/watermark'
 import { describeError } from '../../lib/errors'
@@ -52,7 +53,9 @@ const SECTION_TABS = [
   { value: 'style', label: 'Style' },
 ] as const
 
-const TEXT_HINT = `Up to ${String(MAX_TEXT_LENGTH)} characters on up to ${String(MAX_TEXT_LINES)} lines. ${TEXT_TOKENS.join(', ')} are filled in per photo.`
+/** Written as a plain string so the literal `{location}` is not read as an interpolation. */
+const LOCATION_NOTE = "{location} prints the photo's GPS position on the picture."
+const TEXT_HINT = `Up to ${String(MAX_TEXT_LENGTH)} characters on up to ${String(MAX_TEXT_LINES)} lines. Use "Insert detail" for tokens like the date or camera, filled in per photo. ${LOCATION_NOTE}`
 
 /** Keeps a typed or pasted value within the line limit; extra line breaks join the last line. */
 function limitLines(text: string): string {
@@ -86,6 +89,24 @@ export function WatermarkDesigner({
   const [nameError, setNameError] = useState<string | null>(null)
   const [spec, setSpec] = useState<WatermarkSpec>(() => initial?.spec ?? blankSpec())
   const [drafts, setDrafts] = useState<Partial<Record<MarkKind, WatermarkSpec>>>({})
+  const textRef = useRef<HTMLTextAreaElement>(null)
+
+  /** Inserts a token at the caret (or the end) of the text mark and keeps focus after it. */
+  function insertToken(token: TextToken) {
+    if (spec.kind !== 'text') {
+      return
+    }
+    const field = textRef.current
+    const start = field?.selectionStart ?? spec.text.length
+    const end = field?.selectionEnd ?? spec.text.length
+    const next = limitLines(spec.text.slice(0, start) + token + spec.text.slice(end))
+    setSpec({ ...spec, text: next })
+    const caret = start + token.length
+    requestAnimationFrame(() => {
+      field?.focus()
+      field?.setSelectionRange(caret, caret)
+    })
+  }
 
   const save = useMutation({
     mutationFn: (body: { name: string; spec: WatermarkSpec }) =>
@@ -178,6 +199,7 @@ export function WatermarkDesigner({
                       {(controlProps) => (
                         <Textarea
                           {...controlProps}
+                          ref={textRef}
                           value={spec.text}
                           maxLength={MAX_TEXT_LENGTH}
                           rows={2}
@@ -187,6 +209,7 @@ export function WatermarkDesigner({
                         />
                       )}
                     </Field>
+                    <TokenMenu onInsert={insertToken} />
                     <FontPicker
                       family={spec.fontFamily}
                       weight={spec.fontWeight}

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { PhotoMetadata } from '../../../shared/metadata'
 import type { WatermarkSpec } from '../../../shared/watermark'
+import type { Size } from '../../engine/layout'
 import type { Transform } from '../../engine/pipeline'
 import { apiRequest } from '../../lib/api'
 import { describeError } from '../../lib/errors'
@@ -31,6 +33,7 @@ export function useRenderer(
   organizationId: string,
   specs: readonly WatermarkSpec[],
   transform: Transform | undefined,
+  outputSize: Size,
 ) {
   const rendererRef = useRef<PreviewRenderer | null>(null)
   const [state, setState] = useState<RendererState>({
@@ -55,13 +58,19 @@ export function useRenderer(
   // Serialised so structurally equal marks or transforms do not trigger a re-render.
   const transformKey = JSON.stringify(transform ?? null)
   const specsKey = JSON.stringify(specs)
+  const outputKey = JSON.stringify(outputSize)
   const specsRef = useRef(specs)
   specsRef.current = specs
+  const outputRef = useRef(outputSize)
+  outputRef.current = outputSize
   useEffect(() => {
     const currentTransform = parseTransform(transformKey)
     async function renderFrame(renderer: PreviewRenderer, current: readonly WatermarkSpec[]) {
       try {
-        const next = await renderer.render(current, { transform: currentTransform })
+        const next = await renderer.render(current, {
+          transform: currentTransform,
+          output: outputRef.current,
+        })
         if (next === null) {
           return
         }
@@ -85,7 +94,7 @@ export function useRenderer(
     return () => {
       clearTimeout(timer)
     }
-  }, [specsKey, transformKey, subjectVersion])
+  }, [specsKey, transformKey, outputKey, subjectVersion])
 
   // Each object URL lives until the next result replaces it or the component unmounts.
   const url = state.result?.url
@@ -98,18 +107,21 @@ export function useRenderer(
     [url],
   )
 
-  const setSubject = useCallback(async (file: File | null) => {
-    const renderer = rendererRef.current
-    if (renderer === null) {
-      return
-    }
-    try {
-      await renderer.setSubject(file)
-      setSubjectVersion((version) => version + 1)
-    } catch (error_) {
-      setState((previous) => ({ ...previous, error: describeError(error_) }))
-    }
-  }, [])
+  const setSubject = useCallback(
+    async (file: File | null, metadata: PhotoMetadata | null = null) => {
+      const renderer = rendererRef.current
+      if (renderer === null) {
+        return
+      }
+      try {
+        await renderer.setSubject(file, metadata)
+        setSubjectVersion((version) => version + 1)
+      } catch (error_) {
+        setState((previous) => ({ ...previous, error: describeError(error_) }))
+      }
+    },
+    [],
+  )
 
   return { ...state, renderer: rendererRef, setSubject }
 }

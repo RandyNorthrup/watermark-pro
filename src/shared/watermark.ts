@@ -6,7 +6,8 @@
  */
 import { z } from 'zod'
 
-import { FONT_WEIGHTS } from './constants'
+import { COMMON_SHUTTER_DENOMINATORS, FONT_WEIGHTS } from './constants'
+import { EMPTY_PHOTO_METADATA, type GeoLocation, type PhotoMetadata } from './metadata'
 
 export const ANCHORS = [
   'top-left',
@@ -108,30 +109,135 @@ export const MAX_QR_CONTENT_LENGTH = 512
 
 /**
  * Placeholders a text mark may carry; the host fills them in per photo
- * (`resolveTextTokens`) before the engine sees the text.
+ * (`resolveTextTokens`) before the engine sees the text. Camera fields come
+ * from the photo's EXIF and are empty when the photo has none.
  */
-export const TEXT_TOKENS = ['{date}', '{time}', '{filename}'] as const
+export const TEXT_TOKENS = [
+  '{date}',
+  '{time}',
+  '{taken}',
+  '{filename}',
+  '{camera}',
+  '{lens}',
+  '{iso}',
+  '{aperture}',
+  '{shutter}',
+  '{focal}',
+  '{location}',
+  '{index}',
+  '{count}',
+  '{width}',
+  '{height}',
+] as const
+
+export type TextToken = (typeof TEXT_TOKENS)[number]
 
 export interface TextTokenContext {
-  /** When the photo was taken or, failing that, last modified. */
+  /** Fallback when the photo has no capture date (its last-modified time). */
   date: Date
   /** The photo's file name without its extension. */
   fileName: string
+  /** EXIF fields for the camera tokens; absent or null means a photo with none. */
+  metadata?: PhotoMetadata | null
+  /** 1-based position of the photo in its batch; 1 in the editor. */
+  index?: number
+  /** Number of photos in the batch; 1 in the editor. */
+  count?: number
+  /** Output pixel size, for `{width}` and `{height}`. */
+  output?: { width: number; height: number }
 }
 
-/** Fills `{date}`, `{time}` and `{filename}` in a text mark. */
+/** Decimal places for a printed GPS coordinate. */
+const GPS_DECIMALS = 4
+/** One second, the boundary between "N s" and "1/N s" shutter formatting. */
+const ONE_SECOND = 1
+/** Rounding step for a trimmed one-decimal number. */
+const ONE_DECIMAL = 10
+
+/** A number as an integer when whole, else to one decimal place. */
+function trimNumber(value: number): string {
+  return String(Number.isSafeInteger(value) ? value : Math.round(value * ONE_DECIMAL) / ONE_DECIMAL)
+}
+
+/** Exposure time as "2 s" (≥ 1 s) or "1/250 s" (snapped to a common denominator). */
+function formatShutter(seconds: number): string {
+  if (seconds >= ONE_SECOND) {
+    return `${trimNumber(seconds)} s`
+  }
+  const denominator = 1 / seconds
+  let nearest: number = COMMON_SHUTTER_DENOMINATORS[0]
+  for (const candidate of COMMON_SHUTTER_DENOMINATORS) {
+    if (Math.abs(candidate - denominator) < Math.abs(nearest - denominator)) {
+      nearest = candidate
+    }
+  }
+  return `1/${String(nearest)} s`
+}
+
+/** A GPS position as "51.5074° N, 0.1278° W". */
+function formatLocation(location: GeoLocation): string {
+  const northSouth = location.latitude >= 0 ? 'N' : 'S'
+  const eastWest = location.longitude >= 0 ? 'E' : 'W'
+  const lat = Math.abs(location.latitude).toFixed(GPS_DECIMALS)
+  const lng = Math.abs(location.longitude).toFixed(GPS_DECIMALS)
+  return `${lat}° ${northSouth}, ${lng}° ${eastWest}`
+}
+
+/** A date and time in the locale's medium/short styles. */
+function formatDateTime(date: Date): string {
+  const day = date.toLocaleDateString(undefined, { dateStyle: 'medium' })
+  const time = date.toLocaleTimeString(undefined, { timeStyle: 'short' })
+  return `${day} ${time}`
+}
+
+/**
+ * Cleans up separators left behind when a token resolved to an empty string:
+ * a spaced "·" or "-" joiner that lost a neighbour, a doubled joiner, and
+ * doubled or trailing spaces. Only spaced separators are touched, so a hyphen
+ * inside a word ("RF24-70mm") is left alone. Iterates to a fixed point.
+ */
+export function tidyResolvedText(text: string): string {
+  let out = text
+  let previous = ''
+  while (out !== previous) {
+    previous = out
+    out = out
+      .replaceAll(/ [·-] (?= *[·-] )/gu, ' ')
+      .replaceAll(/^ *[·-] /gmu, '')
+      .replaceAll(/ [·-] *$/gmu, '')
+      .replaceAll(/ {2,}/gu, ' ')
+  }
+  return out.replaceAll(/[^\S\n]+$/gmu, '').replaceAll(/^[^\S\n]+/gmu, '')
+}
+
+/** Fills every token in a text mark for one photo, then tidies empty gaps. */
 export function resolveTextTokens(text: string, context: TextTokenContext): string {
-  const values: Record<(typeof TEXT_TOKENS)[number], string> = {
-    '{date}': context.date.toLocaleDateString(undefined, { dateStyle: 'medium' }),
-    '{time}': context.date.toLocaleTimeString(undefined, { timeStyle: 'short' }),
+  const meta = context.metadata ?? EMPTY_PHOTO_METADATA
+  const when = meta.takenAt ?? context.date
+  const output = context.output ?? null
+  const values: Record<TextToken, string> = {
+    '{date}': when.toLocaleDateString(undefined, { dateStyle: 'medium' }),
+    '{time}': when.toLocaleTimeString(undefined, { timeStyle: 'short' }),
+    '{taken}': meta.takenAt === null ? '' : formatDateTime(meta.takenAt),
     '{filename}': context.fileName,
+    '{camera}': meta.camera ?? '',
+    '{lens}': meta.lens ?? '',
+    '{iso}': meta.iso === null ? '' : `ISO ${String(meta.iso)}`,
+    '{aperture}': meta.aperture === null ? '' : `f/${trimNumber(meta.aperture)}`,
+    '{shutter}': meta.shutter === null ? '' : formatShutter(meta.shutter),
+    '{focal}': meta.focalLength === null ? '' : `${trimNumber(meta.focalLength)} mm`,
+    '{location}': meta.location === null ? '' : formatLocation(meta.location),
+    '{index}': String(context.index ?? 1),
+    '{count}': String(context.count ?? 1),
+    '{width}': output === null ? '' : String(output.width),
+    '{height}': output === null ? '' : String(output.height),
   }
   // Split-and-join: a replacement value is never reparsed for `$` patterns.
   let resolved = text
   for (const token of TEXT_TOKENS) {
     resolved = resolved.split(token).join(values[token])
   }
-  return resolved
+  return tidyResolvedText(resolved)
 }
 
 const fontWeightSchema = z.union(FONT_WEIGHTS.map((weight) => z.literal(weight)))

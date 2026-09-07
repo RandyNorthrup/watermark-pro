@@ -152,3 +152,8 @@ export const API_ERROR_CODE = {
 
 /** One year in seconds; the HSTS max-age recommended by hstspreload.org. */
 export const HSTS_MAX_AGE_SECONDS = 31_536_000
+
+/** Standard camera shutter denominators; a raw exposure time snaps to the nearest for the `{shutter}` token. */
+export const COMMON_SHUTTER_DENOMINATORS = [
+  1, 2, 4, 8, 15, 30, 60, 125, 250, 500, 1000, 2000, 4000, 8000,
+] as const

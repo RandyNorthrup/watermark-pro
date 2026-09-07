@@ -17,8 +17,10 @@ import {
 } from './analysis'
 import type { Canvas2D, CanvasBackend, EngineCanvas } from './canvas'
 import { resolveContrast, type ResolvedContrast } from './contrast'
-import { encodeCanvas, type EncodeOptions } from './encode'
+import { DEFAULT_METADATA_POLICY, encodeCanvas, type EncodeOptions } from './encode'
 import { markSize, resolvePlacement, type Size, tileCentres } from './layout'
+import type { RawMetadata } from './metadata/segments'
+import { withMetadata } from './metadata/write'
 import {
   chain,
   type Matrix,
@@ -77,6 +79,8 @@ export interface ApplyRequest {
   marks: RenderableMark[]
   output: EncodeOptions
   transform?: Transform
+  /** Source metadata to write back per `output.metadata`; null strips everything. */
+  metadata?: RawMetadata | null
 }
 
 /** Where the (single, untiled) mark landed, in output pixels; the editor draws its handles from this. */
@@ -263,7 +267,14 @@ export async function applyWatermark(
   // other, and a later mark paints over an earlier one where they meet.
   const marks = request.marks.map((mark) => composeMark(canvas.context, canvas, map, mark))
   const framed = await frameCanvas(canvas, request.transform?.border, backend)
-  const blob = await encodeCanvas(framed.canvas, request.output)
+  const encoded = await encodeCanvas(framed.canvas, request.output)
+  const blob = await withMetadata(
+    encoded,
+    request.output.format,
+    request.metadata ?? null,
+    request.output.metadata ?? DEFAULT_METADATA_POLICY,
+    { width: framed.canvas.width, height: framed.canvas.height },
+  )
   const offsetMarks = marks.map((mark) => ({
     ...mark,
     placement: {

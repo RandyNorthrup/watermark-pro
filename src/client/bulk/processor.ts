@@ -13,15 +13,24 @@ import {
   isIdentityOrientation,
   type Orientation,
 } from '../../shared/adjustments'
+import type { PhotoMetadata } from '../../shared/metadata'
 import type { WatermarkSpec } from '../../shared/watermark'
 import { fitLongestSide, isSameSize } from '../editor/geometry'
 import type { EncodeOptions } from '../engine/encode'
 import { closeInputBitmaps } from '../engine/engine'
+import type { Size } from '../engine/layout'
+import type { RawMetadata } from '../engine/metadata/segments'
 import { orientedSize } from '../engine/orient'
 import type { Border, Transform } from '../engine/pipeline'
 import { seedFor } from '../engine/random'
 import type { MarkResources } from '../lib/mark-resources'
 import { specForPhoto } from '../lib/spec-tokens'
+
+/** Position of a photo within a batch, for the `{index}` and `{count}` tokens. */
+export interface BatchPosition {
+  index: number
+  count: number
+}
 
 export interface BulkSettings {
   output: EncodeOptions
@@ -62,6 +71,24 @@ function bulkTransform(
   return Object.keys(transform).length === 0 ? undefined : transform
 }
 
+/** The photo's output size after resize and an optional matte frame. */
+function framedSize(photo: Size, border: Border | null): Size {
+  if (border === null || border.width <= 0) {
+    return photo
+  }
+  const offset = Math.round(border.width * Math.min(photo.width, photo.height))
+  return { width: photo.width + offset * 2, height: photo.height + offset * 2 }
+}
+
+/** The final output size a batch produces for one source, for `{width}`/`{height}`. */
+function bulkOutputSize(sourceSize: Size, settings: BulkSettings): Size {
+  const orientation: Orientation = { ...settings.orientation, straighten: 0 }
+  const oriented = orientedSize(sourceSize, orientation)
+  const target =
+    settings.fitLongestSide === null ? oriented : fitLongestSide(oriented, settings.fitLongestSide)
+  return framedSize(target, settings.border)
+}
+
 export interface BulkResult {
   blob: Blob
   fileName: string
@@ -100,30 +127,40 @@ export class BulkProcessor {
 
   async process(
     file: File,
+    metadata: PhotoMetadata,
     specs: readonly WatermarkSpec[],
     settings: BulkSettings,
+    position: BatchPosition,
     signal: AbortSignal,
   ): Promise<BulkResult> {
     if (isAborted(signal)) {
       throw new CancelledError()
     }
-    const [source, inputs] = await Promise.all([
-      decode(file),
-      this.#resources.resolve(
-        specs.map((spec) => specForPhoto(spec, file)),
-        seedFor(file),
+    const source = await decode(file)
+    const sourceSize = { width: source.width, height: source.height }
+    const outputSize = bulkOutputSize(sourceSize, settings)
+    const inputs = await this.#resources.resolve(
+      specs.map((spec) =>
+        specForPhoto(spec, file, {
+          metadata,
+          index: position.index,
+          count: position.count,
+          output: outputSize,
+        }),
       ),
-    ])
+      seedFor(file),
+    )
     if (isAborted(signal)) {
       closeInputBitmaps({ ...inputs, source, output: settings.output })
       throw new CancelledError()
     }
-    const sourceSize = { width: source.width, height: source.height }
     const transform = bulkTransform(sourceSize, settings)
+    const raw: RawMetadata = { exif: metadata.exif, xmp: metadata.xmp, density: metadata.density }
     const result = await this.#pool.apply({
       ...inputs,
       source,
       output: settings.output,
+      metadata: raw,
       ...(transform !== undefined && { transform }),
     })
     return {
