@@ -7,13 +7,38 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-07
+
+M11: photo adjustments and orientation.
+
 ### Added
+
+- Orientation in the editor's Crop tab: rotate left and right in quarter
+  turns, flip horizontally and vertically, and a straighten slider (−45° to
+  +45°) that auto-crops the tilt to the largest rectangle of the original
+  aspect, so an export never has empty corners.
+- An Adjust tab with brightness, contrast, saturation, warmth, sepia and
+  vignette sliders (each with a reset) and eight one-tap filters — Original,
+  Mono, Sepia, Vivid, Warm, Cool, Fade and Noir — previewed as thumbnails of
+  the current photo. A mark's auto contrast is computed from the adjusted
+  pixels, so ink stays legible after a darkening filter.
+- The bulk tool gains a "Photo adjustments" section: one rotation, flip and
+  filter applied to every photo in the batch.
+- Adjustments run as pure pixel maths in the engine (`src/client/engine/adjust.ts`):
+  brightness and contrast fold into a lookup table, saturation, warmth and
+  sepia into one colour matrix, and vignette is spatial. A 12-megapixel
+  frame is adjusted well within a 250 ms budget (browser test logs the time).
+- The engine's orientation geometry (`src/client/engine/orient.ts`) maps the
+  oriented, straightened output frame back onto the source with a single
+  affine, so crop, resize and adjustments compose in one draw.
+
+### Documentation
 
 - Specifications for milestones M11–M19 under `docs/plans/` (photo
   adjustments, mark engine extensions, metadata, bulk power, preset files
   and logo tools, import surfaces, video and PDF, localisation,
-  performance), with an agent runbook, and their entries and open
-  questions in `PLAN.md`.
+  performance), with an agent runbook, and their entries and open questions
+  in `PLAN.md`.
 
 ## [1.2.0] - 2026-09-06
 

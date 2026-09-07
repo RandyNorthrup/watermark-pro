@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest'
 import { offscreenBackend } from './canvas'
 import { INK } from './contrast'
 import { EncodeError, encodeCanvas } from './encode'
+import { orientedFrame } from './orient'
 import { analyseSource, applyWatermark, prepareCanvas } from './pipeline'
 import { measureAspect } from './render'
-import { countChanged, pixelsOf, splitBitmap } from './test-support/fixtures'
+import { colourAt, countChanged, pixelsOf, quadBitmap, splitBitmap } from './test-support/fixtures'
 import { WatermarkWorker } from './worker-client'
+import { IDENTITY_ORIENTATION, type Orientation } from '../../shared/adjustments'
 import { DEFAULT_STYLE, type WatermarkSpec } from '../../shared/watermark'
 
 const WHITE: [number, number, number] = [255, 255, 255]
@@ -369,6 +371,89 @@ describe('applyWatermark', () => {
 
   it('surfaces unsupported encoders as EncodeError', () => {
     expect(new EncodeError('x')).toBeInstanceOf(Error)
+  })
+})
+
+const QUADS = {
+  topLeft: '#ff0000',
+  topRight: '#00ff00',
+  bottomLeft: '#0000ff',
+  bottomRight: '#ffff00',
+}
+
+function orientation(overrides: Partial<Orientation>): Orientation {
+  return { ...IDENTITY_ORIENTATION, ...overrides }
+}
+
+function isRed([r, g, b]: readonly number[]): boolean {
+  return (r ?? 0) > 180 && (g ?? 0) < 90 && (b ?? 0) < 90
+}
+
+describe('applyWatermark orientation', () => {
+  it('turns the photo a quarter clockwise, swapping width and height', async () => {
+    const source = await quadBitmap(400, 200, QUADS)
+    const result = await applyWatermark(
+      {
+        source,
+        marks: [],
+        output: { format: 'image/png', quality: 1 },
+        transform: { orientation: orientation({ turns: 1 }) },
+      },
+      offscreenBackend,
+    )
+    expect(result.width).toBe(200)
+    expect(result.height).toBe(400)
+    const pixels = await pixelsOf(result.blob)
+    // The source top-left (red) quadrant centre maps to output (150, 100).
+    expect(isRed(colourAt(pixels, 150, 100))).toBe(true)
+  })
+
+  it('mirrors the photo under a horizontal flip', async () => {
+    const source = await quadBitmap(400, 200, QUADS)
+    const result = await applyWatermark(
+      {
+        source,
+        marks: [],
+        output: { format: 'image/png', quality: 1 },
+        transform: { orientation: orientation({ flipX: true }) },
+      },
+      offscreenBackend,
+    )
+    expect(result.width).toBe(400)
+    const pixels = await pixelsOf(result.blob)
+    // The red top-left quadrant is mirrored to the top-right.
+    expect(isRed(colourAt(pixels, 300, 50))).toBe(true)
+    expect(isRed(colourAt(pixels, 100, 50))).toBe(false)
+  })
+
+  it('straightens with an auto-crop that leaves no empty corners', async () => {
+    const source = await splitBitmap(400, 200, '#808080', '#808080')
+    const result = await applyWatermark(
+      {
+        source,
+        marks: [],
+        output: { format: 'image/png', quality: 1 },
+        transform: { orientation: orientation({ straighten: 10 }) },
+      },
+      offscreenBackend,
+    )
+    const expected = orientedFrame({ width: 400, height: 200 }, orientation({ straighten: 10 }))
+    expect(Math.abs(result.width - expected.width)).toBeLessThanOrEqual(1)
+    expect(Math.abs(result.height - expected.height)).toBeLessThanOrEqual(1)
+    const pixels = await pixelsOf(result.blob)
+    // Every corner is opaque grey (the fill), never a transparent or black gap.
+    for (const [x, y] of [
+      [1, 1],
+      [result.width - 2, 1],
+      [1, result.height - 2],
+      [result.width - 2, result.height - 2],
+    ] as const) {
+      const [r, g, b, a] = colourAt(pixels, x, y)
+      expect(a).toBe(255)
+      expect(r).toBeGreaterThan(100)
+      expect(g).toBeGreaterThan(100)
+      expect(b).toBeGreaterThan(100)
+    }
   })
 })
 

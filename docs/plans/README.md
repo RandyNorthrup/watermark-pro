@@ -128,15 +128,23 @@ peerDependencies license`, confirm the peer range against what is
    2. semgrep: `npm run security:sast` (on Randy's machine semgrep lives in
       `%APPDATA%\Python\Python314\Scripts`, append it to `PATH` first)
    3. `npm run test:e2e` (all four device projects; port 5173 must be free)
-   4. `npm run build && npm run preview` in the background, then
-      `node scripts/screenshots.mjs <milestone> all` and
-      `CHROME_PATH="C:/Program Files/Google/Chrome/Application/chrome.exe" LIGHTHOUSE_RUNS=5 node scripts/lighthouse.mjs <milestone>`
-      and the same with `mobile`; stop the preview afterwards
-   5. `node scripts/red-drill.mjs` (every drill; report lands in
+   4. `node scripts/red-drill.mjs` (every drill; report lands in
       `docs/red-drill/<local date>.md`)
+   5. **Lighthouse and screenshots are deferred to M19** (Randy, 2026-09-07):
+      they cost more wall-clock than the feature code, and M19 owns the
+      performance budgets and the visual record. Do **not** run
+      `scripts/lighthouse.mjs` or `scripts/screenshots.mjs` per milestone for
+      M12–M18. Instead, in the milestone's `PLAN.md` checklist, write the
+      Lighthouse/screenshots line as "deferred to M19" and add the screens
+      the milestone introduced to a running list in `docs/plans/m19-performance.md`
+      under "Deferred audits", so M19 captures and budgets them all at once.
+      (M11 already ran the full suite; the deferral starts at M12.)
    6. Fill the numbers into the `PLAN.md` checklist; tick the boxes only for
       what actually ran and passed. A gate that did not run is written as
-      "not run" with the reason.
+      "not run" or "deferred to M19" with the reason.
+   7. UX pass (see "Simple by default"): open every changed screen at 390 px
+      and 1440 px — reuse the milestone's own e2e or a quick manual check,
+      not a screenshot run — and write one sentence per screen into §8.
 8. Commit (from PowerShell or Bash; the pre-commit hook runs gitleaks and
    lint-staged), push `main`, wait for CI, tag `vX.Y.Z` (minor bump per
    milestone), and create the GitHub release from the CHANGELOG entry. The

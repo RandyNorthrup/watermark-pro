@@ -11,8 +11,15 @@ import { CancelledError, JobQueue } from './queue'
 import { createBulkRuntime } from './runtime'
 import { defaultPoolSize, MAX_POOL_SIZE, WorkerPool } from './worker-pool'
 import { uniqueNames, zipEntries } from './zip'
+import { IDENTITY_ADJUSTMENTS } from '../../shared/adjustments'
 import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
 import { MarkResources } from '../lib/mark-resources'
+
+/** Orientation and adjustments every non-M11 case leaves at the identity. */
+const BULK_EXTRA = {
+  orientation: { turns: 0, flipX: false, flipY: false },
+  adjust: IDENTITY_ADJUSTMENTS,
+} as const
 
 const FIXTURES = 20
 const FIXTURE_WIDTH = 1600
@@ -145,7 +152,7 @@ describe('BulkProcessor', () => {
       const kept = await processor.process(
         file,
         [DEFAULT_TEXT_SPEC],
-        { output: { format: 'image/webp', quality: 0.8 }, fitLongestSide: null },
+        { output: { format: 'image/webp', quality: 0.8 }, fitLongestSide: null, ...BULK_EXTRA },
         new AbortController().signal,
       )
       expect(kept.fileName).toBe('holiday-watermarked.webp')
@@ -155,7 +162,7 @@ describe('BulkProcessor', () => {
       const small = await processor.process(
         file,
         [DEFAULT_TEXT_SPEC],
-        { output: { format: 'image/png', quality: 1 }, fitLongestSide: 800 },
+        { output: { format: 'image/png', quality: 1 }, fitLongestSide: 800, ...BULK_EXTRA },
         new AbortController().signal,
       )
       expect(await decodedSize(small.blob)).toEqual({ width: 800, height: 600 })
@@ -167,7 +174,7 @@ describe('BulkProcessor', () => {
         processor.process(
           file,
           [DEFAULT_TEXT_SPEC],
-          { output: { format: 'image/png', quality: 1 }, fitLongestSide: null },
+          { output: { format: 'image/png', quality: 1 }, fitLongestSide: null, ...BULK_EXTRA },
           aborted.signal,
         ),
       ).rejects.toBeInstanceOf(CancelledError)
@@ -176,7 +183,7 @@ describe('BulkProcessor', () => {
         processor.process(
           new File(['not an image'], 'notes.txt', { type: 'text/plain' }),
           [DEFAULT_TEXT_SPEC],
-          { output: { format: 'image/png', quality: 1 }, fitLongestSide: null },
+          { output: { format: 'image/png', quality: 1 }, fitLongestSide: null, ...BULK_EXTRA },
           new AbortController().signal,
         ),
       ).rejects.toThrow(/notes\.txt is not an image/)
@@ -201,7 +208,7 @@ describe('BulkProcessor', () => {
       const result = await processor.process(
         file,
         [DEFAULT_TEXT_SPEC],
-        { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null },
+        { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null, ...BULK_EXTRA },
         new AbortController().signal,
       )
       // The orientation tag was applied to the pixels, so nothing is lost by dropping it.
@@ -227,7 +234,7 @@ describe('bulk throughput', () => {
           runtime.run(
             file,
             [DEFAULT_TEXT_SPEC],
-            { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null },
+            { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null, ...BULK_EXTRA },
             signal,
           ),
       })

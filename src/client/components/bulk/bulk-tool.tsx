@@ -16,6 +16,12 @@ import {
 import { type DragEvent, useId, useMemo, useRef, useState } from 'react'
 
 import { useBulkQueue } from './use-bulk-queue'
+import {
+  type Adjustments,
+  IDENTITY_ADJUSTMENTS,
+  IDENTITY_ORIENTATION,
+  type Orientation,
+} from '../../../shared/adjustments'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import type { BulkSettings, BulkResult } from '../../bulk/processor'
 import type { JobState } from '../../bulk/queue'
@@ -28,7 +34,9 @@ import { formatBytes } from '../../lib/format-bytes'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { watermarksQueryOptions } from '../../lib/library'
 import { canShareFiles, shareFile } from '../../lib/share-file'
+import { AdjustPanel } from '../editor/adjust-panel'
 import { FORMAT_OPTIONS } from '../editor/formats'
+import { OrientationControls } from '../editor/orientation-controls'
 import { PresetGate } from '../presets/preset-gate'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -148,6 +156,8 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
   const [size, setSize] = useState<SizeChoice>('original')
+  const [orientation, setOrientation] = useState<Orientation>(IDENTITY_ORIENTATION)
+  const [adjust, setAdjust] = useState<Adjustments>(IDENTITY_ADJUSTMENTS)
   const [isZipping, setIsZipping] = useState(false)
   const [zipError, setZipError] = useState<string | null>(null)
   const [saving, setSaving] = useState<SaveProgress | null>(null)
@@ -186,7 +196,12 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
 
   function settings(): BulkSettings {
     const output: EncodeOptions = { format, quality }
-    return { output, fitLongestSide: size === 'original' ? null : Number(size) }
+    return {
+      output,
+      fitLongestSide: size === 'original' ? null : Number(size),
+      orientation: { turns: orientation.turns, flipX: orientation.flipX, flipY: orientation.flipY },
+      adjust,
+    }
   }
 
   function addFiles(list: FileList | File[]) {
@@ -517,6 +532,16 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                 }}
               />
             </div>
+
+            <details className="rounded-lg border border-line" data-testid="bulk-adjustments">
+              <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
+                Photo adjustments
+              </summary>
+              <div className="flex flex-col gap-4 border-t border-line p-3">
+                <OrientationControls orientation={orientation} onChange={setOrientation} />
+                <AdjustPanel adjust={adjust} onChange={setAdjust} photoFile={files[0] ?? null} />
+              </div>
+            </details>
 
             <div className="flex flex-wrap gap-2">
               {snapshot.isRunning ? (

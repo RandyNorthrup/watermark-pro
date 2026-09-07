@@ -263,25 +263,32 @@ Add up to eight presets to one photo. Each is a layer with its own
 placement and style; the list under the preset picker selects the layer the
 handles and the panels edit, and later layers paint over earlier ones.
 
-Crop with a free frame or a fixed ratio (original, 1:1, 4:3, 3:2, 16:9, 4:5,
-9:16), resize with a proportion lock or the percentage and long-edge
-shortcuts, then download as PNG, JPEG or WebP at full resolution, or hand
-the file to the device's share sheet (on an iPhone that is where "Save
-Image" and the social apps live; the button appears only where the browser
-can share files). Every step is undoable (Ctrl/Cmd+Z, Ctrl+Shift+Z or
-Ctrl+Y). Rendering and export happen in a Web Worker in your browser, or on
-the main thread where the browser has no `OffscreenCanvas`; nothing is
-uploaded.
+Rotate in quarter turns, flip, and straighten with a slider that
+auto-crops the tilt away so no empty corners are ever exported. The Crop
+tab works in the oriented frame: crop with a free frame or a fixed ratio
+(original, 1:1, 4:3, 3:2, 16:9, 4:5, 9:16). The Adjust tab has brightness,
+contrast, saturation, warmth, sepia and vignette sliders and eight one-tap
+filters (Mono, Sepia, Vivid, Warm, Cool, Fade, Noir and Original), each
+previewed on your own photo; the mark's auto contrast reads the adjusted
+photo, so ink stays legible after a filter. Resize with a proportion lock
+or the percentage and long-edge shortcuts, then download as PNG, JPEG or
+WebP at full resolution, or hand the file to the device's share sheet (on
+an iPhone that is where "Save Image" and the social apps live; the button
+appears only where the browser can share files). Every step is undoable
+(Ctrl/Cmd+Z, Ctrl+Shift+Z or Ctrl+Y). Rendering and export happen in a Web
+Worker in your browser, or on the main thread where the browser has no
+`OffscreenCanvas`; nothing is uploaded.
 
 ## Bulk watermarking
 
 `/app/bulk` applies one or more presets to a whole shoot (up to 500 photos).
 Drop the photos in or pick them, tick the presets (they are applied in the
 order ticked, later ones over earlier ones), choose the output format and
-quality, and optionally a maximum long edge, then press Start. The browser
-decodes each photo and a pool of engine workers (one per core, up to eight)
-renders them in parallel with smart placement and auto contrast worked out
-per photo and per mark. Cancel keeps what has finished, Retry re-queues
+quality, and optionally a maximum long edge. A "Photo adjustments" section
+applies one rotation, flip and filter to every photo in the batch. Press
+Start; the browser decodes each photo and a pool of engine workers (one per
+core, up to eight) renders them in parallel with smart placement and auto
+contrast worked out per photo and per mark. Cancel keeps what has finished, Retry re-queues
 failures, and the results download one by one, go to the share sheet one by
 one, or download as a single ZIP. Nothing is uploaded unless you save the
 results to the gallery.

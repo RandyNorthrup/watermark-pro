@@ -1,17 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Crop, Download, ImagePlus, Redo2, RotateCcw, Scaling, Stamp, Undo2 } from 'lucide-react'
+import {
+  Crop,
+  Download,
+  ImagePlus,
+  Redo2,
+  RotateCcw,
+  Scaling,
+  SlidersHorizontal,
+  Stamp,
+  Undo2,
+} from 'lucide-react'
 import { Tabs } from 'radix-ui'
 import { type DragEvent, useEffect, useReducer, useRef, useState } from 'react'
 
+import { AdjustPanel } from './adjust-panel'
 import { CropOverlay, type CropGesture } from './crop-overlay'
 import { CropPanel } from './crop-panel'
 import { ExportPanel } from './export-panel'
 import { FORMAT_EXTENSIONS } from './formats'
 import { MarkOverlay, type MarkGesture, type MarkPatch } from './mark-overlay'
+import { OrientationControls } from './orientation-controls'
 import { ResizePanel } from './resize-panel'
 import { useRenderer } from './use-renderer'
 import { WatermarkPanel } from './watermark-panel'
+import {
+  type Adjustments,
+  IDENTITY_ADJUSTMENTS,
+  IDENTITY_ORIENTATION,
+  type Orientation,
+} from '../../../shared/adjustments'
 import type { WatermarkDto } from '../../../shared/api'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import {
@@ -30,12 +48,15 @@ import {
   editorReducer,
   type Layer,
   MAX_LAYERS,
+  withAdjustments,
   withLayer,
   withoutLayer,
+  withOrientation,
 } from '../../editor/state'
+import { documentTransform, previewTransform } from '../../editor/transform'
 import type { EncodeOptions } from '../../engine/encode'
 import type { Size } from '../../engine/layout'
-import type { Transform } from '../../engine/pipeline'
+import { orientedFrame } from '../../engine/orient'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
@@ -60,11 +81,12 @@ interface EditorProps {
   canSave?: boolean | undefined
 }
 
-type Tool = 'watermark' | 'crop' | 'resize' | 'export'
+type Tool = 'watermark' | 'crop' | 'adjust' | 'resize' | 'export'
 
 const TOOLS: readonly { value: Tool; label: string; icon: typeof Stamp }[] = [
   { value: 'watermark', label: 'Watermark', icon: Stamp },
   { value: 'crop', label: 'Crop', icon: Crop },
+  { value: 'adjust', label: 'Adjust', icon: SlidersHorizontal },
   { value: 'resize', label: 'Resize', icon: Scaling },
   { value: 'export', label: 'Export', icon: Download },
 ]
@@ -99,13 +121,12 @@ function layerSpecs(document: EditorDocument): WatermarkSpec[] {
   return document.layers.map((layer) => layer.spec)
 }
 
-function transformOf(document: EditorDocument): Transform | undefined {
-  if (document.crop === null && document.resize === null) {
-    return undefined
-  }
+/** The oriented, straightened frame the crop is drawn in, floored to whole pixels. */
+function cropSpace(source: Size, orientation: Orientation): Size {
+  const frame = orientedFrame(source, orientation)
   return {
-    ...(document.crop !== null && { crop: document.crop }),
-    ...(document.resize !== null && { resize: document.resize }),
+    width: Math.max(1, Math.floor(frame.width)),
+    height: Math.max(1, Math.floor(frame.height)),
   }
 }
 
@@ -155,7 +176,11 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
       if (current === null || first === undefined) {
         throw new Error('choose a preset first')
       }
-      const blob = await current.exportFull(layerSpecs(document), options, transformOf(document))
+      const blob = await current.exportFull(
+        layerSpecs(document),
+        options,
+        documentTransform(document),
+      )
       return await uploadPhoto(organizationId, {
         blob,
         name: exportFileName(options.format),
@@ -183,8 +208,9 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
 
   const sourceSize = photo?.size ?? SAMPLE_SIZE
   const isCropping = tool === 'crop'
+  const cropBaseSize = cropSpace(sourceSize, document.orientation)
   const renderSpecs = isCropping ? [] : layerSpecs(document)
-  const renderTransform = isCropping ? undefined : transformOf(document)
+  const renderTransform = previewTransform(document, isCropping)
   const { result, isRendering, error, renderer, setSubject } = useRenderer(
     organizationId,
     renderSpecs,
@@ -231,7 +257,16 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
       setPhoto({ file, size })
       setPhotoError(null)
       setAspectId('free')
-      dispatch({ type: 'reset', document: { ...document, crop: null, resize: null } })
+      dispatch({
+        type: 'reset',
+        document: {
+          ...document,
+          orientation: IDENTITY_ORIENTATION,
+          crop: null,
+          resize: null,
+          adjust: IDENTITY_ADJUSTMENTS,
+        },
+      })
       await setSubject(file)
     } catch {
       setPhotoError('That file is not an image the browser can read.')
@@ -241,7 +276,16 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
   async function restoreSample() {
     setPhoto(null)
     setAspectId('free')
-    dispatch({ type: 'reset', document: { ...document, crop: null, resize: null } })
+    dispatch({
+      type: 'reset',
+      document: {
+        ...document,
+        orientation: IDENTITY_ORIENTATION,
+        crop: null,
+        resize: null,
+        adjust: IDENTITY_ADJUSTMENTS,
+      },
+    })
     await setSubject(null)
   }
 
@@ -307,6 +351,14 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
     }
   }
 
+  function changeOrientation(orientation: Orientation) {
+    dispatch({ type: 'commit', document: withOrientation(document, orientation, sourceSize) })
+  }
+
+  function changeAdjust(adjust: Adjustments) {
+    dispatch({ type: 'commit', document: withAdjustments(document, adjust) })
+  }
+
   /** Renders at full size and hands the file to `deliver`; failures show in the export panel. */
   async function produce(
     options: EncodeOptions,
@@ -321,7 +373,11 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
     setExportError(null)
     setSaved(null)
     try {
-      const blob = await current.exportFull(layerSpecs(document), options, transformOf(document))
+      const blob = await current.exportFull(
+        layerSpecs(document),
+        options,
+        documentTransform(document),
+      )
       await deliver(blob, exportFileName(options.format))
     } catch (error_) {
       setExportError(describeError(error_))
@@ -354,11 +410,11 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
     }
   }
 
-  const cropBase = croppedSize(sourceSize, document.crop)
+  const cropBase = croppedSize(cropBaseSize, document.crop)
   const outputSize = document.resize ?? cropBase
-  const crop: CropRect = document.crop ?? fullCrop(sourceSize)
+  const crop: CropRect = document.crop ?? fullCrop(cropBaseSize)
   const aspectPreset = ASPECT_PRESETS.find((candidate) => candidate.id === aspectId)
-  const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, sourceSize)
+  const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, cropBaseSize)
   const activeOutcome = result?.marks[activeIndex]
   const isShowMarkOverlay =
     tool === 'watermark' &&
@@ -477,7 +533,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
               {isCropping ? (
                 <CropOverlay
                   crop={crop}
-                  source={sourceSize}
+                  source={cropBaseSize}
                   displaySize={displaySize}
                   ratio={cropRatio}
                   onGesture={cropGesture}
@@ -511,7 +567,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
         >
           <Tabs.List
             aria-label="Editor tools"
-            className="grid grid-cols-4 gap-1 rounded-lg border border-line bg-surface-raised p-1"
+            className="grid grid-cols-5 gap-1 rounded-lg border border-line bg-surface-raised p-1"
           >
             {TOOLS.map(({ value, label, icon: Icon }) => (
               <Tabs.Trigger
@@ -535,15 +591,27 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
               onSpecChange={changeActiveSpec}
             />
           </Tabs.Content>
-          <Tabs.Content value="crop" className="outline-none">
+          <Tabs.Content value="crop" className="flex flex-col gap-4 outline-none">
+            <OrientationControls
+              orientation={document.orientation}
+              onChange={changeOrientation}
+              showStraighten
+            />
             <CropPanel
-              source={sourceSize}
+              source={cropBaseSize}
               crop={document.crop}
               aspectId={aspectId}
               onAspectChange={setAspectId}
               onCropChange={(next) => {
                 commit({ crop: next })
               }}
+            />
+          </Tabs.Content>
+          <Tabs.Content value="adjust" className="outline-none">
+            <AdjustPanel
+              adjust={document.adjust}
+              onChange={changeAdjust}
+              photoFile={photo?.file ?? null}
             />
           </Tabs.Content>
           <Tabs.Content value="resize" className="outline-none">

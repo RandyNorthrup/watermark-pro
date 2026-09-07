@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FILTER_BY_ID } from '../../../shared/adjustments'
 import { seedOwnerWorkspace, seedViewerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { downloads } from '../../test-support/fake-download'
@@ -141,6 +142,41 @@ describe('editor page', () => {
       crop: { x: 170, y: 0, width: 640, height: 640 },
       resize: { width: 320, height: 320 },
     })
+  })
+
+  it('applies a filter and an orientation, and undoes them', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/editor?preset=wm-1')
+    await screen.findByLabelText('Preset')
+
+    await user.click(screen.getByRole('tab', { name: 'Adjust' }))
+    await user.click(screen.getByRole('radio', { name: 'Vivid' }))
+    await waitFor(() =>
+      expect(renderedTransforms.at(-1)?.adjust).toEqual(FILTER_BY_ID.vivid.adjust),
+    )
+    expect(screen.getByText('Filter: Vivid')).toBeInTheDocument()
+
+    // Nudging one slider turns a named filter into a custom look.
+    fireEvent.change(screen.getByRole('slider', { name: 'Saturation' }), {
+      target: { value: '0.5' },
+    })
+    expect(await screen.findByText('Custom adjustments')).toBeInTheDocument()
+
+    // Reset one slider, then reset everything back to Original.
+    await user.click(screen.getByRole('button', { name: 'Reset Saturation' }))
+    expect(screen.getByRole('slider', { name: 'Saturation' })).toHaveValue('0')
+    await user.click(screen.getByRole('button', { name: 'Reset all' }))
+    await waitFor(() => expect(screen.getByText('Filter: Original')).toBeInTheDocument())
+
+    // Orientation lives on the Crop tab; rotating turns the output.
+    await user.click(screen.getByRole('tab', { name: 'Crop' }))
+    await user.click(screen.getByRole('button', { name: 'Rotate right' }))
+    await waitFor(() => expect(renderedTransforms.at(-1)?.orientation?.turns).toBe(1))
+
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
+    await waitFor(() => expect(renderedTransforms.at(-1)?.orientation).toBeUndefined())
   })
 
   it('opens a photo from disk, resets crop state, and rejects non-images', async () => {

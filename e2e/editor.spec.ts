@@ -127,3 +127,46 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   await page.getByRole('tab', { name: 'Resize' }).click()
   await expect(page.getByLabel('Height (px)')).toHaveValue('640')
 })
+
+test('filters and rotates a photo, and exports the turned result', async ({ page, request }) => {
+  const adjuster = {
+    name: 'Ada Adjust',
+    email: `ada-${runId}@example.test`,
+    password: 'correct horse battery',
+  }
+  await createWorkspace(page, request, adjuster, `Adjust ${runId}`)
+
+  await navigateTo(page, 'Library')
+  await page.getByRole('link', { name: 'New preset' }).click()
+  await page.getByRole('textbox', { name: 'Text' }).fill('© Ada')
+  await page.getByLabel('Preset name').fill('Ada preset')
+  await page.getByRole('button', { name: 'Save preset' }).click()
+  await expect(page.getByRole('link', { name: 'Ada preset', exact: true })).toBeVisible()
+
+  await page.getByRole('link', { name: 'Open Ada preset in the editor' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await expectRendered(page, /Photo with the watermark/)
+
+  // Mono greyscales the whole photo (pixel correctness is covered by the
+  // engine's unit and browser tests; here the journey just applies it).
+  await page.getByRole('tab', { name: 'Adjust' }).click()
+  await page.getByRole('radio', { name: 'Mono' }).click()
+  await expect(page.getByText('Filter: Mono')).toBeVisible()
+  await expectRendered(page, /Photo with the watermark/)
+  await expectAccessible(page)
+
+  // Rotate right on the Crop tab: the 960×640 sample turns to portrait.
+  await page.getByRole('tab', { name: 'Crop' }).click()
+  await page.getByRole('button', { name: 'Rotate right' }).click()
+  await expectRendered(page, /Photo with the crop frame/)
+
+  await page.getByRole('tab', { name: 'Export' }).click()
+  await page.getByRole('combobox', { name: 'Format' }).click()
+  await page.getByRole('option', { name: 'PNG' }).click()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Download' }).click()
+  const download = await downloadPromise
+  const bytes = await downloadBytes(download)
+  expect(bytes.subarray(1, 4).toString('ascii')).toBe('PNG')
+  expect(pngSize(bytes)).toEqual({ width: 640, height: 960 })
+})

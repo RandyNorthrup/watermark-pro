@@ -51,7 +51,11 @@ function fitWithin(size: Size, maxSide: number): Size {
   }
 }
 
-/** Scales a source-pixel transform to a subject drawn at `scale`. */
+/**
+ * Scales a transform to a subject drawn at `scale`. Orientation and colour
+ * adjustments are scale-free and pass through unchanged; only the crop and
+ * the explicit resize follow the subject's pixel scale.
+ */
 export function scaleTransform(
   transform: Transform | undefined,
   scale: number,
@@ -60,6 +64,12 @@ export function scaleTransform(
     return transform
   }
   const scaled: Transform = {}
+  if (transform.orientation !== undefined) {
+    scaled.orientation = transform.orientation
+  }
+  if (transform.adjust !== undefined) {
+    scaled.adjust = transform.adjust
+  }
   if (transform.crop !== undefined) {
     scaled.crop = {
       x: transform.crop.x * scale,

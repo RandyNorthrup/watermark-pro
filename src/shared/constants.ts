@@ -71,6 +71,13 @@ export const PLATFORM_ADMIN_ROLE = 'admin'
  */
 export const SAMPLE_SCENE_PATH = '/sample-scene.jpg'
 
+/** Standard sepia colour matrix, row-major 3×3 (R, G, B output rows). */
+export const SEPIA_MATRIX = [
+  [0.393, 0.769, 0.189],
+  [0.349, 0.686, 0.168],
+  [0.272, 0.534, 0.131],
+] as const
+
 /** Library limits. */
 export const MAX_PRESET_NAME_LENGTH = 60
 export const BYTES_PER_MEGABYTE = 1024 * 1024

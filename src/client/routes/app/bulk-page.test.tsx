@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FILTER_BY_ID, IDENTITY_ADJUSTMENTS } from '../../../shared/adjustments'
 import { seedOwnerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import {
@@ -80,6 +81,8 @@ describe('bulk page', () => {
     expect(runs[0]?.settings).toEqual({
       output: { format: 'image/jpeg', quality: 0.9 },
       fitLongestSide: 2048,
+      orientation: { turns: 0, flipX: false, flipY: false },
+      adjust: IDENTITY_ADJUSTMENTS,
     })
     expect(runs[0]?.specs).toEqual([second.spec, makeWatermark().spec])
     expect(screen.getByRole('alert')).toHaveTextContent('cannot decode fail-three.jpg')
@@ -194,5 +197,25 @@ describe('bulk page', () => {
       dataTransfer: { files: [photo('dropped.jpg')] },
     })
     expect(await screen.findByText('dropped.jpg')).toBeInTheDocument()
+  })
+
+  it('applies a batch orientation and filter to every photo', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/bulk')
+    await screen.findByLabelText('Add photos')
+    await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg'), photo('b.jpg')])
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+
+    await user.click(screen.getByText('Photo adjustments'))
+    await user.click(screen.getByRole('button', { name: 'Rotate left' }))
+    await user.click(screen.getByRole('radio', { name: 'Sepia' }))
+
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
+    // Rotate left from zero is three quarter-turns clockwise.
+    expect(runs[0]?.settings.orientation).toEqual({ turns: 3, flipX: false, flipY: false })
+    expect(runs[0]?.settings.adjust).toEqual(FILTER_BY_ID.sepia.adjust)
   })
 })

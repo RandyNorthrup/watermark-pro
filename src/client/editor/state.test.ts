@@ -9,9 +9,12 @@ import {
   editorReducer,
   EMPTY_DOCUMENT,
   HISTORY_LIMIT,
+  withAdjustments,
   withLayer,
   withoutLayer,
+  withOrientation,
 } from './state'
+import { IDENTITY_ADJUSTMENTS, IDENTITY_ORIENTATION } from '../../shared/adjustments'
 import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
 
 function withCrop(width: number): EditorDocument {
@@ -84,6 +87,31 @@ describe('editor history', () => {
     expect(replaced.layers).toEqual([first, moved])
     expect(withoutLayer(replaced, first.id).layers).toEqual([moved])
     expect(withoutLayer(replaced, 'nobody').layers).toEqual([first, moved])
+  })
+
+  it('resets the crop when the photo is turned, keeps it when only straightened to fit', () => {
+    const source = { width: 400, height: 200 }
+    const cropped: EditorDocument = {
+      ...EMPTY_DOCUMENT,
+      crop: { x: 0, y: 0, width: 100, height: 100 },
+      resize: { width: 50, height: 50 },
+    }
+    const turned = withOrientation(cropped, { ...IDENTITY_ORIENTATION, turns: 1 }, source)
+    expect(turned.crop).toBeNull()
+    expect(turned.resize).toBeNull()
+    expect(turned.orientation.turns).toBe(1)
+
+    const nudged = withOrientation(cropped, { ...IDENTITY_ORIENTATION, straighten: 5 }, source)
+    expect(nudged.crop).toEqual(cropped.crop)
+
+    const overTilted = withOrientation(cropped, { ...IDENTITY_ORIENTATION, straighten: 45 }, source)
+    expect(overTilted.crop).toBeNull()
+  })
+
+  it('sets colour adjustments without touching anything else', () => {
+    const next = withAdjustments(EMPTY_DOCUMENT, { ...IDENTITY_ADJUSTMENTS, brightness: 0.5 })
+    expect(next.adjust.brightness).toBe(0.5)
+    expect(next.layers).toBe(EMPTY_DOCUMENT.layers)
   })
 
   it('caps the past at the history limit and resets on a new photo', () => {

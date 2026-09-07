@@ -201,10 +201,36 @@ Red drills:
 | SW: sign-out keeps the cache         | drop `Clear-Site-Data`                          | unit-worker `auth-flow.test`                                                                                                                                     |
 | Skeleton: wrong theme flashes        | remove the inline theme script                  | e2e `performance.spec` (dark-mode screenshot of the first frame: `page.emulateMedia({ colorScheme: 'dark' })`, assert the skeleton background is the dark token) |
 
+## Deferred audits (from M12–M18)
+
+Lighthouse and screenshots were deferred from every feature milestone to
+here (Randy, 2026-09-07). M19 captures and budgets them all in one pass:
+run `scripts/screenshots.mjs m19 all` and `scripts/lighthouse.mjs m19` (and
+`mobile`) over every page **including the new tools and screens each
+milestone added**. As each milestone lands, append the screens it
+introduced to this list so nothing is missed:
+
+- M11: editor Adjust tab (already captured under `docs/screenshots/m11/`).
+- M12: designer Text tab (effects, curve, spacing) and Shape tab; icon
+  search; a shape and a curved-text preset in the library.
+- M13: editor Export tab with the metadata policy group; the designer token
+  menu.
+- M14: the bulk per-photo override dialog (phone and desktop); the
+  watch-folder card; the batch report.
+- M15: library Import dialog; the designer logo-prepare panel; `/app/verify`.
+- M16: the import menu (camera, link, cloud); `/privacy` and `/terms`.
+- M17: `/app/video` and `/app/documents`.
+- M18: every page in `ar` (right-to-left) at three widths, plus the language
+  menu.
+
+If a milestone changed a page already in the shot list, note that too so
+M19 re-reviews it.
+
 ## Certification checklist
 
-- [ ] every §5.5 budget met on every page, mobile and desktop, median of
-      five, recorded under `docs/lighthouse/m19/`
+- [ ] every §5.5 budget met on every page (all tools and screens from
+      M11–M18 included), mobile and desktop, median of five, recorded under
+      `docs/lighthouse/m19/`
 - [ ] bundle report committed under `docs/bundle/m19.md`; budget gate green
 - [ ] offline journey green; update flow checked by hand on the
       production build (two deploys) and recorded in §8

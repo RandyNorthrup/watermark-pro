@@ -32,11 +32,11 @@ export function read(values: ArrayLike<number>, index: number): number {
 const SOBEL_MAX_GRADIENT = 4
 
 /** Rec. 709 luma coefficients; alpha is ignored (assumed opaque photo). */
-const LUMA_RED = 0.2126
-const LUMA_GREEN = 0.7152
-const LUMA_BLUE = 0.0722
+export const LUMA_RED = 0.2126
+export const LUMA_GREEN = 0.7152
+export const LUMA_BLUE = 0.0722
 const CHANNELS = 4
-const MAX_CHANNEL = 255
+export const MAX_CHANNEL = 255
 
 /** Converts RGBA pixel data into a luminance map. */
 export function toLuminanceMap(

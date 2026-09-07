@@ -161,6 +161,13 @@ async function captureProfile(profileName) {
       await page.waitForTimeout(PREVIEW_SETTLE_MS)
       await shoot('editor-crop')
 
+      // The Adjust tab: filters and colour sliders.
+      await page.getByRole('tab', { name: 'Adjust' }).click()
+      await page.getByRole('radio', { name: 'Vivid' }).click()
+      await page.getByText('Filter: Vivid').waitFor()
+      await page.waitForTimeout(PREVIEW_SETTLE_MS)
+      await shoot('editor-adjust')
+
       // Publish the saved photo and capture the link dialog and the visitor's page.
       await page.goto(`${BASE_URL}/app/gallery`, { waitUntil: 'networkidle' })
       await page

@@ -5,8 +5,15 @@
  * gesture rather than every intermediate frame.
  */
 import type { CropRect } from './geometry'
+import {
+  type Adjustments,
+  IDENTITY_ADJUSTMENTS,
+  IDENTITY_ORIENTATION,
+  type Orientation,
+} from '../../shared/adjustments'
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { Size } from '../engine/layout'
+import { orientedFrame } from '../engine/orient'
 
 /** One mark on the photo: a library preset and this photo's adjustments to it. */
 export interface Layer {
@@ -18,10 +25,14 @@ export interface Layer {
 }
 
 export interface EditorDocument {
-  /** Crop in source pixels; `null` keeps the whole photo. */
+  /** Quarter turns, flips and straighten, applied before the crop. */
+  orientation: Orientation
+  /** Crop in oriented-and-straightened pixel space; `null` keeps the whole frame. */
   crop: CropRect | null
   /** Output size after cropping; `null` keeps the cropped size. */
   resize: Size | null
+  /** Colour adjustments applied to the whole photo. */
+  adjust: Adjustments
   /** Marks in drawing order; later layers paint over earlier ones. Empty until a preset is chosen. */
   layers: Layer[]
 }
@@ -46,6 +57,48 @@ export function withoutLayer(document: EditorDocument, layerId: string): EditorD
   return { ...document, layers: document.layers.filter((layer) => layer.id !== layerId) }
 }
 
+/** Whether a crop still lies inside the oriented frame at a new orientation. */
+export function isCropWithinFrame(crop: CropRect, source: Size, orientation: Orientation): boolean {
+  const frame = orientedFrame(source, orientation)
+  return (
+    crop.x >= 0 &&
+    crop.y >= 0 &&
+    crop.x + crop.width <= frame.width &&
+    crop.y + crop.height <= frame.height
+  )
+}
+
+/**
+ * Sets the orientation. Turning or flipping invalidates any crop and resize
+ * (the frame changes shape); straightening keeps a crop that still fits.
+ */
+export function withOrientation(
+  document: EditorDocument,
+  orientation: Orientation,
+  source: Size,
+): EditorDocument {
+  const previous = document.orientation
+  const isTurnedOrFlipped =
+    orientation.turns !== previous.turns ||
+    orientation.flipX !== previous.flipX ||
+    orientation.flipY !== previous.flipY
+  const shouldKeepCrop =
+    !isTurnedOrFlipped &&
+    document.crop !== null &&
+    isCropWithinFrame(document.crop, source, orientation)
+  return {
+    ...document,
+    orientation,
+    crop: shouldKeepCrop ? document.crop : null,
+    resize: isTurnedOrFlipped ? null : document.resize,
+  }
+}
+
+/** Sets the colour adjustments. */
+export function withAdjustments(document: EditorDocument, adjust: Adjustments): EditorDocument {
+  return { ...document, adjust }
+}
+
 export interface EditorHistory {
   past: EditorDocument[]
   present: EditorDocument
@@ -55,8 +108,10 @@ export interface EditorHistory {
 export const HISTORY_LIMIT = 50
 
 export const EMPTY_DOCUMENT: EditorDocument = {
+  orientation: IDENTITY_ORIENTATION,
   crop: null,
   resize: null,
+  adjust: IDENTITY_ADJUSTMENTS,
   layers: [],
 }
 

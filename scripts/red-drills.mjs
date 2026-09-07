@@ -171,9 +171,9 @@ export const DRILLS = [
   {
     name: 'Engine: analysis ignores the crop',
     file: 'src/client/engine/pipeline.ts',
-    find: '  const crop = cropOf(source, transform)\n  const output = transform?.resize',
+    find: '  const geometry = outputGeometry(source, transform)\n  const scale = Math.min(1, ANALYSIS_MAX_SIDE',
     replace:
-      '  const crop = { x: 0, y: 0, width: source.width, height: source.height }\n  const output = transform?.resize',
+      '  const geometry = outputGeometry(source, undefined)\n  const scale = Math.min(1, ANALYSIS_MAX_SIDE',
     ...browser('src/client/engine/pipeline.browser.test.ts'),
   },
   {
@@ -296,6 +296,56 @@ export const DRILLS = [
     find: '    await start(specs, settings())\n    setTiming',
     replace: '    await start(specs.slice(0, 1), settings())\n    setTiming',
     ...unitClient('src/client/routes/app/bulk-page.test.tsx'),
+  },
+  // --- M11: orientation and colour adjustments -----------------------------
+  {
+    name: 'Adjust: contrast ignored',
+    file: 'src/client/engine/adjust.ts',
+    find: '  const gain = 1 + contrast',
+    replace: '  const gain = 1',
+    ...unitClient('src/client/engine/adjust.test.ts'),
+  },
+  {
+    name: 'Adjust: analysis reads the unadjusted photo',
+    file: 'src/client/engine/pipeline.ts',
+    find: '  ctx.putImageData(image, 0, 0)\n  return analysePixels(image)',
+    replace: '  ctx.putImageData(image, 0, 0)\n  return analyseSource(source, transform, backend)',
+    ...browser('src/client/engine/adjust.browser.test.ts'),
+  },
+  {
+    name: 'Orientation: turns do not swap width and height',
+    file: 'src/client/engine/orient.ts',
+    find: '  return orientation.turns % 2 === 0\n    ? { width: source.width, height: source.height }\n    : { width: source.height, height: source.width }',
+    replace: '  return { width: source.width, height: source.height }',
+    ...unitClient('src/client/engine/orient.test.ts'),
+  },
+  {
+    name: 'Orientation: straighten leaves empty corners',
+    file: 'src/client/engine/orient.ts',
+    find: '  const k = Math.min(w / (w * cos + h * sin), h / (w * sin + h * cos))\n  return { width: w * k, height: h * k }',
+    replace: '  return { width: w, height: h }',
+    ...browser('src/client/engine/pipeline.browser.test.ts'),
+  },
+  {
+    name: 'Editor: rotating keeps a stale crop',
+    file: 'src/client/editor/state.ts',
+    find: '    crop: shouldKeepCrop ? document.crop : null,',
+    replace: '    crop: document.crop,',
+    ...unitClient('src/client/editor/state.test.ts'),
+  },
+  {
+    name: 'Bulk: adjustments not passed to the runtime',
+    file: 'src/client/components/bulk/bulk-tool.tsx',
+    find: '      adjust,\n    }\n  }',
+    replace: '      adjust: IDENTITY_ADJUSTMENTS,\n    }\n  }',
+    ...unitClient('src/client/routes/app/bulk-page.test.tsx'),
+  },
+  {
+    name: 'Filters: Vivid maps to the wrong values',
+    file: 'src/shared/adjustments.ts',
+    find: "  filter('vivid', 'Vivid', { contrast: 0.15, saturation: 0.35 }),",
+    replace: "  filter('vivid', 'Vivid', { contrast: 0.15, saturation: -0.15 }),",
+    ...unitClient('src/shared/adjustments.test.ts'),
   },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
