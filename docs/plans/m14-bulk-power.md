@@ -211,4 +211,5 @@ written only under the chosen output folder with names from
 - [ ] the 500-photo page still renders under 1 s after adding files (page
       test with 500 fake files asserts the list is virtualised or paged:
       render at most 60 rows and "Show all")
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.6.0, tag, deploy, release

@@ -13,9 +13,10 @@ Google Drive, Dropbox and OneDrive where credentials exist.
 
 Research: `docs/competitor-research.md` §1.8 (Import sources), §3.2.
 
-Two of the five items need credentials that only Randy can mint (cloud
-pickers). Everything else is credential-free. Build the free items first,
-then ask.
+The cloud pickers need three application registrations (Google,
+Microsoft, Dropbox). You register them, in Randy's accounts, with the
+Azure CLI and Chrome Control (see part 5). Build the credential-free
+items first, register the applications, then the providers.
 
 ## Behaviour
 
@@ -95,45 +96,134 @@ collects `launchParams.files` (`FileSystemFileHandle[]`), and the editor
 route reads them from a tiny in-memory store (`lib/launch-files.ts`): one
 file opens in the editor; several go to `/app/bulk`.
 
-### 5. Cloud drives (needs credentials: ask Randy first)
+### 5. Cloud drives: users connect their own Google Drive, OneDrive or Dropbox
+
+The OAuth here is user-facing. Watermark Pro is registered once, as an
+application, with each vendor; every user then authorises _their own_
+personal or work account from inside the app and picks files from it.
+Nothing is tied to Randy's tenants, and no token ever reaches the Worker:
+the vendors' browser SDKs obtain a short-lived access token in the page,
+the picker shows the user's files, and the chosen files are downloaded in
+the browser with that token. The app registrations use flows that need
+no client secret (Google's token client, Microsoft's PKCE via MSAL,
+Dropbox's Chooser), so the only configuration is public identifiers.
 
 Each provider is a module implementing
 
 ```ts
 export interface ImportSource {
-  id: 'google-drive' | 'dropbox' | 'onedrive'
+  id: 'google-drive' | 'onedrive' | 'dropbox'
   label: string
   isConfigured(config: PublicConfig): boolean
+  connect(): Promise<void> // first authorisation; remembered by the vendor SDK for the session
   pick(): Promise<File[]> // opens the provider's picker, downloads the chosen files in the browser
+  disconnect(): void // forgets the session token
 }
 ```
 
-behind a "From cloud" menu that lists only configured providers. The
-providers use the vendors' own JavaScript pickers, loaded from their
-origins only when the menu is opened, and download the chosen files with
-the short-lived token the picker returns, all in the browser; the Worker
-sees nothing. Configuration is public (client ids / app keys are not
-secrets): `GOOGLE_PICKER_CLIENT_ID`, `GOOGLE_PICKER_API_KEY`,
-`DROPBOX_APP_KEY`, `ONEDRIVE_CLIENT_ID` as `vars` in `wrangler.jsonc`,
-exposed through `GET /api/config` (`publicConfigSchema`), validated in
-`env.ts` (each optional; a provider is offered only when its variables are
-set). CSP: `script-src` and `frame-src` gain the provider origins
-(`https://apis.google.com`, `https://accounts.google.com`,
-`https://www.dropbox.com`, `https://js.live.net`, `https://onedrive.live.com`),
-each with a §9 row, and `connect-src` the download origins. Lighthouse
-best-practices must not drop below 95 with those entries.
+UI, kept simple: the "Open photo" / "Add photos" menu gains one entry per
+configured provider ("From Google Drive", "From OneDrive", "From Dropbox").
+The first use opens the vendor's own consent window; after that the
+picker opens directly for the rest of the session. The account menu gets a
+"Connected drives" item listing the providers with Connect / Disconnect,
+so a user on a shared device can drop a connection. No server-side
+storage of connections in this milestone; reconnecting is one click.
 
-What to ask Randy, in one line each, before building this part: the
-Google Cloud OAuth client id + API key (Picker API enabled), a Dropbox app
-key (Chooser), a Microsoft Entra app id (OneDrive picker). The milestone
-is certifiable without them: the code path is tested with a fake
-`ImportSource`, and the providers stay hidden until the variables exist.
+Configuration, all public, as `vars` in `wrangler.jsonc` (production and
+the local `.dev.vars.example`), validated in `env.ts` (each optional;
+a provider is offered only when its variables are set) and exposed
+through `GET /api/config` (`publicConfigSchema`): `GOOGLE_OAUTH_CLIENT_ID`,
+`GOOGLE_PICKER_API_KEY`, `GOOGLE_PICKER_APP_ID` (the numeric project
+number), `MICROSOFT_CLIENT_ID`, `DROPBOX_APP_KEY`. CSP: `script-src` and
+`frame-src` gain the provider origins (`https://apis.google.com`,
+`https://accounts.google.com`, `https://docs.google.com` for the picker
+frame, `https://www.dropbox.com`, `https://js.live.net`,
+`https://login.microsoftonline.com`, `https://onedrive.live.com`), each
+with a §9 row, and `connect-src` the download origins
+(`https://www.googleapis.com`, `https://graph.microsoft.com`,
+`https://content.dropboxapi.com`, `https://api.onedrive.com`). Lighthouse
+best practices must not drop below 95 with those entries. Re-verify every
+origin and scope against the vendor's current picker documentation on the
+day (the M16 precedence rule): these were correct on 2026-09-06.
+
+Scopes, the minimum that lets a picker work:
+
+| Provider  | SDK in the page                                           | Scope                                        | Notes                                                                                          |
+| --------- | --------------------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Google    | Google Identity Services token client + Google Picker API | `https://www.googleapis.com/auth/drive.file` | Non-sensitive with the Picker: no app verification; the user sees a plain consent screen       |
+| Microsoft | MSAL.js (PKCE, SPA) + OneDrive File Picker v8             | Graph `Files.Read` (delegated)               | Audience "personal and work accounts" (multi-tenant + MSA); no admin consent                   |
+| Dropbox   | Dropbox Chooser (`dropins.js`)                            | Chooser handles consent; `direct` link type  | The app key alone; the Chooser does not count against the development-mode user limit (verify) |
+
+Google Photos is not included: its Picker API needs a sensitive scope and
+Google's verification review; record it in §4 as a follow-up if wanted.
+
+#### Registering the three applications (you do this, once)
+
+Do this before the provider modules, so the variables exist for the e2e
+run. Randy is signed in to all three vendors in his Chrome. Azure has a
+CLI; Google and Dropbox register OAuth apps only through their web
+consoles, so drive Randy's Chrome with the `chrome-control` MCP server
+(snapshot → find refs → click/type; take a screenshot at each decision
+point and keep them under `docs/setup/m16/` with any secrets cropped;
+these registrations carry no secrets, only ids). Ask in one line before
+starting each vendor ("Registering the Google OAuth app in your Chrome
+now?"), because it acts in his account.
+
+**Microsoft (Azure CLI 2.83, installed):**
+
+```
+az login --use-device-code
+az ad app create --display-name "Watermark Pro" --sign-in-audience AzureADandPersonalMicrosoftAccount --query "{appId:appId,id:id}"
+# add the SPA redirect URIs (Graph PATCH; `az ad app update` has no SPA flag)
+az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/<id>" --headers "Content-Type=application/json" --body "{\"spa\":{\"redirectUris\":[\"https://watermark.blowmoney.net/oauth/microsoft\",\"http://localhost:5173/oauth/microsoft\"]}}"
+# delegated Files.Read on Microsoft Graph
+az ad app permission add --id <appId> --api 00000003-0000-0000-c000-000000000000 --api-permissions 10465720-29dd-4523-a11a-6a75c743c9d9=Scope
+```
+
+`appId` is `MICROSOFT_CLIENT_ID`. Verify the permission id for
+`Files.Read` with `az ad sp show --id 00000003-0000-0000-c000-000000000000 --query "oauth2PermissionScopes[?value=='Files.Read'].id"`
+before using it.
+
+**Google (Chrome Control on console.cloud.google.com):** create a
+project "Watermark Pro"; APIs & Services → enable "Google Picker API" and
+"Google Drive API"; Google Auth Platform → Branding: app name "Watermark
+Pro", support email and developer contact (Randy's), home page
+`https://watermark.blowmoney.net`, privacy and terms pages (add
+`/privacy` and `/terms` static pages to the app in this milestone; short,
+honest, generated from SECURITY.md's data-handling facts); Audience:
+External, then Publish; Data access: add the scope `…/auth/drive.file`;
+Clients → Create client → Web application, name "Watermark Pro web",
+Authorised JavaScript origins `https://watermark.blowmoney.net` and
+`http://localhost:5173`, no redirect URIs (the token client uses a popup);
+copy the client id → `GOOGLE_OAUTH_CLIENT_ID`. Credentials → Create API
+key, restrict to the Picker API and to HTTP referrers
+`https://watermark.blowmoney.net/*` and `http://localhost:5173/*` →
+`GOOGLE_PICKER_API_KEY`. The project number (Dashboard) →
+`GOOGLE_PICKER_APP_ID`.
+
+**Dropbox (Chrome Control on dropbox.com/developers/apps):** Create app →
+Scoped access → "Full Dropbox" (the Chooser reads anywhere the user
+picks) → name "Watermark Pro"; Settings → "Chooser / Saver / Embedder
+domains": add `watermark.blowmoney.net` and `localhost`; Permissions:
+`files.metadata.read`, `files.content.read`; copy the App key →
+`DROPBOX_APP_KEY`. Leave the app in development status unless the
+Chooser turns out to need production; record what you found.
+
+Then: put the five values in `wrangler.jsonc` (`env.production.vars` and
+the top-level `vars` for local), `npm run cf-typegen`, commit. The
+milestone is certifiable only with all three providers working on the
+production build, checked by hand in Randy's Chrome (pick a file from each
+drive into the editor) and recorded in PLAN §8 with the date; the
+automated tests use a fake `ImportSource` and the vendor SDKs are never
+loaded in tests.
 
 ## Files
 
 New: `src/client/lib/capture.ts` (`isCaptureSupported`),
 `src/client/components/import/{take-photo-button,url-import-dialog,cloud-menu}.tsx`,
-`src/client/lib/imports/{source,google-drive,dropbox,onedrive,url}.ts`
+`src/client/lib/imports/{source,google-drive,onedrive,dropbox,url}.ts`,
+`src/client/components/import/connected-drives.tsx`,
+`src/client/routes/{privacy,terms}.tsx` (+ page tests)
 (+ tests with fetch mocks), `src/client/lib/launch-files.ts` (+ test),
 `src/client/lib/shared-files.ts` (IndexedDB read/clear; + jsdom test with
 `fake-indexeddb` — pin it, devDependency, or use a minimal in-memory
@@ -219,7 +309,10 @@ origins; threat model rows; runbook: how to set the picker variables.
       origins), screenshots (import dialog; the cloud menu appears only
       when a provider is configured, so the screenshot set documents
       whichever state the preview build has)
-- [ ] if Randy provided credentials: a manual check of each picker on the
-      production build, recorded in PLAN §8 with the date; else the
-      providers are listed in PLAN §4 as waiting on credentials
+- [ ] the three applications registered (ids in `wrangler.jsonc`,
+      screenshots under `docs/setup/m16/`); each picker checked by hand
+      on the production build in Randy's Chrome and recorded in PLAN §8
+- [ ] `/privacy` and `/terms` pages exist, are linked from the landing
+      footer, and pass axe
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.8.0, tag, deploy, release

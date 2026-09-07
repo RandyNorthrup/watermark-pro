@@ -89,10 +89,13 @@ Implementation `src/client/lib/logo-cleanup.ts`, pure functions on
   Capacity check: the image must have at least `payloadBits × 4` pixels;
   otherwise the switch is disabled ("Photo too small for an invisible
   mark").
-- Verify page `/app/verify` (sidebar "Verify", menu sheet on phones; not
-  in the tab bar): drop a PNG; the page reads the walk, checks magic and
-  CRC and shows "This photo carries the invisible mark: «message»" or "No
-  invisible mark found". Everything in the browser.
+- Verify: a "Check a photo" button in the gallery's header opens a
+  dialog with a drop zone (the route `/app/verify` exists for the deep
+  link from the export hint and renders the same dialog content as a
+  page; it is not in the sidebar, the menu sheet or the tab bar). Drop a
+  PNG; the page reads the walk, checks magic and CRC and shows "This
+  photo carries the invisible mark: «message»" or "No invisible mark
+  found". Everything in the browser.
 - Honesty in the UI: "Survives copying and cropping? No. It survives
   saving as PNG and nothing else. Use it to tell your own originals from
   re-encoded copies."
@@ -131,8 +134,8 @@ New: `src/shared/preset-file.ts` (+ test), `src/client/lib/preset-file.ts`
 Modified: `library/index.tsx` (Export / Import actions), `logo-picker.tsx`
 (prepare panel between choose and upload), `encode.ts`, `pipeline.ts` (call
 `embedInvisibleMark` on the final `ImageData` before `encodeCanvas` when
-requested), `export-panel.tsx`, `bulk-tool.tsx`, `app-shell.tsx` (Verify
-entry), `e2e/library.spec.ts`, README, CHANGELOG, SECURITY.md.
+requested), `export-panel.tsx`, `bulk-tool.tsx`, `gallery.tsx` (the Check a photo
+button), `e2e/library.spec.ts`, README, CHANGELOG, SECURITY.md.
 
 ## Tests
 
@@ -204,4 +207,5 @@ size caps + server-side signature check on logos).
 - [ ] gates, eight drills red, Lighthouse (including `/app/verify`: add it
       to `scripts/lighthouse.mjs` and `scripts/screenshots.mjs`),
       screenshots
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.7.0, tag, deploy, release

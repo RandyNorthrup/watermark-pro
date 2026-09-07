@@ -19,12 +19,35 @@ extracted once. Do not start it while M11–M17 are open.
 `src/shared/locales.ts` with native names for the picker ("Deutsch",
 "日本語", "العربية").
 
-Translations are produced by the implementing agent and marked
-"machine-translated; native review pending" in PLAN §4 per language. A
-glossary (`src/client/locales/GLOSSARY.md`) fixes the product terms first
+There is no human reviewer (Randy, 2026-09-06). Translations are
+produced by you and checked by you with the process below; a language
+that does not pass is cut from the release rather than shipped half-right.
+A glossary (`src/client/locales/GLOSSARY.md`) fixes the product terms first
 (preset, mark, layer, smart placement, contrast, tile, batch, gallery,
 share link, organization, member, owner, admin, editor, viewer) so every
 language uses one word per concept.
+
+### Translation quality process
+
+1. Translate `en/common.json` into the language in one pass, with the
+   glossary and the UI context comments (`_comment` keys in `en`, stripped
+   at build) in front of you. Mind placeholders, plural forms and length:
+   a German label can be 30 % longer, and buttons truncate.
+2. In a separate pass (a fresh subagent that has not seen the English),
+   back-translate the result to English key by key.
+3. Compare source and back-translation per key. A key fails when the
+   meaning differs, a placeholder is missing, a glossary term is
+   inconsistent, or the string exceeds `MAX_LABEL_GROWTH = 1.6` times the
+   English length for keys tagged `short` (buttons, tabs, badges).
+4. Retranslate failed keys once, with the failure reason in the prompt;
+   re-check them the same way.
+5. Ship the language only if fewer than 1 % of keys remain failed and none
+   of them is in `shell`, `auth`, `editor.tabs` or `errors`; otherwise
+   remove the language from `SUPPORTED_LOCALES` and record it in PLAN §4
+   as "cut: N keys failed" with the list, so it can be retried later. A
+   partly English screen is worse than a missing language.
+6. Keep the QA record (`docs/i18n/<locale>-qa.md`: counts, failed keys,
+   final status) so the next agent can see what was done.
 
 ## Library
 
@@ -197,7 +220,9 @@ against the list (no free text stored).
 - [ ] gates incl. `i18n:check`; seven drills red; Lighthouse in `en` and
       `ar` for `/`, `/app/library`, `/app/editor` (mobile and desktop)
       within budget; screenshots for `en` and `ar` at three widths
-- [ ] every language reviewed once by reading the library, editor and
-      bulk pages in it (the agent's own read-through; note any string that
-      overflowed its control and fix the layout, not the translation)
+- [ ] every shipped language passed the quality process (`docs/i18n/`)
+      and was read through once in the library, editor and bulk pages
+      (a string that overflows its control is a layout fix, not a
+      translation fix); cut languages listed in PLAN §4
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.10.0, tag, deploy, release

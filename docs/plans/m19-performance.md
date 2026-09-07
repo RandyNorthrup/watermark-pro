@@ -140,14 +140,18 @@ Better Auth allows a response hook or wrap the route).
 
 - Dependency refresh: `npm outdated`; upgrade everything within peer
   ranges after checking release notes; re-pin; run the whole gate set.
-- Observability: Workers Logs are on (dashboard toggle: ask Randy if it
-  is not) and `console.error` in the Worker carries a request id; the
-  client reports uncaught errors and unhandled rejections to
+- Observability: Workers Logs are already on (`observability.enabled`
+  in `wrangler.jsonc`). Add a request id to every Worker log line
+  (`crypto.randomUUID()` per request, returned as `X-Request-Id`), and
+  have the client report uncaught errors and unhandled rejections to
   `POST /api/client-errors` (rate limited, 2 kB max, no PII beyond the
   message, stack top frame and route; stored 7 days in a new `client_error`
   table, listed on the admin console). No third-party error service.
-- Health and uptime: `/api/health` already exists; a Cloudflare Health
-  Check on it is a dashboard step (ask Randy).
+- Health and uptime, without any dashboard: a scheduled trigger in
+  `wrangler.jsonc` (`triggers.crons: ["*/5 * * * *"]`) runs a `scheduled`
+  handler that fetches `/api/health` and does one D1 read, writes the
+  result to a `health_check` table (kept 7 days) and logs a failure
+  line; the admin console shows the last 24 hours.
 - A11y and security re-audit: axe on every page in every language is
   already in e2e; run `npm run security:sast`, `npm audit`, and re-read
   `SECURITY.md` and the threat model against the M11–M18 additions;
@@ -207,4 +211,5 @@ Red drills:
 - [ ] competitor re-check done; matrix updated; README status line updated
 - [ ] full gate set, full drill, full device matrix, screenshots in `en`
       and `ar`
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 2.0.0, tag, deploy, release

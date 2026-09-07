@@ -253,4 +253,5 @@ row updated. PLAN §3.1 row for `exifr`.
 - [ ] gates, eight drills red, Lighthouse, screenshots (Export tab with the
       policy group; designer token menu)
 - [ ] fuzz test in place and green
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.5.0, tag, deploy, release

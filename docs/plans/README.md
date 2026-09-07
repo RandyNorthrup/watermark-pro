@@ -1,17 +1,66 @@
 # Feature plans M11–M19: how to work them
 
-These documents are written for an implementing agent that has not seen this
-repository before. Read them in this order: `AGENTS.md`, `CLAUDE.md`,
-`PLAN.md` §1–§5 and §7, this file, then the milestone you are on. Every
-milestone here has one file, `docs/plans/mNN-*.md`, that is the full
-specification: behaviour, data model, algorithms, files, tests, red drills,
-docs, security notes and the certification checklist. `PLAN.md` §6 carries the
-short entry and the tick-boxes; tick them there.
+These documents are written for an implementing agent (Claude Opus 4.8 in
+Claude Code, on Randy's workstation) that has not seen this repository
+before. Read them in this order: `AGENTS.md`, `CLAUDE.md`, `PLAN.md` §1–§5
+and §7, this file, then the milestone you are on. Every milestone here has
+one file, `docs/plans/mNN-*.md`, that is the full specification: behaviour,
+data model, algorithms, files, tests, red drills, docs, security notes and
+the certification checklist. `PLAN.md` §6 carries the short entry and the
+tick-boxes; tick them there.
 
 Goal of the whole series (Randy, 2026-09-06): implement every feature the
 market research in `docs/competitor-research.md` found missing, then exceed
 the competitors, then and only then do the performance milestone (M19), so
 nothing is optimised twice. Pricing is out of scope; the product stays free.
+
+## Precedence: research beats older plan text
+
+Parts of `PLAN.md` were written before the market research and before
+this series. Where an older statement in `PLAN.md` (a "not planned" line,
+an "out of scope" note, a budget, an assumption in §2) conflicts with a
+finding in `docs/competitor-research.md` or with one of these specs, the
+newer finding wins: schedule the feature, do not cite the old line. Any
+research done later (the M19 re-check, or a check you run yourself when a
+spec looks out of date) supersedes these specs in the same way; record the
+supersession in `PLAN.md` §8 or §4 so the trail is visible. The same rule
+applies to vendor facts in the specs (package versions, CLI flags, picker
+scopes): they were verified on 2026-09-06 and must be re-verified against
+the vendor's current documentation on the day you use them.
+
+## Simple by default
+
+Randy's standing requirement: feature-rich, but simple and not hard to
+learn. Every milestone is held to this, and the certification checklist of
+every milestone includes the "UX pass" below.
+
+- The three-step path never grows: open a photo (or photos) → pick a
+  preset → export. Every new capability sits beside that path, never in it.
+- Defaults that work untouched: smart placement, auto contrast, strip
+  metadata, original size, the first preset. A user who touches nothing
+  gets a good result.
+- Progressive disclosure: a panel shows its primary controls; everything
+  else is under a "More" disclosure (`<details>`-style, remembered per
+  panel in `localStorage`) or a secondary tab. On a phone, at most seven
+  controls are visible in a panel above the fold.
+- One primary action per screen (the filled violet button); secondary
+  actions are outlined or ghost; destructive actions are confirmed.
+- Plain words. Labels are nouns or verbs a photographer would use
+  ("Straighten", "Frame", "Keep camera data"); each new control has a
+  one-line hint beneath it when its effect is not obvious; no jargon in
+  the UI ("EXIF" only inside the hint, never as the label).
+- Empty states say what to do next (as the library does today); errors say
+  what happened and what to do, never a code.
+- No new top-level navigation beyond what a spec names (Video, Documents).
+  Small features live inside the tool they belong to (Verify sits in the
+  gallery and in the export hint, not in the sidebar).
+- Consistency: reuse `ui/*` primitives and the existing panel layouts;
+  the same control looks the same in the editor, the designer and bulk.
+- UX pass (in every checklist): open every changed screen at 390 px and
+  1440 px in the milestone's screenshots and confirm the points above;
+  write one sentence per screen in `PLAN.md` §8 under "UX pass"; fix before
+  certifying. A control that needed explaining in that sentence gets its
+  hint or goes under "More".
 
 ## Order and dependencies
 
@@ -30,6 +79,16 @@ nothing is optimised twice. Pricing is out of scope; the product stays free.
 Do them in this order. Certify each (its checklist in `PLAN.md`) before
 starting the next. Where a spec says "ask Randy", stop and ask in one line;
 everything else is yours to decide within the spec.
+
+Vendor accounts: Randy has accounts with Google, Microsoft and Dropbox and
+expects the OAuth applications to be registered by you (M16). Use a
+vendor CLI where one exists (Azure CLI 2.83 is installed) and the
+`chrome-control` MCP server (his own Chrome, signed in; 43 `browser_*`
+tools, catalogue in `C:/Users/Randy/Coding/chrome-control-mcp/docs/TOOLS.md`)
+where the vendor only offers a web console. Client ids and API keys are
+public configuration; never paste a client _secret_ into the repository
+or the chat, and prefer flows that need none (PKCE, implicit token
+clients, pickers).
 
 ## The loop for one milestone
 

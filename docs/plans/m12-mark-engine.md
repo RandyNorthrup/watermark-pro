@@ -341,4 +341,5 @@ unknown name).
       Text/Shape tabs and the icon search), bugs logged in §8
 - [ ] initial JS for `/app/library/new` did not grow by more than 5 kB gz
       (the icon name list and library are lazy; check the build output)
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.4.0, tag, deploy, release

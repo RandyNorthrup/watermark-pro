@@ -11,9 +11,12 @@ through) and onto every page of a PDF, both from a new "Video" tool and a
 
 Research: `docs/competitor-research.md` §1.10 (Video), §3.2 (PDF).
 
-This milestone starts with a feasibility spike that is allowed to fail.
-If the spike fails on the day (see M17.0), skip to M18 and record why in
-PLAN §4; do not ship a half-working video tool.
+This milestone starts with a one-day spike that de-risks the pipeline
+(codecs, muxing, audio passthrough, CI). It is not a go/no-go: video ships
+in M17 (Randy, 2026-09-06). If a browser cannot encode a codec, the
+product picks another (see "Codec choice"); if a browser has no
+`VideoEncoder` at all, that browser gets the unsupported message and the
+others get the feature.
 
 ## M17.0 Spike (one day, no product code)
 
@@ -35,10 +38,26 @@ that:
 
 Pass criteria: green in Chromium locally and in CI (Linux Chromium has
 software H.264 through OpenH264 in Playwright's build; if `avc1` is not
-supported there, VP9 `vp09.00.10.08` in WebM is the fallback and the
-product must offer WebM output on such browsers). Also a manual check on
-an iPhone (Safari 17+) that `VideoEncoder` exists and encodes H.264;
-record the result in PLAN §8.
+supported there, VP9 `vp09.00.10.08` in WebM is the path CI exercises).
+The iPhone check: a Playwright probe on the `iphone` project
+(`e2e/video-capabilities.spec.ts`) logs `VideoEncoder.isConfigSupported`
+for each codec (logged, not asserted: Playwright's WebKit build may
+differ from Safari), plus a manual check by Randy on his phone against
+the production build, recorded in PLAN §8. Whatever the spike finds
+changes the implementation, not the decision to ship.
+
+### Codec choice
+
+At run time, in order, with `VideoEncoder.isConfigSupported`:
+`avc1.640028` (H.264 High) in MP4 → `hvc1` (HEVC) in MP4 (Safari) →
+`vp09.00.40.08` (VP9) in WebM → `av01.0.08M.08` (AV1) in WebM. The first
+supported pair wins; the output container follows the codec, and the UI
+shows which one it will produce before the user starts ("Saves as MP4
+(H.264)"). Audio: copied when the input codec fits the output container
+(AAC → MP4, Opus → WebM), else re-encoded with `AudioEncoder` (AAC for
+MP4, Opus for WebM); if neither the copy nor the encoder is available
+the output is silent and the UI says so before starting. Every branch
+has a browser test with a fake `isConfigSupported`.
 
 Dependency: `mediabunny` 1.55.7 (MPL-2.0, allowed by the dependency-review
 list; peer: none; declares WebCodecs types). Verify the version, pin, §3.1
@@ -156,4 +175,5 @@ untrusted input inside the page (no Worker exposure); threat model row.
 - [ ] gates, seven drills red, Lighthouse (two new pages), screenshots
 - [ ] a 60-second 1080p phone video transcodes on the development machine
       in under 2× its duration (recorded in §8)
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.9.0, tag, deploy, release

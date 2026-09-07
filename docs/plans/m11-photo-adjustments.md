@@ -378,4 +378,5 @@ frame budget because previews are downscaled first.
 - [ ] screenshots incl. the Adjust tab, light and dark, three widths, under `docs/screenshots/m11/`, reviewed
 - [ ] `adjustPixels` timing logged in the browser test output and under budget
 - [ ] bugs found by tests fixed before certification (see §8)
+- [ ] UX pass (docs/plans/README.md "Simple by default") written into §8
 - [ ] version 1.3.0, tag `v1.3.0`, deploy green, release notes
