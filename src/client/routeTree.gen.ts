@@ -25,6 +25,7 @@ import { Route as AppEditorRouteImport } from './routes/app/editor'
 import { Route as AppGalleryRouteImport } from './routes/app/gallery'
 import { Route as AppMembersRouteImport } from './routes/app/members'
 import { Route as AppSharesRouteImport } from './routes/app/shares'
+import { Route as AppVerifyRouteImport } from './routes/app/verify'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as AppLibraryIndexRouteImport } from './routes/app/library/index'
 import { Route as AppLibraryWatermarkIdRouteImport } from './routes/app/library/$watermarkId'
@@ -112,6 +113,11 @@ const AppSharesRoute = AppSharesRouteImport.update({
   path: '/shares',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppVerifyRoute = AppVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/app/gallery': typeof AppGalleryRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
+  '/app/verify': typeof AppVerifyRoute
   '/share/$token': typeof ShareTokenRoute
   '/app/': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/app/gallery': typeof AppGalleryRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
+  '/app/verify': typeof AppVerifyRoute
   '/share/$token': typeof ShareTokenRoute
   '/app': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/app/gallery': typeof AppGalleryRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
+  '/app/verify': typeof AppVerifyRoute
   '/share/$token': typeof ShareTokenRoute
   '/app/': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/app/gallery'
     | '/app/members'
     | '/app/shares'
+    | '/app/verify'
     | '/share/$token'
     | '/app/'
     | '/app/library/$watermarkId'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/app/gallery'
     | '/app/members'
     | '/app/shares'
+    | '/app/verify'
     | '/share/$token'
     | '/app'
     | '/app/library/$watermarkId'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/app/gallery'
     | '/app/members'
     | '/app/shares'
+    | '/app/verify'
     | '/share/$token'
     | '/app/'
     | '/app/library/$watermarkId'
@@ -404,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSharesRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/verify': {
+      id: '/app/verify'
+      path: '/verify'
+      fullPath: '/app/verify'
+      preLoaderRoute: typeof AppVerifyRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/share/$token': {
       id: '/share/$token'
       path: '/share/$token'
@@ -450,6 +469,7 @@ interface AppRouteRouteChildren {
   AppGalleryRoute: typeof AppGalleryRoute
   AppMembersRoute: typeof AppMembersRoute
   AppSharesRoute: typeof AppSharesRoute
+  AppVerifyRoute: typeof AppVerifyRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLibraryWatermarkIdRoute: typeof AppLibraryWatermarkIdRoute
   AppLibraryNewRoute: typeof AppLibraryNewRoute
@@ -465,6 +485,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppGalleryRoute: AppGalleryRoute,
   AppMembersRoute: AppMembersRoute,
   AppSharesRoute: AppSharesRoute,
+  AppVerifyRoute: AppVerifyRoute,
   AppIndexRoute: AppIndexRoute,
   AppLibraryWatermarkIdRoute: AppLibraryWatermarkIdRoute,
   AppLibraryNewRoute: AppLibraryNewRoute,

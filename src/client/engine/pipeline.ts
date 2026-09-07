@@ -18,6 +18,7 @@ import {
 import type { Canvas2D, CanvasBackend, EngineCanvas } from './canvas'
 import { resolveContrast, type ResolvedContrast } from './contrast'
 import { DEFAULT_METADATA_POLICY, encodeCanvas, type EncodeOptions } from './encode'
+import { embedInvisibleMark } from './invisible'
 import { markSize, resolvePlacement, type Size, tileCentres } from './layout'
 import type { RawMetadata } from './metadata/segments'
 import { withMetadata } from './metadata/write'
@@ -267,6 +268,7 @@ export async function applyWatermark(
   // other, and a later mark paints over an earlier one where they meet.
   const marks = request.marks.map((mark) => composeMark(canvas.context, canvas, map, mark))
   const framed = await frameCanvas(canvas, request.transform?.border, backend)
+  embedInvisible(framed.canvas, request.output.invisible)
   const encoded = await encodeCanvas(framed.canvas, request.output)
   const blob = await withMetadata(
     encoded,
@@ -329,4 +331,19 @@ function applyAdjustments(
   adjustPixels(image.data, canvas.width, canvas.height, adjust)
   ctx.putImageData(image, 0, 0)
   return analysePixels(image)
+}
+
+/**
+ * Embeds the hidden message (M15) into the framed pixels before encoding.
+ * PNG-only — `encodeCanvas` rejects a lossy format, so the LSB payload never
+ * rides a re-compression that would destroy it. Mirrors `applyAdjustments`.
+ */
+function embedInvisible(canvas: EngineCanvas, invisible: EncodeOptions['invisible']): void {
+  if (invisible === undefined) {
+    return
+  }
+  const ctx = canvas.context
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  embedInvisibleMark(image.data, canvas.width, canvas.height, invisible.message)
+  ctx.putImageData(image, 0, 0)
 }

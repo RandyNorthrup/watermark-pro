@@ -39,6 +39,7 @@ function EditorPage() {
       </header>
       <Editor
         organizationId={organization.id}
+        organizationName={organization.name}
         initialPresetId={preset ?? null}
         canSave={canRole(membership?.role, { photo: ['upload'] })}
       />

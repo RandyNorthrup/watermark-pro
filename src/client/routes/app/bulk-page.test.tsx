@@ -325,6 +325,16 @@ describe('bulk page', () => {
     await waitFor(() => expect(screen.queryByText('Custom')).not.toBeInTheDocument())
   })
 
+  it('embeds an invisible mark on a PNG batch', async () => {
+    const user = await addTwoPhotoBatch()
+    await user.click(screen.getByRole('combobox', { name: 'Format' }))
+    await user.click(await screen.findByRole('option', { name: 'PNG' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Invisible mark' }))
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
+    expect(runs[0]?.settings.output.invisible?.message).toBeTruthy()
+  })
+
   it('caps the visible rows and expands on request', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())

@@ -2,7 +2,11 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { presetFileSchema } from '../../../shared/preset-file'
 import { SIGNATURE_EXPORT_SIDE } from '../../editor/signature'
+import { downloadBlob } from '../../lib/download'
+import { describeSize, hasAlpha, runCleanup, toPngName } from '../../lib/logo-prepare-pipeline'
+import { buildPresetFile } from '../../lib/preset-file'
 import {
   seedOwnerWorkspace,
   seedViewerWorkspace,
@@ -18,6 +22,7 @@ vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-modu
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
 vi.mock('../../lib/image-size', () => import('../../test-support/fake-image-size'))
 vi.mock('../../lib/canvas-backend', () => import('../../test-support/fake-canvas-backend'))
+vi.mock('../../lib/download', () => ({ downloadBlob: vi.fn() }))
 
 const client = fakeAuth
 
@@ -106,6 +111,76 @@ describe('library page', () => {
     renderApp('/app/library')
     expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
   })
+
+  it('exports every preset as a parseable preset file', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/library')
+    await screen.findByRole('heading', { level: 1 })
+
+    await user.click(await screen.findByRole('button', { name: 'Export' }))
+    await waitFor(() => {
+      expect(vi.mocked(downloadBlob)).toHaveBeenCalled()
+    })
+    const lastCall = vi.mocked(downloadBlob).mock.calls.at(-1)
+    expect(lastCall).toBeDefined()
+    const [blob, fileName] = lastCall!
+    expect(fileName).toMatch(/^presets-acme-studio-\d{4}-\d{2}-\d{2}\.wmp\.json$/)
+    const parsed = presetFileSchema.parse(JSON.parse(await blob.text()))
+    expect(parsed.presets.map((entry) => entry.name)).toEqual(['Studio signature'])
+  })
+
+  it('imports selected presets, renaming a name that already exists', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ watermarks: [makeWatermark()] })
+    const bundle = buildPresetFile(
+      [
+        { name: 'Studio signature', spec: makeWatermark().spec },
+        {
+          name: 'Logo mark',
+          spec: {
+            kind: 'image',
+            assetId: 'src-1',
+            placement: { mode: 'smart' },
+            contrast: { mode: 'auto' },
+            style: makeWatermark().spec.style,
+          },
+        },
+      ],
+      [
+        {
+          assetId: 'src-1',
+          name: 'Logo mark',
+          contentType: 'image/png',
+          width: 10,
+          height: 10,
+          bytes: new Uint8Array([0x89, 0x50, 0x4e, 0x47]),
+        },
+      ],
+    )
+    const file = new File([JSON.stringify(bundle)], 'library.wmp.json', {
+      type: 'application/json',
+    })
+
+    renderApp('/app/library')
+    await screen.findByRole('heading', { level: 1 })
+    await user.click(screen.getByRole('button', { name: 'Import presets' }))
+    await user.upload(await screen.findByLabelText('Preset file'), file)
+
+    expect(await screen.findByText(/already exists/)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Import 2 presets' }))
+
+    await waitFor(() => {
+      expect(api.assets).toHaveLength(1)
+    })
+    expect(api.watermarks.map((preset) => preset.name)).toEqual([
+      'Studio signature',
+      'Studio signature (2)',
+      'Logo mark',
+    ])
+  })
 })
 
 describe('preset designer', () => {
@@ -183,7 +258,11 @@ describe('preset designer', () => {
     expect(screen.getByRole('textbox', { name: 'Text' })).toHaveValue('Draft text')
   })
 
-  it('uploads a logo, selects it, and blocks saving until a logo is chosen', async () => {
+  it('prepares an uploaded logo, selects it, and blocks saving until a logo is chosen', async () => {
+    vi.stubGlobal(
+      'createImageBitmap',
+      vi.fn(() => Promise.resolve({ width: 128, height: 64, close: vi.fn() })),
+    )
     const user = userEvent.setup({ applyAccept: false })
     seedOwnerWorkspace(client())
     const api = installLibraryApi({ assets: [makeAsset()] })
@@ -199,11 +278,20 @@ describe('preset designer', () => {
       input,
       new File([new Uint8Array([0x89, 0x50])], 'new-mark.png', { type: 'image/png' }),
     )
+    const panel = await screen.findByRole('region', { name: 'Prepare logo' })
+    const useLogo = await within(panel).findByRole('button', { name: 'Use logo' })
+    await waitFor(() => {
+      expect(useLogo).toBeEnabled()
+    })
+    await user.click(useLogo)
+
     expect(await screen.findByRole('button', { name: 'Logo new-mark' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
     expect(api.assets.map((asset) => asset.name)).toEqual(['Brand mark', 'new-mark'])
+    // The chosen file is re-encoded to a transparent PNG before upload.
+    expect(encoded.at(-1)?.options.format).toBe('image/png')
     await waitFor(() => {
       const latest = renderedSpecs.at(-1)
       expect(latest?.kind).toBe('image')
@@ -212,6 +300,38 @@ describe('preset designer', () => {
 
     await user.upload(input, new File(['not an image'], 'notes.txt', { type: 'text/plain' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('not an image the browser can read')
+  })
+
+  it('toggles the prepare panel and uploads a PNG', async () => {
+    vi.stubGlobal(
+      'createImageBitmap',
+      vi.fn(() => Promise.resolve({ width: 96, height: 48, close: vi.fn() })),
+    )
+    const user = userEvent.setup({ applyAccept: false })
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ assets: [] })
+    renderApp('/app/library/new')
+    await screen.findByRole('heading', { level: 1 })
+    await user.click(screen.getByRole('tab', { name: 'Logo' }))
+
+    await user.upload(
+      screen.getByLabelText('Upload a logo file'),
+      new File([new Uint8Array([0x89, 0x50])], 'mark.png', { type: 'image/png' }),
+    )
+    const panel = await screen.findByRole('region', { name: 'Prepare logo' })
+    const remove = await within(panel).findByRole('checkbox', { name: 'Remove background' })
+    const trim = within(panel).getByRole('checkbox', { name: 'Trim transparent edges' })
+    expect(remove).not.toBeChecked()
+    await user.click(remove)
+    expect(remove).toBeChecked()
+    await user.click(trim)
+    expect(trim).toBeChecked()
+
+    await user.click(within(panel).getByRole('button', { name: 'Use logo' }))
+    await waitFor(() => {
+      expect(api.assets.map((asset) => asset.name)).toEqual(['mark'])
+    })
+    expect(encoded.at(-1)?.options.format).toBe('image/png')
   })
 
   it('saves a drawn signature as a logo and selects it', async () => {
@@ -319,5 +439,62 @@ describe('preset designer', () => {
 
     renderApp('/app/library/missing')
     expect(await screen.findByRole('alert')).toHaveTextContent('That preset no longer exists.')
+  })
+})
+
+describe('logo prepare helpers', () => {
+  it('detects an alpha channel', () => {
+    expect(hasAlpha({ data: new Uint8ClampedArray([10, 20, 30, 255]), width: 1, height: 1 })).toBe(
+      false,
+    )
+    expect(hasAlpha({ data: new Uint8ClampedArray([10, 20, 30, 0]), width: 1, height: 1 })).toBe(
+      true,
+    )
+  })
+
+  it('renames the prepared file to a .png', () => {
+    expect(toPngName('logo.jpg')).toBe('logo.png')
+    expect(toPngName('logo')).toBe('logo.png')
+    expect(toPngName('a.b.webp')).toBe('a.b.png')
+  })
+
+  it('formats the output size', () => {
+    expect(describeSize(128, 64)).toBe('128 × 64')
+  })
+
+  it('trims transparent margins, cropping to the visible pixels', () => {
+    const bordered = new Uint8ClampedArray(3 * 3 * 4)
+    const centre = (1 * 3 + 1) * 4
+    bordered[centre] = 200
+    bordered[centre + 1] = 100
+    bordered[centre + 2] = 50
+    bordered[centre + 3] = 255
+    const result = runCleanup(
+      { data: bordered, width: 3, height: 3 },
+      { removeBackground: false, tolerance: 0, trim: true },
+    )
+    expect(result.width).toBe(1)
+    expect(result.height).toBe(1)
+  })
+
+  it('keeps the original when a trim would erase everything', () => {
+    const empty = { data: new Uint8ClampedArray(2 * 2 * 4), width: 2, height: 2 }
+    const guarded = runCleanup(empty, { removeBackground: false, tolerance: 0, trim: true })
+    expect(guarded.width).toBe(2)
+    expect(guarded.height).toBe(2)
+  })
+
+  it('clears a flat background and leaves a no-op alone', () => {
+    const white = new Uint8ClampedArray(2 * 2 * 4).fill(255)
+    const removed = runCleanup(
+      { data: white, width: 2, height: 2 },
+      { removeBackground: true, tolerance: 24, trim: false },
+    )
+    expect(removed.width).toBe(2)
+    expect(removed.data[3]).toBeLessThan(255)
+
+    const source = { data: new Uint8ClampedArray([1, 2, 3, 255]), width: 1, height: 1 }
+    const untouched = runCleanup(source, { removeBackground: false, tolerance: 0, trim: false })
+    expect(untouched).toBe(source)
   })
 })

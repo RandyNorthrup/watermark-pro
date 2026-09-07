@@ -157,3 +157,25 @@ export const HSTS_MAX_AGE_SECONDS = 31_536_000
 export const COMMON_SHUTTER_DENOMINATORS = [
   1, 2, 4, 8, 15, 30, 60, 125, 250, 500, 1000, 2000, 4000, 8000,
 ] as const
+
+/** Preset file import/export (M15): a portable `.wmp.json` bundle of presets and their logos. */
+export const PRESET_FILE_FORMAT = 'watermark-pro/presets'
+export const PRESET_FILE_VERSION = 1
+export const MAX_PRESET_FILE_PRESETS = 100
+export const MAX_PRESET_FILE_BYTES = 40 * BYTES_PER_MEGABYTE
+
+/** Logo prepare tools (M15): background removal tolerance and the alpha level a trim treats as empty. */
+export const DEFAULT_BACKGROUND_TOLERANCE = 24
+export const MAX_BACKGROUND_TOLERANCE = 60
+export const ALPHA_TRIM_THRESHOLD = 8
+
+/**
+ * Invisible (steganographic) mark (M15). PNG-only, lossless: the payload is
+ * `WMP1` + length + UTF-8 message + CRC-32, written to the blue-channel LSB of
+ * pixels visited along a seeded walk (stride = the first of these primes that
+ * is coprime to the pixel count; start from `mulberry32(SEED ^ length)`).
+ */
+export const INVISIBLE_MAGIC = 'WMP1'
+export const MAX_INVISIBLE_MESSAGE_LENGTH = 64
+export const INVISIBLE_MARK_SEED = 2_654_435_769
+export const INVISIBLE_STRIDE_PRIMES = [7919, 104_729, 1_299_709, 15_485_863] as const

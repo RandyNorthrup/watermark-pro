@@ -7,6 +7,35 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-09-07
+
+M15: preset files, logo tools and an invisible mark.
+
+### Added
+
+- **Preset files**: export any or all presets to a portable `.wmp.json` bundle
+  (logos embedded) and import them back, with a name-collision check that
+  renames rather than overwrites. Round-trips through the same Zod schema the
+  app validates presets with.
+- **Logo prepare tools**: when a logo is chosen, a "Prepare" step can remove a
+  flat background (corner-seeded flood with an adjustable tolerance and a
+  one-pixel feather) and trim transparent margins, then uploads a clean PNG.
+- **Invisible mark**: the editor and the bulk tool can hide a short message in
+  the pixels of a PNG export (LSB steganography along a seeded walk, protected
+  by a CRC). It is PNG-only — a lossy re-encode is refused — and defaults to the
+  workspace name. A new **/app/verify** page and a gallery "Check a photo"
+  entry read the message back (or report that a photo carries no mark).
+
+### Notes
+
+- The steganography, background-removal, preset-file and read-back logic are
+  pure modules unit-tested in jsdom; the canvas decode/encode wrappers
+  (`read-invisible.ts`, the logo-prepare panel) are browser-only and covered by
+  their callers, excluded from coverage like `engine/render.ts` (PLAN.md §9).
+- New red drills: an invisible mark written into a lossy JPEG, a corrupted
+  payload read as valid, a preset spec imported without validation, and a
+  background removal that ignores its tolerance.
+
 ## [1.6.1] - 2026-09-07
 
 M14 (completion): the two carried-forward bulk features now ship.

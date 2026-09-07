@@ -5,6 +5,7 @@ import { Editor } from '../editor/editor'
 
 interface OverrideDialogProps {
   organizationId: string
+  organizationName: string
   /** The photo being adjusted and its display name. */
   file: File
   fileName: string
@@ -20,6 +21,7 @@ interface OverrideDialogProps {
 /** A full-screen dialog that edits one batch photo through the embedded editor. */
 export function OverrideDialog({
   organizationId,
+  organizationName,
   file,
   fileName,
   document,
@@ -47,6 +49,7 @@ export function OverrideDialog({
           <Radix.Title className="text-base font-semibold">Adjust {fileName}</Radix.Title>
           <Editor
             organizationId={organizationId}
+            organizationName={organizationName}
             embedded={{
               document,
               file,

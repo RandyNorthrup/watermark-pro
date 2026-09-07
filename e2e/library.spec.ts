@@ -83,6 +83,8 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
     mimeType: 'image/png',
     buffer: pngFixture(LOGO_WIDTH, LOGO_HEIGHT, [0xff, 0x33, 0x66]),
   })
+  // The chosen file opens the Prepare panel; "Use logo" applies it and uploads.
+  await page.getByRole('button', { name: 'Use logo' }).click()
   await expect(page.getByRole('button', { name: 'Logo brand-mark', exact: true })).toHaveAttribute(
     'aria-pressed',
     'true',

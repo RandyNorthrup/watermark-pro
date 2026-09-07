@@ -25,6 +25,7 @@ import {
   IDENTITY_ORIENTATION,
   type Orientation,
 } from '../../../shared/adjustments'
+import { MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import {
   type BulkFile,
@@ -73,6 +74,8 @@ import { SliderField } from '../ui/slider-field'
 
 interface BulkToolProps {
   organizationId: string
+  /** The workspace name; seeds the default invisible-mark message. */
+  organizationName: string
   /** Whether the current member may store photos in the gallery. */
   canSave?: boolean | undefined
 }
@@ -180,7 +183,7 @@ const STATUS_LABELS: Record<JobState<BulkJobInput, BulkResult>['status'], string
  * through the worker pool with progress, cancel and retry, then download
  * everything as one ZIP or file by file.
  */
-export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
+export function BulkTool({ organizationId, organizationName, canSave = false }: BulkToolProps) {
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const { snapshot, workers, add, start, setOverride, pause, resume, cancel, retry, clear } =
     useBulkQueue(organizationId)
@@ -203,6 +206,8 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
   const [policy, setPolicy] = useState<MetadataPolicy>(DEFAULT_METADATA_POLICY)
+  const [wantsInvisible, setWantsInvisible] = useState(false)
+  const [invisibleMessage, setInvisibleMessage] = useState(organizationName)
   const [size, setSize] = useState<SizeChoice>('original')
   const [orientation, setOrientation] = useState<Orientation>(IDENTITY_ORIENTATION)
   const [adjust, setAdjust] = useState<Adjustments>(IDENTITY_ADJUSTMENTS)
@@ -280,7 +285,14 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   })()
 
   function settings(): BulkSettings {
-    const output: EncodeOptions = { format, quality, metadata: effectivePolicy(policy, format) }
+    const message = invisibleMessage.trim()
+    const willEmbedMark = format === 'image/png' && wantsInvisible && message.length > 0
+    const output: EncodeOptions = {
+      format,
+      quality,
+      metadata: effectivePolicy(policy, format),
+      ...(willEmbedMark && { invisible: { message } }),
+    }
     return {
       output,
       fitLongestSide: size === 'original' ? null : Number(size),
@@ -768,6 +780,37 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
             />
             <MetadataPolicyField policy={policy} format={format} onChange={setPolicy} />
             <div className="flex flex-col gap-1.5">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  className="size-4 accent-brand-600"
+                  checked={wantsInvisible}
+                  disabled={format !== 'image/png' || snapshot.isRunning}
+                  onChange={(event) => {
+                    setWantsInvisible(event.currentTarget.checked)
+                  }}
+                />
+                Invisible mark
+              </label>
+              {format === 'image/png' ? (
+                wantsInvisible ? (
+                  <Input
+                    aria-label="Invisible message"
+                    value={invisibleMessage}
+                    maxLength={MAX_INVISIBLE_MESSAGE_LENGTH}
+                    disabled={snapshot.isRunning}
+                    onChange={(event) => {
+                      setInvisibleMessage(event.currentTarget.value)
+                    }}
+                  />
+                ) : null
+              ) : (
+                <p className="text-xs text-ink-muted">
+                  Choose PNG to hide a message in every photo.
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5">
               <span className="text-sm font-medium">Size</span>
               <Select
                 aria-label="Size"
@@ -913,6 +956,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
           {adjusting === null ? null : (
             <OverrideDialog
               organizationId={organizationId}
+              organizationName={organizationName}
               file={adjusting.input.file}
               fileName={adjusting.input.relativePath}
               document={adjusting.input.override ?? batchDocument()}

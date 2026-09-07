@@ -89,6 +89,8 @@ export interface EmbeddedEditing {
 
 interface EditorProps {
   organizationId: string
+  /** The workspace name; seeds the export panel's default invisible-mark message. */
+  organizationName: string
   /** Preset to load when the editor opens (from the library's "Open in editor"). */
   initialPresetId?: string | null | undefined
   /** Whether the current member may store photos in the gallery. */
@@ -179,6 +181,7 @@ function PendingPreview({ hasPhoto }: { hasPhoto: boolean }) {
  */
 export function Editor({
   organizationId,
+  organizationName,
   initialPresetId,
   canSave = false,
   embedded,
@@ -700,6 +703,7 @@ export function Editor({
           {embedded === undefined ? (
             <Tabs.Content value="export" className="outline-none">
               <ExportPanel
+                organizationName={organizationName}
                 outputSize={outputSize}
                 isReady={document.layers.length > 0}
                 isExporting={isExporting}

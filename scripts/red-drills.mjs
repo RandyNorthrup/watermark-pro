@@ -508,6 +508,35 @@ export const DRILLS = [
     replace: 'return current',
     ...unitClient('src/client/bulk/watch.test.ts'),
   },
+  // --- M15: preset files, logo tools, invisible mark -----------------------
+  {
+    name: 'Invisible: a hidden mark is written into a lossy JPEG',
+    file: 'src/client/engine/encode.ts',
+    find: "options.invisible !== undefined && options.format !== 'image/png'",
+    replace: "options.invisible !== undefined && options.format === 'image/png'",
+    ...unitClient('src/client/engine/encode.test.ts'),
+  },
+  {
+    name: 'Invisible: a corrupted payload is read as valid',
+    file: 'src/client/engine/invisible.ts',
+    find: 'if (actualCrc >>> 0 !== crc32(checked)) {',
+    replace: 'if (false) {',
+    ...unitClient('src/client/engine/invisible.test.ts'),
+  },
+  {
+    name: 'Preset import: a preset spec is not validated',
+    file: 'src/shared/preset-file.ts',
+    find: 'spec: watermarkSpecSchema,',
+    replace: 'spec: z.unknown(),',
+    ...unitClient('src/shared/preset-file.test.ts'),
+  },
+  {
+    name: 'Logo cleanup: background removal ignores the tolerance',
+    file: 'src/client/lib/logo-cleanup.ts',
+    find: 'if (colourDistance(data, neighbour * CHANNELS, seedOffset) <= tolerance) {',
+    replace: 'if (colourDistance(data, neighbour * CHANNELS, seedOffset) >= 0) {',
+    ...unitClient('src/client/lib/logo-cleanup.test.ts'),
+  },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
     name: 'Gate: ESLint rejects `any`',

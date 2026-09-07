@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { FORMAT_OPTIONS } from './formats'
 import { MetadataPolicyField } from './metadata-policy'
+import { MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
 import {
   DEFAULT_METADATA_POLICY,
   effectivePolicy,
@@ -11,6 +12,7 @@ import {
   OUTPUT_FORMATS,
   type OutputFormat,
 } from '../../engine/encode'
+import { invisibleCapacity } from '../../engine/invisible'
 import type { Size } from '../../engine/layout'
 import { canShareFiles } from '../../lib/share-file'
 import { Button } from '../ui/button'
@@ -28,12 +30,19 @@ interface ExportPanelProps {
   /** Present when the user may store photos in the gallery. */
   onSave?: ((options: EncodeOptions) => void) | undefined
   isSaving?: boolean | undefined
+  /** Seeds the default hidden-mark message; the workspace name identifies the owner. */
+  organizationName: string
 }
 
 const DEFAULT_QUALITY = 0.9
 const QUALITY_STEP = 0.01
 const MIN_QUALITY = 0.3
 const PERCENT = 100
+
+/** UTF-8 byte length, the unit the invisible payload is measured in. */
+function byteLength(text: string): number {
+  return new TextEncoder().encode(text).length
+}
 
 function isOutputFormat(value: string): value is OutputFormat {
   return (OUTPUT_FORMATS as readonly string[]).includes(value)
@@ -49,17 +58,28 @@ export function ExportPanel({
   isSharing,
   onSave,
   isSaving = false,
+  organizationName,
 }: ExportPanelProps) {
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
   const [policy, setPolicy] = useState<MetadataPolicy>(DEFAULT_METADATA_POLICY)
+  const [wantsInvisible, setWantsInvisible] = useState(false)
+  const [message, setMessage] = useState(organizationName)
   const isLossy = format !== 'image/png'
   const isBusy = isExporting || isSharing || isSaving
   const isShareable = canShareFiles(format)
+  const trimmedMessage = message.trim()
+  const capacity = invisibleCapacity(outputSize.width, outputSize.height)
+  const isOverCapacity = byteLength(trimmedMessage) > capacity
+  // A mark is embedded only for a PNG with a message that fits; an over-long
+  // message is an error that blocks export rather than a silent truncation.
+  const willEmbedMark = !isLossy && wantsInvisible && trimmedMessage.length > 0 && !isOverCapacity
+  const isBlocked = !isLossy && wantsInvisible && isOverCapacity
   const options = (): EncodeOptions => ({
     format,
     quality,
     metadata: effectivePolicy(policy, format),
+    ...(willEmbedMark && { invisible: { message: trimmedMessage } }),
   })
   return (
     <div className="flex flex-col gap-4">
@@ -89,6 +109,42 @@ export function ExportPanel({
         onChange={setQuality}
       />
       <MetadataPolicyField policy={policy} format={format} onChange={setPolicy} />
+      <div className="flex flex-col gap-1.5">
+        <label className="flex items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            className="size-4 accent-brand-600"
+            checked={wantsInvisible}
+            disabled={isLossy}
+            onChange={(event) => {
+              setWantsInvisible(event.currentTarget.checked)
+            }}
+          />
+          Invisible mark
+        </label>
+        {isLossy ? (
+          <p className="text-xs text-ink-muted">Choose PNG to hide a message in the pixels.</p>
+        ) : null}
+        {!isLossy && wantsInvisible ? (
+          <>
+            <input
+              type="text"
+              aria-label="Invisible message"
+              value={message}
+              maxLength={MAX_INVISIBLE_MESSAGE_LENGTH}
+              onChange={(event) => {
+                setMessage(event.currentTarget.value)
+              }}
+              className="rounded-lg border border-line bg-surface px-2 py-1.5 text-sm"
+            />
+            <p className={`text-xs ${isOverCapacity ? 'text-rose-600' : 'text-ink-muted'}`}>
+              {isOverCapacity
+                ? `Too long for a ${String(outputSize.width)}×${String(outputSize.height)} photo (fits ${String(capacity)} bytes).`
+                : `Hidden in the pixels and readable under Verify. Survives PNG only.`}
+            </p>
+          </>
+        ) : null}
+      </div>
       <p className="text-xs text-ink-muted">
         {String(outputSize.width)} × {String(outputSize.height)} px
         {isLossy ? '' : '; PNG is lossless'}. Rendered in your browser at full resolution
@@ -98,7 +154,7 @@ export function ExportPanel({
         <Button
           type="button"
           isPending={isExporting}
-          disabled={!isReady || (isBusy && !isExporting)}
+          disabled={!isReady || isBlocked || (isBusy && !isExporting)}
           onClick={() => {
             onExport(options())
           }}
@@ -111,7 +167,7 @@ export function ExportPanel({
             type="button"
             variant="secondary"
             isPending={isSharing}
-            disabled={!isReady || (isBusy && !isSharing)}
+            disabled={!isReady || isBlocked || (isBusy && !isSharing)}
             onClick={() => {
               onShare(options())
             }}
@@ -125,7 +181,7 @@ export function ExportPanel({
             type="button"
             variant="secondary"
             isPending={isSaving}
-            disabled={!isReady || (isBusy && !isSaving)}
+            disabled={!isReady || isBlocked || (isBusy && !isSaving)}
             onClick={() => {
               onSave(options())
             }}

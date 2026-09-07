@@ -244,7 +244,14 @@ bytes in R2 under a key that includes the organization id, serves them only
 to signed-in members through `/api/orgs/:orgId/assets/:id/file`, and refuses
 to delete a logo while a preset still references it (HTTP 409). A drawn
 signature is exported at 1024 px on its long side with a small margin and
-uploaded through the same route.
+uploaded through the same route. When a logo is chosen a **Prepare** step can
+remove a flat background (an adjustable-tolerance corner flood with a
+one-pixel feather) and trim transparent margins, then uploads a clean PNG.
+
+Presets **export** to a portable `.wmp.json` file (logos embedded) and
+**import** back — one preset or the whole library. Import validates every
+preset against the same schema the app uses and renames a name clash rather
+than overwriting, so a file from another workspace lands safely.
 
 The designer previews every change through the same Web Worker that will
 process real photos, on a bundled sample scene or on a photo you pick; the
@@ -337,6 +344,19 @@ rewritten to the output size. Print density (DPI) is preserved in every mode
 personal. Metadata is read and written entirely in the browser (`exifr` plus
 `src/client/engine/metadata/`); nothing is uploaded for it. The gallery stores
 whatever the export carried.
+
+### Invisible mark
+
+A PNG export (from the editor or the bulk tool) can carry an **invisible
+mark**: a short message hidden in the pixels themselves — the least significant
+bit of the blue channel along a seeded walk, protected by a CRC so a corrupted
+read fails rather than lies. It defaults to the workspace name. It is **PNG
+only**: a JPEG or WebP re-encode would destroy it, so the option is refused for
+lossy formats, and a message too large for the photo blocks the export instead
+of being truncated. Open **/app/verify** (or "Check a photo" in the gallery)
+and choose a PNG to read the message back, or confirm a photo carries no mark.
+The mark is honest steganography, not DRM — anyone re-saving the PNG as JPEG
+strips it, by design.
 
 ### Tokens
 

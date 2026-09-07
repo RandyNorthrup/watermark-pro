@@ -86,6 +86,14 @@ export default defineConfig({
         // project (pipeline/text-layout browser tests), which cannot report
         // coverage. See PLAN.md §9.
         'src/client/engine/render.ts',
+        // Decodes an image file to pixels on a canvas to read an invisible
+        // mark; getContext is null in jsdom, so the Verify page test replaces
+        // this module with a fake. See PLAN.md §9.
+        'src/client/lib/read-invisible.ts',
+        // The logo-prepare panel decodes/encodes on a 2D canvas (createImageBitmap
+        // and getImageData, both absent in jsdom); its pure decisions live in the
+        // fully tested lib/logo-prepare-pipeline.ts. See PLAN.md §9.
+        'src/client/components/designer/logo-prepare.tsx',
         // D1 and binding wiring that only executes inside workerd. Covered
         // functionally by the `workers` project, which cannot report coverage.
         'src/worker/db/**',

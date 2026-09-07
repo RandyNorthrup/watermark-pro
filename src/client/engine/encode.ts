@@ -30,6 +30,11 @@ export interface EncodeOptions {
   quality: number
   /** How much source metadata to keep; defaults to strip when absent. */
   metadata?: MetadataPolicy
+  /**
+   * A hidden message embedded in the pixels (M15). Lossless PNG only — a lossy
+   * re-encode would destroy the LSB payload, so it is rejected here.
+   */
+  invisible?: { message: string }
 }
 
 export class EncodeError extends Error {
@@ -39,6 +44,9 @@ export class EncodeError extends Error {
 export async function encodeCanvas(canvas: EngineCanvas, options: EncodeOptions): Promise<Blob> {
   if (options.quality < 0 || options.quality > 1) {
     throw new RangeError('quality must be between 0 and 1')
+  }
+  if (options.invisible !== undefined && options.format !== 'image/png') {
+    throw new RangeError('an invisible mark can only be embedded in a PNG')
   }
   const blob = await canvas.encode(options)
   if (blob.type !== options.format) {

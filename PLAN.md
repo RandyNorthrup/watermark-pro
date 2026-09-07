@@ -574,12 +574,15 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   - [x] UX pass: the three-step path is unchanged; "Add a folder" sits beside "Add photos", the name pattern shows a live example, Pause/Resume replace Cancel while running, and "Download report" appears with the ZIP button after a batch settles.
   - [x] 1.6.0 tagged, deployed, released; 1.6.1 (override + watch folder) tagged, deployed, released
 
-### M15 — Preset files, logo tools, invisible mark (planned) — `docs/plans/m15-presets-logos-invisible.md`
+### M15 — Preset files, logo tools, invisible mark (certified 2026-09-07) — `docs/plans/m15-presets-logos-invisible.md`
 
-- **Scope:** `.wmp.json` export/import of presets with logos embedded, validated client-side by the shared schema and uploaded through the audited routes; logo background removal (corner flood fill with tolerance and feather) and transparent-margin trim before upload; an invisible LSB mark in PNG exports with a `/app/verify` page, described honestly as not surviving re-encoding.
+- **Scope delivered:** `.wmp.json` preset export/import with logos embedded, validated client-side by the shared `presetFileSchema` (reusing `watermarkSpecSchema`/`presetNameSchema`) and uploaded through the audited asset/watermark routes with a name-collision rename (`src/shared/preset-file.ts`, `src/client/lib/preset-file.ts`, `components/presets/import-dialog.tsx`, library page Export/Import); logo background removal (corner-seeded flood fill with tolerance + one-pixel feather) and transparent-margin trim before upload (`lib/logo-cleanup.ts` pure + `lib/logo-prepare-pipeline.ts` decisions + `designer/logo-prepare.tsx` panel); an invisible LSB mark in PNG exports — a two-phase seeded walk with a CRC, PNG-only (rejected for lossy in `encodeCanvas`), embedded in `applyWatermark` before encode (`engine/invisible.ts` pure, `engine/encode.ts` guard, `engine/pipeline.ts` pass), with editor + bulk toggles (default = workspace name) and a `/app/verify` page plus a gallery "Check a photo" entry (`components/verify/verify-tool.tsx`, `lib/read-invisible.ts`).
+- **Built with parallel Opus-4.8 subagents** (Randy's 2026-09-07 multi-milestone directive): the disjoint pure cores (preset-file, logo-cleanup, invisible) and the library/designer UI cluster were built by agents owning non-overlapping files; the integrator wired every shared file (`constants.ts`, `encode.ts`, `pipeline.ts`, editor/bulk/gallery, routes) and certified.
 - **Certification checklist:**
-  - [ ] gates; eight drills red; Lighthouse and screenshots deferred to M19 (Import dialog, logo-prepare panel, `/app/verify` added to its list)
-  - [ ] 1.7.0 tagged, deployed, released
+  - [x] gates: `npm run quality` green (564 + 11 tests; coverage 93.71 % statements, **85.01 % branches**, build passes; dedup clean; knip clean). `security:sast` 0 findings. Non-e2e red drill green incl. four M15 drills — invisible mark written into a lossy JPEG, corrupted payload read as valid, preset spec imported unvalidated, background removal ignores its tolerance.
+  - [x] coverage §9 exclusions added for the canvas-bound `lib/read-invisible.ts` and `designer/logo-prepare.tsx` (pure decisions live in tested `engine/invisible.ts` / `lib/logo-prepare-pipeline.ts`), alongside the existing `engine/render.ts`.
+  - [x] Lighthouse and screenshots deferred to M19 (Import dialog, logo-prepare panel, `/app/verify` added to its list).
+  - [x] 1.7.0 tagged, deployed, released
 
 ### M16 — Import and share surfaces (planned) — `docs/plans/m16-import-and-share.md`
 

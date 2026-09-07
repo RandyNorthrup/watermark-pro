@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Trash2, Upload } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
 
+import { LogoPrepare } from './logo-prepare'
 import { SignaturePad } from './signature-pad'
 import type { AssetDto } from '../../../shared/api'
 import { BYTES_PER_MEGABYTE, LOGO_CONTENT_TYPES, MAX_LOGO_BYTES } from '../../../shared/constants'
@@ -40,6 +41,8 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
   const inputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  /** The chosen file awaiting the prepare step, or null when none is in progress. */
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
 
   async function invalidate() {
     await queryClient.invalidateQueries({ queryKey: libraryQueryKey(organizationId) })
@@ -60,6 +63,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
     },
     onSuccess: async (asset) => {
       setUploadError(null)
+      setPendingFile(null)
       onChange(asset.id)
       await invalidate()
     },
@@ -172,7 +176,8 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
             onChange={(event) => {
               const file = event.currentTarget.files?.[0]
               if (file !== undefined) {
-                upload.mutate(file)
+                setUploadError(null)
+                setPendingFile(file)
               }
               event.currentTarget.value = ''
             }}
@@ -199,6 +204,18 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
           <p className="text-xs text-ink-muted">
             PNG, JPEG or WebP up to {String(MAX_LOGO_MEGABYTES)} MB, or a drawn signature.
           </p>
+          {pendingFile === null ? null : (
+            <LogoPrepare
+              file={pendingFile}
+              isSaving={upload.isPending}
+              onPrepared={(prepared) => {
+                upload.mutate(prepared)
+              }}
+              onCancel={() => {
+                setPendingFile(null)
+              }}
+            />
+          )}
         </div>
       ) : null}
       {uploadError === null ? null : <Alert tone="error">{uploadError}</Alert>}

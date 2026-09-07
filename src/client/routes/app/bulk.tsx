@@ -29,6 +29,7 @@ function BulkPage() {
       </header>
       <BulkTool
         organizationId={organization.id}
+        organizationName={organization.name}
         canSave={canRole(membership?.role, { photo: ['upload'] })}
       />
     </div>

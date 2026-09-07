@@ -1,6 +1,16 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { CheckSquare, Download, Images, Search, Share2, Square, Trash2, X } from 'lucide-react'
+import {
+  CheckSquare,
+  Download,
+  FileSearch,
+  Images,
+  Search,
+  Share2,
+  Square,
+  Trash2,
+  X,
+} from 'lucide-react'
 import { AlertDialog, Dialog } from 'radix-ui'
 import { useDeferredValue, useId, useMemo, useState } from 'react'
 
@@ -109,6 +119,13 @@ export function Gallery({ organizationId, role }: GalleryProps) {
           </p>
         </Card>
       )}
+
+      <div className="flex justify-end">
+        <Link to="/app/verify" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+          <FileSearch aria-hidden="true" className="size-4" />
+          Check a photo
+        </Link>
+      </div>
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex min-w-56 flex-1 flex-col gap-1.5">
