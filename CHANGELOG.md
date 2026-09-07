@@ -60,6 +60,10 @@ stays free.
   fourth are folded into the last line.
 - `PLATFORM_ADMIN_ROLE` moved to `src/shared/constants.ts`, where both the
   Worker and the client read it.
+- Pre-commit: lint-staged runs with `--max-arg-length=4000`; its Windows
+  default overflowed cmd.exe on a milestone-sized commit. Generated drill
+  reports are excluded from Prettier, and Vitest's failed-test screenshots
+  from git.
 
 ### Fixed
 
