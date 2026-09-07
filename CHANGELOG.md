@@ -7,6 +7,14 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Added
+
+- Specifications for milestones M11–M19 under `docs/plans/` (photo
+  adjustments, mark engine extensions, metadata, bulk power, preset files
+  and logo tools, import surfaces, video and PDF, localisation,
+  performance), with an agent runbook, and their entries and open
+  questions in `PLAN.md`.
+
 ## [1.2.0] - 2026-09-06
 
 M10: parity with the market. Everything `docs/competitor-research.md` found

@@ -21,7 +21,11 @@ four-device end-to-end matrix, mobile Lighthouse budgets and the red drill)
 and M10 (parity with the market: ink colour, multi-line text with a box,
 date and file-name stamps, QR codes, drawn signatures, several marks per
 photo, snap-to-grid, the share sheet for exports and a no-metadata export
-policy) are complete: 1.2.0. See
+policy) are complete: 1.2.0. Next: the feature series M11–M18 (photo adjustments,
+arc text and shapes, EXIF tokens and metadata policy, per-photo batch
+overrides and folders, preset files and logo tools, camera/URL/cloud import,
+video and PDF, twelve languages) followed by the performance milestone M19;
+each has a full specification under [docs/plans/](docs/plans/). See
 [PLAN.md](PLAN.md) for the roadmap and [CHANGELOG.md](CHANGELOG.md) for what
 has actually shipped.
 
