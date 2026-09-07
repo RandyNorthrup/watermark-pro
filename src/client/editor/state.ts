@@ -8,15 +8,42 @@ import type { CropRect } from './geometry'
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { Size } from '../engine/layout'
 
+/** One mark on the photo: a library preset and this photo's adjustments to it. */
+export interface Layer {
+  /** Stable within a document so the active layer survives reordering and undo. */
+  id: string
+  spec: WatermarkSpec
+  /** Library preset the spec came from, for the "modified" indicator. */
+  presetId: string
+}
+
 export interface EditorDocument {
   /** Crop in source pixels; `null` keeps the whole photo. */
   crop: CropRect | null
   /** Output size after cropping; `null` keeps the cropped size. */
   resize: Size | null
-  /** The mark being applied; `null` until a preset is chosen. */
-  spec: WatermarkSpec | null
-  /** Library preset the spec came from, for the "modified" indicator. */
-  presetId: string | null
+  /** Marks in drawing order; later layers paint over earlier ones. Empty until a preset is chosen. */
+  layers: Layer[]
+}
+
+/** Layers a document may carry; beyond this the photo is a collage, not a watermark. */
+export const MAX_LAYERS = 8
+
+/** A layer for a preset, with an id no other layer will get. */
+export function createLayer(presetId: string, spec: WatermarkSpec): Layer {
+  return { id: crypto.randomUUID(), presetId, spec }
+}
+
+/** The document with one layer replaced in place. */
+export function withLayer(document: EditorDocument, layer: Layer): EditorDocument {
+  return {
+    ...document,
+    layers: document.layers.map((candidate) => (candidate.id === layer.id ? layer : candidate)),
+  }
+}
+
+export function withoutLayer(document: EditorDocument, layerId: string): EditorDocument {
+  return { ...document, layers: document.layers.filter((layer) => layer.id !== layerId) }
 }
 
 export interface EditorHistory {
@@ -30,8 +57,7 @@ export const HISTORY_LIMIT = 50
 export const EMPTY_DOCUMENT: EditorDocument = {
   crop: null,
   resize: null,
-  spec: null,
-  presetId: null,
+  layers: [],
 }
 
 export type EditorAction =

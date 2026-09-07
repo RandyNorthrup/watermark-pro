@@ -3,9 +3,8 @@
  * its own module so both sides share one definition and the worker file
  * stays free of main-thread imports.
  */
-import type { ResolvedContrast } from './contrast'
 import type { EncodeOptions } from './encode'
-import type { ApplyResult, Transform } from './pipeline'
+import type { MarkOutcome, Transform } from './pipeline'
 import type { WatermarkSpec } from '../../shared/watermark'
 
 export interface FontResource {
@@ -15,13 +14,21 @@ export interface FontResource {
   url: string
 }
 
+/** One mark to draw, with the binary resources its spec needs. */
+export interface MarkInput {
+  spec: WatermarkSpec
+  /** Required for `image` marks; transferred to the worker and closed there. */
+  image?: ImageBitmap
+  /** SVG path data (24×24 viewBox) for `icon` symbols. */
+  iconPath?: string
+}
+
 export interface ApplyMessage {
   type: 'apply'
   id: number
   source: ImageBitmap
-  spec: WatermarkSpec
-  image?: ImageBitmap
-  iconPath?: string
+  /** Drawn in order; later marks paint over earlier ones. */
+  marks: MarkInput[]
   fonts: FontResource[]
   output: EncodeOptions
   transform?: Transform
@@ -33,8 +40,8 @@ export interface ApplyDoneMessage {
   blob: Blob
   width: number
   height: number
-  placement: ApplyResult['placement']
-  contrast: ResolvedContrast
+  /** One entry per mark, in the order they were given. */
+  marks: MarkOutcome[]
 }
 
 export interface ApplyFailedMessage {

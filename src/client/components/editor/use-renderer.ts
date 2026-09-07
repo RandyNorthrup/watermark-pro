@@ -23,12 +23,13 @@ export interface RendererState {
 
 /**
  * Owns a `PreviewRenderer` for the lifetime of a component and re-renders
- * whenever the spec or transform changes. The renderer is also handed back
- * so callers can swap the subject or export at full size.
+ * whenever the marks or transform change (an empty list renders the photo
+ * alone). The renderer is also handed back so callers can swap the subject
+ * or export at full size.
  */
 export function useRenderer(
   organizationId: string,
-  spec: WatermarkSpec | null,
+  specs: readonly WatermarkSpec[],
   transform: Transform | undefined,
 ) {
   const rendererRef = useRef<PreviewRenderer | null>(null)
@@ -51,14 +52,14 @@ export function useRenderer(
     }
   }, [organizationId])
 
-  // Serialised so a structurally equal transform does not trigger a re-render.
+  // Serialised so structurally equal marks or transforms do not trigger a re-render.
   const transformKey = JSON.stringify(transform ?? null)
+  const specsKey = JSON.stringify(specs)
+  const specsRef = useRef(specs)
+  specsRef.current = specs
   useEffect(() => {
-    if (spec === null) {
-      return
-    }
     const currentTransform = parseTransform(transformKey)
-    async function renderFrame(renderer: PreviewRenderer, current: WatermarkSpec) {
+    async function renderFrame(renderer: PreviewRenderer, current: readonly WatermarkSpec[]) {
       try {
         const next = await renderer.render(current, { transform: currentTransform })
         if (next === null) {
@@ -79,12 +80,12 @@ export function useRenderer(
         return
       }
       setState((previous) => ({ ...previous, isRendering: true }))
-      void renderFrame(renderer, spec)
+      void renderFrame(renderer, specsRef.current)
     }, RENDER_DEBOUNCE_MS)
     return () => {
       clearTimeout(timer)
     }
-  }, [spec, transformKey, subjectVersion])
+  }, [specsKey, transformKey, subjectVersion])
 
   // Each object URL lives until the next result replaces it or the component unmounts.
   const url = state.result?.url
@@ -97,7 +98,7 @@ export function useRenderer(
     [url],
   )
 
-  const setSubject = useCallback(async (file: Blob | null) => {
+  const setSubject = useCallback(async (file: File | null) => {
     const renderer = rendererRef.current
     if (renderer === null) {
       return

@@ -1,5 +1,6 @@
 import { AxeBuilder } from '@axe-core/playwright'
-import { expect, test } from '@playwright/test'
+
+import { expect, test } from './support'
 
 test('landing page renders and has no accessibility violations', async ({ page }) => {
   await page.goto('/')

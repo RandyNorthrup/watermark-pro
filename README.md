@@ -15,7 +15,13 @@ hand placement, undo and download) M5 (bulk processing with a worker
 pool, progress, cancel, retry and ZIP export) M6 (stored photos with a
 searchable gallery), M7 (revocable share links with the Web Share API) and
 M8 (platform admin console, Turnstile bot protection, threat model, runbook,
-dependency review and tag-driven deploys) are complete: 1.0.0. See
+dependency review and tag-driven deploys), M9 (phone and tablet layouts,
+touch gestures, Safari support through a main-thread engine path, the
+four-device end-to-end matrix, mobile Lighthouse budgets and the red drill)
+and M10 (parity with the market: ink colour, multi-line text with a box,
+date and file-name stamps, QR codes, drawn signatures, several marks per
+photo, snap-to-grid, the share sheet for exports and a no-metadata export
+policy) are complete: 1.2.0. See
 [PLAN.md](PLAN.md) for the roadmap and [CHANGELOG.md](CHANGELOG.md) for what
 has actually shipped.
 
@@ -40,7 +46,10 @@ has actually shipped.
   Used by the pre-commit hook and `npm run security:secrets`.
 - [semgrep](https://semgrep.dev/) on `PATH` for `npm run security:sast`
   (1.174.0 verified; `pip install semgrep`). CI runs it regardless.
-- Playwright browsers for `npm run test:e2e`: `npx playwright install chromium`.
+- Playwright browsers for `npm run test:e2e`:
+  `npx playwright install chromium webkit` (WebKit runs the iPhone and iPad
+  projects; Playwright's Windows WebKit build has no `OffscreenCanvas`, which
+  exercises the main-thread engine path). CI installs both.
   If the Playwright downloader times out on your network, fetch the zip with
   `curl` and unpack it under `%LOCALAPPDATA%\ms-playwright\` with an empty
   `INSTALLATION_COMPLETE` marker file; that is what was done on the original
@@ -88,24 +97,25 @@ refuses in production.
 Every command exits non-zero on a finding. Each one was deliberately broken
 and observed to fail before being trusted; the log is in PLAN.md §8.
 
-| Command                     | Gate                                                                |
-| --------------------------- | ------------------------------------------------------------------- |
-| `npm run format:check`      | Prettier (with Tailwind class sorting)                              |
-| `npm run lint`              | ESLint, type-checked, zero warnings                                 |
-| `npm run lint:css`          | stylelint, zero warnings                                            |
-| `npm run typecheck`         | `tsc -b` over client, worker, and tooling projects                  |
-| `npm run deadcode`          | knip: unused files, exports, dependencies                           |
-| `npm run lint:cycles`       | dpdm: circular imports                                              |
-| `npm run lint:dup`          | jscpd: copy-paste, zero tolerance                                   |
-| `npm run security:secrets`  | gitleaks over git history                                           |
-| `npm run security:audit`    | `npm audit --audit-level=high`                                      |
-| `npm run security:sast`     | semgrep (`p/default`, `p/typescript`, `p/react`, `p/secrets`)       |
-| `npm run test`              | Vitest with coverage thresholds, then the workerd project           |
-| `npm run test:e2e`          | Playwright against the production build, axe on every page          |
-| `npm run audit:lighthouse`  | Lighthouse desktop budgets (PLAN.md §5.5) against a running preview |
-| `npm run audit:screenshots` | Visual record of every screen in both themes                        |
-| `npm run build`             | Vite production build                                               |
-| `npm run quality`           | All gates except `security:sast`, `test:e2e`, and the audits        |
+| Command                     | Gate                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| `npm run format:check`      | Prettier (with Tailwind class sorting)                                         |
+| `npm run lint`              | ESLint, type-checked, zero warnings                                            |
+| `npm run lint:css`          | stylelint, zero warnings                                                       |
+| `npm run typecheck`         | `tsc -b` over client, worker, and tooling projects                             |
+| `npm run deadcode`          | knip: unused files, exports, dependencies                                      |
+| `npm run lint:cycles`       | dpdm: circular imports                                                         |
+| `npm run lint:dup`          | jscpd: copy-paste, zero tolerance                                              |
+| `npm run security:secrets`  | gitleaks over git history                                                      |
+| `npm run security:audit`    | `npm audit --audit-level=high`                                                 |
+| `npm run security:sast`     | semgrep (`p/default`, `p/typescript`, `p/react`, `p/secrets`)                  |
+| `npm run test`              | Vitest with coverage thresholds, then the workerd project                      |
+| `npm run test:e2e`          | Playwright against the production build on four devices, axe on every page     |
+| `npm run test:drill`        | Red drill: every mutation in `scripts/red-drills.mjs` must turn a test red     |
+| `npm run audit:lighthouse`  | Lighthouse desktop and mobile budgets (PLAN.md §5.5) against a running preview |
+| `npm run audit:screenshots` | Visual record of every screen, both themes, desktop, iPhone and iPad           |
+| `npm run build`             | Vite production build                                                          |
+| `npm run quality`           | All gates except `security:sast`, `test:e2e`, and the audits                   |
 
 `npm run quality` omits the tools that need a browser or a machine install so
 it stays runnable anywhere. CI runs `quality:ci`, the e2e job, and the semgrep
@@ -119,6 +129,17 @@ Other test commands: `npm run test:unit` (jsdom + Node projects),
 mode; includes the throughput benchmark recorded in `docs/benchmarks.md`),
 `npm run test:workers` (workerd with real D1 and rate-limit bindings),
 `npm run test:watch`.
+
+The end-to-end suite runs every journey on four Playwright projects:
+`desktop-chrome`, `iphone` (iPhone 14, WebKit), `ipad` (iPad Mini, WebKit)
+and `android` (Pixel 7, Chromium). Pass `--project iphone` to run one.
+WebKit needs `npx playwright install webkit` once.
+
+The red drill (`npm run test:drill`, or `node scripts/red-drill.mjs --unit`
+to skip the two end-to-end drills) is how the tests prove themselves: each
+entry in `scripts/red-drills.mjs` breaks one behaviour, runs the test or
+gate that owns it, and restores the file. A drill whose command stays green
+fails the run. Reports are written to `docs/red-drill/`.
 
 ## Environment variables and bindings
 
@@ -195,21 +216,29 @@ preset is a mark plus placement, contrast and style settings
 (`src/shared/watermark.ts`):
 
 - **Marks:** text in any of 51 bundled font families (Fontsource, OFL or
-  Apache licensed, latin subset, loaded only when chosen); a Unicode glyph
-  from eight groups (legal, stars, arrows, shapes, checks, nature, objects,
-  currency); one of 70 lucide icons; or an uploaded logo.
+  Apache licensed, latin subset, loaded only when chosen), up to four lines,
+  with `{date}`, `{time}` and `{filename}` tokens filled in per photo from
+  the file's last-modified time and name; a Unicode glyph from eight groups
+  (legal, stars, arrows, shapes, checks, nature, objects, currency); one of
+  70 lucide icons; an uploaded logo; a signature drawn with a finger or mouse
+  on the designer's pad (saved as a transparent PNG logo); or a QR code
+  (up to 512 characters, always dark on a light field so it scans).
 - **Placement:** smart (the engine scores each corner and edge of every
   photo), a fixed corner, or a custom position.
 - **Contrast:** automatic light or dark ink with an outline that only appears
-  on mid-tone backgrounds, or a manual variant and outline strength.
-- **Style:** opacity, size relative to the photo width, rotation, margin, and
-  tiling with adjustable spacing.
+  on mid-tone backgrounds; a manual light or dark variant; or any colour,
+  with the outline in the opposite tone and an adjustable strength.
+- **Style:** opacity, size relative to the photo width, rotation, margin,
+  tiling with adjustable spacing, and for text and symbols an optional box
+  behind the mark with its own opacity.
 
 Logos are PNG, JPEG or WebP up to 5 MB, at most 50 per organization. The
 Worker checks the file signature rather than the declared type, stores the
 bytes in R2 under a key that includes the organization id, serves them only
 to signed-in members through `/api/orgs/:orgId/assets/:id/file`, and refuses
-to delete a logo while a preset still references it (HTTP 409).
+to delete a logo while a preset still references it (HTTP 409). A drawn
+signature is exported at 1024 px on its long side with a small margin and
+uploaded through the same route.
 
 The designer previews every change through the same Web Worker that will
 process real photos, on a bundled sample scene or on a photo you pick; the
@@ -218,27 +247,51 @@ photo never leaves the browser.
 ## Editor
 
 `/app/editor` watermarks one photo at a time. Open a photo (or drop it on the
-canvas), choose a preset, and adjust it for this photo only: drag the mark,
-scale it from the corner handle, rotate it from the top handle, or use the
-keyboard (arrow keys nudge, Shift for larger steps, `+`/`-` resize, `[`/`]`
-rotate). The library preset is never changed; "Revert" restores it.
+canvas), add a preset, and adjust it for this photo only: drag the mark,
+scale it from the corner handle, rotate it from the top handle, pinch and
+twist on a touch screen, or use the keyboard (arrow keys nudge, Shift for
+larger steps, `+`/`-` resize, `[`/`]` rotate). While dragging, the mark's
+centre snaps to the margin lines, the thirds and the centre, with guides
+drawn while it is snapped; hold Alt (Option on a Mac) to place it freely.
+The library preset is never changed; "Revert" restores it.
+
+Add up to eight presets to one photo. Each is a layer with its own
+placement and style; the list under the preset picker selects the layer the
+handles and the panels edit, and later layers paint over earlier ones.
 
 Crop with a free frame or a fixed ratio (original, 1:1, 4:3, 3:2, 16:9, 4:5,
 9:16), resize with a proportion lock or the percentage and long-edge
-shortcuts, then download as PNG, JPEG or WebP at full resolution. Every step
-is undoable (Ctrl/Cmd+Z, Ctrl+Shift+Z or Ctrl+Y). Rendering and export
-happen in a Web Worker in your browser; nothing is uploaded.
+shortcuts, then download as PNG, JPEG or WebP at full resolution, or hand
+the file to the device's share sheet (on an iPhone that is where "Save
+Image" and the social apps live; the button appears only where the browser
+can share files). Every step is undoable (Ctrl/Cmd+Z, Ctrl+Shift+Z or
+Ctrl+Y). Rendering and export happen in a Web Worker in your browser, or on
+the main thread where the browser has no `OffscreenCanvas`; nothing is
+uploaded.
 
 ## Bulk watermarking
 
-`/app/bulk` applies one preset to a whole shoot (up to 500 photos). Drop the
-photos in or pick them, choose the preset, the output format and quality, and
-optionally a maximum long edge, then press Start. The browser decodes each
-photo and a pool of engine workers (one per core, up to eight) renders them
-in parallel with smart placement and auto contrast worked out per photo.
-Cancel keeps what has finished, Retry re-queues failures, and the results
-download one by one or as a single ZIP. Nothing is uploaded unless you save
-the results to the gallery.
+`/app/bulk` applies one or more presets to a whole shoot (up to 500 photos).
+Drop the photos in or pick them, tick the presets (they are applied in the
+order ticked, later ones over earlier ones), choose the output format and
+quality, and optionally a maximum long edge, then press Start. The browser
+decodes each photo and a pool of engine workers (one per core, up to eight)
+renders them in parallel with smart placement and auto contrast worked out
+per photo and per mark. Cancel keeps what has finished, Retry re-queues
+failures, and the results download one by one, go to the share sheet one by
+one, or download as a single ZIP. Nothing is uploaded unless you save the
+results to the gallery.
+
+## Exports and metadata
+
+Every export, from the editor or the bulk tool, is re-encoded from pixels by
+the browser's canvas. The source file's EXIF block, and with it the camera
+model, GPS position, capture time and any embedded thumbnail, is not copied
+into the output; the orientation tag is applied to the pixels first, so
+photos from a phone come out upright. This is the only mode: there is no
+option to keep metadata. The gallery stores the exported file, so stored
+photos carry none either. `src/client/bulk/bulk.browser.test.ts` proves it
+with a tagged JPEG.
 
 ## Gallery
 
@@ -357,7 +410,8 @@ password reset, server-side RBAC on every route, a platform admin role with
 audited bans and role changes, an append-only audit trail, signed share
 tokens, fail-closed configuration validation, secret scanning in the hook and
 in CI, dependency audit and dependency review on pull requests, semgrep, exact
-pins with a seven-day release age, and GitHub Actions pinned to commit SHAs.
+pins with a seven-day release age, GitHub Actions pinned to commit SHAs, and
+exports that carry no EXIF (see "Exports and metadata").
 
 ## Troubleshooting
 

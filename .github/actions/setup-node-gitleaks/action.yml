@@ -28,4 +28,4 @@ runs:
     # The Vitest `browser` project and the Playwright suite both run in
     # Chromium; installing it here keeps every job that runs tests identical.
     - shell: bash
-      run: npx playwright install --with-deps chromium
+      run: npx playwright install --with-deps chromium webkit

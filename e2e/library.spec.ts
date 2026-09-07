@@ -4,15 +4,18 @@
  * saves a logo preset, edits and deletes from the library, and a viewer
  * sees the library read-only.
  */
-import { expect, type Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 import {
   createWorkspace,
+  expect,
   expectAccessible,
   latestLinkFor,
+  navigateTo,
   pngFixture,
   signIn,
   signUpAndVerify,
+  test,
 } from './support'
 
 const runId = Date.now().toString(36)
@@ -44,7 +47,7 @@ test.describe.configure({ mode: 'serial' })
 test('owner designs, saves, edits and deletes presets', async ({ page, request }) => {
   await createWorkspace(page, request, owner, organizationName)
 
-  await page.getByRole('link', { name: 'Library' }).first().click()
+  await navigateTo(page, 'Library')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
   await expect(page.getByText(/No presets yet/)).toBeVisible()
   await expectAccessible(page)
@@ -103,7 +106,7 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await expect(page.getByRole('link', { name: 'Script signature v2', exact: true })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
 
-  await page.getByRole('link', { name: 'Audit log' }).first().click()
+  await navigateTo(page, 'Audit log')
   await expect(page.getByText('watermark.created').first()).toBeVisible()
   await expect(page.getByText('asset.uploaded')).toBeVisible()
   await expect(page.getByText('watermark.deleted')).toBeVisible()
@@ -111,7 +114,7 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
 
 test('a viewer can browse presets but cannot change them', async ({ browser, page, request }) => {
   await signIn(page, owner, organizationName)
-  await page.getByRole('link', { name: 'Members' }).first().click()
+  await navigateTo(page, 'Members')
   await page.getByLabel('Email').fill(viewer.email)
   await page.getByRole('combobox', { name: 'Role' }).click()
   await page.getByRole('option', { name: 'Viewer' }).click()
@@ -124,7 +127,7 @@ test('a viewer can browse presets but cannot change them', async ({ browser, pag
   await signUpAndVerify(viewerPage, request, viewer)
   await viewerPage.goto(acceptPath)
   await viewerPage.getByRole('button', { name: 'Accept invitation' }).click()
-  await viewerPage.getByRole('link', { name: 'Library' }).first().click()
+  await navigateTo(viewerPage, 'Library')
   await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
   await expect(viewerPage.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
   await expect(viewerPage.getByRole('link', { name: 'New preset' })).toHaveCount(0)

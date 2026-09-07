@@ -53,7 +53,20 @@ describe('platform administration over D1', () => {
     emptyId = await client.createOrganization('Empty Org', 'empty-org')
     const { db } = getServices(env)
     await db.delete(member).where(eq(member.organizationId, emptyId))
-    await db.update(user).set({ role: 'admin' }).where(eq(user.email, owner.email))
+  })
+
+  it('promotes through the dev route with a real D1 update, once per existing account', async () => {
+    const refused = await client.get('/api/admin/organizations')
+    expect(refused.status).toBe(HTTP_STATUS.forbidden)
+    const missing = await client.post('/api/dev/promote', { email: 'nobody@example.test' })
+    expect(missing.status).toBe(HTTP_STATUS.notFound)
+    const promoted = await client.post('/api/dev/promote', { email: owner.email })
+    expect(promoted.status).toBe(HTTP_STATUS.ok)
+    const [row] = await getServices(env)
+      .db.select({ role: user.role })
+      .from(user)
+      .where(eq(user.email, owner.email))
+    expect(row?.role).toBe('admin')
   })
 
   it('counts members per organization with the grouped query', async () => {

@@ -164,7 +164,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
             onPointerMove={move}
             onPointerUp={end}
             onPointerCancel={end}
-            className={`absolute size-3.5 touch-none rounded-sm border-2 border-brand-600 bg-white shadow ${HANDLE_POSITIONS[handle]}`}
+            className={`absolute size-3.5 touch-none rounded-sm border-2 border-brand-600 bg-white shadow after:absolute after:-inset-3 after:content-[""] pointer-coarse:size-5 ${HANDLE_POSITIONS[handle]}`}
           />
         ))}
       </div>

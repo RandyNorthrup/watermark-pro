@@ -4,6 +4,9 @@
  * smart placement and contrast heuristics both busy and calm regions to
  * choose between without shipping a photograph.
  */
+import type { Canvas2D, CanvasBackend } from '../engine/canvas'
+import type { Size } from '../engine/layout'
+
 export const SAMPLE_PHOTO_WIDTH = 960
 export const SAMPLE_PHOTO_HEIGHT = 640
 
@@ -25,7 +28,7 @@ const HILL_PHASE_STEP = Math.PI / 2
 const HILL_STEPS = 64
 
 function drawHill(
-  ctx: OffscreenCanvasRenderingContext2D,
+  ctx: Canvas2D,
   width: number,
   height: number,
   baseline: number,
@@ -45,13 +48,8 @@ function drawHill(
   ctx.fill(path)
 }
 
-/** Draws the sample scene; exported so the browser tests can check its content. */
-export function drawSamplePhoto(canvas: OffscreenCanvas): void {
-  const ctx = canvas.getContext('2d')
-  if (ctx === null) {
-    throw new Error('2D canvas context is unavailable')
-  }
-  const { width, height } = canvas
+/** Draws the sample scene on any 2D context; exported so the browser tests can check its content. */
+export function drawSamplePhoto(ctx: Canvas2D, { width, height }: Size): void {
   const sky = ctx.createLinearGradient(0, 0, 0, height * HORIZON)
   sky.addColorStop(0, SKY_TOP)
   sky.addColorStop(1, SKY_BOTTOM)
@@ -71,8 +69,8 @@ export function drawSamplePhoto(canvas: OffscreenCanvas): void {
   ctx.fillRect(0, height * GROUND_START, width, height * (1 - GROUND_START))
 }
 
-export async function createSamplePhoto(): Promise<ImageBitmap> {
-  const canvas = new OffscreenCanvas(SAMPLE_PHOTO_WIDTH, SAMPLE_PHOTO_HEIGHT)
-  drawSamplePhoto(canvas)
-  return await createImageBitmap(canvas)
+export async function createSamplePhoto(backend: CanvasBackend): Promise<ImageBitmap> {
+  const canvas = backend.createCanvas(SAMPLE_PHOTO_WIDTH, SAMPLE_PHOTO_HEIGHT)
+  drawSamplePhoto(canvas.context, canvas)
+  return await canvas.toBitmap()
 }

@@ -151,3 +151,13 @@ export interface OrganizationStore {
    */
   listSummaries(): Promise<OrganizationSummary[]>
 }
+
+export interface UserStore {
+  /**
+   * Grants the platform `admin` role to the account with this email. Never
+   * reachable from the product API: production promotes through a D1 update
+   * (docs/runbook.md); the console-provider dev route uses this for tests.
+   * Resolves false when no such account exists.
+   */
+  promoteToPlatformAdmin(email: string): Promise<boolean>
+}

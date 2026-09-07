@@ -7,6 +7,12 @@ type ResolvedTheme = 'light' | 'dark'
 
 const STORAGE_KEY = 'watermark-pro.theme'
 const DARK_QUERY = '(prefers-color-scheme: dark)'
+/**
+ * Browser chrome colour (the iPhone status bar, Android's toolbar) per
+ * resolved theme: the raised surface colour from src/client/styles/app.css,
+ * as sRGB hex because the meta tag takes no oklch.
+ */
+const CHROME_COLOURS: Record<ResolvedTheme, string> = { light: '#ffffff', dark: '#26242f' }
 
 function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && (THEMES as readonly string[]).includes(value)
@@ -35,7 +41,14 @@ function resolve(theme: Theme): ResolvedTheme {
  * about the system setting itself.
  */
 export function applyTheme(theme: Theme): void {
-  document.documentElement.dataset['theme'] = resolve(theme)
+  const resolved = resolve(theme)
+  document.documentElement.dataset['theme'] = resolved
+  // index.html ships one theme-color per system scheme for the first paint;
+  // once the app decides, both carry the resolved colour so a manual choice
+  // wins over the system setting in the browser chrome too.
+  for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+    meta.setAttribute('content', CHROME_COLOURS[resolved])
+  }
   try {
     window.localStorage.setItem(STORAGE_KEY, theme)
   } catch {

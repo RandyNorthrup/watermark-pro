@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Trash2, Upload } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
 
+import { SignaturePad } from './signature-pad'
 import type { AssetDto } from '../../../shared/api'
 import { BYTES_PER_MEGABYTE, LOGO_CONTENT_TYPES, MAX_LOGO_BYTES } from '../../../shared/constants'
 import { describeError } from '../../lib/errors'
@@ -57,6 +58,20 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
       }
       return await uploadLogo(organizationId, { file, name: stripExtension(file.name), ...size })
     },
+    onSuccess: async (asset) => {
+      setUploadError(null)
+      onChange(asset.id)
+      await invalidate()
+    },
+    onError: (error) => {
+      setUploadError(describeError(error))
+    },
+  })
+
+  /** A drawn signature arrives already sized and as a PNG; it only needs uploading. */
+  const signature = useMutation({
+    mutationFn: async ({ file, size }: { file: File; size: { width: number; height: number } }) =>
+      await uploadLogo(organizationId, { file, name: stripExtension(file.name), ...size }),
     onSuccess: async (asset) => {
       setUploadError(null)
       onChange(asset.id)
@@ -162,19 +177,27 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
               event.currentTarget.value = ''
             }}
           />
-          <Button
-            type="button"
-            variant="secondary"
-            isPending={upload.isPending}
-            onClick={() => {
-              inputRef.current?.click()
-            }}
-          >
-            {upload.isPending ? null : <Upload aria-hidden="true" className="size-4" />}
-            Upload logo
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              isPending={upload.isPending}
+              onClick={() => {
+                inputRef.current?.click()
+              }}
+            >
+              {upload.isPending ? null : <Upload aria-hidden="true" className="size-4" />}
+              Upload logo
+            </Button>
+            <SignaturePad
+              isSaving={signature.isPending}
+              onSave={async (file, size) => {
+                await signature.mutateAsync({ file, size })
+              }}
+            />
+          </div>
           <p className="text-xs text-ink-muted">
-            PNG, JPEG or WebP up to {String(MAX_LOGO_MEGABYTES)} MB.
+            PNG, JPEG or WebP up to {String(MAX_LOGO_MEGABYTES)} MB, or a drawn signature.
           </p>
         </div>
       ) : null}

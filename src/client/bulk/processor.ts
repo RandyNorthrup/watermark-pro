@@ -10,8 +10,10 @@ import type { WorkerPool } from './worker-pool'
 import type { WatermarkSpec } from '../../shared/watermark'
 import { fitLongestSide, isSameSize } from '../editor/geometry'
 import type { EncodeOptions } from '../engine/encode'
+import { closeInputBitmaps } from '../engine/engine'
 import type { Transform } from '../engine/pipeline'
 import type { MarkResources } from '../lib/mark-resources'
+import { specForPhoto } from '../lib/spec-tokens'
 
 export interface BulkSettings {
   output: EncodeOptions
@@ -57,17 +59,19 @@ export class BulkProcessor {
 
   async process(
     file: File,
-    spec: WatermarkSpec,
+    specs: readonly WatermarkSpec[],
     settings: BulkSettings,
     signal: AbortSignal,
   ): Promise<BulkResult> {
     if (isAborted(signal)) {
       throw new CancelledError()
     }
-    const [source, inputs] = await Promise.all([decode(file), this.#resources.resolve(spec)])
+    const [source, inputs] = await Promise.all([
+      decode(file),
+      this.#resources.resolve(specs.map((spec) => specForPhoto(spec, file))),
+    ])
     if (isAborted(signal)) {
-      source.close()
-      inputs.image?.close()
+      closeInputBitmaps({ ...inputs, source, output: settings.output })
       throw new CancelledError()
     }
     const sourceSize = { width: source.width, height: source.height }

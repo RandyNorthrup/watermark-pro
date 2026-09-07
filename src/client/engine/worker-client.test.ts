@@ -35,7 +35,7 @@ const fakeBitmap = { width: 1, height: 1, close: noop } as unknown as ImageBitma
 function input() {
   return {
     source: fakeBitmap,
-    spec: DEFAULT_TEXT_SPEC,
+    marks: [{ spec: DEFAULT_TEXT_SPEC }],
     fonts: [],
     output: { format: 'image/png' as const, quality: 1 },
   }
@@ -54,8 +54,12 @@ describe('WatermarkWorker', () => {
       blob: new Blob(),
       width: 1,
       height: 1,
-      placement: { centreX: 0, centreY: 0, anchor: null, width: 1, height: 1, rotation: 0 },
-      contrast: { variant: 'dark', outline: 0, isAuto: true },
+      marks: [
+        {
+          placement: { centreX: 0, centreY: 0, anchor: null, width: 1, height: 1, rotation: 0 },
+          contrast: { variant: 'dark', fill: '#0f172a', outline: 0, isAuto: true },
+        },
+      ],
     })
     expect(client.busy).toBe(2)
     fake.respond({ type: 'failed', id: 2, message: 'boom' })
@@ -66,13 +70,17 @@ describe('WatermarkWorker', () => {
       blob: new Blob(),
       width: 3,
       height: 4,
-      placement: { centreX: 1, centreY: 2, anchor: 'center', width: 1, height: 1, rotation: 0 },
-      contrast: { variant: 'light', outline: 0.5, isAuto: false },
+      marks: [
+        {
+          placement: { centreX: 1, centreY: 2, anchor: 'center', width: 1, height: 1, rotation: 0 },
+          contrast: { variant: 'light', fill: '#f8fafc', outline: 0.5, isAuto: false },
+        },
+      ],
     })
     await expect(first).resolves.toMatchObject({
       width: 3,
       height: 4,
-      placement: { anchor: 'center' },
+      marks: [{ placement: { anchor: 'center' } }],
     })
     expect(client.busy).toBe(0)
   })

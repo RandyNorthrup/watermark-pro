@@ -1,4 +1,4 @@
-import { ADMIN_ORGANIZATION_PAGE_SIZE } from '../../shared/constants'
+import { ADMIN_ORGANIZATION_PAGE_SIZE, PLATFORM_ADMIN_ROLE } from '../../shared/constants'
 import type {
   AssetRecord,
   AssetStore,
@@ -9,6 +9,7 @@ import type {
   ShareRecord,
   ShareStore,
   StoredObject,
+  UserStore,
   WatermarkRecord,
   WatermarkStore,
 } from '../stores'
@@ -226,8 +227,23 @@ export function createMemoryShareStore(): ShareStore {
 
 /** The rows Better Auth's memory adapter keeps for tenants; shared by reference. */
 export interface MemoryTenantTables {
+  user: { email: string; role?: string | null }[]
   organization: { id: string; name: string; slug: string; createdAt: Date }[]
   member: { organizationId: string }[]
+}
+
+/** Promotes straight in the array Better Auth's memory adapter reads users from. */
+export function createMemoryUserStore(tables: Pick<MemoryTenantTables, 'user'>): UserStore {
+  return {
+    promoteToPlatformAdmin(email) {
+      const row = tables.user.find((candidate) => candidate.email === email)
+      if (row === undefined) {
+        return Promise.resolve(false)
+      }
+      row.role = PLATFORM_ADMIN_ROLE
+      return Promise.resolve(true)
+    },
+  }
 }
 
 /**

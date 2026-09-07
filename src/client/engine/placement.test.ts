@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { chooseContrast, resolveContrast } from './contrast'
+import { chooseContrast, INK, resolveContrast } from './contrast'
 import { markSize, meanLuminanceUnder, resolvePlacement, tileCentres } from './layout'
 import { anchorCentre, rankPlacements } from './placement'
 import { mapFrom } from './test-support/maps'
@@ -89,6 +89,7 @@ describe('chooseContrast', () => {
   it('honours a manual override', () => {
     expect(resolveContrast({ mode: 'manual', variant: 'dark', outline: 0.2 }, 0.1)).toEqual({
       variant: 'dark',
+      fill: INK.dark.fill,
       outline: 0.2,
       isAuto: false,
     })

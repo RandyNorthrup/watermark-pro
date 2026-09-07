@@ -2,10 +2,12 @@ import { ImagePlus, RotateCcw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import type { WatermarkSpec } from '../../../shared/watermark'
+import { INK } from '../../engine/contrast'
 import { apiRequest } from '../../lib/api'
 import { describeError } from '../../lib/errors'
 import { assetFileUrl } from '../../lib/library'
 import { PreviewRenderer, type PreviewResult } from '../../lib/preview'
+import { SampleScene } from '../sample-scene'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
@@ -24,12 +26,40 @@ function isRenderable(spec: WatermarkSpec): boolean {
 }
 
 function describePlacement(result: PreviewResult): string {
-  const ink = result.contrast.variant === 'light' ? 'light ink' : 'dark ink'
-  const anchor = result.placement.anchor
+  const mark = result.marks[0]
+  if (mark === undefined) {
+    return 'Nothing to place.'
+  }
+  const ink =
+    mark.contrast.isAuto || mark.contrast.fill === INK[mark.contrast.variant].fill
+      ? `${mark.contrast.variant} ink`
+      : `ink ${mark.contrast.fill}`
+  const anchor = mark.placement.anchor
   if (anchor === null) {
     return `Custom position, ${ink}.`
   }
   return `Placed ${anchor.replaceAll('-', ' ')}, ${ink}.`
+}
+
+/** What the preview area shows before the engine's first frame. */
+function PendingPreview({
+  isRenderable: isSpecRenderable,
+  hasOwnPhoto,
+}: {
+  isRenderable: boolean
+  hasOwnPhoto: boolean
+}) {
+  if (!isSpecRenderable) {
+    return (
+      <p className="p-6 text-center text-sm text-ink-muted">
+        Choose or upload a logo to see the preview.
+      </p>
+    )
+  }
+  if (hasOwnPhoto) {
+    return <Spinner className="size-6" label="Rendering preview" />
+  }
+  return <SampleScene className="max-h-[70vh] w-full object-contain" />
 }
 
 /**
@@ -98,6 +128,10 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
     [result],
   )
 
+  // A logo mark without a logo has nothing to show; a frame left over from
+  // the previous mark would misrepresent it, so the hint takes its place.
+  const shownResult = isRenderable(spec) ? result : null
+
   async function changeSubject(file: File | null) {
     const renderer = rendererRef.current
     if (renderer === null) {
@@ -161,27 +195,21 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
         </div>
       </div>
       <div className="flex min-h-64 items-center justify-center overflow-hidden rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
-        {result === null ? (
-          isRenderable(spec) ? (
-            <Spinner className="size-6" label="Rendering preview" />
-          ) : (
-            <p className="p-6 text-center text-sm text-ink-muted">
-              Choose or upload a logo to see the preview.
-            </p>
-          )
+        {shownResult === null ? (
+          <PendingPreview isRenderable={isRenderable(spec)} hasOwnPhoto={hasOwnPhoto} />
         ) : (
           <img
-            src={result.url}
+            src={shownResult.url}
             alt="Watermark preview on the subject photo"
-            width={result.width}
-            height={result.height}
+            width={shownResult.width}
+            height={shownResult.height}
             className="max-h-[70vh] w-full object-contain"
           />
         )}
       </div>
-      {result === null ? null : (
+      {shownResult === null ? null : (
         <p className="text-xs text-ink-muted" aria-live="polite">
-          {describePlacement(result)}
+          {describePlacement(shownResult)}
         </p>
       )}
       {error === null ? null : (

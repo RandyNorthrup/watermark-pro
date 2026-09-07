@@ -5,7 +5,46 @@
 import { deflateSync } from 'node:zlib'
 
 import { AxeBuilder } from '@axe-core/playwright'
-import { type APIRequestContext, type Download, expect, type Page } from '@playwright/test'
+import {
+  type APIRequestContext,
+  type Download,
+  expect,
+  type Page,
+  test as base,
+  type TestInfo,
+} from '@playwright/test'
+
+import { PREVIEW_ORIGIN } from './preview'
+
+export { expect } from '@playwright/test'
+
+/** Octets of the documentation range each test's address is drawn from. */
+const ADDRESS_PREFIX = '203.0.113'
+const OCTET_RANGE = 256
+
+/** A stable, distinct client address per test, from a hash of its id. */
+function addressFor(testInfo: TestInfo): string {
+  let hash = 0
+  for (const char of testInfo.testId) {
+    hash = (hash * 31 + (char.codePointAt(0) ?? 0)) >>> 0
+  }
+  const octet = (hash + testInfo.repeatEachIndex) % OCTET_RANGE
+  return `${ADDRESS_PREFIX}.${String(octet)}`
+}
+
+/**
+ * Every journey gets its own client address, as it would with real users on
+ * real devices. The Worker rate-limits credential attempts per address
+ * (PLAN.md 5.4); four device projects signing up in parallel from one
+ * address would trip that limit, and the limiter itself is proven by
+ * `auth-flow.workers.test.ts` against the real binding.
+ */
+export const test = base.extend({
+  context: async ({ context }, provide, testInfo) => {
+    await context.setExtraHTTPHeaders({ 'cf-connecting-ip': addressFor(testInfo) })
+    await provide(context)
+  },
+})
 
 export interface Person {
   name: string
@@ -45,9 +84,74 @@ export async function latestLinkFor(
   return `${parsed.pathname}${parsed.search}`
 }
 
+const SIDEBAR_SELECTOR = 'nav[aria-label="Primary"]'
+
+/**
+ * Follows a primary navigation link. Wide layouts show every destination in
+ * the sidebar; phones show the four tools in the tab bar and the rest behind
+ * the "Menu" sheet, so the helper opens that when it has to.
+ */
+export async function navigateTo(page: Page, label: string) {
+  const sidebar = page.getByRole('navigation', { name: 'Primary', exact: true })
+  const tabBar = page.getByRole('navigation', { name: 'Tools' })
+  // Both navigations are always in the document; CSS decides which one shows.
+  // Waiting for the sidebar to exist means the shell has rendered (a CSS
+  // locator, because role locators skip elements hidden by `display: none`).
+  await page.locator(SIDEBAR_SELECTOR).waitFor({ state: 'attached' })
+  for (const container of [sidebar, tabBar]) {
+    const link = container.getByRole('link', { name: label, exact: true })
+    if (await link.isVisible()) {
+      await link.click()
+      return
+    }
+  }
+  await page.getByRole('button', { name: 'Menu', exact: true }).click()
+  await page
+    .getByRole('navigation', { name: 'Primary (menu)' })
+    .getByRole('link', { name: label, exact: true })
+    .click()
+  await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+}
+
+/** Asserts a destination is absent from the navigation, opening the phone menu when needed. */
+export async function expectNoNavLink(page: Page, label: string) {
+  await page.locator(SIDEBAR_SELECTOR).waitFor({ state: 'attached' })
+  const menu = page.getByRole('button', { name: 'Menu', exact: true })
+  if (await menu.isVisible()) {
+    await menu.click()
+    await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible()
+  }
+  await expect(page.getByRole('link', { name: label, exact: true })).toHaveCount(0)
+  if (await menu.isVisible()) {
+    await page.getByRole('button', { name: 'Close menu' }).click()
+    await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+  }
+}
+
+/**
+ * Grants the platform admin role through the console-provider-only dev
+ * route, the same change the runbook makes with a D1 update in production.
+ */
+export async function promoteToPlatformAdmin(request: APIRequestContext, email: string) {
+  const response = await request.post('/api/dev/promote', {
+    data: { email },
+    headers: { origin: PREVIEW_ORIGIN },
+  })
+  expect(response.status()).toBe(200)
+}
+
+/**
+ * axe with zero violations, and no sideways scrolling (WCAG 1.4.10 reflow):
+ * a page wider than its viewport puts tap targets off-screen on a phone,
+ * which is how a long nowrap preset description broke the Android tab bar.
+ */
 export async function expectAccessible(page: Page) {
   const results = await new AxeBuilder({ page }).analyze()
   expect(results.violations).toEqual([])
+  const overflow = await page.evaluate<number>(
+    'document.documentElement.scrollWidth - document.documentElement.clientWidth',
+  )
+  expect(overflow, 'page must not scroll horizontally').toBeLessThanOrEqual(0)
 }
 
 export async function signUpAndVerify(page: Page, request: APIRequestContext, person: Person) {
@@ -64,6 +168,9 @@ export async function signUpAndVerify(page: Page, request: APIRequestContext, pe
 
   const verifyPath = await latestLinkFor(request, person.email, '/api/auth/verify-email')
   await page.goto(verifyPath)
+  // The verification link lands in the app, which redirects a member of no
+  // organization to the creation page; wait for that before navigating on.
+  await expect(page).toHaveURL(/\/app\/organizations\/new/)
 }
 
 export async function signIn(page: Page, person: Person, expectedHeading: string | RegExp) {

@@ -166,6 +166,29 @@ describe('photo storage', () => {
     expect(harness.objects.keys()).toHaveLength(2)
   })
 
+  it('enforces the photo count quota before reading the body', async () => {
+    for (let index = 0; index < MAX_PHOTOS_PER_ORGANIZATION; index += 1) {
+      await harness.services.photos.create({
+        id: `count-${String(index)}`,
+        organizationId,
+        name: `count ${String(index)}`,
+        key: `ck${String(index)}`,
+        thumbnailKey: `ct${String(index)}`,
+        contentType: 'image/png',
+        size: 1,
+        width: 1,
+        height: 1,
+        presetId: null,
+        presetName: null,
+        createdBy: null,
+      })
+    }
+    const overflow = await upload(ownerClient, photoForm('One too many', PNG_BYTES))
+    expect(overflow.status).toBe(HTTP_STATUS.badRequest)
+    expect(await errorCodeOf(overflow)).toBe(API_ERROR_CODE.quotaExceeded)
+    expect(harness.objects.keys()).toEqual([])
+  })
+
   it('enforces the storage byte quota', async () => {
     const big = new Uint8Array(MAX_PHOTO_BYTES)
     big.set(PNG_BYTES)

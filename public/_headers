@@ -10,8 +10,14 @@
 # Turn that off in the dashboard (Analytics & Logs -> Web Analytics) and remove
 # the two insights entries to drop it. Every other script stays self-hosted.
 # Tracked in PLAN.md §9.
+#
+# No upgrade-insecure-requests: production is HTTPS-only behind HSTS, every
+# source list here is 'self' or an explicit https origin, and an https page
+# cannot load http subresources under this policy anyway. WebKit (Safari) also
+# applies the directive to plain-http localhost, which Chromium exempts, so the
+# directive made the local preview unrenderable in the iPhone test projects.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

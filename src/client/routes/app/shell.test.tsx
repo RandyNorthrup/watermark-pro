@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -15,6 +15,8 @@ import { renderApp } from '../../test-support/render-app'
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 
 const client = fakeAuth
+/** Dashboard, Library, Editor, Bulk, Gallery, Shares, Members, Audit log. */
+const NAV_ITEM_COUNT = 8
 
 beforeEach(() => {
   installFakeAuth()
@@ -79,6 +81,37 @@ describe('application shell', () => {
     expect(window.localStorage.getItem('watermark-pro.theme')).toBe('dark')
     await user.click(screen.getByRole('button', { name: /Theme: dark/ }))
     expect(window.localStorage.getItem('watermark-pro.theme')).toBe('system')
+  })
+
+  it('offers the phone tab bar and a menu sheet with the remaining destinations', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const { router } = renderApp('/app')
+    await screen.findByRole('heading', { level: 1 })
+    const tabBar = screen.getByRole('navigation', { name: 'Tools' })
+    expect(
+      within(tabBar)
+        .getAllByRole('link')
+        .map((link) => link.textContent),
+    ).toEqual(['Library', 'Editor', 'Bulk', 'Gallery'])
+    expect(screen.queryByRole('dialog')).toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Menu' }))
+    const sheet = await screen.findByRole('dialog', { name: 'Menu' })
+    expect(
+      within(sheet).getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
+    ).toBeInTheDocument()
+    const menuNav = within(sheet).getByRole('navigation', { name: 'Primary (menu)' })
+    expect(within(menuNav).getAllByRole('link')).toHaveLength(NAV_ITEM_COUNT)
+    expect(within(menuNav).queryByRole('link', { name: 'Admin' })).toBeNull()
+    await user.click(within(menuNav).getByRole('link', { name: 'Members' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/members'))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+
+    await user.click(screen.getByRole('button', { name: 'Menu' }))
+    await screen.findByRole('dialog', { name: 'Menu' })
+    await user.click(screen.getByRole('button', { name: 'Close menu' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
   it('shows the layout error boundary when the organization cannot be loaded', async () => {

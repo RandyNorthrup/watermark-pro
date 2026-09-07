@@ -5,8 +5,8 @@
  * the bytes are cached).
  */
 import type { WatermarkSpec } from '../../shared/watermark'
-import type { FontResource } from '../engine/protocol'
-import type { ApplyInput } from '../engine/worker-client'
+import type { ApplyInput } from '../engine/engine'
+import type { FontResource, MarkInput } from '../engine/protocol'
 import { loadFont } from '../fonts/load'
 import { iconPath } from '../symbols/catalogue'
 
@@ -15,7 +15,8 @@ const GLYPH_WEIGHT = 400
 
 export type LogoLoader = (assetId: string) => Promise<Blob>
 
-export type MarkInputs = Omit<ApplyInput, 'source' | 'output' | 'transform'>
+/** The marks and fonts an engine call needs, ready to spread into `ApplyInput`. */
+export type MarkInputs = Pick<ApplyInput, 'marks' | 'fonts'>
 
 async function fontsFor(spec: WatermarkSpec): Promise<FontResource[]> {
   if (spec.kind === 'text') {
@@ -44,18 +45,32 @@ export class MarkResources {
     return await createImageBitmap(blob)
   }
 
-  async resolve(spec: WatermarkSpec): Promise<MarkInputs> {
+  async #mark(spec: WatermarkSpec): Promise<{ mark: MarkInput; fonts: FontResource[] }> {
     const [fonts, image] = await Promise.all([
       fontsFor(spec),
       spec.kind === 'image' ? this.#logoBitmap(spec.assetId) : Promise.resolve(undefined),
     ])
     return {
-      spec,
       fonts,
-      ...(image !== undefined && { image }),
-      ...(spec.kind === 'symbol' &&
-        spec.symbol.type === 'icon' && { iconPath: iconPath(spec.symbol.name) }),
+      mark: {
+        spec,
+        ...(image !== undefined && { image }),
+        ...(spec.kind === 'symbol' &&
+          spec.symbol.type === 'icon' && { iconPath: iconPath(spec.symbol.name) }),
+      },
     }
+  }
+
+  /** Resources for every spec, in order; each font file is listed once. */
+  async resolve(specs: readonly WatermarkSpec[]): Promise<MarkInputs> {
+    const resolved = await Promise.all(specs.map((spec) => this.#mark(spec)))
+    const fonts = new Map<string, FontResource>()
+    for (const entry of resolved) {
+      for (const font of entry.fonts) {
+        fonts.set(`${font.family}#${String(font.weight)}`, font)
+      }
+    }
+    return { marks: resolved.map((entry) => entry.mark), fonts: fonts.values().toArray() }
   }
 
   /** Forget a cached logo, for example after it was replaced. */

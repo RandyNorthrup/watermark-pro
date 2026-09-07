@@ -7,6 +7,169 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-06
+
+M10: parity with the market. Everything `docs/competitor-research.md` found
+missing against eZy Watermark and its peers, except pricing: the product
+stays free.
+
+### Added
+
+- Ink colour: a third contrast mode beside Auto and Light/Dark takes any
+  `#rrggbb` colour from a native colour input; the outline, shadow and box
+  take the tone opposite to the ink's own luminance so readability rules
+  still hold.
+- Multi-line text marks (up to four lines) and an optional box behind text
+  and symbol marks ("Box behind the mark", with its own opacity). Placement
+  measures the whole block.
+- Several marks per photo: the editor holds up to eight layers, each a
+  preset with its own placement and style; the list under the preset picker
+  chooses the layer the handles and panels edit, later layers paint over
+  earlier ones, and export, save, share and undo cover all of them. The
+  engine takes an ordered list of marks and reports placement and contrast
+  for each. Bulk applies several presets in the order ticked.
+- Snap to grid while dragging: the mark's centre snaps to the margin lines,
+  the thirds and the centre within 8 px, guides are drawn while snapped, and
+  Alt (Option) frees the drag.
+- Share sheet: the editor's export panel and every finished bulk file offer
+  Share where the browser can share files (`navigator.canShare`), so an
+  iPhone gets "Save Image" and the social apps; download stays.
+- Drawn signature: a pad in the designer's logo section (four pen widths,
+  undo, clear) that saves the strokes as a transparent PNG logo at 1024 px
+  through the existing asset route and selects it for the preset.
+- Date, time and file-name stamps: text marks accept `{date}`, `{time}` and
+  `{filename}`, resolved per photo from the file's last-modified time and
+  name in the designer preview, the editor and bulk.
+- QR-code marks: a fourth mark kind, up to 512 characters, drawn from the
+  module matrix of `qrcode-generator` 2.0.4 (MIT, no dependencies) as dark
+  modules on a light field with a quiet zone, whatever the background.
+- Metadata policy: exports are re-encoded from pixels and carry no EXIF (no
+  GPS, camera or capture time); the orientation tag is applied to the
+  pixels first. A browser test feeds a JPEG with a hand-built Exif segment
+  through the bulk processor and checks the output. Documented in README,
+  SECURITY.md and the threat model.
+- Ten red drills for the new behaviour (layers, colour, line breaks, box,
+  QR field, tokens, snap, share capability, signature padding, bulk preset
+  order), each seen red before the full drill.
+
+### Changed
+
+- The editor's preset select reads "Add another preset" once a layer is
+  present; "Revert" restores the active layer's preset.
+- The designer's Text field is a textarea; extra line breaks beyond the
+  fourth are folded into the last line.
+- `PLATFORM_ADMIN_ROLE` moved to `src/shared/constants.ts`, where both the
+  Worker and the client read it.
+
+### Fixed
+
+- The library page (and the dashboard, landing and placement grids) could
+  grow wider than a phone: an implicit `auto` grid column takes a card's
+  min-content width, and a long preset description pushed the page 86 px
+  past a Pixel 7, putting the tab bar off-screen. Every responsive grid now
+  has an explicit single base column, and the end-to-end suite asserts on
+  every page that nothing scrolls sideways.
+- The editor and designer requested their first-paint image (the sample
+  scene) only after the session and organization fetches; routes now declare
+  it and boot preloads it for the matched URL. Mobile Lighthouse: editor 81
+  to 85, designer 83 to 86, both within the budget.
+- The bulk page test ticked one preset, so a batch that dropped every preset
+  but the first would have passed it; found by the red drill, the test now
+  ticks two in reverse order and checks the order the runtime receives.
+- The bulk end-to-end fixture's two-line stamp had lost its line break to
+  the shell that wrote it.
+- Red drill runner: strips terminal colour codes before matching a runner's
+  failure line (tsc colours its output even with `FORCE_COLOR=0`, which hid
+  its "error TS" line), stamps reports with the local date instead of UTC,
+  and the main-thread engine drill follows the shared bitmap release helper.
+
+## [1.1.0] - 2026-09-06
+
+M9: mobile and Safari certification, red drill.
+
+### Added
+
+- Phone layout for the signed-in app: a compact top bar (menu, brand, theme,
+  account), a bottom tab bar with Library, Editor, Bulk and Gallery, and a
+  "Menu" sheet with the organization switcher and every other destination.
+  Safe-area insets on the header, tab bar and sheet; `scroll-padding` keeps
+  focused fields and tapped tabs clear of both bars; `viewport-fit=cover`,
+  theme-colour metas that follow the applied theme, an apple-touch-icon and
+  a web manifest for "Add to Home Screen".
+- Editor touch gestures: two fingers on the mark pinch to resize, twist to
+  rotate and slide to move; mark and crop handles keep a 44 px hit area on
+  coarse pointers. Synthetic multi-pointer tests cover the gesture.
+- Main-thread rendering path: the engine draws through a `CanvasBackend`
+  (`OffscreenCanvas` in the worker, `HTMLCanvasElement` on the page) and
+  `LocalEngine` runs the same pipeline on the calling thread where workers
+  cannot draw (Safari before 16.4, Playwright's Windows WebKit). Chosen by
+  capability detection, loaded on demand, covered by browser tests.
+- Playwright projects `iphone` (iPhone 14, WebKit), `ipad` (iPad Mini,
+  WebKit) and `android` (Pixel 7, Chromium) beside `desktop-chrome`; every
+  journey runs on all four with axe on every page. `navigateTo` and
+  `expectNoNavLink` helpers drive whichever navigation the layout shows; a
+  per-test client address fixture keeps the four projects out of one
+  credential-limit bucket.
+- `POST /api/dev/promote`: the console-provider-only platform-admin
+  promotion the end-to-end suite and audit scripts use instead of
+  `wrangler d1 execute --local`, which crashed Miniflare when four journeys
+  ran it concurrently against the serving database. 404 in any other
+  configuration; tested in Node and against real D1.
+- The red drill: `npm run test:drill` applies every mutation in
+  `scripts/red-drills.mjs` (RBAC, CSRF, rate limits, share tokens, uploads,
+  configuration, cookies, placement, contrast, crop analysis, engine
+  ownership, capability switch, undo, pinch, thumbnails, theme, shell, four
+  gates, two end-to-end journeys), runs the test or gate that owns each,
+  restores the file and fails on survivors. Its first run found three:
+  viewers updating presets, JSON requests from a foreign origin, and the
+  photo count quota had no failing test; all three now have one.
+- `scripts/lighthouse.mjs <milestone> mobile`: Lighthouse's phone emulation
+  with its own budgets (PLAN.md §5.5), audited through a brotli proxy
+  (`scripts/lib/compressing-proxy.mjs`) because the preview serves
+  uncompressed bytes and production does not; median of three runs per page.
+- `scripts/screenshots.mjs <milestone> [desktop|phone|tablet|all]`: the
+  visual record at 1440×900, on an iPhone 14 and on an iPad Mini (WebKit).
+- Dashboard tool cards; a sample-scene placeholder so the editor and
+  designer paint the photo with the page instead of a spinner; a
+  metric-matched fallback face for Inter so the font swap moves nothing.
+- `docs/competitor-research.md`: feature matrix for eZy Watermark,
+  Watermarkly, Visual Watermark, iWatermark+, uMark and three Android apps,
+  the input to the M10 parity plan.
+
+### Changed
+
+- CSP no longer sets `upgrade-insecure-requests`: HSTS and source lists of
+  `'self'` and explicit https origins already forbid http subresources, and
+  WebKit applies the directive to plain-http localhost, which made the app
+  unrenderable in Safari-engine tests.
+- Build: the UI primitives and every icon in use are one `ui` chunk instead
+  of thirty 1 kB files; the authenticated layout stays in the entry chunk;
+  matched route chunks download alongside the session check; the active
+  organization is requested alongside the organization list.
+- `PLATFORM_ADMIN_ROLE` lives in `src/shared/constants.ts` (it was defined
+  twice); `OrganizationStore` gains a `UserStore` sibling.
+- Landing page: no "early access" badge, honest security copy, wrapping
+  header at phone widths.
+- Playwright: 60 s test timeout, 10 s expect timeout, at most four workers.
+  Vitest page tests: 20 s timeout and a 4 s Testing Library async budget,
+  because the whole suite under coverage on a busy workstation timed out at
+  five seconds while every test passed alone.
+
+### Fixed
+
+- Safari: the app rendered nothing against the local preview (see CSP
+  above) and the engine threw `Can't find variable: OffscreenCanvas` where
+  that constructor is missing.
+- The phone header overflowed sideways with nine icon links; the audit and
+  organization tables were scroll regions without keyboard access; the
+  gallery lightbox squeezed its title to nothing beside four buttons; the
+  library card's title link overflowed its heading on an iPad; the designer
+  kept showing the previous mark's frame after switching to a logo mark
+  without a logo.
+- The dashboard still carried the M1 "what is next" roadmap copy.
+- `env.ts` refused a half-configured Turnstile but nothing tested it; now
+  `env.test.ts` does.
+
 ## [1.0.1] - 2026-09-06
 
 ### Changed

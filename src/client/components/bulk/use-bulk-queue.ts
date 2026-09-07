@@ -19,7 +19,7 @@ const EMPTY: BulkSnapshot = { jobs: [], isRunning: false, isSettled: false }
 export function useBulkQueue(organizationId: string) {
   const runtimeRef = useRef<BulkRuntime | null>(null)
   const queueRef = useRef<JobQueue<File, BulkResult> | null>(null)
-  const specRef = useRef<WatermarkSpec | null>(null)
+  const specsRef = useRef<readonly WatermarkSpec[] | null>(null)
   const settingsRef = useRef<BulkSettings | null>(null)
   const [snapshot, setSnapshot] = useState<BulkSnapshot>(EMPTY)
   const [workers, setWorkers] = useState(1)
@@ -32,12 +32,12 @@ export function useBulkQueue(organizationId: string) {
     const queue = new JobQueue<File, BulkResult>({
       concurrency: runtime.workers,
       run: (file, signal) => {
-        const spec = specRef.current
+        const specs = specsRef.current
         const settings = settingsRef.current
-        if (spec === null || settings === null) {
+        if (settings === null || specs === null || specs.length === 0) {
           return Promise.reject(new Error('choose a preset before starting'))
         }
-        return runtime.run(file, spec, settings, signal)
+        return runtime.run(file, specs, settings, signal)
       },
       onChange: setSnapshot,
     })
@@ -56,8 +56,8 @@ export function useBulkQueue(organizationId: string) {
     queueRef.current?.add(files)
   }, [])
 
-  const start = useCallback((spec: WatermarkSpec, settings: BulkSettings) => {
-    specRef.current = spec
+  const start = useCallback((specs: readonly WatermarkSpec[], settings: BulkSettings) => {
+    specsRef.current = specs
     settingsRef.current = settings
     return queueRef.current?.start() ?? Promise.resolve(EMPTY)
   }, [])

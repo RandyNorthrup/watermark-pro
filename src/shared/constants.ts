@@ -59,6 +59,18 @@ export const SENSITIVE_AUTH_PATHS = [
   '/change-password',
 ] as const
 
+/**
+ * Better Auth's platform-wide admin role (distinct from organization roles).
+ * Never granted through the product API; see docs/runbook.md.
+ */
+export const PLATFORM_ADMIN_ROLE = 'admin'
+
+/**
+ * The bundled sample scene the editor and designer show before the engine's
+ * first frame, written to `public/` by `scripts/sample-scene.mjs`.
+ */
+export const SAMPLE_SCENE_PATH = '/sample-scene.jpg'
+
 /** Library limits. */
 export const MAX_PRESET_NAME_LENGTH = 60
 export const BYTES_PER_MEGABYTE = 1024 * 1024

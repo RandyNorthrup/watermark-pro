@@ -4,10 +4,18 @@
  * downloaded and unpacked in Node, and every entry is a real image of the
  * requested size.
  */
-import { expect, test } from '@playwright/test'
 import { unzipSync } from 'fflate'
 
-import { createWorkspace, downloadBytes, expectAccessible, pngFixture, pngSize } from './support'
+import {
+  createWorkspace,
+  downloadBytes,
+  expect,
+  expectAccessible,
+  navigateTo,
+  pngFixture,
+  pngSize,
+  test,
+} from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -23,14 +31,25 @@ const FIXTURE_HEIGHT = 400
 test('watermarks twenty photos and downloads them as a ZIP', async ({ page, request }) => {
   await createWorkspace(page, request, owner, organizationName)
 
-  await page.getByRole('link', { name: 'Library' }).first().click()
+  await navigateTo(page, 'Library')
   await page.getByRole('link', { name: 'New preset' }).click()
-  await page.getByRole('textbox', { name: 'Text' }).fill('© Batch')
+  // Two presets: a coloured, boxed, two-line text with a date stamp, and a symbol.
+  await page.getByRole('textbox', { name: 'Text' }).fill('© Batch\n{date} {filename}')
+  await page.getByRole('tab', { name: 'Style' }).click()
+  await page.getByRole('radio', { name: 'Colour' }).click()
+  await page.getByRole('switch', { name: 'Box behind the mark' }).click()
   await page.getByLabel('Preset name').fill('Batch preset')
   await page.getByRole('button', { name: 'Save preset' }).click()
   await expect(page.getByRole('link', { name: 'Batch preset', exact: true })).toBeVisible()
+  await page.getByRole('link', { name: 'New preset' }).click()
+  await page.getByRole('tab', { name: 'Symbol' }).click()
+  await page.getByLabel('Preset name').fill('Batch symbol')
+  await page.getByRole('button', { name: 'Save preset' }).click()
+  await expect(page.getByRole('link', { name: 'Batch symbol', exact: true })).toBeVisible()
+  // Two cards with long descriptions must still fit a phone's width.
+  await expectAccessible(page)
 
-  await page.getByRole('link', { name: 'Bulk' }).first().click()
+  await navigateTo(page, 'Bulk')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Bulk watermarking')
   await expectAccessible(page)
 
@@ -48,7 +67,9 @@ test('watermarks twenty photos and downloads them as a ZIP', async ({ page, requ
   await expect(
     page.getByRole('heading', { level: 2, name: `${String(FIXTURES)} photos` }),
   ).toBeVisible()
-  await page.getByLabel('Preset').selectOption({ label: 'Batch preset' })
+  await page.getByRole('checkbox', { name: 'Batch preset' }).check()
+  await page.getByRole('checkbox', { name: 'Batch symbol' }).check()
+  await expect(page.getByText('applied in the order ticked')).toBeVisible()
   await page.getByRole('combobox', { name: 'Format' }).click()
   await page.getByRole('option', { name: 'PNG' }).click()
   await page.getByRole('combobox', { name: 'Size' }).click()

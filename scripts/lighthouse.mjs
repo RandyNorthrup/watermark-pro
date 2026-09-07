@@ -5,7 +5,11 @@
  * Runs against a preview server that is already listening on APP_URL:
  *   npm run build && npm run db:migrate:local && npm run preview
  * then, in another terminal:
- *   node scripts/lighthouse.mjs
+ *   node scripts/lighthouse.mjs <milestone> [desktop|mobile]
+ *
+ * `desktop` (the default) uses Lighthouse's desktop preset; `mobile` uses
+ * its default emulation (a mid-range Android phone on slow 4G with a 4x
+ * CPU slowdown), which is the harsher of the two and has its own budgets.
  *
  * Public pages are audited directly. For the authenticated dashboard the
  * script signs up a throwaway user through the API, verifies it through the
@@ -20,12 +24,28 @@ import { launch } from 'chrome-launcher'
 import lighthouse from 'lighthouse'
 import desktopConfig from 'lighthouse/core/config/desktop-config.js'
 
+import { startCompressingProxy } from './lib/compressing-proxy.mjs'
 import { waitForLink } from './lib/dev-mailbox.mjs'
-import { promoteToPlatformAdmin } from './lib/local-admin.ts'
 
 const BASE_URL = process.env.APP_URL ?? 'http://localhost:5173'
 const MILESTONE = process.argv[2] ?? 'm1'
-const BUDGETS = { performance: 0.9, accessibility: 0.95, 'best-practices': 0.95 }
+const FORM_FACTOR = process.argv[3] ?? 'desktop'
+if (FORM_FACTOR !== 'desktop' && FORM_FACTOR !== 'mobile') {
+  throw new Error(`form factor must be desktop or mobile, not ${FORM_FACTOR}`)
+}
+/** PLAN.md 5.5: the mobile row allows for the simulated slow phone and network. */
+const BUDGETS = {
+  desktop: { performance: 0.9, accessibility: 0.95, 'best-practices': 0.95 },
+  mobile: { performance: 0.85, accessibility: 0.95, 'best-practices': 0.95 },
+}[FORM_FACTOR]
+const REPORT_DIR = path.join('docs', 'lighthouse', MILESTONE, FORM_FACTOR)
+/**
+ * Pages are audited through a brotli proxy (scripts/lib/compressing-proxy.mjs)
+ * because the preview serves uncompressed bytes and production does not;
+ * sessions are still created against the preview itself. Cookies ignore
+ * ports, so the session set on localhost:5173 is sent to the proxy too.
+ */
+const PROXY_PORT = 5199
 const PUBLIC_PAGES = ['/', '/login', '/signup']
 const AUTHENTICATED_PAGES = [
   '/app',
@@ -108,7 +128,13 @@ async function createSession() {
   }
   // The admin console is part of the audited surface; the role is read from
   // the database on every request, so the promotion applies to this session.
-  promoteToPlatformAdmin(email)
+  const promoted = await api('/api/dev/promote', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+  if (!promoted.ok) {
+    throw new Error(`promotion failed: ${promoted.status}`)
+  }
   return { cookie, organizationId: id }
 }
 
@@ -148,12 +174,41 @@ async function createSharePath(cookie, organizationId) {
 }
 
 const MAX_ATTEMPTS = 3
+/**
+ * Simulated throttling still starts from observed server timings, which
+ * jitter on a workstation; the median of three runs per page is what
+ * Lighthouse CI reports and what the budgets are judged on.
+ */
+const RUNS_PER_PAGE = Number(process.env.LIGHTHOUSE_RUNS ?? '3')
 
-async function audit(chrome, pathname, cookie, attempt = 1, slugOverride = null) {
-  // PLAN.md §5.5 budgets are desktop numbers: Lighthouse's desktop preset
-  // (40 ms RTT, 10 Mbps, no CPU slowdown) rather than the default mobile one.
+/** The run whose performance score is the median; ties go to the earlier run. */
+function medianRun(runs) {
+  const sorted = runs.toSorted((a, b) => a.scores.performance - b.scores.performance)
+  return sorted[Math.floor((sorted.length - 1) / 2)]
+}
+
+async function auditMedian(origin, chrome, pathname, cookie, slugOverride = null) {
+  const runs = []
+  for (let run = 0; run < RUNS_PER_PAGE; run += 1) {
+    const sample = await audit(origin, chrome, pathname, cookie, 1, slugOverride)
+    if (sample !== null) {
+      runs.push(sample)
+    }
+  }
+  if (runs.length === 0) {
+    throw new Error(`${pathname}: no run produced a trace`)
+  }
+  const chosen = medianRun(runs)
+  await mkdir(REPORT_DIR, { recursive: true })
+  await writeFile(path.join(REPORT_DIR, `${chosen.slug}.html`), chosen.report)
+  return chosen.scores
+}
+
+async function audit(origin, chrome, pathname, cookie, attempt = 1, slugOverride = null) {
+  // Desktop preset: 40 ms RTT, 10 Mbps, no CPU slowdown. Mobile: Lighthouse's
+  // default config, which emulates a phone screen, slow 4G and a 4x slower CPU.
   const result = await lighthouse(
-    `${BASE_URL}${pathname}`,
+    `${origin}${pathname}`,
     {
       port: chrome.port,
       output: 'html',
@@ -161,45 +216,48 @@ async function audit(chrome, pathname, cookie, attempt = 1, slugOverride = null)
       onlyCategories: Object.keys(BUDGETS),
       extraHeaders: cookie === '' ? undefined : { Cookie: cookie },
     },
-    desktopConfig,
+    FORM_FACTOR === 'desktop' ? desktopConfig : undefined,
   )
   if (result === undefined) {
     throw new Error(`lighthouse produced no result for ${pathname}`)
   }
   if (result.lhr.runtimeError !== undefined) {
-    // Trace capture occasionally fails (NO_NAVSTART); Lighthouse itself says to rerun.
+    // Trace capture occasionally fails (NO_NAVSTART); Lighthouse itself says
+    // to rerun. A sample that never traces is dropped; the median needs one.
     if (attempt < MAX_ATTEMPTS) {
       console.warn(`retrying ${pathname}: ${result.lhr.runtimeError.code}`)
-      return await audit(chrome, pathname, cookie, attempt + 1, slugOverride)
+      return await audit(origin, chrome, pathname, cookie, attempt + 1, slugOverride)
     }
-    throw new Error(`${pathname}: ${result.lhr.runtimeError.message}`)
+    console.warn(`dropping a sample of ${pathname}: ${result.lhr.runtimeError.code}`)
+    return null
   }
   const scores = Object.fromEntries(
     Object.entries(result.lhr.categories).map(([key, category]) => [key, category.score ?? 0]),
   )
   const slug =
     slugOverride ?? (pathname === '/' ? 'home' : pathname.replaceAll('/', '-').replace(/^-/, ''))
-  const reportDir = path.join('docs', 'lighthouse', MILESTONE)
-  await mkdir(reportDir, { recursive: true })
-  await writeFile(path.join(reportDir, `${slug}.html`), result.report)
-  return scores
+  return { scores, slug, report: result.report }
 }
 
 const chrome = await launch({
   chromeFlags: ['--headless=new', '--no-first-run', '--disable-gpu'],
 })
+const proxy = await startCompressingProxy({ upstream: BASE_URL, port: PROXY_PORT })
 try {
   const { cookie, organizationId } = await createSession()
   const rows = []
   let hasFailure = false
   for (const pathname of PUBLIC_PAGES) {
-    rows.push([pathname, await audit(chrome, pathname, '')])
+    rows.push([pathname, await auditMedian(proxy.origin, chrome, pathname, '')])
   }
   for (const pathname of AUTHENTICATED_PAGES) {
-    rows.push([pathname, await audit(chrome, pathname, cookie)])
+    rows.push([pathname, await auditMedian(proxy.origin, chrome, pathname, cookie)])
   }
   const sharePath = await createSharePath(cookie, organizationId)
-  rows.push(['/share/<token>', await audit(chrome, sharePath, '', 1, 'share-token')])
+  rows.push([
+    '/share/<token>',
+    await auditMedian(proxy.origin, chrome, sharePath, '', 'share-token'),
+  ])
   const summary = [
     '| Page | Performance | Accessibility | Best practices |',
     '| --- | --- | --- | --- |',
@@ -214,13 +272,14 @@ try {
     summary.push(`| \`${pathname}\` | ${cells.join(' | ')} |`)
   }
   const table = summary.join('\n')
-  await writeFile(path.join('docs', 'lighthouse', MILESTONE, 'summary.md'), `${table}\n`)
-  console.info(table)
+  await writeFile(path.join(REPORT_DIR, 'summary.md'), `${table}\n`)
+  console.info(`${FORM_FACTOR}\n${table}`)
   if (hasFailure) {
-    console.error('Lighthouse budget missed (PLAN.md §5.5)')
+    console.error(`Lighthouse ${FORM_FACTOR} budget missed (PLAN.md §5.5)`)
     process.exitCode = 1
   }
 } finally {
+  await proxy.close()
   try {
     await chrome.kill()
   } catch (error) {

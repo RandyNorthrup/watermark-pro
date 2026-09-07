@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vitest/config'
 
+const PAGE_TEST_TIMEOUT_MS = 20_000
+
 /** Coverage floors. Lowering one needs a PLAN.md §9 entry. */
 const COVERAGE_THRESHOLDS = {
   lines: 90,
@@ -30,6 +32,10 @@ export default defineConfig({
           include: ['src/client/**/*.test.{ts,tsx}', 'src/shared/**/*.test.ts'],
           exclude: ['src/client/**/*.browser.test.ts'],
           setupFiles: ['./src/client/test-setup.ts'],
+          // Router-level page tests: many awaited steps each, under coverage,
+          // on a machine that may be busy. Failures still surface; slow steps
+          // are not mistaken for broken ones.
+          testTimeout: PAGE_TEST_TIMEOUT_MS,
         },
       },
       {

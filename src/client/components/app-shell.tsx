@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate, useRouter } from '@tanstack/react-router'
+import { Link, useNavigate, useRouter, useRouterState } from '@tanstack/react-router'
 import {
   Building2,
   ChevronsUpDown,
@@ -7,6 +7,7 @@ import {
   Layers,
   LayoutDashboard,
   LogOut,
+  Menu,
   PencilRuler,
   Plus,
   ScrollText,
@@ -15,7 +16,7 @@ import {
   Stamp,
   Users,
 } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
 
 import { BrandMark } from './brand-mark'
 import { ThemeToggle } from './theme-toggle'
@@ -32,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 
 const NAV_ITEMS = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -53,6 +55,14 @@ const ADMIN_NAV_ITEM = {
 
 type NavItem = (typeof NAV_ITEMS)[number] | typeof ADMIN_NAV_ITEM
 
+/**
+ * The tools a phone user reaches for most sit in the bottom tab bar; the
+ * rest, with the organization switcher, are behind the "More" sheet.
+ */
+const TAB_BAR_ITEMS: readonly NavItem[] = NAV_ITEMS.filter((item) =>
+  ['/app/library', '/app/editor', '/app/bulk', '/app/gallery'].includes(item.to),
+)
+
 /** Platform administrators get one more entry; everyone else never sees it. */
 function navItemsFor(session: SessionData): readonly NavItem[] {
   return isPlatformAdmin(session.user) ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS
@@ -66,8 +76,10 @@ interface AppShellProps {
 }
 
 /**
- * Authenticated chrome: sidebar navigation, organization switcher, user
- * menu, theme toggle. Rendered by the `/app` layout route.
+ * Authenticated chrome. Wide screens: a sidebar with the organization
+ * switcher and every destination. Phones: a compact top bar, a bottom tab
+ * bar with the four tools, and a "More" sheet for the rest. Both layouts
+ * respect the device's safe areas.
  */
 export function AppShell({ session, organization, organizations, children }: AppShellProps) {
   const navItems = navItemsFor(session)
@@ -84,54 +96,126 @@ export function AppShell({ session, organization, organizations, children }: App
         <div className="mt-6">
           <OrganizationSwitcher organization={organization} organizations={organizations} />
         </div>
-        <nav aria-label="Primary" className="mt-6 flex flex-col gap-1">
-          {navItems.map(({ to, label, icon: Icon, exact }) => (
-            <Link
-              key={to}
-              to={to}
-              activeOptions={{ exact }}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-brand-50 hover:text-ink dark:hover:bg-brand-900/40"
-              activeProps={{
-                className: 'bg-brand-50 text-brand-800 dark:bg-brand-900/50 dark:text-brand-100',
-              }}
-            >
-              <Icon aria-hidden="true" className="size-4" />
-              {label}
-            </Link>
-          ))}
-        </nav>
+        <NavList items={navItems} label="Primary" className="mt-6" />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface-raised/80 px-4 py-3 backdrop-blur md:px-8">
-          <div className="md:hidden">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface-raised/80 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur md:px-8 md:pt-3">
+          <div className="flex min-w-0 items-center gap-1 md:hidden">
+            <MobileMenu
+              items={navItems}
+              organization={organization}
+              organizations={organizations}
+            />
             <BrandMark to="/app" />
           </div>
-          <nav aria-label="Primary (compact)" className="flex gap-1 md:hidden">
-            {navItems.map(({ to, label, icon: Icon, exact }) => (
-              <Link
-                key={to}
-                to={to}
-                activeOptions={{ exact }}
-                aria-label={label}
-                className="rounded-lg p-2 text-ink-muted"
-                activeProps={{
-                  className: 'bg-brand-50 text-brand-800 dark:bg-brand-900/50 dark:text-brand-100',
-                }}
-              >
-                <Icon aria-hidden="true" className="size-5" />
-              </Link>
-            ))}
-          </nav>
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
             <UserMenu session={session} />
           </div>
         </header>
-        <main id="main" tabIndex={-1} className="flex-1 px-4 py-8 md:px-8">
+        <main
+          id="main"
+          tabIndex={-1}
+          className="flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:py-8 md:pb-8"
+        >
           <div className="mx-auto w-full max-w-5xl">{children}</div>
         </main>
+        <TabBar items={TAB_BAR_ITEMS} />
       </div>
     </div>
+  )
+}
+
+interface NavListProps {
+  items: readonly NavItem[]
+  label: string
+  className?: string
+  onNavigate?: () => void
+}
+
+function NavList({ items, label, className, onNavigate }: NavListProps) {
+  return (
+    <nav aria-label={label} className={cn('flex flex-col gap-1', className)}>
+      {items.map(({ to, label: itemLabel, icon: Icon, exact }) => (
+        <Link
+          key={to}
+          to={to}
+          activeOptions={{ exact }}
+          onClick={onNavigate}
+          className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-brand-50 hover:text-ink dark:hover:bg-brand-900/40"
+          activeProps={{
+            className: 'bg-brand-50 text-brand-800 dark:bg-brand-900/50 dark:text-brand-100',
+          }}
+        >
+          <Icon aria-hidden="true" className="size-4" />
+          {itemLabel}
+        </Link>
+      ))}
+    </nav>
+  )
+}
+
+/** Phone-only bottom tab bar; sits above the home indicator. */
+function TabBar({ items }: { items: readonly NavItem[] }) {
+  return (
+    <nav
+      aria-label="Tools"
+      className="fixed inset-x-0 bottom-0 z-10 grid h-(--app-tab-bar-height) border-t border-line bg-surface-raised/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      style={{ gridTemplateColumns: `repeat(${String(items.length)}, minmax(0, 1fr))` }}
+    >
+      {items.map(({ to, label, icon: Icon, exact }) => (
+        <Link
+          key={to}
+          to={to}
+          activeOptions={{ exact }}
+          className="flex flex-col items-center justify-center gap-1 px-1 text-[0.6875rem] font-medium text-ink-muted"
+          activeProps={{ className: 'text-brand-700 dark:text-brand-200' }}
+        >
+          <Icon aria-hidden="true" className="size-5" />
+          {label}
+        </Link>
+      ))}
+    </nav>
+  )
+}
+
+function MobileMenu({
+  items,
+  organization,
+  organizations,
+}: Pick<AppShellProps, 'organization' | 'organizations'> & { items: readonly NavItem[] }) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  // The sheet is open for the path it was opened on, so any navigation,
+  // including the organization switcher's, closes it without an effect.
+  const [openPathname, setOpenPathname] = useState<string | null>(null)
+  const isOpen = openPathname === pathname
+  return (
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        setOpenPathname(open ? pathname : null)
+      }}
+    >
+      <SheetTrigger asChild>
+        <Button type="button" variant="ghost" size="icon" aria-label="Menu">
+          <Menu aria-hidden="true" className="size-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent
+        title="Menu"
+        description="Switch organization or go to any part of Watermark Pro."
+        isDescriptionHidden
+      >
+        <OrganizationSwitcher organization={organization} organizations={organizations} />
+        <NavList
+          items={items}
+          label="Primary (menu)"
+          onNavigate={() => {
+            setOpenPathname(null)
+          }}
+        />
+      </SheetContent>
+    </Sheet>
   )
 }
 

@@ -274,6 +274,12 @@ describe('library access control', () => {
     })
     expect(viewerCreate.status).toBe(HTTP_STATUS.forbidden)
     expect(await uploadStatus(viewerClient)).toBe(HTTP_STATUS.forbidden)
+    const viewerUpdate = await viewerClient.request(base(`/watermarks/${presetId}`), {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Renamed by a viewer', spec: DEFAULT_TEXT_SPEC }),
+    })
+    expect(viewerUpdate.status).toBe(HTTP_STATUS.forbidden)
     const viewerDelete = await viewerClient.request(base(`/watermarks/${presetId}`), {
       method: 'DELETE',
     })

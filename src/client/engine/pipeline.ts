@@ -1,13 +1,16 @@
 /**
  * End-to-end application of a mark to one image: optional crop and resize,
  * analysis, placement, contrast, drawing (single or tiled), and encoding.
- * Runs in a Web Worker via `worker.ts` and in the editor on the main thread.
+ * Runs in a Web Worker via `worker.ts` and, where the worker cannot draw,
+ * on the main thread via `local-engine.ts`; the caller supplies the canvas
+ * backend for its context.
  */
 import { type LuminanceMap, toLuminanceMap } from './analysis'
+import type { Canvas2D, CanvasBackend, EngineCanvas } from './canvas'
 import { resolveContrast, type ResolvedContrast } from './contrast'
 import { encodeCanvas, type EncodeOptions } from './encode'
 import { markSize, resolvePlacement, type Size, tileCentres } from './layout'
-import { type Canvas2D, drawMark, measureAspect, type RenderableMark } from './render'
+import { drawMark, measureAspect, type RenderableMark } from './render'
 import type { Anchor } from '../../shared/watermark'
 
 /** Longest side of the analysis map; small enough to be instant, large enough to see composition. */
@@ -29,7 +32,8 @@ export interface Transform {
 
 export interface ApplyRequest {
   source: ImageBitmap
-  mark: RenderableMark
+  /** Drawn in order; later marks paint over earlier ones. */
+  marks: RenderableMark[]
   output: EncodeOptions
   transform?: Transform
 }
@@ -44,58 +48,62 @@ export interface MarkPlacement {
   rotation: number
 }
 
-export interface ApplyResult {
-  blob: Blob
-  width: number
-  height: number
+/** Where one mark landed and which ink it got. */
+export interface MarkOutcome {
   placement: MarkPlacement
   contrast: ResolvedContrast
 }
 
-export function createCanvas(width: number, height: number): OffscreenCanvas {
-  return new OffscreenCanvas(Math.max(1, Math.round(width)), Math.max(1, Math.round(height)))
+export interface ApplyResult {
+  blob: Blob
+  width: number
+  height: number
+  /** One entry per mark, in the order they were given. */
+  marks: MarkOutcome[]
 }
 
-function context(canvas: OffscreenCanvas): OffscreenCanvasRenderingContext2D {
-  const ctx = canvas.getContext('2d')
-  if (ctx === null) {
-    throw new Error('2D canvas context is unavailable')
+/** The crop a transform asks for, or the whole source. */
+function cropOf(source: ImageBitmap, transform: Transform | undefined): CropRect {
+  const crop = transform?.crop ?? { x: 0, y: 0, width: source.width, height: source.height }
+  if (crop.width <= 0 || crop.height <= 0) {
+    throw new RangeError('crop rectangle must have a positive size')
   }
-  return ctx
+  return crop
+}
+
+function drawCropped(ctx: Canvas2D, source: ImageBitmap, crop: CropRect, target: Size): void {
+  ctx.drawImage(source, crop.x, crop.y, crop.width, crop.height, 0, 0, target.width, target.height)
 }
 
 /** Draws the (cropped, resized) source onto a fresh canvas. */
 export function prepareCanvas(
   source: ImageBitmap,
   transform: Transform | undefined,
-): OffscreenCanvas {
-  const crop = transform?.crop ?? { x: 0, y: 0, width: source.width, height: source.height }
-  if (crop.width <= 0 || crop.height <= 0) {
-    throw new RangeError('crop rectangle must have a positive size')
-  }
+  backend: CanvasBackend,
+): EngineCanvas {
+  const crop = cropOf(source, transform)
   const size = transform?.resize ?? { width: crop.width, height: crop.height }
-  const canvas = createCanvas(size.width, size.height)
-  context(canvas).drawImage(
-    source,
-    crop.x,
-    crop.y,
-    crop.width,
-    crop.height,
-    0,
-    0,
-    canvas.width,
-    canvas.height,
-  )
+  const canvas = backend.createCanvas(size.width, size.height)
+  drawCropped(canvas.context, source, crop, canvas)
   return canvas
 }
 
-/** Luminance map of a canvas at analysis resolution. */
-export function analyseCanvas(canvas: OffscreenCanvas): LuminanceMap {
-  const scale = Math.min(1, ANALYSIS_MAX_SIDE / Math.max(canvas.width, canvas.height))
-  const small = createCanvas(canvas.width * scale, canvas.height * scale)
-  const ctx = context(small)
-  ctx.drawImage(canvas, 0, 0, small.width, small.height)
-  const pixels = ctx.getImageData(0, 0, small.width, small.height)
+/**
+ * Luminance map of the (cropped) source at analysis resolution. Samples the
+ * source bitmap rather than the prepared canvas so no canvas ever has to
+ * serve as an image source, which keeps the backend interface minimal.
+ */
+export function analyseSource(
+  source: ImageBitmap,
+  transform: Transform | undefined,
+  backend: CanvasBackend,
+): LuminanceMap {
+  const crop = cropOf(source, transform)
+  const output = transform?.resize ?? { width: crop.width, height: crop.height }
+  const scale = Math.min(1, ANALYSIS_MAX_SIDE / Math.max(output.width, output.height))
+  const small = backend.createCanvas(output.width * scale, output.height * scale)
+  drawCropped(small.context, source, crop, small)
+  const pixels = small.context.getImageData(0, 0, small.width, small.height)
   return toLuminanceMap(pixels.data, pixels.width, pixels.height)
 }
 
@@ -108,7 +116,7 @@ export function composeMark(
   image: Size,
   map: LuminanceMap,
   mark: RenderableMark,
-): Pick<ApplyResult, 'placement' | 'contrast'> {
+): MarkOutcome {
   const { spec } = mark
   const size = markSize(spec, image, measureAspect(ctx, mark))
   const placement = resolvePlacement(spec, image, size, map)
@@ -139,10 +147,15 @@ export function composeMark(
   }
 }
 
-export async function applyWatermark(request: ApplyRequest): Promise<ApplyResult> {
-  const canvas = prepareCanvas(request.source, request.transform)
-  const map = analyseCanvas(canvas)
-  const composed = composeMark(context(canvas), canvas, map, request.mark)
+export async function applyWatermark(
+  request: ApplyRequest,
+  backend: CanvasBackend,
+): Promise<ApplyResult> {
+  const canvas = prepareCanvas(request.source, request.transform, backend)
+  const map = analyseSource(request.source, request.transform, backend)
+  // Every mark is placed against the photo alone: marks do not avoid each
+  // other, and a later mark paints over an earlier one where they meet.
+  const marks = request.marks.map((mark) => composeMark(canvas.context, canvas, map, mark))
   const blob = await encodeCanvas(canvas, request.output)
-  return { blob, width: canvas.width, height: canvas.height, ...composed }
+  return { blob, width: canvas.width, height: canvas.height, marks }
 }

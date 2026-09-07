@@ -9,6 +9,7 @@ import {
   Images,
   Loader2,
   RotateCcw,
+  Share2,
   Trash2,
   X,
 } from 'lucide-react'
@@ -26,6 +27,7 @@ import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { watermarksQueryOptions } from '../../lib/library'
+import { canShareFiles, shareFile } from '../../lib/share-file'
 import { FORMAT_OPTIONS } from '../editor/formats'
 import { PresetGate } from '../presets/preset-gate'
 import { Alert } from '../ui/alert'
@@ -64,9 +66,6 @@ const SIZE_OPTIONS: readonly SelectOption<SizeChoice>[] = [
     label: `Fit ${String(side)} px`,
   })),
 ]
-
-const selectClassName =
-  'h-10 w-full rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
 
 function isOutputFormat(value: string): value is OutputFormat {
   return (OUTPUT_FORMATS as readonly string[]).includes(value)
@@ -142,9 +141,10 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const { snapshot, workers, add, start, cancel, retry, clear } = useBulkQueue(organizationId)
   const inputRef = useRef<HTMLInputElement>(null)
-  const presetSelectId = useId()
+  const presetsHintId = useId()
   const [files, setFiles] = useState<File[]>([])
-  const [presetId, setPresetId] = useState('')
+  /** Chosen presets in the order they were ticked, which is the order they are drawn. */
+  const [presetIds, setPresetIds] = useState<string[]>([])
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
   const [size, setSize] = useState<SizeChoice>('original')
@@ -154,8 +154,13 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const queryClient = useQueryClient()
   const [timing, setTiming] = useState<Timing | null>(null)
 
-  const spec: WatermarkSpec | null =
-    presets.data?.find((candidate) => candidate.id === presetId)?.spec ?? null
+  const specs: WatermarkSpec[] = presetIds.flatMap((id) => {
+    const preset = presets.data?.find((candidate) => candidate.id === id)
+    return preset === undefined ? [] : [preset.spec]
+  })
+  const hasPresets = specs.length > 0
+  /** The gallery records one preset per photo: the first one applied. */
+  const presetId = presetIds[0] ?? null
   const hasStarted = snapshot.jobs.length > 0
   const counts = useMemo(() => {
     const tally = { done: 0, failed: 0, cancelled: 0, running: 0, queued: 0 }
@@ -167,6 +172,17 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const finished = counts.done + counts.failed + counts.cancelled
   const results = snapshot.jobs.filter((job) => job.output !== null)
   const elapsedSeconds = elapsedOf(timing)
+
+  const isShareable = canShareFiles(format)
+
+  /** One photo to the platform share sheet; a refusal shows where ZIP errors do. */
+  async function shareOutput(output: BulkResult) {
+    try {
+      await shareFile(output.blob, output.fileName)
+    } catch (error) {
+      setZipError(describeError(error))
+    }
+  }
 
   function settings(): BulkSettings {
     const output: EncodeOptions = { format, quality }
@@ -182,8 +198,16 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
     addFiles(event.dataTransfer.files)
   }
 
+  function togglePreset(id: string, isChecked: boolean) {
+    setPresetIds((previous) =>
+      isChecked
+        ? [...previous.filter((other) => other !== id), id]
+        : previous.filter((other) => other !== id),
+    )
+  }
+
   async function run() {
-    if (spec === null) {
+    if (!hasPresets) {
       return
     }
     clear()
@@ -192,16 +216,16 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
     setTiming({ startedAt, finishedAt: null })
     setZipError(null)
     setSaving(null)
-    await start(spec, settings())
+    await start(specs, settings())
     setTiming({ startedAt, finishedAt: performance.now() })
   }
 
   async function runRetry() {
-    if (spec === null) {
+    if (!hasPresets) {
       return
     }
     retry()
-    await start(spec, settings())
+    await start(specs, settings())
   }
 
   /** Uploads every finished result one at a time; a failure does not stop the rest. */
@@ -332,7 +356,10 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                     </p>
                   </>
                 ) : null}
-                <ul className="divide-y divide-line rounded-lg border border-line">
+                <ul
+                  aria-label="Photos in this batch"
+                  className="divide-y divide-line rounded-lg border border-line"
+                >
                   {(hasStarted ? snapshot.jobs : files.map((file) => ({ file }))).map((row) => {
                     const job = 'status' in row ? row : null
                     const file = 'status' in row ? row.input : row.file
@@ -364,19 +391,36 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                           </span>
                         )}
                         {job?.output === undefined || job.output === null ? null : (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            aria-label={`Download ${job.output.fileName}`}
-                            onClick={() => {
-                              if (job.output !== null) {
-                                downloadBlob(job.output.blob, job.output.fileName)
-                              }
-                            }}
-                          >
-                            <Download aria-hidden="true" className="size-4" />
-                          </Button>
+                          <>
+                            {isShareable ? (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Share ${job.output.fileName}`}
+                                onClick={() => {
+                                  if (job.output !== null) {
+                                    void shareOutput(job.output)
+                                  }
+                                }}
+                              >
+                                <Share2 aria-hidden="true" className="size-4" />
+                              </Button>
+                            ) : null}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Download ${job.output.fileName}`}
+                              onClick={() => {
+                                if (job.output !== null) {
+                                  downloadBlob(job.output.blob, job.output.fileName)
+                                }
+                              }}
+                            >
+                              <Download aria-hidden="true" className="size-4" />
+                            </Button>
+                          </>
                         )}
                         {job === null && !snapshot.isRunning ? (
                           <Button
@@ -402,29 +446,39 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
           </Card>
 
           <Card className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor={presetSelectId} className="text-sm font-medium">
-                Preset
-              </label>
-              <select
-                id={presetSelectId}
-                value={presetId}
-                disabled={snapshot.isRunning}
-                onChange={(event) => {
-                  setPresetId(event.currentTarget.value)
-                }}
-                className={selectClassName}
-              >
-                <option value="" disabled>
-                  Choose a preset
-                </option>
-                {list.map((candidate) => (
-                  <option key={candidate.id} value={candidate.id}>
-                    {candidate.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <fieldset className="flex flex-col gap-2" aria-describedby={presetsHintId}>
+              <legend className="mb-1.5 text-sm font-medium">Presets</legend>
+              <ul className="flex flex-col gap-1">
+                {list.map((candidate) => {
+                  const order = presetIds.indexOf(candidate.id)
+                  return (
+                    <li key={candidate.id}>
+                      <label className="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2 text-sm hover:bg-brand-50/60 dark:hover:bg-brand-900/20">
+                        <input
+                          type="checkbox"
+                          checked={order !== -1}
+                          disabled={snapshot.isRunning}
+                          onChange={(event) => {
+                            togglePreset(candidate.id, event.currentTarget.checked)
+                          }}
+                          className="size-4 accent-brand-600"
+                        />
+                        <span className="min-w-0 flex-1 truncate">{candidate.name}</span>
+                        {order === -1 ? null : (
+                          <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-800 dark:bg-brand-900/50 dark:text-brand-100">
+                            {String(order + 1)}
+                          </span>
+                        )}
+                      </label>
+                    </li>
+                  )
+                })}
+              </ul>
+              <p id={presetsHintId} className="text-xs text-ink-muted">
+                Tick one or more; they are applied in the order ticked, later ones over earlier
+                ones.
+              </p>
+            </fieldset>
             <div className="flex flex-col gap-1.5">
               <span className="text-sm font-medium">Format</span>
               <Select
@@ -472,7 +526,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
               ) : (
                 <Button
                   type="button"
-                  disabled={files.length === 0 || spec === null}
+                  disabled={files.length === 0 || !hasPresets}
                   onClick={() => {
                     void run()
                   }}

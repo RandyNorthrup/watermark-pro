@@ -1,3 +1,4 @@
+import { mainThreadBackend } from './canvas-backend'
 import type { Size } from '../engine/layout'
 
 /** Longest side of gallery thumbnails; small enough for a grid, big enough to recognise. */
@@ -15,13 +16,9 @@ export async function createThumbnail(source: Blob): Promise<Thumbnail> {
     const scale = Math.min(1, THUMBNAIL_MAX_SIDE / Math.max(bitmap.width, bitmap.height))
     const width = Math.max(1, Math.round(bitmap.width * scale))
     const height = Math.max(1, Math.round(bitmap.height * scale))
-    const canvas = new OffscreenCanvas(width, height)
-    const ctx = canvas.getContext('2d')
-    if (ctx === null) {
-      throw new Error('2D canvas context is unavailable')
-    }
-    ctx.drawImage(bitmap, 0, 0, width, height)
-    const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: THUMBNAIL_QUALITY })
+    const canvas = mainThreadBackend().createCanvas(width, height)
+    canvas.context.drawImage(bitmap, 0, 0, width, height)
+    const blob = await canvas.encode({ format: 'image/jpeg', quality: THUMBNAIL_QUALITY })
     return { blob, width, height }
   } finally {
     bitmap.close()

@@ -37,15 +37,30 @@ describe('theme', () => {
     expect(readTheme()).toBe('system')
   })
 
-  it('resolves system to the media query and persists the preference', () => {
-    stubMatchMedia(true)
-    applyTheme('system')
-    expect(document.documentElement.dataset['theme']).toBe('dark')
-    expect(readTheme()).toBe('system')
+  it('resolves system to the media query, persists the preference and tints the browser chrome', () => {
+    const metas = ['(prefers-color-scheme: light)', '(prefers-color-scheme: dark)'].map((media) => {
+      const meta = document.createElement('meta')
+      meta.name = 'theme-color'
+      meta.media = media
+      document.head.append(meta)
+      return meta
+    })
+    try {
+      stubMatchMedia(true)
+      applyTheme('system')
+      expect(document.documentElement.dataset['theme']).toBe('dark')
+      expect(readTheme()).toBe('system')
+      expect(metas.map((meta) => meta.content)).toEqual(['#26242f', '#26242f'])
 
-    applyTheme('light')
-    expect(document.documentElement.dataset['theme']).toBe('light')
-    expect(readTheme()).toBe('light')
+      applyTheme('light')
+      expect(document.documentElement.dataset['theme']).toBe('light')
+      expect(readTheme()).toBe('light')
+      expect(metas.map((meta) => meta.content)).toEqual(['#ffffff', '#ffffff'])
+    } finally {
+      for (const meta of metas) {
+        meta.remove()
+      }
+    }
   })
 
   it('follows system changes only while the preference is system', () => {

@@ -1,11 +1,38 @@
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
-import { ScrollText, Users } from 'lucide-react'
+import { Images, Layers, PencilRuler, ScrollText, Stamp, Users } from 'lucide-react'
 
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
 import { activeMemberRoleQueryOptions } from '../../lib/queries'
 
 const appRoute = getRouteApi('/app')
+
+const TOOLS = [
+  {
+    to: '/app/library',
+    label: 'Library',
+    icon: Stamp,
+    body: 'Design text, symbol and logo watermarks once and keep them as presets.',
+  },
+  {
+    to: '/app/editor',
+    label: 'Editor',
+    icon: PencilRuler,
+    body: 'Watermark one photo by hand: place, crop, resize and export.',
+  },
+  {
+    to: '/app/bulk',
+    label: 'Bulk',
+    icon: Layers,
+    body: 'Apply a preset to a whole shoot and download the results as a ZIP.',
+  },
+  {
+    to: '/app/gallery',
+    label: 'Gallery',
+    icon: Images,
+    body: 'Browse what the team has saved, then share albums with a link.',
+  },
+] as const
 
 export const Route = createFileRoute('/app/')({
   loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
@@ -33,7 +60,30 @@ function DashboardPage() {
           </p>
         )}
       </header>
-      <section aria-labelledby="overview-heading" className="grid gap-4 sm:grid-cols-2">
+      <section aria-labelledby="tools-heading" className="flex flex-col gap-3">
+        <h2 id="tools-heading" className="text-xl font-semibold tracking-tight">
+          Tools
+        </h2>
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {TOOLS.map(({ to, label, icon: Icon, body }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                className="flex h-full items-start gap-3 rounded-card border border-line bg-surface-raised p-4 shadow-card transition-colors hover:border-brand-300 hover:bg-brand-50/40 dark:hover:bg-brand-900/20"
+              >
+                <span className="rounded-lg bg-brand-50 p-2 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
+                  <Icon aria-hidden="true" className="size-5" />
+                </span>
+                <span className="flex flex-col gap-1">
+                  <span className="font-semibold">{label}</span>
+                  <span className="text-sm text-ink-muted">{body}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section aria-labelledby="overview-heading" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <h2 id="overview-heading" className="sr-only">
           Overview
         </h2>
@@ -67,16 +117,6 @@ function DashboardPage() {
             View audit log
           </Link>
         </Card>
-      </section>
-      <section aria-labelledby="roadmap-heading" className="flex flex-col gap-2">
-        <h2 id="roadmap-heading" className="text-xl font-semibold tracking-tight">
-          What is next
-        </h2>
-        <p className="max-w-prose text-sm text-ink-muted">
-          This foundation release covers accounts, organizations and roles. The watermark engine,
-          library, editor, bulk processing, storage and sharing arrive milestone by milestone; the
-          plan is in the repository.
-        </p>
       </section>
     </div>
   )

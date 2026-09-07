@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { type QueryClient, useQuery } from '@tanstack/react-query'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 import { AppShell } from '../../components/app-shell'
@@ -13,6 +13,15 @@ import {
 
 const NEW_ORGANIZATION_PATH = '/app/organizations/new'
 
+/** Starts the active-organization request; a failure is reported by the loader's own request. */
+async function warmActiveOrganization(queryClient: QueryClient): Promise<void> {
+  try {
+    await queryClient.query(activeOrganizationQueryOptions)
+  } catch {
+    // Reported when the loader asks for it.
+  }
+}
+
 /**
  * Authenticated area. Requires a session and, except on the organization
  * creation screen, at least one organization; the first organization becomes
@@ -24,7 +33,15 @@ export const Route = createFileRoute('/app')({
     if (session === null) {
       throw redirect({ to: '/login', search: { redirect: location.pathname } })
     }
-    const organizations = await context.queryClient.query(organizationsQueryOptions)
+    // The loader needs the active organization; start it now, alongside the
+    // list, instead of after it (one round trip fewer on a phone). Its
+    // outcome is read by the loader, so only the list is awaited here.
+    const [organizations] = await Promise.all([
+      context.queryClient.query(organizationsQueryOptions),
+      session.session.activeOrganizationId === null
+        ? undefined
+        : warmActiveOrganization(context.queryClient),
+    ])
     const isCreating = location.pathname === NEW_ORGANIZATION_PATH
     if (!isCreating && organizations.length === 0) {
       throw redirect({ to: NEW_ORGANIZATION_PATH })

@@ -1,13 +1,15 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { SIGNATURE_EXPORT_SIDE } from '../../editor/signature'
 import {
   seedOwnerWorkspace,
   seedViewerWorkspace,
   VIEWER,
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
+import { encoded, resetFakeCanvasBackend } from '../../test-support/fake-canvas-backend'
 import { installLibraryApi, makeAsset, makeWatermark } from '../../test-support/fake-library-api'
 import { renderedSpecs, resetFakePreview } from '../../test-support/fake-preview'
 import { renderApp } from '../../test-support/render-app'
@@ -15,17 +17,20 @@ import { renderApp } from '../../test-support/render-app'
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
 vi.mock('../../lib/image-size', () => import('../../test-support/fake-image-size'))
+vi.mock('../../lib/canvas-backend', () => import('../../test-support/fake-canvas-backend'))
 
 const client = fakeAuth
 
 beforeEach(() => {
   installFakeAuth()
   resetFakePreview()
+  resetFakeCanvasBackend()
   // jsdom has no object URLs; the fake preview never creates one, but the panel revokes.
   Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:unused'), revokeObjectURL: vi.fn() })
 })
 
 afterEach(() => {
+  vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
 
@@ -207,6 +212,56 @@ describe('preset designer', () => {
 
     await user.upload(input, new File(['not an image'], 'notes.txt', { type: 'text/plain' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('not an image the browser can read')
+  })
+
+  it('saves a drawn signature as a logo and selects it', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ assets: [] })
+    renderApp('/app/library/new')
+    await screen.findByRole('heading', { level: 1 })
+    await user.click(screen.getByRole('tab', { name: 'Logo' }))
+    await user.click(screen.getByRole('button', { name: 'Draw a signature' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Draw a signature' })
+    // jsdom has no layout: give the pad its drawn size so pointer positions map onto it.
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 640,
+      bottom: 320,
+      width: 640,
+      height: 320,
+      toJSON: () => ({}),
+    })
+    const pad = within(dialog).getByRole('img', { name: /Signature pad/ })
+    const save = within(dialog).getByRole('button', { name: 'Save as logo' })
+    expect(save).toBeDisabled()
+    expect(within(dialog).getByRole('button', { name: 'Undo stroke' })).toBeDisabled()
+
+    await user.click(within(dialog).getByRole('radio', { name: '10 pixel pen' }))
+    for (const [x, y] of [
+      [40, 60],
+      [120, 90],
+      [200, 70],
+    ]) {
+      fireEvent.pointerDown(pad, { clientX: x, clientY: y, pointerId: 1 })
+      fireEvent.pointerMove(pad, { clientX: (x ?? 0) + 30, clientY: (y ?? 0) + 10, pointerId: 1 })
+      fireEvent.pointerUp(pad, { clientX: (x ?? 0) + 30, clientY: (y ?? 0) + 10, pointerId: 1 })
+    }
+    expect(save).toBeEnabled()
+    await user.click(within(dialog).getByRole('button', { name: 'Undo stroke' }))
+    await user.click(save)
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(api.assets.map((asset) => asset.name)).toEqual(['signature'])
+    expect(await screen.findByRole('button', { name: 'Logo signature' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    const saved = encoded.at(-1)
+    expect(saved?.options.format).toBe('image/png')
+    expect(Math.max(saved?.width ?? 0, saved?.height ?? 0)).toBe(SIGNATURE_EXPORT_SIDE)
   })
 
   it('refuses to delete a logo that a preset still uses', async () => {

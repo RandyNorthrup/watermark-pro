@@ -1,6 +1,23 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach } from 'vitest'
+
+/**
+ * Page tests drive the real router, query client and a fake engine through
+ * several round trips per step. Testing Library's one-second default for
+ * `findBy*` is tuned for a single component on an idle machine; the whole
+ * suite under coverage on a shared workstation needs more headroom, and a
+ * slow step is still caught by the project's test timeout.
+ */
+const ASYNC_UTIL_TIMEOUT_MS = 4000
+configure({ asyncUtilTimeout: ASYNC_UTIL_TIMEOUT_MS })
+
+// jsdom has no canvas; the sample scene placeholder draws nothing here and
+// says so once instead of on every render.
+Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+  value: () => null,
+  writable: true,
+})
 
 // jsdom does not implement scrolling; the router calls scrollTo on navigation
 // for scroll restoration, which would otherwise log "Not implemented" noise.

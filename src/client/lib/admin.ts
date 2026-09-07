@@ -8,8 +8,8 @@ import { z } from 'zod'
 import { ApiRequestError, fetchJson } from './api'
 import { authClient } from './auth-client'
 import { adminOrganizationListSchema, auditListResponseSchema } from '../../shared/api'
+import { PLATFORM_ADMIN_ROLE } from '../../shared/constants'
 
-export const PLATFORM_ADMIN_ROLE = 'admin'
 export const ADMIN_USER_PAGE_SIZE = 50
 
 export const adminUserSchema = z.object({

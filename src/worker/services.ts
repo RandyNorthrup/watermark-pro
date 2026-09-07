@@ -19,6 +19,7 @@ import {
 } from './db/library-stores'
 import { createDrizzleOrganizationStore } from './db/organization-store'
 import * as schema from './db/schema'
+import { createDrizzleUserStore } from './db/user-store'
 import { createCloudflareEmailSender } from './email/cloudflare'
 import { createConsoleEmailSender, type DevMailbox } from './email/console'
 import type { EmailSender } from './email/sender'
@@ -29,6 +30,7 @@ import type {
   OrganizationStore,
   PhotoStore,
   ShareStore,
+  UserStore,
   WatermarkStore,
 } from './stores'
 
@@ -43,6 +45,7 @@ export interface Services {
   photos: PhotoStore
   shares: ShareStore
   organizations: OrganizationStore
+  users: UserStore
   objects: ObjectStore
   /** Per-address limiter shared with Better Auth; public routes consume it too. */
   rateLimit: RateLimitStorage
@@ -103,6 +106,7 @@ export function buildServices(config: ValidatedEnv): Services {
     photos: createDrizzlePhotoStore(db),
     shares: createDrizzleShareStore(db),
     organizations: createDrizzleOrganizationStore(db),
+    users: createDrizzleUserStore(db),
     objects: createR2ObjectStore(config.BUCKET),
     rateLimit,
     devMailbox,

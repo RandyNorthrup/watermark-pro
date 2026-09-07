@@ -49,10 +49,10 @@ describe('engine throughput', () => {
     const output = { format: 'image/jpeg' as const, quality: 0.9 }
     try {
       const warmup = await photoLike()
-      await single.apply({ source: warmup, spec, fonts: [], output })
+      await single.apply({ source: warmup, marks: [{ spec }], fonts: [], output })
       const started = performance.now()
       const source = await photoLike()
-      await single.apply({ source, spec, fonts: [], output })
+      await single.apply({ source, marks: [{ spec }], fonts: [], output })
       const seconds = (performance.now() - started) / MILLISECONDS
       console.info(`single worker: ${seconds.toFixed(2)} s per image`)
       expect(seconds).toBeLessThan(MAX_SECONDS_PER_IMAGE_SINGLE_WORKER)
@@ -71,7 +71,7 @@ describe('engine throughput', () => {
           if (worker === undefined) {
             throw new Error('pool index out of range')
           }
-          return worker.apply({ source, spec, fonts: [], output })
+          return worker.apply({ source, marks: [{ spec }], fonts: [], output })
         }),
       )
       const seconds = (performance.now() - started) / MILLISECONDS

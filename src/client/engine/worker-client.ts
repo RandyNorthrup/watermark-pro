@@ -2,10 +2,8 @@
  * Main-thread handle on one watermark worker. Requests are correlated by id;
  * bitmaps are transferred, not copied.
  */
-import type { ApplyDoneMessage, ApplyMessage, WorkerResponse } from './protocol'
-
-export type ApplyInput = Omit<ApplyMessage, 'type' | 'id'>
-export type ApplyOutput = Omit<ApplyDoneMessage, 'type' | 'id'>
+import type { ApplyInput, ApplyOutput, WatermarkEngine } from './engine'
+import type { ApplyMessage, WorkerResponse } from './protocol'
 
 export class WatermarkWorkerError extends Error {
   override readonly name = 'WatermarkWorkerError'
@@ -16,7 +14,7 @@ interface Pending {
   reject: (reason: Error) => void
 }
 
-export class WatermarkWorker {
+export class WatermarkWorker implements WatermarkEngine {
   readonly #worker: Worker
   readonly #pending = new Map<number, Pending>()
   #nextId = 1
@@ -49,7 +47,6 @@ export class WatermarkWorker {
     }
   }
 
-  /** Number of requests in flight. */
   get busy(): number {
     return this.#pending.size
   }
@@ -58,10 +55,10 @@ export class WatermarkWorker {
     const id = this.#nextId
     this.#nextId += 1
     const message: ApplyMessage = { type: 'apply', id, ...input }
-    const transfer: Transferable[] = [input.source]
-    if (input.image !== undefined) {
-      transfer.push(input.image)
-    }
+    const transfer: Transferable[] = [
+      input.source,
+      ...input.marks.flatMap((mark) => (mark.image === undefined ? [] : [mark.image])),
+    ]
     return new Promise<ApplyOutput>((resolve, reject) => {
       this.#pending.set(id, { resolve, reject })
       this.#worker.postMessage(message, transfer)

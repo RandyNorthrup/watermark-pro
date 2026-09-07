@@ -6,9 +6,16 @@
  * Emails are read from the development mailbox endpoint that exists only
  * with the console email provider (never in production).
  */
-import { expect, test } from '@playwright/test'
 
-import { expectAccessible, latestLinkFor, signIn, signUpAndVerify } from './support'
+import {
+  expect,
+  expectAccessible,
+  latestLinkFor,
+  navigateTo,
+  signIn,
+  signUpAndVerify,
+  test,
+} from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -37,7 +44,7 @@ test('owner signs up, verifies, and creates an organization', async ({ page, req
   await expect(page.getByText('owner')).toBeVisible()
   await expectAccessible(page)
 
-  await page.getByRole('link', { name: 'Audit log' }).first().click()
+  await navigateTo(page, 'Audit log')
   await expect(page.getByRole('table')).toBeVisible()
   await expect(page.getByText('organization.created')).toBeVisible()
   await expectAccessible(page)
@@ -54,7 +61,7 @@ test('owner invites a viewer who accepts and is limited to reading', async ({
   await expectAccessible(page)
   await signIn(page, owner, organizationName)
 
-  await page.getByRole('link', { name: 'Members' }).first().click()
+  await navigateTo(page, 'Members')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Members')
   await page.getByLabel('Email').fill(viewer.email)
   await page.getByRole('combobox', { name: 'Role' }).click()
@@ -79,7 +86,7 @@ test('owner invites a viewer who accepts and is limited to reading', async ({
   const audit = await viewerContext.request.get('/api/orgs/placeholder/audit')
   expect(audit.status()).toBe(403)
 
-  await viewerPage.getByRole('link', { name: 'Audit log' }).first().click()
+  await navigateTo(viewerPage, 'Audit log')
   await expect(viewerPage.getByRole('alert')).toContainText(
     'Your role does not include audit access.',
   )

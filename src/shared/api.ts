@@ -75,6 +75,11 @@ export const devMailboxResponseSchema = z.object({
 
 export type DevMailboxResponse = z.infer<typeof devMailboxResponseSchema>
 
+/** Body of the console-provider-only `POST /api/dev/promote`. */
+export const devPromoteRequestSchema = z.object({
+  email: z.email(),
+})
+
 export const presetNameSchema = z
   .string()
   .trim()

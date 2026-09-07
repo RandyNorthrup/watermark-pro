@@ -35,8 +35,17 @@ Only the `main` branch and the latest tagged release receive fixes.
   whether the organization exists.
 - Append-only audit trail for sign-ups and every organization, invitation and
   membership change, readable only by owners and admins.
-- Fail-closed configuration validation; the console email provider (which
-  exposes a development mailbox) is refused in production.
+- Fail-closed configuration validation; the console email provider is
+  refused in production. Two test-only routes exist solely with that
+  provider: the development mailbox (`GET /api/dev/mailbox`) and the
+  platform-admin promotion the end-to-end suite uses (`POST /api/dev/promote`,
+  the same change the runbook makes with a D1 update). Both answer 404 in
+  any other configuration, and a Node test proves it.
+- Transport: HSTS (one year, subdomains included) and every CSP source list
+  limited to `'self'` or an explicit `https:` origin, so an https page can
+  load no http subresource. `upgrade-insecure-requests` is deliberately not
+  set: it adds nothing on this origin and WebKit applies it to plain-http
+  localhost, which made the app unrenderable in Safari-engine tests.
 - HTML email bodies are built with a library escaper; no raw interpolation.
 - Secrets scanning in the pre-commit hook and in CI (gitleaks, full history).
 - Dependency vulnerability audit in CI at the `high` level.
@@ -74,6 +83,20 @@ Only the `main` branch and the latest tagged release receive fixes.
   files are decoded in the browser, rendered in workers, zipped in memory,
   and downloaded through a same-origin object URL that is revoked
   immediately.
+- Metadata policy (M10): every export is re-encoded from pixels by the
+  canvas, so the source's EXIF block (camera, GPS position, capture time,
+  embedded thumbnail) never reaches the output, the share sheet or the
+  gallery. The orientation tag is applied to the pixels before it is
+  dropped. There is no option to keep metadata. A browser test feeds a
+  tagged JPEG through the bulk processor and checks the result for an Exif
+  header.
+- Sharing an export through the Web Share API (M10) hands the file to the
+  operating system's share sheet; the browser only offers the button where
+  `navigator.canShare({ files })` accepts the output type, and the app
+  itself never sees where the file goes.
+- QR-code marks (M10) are rendered from the content typed into the preset;
+  the content is stored with the preset (limited to 512 characters) and
+  rendered as pixels, never interpreted or fetched by the app.
 
 - Bot protection (M8): when `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
   are configured, sign-up and password-reset requests must carry a Turnstile

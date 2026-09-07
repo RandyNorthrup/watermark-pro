@@ -325,7 +325,12 @@ function OrganizationsPanel() {
     )
   }
   return (
-    <Card className="overflow-x-auto p-0">
+    <Card
+      className="overflow-x-auto p-0 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
+      tabIndex={0}
+      role="region"
+      aria-label="Organizations, newest first"
+    >
       <table className="w-full text-sm">
         <caption className="sr-only">Organizations, newest first</caption>
         <thead className="text-left text-xs text-ink-muted uppercase">

@@ -1,6 +1,7 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 import { z } from 'zod'
 
+import { SAMPLE_SCENE_PATH } from '../../../shared/constants'
 import { Editor } from '../../components/editor/editor'
 import { Alert } from '../../components/ui/alert'
 import { activeMemberRoleQueryOptions } from '../../lib/queries'
@@ -15,6 +16,7 @@ const editorSearchSchema = z.object({
 
 export const Route = createFileRoute('/app/editor')({
   validateSearch: editorSearchSchema,
+  staticData: { preloadImages: [SAMPLE_SCENE_PATH] },
   loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
   component: EditorPage,
 })

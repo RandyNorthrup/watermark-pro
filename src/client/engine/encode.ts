@@ -3,6 +3,8 @@
  * type is verified on the result because an unsupported type silently
  * falls back to PNG in some engines.
  */
+import type { EngineCanvas } from './canvas'
+
 export const OUTPUT_FORMATS = ['image/png', 'image/jpeg', 'image/webp'] as const
 
 export type OutputFormat = (typeof OUTPUT_FORMATS)[number]
@@ -17,11 +19,11 @@ export class EncodeError extends Error {
   override readonly name = 'EncodeError'
 }
 
-export async function encodeCanvas(canvas: OffscreenCanvas, options: EncodeOptions): Promise<Blob> {
+export async function encodeCanvas(canvas: EngineCanvas, options: EncodeOptions): Promise<Blob> {
   if (options.quality < 0 || options.quality > 1) {
     throw new RangeError('quality must be between 0 and 1')
   }
-  const blob = await canvas.convertToBlob({ type: options.format, quality: options.quality })
+  const blob = await canvas.encode(options)
   if (blob.type !== options.format) {
     throw new EncodeError(`this browser cannot encode ${options.format}`)
   }

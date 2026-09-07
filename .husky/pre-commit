@@ -1,4 +1,7 @@
 # Secrets never reach a commit: scan the staged diff before anything else.
 gitleaks git --pre-commit --staged --redact --no-banner
 # Format and lint only what is staged; the full gate set runs in CI.
-npx lint-staged
+# lint-staged's Windows default (8191) counts only the file arguments; the
+# .cmd shim that launches each tool adds its own prefix, so a milestone-sized
+# commit overflowed cmd.exe. Half the limit keeps every chunk safe.
+npx lint-staged --max-arg-length=4000

@@ -13,7 +13,7 @@ import { ResizePanel } from './resize-panel'
 import { useRenderer } from './use-renderer'
 import { WatermarkPanel } from './watermark-panel'
 import type { WatermarkDto } from '../../../shared/api'
-import { DEFAULT_TEXT_SPEC, type WatermarkSpec } from '../../../shared/watermark'
+import type { WatermarkSpec } from '../../../shared/watermark'
 import {
   ASPECT_PRESETS,
   type CropRect,
@@ -25,8 +25,13 @@ import {
   canRedo,
   canUndo,
   createHistory,
+  createLayer,
   type EditorDocument,
   editorReducer,
+  type Layer,
+  MAX_LAYERS,
+  withLayer,
+  withoutLayer,
 } from '../../editor/state'
 import type { EncodeOptions } from '../../engine/encode'
 import type { Size } from '../../engine/layout'
@@ -37,8 +42,11 @@ import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { readImageSize } from '../../lib/image-size'
 import { watermarksQueryOptions } from '../../lib/library'
 import { SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from '../../lib/sample-photo'
+import { shareFile } from '../../lib/share-file'
 import { withPlacement, withStyle } from '../../lib/spec-edit'
+import { baseName, SAMPLE_FILE_NAME } from '../../lib/spec-tokens'
 import { useElementSize } from '../../lib/use-element-size'
+import { SampleScene } from '../sample-scene'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
@@ -64,9 +72,6 @@ const TOOLS: readonly { value: Tool; label: string; icon: typeof Stamp }[] = [
 const ACCEPTED_PHOTO_TYPES = 'image/png,image/jpeg,image/webp,image/avif,image/gif'
 const SAMPLE_SIZE: Size = { width: SAMPLE_PHOTO_WIDTH, height: SAMPLE_PHOTO_HEIGHT }
 
-/** Renders the photo alone: the default mark at zero opacity. */
-const PHOTO_ONLY_SPEC: WatermarkSpec = withStyle(DEFAULT_TEXT_SPEC, { opacity: 0 })
-
 interface Photo {
   file: File
   size: Size
@@ -90,6 +95,10 @@ function applyMarkPatch(spec: WatermarkSpec, patch: MarkPatch): WatermarkSpec {
   return next
 }
 
+function layerSpecs(document: EditorDocument): WatermarkSpec[] {
+  return document.layers.map((layer) => layer.spec)
+}
+
 function transformOf(document: EditorDocument): Transform | undefined {
   if (document.crop === null && document.resize === null) {
     return undefined
@@ -100,16 +109,20 @@ function transformOf(document: EditorDocument): Transform | undefined {
   }
 }
 
-function baseName(fileName: string): string {
-  const dot = fileName.lastIndexOf('.')
-  return dot > 0 ? fileName.slice(0, dot) : fileName
-}
-
 function isEditableTarget(target: EventTarget | null): boolean {
   return (
     target instanceof HTMLInputElement ||
     target instanceof HTMLTextAreaElement ||
     target instanceof HTMLSelectElement
+  )
+}
+
+/** Before the first frame: the sample scene itself, or a spinner while a chosen photo renders. */
+function PendingPreview({ hasPhoto }: { hasPhoto: boolean }) {
+  return hasPhoto ? (
+    <Spinner className="size-6" label="Rendering preview" />
+  ) : (
+    <SampleScene className="max-h-[42svh] lg:max-h-[70vh]" />
   )
 }
 
@@ -122,26 +135,33 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
   const [history, dispatch] = useReducer(editorReducer, undefined, () => createHistory())
   const document = history.present
   const [tool, setTool] = useState<Tool>('watermark')
+  const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
+  // The active layer: the chosen one while it exists, else the topmost.
+  const activeLayer: Layer | null =
+    document.layers.find((layer) => layer.id === activeLayerId) ?? document.layers.at(-1) ?? null
+  const activeIndex = activeLayer === null ? -1 : document.layers.indexOf(activeLayer)
   const [aspectId, setAspectId] = useState('free')
   const [photo, setPhoto] = useState<Photo | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [isExporting, setIsExporting] = useState(false)
+  const [isSharing, setIsSharing] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const [saved, setSaved] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const save = useMutation({
     mutationFn: async (options: EncodeOptions) => {
       const current = renderer.current
-      if (current === null || document.spec === null) {
+      const first = document.layers[0]
+      if (current === null || first === undefined) {
         throw new Error('choose a preset first')
       }
-      const blob = await current.exportFull(document.spec, options, transformOf(document))
+      const blob = await current.exportFull(layerSpecs(document), options, transformOf(document))
       return await uploadPhoto(organizationId, {
         blob,
         name: exportFileName(options.format),
         width: outputSize.width,
         height: outputSize.height,
-        presetId: document.presetId,
+        presetId: first.presetId,
       })
     },
     onMutate: () => {
@@ -163,21 +183,21 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
 
   const sourceSize = photo?.size ?? SAMPLE_SIZE
   const isCropping = tool === 'crop'
-  const renderSpec = isCropping ? PHOTO_ONLY_SPEC : (document.spec ?? PHOTO_ONLY_SPEC)
+  const renderSpecs = isCropping ? [] : layerSpecs(document)
   const renderTransform = isCropping ? undefined : transformOf(document)
   const { result, isRendering, error, renderer, setSubject } = useRenderer(
     organizationId,
-    renderSpec,
+    renderSpecs,
     renderTransform,
   )
 
   // Load the preset named in the URL once the library has arrived.
   const initialPreset = presets.data?.find((candidate) => candidate.id === initialPresetId)
   useEffect(() => {
-    if (initialPreset !== undefined && document.spec === null) {
+    if (initialPreset !== undefined && document.layers.length === 0) {
       dispatch({
         type: 'reset',
-        document: { ...document, spec: initialPreset.spec, presetId: initialPreset.id },
+        document: { ...document, layers: [createLayer(initialPreset.id, initialPreset.spec)] },
       })
     }
   }, [initialPreset, document])
@@ -230,10 +250,13 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
   }
 
   function markGesture(gesture: MarkGesture) {
-    if (document.spec === null) {
+    if (activeLayer === null) {
       return
     }
-    const next = { ...document, spec: applyMarkPatch(document.spec, gesture.patch) }
+    const next = withLayer(document, {
+      ...activeLayer,
+      spec: applyMarkPatch(activeLayer.spec, gesture.patch),
+    })
     switch (gesture.phase) {
       case 'start': {
         dispatch({ type: 'checkpoint' })
@@ -264,29 +287,62 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
     }
   }
 
-  function choosePreset(preset: WatermarkDto) {
-    commit({ spec: preset.spec, presetId: preset.id })
-  }
-
-  async function exportPhoto(options: EncodeOptions) {
-    const current = renderer.current
-    if (current === null || document.spec === null) {
+  /** Adds the preset as the topmost layer and makes it the active one. */
+  function addPreset(preset: WatermarkDto) {
+    if (document.layers.length >= MAX_LAYERS) {
       return
     }
-    setIsExporting(true)
+    const layer = createLayer(preset.id, preset.spec)
+    commit({ layers: [...document.layers, layer] })
+    setActiveLayerId(layer.id)
+  }
+
+  function removeLayer(layerId: string) {
+    commit(withoutLayer(document, layerId))
+  }
+
+  function changeActiveSpec(spec: WatermarkSpec) {
+    if (activeLayer !== null) {
+      commit(withLayer(document, { ...activeLayer, spec }))
+    }
+  }
+
+  /** Renders at full size and hands the file to `deliver`; failures show in the export panel. */
+  async function produce(
+    options: EncodeOptions,
+    setIsBusy: (isBusy: boolean) => void,
+    deliver: (blob: Blob, fileName: string) => Promise<void> | void,
+  ) {
+    const current = renderer.current
+    if (current === null || document.layers.length === 0) {
+      return
+    }
+    setIsBusy(true)
     setExportError(null)
+    setSaved(null)
     try {
-      const blob = await current.exportFull(document.spec, options, transformOf(document))
-      downloadBlob(blob, exportFileName(options.format))
+      const blob = await current.exportFull(layerSpecs(document), options, transformOf(document))
+      await deliver(blob, exportFileName(options.format))
     } catch (error_) {
       setExportError(describeError(error_))
     } finally {
-      setIsExporting(false)
+      setIsBusy(false)
     }
   }
 
+  function exportPhoto(options: EncodeOptions) {
+    return produce(options, setIsExporting, downloadBlob)
+  }
+
+  /** The share sheet is its own feedback; a dismissed sheet needs no message. */
+  function sharePhoto(options: EncodeOptions) {
+    return produce(options, setIsSharing, async (blob, fileName) => {
+      await shareFile(blob, fileName)
+    })
+  }
+
   function exportFileName(format: EncodeOptions['format']): string {
-    const name = photo === null ? 'sample-photo' : baseName(photo.file.name)
+    const name = photo === null ? SAMPLE_FILE_NAME : baseName(photo.file.name)
     return `${name}-watermarked.${FORMAT_EXTENSIONS[format]}`
   }
 
@@ -303,17 +359,18 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
   const crop: CropRect = document.crop ?? fullCrop(sourceSize)
   const aspectPreset = ASPECT_PRESETS.find((candidate) => candidate.id === aspectId)
   const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, sourceSize)
+  const activeOutcome = result?.marks[activeIndex]
   const isShowMarkOverlay =
     tool === 'watermark' &&
-    document.spec !== null &&
-    !document.spec.style.tiling.enabled &&
-    result !== null
+    activeLayer !== null &&
+    !activeLayer.spec.style.tiling.enabled &&
+    activeOutcome !== undefined
   const previewSize: Size | null =
     result === null ? null : { width: result.width, height: result.height }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-      <Card className="flex flex-col gap-3 p-4">
+    <div className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:gap-6">
+      <Card className="flex flex-col gap-3 p-3 lg:p-4">
         <div className="flex flex-wrap items-center gap-2">
           <input
             ref={inputRef}
@@ -392,10 +449,10 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
             event.preventDefault()
           }}
           onDrop={onDrop}
-          className="relative flex min-h-72 items-center justify-center overflow-hidden rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]"
+          className="relative flex min-h-48 items-center justify-center overflow-hidden rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:min-h-72"
         >
           {result === null ? (
-            <Spinner className="size-6" label="Rendering preview" />
+            <PendingPreview hasPhoto={photo !== null} />
           ) : (
             <div className="relative">
               <img
@@ -404,15 +461,16 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
                 alt={isCropping ? 'Photo with the crop frame' : 'Photo with the watermark applied'}
                 width={result.width}
                 height={result.height}
-                className="block max-h-[70vh] max-w-full"
+                className="block max-h-[42svh] max-w-full lg:max-h-[70vh]"
               />
-              {isShowMarkOverlay && previewSize !== null && document.spec !== null ? (
+              {isShowMarkOverlay && previewSize !== null ? (
                 <MarkOverlay
-                  placement={result.placement}
+                  placement={activeOutcome.placement}
                   previewSize={previewSize}
                   displaySize={displaySize}
-                  scale={document.spec.style.scale}
-                  rotation={document.spec.style.rotation}
+                  scale={activeLayer.spec.style.scale}
+                  rotation={activeLayer.spec.style.rotation}
+                  margin={activeLayer.spec.style.margin}
                   onGesture={markGesture}
                 />
               ) : null}
@@ -429,7 +487,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
           )}
         </div>
         <p className="text-xs text-ink-muted" aria-live="polite">
-          {document.spec === null
+          {document.layers.length === 0
             ? 'Choose a preset to place a watermark. Drop a photo anywhere on the canvas.'
             : `Output ${String(outputSize.width)} × ${String(outputSize.height)} px.`}
         </p>
@@ -469,12 +527,12 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
           <Tabs.Content value="watermark" className="outline-none">
             <WatermarkPanel
               organizationId={organizationId}
-              presetId={document.presetId}
-              spec={document.spec}
-              onPresetChange={choosePreset}
-              onSpecChange={(spec) => {
-                commit({ spec })
-              }}
+              layers={document.layers}
+              activeLayerId={activeLayer?.id ?? null}
+              onAddPreset={addPreset}
+              onSelectLayer={setActiveLayerId}
+              onRemoveLayer={removeLayer}
+              onSpecChange={changeActiveSpec}
             />
           </Tabs.Content>
           <Tabs.Content value="crop" className="outline-none">
@@ -500,11 +558,15 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
           <Tabs.Content value="export" className="outline-none">
             <ExportPanel
               outputSize={outputSize}
-              isReady={document.spec !== null}
+              isReady={document.layers.length > 0}
               isExporting={isExporting}
               onExport={(options) => {
                 void exportPhoto(options)
               }}
+              onShare={(options) => {
+                void sharePhoto(options)
+              }}
+              isSharing={isSharing}
               onSave={canSave ? save.mutate : undefined}
               isSaving={save.isPending}
             />

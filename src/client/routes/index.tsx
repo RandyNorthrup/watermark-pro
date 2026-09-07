@@ -46,32 +46,35 @@ const FEATURES = [
   {
     icon: ShieldCheck,
     title: 'Built to be trusted',
-    body: 'Strict content security policy, audited actions, and no third-party scripts.',
+    body: 'Strict content security policy, audited actions, and photos that never leave your browser unless you save them.',
   },
 ] as const
 
 function LandingPage() {
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="flex items-center justify-between px-6 py-4">
+      <header className="flex items-center justify-between gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4 sm:px-6">
         <BrandMark />
-        <nav aria-label="Account" className="flex items-center gap-2">
+        <nav aria-label="Account" className="flex items-center gap-1 sm:gap-2">
           <ThemeToggle />
-          <Link to="/login" className="px-3 py-2 text-sm font-medium text-ink-muted hover:text-ink">
+          <Link
+            to="/login"
+            className="px-3 py-2 text-sm font-medium whitespace-nowrap text-ink-muted hover:text-ink"
+          >
             Sign in
           </Link>
           <Link
             to="/signup"
-            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700"
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium whitespace-nowrap text-white shadow-sm hover:bg-brand-700"
           >
             Create account
           </Link>
         </nav>
       </header>
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-6 py-16">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 py-10 sm:px-6 sm:py-16 md:gap-16">
         <section className="flex max-w-3xl flex-col gap-6">
           <p className="text-sm font-semibold tracking-wide text-brand-600 uppercase dark:text-brand-300">
-            Early access
+            Free and open source
           </p>
           <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
             {APP_TAGLINE}
@@ -81,16 +84,16 @@ function LandingPage() {
             lifting in your browser, keeps your originals private, and gives your team roles that
             actually mean something.
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Link
               to="/signup"
-              className="rounded-lg bg-brand-600 px-5 py-3 text-sm font-medium text-white shadow-sm hover:bg-brand-700"
+              className="rounded-lg bg-brand-600 px-5 py-3 text-center text-sm font-medium text-white shadow-sm hover:bg-brand-700 max-sm:w-full"
             >
               Create your workspace
             </Link>
             <Link
               to="/login"
-              className="rounded-lg border border-line bg-surface-raised px-5 py-3 text-sm font-medium hover:bg-brand-50"
+              className="rounded-lg border border-line bg-surface-raised px-5 py-3 text-center text-sm font-medium hover:bg-brand-50 max-sm:w-full"
             >
               Sign in
             </Link>
@@ -100,7 +103,7 @@ function LandingPage() {
           <h2 id="features-heading" className="text-2xl font-semibold tracking-tight">
             What it does
           </h2>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map(({ icon: Icon, title, body }) => (
               <li key={title}>
                 <Card className="flex h-full flex-col gap-3">
@@ -115,7 +118,7 @@ function LandingPage() {
           </ul>
         </section>
       </main>
-      <footer className="border-t border-line px-6 py-6 text-center text-sm text-ink-muted">
+      <footer className="border-t border-line px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center text-sm text-ink-muted">
         Watermark Pro is open source under the MIT licence.
       </footer>
     </div>

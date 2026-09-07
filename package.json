@@ -1,6 +1,6 @@
 {
   "name": "watermark-pro",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "private": true,
   "description": "Enterprise-grade photo watermarking on Cloudflare Workers: bulk jobs, watermark library, smart placement, editor, sharing, RBAC.",
   "license": "MIT",
@@ -31,6 +31,7 @@
     "test:workers": "vitest run --project workers",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:drill": "node scripts/red-drill.mjs",
     "audit:lighthouse": "node scripts/lighthouse.mjs",
     "audit:screenshots": "node scripts/screenshots.mjs",
     "security:audit": "npm audit --audit-level=high",
@@ -103,6 +104,7 @@
     "hono": "4.13.7",
     "lucide": "1.37.0",
     "lucide-react": "1.37.0",
+    "qrcode-generator": "2.0.4",
     "radix-ui": "1.6.7",
     "react": "19.2.8",
     "react-dom": "19.2.8",

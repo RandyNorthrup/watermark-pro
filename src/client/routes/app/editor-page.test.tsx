@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -8,6 +8,7 @@ import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import {
   exports,
+  renderedBatches,
   renderedSpecs,
   renderedTransforms,
   resetFakePreview,
@@ -24,6 +25,11 @@ const client = fakeAuth
 
 function lastSpec() {
   return renderedSpecs.at(-1)
+}
+
+/** The preset picker, which adds a layer; its label changes once one exists. */
+function presetSelect() {
+  return screen.getByRole('combobox', { name: /^(Preset|Add another preset)$/ })
 }
 
 /** Opens the editor with the first preset and switches to a square crop. */
@@ -68,8 +74,9 @@ describe('editor page', () => {
     installLibraryApi({ watermarks: [makeWatermark(), makeWatermark({ id: 'wm-2', name: 'Two' })] })
     renderApp('/app/editor?preset=wm-1')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
-    expect(await screen.findByLabelText('Preset')).toHaveValue('wm-1')
-    // The photo-only render (opacity 0) comes first; wait for the preset itself.
+    // The preset from the URL is the first (and active) layer.
+    const layers = within(await screen.findByRole('list', { name: 'Layers, bottom to top' }))
+    expect(layers.getByRole('button', { pressed: true })).toHaveTextContent('Studio signature')
     await waitFor(() => expect(lastSpec()?.style.opacity).toBe(0.85))
 
     const frame = await screen.findByRole('group', { name: /Watermark position/ })
@@ -85,8 +92,14 @@ describe('editor page', () => {
     await user.click(screen.getByRole('button', { name: 'Revert' }))
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'smart' }))
 
-    await user.selectOptions(screen.getByLabelText('Preset'), 'wm-2')
-    expect(screen.getByLabelText('Preset')).toHaveValue('wm-2')
+    // A second preset becomes a second, active layer; removing it leaves the first.
+    await user.selectOptions(presetSelect(), 'wm-2')
+    expect(layers.getAllByRole('button', { pressed: true })).toHaveLength(1)
+    expect(layers.getByRole('button', { pressed: true })).toHaveTextContent('Two')
+    await waitFor(() => expect(renderedBatches.at(-1)).toHaveLength(2))
+    await user.click(layers.getByRole('button', { name: 'Remove Two from this photo' }))
+    await waitFor(() => expect(renderedBatches.at(-1)).toHaveLength(1))
+    expect(screen.queryByRole('button', { name: /Remove Two/ })).not.toBeInTheDocument()
   })
 
   it('crops with a preset ratio, resizes with the lock, and exports the transform', async () => {
@@ -198,7 +211,7 @@ describe('editor page', () => {
     fireEvent.drop(canvas!, { dataTransfer: { files: [dropped] } })
     expect(await screen.findByText(/dropped\.jpg/)).toBeInTheDocument()
 
-    await user.selectOptions(screen.getByLabelText('Preset'), 'wm-tiled')
+    await user.selectOptions(presetSelect(), 'wm-tiled')
     await waitFor(() => {
       expect(screen.queryByRole('group', { name: /Watermark position/ })).not.toBeInTheDocument()
     })

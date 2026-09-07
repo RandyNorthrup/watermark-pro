@@ -384,7 +384,7 @@ function Lightbox({
           {photo === null ? null : (
             <>
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <Dialog.Title className="truncate text-lg font-semibold">
                     {photo.name}
                   </Dialog.Title>
@@ -394,48 +394,49 @@ function Lightbox({
                     {dateTimeFormatter.format(new Date(photo.createdAt))}
                   </Dialog.Description>
                 </div>
-                <div className="flex shrink-0 items-center gap-1">
-                  <a
-                    href={photoFileUrl(organizationId, photo.id)}
-                    download={photo.name}
-                    className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+                <Dialog.Close asChild>
+                  <Button type="button" variant="ghost" size="icon" aria-label="Close">
+                    <X aria-hidden="true" className="size-4" />
+                  </Button>
+                </Dialog.Close>
+              </div>
+              {/* Actions on their own row so a long file name never squeezes them, or vice versa, on a phone. */}
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={photoFileUrl(organizationId, photo.id)}
+                  download={photo.name}
+                  className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+                >
+                  <Download aria-hidden="true" className="size-4" />
+                  Download
+                </a>
+                {canShare ? (
+                  <ShareDialog
+                    organizationId={organizationId}
+                    photoIds={[photo.id]}
+                    defaultTitle={photo.name}
+                    trigger={
+                      <Button type="button" variant="secondary" size="sm">
+                        <Share2 aria-hidden="true" className="size-4" />
+                        Share
+                      </Button>
+                    }
+                  />
+                ) : null}
+                {canDelete ? (
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    isPending={isDeleting}
+                    onClick={() => {
+                      onDelete(photo)
+                    }}
                   >
-                    <Download aria-hidden="true" className="size-4" />
-                    Download
-                  </a>
-                  {canShare ? (
-                    <ShareDialog
-                      organizationId={organizationId}
-                      photoIds={[photo.id]}
-                      defaultTitle={photo.name}
-                      trigger={
-                        <Button type="button" variant="secondary" size="sm">
-                          <Share2 aria-hidden="true" className="size-4" />
-                          Share
-                        </Button>
-                      }
-                    />
-                  ) : null}
-                  {canDelete ? (
-                    <Button
-                      type="button"
-                      variant="danger"
-                      size="sm"
-                      isPending={isDeleting}
-                      onClick={() => {
-                        onDelete(photo)
-                      }}
-                    >
-                      <Trash2 aria-hidden="true" className="size-4" />
-                      Delete
-                    </Button>
-                  ) : null}
-                  <Dialog.Close asChild>
-                    <Button type="button" variant="ghost" size="icon" aria-label="Close">
-                      <X aria-hidden="true" className="size-4" />
-                    </Button>
-                  </Dialog.Close>
-                </div>
+                    <Trash2 aria-hidden="true" className="size-4" />
+                    Delete
+                  </Button>
+                ) : null}
               </div>
               <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
                 <img

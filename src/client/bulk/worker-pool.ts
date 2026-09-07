@@ -1,9 +1,10 @@
 /**
- * A fixed set of engine workers handed out round-robin. Each worker caches
+ * A fixed set of engines handed out least-busy first. Each worker caches
  * fonts independently, so the pool warms up over the first few images and
  * then runs fully parallel.
  */
-import { type ApplyInput, type ApplyOutput, WatermarkWorker } from '../engine/worker-client'
+import type { ApplyInput, ApplyOutput, WatermarkEngine } from '../engine/engine'
+import { createEngine } from '../lib/canvas-backend'
 
 /** Leave one core for the page; never more than eight workers. */
 export const MAX_POOL_SIZE = 8
@@ -15,10 +16,10 @@ export function defaultPoolSize(hardwareConcurrency = navigator.hardwareConcurre
 }
 
 export class WorkerPool {
-  readonly #workers: WatermarkWorker[]
+  readonly #workers: WatermarkEngine[]
   #next = 0
 
-  constructor(size: number, create: () => WatermarkWorker = () => new WatermarkWorker()) {
+  constructor(size: number, create: () => WatermarkEngine = createEngine) {
     if (!Number.isSafeInteger(size) || size < 1) {
       throw new RangeError('pool size must be a positive integer')
     }
@@ -26,7 +27,7 @@ export class WorkerPool {
   }
 
   /** The least-loaded worker, ties broken round-robin. */
-  #pick(): WatermarkWorker {
+  #pick(): WatermarkEngine {
     let chosen = this.#workers[this.#next % this.#workers.length]
     for (const worker of this.#workers) {
       if (chosen === undefined || worker.busy < chosen.busy) {

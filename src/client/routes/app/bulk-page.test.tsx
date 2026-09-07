@@ -48,7 +48,8 @@ describe('bulk page', () => {
   it('runs a batch with progress, isolates failures, retries them, and downloads a ZIP', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
-    installLibraryApi({ watermarks: [makeWatermark()] })
+    const second = makeWatermark({ id: 'wm-2', name: 'Corner glyph' })
+    installLibraryApi({ watermarks: [makeWatermark(), second] })
     renderApp('/app/bulk')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Bulk watermarking')
     expect(await screen.findByText(/using 2 workers/)).toBeInTheDocument()
@@ -66,7 +67,10 @@ describe('bulk page', () => {
     await user.click(screen.getByRole('button', { name: 'Remove two.jpg' }))
     expect(screen.getByRole('heading', { level: 2, name: '2 photos' })).toBeInTheDocument()
 
-    await user.selectOptions(screen.getByLabelText('Preset'), 'wm-1')
+    // Ticked in reverse library order: the batch applies presets in the order ticked.
+    await user.click(screen.getByRole('checkbox', { name: 'Corner glyph' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+    expect(screen.getByText(/applied in the order ticked/)).toBeInTheDocument()
     await user.click(screen.getByRole('combobox', { name: 'Size' }))
     await user.click(await screen.findByRole('option', { name: 'Fit 2048 px' }))
     await user.click(screen.getByRole('button', { name: 'Start' }))
@@ -77,7 +81,7 @@ describe('bulk page', () => {
       output: { format: 'image/jpeg', quality: 0.9 },
       fitLongestSide: 2048,
     })
-    expect(runs[0]?.spec).toEqual(makeWatermark().spec)
+    expect(runs[0]?.specs).toEqual([second.spec, makeWatermark().spec])
     expect(screen.getByRole('alert')).toHaveTextContent('cannot decode fail-three.jpg')
     expect(screen.getByRole('progressbar', { name: 'Batch progress' })).toHaveAttribute(
       'value',
@@ -111,7 +115,7 @@ describe('bulk page', () => {
       photo('slow-b.png'),
       photo('slow-c.png'),
     ])
-    await user.selectOptions(screen.getByLabelText('Preset'), 'wm-1')
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
     await user.click(screen.getByRole('combobox', { name: 'Format' }))
     await user.click(await screen.findByRole('option', { name: 'PNG' }))
     expect(screen.getByLabelText('Quality')).toBeDisabled()
@@ -125,7 +129,7 @@ describe('bulk page', () => {
         screen.getByText(/1 of 4 finished, 3 cancelled|4 of 4 finished, 3 cancelled/),
       ).toBeInTheDocument(),
     )
-    const list = screen.getByRole('list')
+    const list = screen.getByRole('list', { name: 'Photos in this batch' })
     expect(within(list).getAllByText('Cancelled')).toHaveLength(3)
     expect(within(list).getByText('Done')).toBeInTheDocument()
 
@@ -141,7 +145,7 @@ describe('bulk page', () => {
     await waitFor(() => expect(screen.getByText(/4 of 4 finished in/)).toBeInTheDocument())
 
     await user.click(screen.getByRole('button', { name: 'Clear list' }))
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list', { name: 'Photos in this batch' })).not.toBeInTheDocument()
     unmount()
     expect(disposed.count).toBe(1)
   })
@@ -153,7 +157,7 @@ describe('bulk page', () => {
     renderApp('/app/bulk')
     await screen.findByLabelText('Add photos')
     await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg'), photo('b.jpg')])
-    await user.selectOptions(screen.getByLabelText('Preset'), 'wm-1')
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
     await user.click(screen.getByRole('button', { name: 'Start' }))
     await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
 

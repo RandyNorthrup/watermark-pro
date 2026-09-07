@@ -21,21 +21,27 @@ interface AuditTableProps {
 
 export function AuditTable({ caption, entries, detailHeading, renderDetail }: AuditTableProps) {
   return (
-    <Card className="overflow-x-auto p-0">
+    <Card
+      className="overflow-x-auto p-0 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
+      // Wide tables scroll sideways on phones; a scroll region must be reachable from the keyboard.
+      tabIndex={0}
+      role="region"
+      aria-label={caption}
+    >
       <table className="w-full text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead className="text-left text-xs text-ink-muted uppercase">
           <tr>
-            <th scope="col" className="px-4 py-3">
+            <th scope="col" className="px-3 py-3 md:px-4">
               When
             </th>
-            <th scope="col" className="px-4 py-3">
+            <th scope="col" className="px-3 py-3 md:px-4">
               Who
             </th>
-            <th scope="col" className="px-4 py-3">
+            <th scope="col" className="px-3 py-3 md:px-4">
               Action
             </th>
-            <th scope="col" className="px-4 py-3">
+            <th scope="col" className="px-3 py-3 md:px-4">
               {detailHeading}
             </th>
           </tr>
@@ -43,13 +49,13 @@ export function AuditTable({ caption, entries, detailHeading, renderDetail }: Au
         <tbody>
           {entries.map((entry) => (
             <tr key={entry.id} className="border-t border-line">
-              <td className="px-4 py-3 whitespace-nowrap">
+              <td className="px-3 py-3 whitespace-nowrap md:px-4">
                 <time dateTime={entry.createdAt}>
                   {dateTimeFormatter.format(new Date(entry.createdAt))}
                 </time>
               </td>
-              <td className="px-4 py-3">{entry.actorName ?? 'System'}</td>
-              <td className="px-4 py-3 font-mono text-xs">{entry.action}</td>
+              <td className="px-3 py-3 md:px-4">{entry.actorName ?? 'System'}</td>
+              <td className="px-3 py-3 font-mono text-xs md:px-4">{entry.action}</td>
               {renderDetail(entry)}
             </tr>
           ))}

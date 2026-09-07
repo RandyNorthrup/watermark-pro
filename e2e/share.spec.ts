@@ -3,9 +3,16 @@
  * is published under a link, a visitor with no session opens it and
  * downloads the photo, the link is revoked, and the visitor is shut out.
  */
-import { expect, test } from '@playwright/test'
 
-import { createWorkspace, downloadBytes, expectAccessible, pngSize } from './support'
+import {
+  createWorkspace,
+  downloadBytes,
+  expect,
+  expectAccessible,
+  navigateTo,
+  pngSize,
+  test,
+} from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -18,7 +25,7 @@ const organizationName = `Share ${runId}`
 test('publishes a link, serves a visitor, and revokes', async ({ browser, page, request }) => {
   await createWorkspace(page, request, owner, organizationName)
 
-  await page.getByRole('link', { name: 'Library' }).first().click()
+  await navigateTo(page, 'Library')
   await page.getByRole('link', { name: 'New preset' }).click()
   await page.getByRole('textbox', { name: 'Text' }).fill('© Sal')
   await page.getByLabel('Preset name').fill('Share preset')
@@ -66,7 +73,7 @@ test('publishes a link, serves a visitor, and revokes', async ({ browser, page, 
   )
   expect(tampered.status()).toBe(404)
 
-  await page.getByRole('link', { name: 'Shares' }).first().click()
+  await navigateTo(page, 'Shares')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Shares')
   await expect(page.getByText('Visitor preview')).toBeVisible()
   await expectAccessible(page)
@@ -78,7 +85,7 @@ test('publishes a link, serves a visitor, and revokes', async ({ browser, page, 
   await expectAccessible(visitor)
   await visitorContext.close()
 
-  await page.getByRole('link', { name: 'Audit log' }).first().click()
+  await navigateTo(page, 'Audit log')
   await expect(page.getByText('share.created')).toBeVisible()
   await expect(page.getByText('share.revoked')).toBeVisible()
 })

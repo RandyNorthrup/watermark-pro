@@ -12,7 +12,12 @@ export const MARK_KINDS: readonly { value: MarkKind; label: string }[] = [
   { value: 'text', label: 'Text' },
   { value: 'symbol', label: 'Symbol' },
   { value: 'image', label: 'Logo' },
+  { value: 'qr', label: 'QR code' },
 ]
+
+/** QR codes need room for their modules; a quarter of the width scans from a phone. */
+const DEFAULT_QR_SCALE = 0.18
+export const DEFAULT_QR_CONTENT = 'https://'
 
 /** The settings every kind shares. */
 type SharedSettings = Pick<WatermarkSpec, 'placement' | 'contrast' | 'style'>
@@ -49,12 +54,27 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
     case 'image': {
       return { ...settings, kind: 'image', assetId }
     }
+    case 'qr': {
+      return {
+        ...settings,
+        style: { ...settings.style, scale: DEFAULT_QR_SCALE },
+        kind: 'qr',
+        content: DEFAULT_QR_CONTENT,
+      }
+    }
   }
 }
 
 /** Fresh designer state. */
 export function blankSpec(): WatermarkSpec {
-  return { ...DEFAULT_TEXT_SPEC, style: { ...DEFAULT_STYLE, tiling: { ...DEFAULT_STYLE.tiling } } }
+  return {
+    ...DEFAULT_TEXT_SPEC,
+    style: {
+      ...DEFAULT_STYLE,
+      tiling: { ...DEFAULT_STYLE.tiling },
+      backdrop: { ...DEFAULT_STYLE.backdrop },
+    },
+  }
 }
 
 export function withPlacement(spec: WatermarkSpec, placement: WatermarkSpec['placement']) {
@@ -67,16 +87,18 @@ export function withContrast(spec: WatermarkSpec, contrast: WatermarkSpec['contr
 
 export function withStyle(
   spec: WatermarkSpec,
-  patch: Partial<Omit<WatermarkSpec['style'], 'tiling'>> & {
+  patch: Partial<Omit<WatermarkSpec['style'], 'tiling' | 'backdrop'>> & {
     tiling?: Partial<WatermarkSpec['style']['tiling']>
+    backdrop?: Partial<WatermarkSpec['style']['backdrop']>
   },
 ): WatermarkSpec {
-  const { tiling, ...rest } = patch
+  const { tiling, backdrop, ...rest } = patch
   return {
     ...spec,
     style: {
       ...spec.style,
       ...rest,
+      backdrop: { ...spec.style.backdrop, ...backdrop },
       tiling: { ...spec.style.tiling, ...tiling },
     },
   }

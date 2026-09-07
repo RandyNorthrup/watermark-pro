@@ -1,8 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
+import { X } from 'lucide-react'
 import { useId } from 'react'
 
 import type { WatermarkDto } from '../../../shared/api'
 import type { WatermarkSpec } from '../../../shared/watermark'
+import { type Layer, MAX_LAYERS } from '../../editor/state'
+import { cn } from '../../lib/cn'
 import { watermarksQueryOptions } from '../../lib/library'
 import { withPlacement } from '../../lib/spec-edit'
 import { PlacementPanel } from '../designer/placement-panel'
@@ -12,9 +15,13 @@ import { Button } from '../ui/button'
 
 interface WatermarkPanelProps {
   organizationId: string
-  presetId: string | null
-  spec: WatermarkSpec | null
-  onPresetChange: (preset: WatermarkDto) => void
+  /** Marks on the photo in drawing order. */
+  layers: readonly Layer[]
+  activeLayerId: string | null
+  onAddPreset: (preset: WatermarkDto) => void
+  onSelectLayer: (layerId: string) => void
+  onRemoveLayer: (layerId: string) => void
+  /** Replaces the active layer's spec. */
   onSpecChange: (spec: WatermarkSpec) => void
 }
 
@@ -25,29 +32,18 @@ function isSameSpec(a: WatermarkSpec, b: WatermarkSpec): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
 }
 
-/** Choose a library preset, then adjust placement and style for this photo only. */
-export function WatermarkPanel({
-  organizationId,
-  presetId,
-  spec,
-  onPresetChange,
-  onSpecChange,
-}: WatermarkPanelProps) {
+/**
+ * The marks on this photo: add library presets as layers, pick one to
+ * adjust its placement and style for this photo only, remove the ones you
+ * no longer want.
+ */
+export function WatermarkPanel({ organizationId, ...props }: WatermarkPanelProps) {
   const selectId = useId()
   const presets = useQuery(watermarksQueryOptions(organizationId))
 
   return (
     <PresetGate query={presets} emptyHint="to apply it here.">
-      {(list) => (
-        <PanelBody
-          list={list}
-          selectId={selectId}
-          presetId={presetId}
-          spec={spec}
-          onPresetChange={onPresetChange}
-          onSpecChange={onSpecChange}
-        />
-      )}
+      {(list) => <PanelBody list={list} selectId={selectId} {...props} />}
     </PresetGate>
   )
 }
@@ -60,34 +56,43 @@ interface PanelBodyProps extends Omit<WatermarkPanelProps, 'organizationId'> {
 function PanelBody({
   list,
   selectId,
-  presetId,
-  spec,
-  onPresetChange,
+  layers,
+  activeLayerId,
+  onAddPreset,
+  onSelectLayer,
+  onRemoveLayer,
   onSpecChange,
 }: PanelBodyProps) {
-  const preset = list.find((candidate) => candidate.id === presetId)
-  const isModified = preset !== undefined && spec !== null && !isSameSpec(preset.spec, spec)
+  const active = layers.find((layer) => layer.id === activeLayerId)
+  const activePreset = list.find((candidate) => candidate.id === active?.presetId)
+  const isModified =
+    active !== undefined &&
+    activePreset !== undefined &&
+    !isSameSpec(activePreset.spec, active.spec)
+  const revertTo = isModified ? activePreset : undefined
+  const isFull = layers.length >= MAX_LAYERS
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
         <label htmlFor={selectId} className="text-sm font-medium">
-          Preset
+          {layers.length === 0 ? 'Preset' : 'Add another preset'}
         </label>
         <select
           id={selectId}
-          value={presetId ?? ''}
+          value=""
+          disabled={isFull}
           onChange={(event) => {
             const { value } = event.currentTarget
             const chosen = list.find((candidate) => candidate.id === value)
             if (chosen !== undefined) {
-              onPresetChange(chosen)
+              onAddPreset(chosen)
             }
           }}
           className={selectClassName}
         >
           <option value="" disabled>
-            Choose a preset
+            {isFull ? `Up to ${String(MAX_LAYERS)} marks per photo` : 'Choose a preset'}
           </option>
           {list.map((candidate) => (
             <option key={candidate.id} value={candidate.id}>
@@ -95,36 +100,85 @@ function PanelBody({
             </option>
           ))}
         </select>
-        {isModified ? (
-          <div className="flex items-center justify-between gap-2 text-xs text-ink-muted">
-            <span>Adjusted for this photo; the library preset is unchanged.</span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                onPresetChange(preset)
-              }}
-            >
-              Revert
-            </Button>
-          </div>
-        ) : null}
       </div>
-      {spec === null ? null : (
+
+      {layers.length === 0 ? null : (
+        <section aria-labelledby="editor-layers-heading" className="flex flex-col gap-2">
+          <h2 id="editor-layers-heading" className="text-sm font-semibold">
+            Marks on this photo
+          </h2>
+          <ul className="flex flex-col gap-1" aria-label="Layers, bottom to top">
+            {layers.map((layer, index) => {
+              const preset = list.find((candidate) => candidate.id === layer.presetId)
+              const name = preset?.name ?? 'Removed preset'
+              const isActive = layer.id === active?.id
+              return (
+                <li key={layer.id} className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => {
+                      onSelectLayer(layer.id)
+                    }}
+                    className={cn(
+                      'flex min-h-10 min-w-0 flex-1 items-center gap-2 rounded-lg px-3 text-left text-sm transition-colors',
+                      isActive
+                        ? 'bg-brand-50 font-medium text-brand-800 dark:bg-brand-900/50 dark:text-brand-100'
+                        : 'text-ink hover:bg-brand-50/60 dark:hover:bg-brand-900/20',
+                    )}
+                  >
+                    <span className="w-4 shrink-0 text-xs text-ink-muted">{String(index + 1)}</span>
+                    <span className="truncate">{name}</span>
+                  </button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Remove ${name} from this photo`}
+                    onClick={() => {
+                      onRemoveLayer(layer.id)
+                    }}
+                  >
+                    <X aria-hidden="true" className="size-4" />
+                  </Button>
+                </li>
+              )
+            })}
+          </ul>
+          {isModified ? (
+            <div className="flex items-center justify-between gap-2 text-xs text-ink-muted">
+              <span>Adjusted for this photo; the library preset is unchanged.</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (revertTo !== undefined) {
+                    onSpecChange(revertTo.spec)
+                  }
+                }}
+              >
+                Revert
+              </Button>
+            </div>
+          ) : null}
+        </section>
+      )}
+
+      {active === undefined ? null : (
         <>
           <section aria-labelledby="editor-placement-heading" className="flex flex-col gap-3">
             <h2 id="editor-placement-heading" className="text-sm font-semibold">
               Placement
             </h2>
             <PlacementPanel
-              placement={spec.placement}
+              placement={active.spec.placement}
               onChange={(placement) => {
-                onSpecChange(withPlacement(spec, placement))
+                onSpecChange(withPlacement(active.spec, placement))
               }}
             />
           </section>
-          <StylePanel spec={spec} onChange={onSpecChange} />
+          <StylePanel spec={active.spec} onChange={onSpecChange} />
         </>
       )}
     </div>

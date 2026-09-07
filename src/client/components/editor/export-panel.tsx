@@ -1,9 +1,10 @@
-import { Download, Images } from 'lucide-react'
+import { Download, Images, Share2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { FORMAT_OPTIONS } from './formats'
 import { type EncodeOptions, OUTPUT_FORMATS, type OutputFormat } from '../../engine/encode'
 import type { Size } from '../../engine/layout'
+import { canShareFiles } from '../../lib/share-file'
 import { Button } from '../ui/button'
 import { Select } from '../ui/select'
 import { SliderField } from '../ui/slider-field'
@@ -13,6 +14,9 @@ interface ExportPanelProps {
   isReady: boolean
   isExporting: boolean
   onExport: (options: EncodeOptions) => void
+  /** Hands the render to the platform share sheet; shown only where the browser can share files. */
+  onShare: (options: EncodeOptions) => void
+  isSharing: boolean
   /** Present when the user may store photos in the gallery. */
   onSave?: ((options: EncodeOptions) => void) | undefined
   isSaving?: boolean | undefined
@@ -33,12 +37,16 @@ export function ExportPanel({
   isReady,
   isExporting,
   onExport,
+  onShare,
+  isSharing,
   onSave,
   isSaving = false,
 }: ExportPanelProps) {
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
   const isLossy = format !== 'image/png'
+  const isBusy = isExporting || isSharing || isSaving
+  const isShareable = canShareFiles(format)
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
@@ -68,13 +76,14 @@ export function ExportPanel({
       />
       <p className="text-xs text-ink-muted">
         {String(outputSize.width)} × {String(outputSize.height)} px
-        {isLossy ? '' : '; PNG is lossless'}. Rendered in your browser at full resolution.
+        {isLossy ? '' : '; PNG is lossless'}. Rendered in your browser at full resolution
+        {isShareable ? '; Share sends it to Photos, Messages or any app on this device' : ''}.
       </p>
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
           isPending={isExporting}
-          disabled={!isReady || isSaving}
+          disabled={!isReady || (isBusy && !isExporting)}
           onClick={() => {
             onExport({ format, quality })
           }}
@@ -82,12 +91,26 @@ export function ExportPanel({
           {isExporting ? null : <Download aria-hidden="true" className="size-4" />}
           Download
         </Button>
+        {isShareable ? (
+          <Button
+            type="button"
+            variant="secondary"
+            isPending={isSharing}
+            disabled={!isReady || (isBusy && !isSharing)}
+            onClick={() => {
+              onShare({ format, quality })
+            }}
+          >
+            {isSharing ? null : <Share2 aria-hidden="true" className="size-4" />}
+            Share
+          </Button>
+        ) : null}
         {onSave === undefined ? null : (
           <Button
             type="button"
             variant="secondary"
             isPending={isSaving}
-            disabled={!isReady || isExporting}
+            disabled={!isReady || (isBusy && !isSaving)}
             onClick={() => {
               onSave({ format, quality })
             }}

@@ -36,6 +36,12 @@ async function promote(userId: string) {
   })
 }
 
+/** The status of a request, for one-line assertions. */
+async function statusOf(response: Promise<Response>): Promise<number> {
+  const settled = await response
+  return settled.status
+}
+
 async function currentUserId(client: TestClient): Promise<string> {
   const response = await client.get('/api/auth/get-session')
   return z.object({ user: z.object({ id: z.string() }) }).parse(await response.json()).user.id
@@ -48,6 +54,32 @@ beforeEach(async () => {
     slug: 'admin-org',
   }))
   await promote(await currentUserId(adminClient))
+})
+
+describe('dev promotion route', () => {
+  it('promotes an existing account only while the console provider is configured', async () => {
+    const otherClient = new TestClient(harness.app, harness.env)
+    await otherClient.signUpAndVerify(harness.mailbox, other)
+    expect(await statusOf(otherClient.get('/api/admin/audit'))).toBe(HTTP_STATUS.forbidden)
+
+    expect(await statusOf(otherClient.post('/api/dev/promote', { email: 'not an email' }))).toBe(
+      HTTP_STATUS.badRequest,
+    )
+    expect(
+      await statusOf(otherClient.post('/api/dev/promote', { email: 'nobody@example.test' })),
+    ).toBe(HTTP_STATUS.notFound)
+    expect(await statusOf(otherClient.post('/api/dev/promote', { email: other.email }))).toBe(
+      HTTP_STATUS.ok,
+    )
+    expect(await statusOf(otherClient.get('/api/admin/audit'))).toBe(HTTP_STATUS.ok)
+
+    // Without the console provider (production) the route does not exist.
+    harness.services.devMailbox = undefined
+    expect(await statusOf(otherClient.post('/api/dev/promote', { email: other.email }))).toBe(
+      HTTP_STATUS.notFound,
+    )
+    expect(await statusOf(otherClient.get('/api/dev/mailbox'))).toBe(HTTP_STATUS.notFound)
+  })
 })
 
 describe('platform administration', () => {

@@ -85,7 +85,7 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
         </fieldset>
       ) : null}
       {placement.mode === 'custom' ? (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <SliderField
             label="Horizontal"
             value={placement.x}

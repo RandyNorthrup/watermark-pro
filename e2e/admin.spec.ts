@@ -5,10 +5,17 @@
  * unban them, see every organization, and find the ban in the global audit
  * trail. Promotion happens the way the runbook does it: a direct D1 update.
  */
-import { expect, test } from '@playwright/test'
 
-import { createWorkspace, expectAccessible, signIn } from './support'
-import { promoteToPlatformAdmin } from '../scripts/lib/local-admin'
+import {
+  createWorkspace,
+  expect,
+  expectAccessible,
+  expectNoNavLink,
+  navigateTo,
+  promoteToPlatformAdmin,
+  signIn,
+  test,
+} from './support'
 
 const runId = Date.now().toString(36)
 const admin = {
@@ -34,7 +41,7 @@ test('promoted administrator manages users and sees every organization', async (
   await createWorkspace(page, request, admin, adminOrganization)
 
   // Before promotion the console is a dead end and the nav does not offer it.
-  await expect(page.getByRole('link', { name: 'Admin' })).toHaveCount(0)
+  await expectNoNavLink(page, 'Admin')
   await page.goto('/app/admin')
   await expect(page.getByRole('alert')).toContainText('Only platform administrators')
   await expectAccessible(page)
@@ -44,9 +51,9 @@ test('promoted administrator manages users and sees every organization', async (
   const memberPage = await memberContext.newPage()
   await createWorkspace(memberPage, memberContext.request, member, memberOrganization)
 
-  promoteToPlatformAdmin(admin.email)
+  await promoteToPlatformAdmin(request, admin.email)
   await page.reload()
-  await page.getByRole('link', { name: 'Admin' }).first().click()
+  await navigateTo(page, 'Admin')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Administration')
   await expect(page.getByText(/\d+ users?[,.]/)).toBeVisible()
   await expectAccessible(page)

@@ -14,9 +14,27 @@
  * exactly once. Semantic tokens (surface, ink, line) switch with the colour
  * scheme; brand tokens do not.
  */
+
+/*
+ * Metric-matched stand-in for Inter while the web font downloads: Arial (or
+ * Helvetica on Apple platforms, which local() resolves the same way) scaled
+ * and offset to Inter's advance widths and vertical metrics, so the swap
+ * moves nothing. Values are the published Inter/Arial overrides (fontaine,
+ * capsize). Without this the swap shifted long lists by 0.16 CLS on phones.
+ */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 107.12%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
+
 @theme {
   --font-sans:
-    'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+    'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', roboto,
+    sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', menlo, consolas, monospace;
   --color-brand-50: oklch(97% 0.02 285deg);
   --color-brand-100: oklch(93% 0.05 285deg);
@@ -37,9 +55,46 @@
   --color-line: var(--line);
   --radius-card: 1rem;
   --shadow-card: 0 1px 2px oklch(0% 0 0deg / 6%), 0 12px 32px -12px oklch(0% 0 0deg / 18%);
+  --animate-sheet-in: sheet-in 200ms ease-out;
+  --animate-sheet-out: sheet-out 150ms ease-in;
+  --animate-fade-in: fade-in 200ms ease-out;
+  --animate-fade-out: fade-out 150ms ease-in;
+
+  @keyframes sheet-in {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes sheet-out {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
 }
 
 :root {
+  /*
+   * Height of the app header (src/client/components/app-shell.tsx): its top
+   * padding grows with the phone's safe area, then 2.25rem of controls,
+   * 0.75rem of bottom padding and the 1px border. The phone tab bar is
+   * 3.5rem plus the home indicator. Scrolling something into view (a focused
+   * field, a tapped tab) keeps clear of both.
+   */
+  --app-header-height: calc(max(0.75rem, env(safe-area-inset-top)) + 3.0625rem);
+  --app-tab-bar-height: calc(3.5rem + env(safe-area-inset-bottom));
   --surface: oklch(99% 0.004 285deg);
   --surface-raised: oklch(100% 0 0deg);
   --ink: oklch(20% 0.02 285deg);
@@ -70,5 +125,26 @@
   :focus-visible {
     outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
+  }
+
+  /* Phones: keep the app's colours behind the notch and the home indicator. */
+  html {
+    background-color: var(--surface);
+    scroll-padding-top: var(--app-header-height);
+  }
+
+  @media (width < 48rem) {
+    html {
+      scroll-padding-bottom: var(--app-tab-bar-height);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

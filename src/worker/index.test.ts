@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createApp } from './index'
 import { apiErrorSchema, healthResponseSchema } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HTTP_STATUS } from '../shared/constants'
-import { createTestEnv, createTestHarness } from './test-support/test-app'
+import { createTestEnv, createTestHarness, TEST_APP_URL } from './test-support/test-app'
 
 function silenceConsoleError() {
   return vi.spyOn(console, 'error').mockImplementation(() => {
@@ -76,6 +76,22 @@ describe('error handling', () => {
     )
 
     expect(response.status).toBe(HTTP_STATUS.forbidden)
+  })
+
+  it('rejects state-changing JSON requests from another origin or with no origin at all', async () => {
+    const { app, env } = createTestHarness()
+    const statusWith = async (headers: Record<string, string>) => {
+      const response = await app.request(
+        HEALTH_PATH,
+        { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: '{}' },
+        env,
+      )
+      return response.status
+    }
+    expect(await statusWith({ origin: 'https://evil.example' })).toBe(HTTP_STATUS.forbidden)
+    expect(await statusWith({})).toBe(HTTP_STATUS.forbidden)
+    // The app's own origin passes the guard; the health route then answers as usual.
+    expect(await statusWith({ origin: TEST_APP_URL })).not.toBe(HTTP_STATUS.forbidden)
   })
 
   it('converts unexpected exceptions into a JSON 500 without leaking details', async () => {

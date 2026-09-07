@@ -5,6 +5,8 @@ import { CropOverlay, type CropGesture } from './crop-overlay'
 import { MarkOverlay, type MarkGesture } from './mark-overlay'
 
 const previewSize = { width: 1000, height: 500 }
+/** 4% of the shorter (250 px) display side: 10 px. */
+const MARGIN = 0.04
 /** Displayed at half size so every conversion is exercised. */
 const displaySize = { width: 500, height: 250 }
 const placement = {
@@ -44,6 +46,7 @@ function renderOverlay(onGesture: (gesture: MarkGesture) => void, rotation = 0, 
       placement={{ ...placement, rotation }}
       previewSize={previewSize}
       displaySize={displaySize}
+      margin={MARGIN}
       scale={scale}
       rotation={rotation}
       onGesture={onGesture}
@@ -97,6 +100,90 @@ describe('MarkOverlay', () => {
     expect(gestures.at(-2)?.patch.rotation).toBeCloseTo(10 - 90)
   })
 
+  it('snaps a dragged centre to the middle, thirds and margins, shows guides, and frees it with Alt', () => {
+    const gestures: MarkGesture[] = []
+    renderOverlay((gesture) => {
+      gestures.push(gesture)
+    })
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    // Centre starts at (400, 200); 146px left lands at 254, within reach of the 250 middle line.
+    pointer('pointerdown', frame, 400, 200)
+    pointer('pointermove', frame, 254, 200)
+    expect(gestures.at(-1)?.patch.x).toBeCloseTo(0.5)
+    expect(gestures.at(-1)?.patch.y).toBeCloseTo(0.8)
+    expect(document.querySelector('[data-snap-guide="x"]')).not.toBeNull()
+    expect(document.querySelector('[data-snap-guide="y"]')).toBeNull()
+    // The bottom margin line for a 50px-tall mark on a 250px preview is at 215.
+    pointer('pointermove', frame, 254, 210)
+    expect(gestures.at(-1)?.patch.y).toBeCloseTo(215 / 250)
+    expect(document.querySelector('[data-snap-guide="y"]')).not.toBeNull()
+    // Alt places it exactly where the pointer is.
+    fireEvent(
+      frame,
+      new PointerEvent('pointermove', {
+        clientX: 254,
+        clientY: 210,
+        pointerId: 1,
+        altKey: true,
+        bubbles: true,
+      }),
+    )
+    expect(gestures.at(-1)?.patch.x).toBeCloseTo(254 / 500)
+    expect(gestures.at(-1)?.patch.y).toBeCloseTo(210 / 250)
+    expect(document.querySelector('[data-snap-guide]')).toBeNull()
+    pointer('pointerup', frame, 254, 210)
+    expect(gestures.at(-1)?.phase).toBe('end')
+    expect(document.querySelector('[data-snap-guide]')).toBeNull()
+  })
+
+  it('pinches with two fingers to move, scale and rotate in one gesture', () => {
+    const gestures: MarkGesture[] = []
+    renderOverlay((gesture) => {
+      gestures.push(gesture)
+    })
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    // Two fingers 100px apart, level, centred on the mark at (400, 200).
+    pointer('pointerdown', frame, 350, 200, 1)
+    pointer('pointerdown', frame, 450, 200, 2)
+    // The first finger slides left: 150px apart, midpoint 25px left of where it started.
+    pointer('pointermove', frame, 300, 200, 1)
+    expect(gestures.map((gesture) => gesture.phase)).toEqual(['start', 'move'])
+    expect(gestures[1]?.patch).toEqual({
+      x: expect.closeTo(0.75, 5) as number,
+      y: expect.closeTo(0.8, 5) as number,
+      scale: expect.closeTo(0.3, 5) as number,
+      rotation: expect.closeTo(0, 5) as number,
+    })
+    // The second finger drops below: the pair now spans 45° clockwise on screen.
+    pointer('pointermove', frame, 450, 350, 2)
+    expect(gestures[2]?.patch.rotation).toBeCloseTo(-45)
+    expect(gestures[2]?.patch.scale).toBeCloseTo((0.2 * Math.hypot(150, 150)) / 100)
+    // A third pointer that was never part of the gesture changes nothing.
+    pointer('pointermove', frame, 10, 10, 3)
+    pointer('pointerup', frame, 10, 10, 3)
+    expect(gestures).toHaveLength(3)
+    pointer('pointerup', frame, 450, 350, 2)
+    expect(gestures.at(-1)?.phase).toBe('end')
+    // The lingering first finger starts nothing new until it lifts and presses again.
+    pointer('pointermove', frame, 320, 200, 1)
+    expect(gestures).toHaveLength(4)
+  })
+
+  it('ignores a second finger while a handle is being dragged', () => {
+    const gestures: MarkGesture[] = []
+    renderOverlay((gesture) => {
+      gestures.push(gesture)
+    })
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    const resize = screen.getByRole('button', { name: 'Resize watermark' })
+    pointer('pointerdown', resize, 500, 200, 1)
+    pointer('pointerdown', frame, 350, 200, 2)
+    pointer('pointermove', frame, 300, 200, 2)
+    pointer('pointermove', resize, 550, 200, 1)
+    expect(gestures.map((gesture) => gesture.phase)).toEqual(['start', 'move'])
+    expect(gestures[1]?.patch).toEqual({ scale: expect.closeTo(0.3, 5) as number })
+  })
+
   it('nudges, resizes and rotates from the keyboard as discrete commits', () => {
     const gestures: MarkGesture[] = []
     renderOverlay(
@@ -132,6 +219,7 @@ describe('MarkOverlay', () => {
         displaySize={{ width: 0, height: 0 }}
         scale={0.2}
         rotation={0}
+        margin={MARGIN}
         onGesture={vi.fn()}
       />,
     )

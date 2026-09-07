@@ -4,10 +4,13 @@ import {
   canRedo,
   canUndo,
   createHistory,
+  createLayer,
   type EditorDocument,
   editorReducer,
   EMPTY_DOCUMENT,
   HISTORY_LIMIT,
+  withLayer,
+  withoutLayer,
 } from './state'
 import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
 
@@ -39,7 +42,8 @@ describe('editor history', () => {
   })
 
   it('treats a checkpoint plus many sets as one undoable gesture', () => {
-    let history = createHistory({ ...EMPTY_DOCUMENT, spec: DEFAULT_TEXT_SPEC, presetId: 'p1' })
+    const layer = createLayer('p1', DEFAULT_TEXT_SPEC)
+    let history = createHistory({ ...EMPTY_DOCUMENT, layers: [layer] })
     history = editorReducer(history, { type: 'checkpoint' })
     for (const width of [10, 20, 30, 40]) {
       history = editorReducer(history, { type: 'set', document: withCrop(width) })
@@ -48,7 +52,7 @@ describe('editor history', () => {
     expect(history.present.crop?.width).toBe(40)
     history = editorReducer(history, { type: 'undo' })
     expect(history.present.crop).toBeNull()
-    expect(history.present.presetId).toBe('p1')
+    expect(history.present.layers[0]?.presetId).toBe('p1')
     expect(history.future[0]?.crop?.width).toBe(40)
   })
 
@@ -65,6 +69,21 @@ describe('editor history', () => {
     expect(canRedo(history)).toBe(true)
     history = editorReducer(history, { type: 'commit', document: withCrop(60) })
     expect(canRedo(history)).toBe(false)
+  })
+
+  it('replaces and removes layers by id with fresh ids per layer', () => {
+    const first = createLayer('p1', DEFAULT_TEXT_SPEC)
+    const second = createLayer('p2', DEFAULT_TEXT_SPEC)
+    expect(first.id).not.toBe(second.id)
+    const document = { ...EMPTY_DOCUMENT, layers: [first, second] }
+    const moved = {
+      ...second,
+      spec: { ...second.spec, style: { ...second.spec.style, scale: 0.5 } },
+    }
+    const replaced = withLayer(document, moved)
+    expect(replaced.layers).toEqual([first, moved])
+    expect(withoutLayer(replaced, first.id).layers).toEqual([moved])
+    expect(withoutLayer(replaced, 'nobody').layers).toEqual([first, moved])
   })
 
   it('caps the past at the history limit and resets on a new photo', () => {

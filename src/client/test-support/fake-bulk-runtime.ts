@@ -8,7 +8,7 @@ import type { BulkRuntime } from '../bulk/runtime'
  * unless the file name says otherwise: `fail-*` rejects, `slow-*` waits for
  * the abort signal or `releaseSlow()`.
  */
-export const runs: { name: string; spec: WatermarkSpec; settings: BulkSettings }[] = []
+export const runs: { name: string; specs: readonly WatermarkSpec[]; settings: BulkSettings }[] = []
 export const disposed = { count: 0 }
 const slowReleases: (() => void)[] = []
 
@@ -29,8 +29,8 @@ const FAKE_WORKERS = 2
 export function createBulkRuntime(): BulkRuntime {
   return {
     workers: FAKE_WORKERS,
-    run(file, spec, settings, signal) {
-      runs.push({ name: file.name, spec, settings })
+    run(file, specs, settings, signal) {
+      runs.push({ name: file.name, specs, settings })
       return new Promise<BulkResult>((resolve, reject) => {
         const finish = () => {
           resolve({

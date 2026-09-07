@@ -3,9 +3,16 @@
  * from the editor lands in R2 with a thumbnail, shows in the gallery with
  * its preset, can be searched, opened, downloaded, and deleted.
  */
-import { expect, test } from '@playwright/test'
 
-import { createWorkspace, downloadBytes, expectAccessible, pngSize } from './support'
+import {
+  createWorkspace,
+  downloadBytes,
+  expect,
+  expectAccessible,
+  navigateTo,
+  pngSize,
+  test,
+} from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -21,19 +28,23 @@ test('saves from the editor, browses, searches, downloads and deletes', async ({
 }) => {
   await createWorkspace(page, request, owner, organizationName)
 
-  await page.getByRole('link', { name: 'Gallery' }).first().click()
+  await navigateTo(page, 'Gallery')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Gallery')
   await expect(page.getByText(/No photos yet/)).toBeVisible()
   await expectAccessible(page)
 
-  await page.getByRole('link', { name: 'Library' }).first().click()
+  await navigateTo(page, 'Library')
   await page.getByRole('link', { name: 'New preset' }).click()
   await page.getByRole('textbox', { name: 'Text' }).fill('© Gil')
   await page.getByLabel('Preset name').fill('Gallery preset')
   await page.getByRole('button', { name: 'Save preset' }).click()
   await page.getByRole('link', { name: 'Open Gallery preset in the editor' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
-  await expect(page.getByLabel('Preset', { exact: true })).toHaveValue(/.+/)
+  await expect(
+    page
+      .getByRole('list', { name: 'Layers, bottom to top' })
+      .getByRole('button', { pressed: true }),
+  ).toHaveText(/Gallery preset/)
   await page.getByRole('tab', { name: 'Export' }).click()
   await page.getByRole('combobox', { name: 'Format' }).click()
   await page.getByRole('option', { name: 'PNG' }).click()
@@ -69,7 +80,7 @@ test('saves from the editor, browses, searches, downloads and deletes', async ({
   await expect(page.getByText(/No photos match these filters|No photos yet/)).toBeVisible()
   await expect(page.getByTestId('usage-summary')).toContainText('0 photos ·')
 
-  await page.getByRole('link', { name: 'Audit log' }).first().click()
+  await navigateTo(page, 'Audit log')
   await expect(page.getByText('photo.uploaded')).toBeVisible()
   await expect(page.getByText('photo.deleted')).toBeVisible()
 })

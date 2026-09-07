@@ -44,6 +44,56 @@ async function decodedSize(blob: Blob): Promise<{ width: number; height: number 
   return size
 }
 
+const JPEG_SOI_LENGTH = 2
+const EXIF_ORIENTATION_TAG = 0x01_12
+const EXIF_ROTATE_90_CLOCKWISE = 6
+const EXIF_HEADER = [0x45, 0x78, 0x69, 0x66, 0, 0] // "Exif\0\0"
+
+/** Little-endian 16- and 32-bit words for a hand-built TIFF block. */
+function word16(value: number): number[] {
+  return [value & 0xff, value >> 8]
+}
+function word32(value: number): number[] {
+  return [...word16(value & 0xff_ff), ...word16(value >>> 16)]
+}
+
+/**
+ * Inserts an APP1 Exif segment carrying only an Orientation tag after the
+ * SOI marker, the way a camera or phone tags its files.
+ */
+function withExifOrientation(jpeg: Uint8Array, orientation: number): Uint8Array<ArrayBuffer> {
+  const tiff = [
+    0x49,
+    0x49, // "II": little-endian
+    ...word16(0x2a),
+    ...word32(8), // first IFD follows the header
+    ...word16(1), // one entry
+    ...word16(EXIF_ORIENTATION_TAG),
+    ...word16(3), // SHORT
+    ...word32(1),
+    ...word16(orientation),
+    ...word16(0), // value padding
+    ...word32(0), // no next IFD
+  ]
+  const payload = [...EXIF_HEADER, ...tiff]
+  const segment = [0xff, 0xe1, ...word16(payload.length + 2).toReversed(), ...payload]
+  return new Uint8Array([
+    ...jpeg.subarray(0, JPEG_SOI_LENGTH),
+    ...segment,
+    ...jpeg.subarray(JPEG_SOI_LENGTH),
+  ])
+}
+
+function hasExifHeader(bytes: Uint8Array): boolean {
+  const isHeaderAt = (index: number): boolean =>
+    EXIF_HEADER.every((expected, offset) => bytes[index + offset] === expected)
+  return bytes.some((_, index) => isHeaderAt(index))
+}
+
+async function bytesOf(blob: Blob): Promise<Uint8Array> {
+  return new Uint8Array(await blob.arrayBuffer())
+}
+
 describe('WorkerPool', () => {
   it('sizes itself from the hardware and hands work to the least busy worker', () => {
     expect(defaultPoolSize(1)).toBe(1)
@@ -94,7 +144,7 @@ describe('BulkProcessor', () => {
       const file = await photoFile('holiday.JPG', 200)
       const kept = await processor.process(
         file,
-        DEFAULT_TEXT_SPEC,
+        [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/webp', quality: 0.8 }, fitLongestSide: null },
         new AbortController().signal,
       )
@@ -104,7 +154,7 @@ describe('BulkProcessor', () => {
 
       const small = await processor.process(
         file,
-        DEFAULT_TEXT_SPEC,
+        [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/png', quality: 1 }, fitLongestSide: 800 },
         new AbortController().signal,
       )
@@ -116,7 +166,7 @@ describe('BulkProcessor', () => {
       await expect(
         processor.process(
           file,
-          DEFAULT_TEXT_SPEC,
+          [DEFAULT_TEXT_SPEC],
           { output: { format: 'image/png', quality: 1 }, fitLongestSide: null },
           aborted.signal,
         ),
@@ -125,11 +175,41 @@ describe('BulkProcessor', () => {
       await expect(
         processor.process(
           new File(['not an image'], 'notes.txt', { type: 'text/plain' }),
-          DEFAULT_TEXT_SPEC,
+          [DEFAULT_TEXT_SPEC],
           { output: { format: 'image/png', quality: 1 }, fitLongestSide: null },
           new AbortController().signal,
         ),
       ).rejects.toThrow(/notes\.txt is not an image/)
+    } finally {
+      pool.terminate()
+    }
+  })
+
+  it('honours the source orientation and writes no metadata to the output', async () => {
+    const pool = new WorkerPool(1)
+    const processor = new BulkProcessor(
+      pool,
+      new MarkResources(() => Promise.reject(new Error('no logos'))),
+    )
+    try {
+      const plain = await bytesOf(await photoFile('phone.jpg', 120))
+      const tagged = withExifOrientation(plain, EXIF_ROTATE_90_CLOCKWISE)
+      expect(hasExifHeader(plain)).toBe(false)
+      expect(hasExifHeader(tagged)).toBe(true)
+      const file = new File([tagged], 'phone.jpg', { type: 'image/jpeg' })
+
+      const result = await processor.process(
+        file,
+        [DEFAULT_TEXT_SPEC],
+        { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null },
+        new AbortController().signal,
+      )
+      // The orientation tag was applied to the pixels, so nothing is lost by dropping it.
+      expect(await decodedSize(result.blob)).toEqual({
+        width: FIXTURE_HEIGHT,
+        height: FIXTURE_WIDTH,
+      })
+      expect(hasExifHeader(await bytesOf(result.blob))).toBe(false)
     } finally {
       pool.terminate()
     }
@@ -146,7 +226,7 @@ describe('bulk throughput', () => {
         run: (file, signal) =>
           runtime.run(
             file,
-            DEFAULT_TEXT_SPEC,
+            [DEFAULT_TEXT_SPEC],
             { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null },
             signal,
           ),

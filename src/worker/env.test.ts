@@ -41,6 +41,20 @@ describe('validateEnv', () => {
     expect(() => validateEnv(createTestEnv({ APP_URL: 'ftp://example.test' }))).toThrow(/APP_URL/)
   })
 
+  it('accepts Turnstile only when both keys are present', () => {
+    const both = validateEnv(
+      createTestEnv({ TURNSTILE_SITE_KEY: 'site', TURNSTILE_SECRET_KEY: 'secret' }),
+    )
+    expect(both.TURNSTILE_SITE_KEY).toBe('site')
+    expect(validateEnv(createTestEnv()).TURNSTILE_SECRET_KEY).toBeUndefined()
+    expect(() => validateEnv(createTestEnv({ TURNSTILE_SITE_KEY: 'site' }))).toThrow(
+      /TURNSTILE_SECRET_KEY/,
+    )
+    expect(() => validateEnv(createTestEnv({ TURNSTILE_SECRET_KEY: 'secret' }))).toThrow(
+      /TURNSTILE_SECRET_KEY/,
+    )
+  })
+
   it('caches the validated result per env object', () => {
     const raw = createTestEnv()
     expect(validateEnv(raw)).toBe(validateEnv(raw))

@@ -68,6 +68,7 @@ export function makeWatermark(overrides: Partial<WatermarkDto> = {}): WatermarkD
         scale: 0.22,
         margin: 0.04,
         tiling: { enabled: false, spacing: 1.5 },
+        backdrop: { enabled: false, opacity: 0.6 },
       },
     },
     createdBy: 'user-1',

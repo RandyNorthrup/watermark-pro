@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
-import { Image, PencilRuler, Plus, Stamp, Trash2, Type } from 'lucide-react'
+import { Image, PencilRuler, Plus, QrCode, Stamp, Trash2, Type } from 'lucide-react'
 
 import type { WatermarkDto } from '../../../../shared/api'
 import type { WatermarkSpec } from '../../../../shared/watermark'
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/app/library/')({
   component: LibraryPage,
 })
 
-const KIND_ICONS = { text: Type, symbol: Stamp, image: Image } as const
+const KIND_ICONS = { text: Type, symbol: Stamp, image: Image, qr: QrCode } as const
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
 
@@ -38,6 +38,9 @@ function describeSpec(spec: WatermarkSpec): string {
     }
     case 'image': {
       return 'Logo'
+    }
+    case 'qr': {
+      return `QR code for ${spec.content}`
     }
   }
 }
@@ -123,7 +126,7 @@ function PresetList({ query, organizationId, canManage }: PresetListProps) {
     )
   }
   return (
-    <ul className="grid gap-4 sm:grid-cols-2">
+    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {query.data.map((preset) => (
         <PresetCard
           key={preset.id}
@@ -160,11 +163,11 @@ function PresetCard({ preset, organizationId, canManage }: PresetCardProps) {
               <Icon aria-hidden="true" className="size-5" />
             </span>
             <div className="min-w-0">
-              <h2 className="truncate text-base font-semibold">
+              <h2 className="text-base font-semibold">
                 <Link
                   to="/app/library/$watermarkId"
                   params={{ watermarkId: preset.id }}
-                  className="hover:underline"
+                  className="block truncate hover:underline"
                 >
                   {preset.name}
                 </Link>

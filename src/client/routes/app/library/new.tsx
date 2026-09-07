@@ -1,5 +1,6 @@
 import { createFileRoute, getRouteApi, useNavigate } from '@tanstack/react-router'
 
+import { SAMPLE_SCENE_PATH } from '../../../../shared/constants'
 import { WatermarkDesigner } from '../../../components/designer/watermark-designer'
 import { Alert } from '../../../components/ui/alert'
 import { activeMemberRoleQueryOptions } from '../../../lib/queries'
@@ -8,6 +9,7 @@ import { canRole } from '../../../lib/roles'
 const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/library/new')({
+  staticData: { preloadImages: [SAMPLE_SCENE_PATH] },
   loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
   component: NewPresetPage,
 })

@@ -1,18 +1,21 @@
 /**
  * Live preview for the designer and the editor: applies a spec to a subject
- * photo through the engine worker and hands back an object URL. Fonts, icon
+ * photo through the watermark engine and hands back an object URL. Fonts, icon
  * paths and logo bitmaps are resolved here so callers only deal in specs.
  *
  * The subject is kept at display resolution for fast re-renders; `exportFull`
  * re-decodes the original file so downloads are full size.
  */
+import { createEngine, mainThreadBackend } from './canvas-backend'
 import { type LogoLoader, MarkResources } from './mark-resources'
 import { createSamplePhoto } from './sample-photo'
+import { specForPhoto } from './spec-tokens'
 import type { WatermarkSpec } from '../../shared/watermark'
+import type { CanvasBackend, EngineCanvas } from '../engine/canvas'
 import type { EncodeOptions } from '../engine/encode'
+import type { WatermarkEngine } from '../engine/engine'
 import type { Size } from '../engine/layout'
-import type { ApplyResult, Transform } from '../engine/pipeline'
-import { WatermarkWorker } from '../engine/worker-client'
+import type { MarkOutcome, Transform } from '../engine/pipeline'
 
 /** Preview subjects are downscaled to keep re-renders under a frame or two. */
 const PREVIEW_MAX_SIDE = 1280
@@ -22,8 +25,15 @@ export interface PreviewResult {
   url: string
   width: number
   height: number
-  placement: ApplyResult['placement']
-  contrast: ApplyResult['contrast']
+  /** One entry per rendered mark, in order; empty when nothing was drawn. */
+  marks: MarkOutcome[]
+}
+
+/** One spec or several, in drawing order. */
+export type SpecInput = WatermarkSpec | readonly WatermarkSpec[]
+
+function specList(input: SpecInput): readonly WatermarkSpec[] {
+  return 'kind' in input ? [input] : input
 }
 
 export interface RenderOptions {
@@ -67,27 +77,39 @@ export function scaleTransform(
   return scaled
 }
 
-function drawScaled(bitmap: ImageBitmap, size: Size): OffscreenCanvas {
-  const canvas = new OffscreenCanvas(size.width, size.height)
-  const ctx = canvas.getContext('2d')
-  if (ctx === null) {
-    throw new Error('2D canvas context is unavailable')
-  }
-  ctx.drawImage(bitmap, 0, 0, size.width, size.height)
+function drawScaled(bitmap: ImageBitmap, size: Size, backend: CanvasBackend): EngineCanvas {
+  const canvas = backend.createCanvas(size.width, size.height)
+  canvas.context.drawImage(bitmap, 0, 0, size.width, size.height)
   return canvas
 }
 
 export class PreviewRenderer {
-  readonly #worker: WatermarkWorker
+  readonly #engine: WatermarkEngine
+  readonly #backend: CanvasBackend
   readonly #resources: MarkResources
-  #subject: OffscreenCanvas | null = null
-  #original: Blob | null = null
+  #subject: EngineCanvas | null = null
+  #original: File | null = null
   #sourceSize: Size | null = null
   #sequence = 0
 
-  constructor(loadLogo: LogoLoader, worker = new WatermarkWorker()) {
+  constructor(
+    loadLogo: LogoLoader,
+    engine: WatermarkEngine = createEngine(),
+    backend: CanvasBackend = mainThreadBackend(),
+  ) {
     this.#resources = new MarkResources(loadLogo)
-    this.#worker = worker
+    this.#engine = engine
+    this.#backend = backend
+  }
+
+  /** The marks the engine should draw for the current subject. */
+  #marksFor(input: SpecInput): readonly WatermarkSpec[] {
+    return specList(input).map((spec) => specForPhoto(spec, this.#original))
+  }
+
+  /** The photo itself, or the sample scene when there is none. */
+  #decode(file: File | null): Promise<ImageBitmap> {
+    return file === null ? createSamplePhoto(this.#backend) : createImageBitmap(file)
   }
 
   /** Pixel size of the photo the preview stands for (the sample scene by default). */
@@ -104,10 +126,10 @@ export class PreviewRenderer {
   }
 
   /** Replaces the subject photo; `null` restores the built-in sample. */
-  async setSubject(file: Blob | null): Promise<void> {
-    const bitmap = file === null ? await createSamplePhoto() : await createImageBitmap(file)
+  async setSubject(file: File | null): Promise<void> {
+    const bitmap = await this.#decode(file)
     const size = { width: bitmap.width, height: bitmap.height }
-    this.#subject = drawScaled(bitmap, fitWithin(size, PREVIEW_MAX_SIDE))
+    this.#subject = drawScaled(bitmap, fitWithin(size, PREVIEW_MAX_SIDE), this.#backend)
     bitmap.close()
     this.#sourceSize = size
     this.#original = file
@@ -119,11 +141,11 @@ export class PreviewRenderer {
   }
 
   /**
-   * Renders `spec` over the current subject. Returns `null` when a newer
+   * Renders the marks over the current subject. Returns `null` when a newer
    * render was requested before this one finished, so callers can ignore
    * stale frames without their own bookkeeping.
    */
-  async render(spec: WatermarkSpec, options: RenderOptions = {}): Promise<PreviewResult | null> {
+  async render(input: SpecInput, options: RenderOptions = {}): Promise<PreviewResult | null> {
     if (this.#subject === null) {
       await this.setSubject(null)
     }
@@ -134,11 +156,11 @@ export class PreviewRenderer {
     this.#sequence += 1
     const ticket = this.#sequence
     const [resources, source] = await Promise.all([
-      this.#resources.resolve(spec),
-      createImageBitmap(subject),
+      this.#resources.resolve(this.#marksFor(input)),
+      subject.toBitmap(),
     ])
     const transform = scaleTransform(options.transform, this.subjectScale)
-    const output = await this.#worker.apply({
+    const output = await this.#engine.apply({
       ...resources,
       source,
       output: PREVIEW_OUTPUT,
@@ -151,8 +173,7 @@ export class PreviewRenderer {
       url: URL.createObjectURL(output.blob),
       width: output.width,
       height: output.height,
-      placement: output.placement,
-      contrast: output.contrast,
+      marks: output.marks,
     }
   }
 
@@ -160,15 +181,10 @@ export class PreviewRenderer {
    * Full-resolution render of the original photo (or the sample scene when
    * none was chosen) for download.
    */
-  async exportFull(
-    spec: WatermarkSpec,
-    output: EncodeOptions,
-    transform?: Transform,
-  ): Promise<Blob> {
-    const source =
-      this.#original === null ? await createSamplePhoto() : await createImageBitmap(this.#original)
-    const resources = await this.#resources.resolve(spec)
-    const result = await this.#worker.apply({
+  async exportFull(input: SpecInput, output: EncodeOptions, transform?: Transform): Promise<Blob> {
+    const source = await this.#decode(this.#original)
+    const resources = await this.#resources.resolve(this.#marksFor(input))
+    const result = await this.#engine.apply({
       ...resources,
       source,
       output,
@@ -178,7 +194,7 @@ export class PreviewRenderer {
   }
 
   dispose(): void {
-    this.#worker.terminate()
+    this.#engine.terminate()
     this.#resources.clear()
   }
 }

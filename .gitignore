@@ -9,6 +9,9 @@ coverage/
 playwright-report/
 test-results/
 blob-report/
+# Vitest browser mode writes screenshots of failed tests here.
+.vitest-attachments/
+**/__screenshots__/
 .tsbuildinfo
 *.tsbuildinfo
 

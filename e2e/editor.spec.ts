@@ -3,9 +3,17 @@
  * the library, place it by keyboard, crop to a square, resize, and download
  * a real PNG whose dimensions match the chosen output size.
  */
-import { expect, type Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
-import { createWorkspace, downloadBytes, expectAccessible, pngSize } from './support'
+import {
+  createWorkspace,
+  downloadBytes,
+  expect,
+  expectAccessible,
+  navigateTo,
+  pngSize,
+  test,
+} from './support'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -26,18 +34,50 @@ async function expectRendered(page: Page, name: RegExp) {
 test('edits a photo end to end and downloads the result', async ({ page, request }) => {
   await createWorkspace(page, request, owner, organizationName)
 
-  await page.getByRole('link', { name: 'Library' }).first().click()
+  await navigateTo(page, 'Library')
   await page.getByRole('link', { name: 'New preset' }).click()
   await page.getByRole('textbox', { name: 'Text' }).fill('© Edie')
   await page.getByLabel('Preset name').fill('Editor preset')
   await page.getByRole('button', { name: 'Save preset' }).click()
   await expect(page.getByRole('link', { name: 'Editor preset', exact: true })).toBeVisible()
 
+  // A QR code preset for the second layer.
+  await page.getByRole('link', { name: 'New preset' }).click()
+  await page.getByRole('tab', { name: 'QR code' }).click()
+  await page.getByLabel('QR code content').fill('https://watermark.blowmoney.net')
+  await page.getByLabel('Preset name').fill('QR link')
+  await expect(
+    page.getByRole('img', { name: 'Watermark preview on the subject photo' }),
+  ).toBeVisible()
+  await expectAccessible(page)
+  await page.getByRole('button', { name: 'Save preset' }).click()
+  await expect(page.getByRole('link', { name: 'QR link', exact: true })).toBeVisible()
+
   await page.getByRole('link', { name: 'Open Editor preset in the editor' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
-  await expect(page.getByLabel('Preset')).toHaveValue(/.+/)
+  // A cold load of the editor asks for the sample scene at boot, before the
+  // session and organization fetches the page waits on (PLAN.md §5.5).
+  await page.reload()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await expect(page.locator('head link[rel="preload"][as="image"]')).toHaveAttribute(
+    'href',
+    '/sample-scene.jpg',
+  )
+  const layers = page.getByRole('list', { name: 'Layers, bottom to top' })
+  await expect(layers.getByRole('button', { pressed: true })).toHaveText(/Editor preset/)
   await expectRendered(page, /Photo with the watermark/)
   await expectAccessible(page)
+
+  // A second layer: a QR code on top, adjusted, then removed again.
+  await page
+    .getByRole('combobox', { name: 'Add another preset' })
+    .selectOption({ label: 'QR link' })
+  await expect(layers.getByRole('listitem')).toHaveCount(2)
+  await expect(layers.getByRole('button', { pressed: true })).toHaveText(/QR link/)
+  await expectRendered(page, /Photo with the watermark/)
+  await expectAccessible(page)
+  await layers.getByRole('button', { name: 'Remove QR link from this photo' }).click()
+  await expect(layers.getByRole('listitem')).toHaveCount(1)
 
   const frame = page.getByRole('group', { name: /Watermark position/ })
   await expect(frame).toBeVisible()

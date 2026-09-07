@@ -9,7 +9,13 @@ import { PreviewPanel } from './preview-panel'
 import { StylePanel } from './style-panel'
 import { SymbolPicker } from './symbol-picker'
 import { presetNameSchema, type WatermarkDto } from '../../../shared/api'
-import { MAX_TEXT_LENGTH, type WatermarkSpec } from '../../../shared/watermark'
+import {
+  MAX_QR_CONTENT_LENGTH,
+  MAX_TEXT_LENGTH,
+  MAX_TEXT_LINES,
+  TEXT_TOKENS,
+  type WatermarkSpec,
+} from '../../../shared/watermark'
 import { describeError } from '../../lib/errors'
 import { createWatermark, libraryQueryKey, updateWatermark } from '../../lib/library'
 import {
@@ -24,6 +30,7 @@ import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 import { Field } from '../ui/field'
 import { Input } from '../ui/input'
+import { Textarea } from '../ui/textarea'
 
 interface WatermarkDesignerProps {
   organizationId: string
@@ -42,6 +49,19 @@ const SECTION_TABS = [
   { value: 'placement', label: 'Placement' },
   { value: 'style', label: 'Style' },
 ] as const
+
+const TEXT_HINT = `Up to ${String(MAX_TEXT_LENGTH)} characters on up to ${String(MAX_TEXT_LINES)} lines. ${TEXT_TOKENS.join(', ')} are filled in per photo.`
+
+/** Keeps a typed or pasted value within the line limit; extra line breaks join the last line. */
+function limitLines(text: string): string {
+  const lines = text.split('\n')
+  if (lines.length <= MAX_TEXT_LINES) {
+    return text
+  }
+  return [...lines.slice(0, MAX_TEXT_LINES - 1), lines.slice(MAX_TEXT_LINES - 1).join(' ')].join(
+    '\n',
+  )
+}
 
 function isMarkKind(value: string): value is MarkKind {
   return MARK_KINDS.some((kind) => kind.value === value)
@@ -152,14 +172,15 @@ export function WatermarkDesigner({
               <Tabs.Content value="text" className="flex flex-col gap-4 outline-none">
                 {spec.kind === 'text' ? (
                   <>
-                    <Field label="Text" hint={`Up to ${String(MAX_TEXT_LENGTH)} characters.`}>
+                    <Field label="Text" hint={TEXT_HINT}>
                       {(controlProps) => (
-                        <Input
+                        <Textarea
                           {...controlProps}
                           value={spec.text}
                           maxLength={MAX_TEXT_LENGTH}
+                          rows={2}
                           onChange={(event) => {
-                            setSpec({ ...spec, text: event.currentTarget.value })
+                            setSpec({ ...spec, text: limitLines(event.currentTarget.value) })
                           }}
                         />
                       )}
@@ -197,6 +218,26 @@ export function WatermarkDesigner({
                       setSpec({ ...spec, assetId })
                     }}
                   />
+                ) : null}
+              </Tabs.Content>
+              <Tabs.Content value="qr" className="flex flex-col gap-4 outline-none">
+                {spec.kind === 'qr' ? (
+                  <Field
+                    label="QR code content"
+                    hint={`A link, usually. Up to ${String(MAX_QR_CONTENT_LENGTH)} characters; the code is always dark on a light field so it scans.`}
+                  >
+                    {(controlProps) => (
+                      <Input
+                        {...controlProps}
+                        value={spec.content}
+                        maxLength={MAX_QR_CONTENT_LENGTH}
+                        inputMode="url"
+                        onChange={(event) => {
+                          setSpec({ ...spec, content: event.currentTarget.value })
+                        }}
+                      />
+                    )}
+                  </Field>
                 ) : null}
               </Tabs.Content>
             </Tabs.Root>
