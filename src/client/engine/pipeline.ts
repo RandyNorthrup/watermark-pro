@@ -58,7 +58,18 @@ export interface Transform {
   resize?: Size
   /** Colour adjustments applied after cropping and resizing. */
   adjust?: Adjustments
+  /** An outer frame drawn around the finished photo, after the marks. */
+  border?: Border
 }
+
+/** A matte frame around the photo; width is a fraction of the shorter output side. */
+export interface Border {
+  width: number
+  colour: string
+}
+
+/** The frame width may not exceed this fraction of the shorter output side. */
+export const MAX_BORDER_RATIO = 0.1
 
 export interface ApplyRequest {
   source: ImageBitmap
@@ -213,7 +224,7 @@ export function composeMark(
 ): MarkOutcome {
   const { spec } = mark
   const size = markSize(spec, image, measureAspect(ctx, mark))
-  const placement = resolvePlacement(spec, image, size, map)
+  const placement = resolvePlacement(spec, image, size, map, mark.seed)
   const contrast = resolveContrast(spec.contrast, placement.meanLuminance)
   const rotation = spec.style.rotation
   if (spec.style.tiling.enabled) {
@@ -251,8 +262,40 @@ export async function applyWatermark(
   // Every mark is placed against the photo alone: marks do not avoid each
   // other, and a later mark paints over an earlier one where they meet.
   const marks = request.marks.map((mark) => composeMark(canvas.context, canvas, map, mark))
-  const blob = await encodeCanvas(canvas, request.output)
-  return { blob, width: canvas.width, height: canvas.height, marks }
+  const framed = await frameCanvas(canvas, request.transform?.border, backend)
+  const blob = await encodeCanvas(framed.canvas, request.output)
+  const offsetMarks = marks.map((mark) => ({
+    ...mark,
+    placement: {
+      ...mark.placement,
+      centreX: mark.placement.centreX + framed.offset,
+      centreY: mark.placement.centreY + framed.offset,
+    },
+  }))
+  return { blob, width: framed.canvas.width, height: framed.canvas.height, marks: offsetMarks }
+}
+
+/** Draws a matte frame around the photo canvas, or returns it unchanged. */
+async function frameCanvas(
+  photo: EngineCanvas,
+  border: Border | undefined,
+  backend: CanvasBackend,
+): Promise<{ canvas: EngineCanvas; offset: number }> {
+  if (border === undefined || border.width <= 0) {
+    return { canvas: photo, offset: 0 }
+  }
+  const offset = Math.round(border.width * Math.min(photo.width, photo.height))
+  if (offset <= 0) {
+    return { canvas: photo, offset: 0 }
+  }
+  const canvas = backend.createCanvas(photo.width + offset * 2, photo.height + offset * 2)
+  const ctx = canvas.context
+  ctx.fillStyle = border.colour
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  const bitmap = await photo.toBitmap()
+  ctx.drawImage(bitmap, offset, offset)
+  bitmap.close()
+  return { canvas, offset }
 }
 
 /**

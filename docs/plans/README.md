@@ -125,26 +125,34 @@ peerDependencies license`, confirm the peer range against what is
 7. Certification, in this order, all on the final tree:
    1. `npm run quality` (format, lint, css, types, dead code, cycles, dup,
       secrets, audit, all Vitest projects with coverage, build)
-   2. semgrep: `npm run security:sast` (on Randy's machine semgrep lives in
-      `%APPDATA%\Python\Python314\Scripts`, append it to `PATH` first)
-   3. `npm run test:e2e` (all four device projects; port 5173 must be free)
-   4. `node scripts/red-drill.mjs` (every drill; report lands in
-      `docs/red-drill/<local date>.md`)
-   5. **Lighthouse and screenshots are deferred to M19** (Randy, 2026-09-07):
-      they cost more wall-clock than the feature code, and M19 owns the
+   2. semgrep: `npm run security:sast`. On Randy's machine the `semgrep`
+      launcher is not on `PATH` and its shim cannot find `pysemgrep`, so call
+      the engine directly:
+      `"%APPDATA%\Python\Python314\Scripts\pysemgrep.exe" scan --config p/default --config p/typescript --config p/react --config p/secrets --error --metrics=off`
+      (exit 0 = clean).
+   3. `node scripts/red-drill.mjs` (every drill; report lands in
+      `docs/red-drill/<local date>.md`). The drill's own e2e entries spin up a
+      Playwright web server on :5173; that is the drill managing its own
+      process. If :5173 is already taken, **do not kill the occupant** — it may
+      be Randy's (see `PLAN.md` §9 / the never-stop-processes rule); defer or
+      ask instead.
+   4. **e2e, Lighthouse and screenshots are deferred to M19** (Randy,
+      2026-09-06/07): they cost more wall-clock than the feature code, e2e
+      risks a :5173 collision with Randy's other work, and M19 owns the
       performance budgets and the visual record. Do **not** run
-      `scripts/lighthouse.mjs` or `scripts/screenshots.mjs` per milestone for
-      M12–M18. Instead, in the milestone's `PLAN.md` checklist, write the
-      Lighthouse/screenshots line as "deferred to M19" and add the screens
-      the milestone introduced to a running list in `docs/plans/m19-performance.md`
-      under "Deferred audits", so M19 captures and budgets them all at once.
-      (M11 already ran the full suite; the deferral starts at M12.)
-   6. Fill the numbers into the `PLAN.md` checklist; tick the boxes only for
+      `npm run test:e2e`, `scripts/lighthouse.mjs` or `scripts/screenshots.mjs`
+      per milestone for M12–M18. Instead, in the milestone's `PLAN.md`
+      checklist, write those lines as "deferred to M19" and add the screens and
+      flows the milestone introduced to a running list in
+      `docs/plans/m19-performance.md` under "Deferred audits", so M19 captures
+      and budgets them all at once. (M11 already ran the full suite; the
+      deferral starts at M12.)
+   5. Fill the numbers into the `PLAN.md` checklist; tick the boxes only for
       what actually ran and passed. A gate that did not run is written as
       "not run" or "deferred to M19" with the reason.
-   7. UX pass (see "Simple by default"): open every changed screen at 390 px
-      and 1440 px — reuse the milestone's own e2e or a quick manual check,
-      not a screenshot run — and write one sentence per screen into §8.
+   6. UX pass (see "Simple by default"): open every changed screen at 390 px
+      and 1440 px with a quick manual check (e2e and screenshots are deferred
+      to M19) and write one sentence per screen into §8.
 8. Commit (from PowerShell or Bash; the pre-commit hook runs gitleaks and
    lint-staged), push `main`, wait for CI, tag `vX.Y.Z` (minor bump per
    milestone), and create the GitHub release from the CHANGELOG entry. The

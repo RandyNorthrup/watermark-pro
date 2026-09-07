@@ -28,11 +28,20 @@ export type ContrastVariant = (typeof CONTRAST_VARIANTS)[number]
 
 const unitInterval = z.number().min(0).max(1)
 
+/** How far a random placement may jitter from its chosen anchor, as a fraction of the image. */
+export const MAX_JITTER = 0.15
+export const DEFAULT_JITTER = 0.08
+
 export const placementSchema = z.discriminatedUnion('mode', [
   z.object({ mode: z.literal('anchor'), anchor: z.enum(ANCHORS) }),
   z.object({ mode: z.literal('smart') }),
   /** Centre of the mark as fractions of the image width and height. */
   z.object({ mode: z.literal('custom'), x: unitInterval, y: unitInterval }),
+  /** A per-photo random anchor with jitter; seeded so a batch reproduces. */
+  z.object({
+    mode: z.literal('random'),
+    jitter: unitInterval.max(MAX_JITTER).default(DEFAULT_JITTER),
+  }),
 ])
 
 /** `#rrggbb`, lower or upper case. */
@@ -143,6 +152,38 @@ const baseMarkSchema = z.object({
   style: styleSchema,
 })
 
+const hexColour = z.string().regex(HEX_COLOUR_PATTERN)
+
+/** How a text mark's glyphs are painted. */
+export const TEXT_EFFECTS = ['solid', 'outline', 'emboss', 'engrave'] as const
+export type TextEffect = (typeof TEXT_EFFECTS)[number]
+export const MIN_LETTER_SPACING = -0.1
+export const MAX_LETTER_SPACING = 1
+export const MAX_CURVE = 1
+
+/** Shape marks: a rectangle, rounded rectangle, ellipse or line. */
+export const SHAPES = ['rectangle', 'rounded-rectangle', 'ellipse', 'line'] as const
+export type Shape = (typeof SHAPES)[number]
+export const MIN_SHAPE_ASPECT = 0.25
+export const MAX_SHAPE_ASPECT = 4
+export const MIN_LINE_ASPECT = 4
+export const MAX_LINE_ASPECT = 40
+export const DEFAULT_SHAPE_ASPECT = 2
+export const MAX_STROKE_RATIO = 0.2
+export const DEFAULT_STROKE_RATIO = 0.06
+
+const boundedStroke = unitInterval.max(MAX_STROKE_RATIO)
+const nullableColour = hexColour.nullable()
+const shapeFillSchema = z.object({ enabled: z.boolean(), colour: hexColour, opacity: unitInterval })
+const shapeStrokeSchema = z.object({ width: boundedStroke, colour: nullableColour })
+
+/** Extra text controls; all optional with defaults so presets saved before M12 still parse. */
+const textExtras = {
+  letterSpacing: z.number().min(MIN_LETTER_SPACING).max(MAX_LETTER_SPACING).default(0),
+  curve: z.number().min(-MAX_CURVE).max(MAX_CURVE).default(0),
+  effect: z.enum(TEXT_EFFECTS).default('solid'),
+}
+
 export const symbolSourceSchema = z.discriminatedUnion('type', [
   /** A Unicode glyph such as © or ★, drawn with the given font family. */
   z.object({
@@ -160,6 +201,7 @@ export const watermarkSpecSchema = z.discriminatedUnion('kind', [
     text: textSchema,
     fontFamily: z.string().min(1),
     fontWeight: fontWeightSchema,
+    ...textExtras,
   }),
   baseMarkSchema.extend({
     kind: z.literal('symbol'),
@@ -175,9 +217,22 @@ export const watermarkSpecSchema = z.discriminatedUnion('kind', [
     kind: z.literal('qr'),
     content: z.string().min(1).max(MAX_QR_CONTENT_LENGTH),
   }),
+  /** A geometric shape: fill and/or stroke, sized by `aspect`. */
+  baseMarkSchema.extend({
+    kind: z.literal('shape'),
+    shape: z.enum(SHAPES),
+    aspect: z.number().min(MIN_SHAPE_ASPECT).max(MAX_LINE_ASPECT),
+    fill: shapeFillSchema,
+    stroke: shapeStrokeSchema,
+  }),
 ])
 
 export type WatermarkSpec = z.infer<typeof watermarkSpecSchema>
+
+/** A text mark, narrowed from the spec union. */
+export type TextSpec = Extract<WatermarkSpec, { kind: 'text' }>
+/** A shape mark, narrowed from the spec union. */
+export type ShapeSpec = Extract<WatermarkSpec, { kind: 'shape' }>
 
 export const DEFAULT_STYLE: WatermarkStyle = {
   opacity: 0.85,
@@ -188,12 +243,27 @@ export const DEFAULT_STYLE: WatermarkStyle = {
   backdrop: { enabled: false, opacity: 0.6 },
 }
 
-export const DEFAULT_TEXT_SPEC: WatermarkSpec = {
+export const DEFAULT_TEXT_SPEC: TextSpec = {
   kind: 'text',
   text: '© Watermark Pro',
   fontFamily: 'Inter Variable',
   fontWeight: 600,
+  letterSpacing: 0,
+  curve: 0,
+  effect: 'solid',
   placement: { mode: 'smart' },
   contrast: { mode: 'auto' },
   style: DEFAULT_STYLE,
+}
+
+/** A shape mark with no fill and an auto-contrast stroke, sized like a symbol. */
+export const DEFAULT_SHAPE_SPEC: ShapeSpec = {
+  kind: 'shape',
+  shape: 'rectangle',
+  aspect: DEFAULT_SHAPE_ASPECT,
+  fill: { enabled: false, colour: '#6d4de6', opacity: 0.5 },
+  stroke: { width: DEFAULT_STROKE_RATIO, colour: null },
+  placement: { mode: 'smart' },
+  contrast: { mode: 'auto' },
+  style: { ...DEFAULT_STYLE, scale: 0.2 },
 }

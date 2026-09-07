@@ -1,9 +1,25 @@
 import { FontPicker } from './font-picker'
 import type { WatermarkSpec } from '../../../shared/watermark'
+import { DEFAULT_FONT_FAMILY } from '../../fonts/catalogue'
 import { cn } from '../../lib/cn'
-import { GLYPH_GROUPS, ICON_CATALOGUE, iconToPath } from '../../symbols/catalogue'
+import { EMOJI_FONT_STACK, GLYPH_GROUPS, ICON_CATALOGUE, iconToPath } from '../../symbols/catalogue'
 
 type SymbolSource = Extract<WatermarkSpec, { kind: 'symbol' }>['symbol']
+
+/**
+ * The font a picked glyph keeps: emoji groups force the colour-emoji stack,
+ * an existing text font carries over, and anything else falls back to the
+ * default family.
+ */
+function glyphFontFamily(isEmoji: boolean, symbol: SymbolSource): string {
+  if (isEmoji) {
+    return EMOJI_FONT_STACK
+  }
+  if (symbol.type === 'glyph' && symbol.fontFamily !== EMOJI_FONT_STACK) {
+    return symbol.fontFamily
+  }
+  return DEFAULT_FONT_FAMILY
+}
 
 interface SymbolPickerProps {
   symbol: SymbolSource
@@ -31,11 +47,8 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
                 aria-pressed={symbol.type === 'glyph' && symbol.glyph === glyph}
                 className={tileClassName}
                 onClick={() => {
-                  onChange({
-                    type: 'glyph',
-                    glyph,
-                    fontFamily: symbol.type === 'glyph' ? symbol.fontFamily : 'Inter Variable',
-                  })
+                  const fontFamily = glyphFontFamily(group.isEmoji === true, symbol)
+                  onChange({ type: 'glyph', glyph, fontFamily })
                 }}
               >
                 {glyph}
@@ -75,7 +88,7 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
           ))}
         </div>
       </fieldset>
-      {symbol.type === 'glyph' ? (
+      {symbol.type === 'glyph' && symbol.fontFamily !== EMOJI_FONT_STACK ? (
         <FontPicker
           family={symbol.fontFamily}
           onFamilyChange={(fontFamily) => {

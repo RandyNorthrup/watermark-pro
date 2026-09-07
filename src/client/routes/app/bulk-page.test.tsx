@@ -83,6 +83,7 @@ describe('bulk page', () => {
       fitLongestSide: 2048,
       orientation: { turns: 0, flipX: false, flipY: false },
       adjust: IDENTITY_ADJUSTMENTS,
+      border: null,
     })
     expect(runs[0]?.specs).toEqual([second.spec, makeWatermark().spec])
     expect(screen.getByRole('alert')).toHaveTextContent('cannot decode fail-three.jpg')

@@ -21,6 +21,8 @@ export interface MarkInput {
   image?: ImageBitmap
   /** SVG path data (24×24 viewBox) for `icon` symbols. */
   iconPath?: string
+  /** Seed for random placement; a stable per-photo value. */
+  seed?: number
 }
 
 export interface ApplyMessage {

@@ -21,6 +21,9 @@ export function documentTransform(document: EditorDocument): Transform | undefin
   if (!isIdentityAdjustments(document.adjust)) {
     transform.adjust = document.adjust
   }
+  if (document.border !== null) {
+    transform.border = document.border
+  }
   return Object.keys(transform).length === 0 ? undefined : transform
 }
 
@@ -36,5 +39,5 @@ export function previewTransform(
   if (!isCropping) {
     return documentTransform(document)
   }
-  return documentTransform({ ...document, crop: null, resize: null })
+  return documentTransform({ ...document, crop: null, resize: null, border: null })
 }

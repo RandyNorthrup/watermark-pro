@@ -14,6 +14,7 @@ import {
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { Size } from '../engine/layout'
 import { orientedFrame } from '../engine/orient'
+import type { Border } from '../engine/pipeline'
 
 /** One mark on the photo: a library preset and this photo's adjustments to it. */
 export interface Layer {
@@ -33,6 +34,8 @@ export interface EditorDocument {
   resize: Size | null
   /** Colour adjustments applied to the whole photo. */
   adjust: Adjustments
+  /** An outer matte frame around the photo; `null` for none. */
+  border: Border | null
   /** Marks in drawing order; later layers paint over earlier ones. Empty until a preset is chosen. */
   layers: Layer[]
 }
@@ -112,6 +115,7 @@ export const EMPTY_DOCUMENT: EditorDocument = {
   crop: null,
   resize: null,
   adjust: IDENTITY_ADJUSTMENTS,
+  border: null,
   layers: [],
 }
 

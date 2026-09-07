@@ -45,7 +45,10 @@ export class MarkResources {
     return await createImageBitmap(blob)
   }
 
-  async #mark(spec: WatermarkSpec): Promise<{ mark: MarkInput; fonts: FontResource[] }> {
+  async #mark(
+    spec: WatermarkSpec,
+    seed: number,
+  ): Promise<{ mark: MarkInput; fonts: FontResource[] }> {
     const [fonts, image] = await Promise.all([
       fontsFor(spec),
       spec.kind === 'image' ? this.#logoBitmap(spec.assetId) : Promise.resolve(undefined),
@@ -57,13 +60,14 @@ export class MarkResources {
         ...(image !== undefined && { image }),
         ...(spec.kind === 'symbol' &&
           spec.symbol.type === 'icon' && { iconPath: iconPath(spec.symbol.name) }),
+        seed,
       },
     }
   }
 
-  /** Resources for every spec, in order; each font file is listed once. */
-  async resolve(specs: readonly WatermarkSpec[]): Promise<MarkInputs> {
-    const resolved = await Promise.all(specs.map((spec) => this.#mark(spec)))
+  /** Resources for every spec, in order; each font file is listed once. `seed` drives random placement. */
+  async resolve(specs: readonly WatermarkSpec[], seed = 1): Promise<MarkInputs> {
+    const resolved = await Promise.all(specs.map((spec) => this.#mark(spec, seed)))
     const fonts = new Map<string, FontResource>()
     for (const entry of resolved) {
       for (const font of entry.fonts) {

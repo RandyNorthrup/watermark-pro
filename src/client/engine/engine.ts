@@ -30,6 +30,7 @@ export function toApplyRequest(input: ApplyInput): ApplyRequest {
       spec: mark.spec,
       ...(mark.image !== undefined && { image: mark.image }),
       ...(mark.iconPath !== undefined && { iconPath: mark.iconPath }),
+      ...(mark.seed !== undefined && { seed: mark.seed }),
     })),
     output: input.output,
     ...(input.transform !== undefined && { transform: input.transform }),

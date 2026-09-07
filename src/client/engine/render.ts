@@ -6,7 +6,8 @@ import type { Canvas2D } from './canvas'
 import { INK, type ResolvedContrast } from './contrast'
 import type { MarkGeometry } from './layout'
 import { qrMatrix } from './qr'
-import type { WatermarkSpec } from '../../shared/watermark'
+import { arcBounds, measureRun } from './text-layout'
+import type { Shape, TextEffect, WatermarkSpec } from '../../shared/watermark'
 
 /** A spec plus the binary resources it needs, resolved by the caller. */
 export interface RenderableMark {
@@ -15,6 +16,8 @@ export interface RenderableMark {
   image?: ImageBitmap
   /** SVG path data (24×24 viewBox) for `icon` symbols. */
   iconPath?: string
+  /** Seed for random placement; a stable value per photo (and per-layer salt). */
+  seed?: number
 }
 
 /** Font size used to measure text before scaling it to the target width. */
@@ -38,9 +41,20 @@ const HALF_TURN_DEGREES = 180
 const DEGREES_TO_RADIANS = Math.PI / HALF_TURN_DEGREES
 /** Glyph symbols are always drawn at regular weight. */
 const GLYPH_WEIGHT = 400
+/** Emboss and engrave offset the light and dark copies by this fraction of the font size. */
+const EFFECT_OFFSET_RATIO = 0.04
+/** The dimmed alpha of the ink layer over an emboss or engrave. */
+const EFFECT_INK_ALPHA = 0.7
+/** The outline effect strokes at least this strongly, even with a low outline setting. */
+const MIN_OUTLINE_EFFECT = 0.5
+/** Rounded-rectangle corner radius as a fraction of the shorter side. */
+const SHAPE_CORNER_RATIO = 0.15
 
 function fontString(family: string, weight: number, size: number): string {
-  return `${String(weight)} ${String(size)}px "${family}"`
+  // A comma-separated stack (the emoji fonts) is passed through unquoted; a
+  // single family name is quoted so spaces and digits are safe.
+  const face = family.includes(',') ? family : `"${family}"`
+  return `${String(weight)} ${String(size)}px ${face}`
 }
 
 function glyphFont(mark: RenderableMark, size: number): string {
@@ -66,10 +80,22 @@ function glyphLines(mark: RenderableMark): string[] {
   throw new TypeError('glyphLines is only defined for text and glyph marks')
 }
 
-/** Widest line at the probe size, never zero. */
-function probeWidth(ctx: Canvas2D, mark: RenderableMark): number {
+/** Letter spacing, curve and effect of a mark; symbol glyphs use the defaults. */
+function textParams(mark: RenderableMark): { spacing: number; curve: number; effect: TextEffect } {
+  const { spec } = mark
+  if (spec.kind === 'text') {
+    return { spacing: spec.letterSpacing, curve: spec.curve, effect: spec.effect }
+  }
+  return { spacing: 0, curve: 0, effect: 'solid' }
+}
+
+/** Widest run width at the probe size, with letter spacing, never zero. */
+function probeRunWidth(ctx: Canvas2D, mark: RenderableMark, spacing: number): number {
   ctx.font = glyphFont(mark, PROBE_FONT_SIZE)
-  return Math.max(...glyphLines(mark).map((line) => ctx.measureText(line).width), 1)
+  return Math.max(
+    ...glyphLines(mark).map((line) => measureRun(ctx, line, spacing, PROBE_FONT_SIZE).width),
+    1,
+  )
 }
 
 /**
@@ -85,23 +111,32 @@ export function measureAspect(ctx: Canvas2D, mark: RenderableMark): number {
     }
     return mark.image.width / mark.image.height
   }
+  if (spec.kind === 'shape') {
+    return spec.aspect
+  }
   if (spec.kind === 'qr' || (spec.kind === 'symbol' && spec.symbol.type === 'icon')) {
     return 1
   }
+  const { spacing, curve } = textParams(mark)
   const lines = glyphLines(mark)
-  const width = probeWidth(ctx, mark)
-  if (lines.length > 1) {
-    return width / (PROBE_FONT_SIZE * LINE_HEIGHT * lines.length)
+  const runWidth = probeRunWidth(ctx, mark, spacing)
+  if (curve === 0 && lines.length === 1) {
+    const metrics = ctx.measureText(lines[0] ?? '')
+    const height =
+      metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || PROBE_FONT_SIZE
+    return runWidth / height
   }
-  const metrics = ctx.measureText(lines[0] ?? '')
-  const height =
-    metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || PROBE_FONT_SIZE
-  return width / height
+  const box = arcBounds(runWidth, PROBE_FONT_SIZE, lines.length, curve, LINE_HEIGHT)
+  return box.width / box.height
 }
 
-/** Font size at which the widest line fills `width`. */
+/** Font size at which the arced (or straight) text box fills `width`. */
 function fontSizeFor(ctx: Canvas2D, mark: RenderableMark, width: number): number {
-  return (width / probeWidth(ctx, mark)) * PROBE_FONT_SIZE
+  const { spacing, curve } = textParams(mark)
+  const lines = glyphLines(mark)
+  const probeWidthValue = probeRunWidth(ctx, mark, spacing)
+  const box = arcBounds(probeWidthValue, PROBE_FONT_SIZE, lines.length, curve, LINE_HEIGHT)
+  return (width / box.width) * PROBE_FONT_SIZE
 }
 
 /** A box behind the mark in the opposite tone of the ink; the shadow is off while it is drawn. */
@@ -149,6 +184,100 @@ function drawIcon(ctx: Canvas2D, mark: RenderableMark, width: number, contrast: 
   ctx.stroke(path)
 }
 
+/** Paints one cluster at (x, y) with the chosen effect; the transform and font are already set. */
+function paintGlyph(
+  ctx: Canvas2D,
+  char: string,
+  x: number,
+  y: number,
+  fontSize: number,
+  contrast: ResolvedContrast,
+  effect: TextEffect,
+): void {
+  if (effect === 'outline') {
+    ctx.lineJoin = 'round'
+    ctx.strokeStyle = contrast.fill
+    ctx.lineWidth = fontSize * OUTLINE_RATIO * Math.max(contrast.outline, MIN_OUTLINE_EFFECT)
+    ctx.strokeText(char, x, y)
+    return
+  }
+  const offset = fontSize * EFFECT_OFFSET_RATIO
+  if (effect === 'emboss' || effect === 'engrave') {
+    const highlight = effect === 'emboss' ? INK.light.fill : INK.dark.fill
+    const shadow = effect === 'emboss' ? INK.dark.fill : INK.light.fill
+    ctx.fillStyle = highlight
+    ctx.fillText(char, x - offset, y - offset)
+    ctx.fillStyle = shadow
+    ctx.fillText(char, x + offset, y + offset)
+    ctx.save()
+    ctx.globalAlpha *= EFFECT_INK_ALPHA
+    ctx.fillStyle = contrast.fill
+    ctx.fillText(char, x, y)
+    ctx.restore()
+    return
+  }
+  if (contrast.outline > 0) {
+    ctx.lineJoin = 'round'
+    ctx.strokeStyle = INK[contrast.variant].outline
+    ctx.lineWidth = fontSize * OUTLINE_RATIO * contrast.outline
+    ctx.strokeText(char, x, y)
+  }
+  ctx.fillStyle = contrast.fill
+  ctx.fillText(char, x, y)
+}
+
+/** Draws one line straight, its run centred on the origin. */
+function drawStraightLine(
+  ctx: Canvas2D,
+  line: string,
+  y: number,
+  spacing: number,
+  fontSize: number,
+  contrast: ResolvedContrast,
+  effect: TextEffect,
+): void {
+  if (spacing === 0) {
+    // Keep kerning and ligatures: one call for the whole line.
+    ctx.textAlign = 'center'
+    paintGlyph(ctx, line, 0, y, fontSize, contrast, effect)
+    return
+  }
+  ctx.textAlign = 'left'
+  const run = measureRun(ctx, line, spacing, fontSize)
+  let cursor = -run.width / 2
+  for (const glyph of run.glyphs) {
+    paintGlyph(ctx, glyph.char, cursor, y, fontSize, contrast, effect)
+    cursor += glyph.advance
+  }
+}
+
+/** Draws one line along an arc of radius `radius`; `sign` is +1 to bend over the top. */
+function drawArcLine(
+  ctx: Canvas2D,
+  line: string,
+  radius: number,
+  sign: number,
+  spacing: number,
+  fontSize: number,
+  contrast: ResolvedContrast,
+  effect: TextEffect,
+): void {
+  ctx.textAlign = 'center'
+  const run = measureRun(ctx, line, spacing, fontSize)
+  let cursor = 0
+  for (const glyph of run.glyphs) {
+    const centre = cursor + glyph.advance / 2
+    const angle = ((centre - run.width / 2) / radius) * sign
+    ctx.save()
+    ctx.translate(0, sign * radius)
+    ctx.rotate(angle)
+    ctx.translate(0, -sign * radius)
+    paintGlyph(ctx, glyph.char, 0, 0, fontSize, contrast, effect)
+    ctx.restore()
+    cursor += glyph.advance
+  }
+}
+
 function drawGlyphs(
   ctx: Canvas2D,
   mark: RenderableMark,
@@ -157,20 +286,62 @@ function drawGlyphs(
 ): void {
   const fontSize = fontSizeFor(ctx, mark, width)
   ctx.font = glyphFont(mark, fontSize)
-  ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
+  const { spacing, curve, effect } = textParams(mark)
+  if (effect === 'outline') {
+    ctx.shadowBlur = 0
+  }
   const lines = glyphLines(mark)
   const pitch = fontSize * LINE_HEIGHT
-  for (const [index, line] of lines.entries()) {
-    const y = (index - (lines.length - 1) / 2) * pitch
-    if (contrast.outline > 0) {
-      ctx.lineJoin = 'round'
-      ctx.strokeStyle = INK[contrast.variant].outline
-      ctx.lineWidth = fontSize * OUTLINE_RATIO * contrast.outline
-      ctx.strokeText(line, 0, y)
+  if (curve === 0) {
+    for (const [index, line] of lines.entries()) {
+      const y = (index - (lines.length - 1) / 2) * pitch
+      drawStraightLine(ctx, line, y, spacing, fontSize, contrast, effect)
     }
-    ctx.fillStyle = contrast.fill
-    ctx.fillText(line, 0, y)
+    return
+  }
+  const sign = curve > 0 ? 1 : -1
+  const angle = Math.abs(curve) * Math.PI
+  const baseRadius = (probeRunWidth(ctx, mark, spacing) * (fontSize / PROBE_FONT_SIZE)) / angle
+  for (const [index, line] of lines.entries()) {
+    const radius = baseRadius + (index - (lines.length - 1) / 2) * pitch * sign
+    drawArcLine(ctx, line, Math.max(radius, 1), sign, spacing, fontSize, contrast, effect)
+  }
+}
+
+/** Draws a rectangle, rounded rectangle, ellipse or line filling the mark box. */
+function drawShape(
+  ctx: Canvas2D,
+  spec: Extract<WatermarkSpec, { kind: 'shape' }>,
+  geometry: MarkGeometry,
+  contrast: ResolvedContrast,
+): void {
+  const halfWidth = geometry.width / 2
+  const halfHeight = geometry.height / 2
+  const shorter = Math.min(geometry.width, geometry.height)
+  const path = new Path2D()
+  const shape: Shape = spec.shape
+  if (shape === 'ellipse') {
+    path.ellipse(0, 0, halfWidth, halfHeight, 0, 0, Math.PI * 2)
+  } else if (shape === 'rectangle') {
+    path.rect(-halfWidth, -halfHeight, geometry.width, geometry.height)
+  } else {
+    // Rounded rectangle and line (a very rounded, thin rectangle).
+    const radius = shape === 'line' ? halfHeight : shorter * SHAPE_CORNER_RATIO
+    path.roundRect(-halfWidth, -halfHeight, geometry.width, geometry.height, radius)
+  }
+  if (spec.fill.enabled) {
+    ctx.save()
+    ctx.globalAlpha *= spec.fill.opacity
+    ctx.fillStyle = spec.fill.colour
+    ctx.fill(path)
+    ctx.restore()
+  }
+  if (spec.stroke.width > 0) {
+    // A chosen stroke colour, else the auto-contrast ink.
+    ctx.strokeStyle = spec.stroke.colour ?? contrast.fill
+    ctx.lineWidth = geometry.height * spec.stroke.width
+    ctx.stroke(path)
   }
 }
 
@@ -212,27 +383,38 @@ export function drawMark(
   ctx.shadowColor = INK[contrast.variant].outline
   ctx.shadowBlur = geometry.height * SHADOW_RATIO * contrast.outline
 
-  if (spec.kind === 'qr') {
-    drawQr(ctx, spec.content, geometry.width)
-  } else if (spec.kind === 'image') {
-    if (mark.image === undefined) {
-      throw new TypeError('image marks need a resolved bitmap')
+  switch (spec.kind) {
+    case 'qr': {
+      drawQr(ctx, spec.content, geometry.width)
+      break
     }
-    ctx.drawImage(
-      mark.image,
-      -geometry.width / 2,
-      -geometry.height / 2,
-      geometry.width,
-      geometry.height,
-    )
-  } else {
-    if (spec.style.backdrop.enabled) {
-      drawBackdrop(ctx, geometry, spec.style.backdrop.opacity, contrast)
+    case 'shape': {
+      drawShape(ctx, spec, geometry, contrast)
+      break
     }
-    if (spec.kind === 'symbol' && spec.symbol.type === 'icon') {
-      drawIcon(ctx, mark, geometry.width, contrast)
-    } else {
-      drawGlyphs(ctx, mark, geometry.width, contrast)
+    case 'image': {
+      if (mark.image === undefined) {
+        throw new TypeError('image marks need a resolved bitmap')
+      }
+      ctx.drawImage(
+        mark.image,
+        -geometry.width / 2,
+        -geometry.height / 2,
+        geometry.width,
+        geometry.height,
+      )
+      break
+    }
+    default: {
+      // Text and symbol marks: an optional backdrop, then the glyphs or icon.
+      if (spec.style.backdrop.enabled) {
+        drawBackdrop(ctx, geometry, spec.style.backdrop.opacity, contrast)
+      }
+      if (spec.kind === 'symbol' && spec.symbol.type === 'icon') {
+        drawIcon(ctx, mark, geometry.width, contrast)
+      } else {
+        drawGlyphs(ctx, mark, geometry.width, contrast)
+      }
     }
   }
   ctx.restore()

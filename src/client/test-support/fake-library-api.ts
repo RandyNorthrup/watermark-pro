@@ -60,6 +60,9 @@ export function makeWatermark(overrides: Partial<WatermarkDto> = {}): WatermarkD
       text: '© Acme Studio',
       fontFamily: 'Inter Variable',
       fontWeight: 600,
+      letterSpacing: 0,
+      curve: 0,
+      effect: 'solid',
       placement: { mode: 'smart' },
       contrast: { mode: 'auto' },
       style: {

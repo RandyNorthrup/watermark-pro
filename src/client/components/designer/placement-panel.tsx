@@ -1,4 +1,10 @@
-import { type Anchor, ANCHORS, type WatermarkSpec } from '../../../shared/watermark'
+import {
+  type Anchor,
+  ANCHORS,
+  DEFAULT_JITTER,
+  MAX_JITTER,
+  type WatermarkSpec,
+} from '../../../shared/watermark'
 import { ChoiceGroup } from '../ui/choice-group'
 import { SliderField } from '../ui/slider-field'
 
@@ -17,7 +23,14 @@ const MODE_CHOICES = [
   },
   { value: 'anchor', label: 'Corner', description: 'Fixed position relative to the edges' },
   { value: 'custom', label: 'Custom', description: 'Exact position as a fraction of the photo' },
+  {
+    value: 'random',
+    label: 'Random',
+    description: 'A different spot per photo; harder to auto-remove',
+  },
 ] as const
+
+const JITTER_STEP = 0.01
 
 const ANCHOR_LABELS: Record<Anchor, string> = {
   'top-left': 'Top left',
@@ -48,12 +61,22 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
         value={placement.mode}
         choices={MODE_CHOICES}
         onChange={(mode) => {
-          if (mode === 'smart') {
-            onChange({ mode })
-          } else if (mode === 'anchor') {
-            onChange({ mode, anchor: DEFAULT_ANCHOR })
-          } else {
-            onChange({ mode, x: CENTRE, y: CENTRE })
+          switch (mode) {
+            case 'anchor': {
+              onChange({ mode, anchor: DEFAULT_ANCHOR })
+              break
+            }
+            case 'random': {
+              onChange({ mode, jitter: DEFAULT_JITTER })
+              break
+            }
+            case 'custom': {
+              onChange({ mode, x: CENTRE, y: CENTRE })
+              break
+            }
+            default: {
+              onChange({ mode: 'smart' })
+            }
           }
         }}
       />
@@ -62,6 +85,25 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
           The engine scores every corner and edge for detail, contrast and subject, then places the
           mark where it is legible and least intrusive.
         </p>
+      ) : null}
+      {placement.mode === 'random' ? (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-ink-muted">
+            Each photo gets a random corner, nudged by up to the jitter below. The same photo always
+            lands in the same place.
+          </p>
+          <SliderField
+            label="Jitter"
+            value={placement.jitter}
+            min={0}
+            max={MAX_JITTER}
+            step={JITTER_STEP}
+            format={percent}
+            onChange={(jitter) => {
+              onChange({ mode: 'random', jitter })
+            }}
+          />
+        </div>
       ) : null}
       {placement.mode === 'anchor' ? (
         <fieldset className="flex flex-col gap-2">

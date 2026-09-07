@@ -5,7 +5,8 @@
  */
 import { type LuminanceMap, read } from './analysis'
 import { anchorCentre, rankPlacements } from './placement'
-import type { Anchor, WatermarkSpec } from '../../shared/watermark'
+import { mulberry32 } from './random'
+import { type Anchor, ANCHORS, type WatermarkSpec } from '../../shared/watermark'
 
 export interface Size {
   width: number
@@ -29,6 +30,9 @@ export interface ResolvedPlacement {
 
 /** The mark may not exceed this share of the image height, whatever the scale says. */
 const MAX_HEIGHT_FRACTION = 0.9
+/** Centre and span for turning a [0, 1) random into a symmetric jitter. */
+const RANDOM_CENTRE = 0.5
+const RANDOM_SPAN = 2
 
 /**
  * Pixel size of the mark from the spec's scale (a fraction of the image
@@ -88,6 +92,7 @@ export function resolvePlacement(
   image: Size,
   mark: Size,
   map: LuminanceMap,
+  seed = 1,
 ): ResolvedPlacement {
   const widthFraction = mark.width / image.width
   const heightFraction = mark.height / image.height
@@ -113,6 +118,25 @@ export function resolvePlacement(
   const shorter = Math.min(image.width, image.height)
   const marginX = (spec.style.margin * shorter) / image.width
   const marginY = (spec.style.margin * shorter) / image.height
+
+  if (spec.placement.mode === 'random') {
+    const next = mulberry32(seed)
+    const anchor = ANCHORS[Math.floor(next() * ANCHORS.length)] ?? 'bottom-right'
+    const base = anchorCentre(anchor, widthFraction, heightFraction, marginX, marginY)
+    const jitter = spec.placement.jitter
+    // A random offset centred on zero, up to ±jitter.
+    const offsetX = (next() - RANDOM_CENTRE) * RANDOM_SPAN * jitter
+    const offsetY = (next() - RANDOM_CENTRE) * RANDOM_SPAN * jitter
+    const x = clamp(base.x + offsetX, widthFraction / 2, 1 - widthFraction / 2)
+    const y = clamp(base.y + offsetY, heightFraction / 2, 1 - heightFraction / 2)
+    return {
+      centreX: x * image.width,
+      centreY: y * image.height,
+      anchor,
+      meanLuminance: meanLuminanceUnder(map, x, y, widthFraction, heightFraction),
+    }
+  }
+
   const centre =
     spec.placement.mode === 'anchor'
       ? anchorCentre(spec.placement.anchor, widthFraction, heightFraction, marginX, marginY)

@@ -7,6 +7,44 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-07
+
+M12: richer marks — text effects, shapes, frames and random placement.
+
+### Added
+
+- Text marks gain a Text tab with **letter spacing** (−10% to +100% of the
+  font size), a **curve** slider (−100% to +100%) that bends the line into an
+  arc, and four **paint effects** — Solid, Outline, Emboss and Engrave.
+  Spacing is measured per grapheme cluster (`Intl.Segmenter`), so emoji and
+  combining marks space correctly.
+- A new **Shape** mark kind: rectangle, rounded rectangle, ellipse or line,
+  with an aspect/length slider, an optional fill (colour and opacity) and a
+  stroke (width and an optional custom colour; otherwise the auto-contrast
+  ink).
+- A **Frame** control in the editor's Adjust tab and the bulk tool's Photo
+  adjustments: a solid border of a chosen width (up to 10% of the shorter
+  side) and colour is drawn around the photo, and every mark's placement is
+  offset by the border so anchors stay correct.
+- A **Random** placement mode: each photo gets a per-file pseudo-random anchor
+  and jitter, seeded from the file's name, size and modified time
+  (`src/client/engine/random.ts`), so a batch and its preview reproduce the
+  same layout.
+- An **Emoji** group in the symbol picker (96 glyphs) drawn with the platform
+  colour-emoji font; the ink only tints their outline and shadow.
+
+### Changed
+
+- `DEFAULT_TEXT_SPEC` and `DEFAULT_SHAPE_SPEC` are now typed as their narrowed
+  spec members (`TextSpec`, `ShapeSpec`), removing defensive `kind ===` guards.
+- `hashString` (placement seed) now hashes UTF-8 bytes (canonical FNV-1a),
+  removing an unreachable branch.
+
+### Notes
+
+- Per-milestone certification for M12–M18 runs `npm run quality`, semgrep and
+  the red-drill suite; e2e, Lighthouse and screenshots are deferred to M19.
+
 ## [1.3.0] - 2026-09-07
 
 M11: photo adjustments and orientation.

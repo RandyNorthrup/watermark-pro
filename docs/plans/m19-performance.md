@@ -203,16 +203,23 @@ Red drills:
 
 ## Deferred audits (from M12–M18)
 
-Lighthouse and screenshots were deferred from every feature milestone to
-here (Randy, 2026-09-07). M19 captures and budgets them all in one pass:
-run `scripts/screenshots.mjs m19 all` and `scripts/lighthouse.mjs m19` (and
+e2e, Lighthouse and screenshots were deferred from every feature milestone
+to here (Randy, 2026-09-06/07). M19 captures and budgets them all in one
+pass: run the full `npm run test:e2e` (all four device projects) once, then
+`scripts/screenshots.mjs m19 all` and `scripts/lighthouse.mjs m19` (and
 `mobile`) over every page **including the new tools and screens each
-milestone added**. As each milestone lands, append the screens it
-introduced to this list so nothing is missed:
+milestone added**, and the `/app/library/new` bundle-size budget (≤ 5 kB gz
+growth per feature milestone). As each milestone lands, append the screens
+and flows it introduced to this list so nothing is missed:
 
 - M11: editor Adjust tab (already captured under `docs/screenshots/m11/`).
-- M12: designer Text tab (effects, curve, spacing) and Shape tab; icon
-  search; a shape and a curved-text preset in the library.
+- M12: designer **Text effects** (Solid/Outline/Emboss/Engrave, curve,
+  letter spacing), the **Shape** mark tab, the **Frame** control (editor
+  Adjust tab and bulk Photo adjustments), and **random placement** with
+  jitter; the Emoji glyph group in the symbol picker. e2e: a text-effects /
+  shape / frame / random journey. Confirm the `/app/library/new` JS grew
+  ≤ 5 kB gz. (Icon search and the Shuffle button were carried forward, see
+  PLAN.md M12.)
 - M13: editor Export tab with the metadata policy group; the designer token
   menu.
 - M14: the bulk per-photo override dialog (phone and desktop); the

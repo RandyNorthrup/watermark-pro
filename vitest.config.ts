@@ -81,6 +81,11 @@ export default defineConfig({
         // Runs inside a Web Worker thread, which coverage cannot instrument;
         // exercised end to end through worker-client tests in Chromium.
         'src/client/engine/worker.ts',
+        // Pure canvas drawing: every branch is a 2D-context call that jsdom
+        // cannot run (getContext is null there). Exercised by the `browser`
+        // project (pipeline/text-layout browser tests), which cannot report
+        // coverage. See PLAN.md §9.
+        'src/client/engine/render.ts',
         // D1 and binding wiring that only executes inside workerd. Covered
         // functionally by the `workers` project, which cannot report coverage.
         'src/worker/db/**',

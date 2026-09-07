@@ -3,7 +3,12 @@
  * returns a new spec; the shared placement, contrast and style settings
  * survive a change of mark kind.
  */
-import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC, type WatermarkSpec } from '../../shared/watermark'
+import {
+  DEFAULT_SHAPE_SPEC,
+  DEFAULT_STYLE,
+  DEFAULT_TEXT_SPEC,
+  type WatermarkSpec,
+} from '../../shared/watermark'
 import { DEFAULT_FONT_FAMILY } from '../fonts/catalogue'
 
 export type MarkKind = WatermarkSpec['kind']
@@ -11,6 +16,7 @@ export type MarkKind = WatermarkSpec['kind']
 export const MARK_KINDS: readonly { value: MarkKind; label: string }[] = [
   { value: 'text', label: 'Text' },
   { value: 'symbol', label: 'Symbol' },
+  { value: 'shape', label: 'Shape' },
   { value: 'image', label: 'Logo' },
   { value: 'qr', label: 'QR code' },
 ]
@@ -38,9 +44,23 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
       return {
         ...settings,
         kind: 'text',
-        text: DEFAULT_TEXT_SPEC.kind === 'text' ? DEFAULT_TEXT_SPEC.text : '',
+        text: DEFAULT_TEXT_SPEC.text,
         fontFamily: DEFAULT_FONT_FAMILY,
         fontWeight: 600,
+        letterSpacing: 0,
+        curve: 0,
+        effect: 'solid',
+      }
+    }
+    case 'shape': {
+      return {
+        ...settings,
+        style: { ...settings.style, scale: DEFAULT_SHAPE_SPEC.style.scale },
+        kind: 'shape',
+        shape: 'rectangle',
+        aspect: DEFAULT_SHAPE_SPEC.aspect,
+        fill: { ...DEFAULT_SHAPE_SPEC.fill },
+        stroke: { ...DEFAULT_SHAPE_SPEC.stroke },
       }
     }
     case 'symbol': {

@@ -1,4 +1,19 @@
 /** Browser-only helpers for engine tests: synthetic bitmaps and pixel probes. */
+import { DEFAULT_STYLE, type TextSpec } from '../../../shared/watermark'
+
+/** A plainly visible text mark shared by the engine pixel tests. */
+export const textSpecFixture: TextSpec = {
+  kind: 'text',
+  text: 'PROOF',
+  fontFamily: 'sans-serif',
+  fontWeight: 700,
+  letterSpacing: 0,
+  curve: 0,
+  effect: 'solid',
+  placement: { mode: 'anchor', anchor: 'bottom-right' },
+  contrast: { mode: 'auto' },
+  style: { ...DEFAULT_STYLE, opacity: 1, scale: 0.3 },
+}
 
 /** A bitmap whose left half is one colour and right half another. */
 export async function splitBitmap(

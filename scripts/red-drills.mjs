@@ -237,8 +237,8 @@ export const DRILLS = [
   {
     name: 'Colour: chosen ink ignored for text',
     file: 'src/client/engine/render.ts',
-    find: '    ctx.fillStyle = contrast.fill',
-    replace: '    ctx.fillStyle = INK[contrast.variant].fill',
+    find: '  ctx.fillStyle = contrast.fill\n  ctx.fillText(char, x, y)',
+    replace: '  ctx.fillStyle = INK[contrast.variant].fill\n  ctx.fillText(char, x, y)',
     ...browser('src/client/engine/pipeline.browser.test.ts'),
   },
   {
@@ -336,8 +336,8 @@ export const DRILLS = [
   {
     name: 'Bulk: adjustments not passed to the runtime',
     file: 'src/client/components/bulk/bulk-tool.tsx',
-    find: '      adjust,\n    }\n  }',
-    replace: '      adjust: IDENTITY_ADJUSTMENTS,\n    }\n  }',
+    find: '      adjust,\n      border,',
+    replace: '      adjust: IDENTITY_ADJUSTMENTS,\n      border,',
     ...unitClient('src/client/routes/app/bulk-page.test.tsx'),
   },
   {
@@ -346,6 +346,49 @@ export const DRILLS = [
     find: "  filter('vivid', 'Vivid', { contrast: 0.15, saturation: 0.35 }),",
     replace: "  filter('vivid', 'Vivid', { contrast: 0.15, saturation: -0.15 }),",
     ...unitClient('src/shared/adjustments.test.ts'),
+  },
+  // --- M12: text effects, shapes, frame, random placement ------------------
+  {
+    name: 'Text: letter spacing ignored',
+    file: 'src/client/engine/text-layout.ts',
+    find: '  const gap = spacing * fontSize',
+    replace: '  const gap = 0',
+    ...browser('src/client/engine/text-layout.browser.test.ts'),
+  },
+  {
+    name: 'Text: curve flattened',
+    file: 'src/client/engine/text-layout.ts',
+    find: '  if (curve === 0) {\n    return { width: runWidth, height: block }',
+    replace: '  if (curve === 0 || true) {\n    return { width: runWidth, height: block }',
+    ...unitClient('src/client/engine/text-layout.test.ts'),
+  },
+  {
+    name: 'Shape: ellipse drawn as a rectangle',
+    file: 'src/client/engine/render.ts',
+    find: '    path.ellipse(0, 0, halfWidth, halfHeight, 0, 0, Math.PI * 2)',
+    replace: '    path.rect(-halfWidth, -halfHeight, geometry.width, geometry.height)',
+    ...browser('src/client/engine/pipeline.browser.test.ts'),
+  },
+  {
+    name: 'Frame: placement not offset by the border',
+    file: 'src/client/engine/pipeline.ts',
+    find: '      centreX: mark.placement.centreX + framed.offset,',
+    replace: '      centreX: mark.placement.centreX,',
+    ...browser('src/client/engine/pipeline.browser.test.ts'),
+  },
+  {
+    name: 'Random: same position for every seed',
+    file: 'src/client/engine/layout.ts',
+    find: '    const next = mulberry32(seed)',
+    replace: '    const next = mulberry32(1)',
+    ...unitClient('src/client/engine/layout.test.ts'),
+  },
+  {
+    name: 'Random: jitter escapes the margin',
+    file: 'src/client/engine/layout.ts',
+    find: '    const x = clamp(base.x + offsetX, widthFraction / 2, 1 - widthFraction / 2)',
+    replace: '    const x = base.x + offsetX * 20',
+    ...unitClient('src/client/engine/layout.test.ts'),
   },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {

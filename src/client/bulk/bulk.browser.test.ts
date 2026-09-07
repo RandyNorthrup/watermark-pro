@@ -19,6 +19,7 @@ import { MarkResources } from '../lib/mark-resources'
 const BULK_EXTRA = {
   orientation: { turns: 0, flipX: false, flipY: false },
   adjust: IDENTITY_ADJUSTMENTS,
+  border: null,
 } as const
 
 const FIXTURES = 20

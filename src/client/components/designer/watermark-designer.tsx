@@ -6,8 +6,10 @@ import { FontPicker } from './font-picker'
 import { LogoPicker } from './logo-picker'
 import { PlacementPanel } from './placement-panel'
 import { PreviewPanel } from './preview-panel'
+import { ShapePanel } from './shape-panel'
 import { StylePanel } from './style-panel'
 import { SymbolPicker } from './symbol-picker'
+import { TextEffects } from './text-effects'
 import { presetNameSchema, type WatermarkDto } from '../../../shared/api'
 import {
   MAX_QR_CONTENT_LENGTH,
@@ -195,8 +197,12 @@ export function WatermarkDesigner({
                         setSpec({ ...spec, fontWeight })
                       }}
                     />
+                    <TextEffects spec={spec} onChange={setSpec} />
                   </>
                 ) : null}
+              </Tabs.Content>
+              <Tabs.Content value="shape" className="outline-none">
+                {spec.kind === 'shape' ? <ShapePanel spec={spec} onChange={setSpec} /> : null}
               </Tabs.Content>
               <Tabs.Content value="symbol" className="outline-none">
                 {spec.kind === 'symbol' ? (

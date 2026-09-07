@@ -6,23 +6,20 @@ import { EncodeError, encodeCanvas } from './encode'
 import { orientedFrame } from './orient'
 import { analyseSource, applyWatermark, prepareCanvas } from './pipeline'
 import { measureAspect } from './render'
-import { colourAt, countChanged, pixelsOf, quadBitmap, splitBitmap } from './test-support/fixtures'
+import {
+  colourAt,
+  countChanged,
+  pixelsOf,
+  quadBitmap,
+  splitBitmap,
+  textSpecFixture as textSpec,
+} from './test-support/fixtures'
 import { WatermarkWorker } from './worker-client'
 import { IDENTITY_ORIENTATION, type Orientation } from '../../shared/adjustments'
-import { DEFAULT_STYLE, type WatermarkSpec } from '../../shared/watermark'
+import { DEFAULT_STYLE, type TextEffect, type WatermarkSpec } from '../../shared/watermark'
 
 const WHITE: [number, number, number] = [255, 255, 255]
 const BLACK: [number, number, number] = [0, 0, 0]
-
-const textSpec: WatermarkSpec = {
-  kind: 'text',
-  text: 'PROOF',
-  fontFamily: 'sans-serif',
-  fontWeight: 700,
-  placement: { mode: 'anchor', anchor: 'bottom-right' },
-  contrast: { mode: 'auto' },
-  style: { ...DEFAULT_STYLE, opacity: 1, scale: 0.3 },
-}
 
 const ICON_CHECK = 'M20 6 9 17l-5-5'
 
@@ -454,6 +451,110 @@ describe('applyWatermark orientation', () => {
       expect(g).toBeGreaterThan(100)
       expect(b).toBeGreaterThan(100)
     }
+  })
+})
+
+const shapeSpec: WatermarkSpec = {
+  kind: 'shape',
+  shape: 'ellipse',
+  aspect: 1,
+  fill: { enabled: true, colour: '#ff0000', opacity: 1 },
+  stroke: { width: 0, colour: null },
+  placement: { mode: 'anchor', anchor: 'center' },
+  contrast: { mode: 'manual', variant: 'dark', outline: 0 },
+  style: { ...DEFAULT_STYLE, opacity: 1, scale: 0.6 },
+}
+
+/** Red channel at the centre of a full-block glyph rendered under one effect. */
+async function centreInk(effect: TextEffect): Promise<number> {
+  const result = await applyWatermark(
+    {
+      source: await splitBitmap(300, 300, '#ffffff', '#ffffff'),
+      marks: [
+        {
+          spec: {
+            ...textSpec,
+            text: '█', // a full block: solid fills it, an outline leaves it hollow
+            effect,
+            placement: { mode: 'anchor', anchor: 'center' },
+            contrast: { mode: 'manual', variant: 'dark', outline: 0 },
+            style: { ...textSpec.style, scale: 0.4 },
+          },
+        },
+      ],
+      output: { format: 'image/png', quality: 1 },
+    },
+    offscreenBackend,
+  )
+  const pixels = await pixelsOf(result.blob)
+  const placement = result.marks[0]?.placement
+  return colourAt(
+    pixels,
+    Math.round(placement?.centreX ?? 150),
+    Math.round(placement?.centreY ?? 150),
+  )[0]
+}
+
+describe('applyWatermark M12', () => {
+  it('draws an ellipse that leaves its bounding-box corners clear', async () => {
+    const result = await applyWatermark(
+      {
+        source: await splitBitmap(300, 300, '#ffffff', '#ffffff'),
+        marks: [{ spec: shapeSpec }],
+        output: { format: 'image/png', quality: 1 },
+      },
+      offscreenBackend,
+    )
+    const pixels = await pixelsOf(result.blob)
+    const placement = result.marks[0]?.placement
+    const half = (placement?.width ?? 0) / 2
+    const cx = placement?.centreX ?? 150
+    const cy = placement?.centreY ?? 150
+    // The centre is red; a corner of the mark's box is background (outside the ellipse).
+    const INSET = 3
+    const centre = colourAt(pixels, Math.round(cx), Math.round(cy))
+    const corner = colourAt(pixels, Math.round(cx - half + INSET), Math.round(cy - half + INSET))
+    expect(isRed(centre)).toBe(true)
+    expect(isRed(corner)).toBe(false)
+  })
+
+  it('frames the photo and offsets the mark placement by the border', async () => {
+    const mark = {
+      spec: { ...textSpec, placement: { mode: 'anchor' as const, anchor: 'top-left' as const } },
+    }
+    const plain = await applyWatermark(
+      {
+        source: await splitBitmap(200, 200, '#ffffff', '#ffffff'),
+        marks: [mark],
+        output: { format: 'image/png', quality: 1 },
+      },
+      offscreenBackend,
+    )
+    const framed = await applyWatermark(
+      {
+        source: await splitBitmap(200, 200, '#ffffff', '#ffffff'),
+        marks: [mark],
+        output: { format: 'image/png', quality: 1 },
+        transform: { border: { width: 0.05, colour: '#ff0000' } },
+      },
+      offscreenBackend,
+    )
+    // 200 + 2 × round(0.05 × 200) = 220; the border is 10 px.
+    const BORDER = 10
+    expect(framed.width).toBe(200 + BORDER * 2)
+    const pixels = await pixelsOf(framed.blob)
+    expect(isRed(colourAt(pixels, 3, 3))).toBe(true)
+    // The framed mark's centre is the plain one shifted by exactly the border.
+    expect(framed.marks[0]?.placement.centreX ?? 0).toBeCloseTo(
+      (plain.marks[0]?.placement.centreX ?? 0) + BORDER,
+      3,
+    )
+  })
+
+  it('leaves a glyph hollow under the outline effect', async () => {
+    // The block's centre is dark when filled, near-white when only outlined.
+    expect(await centreInk('solid')).toBeLessThan(80)
+    expect(await centreInk('outline')).toBeGreaterThan(180)
   })
 })
 

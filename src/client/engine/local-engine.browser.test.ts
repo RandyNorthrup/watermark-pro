@@ -6,22 +6,16 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { LocalEngine, LocalEngineError } from './local-engine'
-import { countChanged, pixelsOf, splitBitmap } from './test-support/fixtures'
-import { DEFAULT_STYLE, type WatermarkSpec } from '../../shared/watermark'
+import {
+  countChanged,
+  pixelsOf,
+  splitBitmap,
+  textSpecFixture as textSpec,
+} from './test-support/fixtures'
 import { loadFont } from '../fonts/load'
 import { domBackend } from '../lib/canvas-backend'
 
 const WHITE: [number, number, number] = [255, 255, 255]
-
-const textSpec: WatermarkSpec = {
-  kind: 'text',
-  text: 'PROOF',
-  fontFamily: 'sans-serif',
-  fontWeight: 700,
-  placement: { mode: 'anchor', anchor: 'bottom-right' },
-  contrast: { mode: 'auto' },
-  style: { ...DEFAULT_STYLE, opacity: 1, scale: 0.3 },
-}
 
 describe('LocalEngine', () => {
   it('applies a mark on the calling thread and releases the bitmaps', async () => {

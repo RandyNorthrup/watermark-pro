@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
-import { Image, PencilRuler, Plus, QrCode, Stamp, Trash2, Type } from 'lucide-react'
+import { Image, PencilRuler, Plus, QrCode, Shapes, Stamp, Trash2, Type } from 'lucide-react'
 
 import type { WatermarkDto } from '../../../../shared/api'
-import type { WatermarkSpec } from '../../../../shared/watermark'
+import type { Shape, WatermarkSpec } from '../../../../shared/watermark'
 import { Alert } from '../../../components/ui/alert'
 import { Badge } from '../../../components/ui/badge'
 import { Button } from '../../../components/ui/button'
@@ -22,7 +22,14 @@ export const Route = createFileRoute('/app/library/')({
   component: LibraryPage,
 })
 
-const KIND_ICONS = { text: Type, symbol: Stamp, image: Image, qr: QrCode } as const
+const KIND_ICONS = { text: Type, symbol: Stamp, shape: Shapes, image: Image, qr: QrCode } as const
+
+const SHAPE_LABELS: Record<Shape, string> = {
+  rectangle: 'Rectangle',
+  'rounded-rectangle': 'Rounded rectangle',
+  ellipse: 'Ellipse',
+  line: 'Line',
+}
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
 
@@ -35,6 +42,9 @@ function describeSpec(spec: WatermarkSpec): string {
       return spec.symbol.type === 'glyph'
         ? `Glyph ${spec.symbol.glyph}`
         : `Icon ${spec.symbol.name}`
+    }
+    case 'shape': {
+      return SHAPE_LABELS[spec.shape]
     }
     case 'image': {
       return 'Logo'
@@ -55,6 +65,9 @@ function describePlacement(spec: WatermarkSpec): string {
     }
     case 'custom': {
       return 'Custom position'
+    }
+    case 'random': {
+      return 'Random placement'
     }
   }
 }

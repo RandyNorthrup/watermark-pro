@@ -18,7 +18,8 @@ import { fitLongestSide, isSameSize } from '../editor/geometry'
 import type { EncodeOptions } from '../engine/encode'
 import { closeInputBitmaps } from '../engine/engine'
 import { orientedSize } from '../engine/orient'
-import type { Transform } from '../engine/pipeline'
+import type { Border, Transform } from '../engine/pipeline'
+import { seedFor } from '../engine/random'
 import type { MarkResources } from '../lib/mark-resources'
 import { specForPhoto } from '../lib/spec-tokens'
 
@@ -30,6 +31,8 @@ export interface BulkSettings {
   orientation: Pick<Orientation, 'turns' | 'flipX' | 'flipY'>
   /** One colour adjustment for every photo in the batch. */
   adjust: Adjustments
+  /** An optional matte frame around every photo. */
+  border: Border | null
 }
 
 /** Builds the transform every photo in a batch shares (orientation, resize, adjustments). */
@@ -52,6 +55,9 @@ function bulkTransform(
   }
   if (!isIdentityAdjustments(settings.adjust)) {
     transform.adjust = settings.adjust
+  }
+  if (settings.border !== null) {
+    transform.border = settings.border
   }
   return Object.keys(transform).length === 0 ? undefined : transform
 }
@@ -103,7 +109,10 @@ export class BulkProcessor {
     }
     const [source, inputs] = await Promise.all([
       decode(file),
-      this.#resources.resolve(specs.map((spec) => specForPhoto(spec, file))),
+      this.#resources.resolve(
+        specs.map((spec) => specForPhoto(spec, file)),
+        seedFor(file),
+      ),
     ])
     if (isAborted(signal)) {
       closeInputBitmaps({ ...inputs, source, output: settings.output })

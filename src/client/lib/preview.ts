@@ -16,6 +16,7 @@ import type { EncodeOptions } from '../engine/encode'
 import type { WatermarkEngine } from '../engine/engine'
 import type { Size } from '../engine/layout'
 import type { MarkOutcome, Transform } from '../engine/pipeline'
+import { seedFor } from '../engine/random'
 
 /** Preview subjects are downscaled to keep re-renders under a frame or two. */
 const PREVIEW_MAX_SIDE = 1280
@@ -70,6 +71,9 @@ export function scaleTransform(
   if (transform.adjust !== undefined) {
     scaled.adjust = transform.adjust
   }
+  if (transform.border !== undefined) {
+    scaled.border = transform.border
+  }
   if (transform.crop !== undefined) {
     scaled.crop = {
       x: transform.crop.x * scale,
@@ -115,6 +119,11 @@ export class PreviewRenderer {
   /** The marks the engine should draw for the current subject. */
   #marksFor(input: SpecInput): readonly WatermarkSpec[] {
     return specList(input).map((spec) => specForPhoto(spec, this.#original))
+  }
+
+  /** A stable seed for random placement: the photo's, or 1 for the sample. */
+  #seed(): number {
+    return this.#original === null ? 1 : seedFor(this.#original)
   }
 
   /** The photo itself, or the sample scene when there is none. */
@@ -166,7 +175,7 @@ export class PreviewRenderer {
     this.#sequence += 1
     const ticket = this.#sequence
     const [resources, source] = await Promise.all([
-      this.#resources.resolve(this.#marksFor(input)),
+      this.#resources.resolve(this.#marksFor(input), this.#seed()),
       subject.toBitmap(),
     ])
     const transform = scaleTransform(options.transform, this.subjectScale)
@@ -193,7 +202,7 @@ export class PreviewRenderer {
    */
   async exportFull(input: SpecInput, output: EncodeOptions, transform?: Transform): Promise<Blob> {
     const source = await this.#decode(this.#original)
-    const resources = await this.#resources.resolve(this.#marksFor(input))
+    const resources = await this.#resources.resolve(this.#marksFor(input), this.#seed())
     const result = await this.#engine.apply({
       ...resources,
       source,

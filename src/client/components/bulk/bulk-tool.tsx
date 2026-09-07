@@ -28,6 +28,7 @@ import type { JobState } from '../../bulk/queue'
 import { zipEntries } from '../../bulk/zip'
 import { LONG_EDGE_PRESETS } from '../../editor/constants'
 import { type EncodeOptions, OUTPUT_FORMATS, type OutputFormat } from '../../engine/encode'
+import type { Border } from '../../engine/pipeline'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
@@ -36,6 +37,7 @@ import { watermarksQueryOptions } from '../../lib/library'
 import { canShareFiles, shareFile } from '../../lib/share-file'
 import { AdjustPanel } from '../editor/adjust-panel'
 import { FORMAT_OPTIONS } from '../editor/formats'
+import { FrameControls } from '../editor/frame-controls'
 import { OrientationControls } from '../editor/orientation-controls'
 import { PresetGate } from '../presets/preset-gate'
 import { Alert } from '../ui/alert'
@@ -158,6 +160,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const [size, setSize] = useState<SizeChoice>('original')
   const [orientation, setOrientation] = useState<Orientation>(IDENTITY_ORIENTATION)
   const [adjust, setAdjust] = useState<Adjustments>(IDENTITY_ADJUSTMENTS)
+  const [border, setBorder] = useState<Border | null>(null)
   const [isZipping, setIsZipping] = useState(false)
   const [zipError, setZipError] = useState<string | null>(null)
   const [saving, setSaving] = useState<SaveProgress | null>(null)
@@ -201,6 +204,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
       fitLongestSide: size === 'original' ? null : Number(size),
       orientation: { turns: orientation.turns, flipX: orientation.flipX, flipY: orientation.flipY },
       adjust,
+      border,
     }
   }
 
@@ -540,6 +544,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
               <div className="flex flex-col gap-4 border-t border-line p-3">
                 <OrientationControls orientation={orientation} onChange={setOrientation} />
                 <AdjustPanel adjust={adjust} onChange={setAdjust} photoFile={files[0] ?? null} />
+                <FrameControls border={border} onChange={setBorder} />
               </div>
             </details>
 

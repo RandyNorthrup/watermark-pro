@@ -21,6 +21,13 @@ describe('spec editing helpers', () => {
 
     const text = defaultSpecFor('text', image)
     expect(text.kind === 'text' && text.text.length > 0).toBe(true)
+
+    const shape = defaultSpecFor('shape', base)
+    expect(shape.kind === 'shape' && shape.shape === 'rectangle').toBe(true)
+    expect(shape.placement).toEqual({ mode: 'anchor', anchor: 'top-left' })
+
+    const qr = defaultSpecFor('qr', base)
+    expect(qr.kind === 'qr' && qr.content.length > 0).toBe(true)
   })
 
   it('returns fresh objects so edits never leak into the defaults', () => {

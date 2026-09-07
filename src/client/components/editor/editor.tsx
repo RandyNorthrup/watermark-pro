@@ -19,6 +19,7 @@ import { CropOverlay, type CropGesture } from './crop-overlay'
 import { CropPanel } from './crop-panel'
 import { ExportPanel } from './export-panel'
 import { FORMAT_EXTENSIONS } from './formats'
+import { FrameControls } from './frame-controls'
 import { MarkOverlay, type MarkGesture, type MarkPatch } from './mark-overlay'
 import { OrientationControls } from './orientation-controls'
 import { ResizePanel } from './resize-panel'
@@ -57,6 +58,7 @@ import { documentTransform, previewTransform } from '../../editor/transform'
 import type { EncodeOptions } from '../../engine/encode'
 import type { Size } from '../../engine/layout'
 import { orientedFrame } from '../../engine/orient'
+import type { Border } from '../../engine/pipeline'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
@@ -265,6 +267,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
           crop: null,
           resize: null,
           adjust: IDENTITY_ADJUSTMENTS,
+          border: null,
         },
       })
       await setSubject(file)
@@ -284,6 +287,7 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
         crop: null,
         resize: null,
         adjust: IDENTITY_ADJUSTMENTS,
+        border: null,
       },
     })
     await setSubject(null)
@@ -357,6 +361,10 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
 
   function changeAdjust(adjust: Adjustments) {
     dispatch({ type: 'commit', document: withAdjustments(document, adjust) })
+  }
+
+  function changeBorder(border: Border | null) {
+    commit({ border })
   }
 
   /** Renders at full size and hands the file to `deliver`; failures show in the export panel. */
@@ -607,12 +615,13 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
               }}
             />
           </Tabs.Content>
-          <Tabs.Content value="adjust" className="outline-none">
+          <Tabs.Content value="adjust" className="flex flex-col gap-4 outline-none">
             <AdjustPanel
               adjust={document.adjust}
               onChange={changeAdjust}
               photoFile={photo?.file ?? null}
             />
+            <FrameControls border={document.border} onChange={changeBorder} />
           </Tabs.Content>
           <Tabs.Content value="resize" className="outline-none">
             <ResizePanel
