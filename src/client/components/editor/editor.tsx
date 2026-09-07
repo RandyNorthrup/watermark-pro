@@ -76,12 +76,25 @@ import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 import { Spinner } from '../ui/spinner'
 
+/** Editing one photo of a bulk batch inside a dialog: no export, a footer instead. */
+export interface EmbeddedEditing {
+  document: EditorDocument
+  file: File
+  hasOverride: boolean
+  onApply: (document: EditorDocument) => void
+  onApplyToAll: (document: EditorDocument) => void
+  onRemove: () => void
+  onCancel: () => void
+}
+
 interface EditorProps {
   organizationId: string
   /** Preset to load when the editor opens (from the library's "Open in editor"). */
   initialPresetId?: string | null | undefined
   /** Whether the current member may store photos in the gallery. */
   canSave?: boolean | undefined
+  /** When set, the editor runs embedded in the bulk override dialog. */
+  embedded?: EmbeddedEditing | undefined
 }
 
 type Tool = 'watermark' | 'crop' | 'adjust' | 'resize' | 'export'
@@ -164,8 +177,15 @@ function PendingPreview({ hasPhoto }: { hasPhoto: boolean }) {
  * preset, adjust its placement and style for this photo, crop, resize, and
  * download. Every step is undoable.
  */
-export function Editor({ organizationId, initialPresetId, canSave = false }: EditorProps) {
-  const [history, dispatch] = useReducer(editorReducer, undefined, () => createHistory())
+export function Editor({
+  organizationId,
+  initialPresetId,
+  canSave = false,
+  embedded,
+}: EditorProps) {
+  const [history, dispatch] = useReducer(editorReducer, undefined, () =>
+    createHistory(embedded?.document),
+  )
   const document = history.present
   const [tool, setTool] = useState<Tool>('watermark')
   const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
@@ -233,16 +253,48 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
     outputSize,
   )
 
-  // Load the preset named in the URL once the library has arrived.
+  const visibleTools =
+    embedded === undefined ? TOOLS : TOOLS.filter((entry) => entry.value !== 'export')
+
+  // Load the preset named in the URL once the library has arrived (not embedded).
   const initialPreset = presets.data?.find((candidate) => candidate.id === initialPresetId)
   useEffect(() => {
-    if (initialPreset !== undefined && document.layers.length === 0) {
+    if (embedded === undefined && initialPreset !== undefined && document.layers.length === 0) {
       dispatch({
         type: 'reset',
         document: { ...document, layers: [createLayer(initialPreset.id, initialPreset.spec)] },
       })
     }
-  }, [initialPreset, document])
+  }, [embedded, initialPreset, document])
+
+  // Embedded mode edits one batch photo: load it without resetting the document.
+  const embeddedFile = embedded?.file ?? null
+  useEffect(() => {
+    if (embeddedFile === null) {
+      return
+    }
+    // Read through a property so a stale async result can be dropped without
+    // TypeScript narrowing the flag to a constant across the await.
+    const live = { current: true }
+    void (async () => {
+      try {
+        const [size, metadata] = await Promise.all([
+          readImageSize(embeddedFile),
+          readPhotoMetadata(embeddedFile),
+        ])
+        if (!live.current) {
+          return
+        }
+        setPhoto({ file: embeddedFile, size })
+        await setSubject(embeddedFile, metadata)
+      } catch {
+        setPhotoError('That file is not an image the browser can read.')
+      }
+    })()
+    return () => {
+      live.current = false
+    }
+  }, [embeddedFile, setSubject])
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -588,9 +640,9 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
         >
           <Tabs.List
             aria-label="Editor tools"
-            className="grid grid-cols-5 gap-1 rounded-lg border border-line bg-surface-raised p-1"
+            className={`grid ${embedded === undefined ? 'grid-cols-5' : 'grid-cols-4'} gap-1 rounded-lg border border-line bg-surface-raised p-1`}
           >
-            {TOOLS.map(({ value, label, icon: Icon }) => (
+            {visibleTools.map(({ value, label, icon: Icon }) => (
               <Tabs.Trigger
                 key={value}
                 value={value}
@@ -645,37 +697,70 @@ export function Editor({ organizationId, initialPresetId, canSave = false }: Edi
               }}
             />
           </Tabs.Content>
-          <Tabs.Content value="export" className="outline-none">
-            <ExportPanel
-              outputSize={outputSize}
-              isReady={document.layers.length > 0}
-              isExporting={isExporting}
-              onExport={(options) => {
-                void exportPhoto(options)
-              }}
-              onShare={(options) => {
-                void sharePhoto(options)
-              }}
-              isSharing={isSharing}
-              onSave={canSave ? save.mutate : undefined}
-              isSaving={save.isPending}
-            />
-            {exportError === null ? null : (
-              <Alert tone="error" title="Export failed" className="mt-3">
-                {exportError}
-              </Alert>
-            )}
-            {saved === null ? null : (
-              <Alert tone="success" className="mt-3">
-                Saved {saved} to the{' '}
-                <Link to="/app/gallery" className="font-medium underline">
-                  gallery
-                </Link>
-                .
-              </Alert>
-            )}
-          </Tabs.Content>
+          {embedded === undefined ? (
+            <Tabs.Content value="export" className="outline-none">
+              <ExportPanel
+                outputSize={outputSize}
+                isReady={document.layers.length > 0}
+                isExporting={isExporting}
+                onExport={(options) => {
+                  void exportPhoto(options)
+                }}
+                onShare={(options) => {
+                  void sharePhoto(options)
+                }}
+                isSharing={isSharing}
+                onSave={canSave ? save.mutate : undefined}
+                isSaving={save.isPending}
+              />
+              {exportError === null ? null : (
+                <Alert tone="error" title="Export failed" className="mt-3">
+                  {exportError}
+                </Alert>
+              )}
+              {saved === null ? null : (
+                <Alert tone="success" className="mt-3">
+                  Saved {saved} to the{' '}
+                  <Link to="/app/gallery" className="font-medium underline">
+                    gallery
+                  </Link>
+                  .
+                </Alert>
+              )}
+            </Tabs.Content>
+          ) : null}
         </Tabs.Root>
+        {embedded === undefined ? null : (
+          <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+            <Button
+              type="button"
+              disabled={document.layers.length === 0}
+              onClick={() => {
+                embedded.onApply(document)
+              }}
+            >
+              Apply to this photo
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={document.layers.length === 0}
+              onClick={() => {
+                embedded.onApplyToAll(document)
+              }}
+            >
+              Apply to all photos
+            </Button>
+            {embedded.hasOverride ? (
+              <Button type="button" variant="secondary" onClick={embedded.onRemove}>
+                Remove override
+              </Button>
+            ) : null}
+            <Button type="button" variant="ghost" onClick={embedded.onCancel}>
+              Cancel
+            </Button>
+          </div>
+        )}
       </Card>
     </div>
   )

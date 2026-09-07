@@ -1,8 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_NAME_PATTERN } from './names'
-import { bulkOutputSize, bulkTransform, extensionFor, type BulkSettings } from './processor'
+import {
+  type BulkJobInput,
+  bulkOutputSize,
+  bulkTransform,
+  extensionFor,
+  marksForJob,
+  outputSizeForJob,
+  transformForJob,
+  type BulkSettings,
+} from './processor'
 import { FILTER_BY_ID, IDENTITY_ADJUSTMENTS } from '../../shared/adjustments'
+import { EMPTY_PHOTO_METADATA } from '../../shared/metadata'
+import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
+import { createLayer, EMPTY_DOCUMENT, type EditorDocument } from '../editor/state'
+import { documentTransform } from '../editor/transform'
 
 const BASE: BulkSettings = {
   output: { format: 'image/jpeg', quality: 0.9, metadata: 'strip' },
@@ -57,5 +70,35 @@ describe('extensionFor', () => {
     expect(extensionFor('image/png')).toBe('png')
     expect(extensionFor('image/jpeg')).toBe('jpg')
     expect(extensionFor('image/webp')).toBe('webp')
+  })
+})
+
+describe('per-photo override', () => {
+  const file = new File([new Uint8Array(1)], 'x.jpg', { type: 'image/jpeg' })
+  const override: EditorDocument = {
+    ...EMPTY_DOCUMENT,
+    layers: [createLayer('preset', DEFAULT_TEXT_SPEC)],
+  }
+  const plain: BulkJobInput = {
+    file,
+    relativePath: 'x.jpg',
+    metadata: EMPTY_PHOTO_METADATA,
+    override: null,
+  }
+  const custom: BulkJobInput = { ...plain, override }
+
+  it('draws the batch presets without an override and the override layers with one', () => {
+    expect(marksForJob(plain, [DEFAULT_TEXT_SPEC])).toEqual([DEFAULT_TEXT_SPEC])
+    expect(marksForJob(custom, [])).toEqual([DEFAULT_TEXT_SPEC])
+  })
+
+  it('uses the override document transform and its own output size', () => {
+    const source = { width: 800, height: 600 }
+    expect(transformForJob(custom, source, BASE)).toEqual(documentTransform(override))
+    expect(outputSizeForJob(custom, source, { ...BASE, fitLongestSide: 200 })).toEqual(source)
+    expect(outputSizeForJob(plain, source, { ...BASE, fitLongestSide: 400 })).toEqual({
+      width: 400,
+      height: 300,
+    })
   })
 })

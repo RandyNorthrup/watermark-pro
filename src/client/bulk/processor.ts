@@ -17,6 +17,8 @@ import {
 import type { PhotoMetadata } from '../../shared/metadata'
 import type { WatermarkSpec } from '../../shared/watermark'
 import { fitLongestSide, isSameSize } from '../editor/geometry'
+import type { EditorDocument } from '../editor/state'
+import { documentTransform } from '../editor/transform'
 import type { EncodeOptions } from '../engine/encode'
 import { closeInputBitmaps } from '../engine/engine'
 import type { Size } from '../engine/layout'
@@ -33,11 +35,13 @@ export interface BatchPosition {
   count: number
 }
 
-/** One photo to process: the file, its path within a folder, and its EXIF. */
+/** One photo to process: the file, its path within a folder, its EXIF, and an optional override. */
 export interface BulkJobInput {
   file: File
   relativePath: string
   metadata: PhotoMetadata
+  /** When set, the photo is rendered from its own editor document, not the batch settings. */
+  override: EditorDocument | null
 }
 
 export interface BulkSettings {
@@ -101,6 +105,34 @@ export function bulkOutputSize(sourceSize: Size, settings: BulkSettings): Size {
   return framedSize(target, settings.border)
 }
 
+/** The marks to draw for one job: the override's layers, else the batch presets. */
+export function marksForJob(
+  input: BulkJobInput,
+  specs: readonly WatermarkSpec[],
+): readonly WatermarkSpec[] {
+  return input.override === null ? specs : input.override.layers.map((layer) => layer.spec)
+}
+
+/** The transform for one job: the override document's, else the shared batch transform. */
+export function transformForJob(
+  input: BulkJobInput,
+  sourceSize: Size,
+  settings: BulkSettings,
+): Transform | undefined {
+  return input.override === null
+    ? bulkTransform(sourceSize, settings)
+    : documentTransform(input.override)
+}
+
+/** The output size (for the `{width}`/`{height}` tokens) for one job. */
+export function outputSizeForJob(
+  input: BulkJobInput,
+  sourceSize: Size,
+  settings: BulkSettings,
+): Size {
+  return input.override === null ? bulkOutputSize(sourceSize, settings) : sourceSize
+}
+
 export interface BulkResult {
   blob: Blob
   /** The output file's base name plus extension (from the name pattern). */
@@ -152,9 +184,9 @@ export class BulkProcessor {
     const { file, metadata } = input
     const source = await decode(file)
     const sourceSize = { width: source.width, height: source.height }
-    const outputSize = bulkOutputSize(sourceSize, settings)
+    const outputSize = outputSizeForJob(input, sourceSize, settings)
     const inputs = await this.#resources.resolve(
-      specs.map((spec) =>
+      marksForJob(input, specs).map((spec) =>
         specForPhoto(spec, file, {
           metadata,
           index: position.index,
@@ -168,7 +200,7 @@ export class BulkProcessor {
       closeInputBitmaps({ ...inputs, source, output: settings.output })
       throw new CancelledError()
     }
-    const transform = bulkTransform(sourceSize, settings)
+    const transform = transformForJob(input, sourceSize, settings)
     const raw: RawMetadata = { exif: metadata.exif, xmp: metadata.xmp, density: metadata.density }
     const result = await this.#pool.apply({
       ...inputs,

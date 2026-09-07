@@ -34,6 +34,20 @@ function photo(name: string, size = 2048): File {
   return new File([new Uint8Array(size)], name, { type: 'image/jpeg' })
 }
 
+type TestUser = ReturnType<typeof userEvent.setup>
+
+/** Seeds the workspace, renders the bulk page, adds one.jpg and two.jpg, and ticks the one preset. */
+async function addTwoPhotoBatch(): Promise<TestUser> {
+  const user = userEvent.setup()
+  seedOwnerWorkspace(client())
+  installLibraryApi({ watermarks: [makeWatermark()] })
+  renderApp('/app/bulk')
+  await screen.findByLabelText('Add photos')
+  await user.upload(screen.getByLabelText('Add photos'), [photo('one.jpg'), photo('two.jpg')])
+  await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+  return user
+}
+
 beforeEach(() => {
   installFakeAuth()
   resetFakeBulkRuntime()
@@ -229,13 +243,7 @@ describe('bulk page', () => {
   })
 
   it('applies a file-name pattern and downloads a CSV report', async () => {
-    const user = userEvent.setup()
-    seedOwnerWorkspace(client())
-    installLibraryApi({ watermarks: [makeWatermark()] })
-    renderApp('/app/bulk')
-    await screen.findByLabelText('Add photos')
-    await user.upload(screen.getByLabelText('Add photos'), [photo('one.jpg'), photo('two.jpg')])
-    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+    const user = await addTwoPhotoBatch()
 
     fireEvent.change(screen.getByLabelText('File names'), { target: { value: '{index}-{name}' } })
     await user.click(screen.getByRole('button', { name: 'Start' }))
@@ -279,6 +287,42 @@ describe('bulk page', () => {
     await user.click(screen.getByRole('button', { name: 'Resume' }))
     releaseSlow()
     await waitFor(() => expect(screen.getByText(/3 of 3 finished/)).toBeInTheDocument())
+  })
+
+  it('adjusts one photo of a batch and re-runs just that job', async () => {
+    const user = await addTwoPhotoBatch()
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
+    const runsBefore = runs.length
+
+    await user.click(screen.getByRole('button', { name: 'Adjust one.jpg' }))
+    await user.click(await screen.findByRole('button', { name: 'Apply to this photo' }))
+
+    await waitFor(() => expect(runs.length).toBeGreaterThan(runsBefore))
+    expect(runs.at(-1)?.override).not.toBeNull()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+  })
+
+  it('pushes one photo’s edits to the whole batch and removes a single override', async () => {
+    const user = await addTwoPhotoBatch()
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
+
+    // "Apply to all photos" re-runs every job and leaves no per-photo override.
+    await user.click(screen.getByRole('button', { name: 'Adjust one.jpg' }))
+    const beforeAll = runs.length
+    await user.click(await screen.findByRole('button', { name: 'Apply to all photos' }))
+    await waitFor(() => expect(runs.length).toBeGreaterThan(beforeAll))
+    expect(screen.queryByText('Custom')).not.toBeInTheDocument()
+
+    // Override just two.jpg, then re-open it and remove that override.
+    await user.click(screen.getByRole('button', { name: 'Adjust two.jpg' }))
+    await user.click(await screen.findByRole('button', { name: 'Apply to this photo' }))
+    expect(await screen.findByText('Custom')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Adjust two.jpg' }))
+    await user.click(await screen.findByRole('button', { name: 'Remove override' }))
+    await waitFor(() => expect(screen.queryByText('Custom')).not.toBeInTheDocument())
   })
 
   it('caps the visible rows and expands on request', async () => {

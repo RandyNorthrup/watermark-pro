@@ -7,6 +7,32 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-09-07
+
+M14 (completion): the two carried-forward bulk features now ship.
+
+### Added
+
+- **Per-photo override**: an "Adjust" button on any bulk row opens that photo
+  in the full editor (embedded, without its own export step). "Apply to this
+  photo" re-runs just that job with the override; "Apply to all photos"
+  reuses the same edits across the batch; "Remove override" restores the batch
+  settings. A row with an override wears a "Custom" badge.
+- **Watch a folder**: pick an input and an output folder (File System Access
+  API, desktop only) and new photos dropped into the input are watermarked
+  with the ticked presets and written to the output while the page stays open.
+  Absent the API (e.g. mobile) the panel does not render.
+
+### Notes
+
+- The override decision (which marks, transform and output size a job uses) is
+  factored into pure helpers (`marksForJob`, `transformForJob`,
+  `outputSizeForJob`) unit-tested in jsdom; the watch scanner (`scanDirectory`,
+  `diffScans`, `writeOutput`) is tested against in-memory fake handles, and the
+  `WatchFolder` component is driven in jsdom with a stubbed directory picker.
+- New red drills cover both features: batch presets drawn despite an override,
+  an adjust that skips its re-run, and a watch that reprocesses seen files.
+
 ## [1.6.0] - 2026-09-07
 
 M14: bulk power — folders, output-name patterns, pause/resume, and a batch report.

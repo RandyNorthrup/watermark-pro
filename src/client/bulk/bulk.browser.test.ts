@@ -32,7 +32,7 @@ const FIRST: BatchPosition = { index: 1, count: 1 }
 
 /** A batch job input for one file with no folder path. */
 function jobInput(file: File): BulkJobInput {
-  return { file, relativePath: file.name, metadata: NO_METADATA }
+  return { file, relativePath: file.name, metadata: NO_METADATA, override: null }
 }
 
 const FIXTURES = 20

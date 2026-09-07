@@ -227,9 +227,9 @@ and flows it introduced to this list so nothing is missed:
   (via `exifr`) that Model is present and GPS is gone.
 - M14: the bulk **folder input** and folder drag-and-drop; the **file-name
   pattern** field with its live example; **Pause/Resume** on a running batch;
-  the **Download report** (CSV) button; the "Show all" row expansion.
-  (The per-photo override dialog and watch-folder card were carried forward —
-  see PLAN.md M14 — so they are not in this milestone's shot list yet.)
+  the **Download report** (CSV) button; the "Show all" row expansion; the
+  per-photo **override** dialog (full editor embedded, "Custom" badge) and the
+  desktop **watch-folder** card (delivered in 1.6.1 — see PLAN.md M14).
 - M15: library Import dialog; the designer logo-prepare panel; `/app/verify`.
 - M16: the import menu (camera, link, cloud); `/privacy` and `/terms`.
 - M17: `/app/video` and `/app/documents`.

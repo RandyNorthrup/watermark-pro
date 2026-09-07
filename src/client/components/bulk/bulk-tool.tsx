@@ -10,12 +10,15 @@ import {
   Loader2,
   RotateCcw,
   Share2,
+  SlidersHorizontal,
   Trash2,
   X,
 } from 'lucide-react'
 import { type DragEvent, useEffect, useId, useMemo, useRef, useState } from 'react'
 
+import { OverrideDialog } from './override-dialog'
 import { useBulkQueue } from './use-bulk-queue'
+import { WatchFolder } from './watch-folder'
 import {
   type Adjustments,
   IDENTITY_ADJUSTMENTS,
@@ -38,6 +41,7 @@ import type { JobState } from '../../bulk/queue'
 import { buildReportCsv, type ReportRow } from '../../bulk/report'
 import { zipEntries } from '../../bulk/zip'
 import { LONG_EDGE_PRESETS } from '../../editor/constants'
+import { createLayer, EMPTY_DOCUMENT, type EditorDocument } from '../../editor/state'
 import {
   DEFAULT_METADATA_POLICY,
   effectivePolicy,
@@ -178,7 +182,7 @@ const STATUS_LABELS: Record<JobState<BulkJobInput, BulkResult>['status'], string
  */
 export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const presets = useQuery(watermarksQueryOptions(organizationId))
-  const { snapshot, workers, add, start, pause, resume, cancel, retry, clear } =
+  const { snapshot, workers, add, start, setOverride, pause, resume, cancel, retry, clear } =
     useBulkQueue(organizationId)
   const inputRef = useRef<HTMLInputElement>(null)
   const folderInputRef = useRef<HTMLInputElement>(null)
@@ -187,6 +191,8 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const [namePattern, setNamePattern] = useState(DEFAULT_NAME_PATTERN)
   const [showAll, setShowAll] = useState(false)
   const [skippedNote, setSkippedNote] = useState<string | null>(null)
+  // The job whose photo is open in the override dialog, or null.
+  const [adjusting, setAdjusting] = useState<{ id: string; input: BulkJobInput } | null>(null)
   const canPickFolder = canPickDirectory()
   // `webkitdirectory` is not a typed React attribute; set it on the element.
   useEffect(() => {
@@ -284,6 +290,47 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
       namePattern,
       presetName,
     }
+  }
+
+  /** The editor document the override dialog starts from: the batch settings as layers. */
+  function batchDocument(): EditorDocument {
+    const layers = presetIds.flatMap((id) => {
+      const preset = presets.data?.find((candidate) => candidate.id === id)
+      return preset === undefined ? [] : [createLayer(id, preset.spec)]
+    })
+    return {
+      ...EMPTY_DOCUMENT,
+      layers,
+      orientation: { ...orientation, straighten: 0 },
+      adjust,
+      border,
+    }
+  }
+
+  function applyOverride(document: EditorDocument): void {
+    if (adjusting !== null) {
+      void setOverride(adjusting.id, document)
+    }
+    setAdjusting(null)
+  }
+
+  /** Copies the dialog's layers and adjustments into the batch and clears every override. */
+  function applyOverrideToAll(document: EditorDocument): void {
+    setPresetIds(document.layers.map((layer) => layer.presetId))
+    setAdjust(document.adjust)
+    setBorder(document.border)
+    setOrientation(document.orientation)
+    for (const job of snapshot.jobs) {
+      void setOverride(job.id, null)
+    }
+    setAdjusting(null)
+  }
+
+  function removeOverride(): void {
+    if (adjusting !== null) {
+      void setOverride(adjusting.id, null)
+    }
+    setAdjusting(null)
   }
 
   function addScan(scan: { files: BulkFile[]; skipped: number }) {
@@ -497,6 +544,8 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
               </p>
             )}
 
+            <WatchFolder organizationId={organizationId} specs={specs} settings={settings()} />
+
             {files.length === 0 ? null : (
               <section aria-labelledby="bulk-files-heading" className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
@@ -561,12 +610,30 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                           {relativePath}
                         </span>
                         <span className="text-xs text-ink-muted">{formatBytes(file.size)}</span>
+                        {job !== null && job.input.override !== null ? (
+                          <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-800 dark:bg-brand-900/50 dark:text-brand-100">
+                            Custom
+                          </span>
+                        ) : null}
                         {job === null ? (
                           <span className="sr-only">Selected</span>
                         ) : (
                           <span className="w-20 text-right text-xs text-ink-muted">
                             {STATUS_LABELS[job.status]}
                           </span>
+                        )}
+                        {job === null ? null : (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Adjust ${relativePath}`}
+                            onClick={() => {
+                              setAdjusting({ id: job.id, input: job.input })
+                            }}
+                          >
+                            <SlidersHorizontal aria-hidden="true" className="size-4" />
+                          </Button>
                         )}
                         {job?.error === undefined || job.error === null ? null : (
                           <span className="text-xs text-rose-600" role="alert">
@@ -843,6 +910,21 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
               is uploaded.
             </p>
           </Card>
+          {adjusting === null ? null : (
+            <OverrideDialog
+              organizationId={organizationId}
+              file={adjusting.input.file}
+              fileName={adjusting.input.relativePath}
+              document={adjusting.input.override ?? batchDocument()}
+              hasOverride={adjusting.input.override !== null}
+              onApply={applyOverride}
+              onApplyToAll={applyOverrideToAll}
+              onRemove={removeOverride}
+              onClose={() => {
+                setAdjusting(null)
+              }}
+            />
+          )}
         </div>
       )}
     </PresetGate>

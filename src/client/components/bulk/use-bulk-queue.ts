@@ -9,6 +9,7 @@ import type { BulkFile } from '../../bulk/folders'
 import type { BulkJobInput, BulkResult, BulkSettings } from '../../bulk/processor'
 import { JobQueue, type QueueSnapshot } from '../../bulk/queue'
 import { type BulkRuntime, createBulkRuntime } from '../../bulk/runtime'
+import type { EditorDocument } from '../../editor/state'
 import { apiRequest } from '../../lib/api'
 import { assetFileUrl } from '../../lib/library'
 import { readPhotoMetadata } from '../../lib/photo-metadata'
@@ -50,8 +51,9 @@ export function useBulkQueue(organizationId: string) {
   const queueRef = useRef<JobQueue<BulkJobInput, BulkResult> | null>(null)
   const specsRef = useRef<readonly WatermarkSpec[] | null>(null)
   const settingsRef = useRef<BulkSettings | null>(null)
-  // Submission order, for the `{index}` / `{count}` tokens.
+  // Submission order (for the `{index}` / `{count}` tokens) and id → input.
   const inputsRef = useRef<BulkJobInput[]>([])
+  const byIdRef = useRef(new Map<string, BulkJobInput>())
   const [snapshot, setSnapshot] = useState<BulkSnapshot>(EMPTY)
   const [workers, setWorkers] = useState(1)
 
@@ -92,15 +94,32 @@ export function useBulkQueue(organizationId: string) {
       file: entry.file,
       relativePath: entry.relativePath,
       metadata: metadata[index] ?? EMPTY_METADATA,
+      override: null,
     }))
     inputsRef.current = [...inputsRef.current, ...inputs]
-    queueRef.current?.add(inputs)
+    const ids = queueRef.current?.add(inputs) ?? []
+    for (const [index, id] of ids.entries()) {
+      const input = inputs[index]
+      if (input !== undefined) {
+        byIdRef.current.set(id, input)
+      }
+    }
   }, [])
 
   const start = useCallback((specs: readonly WatermarkSpec[], settings: BulkSettings) => {
     specsRef.current = specs
     settingsRef.current = settings
     return queueRef.current?.start() ?? Promise.resolve(EMPTY)
+  }, [])
+
+  /** Sets or clears one photo's override document and re-runs just that job. */
+  const setOverride = useCallback((id: string, override: EditorDocument | null) => {
+    const input = byIdRef.current.get(id)
+    if (input === undefined) {
+      return Promise.resolve(EMPTY)
+    }
+    input.override = override
+    return queueRef.current?.rerun(id) ?? Promise.resolve(EMPTY)
   }, [])
 
   const pause = useCallback(() => {
@@ -119,8 +138,9 @@ export function useBulkQueue(organizationId: string) {
 
   const clear = useCallback(() => {
     inputsRef.current = []
+    byIdRef.current.clear()
     queueRef.current?.clear()
   }, [])
 
-  return { snapshot, workers, add, start, pause, resume, cancel, retry, clear }
+  return { snapshot, workers, add, start, setOverride, pause, resume, cancel, retry, clear }
 }

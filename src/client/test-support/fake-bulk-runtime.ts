@@ -1,6 +1,11 @@
 import type { WatermarkSpec } from '../../shared/watermark'
 import { resolveNamePattern } from '../bulk/names'
-import { extensionFor, type BulkResult, type BulkSettings } from '../bulk/processor'
+import {
+  extensionFor,
+  type BulkJobInput,
+  type BulkResult,
+  type BulkSettings,
+} from '../bulk/processor'
 import { CancelledError } from '../bulk/queue'
 import type { BulkRuntime } from '../bulk/runtime'
 import { baseName } from '../lib/spec-tokens'
@@ -10,6 +15,7 @@ interface RunRecord {
   relativePath: string
   specs: readonly WatermarkSpec[]
   settings: BulkSettings
+  override: BulkJobInput['override']
   index: number
   count: number
 }
@@ -48,6 +54,7 @@ export function createBulkRuntime(): BulkRuntime {
         relativePath: input.relativePath,
         specs,
         settings,
+        override: input.override,
         index: position.index,
         count: position.count,
       })

@@ -301,6 +301,16 @@ large batch stays responsive. When it settles, download everything as one ZIP
 download a **CSV report** of every job. Nothing is uploaded unless you save the
 results to the gallery.
 
+One photo can be **adjusted on its own**: "Adjust" opens it in the full editor
+(embedded, no export step); "Apply to this photo" re-runs just that job with
+the edits, "Apply to all photos" reuses them across the batch, and "Remove
+override" restores the batch settings. An adjusted row is marked **Custom**.
+
+**Watch a folder** (desktop browsers with the File System Access API): pick an
+input and an output folder and any new photo dropped into the input is
+watermarked with the ticked presets and written to the output while the page
+stays open — a hands-free hot folder no competitor offers.
+
 ## Exports and metadata
 
 Every export, from the editor or the bulk tool, is re-encoded from pixels by

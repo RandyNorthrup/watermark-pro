@@ -336,8 +336,8 @@ export const DRILLS = [
   {
     name: 'Bulk: adjustments not passed to the runtime',
     file: 'src/client/components/bulk/bulk-tool.tsx',
-    find: '      adjust,\n      border,',
-    replace: '      adjust: IDENTITY_ADJUSTMENTS,\n      border,',
+    find: '      adjust,\n      border,\n      namePattern,',
+    replace: '      adjust: IDENTITY_ADJUSTMENTS,\n      border,\n      namePattern,',
     ...unitClient('src/client/routes/app/bulk-page.test.tsx'),
   },
   {
@@ -485,6 +485,28 @@ export const DRILLS = [
     find: String.raw`const NEEDS_QUOTING = /[",\r\n]/`,
     replace: 'const NEEDS_QUOTING = /(?!)/',
     ...unitClient('src/client/bulk/report.test.ts'),
+  },
+  // --- M14 (carried forward): per-photo override, watch folder -------------
+  {
+    name: 'Override: batch presets drawn despite an override',
+    file: 'src/client/bulk/processor.ts',
+    find: 'return input.override === null ? specs : input.override.layers.map((layer) => layer.spec)',
+    replace: 'return specs',
+    ...unitClient('src/client/bulk/processor.test.ts'),
+  },
+  {
+    name: 'Override: adjusting a photo silently skips the re-run',
+    file: 'src/client/components/bulk/use-bulk-queue.ts',
+    find: 'return queueRef.current?.rerun(id) ?? Promise.resolve(EMPTY)',
+    replace: 'return Promise.resolve(EMPTY)',
+    ...unitClient('src/client/routes/app/bulk-page.test.tsx'),
+  },
+  {
+    name: 'Watch: already-processed files are processed again',
+    file: 'src/client/bulk/watch.ts',
+    find: 'return current.filter((entry) => !seen.has(keyOf(entry)))',
+    replace: 'return current',
+    ...unitClient('src/client/bulk/watch.test.ts'),
   },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
