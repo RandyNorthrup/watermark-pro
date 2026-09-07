@@ -129,6 +129,47 @@ describe('JobQueue', () => {
     expect(result.jobs[0]?.output).toBeNull()
   })
 
+  it('pauses without dequeuing new jobs and resumes the rest', async () => {
+    const runner = controlledRunner()
+    const queue = new JobQueue<string, string>({ concurrency: 1, run: runner.run })
+    queue.add(['a', 'b', 'c'])
+    const first = queue.start()
+    await settle()
+    expect(runner.running).toEqual(['a'])
+    queue.pause()
+    expect(queue.snapshot.isPaused).toBe(true)
+    runner.finish('a')
+    const paused = await first
+    // The running job finished but no new one was dequeued while paused.
+    expect(statuses(paused)).toEqual(['done', 'queued', 'queued'])
+
+    const resumed = queue.resume()
+    expect(queue.snapshot.isPaused).toBe(false)
+    await settle()
+    expect(runner.running).toEqual(['b'])
+    runner.finish('b')
+    await settle()
+    runner.finish('c')
+    const done = await resumed
+    expect(statuses(done)).toEqual(['done', 'done', 'done'])
+  })
+
+  it('reruns one job in place, leaving the other results untouched', async () => {
+    const queue = new JobQueue<string, string>({
+      concurrency: 2,
+      run: (input) => Promise.resolve(`${input}:v1`),
+    })
+    queue.add(['a', 'b'])
+    const done = await queue.start()
+    expect(done.jobs.map((job) => job.output)).toEqual(['a:v1', 'b:v1'])
+
+    const bId = done.jobs[1]?.id ?? ''
+    const after = await queue.rerun(bId)
+    // Only job b re-ran; a keeps its result.
+    expect(after.jobs[0]?.output).toBe('a:v1')
+    expect(after.jobs[1]?.status).toBe('done')
+  })
+
   it('reports non-Error failures and clears everything', async () => {
     const queue = new JobQueue<string, string>({
       concurrency: 3,

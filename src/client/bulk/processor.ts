@@ -5,6 +5,7 @@
  * honoured between the two steps; a render already in a worker completes
  * and its result is discarded by the queue.
  */
+import { resolveNamePattern } from './names'
 import { CancelledError, isAborted } from './queue'
 import type { WorkerPool } from './worker-pool'
 import {
@@ -24,12 +25,19 @@ import { orientedSize } from '../engine/orient'
 import type { Border, Transform } from '../engine/pipeline'
 import { seedFor } from '../engine/random'
 import type { MarkResources } from '../lib/mark-resources'
-import { specForPhoto } from '../lib/spec-tokens'
+import { baseName, specForPhoto } from '../lib/spec-tokens'
 
 /** Position of a photo within a batch, for the `{index}` and `{count}` tokens. */
 export interface BatchPosition {
   index: number
   count: number
+}
+
+/** One photo to process: the file, its path within a folder, and its EXIF. */
+export interface BulkJobInput {
+  file: File
+  relativePath: string
+  metadata: PhotoMetadata
 }
 
 export interface BulkSettings {
@@ -42,10 +50,14 @@ export interface BulkSettings {
   adjust: Adjustments
   /** An optional matte frame around every photo. */
   border: Border | null
+  /** Output file-name pattern (see `names.ts`). */
+  namePattern: string
+  /** Name of the first ticked preset, for the `{preset}` name token. */
+  presetName: string
 }
 
 /** Builds the transform every photo in a batch shares (orientation, resize, adjustments). */
-function bulkTransform(
+export function bulkTransform(
   sourceSize: { width: number; height: number },
   settings: BulkSettings,
 ): Transform | undefined {
@@ -81,7 +93,7 @@ function framedSize(photo: Size, border: Border | null): Size {
 }
 
 /** The final output size a batch produces for one source, for `{width}`/`{height}`. */
-function bulkOutputSize(sourceSize: Size, settings: BulkSettings): Size {
+export function bulkOutputSize(sourceSize: Size, settings: BulkSettings): Size {
   const orientation: Orientation = { ...settings.orientation, straighten: 0 }
   const oriented = orientedSize(sourceSize, orientation)
   const target =
@@ -91,7 +103,10 @@ function bulkOutputSize(sourceSize: Size, settings: BulkSettings): Size {
 
 export interface BulkResult {
   blob: Blob
+  /** The output file's base name plus extension (from the name pattern). */
   fileName: string
+  /** The source's path within its folder, so the ZIP can preserve the tree. */
+  relativePath: string
   width: number
   height: number
 }
@@ -102,10 +117,9 @@ const EXTENSIONS: Record<EncodeOptions['format'], string> = {
   'image/webp': 'webp',
 }
 
-export function outputFileName(sourceName: string, format: EncodeOptions['format']): string {
-  const dot = sourceName.lastIndexOf('.')
-  const base = dot > 0 ? sourceName.slice(0, dot) : sourceName
-  return `${base}-watermarked.${EXTENSIONS[format]}`
+/** The output file's extension for a format. */
+export function extensionFor(format: EncodeOptions['format']): string {
+  return EXTENSIONS[format]
 }
 
 async function decode(file: File): Promise<ImageBitmap> {
@@ -126,8 +140,7 @@ export class BulkProcessor {
   }
 
   async process(
-    file: File,
-    metadata: PhotoMetadata,
+    input: BulkJobInput,
     specs: readonly WatermarkSpec[],
     settings: BulkSettings,
     position: BatchPosition,
@@ -136,6 +149,7 @@ export class BulkProcessor {
     if (isAborted(signal)) {
       throw new CancelledError()
     }
+    const { file, metadata } = input
     const source = await decode(file)
     const sourceSize = { width: source.width, height: source.height }
     const outputSize = bulkOutputSize(sourceSize, settings)
@@ -163,9 +177,19 @@ export class BulkProcessor {
       metadata: raw,
       ...(transform !== undefined && { transform }),
     })
+    const name = resolveNamePattern(settings.namePattern, {
+      name: baseName(file.name),
+      index: position.index,
+      count: position.count,
+      date: metadata.takenAt ?? new Date(file.lastModified),
+      preset: settings.presetName,
+      width: result.width,
+      height: result.height,
+    })
     return {
       blob: result.blob,
-      fileName: outputFileName(file.name, settings.output.format),
+      fileName: `${name}.${extensionFor(settings.output.format)}`,
+      relativePath: input.relativePath,
       width: result.width,
       height: result.height,
     }

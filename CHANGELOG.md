@@ -7,6 +7,44 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-09-07
+
+M14: bulk power — folders, output-name patterns, pause/resume, and a batch report.
+
+### Added
+
+- The bulk tool accepts **folders**: an "Add a folder" button (where the
+  browser supports it) and folder drag-and-drop, with the tree preserved in
+  the ZIP (each output keeps its source sub-folder). Non-image files are
+  skipped and counted.
+- An output **file-name pattern** with a live example and the tokens `{name}`,
+  `{index}` (zero-padded to the batch's digit count), `{count}`, `{date}`,
+  `{preset}`, `{width}` and `{height}`. Unsafe characters become hyphens and
+  an empty result is refused. Duplicate names still get ` (2)` in the ZIP.
+- **Pause and resume** a running batch: pausing lets the jobs already running
+  finish and stops starting new ones.
+- A **batch report** (CSV, "Download report") with one row per job — source,
+  path, output, status, size, duration, error and presets — with proper CSV
+  escaping.
+- The photo list is capped at 60 rows with a "Show all" control, so a
+  500-photo batch stays responsive.
+
+### Changed
+
+- The bulk job input is now typed (`file`, `relativePath`, `metadata`) and
+  each photo's EXIF is read in a small concurrent pool when files are added.
+
+### Notes
+
+- **Carried forward** (recorded in PLAN.md M14): the per-photo **override**
+  (opening one photo of a batch in the embedded editor) and the Chromium
+  **watch-folder** mode. The queue's `rerun` and per-job re-processing are
+  built and tested, ready for the override UI; the folder scanner, name
+  patterns, pause and report ship now. The watch folder is a bonus no
+  competitor offers, so it is not a parity gap.
+- Per-milestone certification runs `npm run quality`, semgrep and the red
+  drill; e2e, Lighthouse and screenshots are deferred to M19.
+
 ## [1.5.0] - 2026-09-07
 
 M13: photo metadata — EXIF tokens, a keep/strip export policy, and preserved DPI.

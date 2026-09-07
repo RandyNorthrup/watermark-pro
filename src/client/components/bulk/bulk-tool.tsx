@@ -13,7 +13,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { type DragEvent, useId, useMemo, useRef, useState } from 'react'
+import { type DragEvent, useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import { useBulkQueue } from './use-bulk-queue'
 import {
@@ -23,8 +23,19 @@ import {
   type Orientation,
 } from '../../../shared/adjustments'
 import type { WatermarkSpec } from '../../../shared/watermark'
-import type { BulkSettings, BulkResult } from '../../bulk/processor'
+import {
+  type BulkFile,
+  canPickDirectory,
+  collectImages,
+  MAX_BULK_FILES,
+  readEntries,
+  zipPath,
+} from '../../bulk/folders'
+import { DEFAULT_NAME_PATTERN, resolveNamePattern } from '../../bulk/names'
+import type { BulkJobInput, BulkSettings, BulkResult } from '../../bulk/processor'
+import { extensionFor } from '../../bulk/processor'
 import type { JobState } from '../../bulk/queue'
+import { buildReportCsv, type ReportRow } from '../../bulk/report'
 import { zipEntries } from '../../bulk/zip'
 import { LONG_EDGE_PRESETS } from '../../editor/constants'
 import {
@@ -42,6 +53,7 @@ import { formatBytes } from '../../lib/format-bytes'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { watermarksQueryOptions } from '../../lib/library'
 import { canShareFiles, shareFile } from '../../lib/share-file'
+import { baseName } from '../../lib/spec-tokens'
 import { AdjustPanel } from '../editor/adjust-panel'
 import { FORMAT_OPTIONS } from '../editor/formats'
 import { FrameControls } from '../editor/frame-controls'
@@ -51,6 +63,7 @@ import { PresetGate } from '../presets/preset-gate'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
+import { Input } from '../ui/input'
 import { Select, type SelectOption } from '../ui/select'
 import { SliderField } from '../ui/slider-field'
 
@@ -72,8 +85,11 @@ const MIN_QUALITY = 0.3
 const QUALITY_STEP = 0.01
 const PERCENT = 100
 const MILLISECONDS = 1000
-/** Enough for a full shoot while keeping the page responsive. */
-export const MAX_BULK_FILES = 500
+/** Rows rendered before the list is collapsed behind "Show all" (keeps 500-photo batches fast). */
+const VISIBLE_ROW_LIMIT = 60
+/** Placeholder output size for the file-name preview. */
+const PREVIEW_WIDTH = 1200
+const PREVIEW_HEIGHT = 900
 
 type SizeChoice = 'original' | `${(typeof LONG_EDGE_PRESETS)[number]}`
 
@@ -107,20 +123,25 @@ function elapsedOf(timing: Timing | null): number | null {
   return (finishedAt - timing.startedAt) / MILLISECONDS
 }
 
-function dedupe(existing: readonly File[], incoming: readonly File[]): File[] {
-  const seen = new Set(existing.map((file) => `${file.name}:${String(file.size)}`))
+function keyOf(entry: BulkFile): string {
+  return `${entry.relativePath}:${String(entry.file.size)}`
+}
+
+function dedupe(existing: readonly BulkFile[], incoming: readonly BulkFile[]): BulkFile[] {
+  const seen = new Set(existing.map((entry) => keyOf(entry)))
   const merged = [...existing]
-  for (const file of incoming) {
-    const key = `${file.name}:${String(file.size)}`
-    if (!seen.has(key)) {
-      seen.add(key)
-      merged.push(file)
+  for (const entry of incoming) {
+    if (seen.has(keyOf(entry))) {
+      continue
     }
+
+    seen.add(keyOf(entry))
+    merged.push(entry)
   }
   return merged.slice(0, MAX_BULK_FILES)
 }
 
-function StatusIcon({ job }: { job: JobState<File, BulkResult> }) {
+function StatusIcon({ job }: { job: JobState<BulkJobInput, BulkResult> }) {
   switch (job.status) {
     case 'done': {
       return <CheckCircle2 aria-hidden="true" className="size-4 text-emerald-600" />
@@ -142,7 +163,7 @@ function StatusIcon({ job }: { job: JobState<File, BulkResult> }) {
   }
 }
 
-const STATUS_LABELS: Record<JobState<File, BulkResult>['status'], string> = {
+const STATUS_LABELS: Record<JobState<BulkJobInput, BulkResult>['status'], string> = {
   queued: 'Queued',
   running: 'Processing',
   done: 'Done',
@@ -157,10 +178,20 @@ const STATUS_LABELS: Record<JobState<File, BulkResult>['status'], string> = {
  */
 export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const presets = useQuery(watermarksQueryOptions(organizationId))
-  const { snapshot, workers, add, start, cancel, retry, clear } = useBulkQueue(organizationId)
+  const { snapshot, workers, add, start, pause, resume, cancel, retry, clear } =
+    useBulkQueue(organizationId)
   const inputRef = useRef<HTMLInputElement>(null)
+  const folderInputRef = useRef<HTMLInputElement>(null)
   const presetsHintId = useId()
-  const [files, setFiles] = useState<File[]>([])
+  const [files, setFiles] = useState<BulkFile[]>([])
+  const [namePattern, setNamePattern] = useState(DEFAULT_NAME_PATTERN)
+  const [showAll, setShowAll] = useState(false)
+  const [skippedNote, setSkippedNote] = useState<string | null>(null)
+  const canPickFolder = canPickDirectory()
+  // `webkitdirectory` is not a typed React attribute; set it on the element.
+  useEffect(() => {
+    folderInputRef.current?.setAttribute('webkitdirectory', '')
+  }, [])
   /** Chosen presets in the order they were ticked, which is the order they are drawn. */
   const [presetIds, setPresetIds] = useState<string[]>([])
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
@@ -195,6 +226,22 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
   const results = snapshot.jobs.filter((job) => job.output !== null)
   const elapsedSeconds = elapsedOf(timing)
 
+  // One uniform row shape before and after the batch starts; the list is
+  // capped at `VISIBLE_ROW_LIMIT` until the user asks to see all, so a
+  // 500-photo batch never renders 500 rows at once.
+  const rows: {
+    file: File
+    relativePath: string
+    job: JobState<BulkJobInput, BulkResult> | null
+  }[] = hasStarted
+    ? snapshot.jobs.map((job) => ({
+        file: job.input.file,
+        relativePath: job.input.relativePath,
+        job,
+      }))
+    : files.map((entry) => ({ file: entry.file, relativePath: entry.relativePath, job: null }))
+  const visibleRows = showAll ? rows : rows.slice(0, VISIBLE_ROW_LIMIT)
+
   const isShareable = canShareFiles(format)
 
   /** One photo to the platform share sheet; a refusal shows where ZIP errors do. */
@@ -206,6 +253,26 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
     }
   }
 
+  const presetName = presets.data?.find((candidate) => candidate.id === presetId)?.name ?? ''
+  const namePatternId = useId()
+  const namePreview = ((): string => {
+    try {
+      const first = files[0]
+      const example = resolveNamePattern(namePattern, {
+        name: first === undefined ? 'photo' : baseName(first.file.name),
+        index: 1,
+        count: Math.max(files.length, 1),
+        date: new Date(),
+        preset: presetName === '' ? 'preset' : presetName,
+        width: PREVIEW_WIDTH,
+        height: PREVIEW_HEIGHT,
+      })
+      return `Example: ${example}.${extensionFor(format)}`
+    } catch {
+      return 'The pattern must produce a name.'
+    }
+  })()
+
   function settings(): BulkSettings {
     const output: EncodeOptions = { format, quality, metadata: effectivePolicy(policy, format) }
     return {
@@ -214,16 +281,41 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
       orientation: { turns: orientation.turns, flipX: orientation.flipX, flipY: orientation.flipY },
       adjust,
       border,
+      namePattern,
+      presetName,
     }
   }
 
-  function addFiles(list: FileList | File[]) {
-    setFiles((previous) => dedupe(previous, [...list]))
+  function addScan(scan: { files: BulkFile[]; skipped: number }) {
+    setFiles((previous) => dedupe(previous, scan.files))
+    setSkippedNote(
+      scan.skipped === 0
+        ? null
+        : `${String(scan.skipped)} file${scan.skipped === 1 ? '' : 's'} skipped: not images`,
+    )
   }
 
-  function onDrop(event: DragEvent<HTMLDivElement>) {
+  function addFiles(list: FileList | File[]) {
+    addScan(collectImages([...list]))
+  }
+
+  async function onDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault()
-    addFiles(event.dataTransfer.files)
+    // `items` and `webkitGetAsEntry` power folder drops; both are absent in
+    // jsdom and on some browsers, so fall back to the plain file list.
+    const list = event.dataTransfer.items as DataTransferItemList | undefined
+    const entries: FileSystemEntry[] = []
+    for (let index = 0; list !== undefined && index < list.length; index += 1) {
+      const entry = list[index]?.webkitGetAsEntry()
+      if (entry !== null && entry !== undefined) {
+        entries.push(entry)
+      }
+    }
+    if (entries.some((entry) => entry.isDirectory)) {
+      addScan(await readEntries(entries))
+    } else {
+      addFiles(event.dataTransfer.files)
+    }
   }
 
   function togglePreset(id: string, isChecked: boolean) {
@@ -239,7 +331,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
       return
     }
     clear()
-    add(files)
+    await add(files)
     const startedAt = performance.now()
     setTiming({ startedAt, finishedAt: null })
     setZipError(null)
@@ -285,7 +377,14 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
     setZipError(null)
     try {
       const entries = results.flatMap((job) =>
-        job.output === null ? [] : [{ name: job.output.fileName, blob: job.output.blob }],
+        job.output === null
+          ? []
+          : [
+              {
+                name: zipPath(job.output.relativePath, job.output.fileName),
+                blob: job.output.blob,
+              },
+            ],
       )
       const blob = await zipEntries(entries)
       downloadBlob(blob, `watermarked-${String(entries.length)}-photos.zip`)
@@ -294,6 +393,26 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
     } finally {
       setIsZipping(false)
     }
+  }
+
+  /** A CSV report of every job in the batch. */
+  function downloadReport() {
+    const presetNames = presetIds
+      .map((id) => presets.data?.find((candidate) => candidate.id === id)?.name ?? id)
+      .join('; ')
+    const reportRows: ReportRow[] = snapshot.jobs.map((job) => ({
+      source: job.input.file.name,
+      relativePath: job.input.relativePath,
+      output: job.output?.fileName ?? '',
+      status: job.status,
+      width: job.output?.width ?? null,
+      height: job.output?.height ?? null,
+      durationMs: job.durationMs,
+      error: job.error,
+      presets: presetNames,
+      override: false,
+    }))
+    downloadBlob(new Blob([buildReportCsv(reportRows)], { type: 'text/csv' }), 'report.csv')
   }
 
   return (
@@ -305,7 +424,9 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
               onDragOver={(event) => {
                 event.preventDefault()
               }}
-              onDrop={onDrop}
+              onDrop={(event) => {
+                void onDrop(event)
+              }}
               className="flex flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed border-line px-4 py-8 text-center"
             >
               <input
@@ -322,9 +443,23 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                   event.currentTarget.value = ''
                 }}
               />
+              <input
+                ref={folderInputRef}
+                type="file"
+                accept={ACCEPTED_PHOTO_TYPES}
+                multiple
+                aria-label="Add a folder"
+                className="sr-only"
+                onChange={(event) => {
+                  if (event.currentTarget.files !== null) {
+                    addFiles(event.currentTarget.files)
+                  }
+                  event.currentTarget.value = ''
+                }}
+              />
               <ImagePlus aria-hidden="true" className="size-8 text-ink-muted" />
-              <p className="text-sm text-ink-muted">
-                Drop photos here, or{' '}
+              <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
+                Drop photos or a folder here, or
                 <Button
                   type="button"
                   variant="secondary"
@@ -336,12 +471,31 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                 >
                   Add photos
                 </Button>
+                {canPickFolder ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    disabled={snapshot.isRunning}
+                    onClick={() => {
+                      folderInputRef.current?.click()
+                    }}
+                  >
+                    Add a folder
+                  </Button>
+                ) : null}
               </p>
               <p className="text-xs text-ink-muted">
                 Up to {String(MAX_BULK_FILES)} photos per batch. Processing happens in your browser
                 using {String(workers)} worker{workers === 1 ? '' : 's'}.
               </p>
             </div>
+
+            {skippedNote === null ? null : (
+              <p className="text-xs text-amber-600" role="status">
+                {skippedNote}
+              </p>
+            )}
 
             {files.length === 0 ? null : (
               <section aria-labelledby="bulk-files-heading" className="flex flex-col gap-2">
@@ -388,12 +542,11 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                   aria-label="Photos in this batch"
                   className="divide-y divide-line rounded-lg border border-line"
                 >
-                  {(hasStarted ? snapshot.jobs : files.map((file) => ({ file }))).map((row) => {
-                    const job = 'status' in row ? row : null
-                    const file = 'status' in row ? row.input : row.file
+                  {visibleRows.map((row) => {
+                    const { job, file, relativePath } = row
                     return (
                       <li
-                        key={`${file.name}:${String(file.size)}`}
+                        key={`${relativePath}:${String(file.size)}`}
                         className="flex items-center gap-3 px-3 py-2 text-sm"
                       >
                         {job === null ? (
@@ -404,7 +557,9 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                         ) : (
                           <StatusIcon job={job} />
                         )}
-                        <span className="min-w-0 flex-1 truncate">{file.name}</span>
+                        <span className="min-w-0 flex-1 truncate" title={relativePath}>
+                          {relativePath}
+                        </span>
                         <span className="text-xs text-ink-muted">{formatBytes(file.size)}</span>
                         {job === null ? (
                           <span className="sr-only">Selected</span>
@@ -455,10 +610,10 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            aria-label={`Remove ${file.name}`}
+                            aria-label={`Remove ${relativePath}`}
                             onClick={() => {
                               setFiles((previous) =>
-                                previous.filter((candidate) => candidate !== file),
+                                previous.filter((candidate) => candidate.file !== file),
                               )
                             }}
                           >
@@ -469,6 +624,19 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                     )
                   })}
                 </ul>
+                {rows.length > visibleRows.length ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="self-start"
+                    onClick={() => {
+                      setShowAll(true)
+                    }}
+                  >
+                    Show all {String(rows.length)} photos
+                  </Button>
+                ) : null}
               </section>
             )}
           </Card>
@@ -546,6 +714,22 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                 }}
               />
             </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={namePatternId} className="text-sm font-medium">
+                File names
+              </label>
+              <Input
+                id={namePatternId}
+                value={namePattern}
+                disabled={snapshot.isRunning}
+                onChange={(event) => {
+                  setNamePattern(event.currentTarget.value)
+                }}
+              />
+              <p className="text-xs text-ink-muted">
+                Tokens: {'{name} {index} {count} {date} {preset} {width} {height}'}. {namePreview}
+              </p>
+            </div>
 
             <details className="rounded-lg border border-line" data-testid="bulk-adjustments">
               <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
@@ -553,16 +737,37 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
               </summary>
               <div className="flex flex-col gap-4 border-t border-line p-3">
                 <OrientationControls orientation={orientation} onChange={setOrientation} />
-                <AdjustPanel adjust={adjust} onChange={setAdjust} photoFile={files[0] ?? null} />
+                <AdjustPanel
+                  adjust={adjust}
+                  onChange={setAdjust}
+                  photoFile={files[0]?.file ?? null}
+                />
                 <FrameControls border={border} onChange={setBorder} />
               </div>
             </details>
 
             <div className="flex flex-wrap gap-2">
-              {snapshot.isRunning ? (
-                <Button type="button" variant="danger" onClick={cancel}>
-                  Cancel
-                </Button>
+              {snapshot.isRunning || snapshot.isPaused ? (
+                <>
+                  {snapshot.isPaused ? (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        void resume()
+                      }}
+                    >
+                      Resume
+                    </Button>
+                  ) : (
+                    <Button type="button" variant="secondary" onClick={pause}>
+                      Pause
+                    </Button>
+                  )}
+                  <Button type="button" variant="danger" onClick={cancel}>
+                    Cancel
+                  </Button>
+                </>
               ) : (
                 <Button
                   type="button"
@@ -599,6 +804,9 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                 >
                   {isZipping ? null : <FolderArchive aria-hidden="true" className="size-4" />}
                   Download {String(results.length)} as ZIP
+                </Button>
+                <Button type="button" variant="ghost" size="sm" onClick={downloadReport}>
+                  Download report (CSV)
                 </Button>
                 {canSave ? (
                   <Button

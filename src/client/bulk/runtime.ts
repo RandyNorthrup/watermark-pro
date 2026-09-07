@@ -3,9 +3,14 @@
  * tests can swap in a fake: the worker pool, resource resolution, and the
  * per-file processor.
  */
-import { type BatchPosition, BulkProcessor, type BulkResult, type BulkSettings } from './processor'
+import {
+  type BatchPosition,
+  type BulkJobInput,
+  BulkProcessor,
+  type BulkResult,
+  type BulkSettings,
+} from './processor'
 import { defaultPoolSize, WorkerPool } from './worker-pool'
-import type { PhotoMetadata } from '../../shared/metadata'
 import type { WatermarkSpec } from '../../shared/watermark'
 import { hasOffscreenCanvas } from '../lib/canvas-backend'
 import { type LogoLoader, MarkResources } from '../lib/mark-resources'
@@ -14,8 +19,7 @@ export interface BulkRuntime {
   /** Number of engine workers; the queue runs this many jobs at once. */
   workers: number
   run(
-    file: File,
-    metadata: PhotoMetadata,
+    input: BulkJobInput,
     specs: readonly WatermarkSpec[],
     settings: BulkSettings,
     position: BatchPosition,
@@ -35,8 +39,8 @@ export function createBulkRuntime(loadLogo: LogoLoader, workers = runtimePoolSiz
   const processor = new BulkProcessor(pool, resources)
   return {
     workers,
-    run: (file, metadata, specs, settings, position, signal) =>
-      processor.process(file, metadata, specs, settings, position, signal),
+    run: (input, specs, settings, position, signal) =>
+      processor.process(input, specs, settings, position, signal),
     dispose: () => {
       pool.terminate()
       resources.clear()

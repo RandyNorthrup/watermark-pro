@@ -225,8 +225,11 @@ and flows it introduced to this list so nothing is missed:
   designer **Insert detail** token menu. e2e: upload the EXIF fixture, stamp
   `{camera} {iso}`, export JPEG "keep except location", and confirm in Node
   (via `exifr`) that Model is present and GPS is gone.
-- M14: the bulk per-photo override dialog (phone and desktop); the
-  watch-folder card; the batch report.
+- M14: the bulk **folder input** and folder drag-and-drop; the **file-name
+  pattern** field with its live example; **Pause/Resume** on a running batch;
+  the **Download report** (CSV) button; the "Show all" row expansion.
+  (The per-photo override dialog and watch-folder card were carried forward —
+  see PLAN.md M14 — so they are not in this milestone's shot list yet.)
 - M15: library Import dialog; the designer logo-prepare panel; `/app/verify`.
 - M16: the import menu (camera, link, cloud); `/privacy` and `/terms`.
 - M17: `/app/video` and `/app/documents`.

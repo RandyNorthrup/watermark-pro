@@ -19,6 +19,8 @@ export interface JobState<Input, Output> {
 export interface QueueSnapshot<Input, Output> {
   jobs: readonly JobState<Input, Output>[]
   isRunning: boolean
+  /** True while paused: running jobs finish but no new ones are dequeued. */
+  isPaused: boolean
   /** True once every job has left the queued and running states. */
   isSettled: boolean
 }
@@ -59,6 +61,7 @@ export class JobQueue<Input, Output> {
   #controller = new AbortController()
   #active = 0
   #nextId = 1
+  #isPaused = false
 
   constructor(options: QueueOptions<Input, Output>) {
     if (!Number.isSafeInteger(options.concurrency) || options.concurrency < 1) {
@@ -75,8 +78,11 @@ export class JobQueue<Input, Output> {
 
   async #drain(): Promise<void> {
     for (;;) {
+      if (this.#isPaused || isAborted(this.#controller.signal)) {
+        return
+      }
       const job = this.#jobs.find((candidate) => candidate.status === 'queued')
-      if (job === undefined || isAborted(this.#controller.signal)) {
+      if (job === undefined) {
         return
       }
       job.status = 'running'
@@ -112,7 +118,7 @@ export class JobQueue<Input, Output> {
     const isRunning = this.#active > 0
     const isSettled =
       jobs.length > 0 && jobs.every((job) => job.status !== 'queued' && job.status !== 'running')
-    return { jobs, isRunning, isSettled }
+    return { jobs, isRunning, isPaused: this.#isPaused, isSettled }
   }
 
   /** Queues inputs; call `start` to process them. Returns the new job ids. */
@@ -133,10 +139,42 @@ export class JobQueue<Input, Output> {
     if (isAborted(this.#controller.signal)) {
       this.#controller = new AbortController()
     }
+    this.#isPaused = false
     const workers = Array.from({ length: this.#concurrency }, () => this.#drain())
     await Promise.all(workers)
     this.#notify()
     return this.snapshot
+  }
+
+  /** Stops dequeuing new jobs; jobs already running finish. */
+  pause(): void {
+    if (this.#isPaused) {
+      return
+    }
+
+    this.#isPaused = true
+    this.#notify()
+  }
+
+  /** Resumes a paused queue, draining the jobs that were left queued. */
+  async resume(): Promise<QueueSnapshot<Input, Output>> {
+    if (!this.#isPaused) {
+      return this.snapshot
+    }
+    return await this.start()
+  }
+
+  /** Re-queues one job (a per-photo override changed) and processes just it. */
+  async rerun(id: string): Promise<QueueSnapshot<Input, Output>> {
+    const job = this.#jobs.find((candidate) => candidate.id === id)
+    if (job === undefined) {
+      return this.snapshot
+    }
+    job.status = 'queued'
+    job.output = null
+    job.error = null
+    this.#notify()
+    return await this.start()
   }
 
   /** Aborts running jobs and marks queued ones cancelled; finished results stay. */

@@ -450,6 +450,42 @@ export const DRILLS = [
     replace: '  return resolved',
     ...unitClient('src/shared/watermark-tokens.test.ts'),
   },
+  // --- M14: folders, output names, pause, batch report ---------------------
+  {
+    name: 'Names: {index} not zero-padded',
+    file: 'src/client/bulk/names.ts',
+    find: "String(context.index).padStart(digits, '0')",
+    replace: 'String(context.index)',
+    ...unitClient('src/client/bulk/names.test.ts'),
+  },
+  {
+    name: 'Names: unsafe characters kept',
+    file: 'src/client/bulk/names.ts',
+    find: "const safe = resolved.replaceAll(UNSAFE_CHARACTERS, '-').trim()",
+    replace: 'const safe = resolved.trim()',
+    ...unitClient('src/client/bulk/names.test.ts'),
+  },
+  {
+    name: 'Folders: tree flattened in the ZIP',
+    file: 'src/client/bulk/folders.ts',
+    find: "const slash = relativePath.lastIndexOf('/')",
+    replace: 'const slash = -1',
+    ...unitClient('src/client/bulk/folders.test.ts'),
+  },
+  {
+    name: 'Pause: new jobs still start while paused',
+    file: 'src/client/bulk/queue.ts',
+    find: 'if (this.#isPaused || isAborted(this.#controller.signal)) {',
+    replace: 'if (isAborted(this.#controller.signal)) {',
+    ...unitClient('src/client/bulk/queue.test.ts'),
+  },
+  {
+    name: 'Report: errors with commas break the CSV',
+    file: 'src/client/bulk/report.ts',
+    find: String.raw`const NEEDS_QUOTING = /[",\r\n]/`,
+    replace: 'const NEEDS_QUOTING = /(?!)/',
+    ...unitClient('src/client/bulk/report.test.ts'),
+  },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
     name: 'Gate: ESLint rejects `any`',

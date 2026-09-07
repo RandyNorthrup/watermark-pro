@@ -84,6 +84,8 @@ describe('bulk page', () => {
       orientation: { turns: 0, flipX: false, flipY: false },
       adjust: IDENTITY_ADJUSTMENTS,
       border: null,
+      namePattern: '{name}-watermarked',
+      presetName: expect.any(String),
     })
     expect(runs[0]?.specs).toEqual([second.spec, makeWatermark().spec])
     expect(screen.getByRole('alert')).toHaveTextContent('cannot decode fail-three.jpg')
@@ -195,9 +197,15 @@ describe('bulk page', () => {
     const dropZone = input.parentElement
     expect(dropZone).not.toBeNull()
     fireEvent.drop(dropZone!, {
-      dataTransfer: { files: [photo('dropped.jpg')] },
+      dataTransfer: {
+        files: [
+          photo('dropped.jpg'),
+          new File([new Uint8Array(1)], 'skip.txt', { type: 'text/plain' }),
+        ],
+      },
     })
     expect(await screen.findByText('dropped.jpg')).toBeInTheDocument()
+    expect(screen.getByText(/1 file skipped: not images/)).toBeInTheDocument()
   })
 
   it('applies a batch orientation and filter to every photo', async () => {
@@ -218,5 +226,74 @@ describe('bulk page', () => {
     // Rotate left from zero is three quarter-turns clockwise.
     expect(runs[0]?.settings.orientation).toEqual({ turns: 3, flipX: false, flipY: false })
     expect(runs[0]?.settings.adjust).toEqual(FILTER_BY_ID.sepia.adjust)
+  })
+
+  it('applies a file-name pattern and downloads a CSV report', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/bulk')
+    await screen.findByLabelText('Add photos')
+    await user.upload(screen.getByLabelText('Add photos'), [photo('one.jpg'), photo('two.jpg')])
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+
+    fireEvent.change(screen.getByLabelText('File names'), { target: { value: '{index}-{name}' } })
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
+
+    expect(runs[0]?.settings.namePattern).toBe('{index}-{name}')
+    expect(screen.getByRole('button', { name: 'Download 1-one.jpg' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /Download report/ }))
+    expect(downloads).toHaveBeenLastCalledWith(expect.any(Blob), 'report.csv')
+  })
+
+  it('warns when the name pattern resolves to an empty name', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/bulk')
+    await screen.findByLabelText('Add photos')
+    await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg')])
+    fireEvent.change(screen.getByLabelText('File names'), { target: { value: ' '.repeat(3) } })
+    expect(screen.getByText(/must produce a name/)).toBeInTheDocument()
+  })
+
+  it('pauses a running batch and resumes it', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/bulk')
+    await screen.findByLabelText('Add photos')
+    await user.upload(screen.getByLabelText('Add photos'), [
+      photo('slow-a.png'),
+      photo('slow-b.png'),
+      photo('slow-c.png'),
+    ])
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+
+    await user.click(await screen.findByRole('button', { name: 'Pause' }))
+    expect(await screen.findByRole('button', { name: 'Resume' })).toBeInTheDocument()
+    releaseSlow()
+    await user.click(screen.getByRole('button', { name: 'Resume' }))
+    releaseSlow()
+    await waitFor(() => expect(screen.getByText(/3 of 3 finished/)).toBeInTheDocument())
+  })
+
+  it('caps the visible rows and expands on request', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/bulk')
+    await screen.findByLabelText('Add photos')
+    await user.upload(
+      screen.getByLabelText('Add photos'),
+      Array.from({ length: 61 }, (_, index) => photo(`p${String(index)}.jpg`)),
+    )
+    const list = screen.getByRole('list', { name: 'Photos in this batch' })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(60)
+    await user.click(screen.getByRole('button', { name: /Show all 61 photos/ }))
+    expect(within(list).getAllByRole('listitem')).toHaveLength(61)
   })
 })

@@ -282,15 +282,23 @@ Worker in your browser, or on the main thread where the browser has no
 ## Bulk watermarking
 
 `/app/bulk` applies one or more presets to a whole shoot (up to 500 photos).
-Drop the photos in or pick them, tick the presets (they are applied in the
-order ticked, later ones over earlier ones), choose the output format and
-quality, and optionally a maximum long edge. A "Photo adjustments" section
-applies one rotation, flip and filter to every photo in the batch. Press
-Start; the browser decodes each photo and a pool of engine workers (one per
-core, up to eight) renders them in parallel with smart placement and auto
-contrast worked out per photo and per mark. Cancel keeps what has finished, Retry re-queues
-failures, and the results download one by one, go to the share sheet one by
-one, or download as a single ZIP. Nothing is uploaded unless you save the
+Drop the photos in or pick them — or drop a **folder**, or use "Add a folder"
+where the browser supports it, and the sub-folder tree is preserved in the
+ZIP. Non-image files are skipped and counted. Tick the presets (they are
+applied in the order ticked, later ones over earlier ones), choose the output
+format, quality, metadata policy and optionally a maximum long edge. A **File
+names** field sets the output naming with a live example and the tokens
+`{name}`, `{index}`, `{count}`, `{date}`, `{preset}`, `{width}` and `{height}`.
+A "Photo adjustments" section applies one rotation, flip, filter and frame to
+every photo.
+
+Press Start; the browser decodes each photo and a pool of engine workers (one
+per core, up to eight) renders them in parallel with smart placement and auto
+contrast worked out per photo and per mark. A running batch can be **paused**
+and resumed. The list shows the first 60 photos with a "Show all" control so a
+large batch stays responsive. When it settles, download everything as one ZIP
+(tree preserved), save to the gallery, share or download file by file, and
+download a **CSV report** of every job. Nothing is uploaded unless you save the
 results to the gallery.
 
 ## Exports and metadata

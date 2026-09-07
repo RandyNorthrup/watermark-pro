@@ -6,7 +6,8 @@
 import { unzipSync } from 'fflate'
 import { describe, expect, it } from 'vitest'
 
-import { type BatchPosition, BulkProcessor, outputFileName } from './processor'
+import { DEFAULT_NAME_PATTERN } from './names'
+import { type BatchPosition, type BulkJobInput, BulkProcessor } from './processor'
 import { CancelledError, JobQueue } from './queue'
 import { createBulkRuntime } from './runtime'
 import { defaultPoolSize, MAX_POOL_SIZE, WorkerPool } from './worker-pool'
@@ -16,16 +17,23 @@ import { EMPTY_PHOTO_METADATA } from '../../shared/metadata'
 import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
 import { MarkResources } from '../lib/mark-resources'
 
-/** Orientation and adjustments every non-M11 case leaves at the identity. */
+/** Orientation, adjustments, frame and naming every basic case leaves at the default. */
 const BULK_EXTRA = {
   orientation: { turns: 0, flipX: false, flipY: false },
   adjust: IDENTITY_ADJUSTMENTS,
   border: null,
+  namePattern: DEFAULT_NAME_PATTERN,
+  presetName: 'Test',
 } as const
 
 /** No source metadata and a single-photo batch, the shape most cases use. */
 const NO_METADATA = EMPTY_PHOTO_METADATA
 const FIRST: BatchPosition = { index: 1, count: 1 }
+
+/** A batch job input for one file with no folder path. */
+function jobInput(file: File): BulkJobInput {
+  return { file, relativePath: file.name, metadata: NO_METADATA }
+}
 
 const FIXTURES = 20
 const FIXTURE_WIDTH = 1600
@@ -156,8 +164,7 @@ describe('BulkProcessor', () => {
     try {
       const file = await photoFile('holiday.JPG', 200)
       const kept = await processor.process(
-        file,
-        NO_METADATA,
+        jobInput(file),
         [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/webp', quality: 0.8 }, fitLongestSide: null, ...BULK_EXTRA },
         FIRST,
@@ -168,22 +175,19 @@ describe('BulkProcessor', () => {
       expect(await decodedSize(kept.blob)).toEqual({ width: FIXTURE_WIDTH, height: FIXTURE_HEIGHT })
 
       const small = await processor.process(
-        file,
-        NO_METADATA,
+        jobInput(file),
         [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/png', quality: 1 }, fitLongestSide: 800, ...BULK_EXTRA },
         FIRST,
         new AbortController().signal,
       )
       expect(await decodedSize(small.blob)).toEqual({ width: 800, height: 600 })
-      expect(outputFileName('no-extension', 'image/jpeg')).toBe('no-extension-watermarked.jpg')
 
       const aborted = new AbortController()
       aborted.abort()
       await expect(
         processor.process(
-          file,
-          NO_METADATA,
+          jobInput(file),
           [DEFAULT_TEXT_SPEC],
           { output: { format: 'image/png', quality: 1 }, fitLongestSide: null, ...BULK_EXTRA },
           FIRST,
@@ -191,10 +195,10 @@ describe('BulkProcessor', () => {
         ),
       ).rejects.toBeInstanceOf(CancelledError)
 
+      const notImage = jobInput(new File(['not an image'], 'notes.txt', { type: 'text/plain' }))
       await expect(
         processor.process(
-          new File(['not an image'], 'notes.txt', { type: 'text/plain' }),
-          NO_METADATA,
+          notImage,
           [DEFAULT_TEXT_SPEC],
           { output: { format: 'image/png', quality: 1 }, fitLongestSide: null, ...BULK_EXTRA },
           FIRST,
@@ -220,8 +224,7 @@ describe('BulkProcessor', () => {
       const file = new File([tagged], 'phone.jpg', { type: 'image/jpeg' })
 
       const result = await processor.process(
-        file,
-        NO_METADATA,
+        jobInput(file),
         [DEFAULT_TEXT_SPEC],
         { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null, ...BULK_EXTRA },
         FIRST,
@@ -248,8 +251,7 @@ describe('bulk throughput', () => {
         concurrency: runtime.workers,
         run: (file, signal) =>
           runtime.run(
-            file,
-            NO_METADATA,
+            jobInput(file),
             [DEFAULT_TEXT_SPEC],
             { output: { format: 'image/jpeg', quality: 0.9 }, fitLongestSide: null, ...BULK_EXTRA },
             FIRST,
