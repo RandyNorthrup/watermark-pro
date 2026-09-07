@@ -307,61 +307,59 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
   return (
     <li>
       <Card className="flex h-full flex-col gap-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
-              <Icon aria-hidden="true" className="size-5" />
-            </span>
-            <div className="min-w-0">
-              <h2 className="text-base font-semibold">
-                <Link
-                  to="/app/library/$watermarkId"
-                  params={{ watermarkId: preset.id }}
-                  className="block truncate hover:underline"
-                >
-                  {preset.name}
-                </Link>
-              </h2>
-              <p className="truncate text-sm text-ink-muted">{describeSpec(preset.spec)}</p>
-            </div>
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
+            <Icon aria-hidden="true" className="size-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-semibold">
+              <Link
+                to="/app/library/$watermarkId"
+                params={{ watermarkId: preset.id }}
+                className="block truncate hover:underline"
+              >
+                {preset.name}
+              </Link>
+            </h2>
+            <p className="truncate text-sm text-ink-muted">{describeSpec(preset.spec)}</p>
           </div>
-          <div className="flex shrink-0 items-center gap-1">
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label={`Export ${preset.name}`}
+            className="text-ink-muted"
+            onClick={() => {
+              onExport(preset)
+            }}
+          >
+            <Download aria-hidden="true" className="size-4" />
+          </Button>
+          <Link
+            to="/app/editor"
+            search={{ preset: preset.id }}
+            aria-label={`Open ${preset.name} in the editor`}
+            className={buttonVariants({ variant: 'ghost', size: 'icon' })}
+          >
+            <PencilRuler aria-hidden="true" className="size-4" />
+          </Link>
+          {canManage ? (
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              aria-label={`Export ${preset.name}`}
-              className="text-ink-muted"
+              aria-label={`Delete ${preset.name}`}
+              disabled={remove.isPending}
               onClick={() => {
-                onExport(preset)
+                remove.mutate()
               }}
+              className="text-ink-muted hover:text-rose-600"
             >
-              <Download aria-hidden="true" className="size-4" />
+              <Trash2 aria-hidden="true" className="size-4" />
             </Button>
-            <Link
-              to="/app/editor"
-              search={{ preset: preset.id }}
-              aria-label={`Open ${preset.name} in the editor`}
-              className={buttonVariants({ variant: 'ghost', size: 'icon' })}
-            >
-              <PencilRuler aria-hidden="true" className="size-4" />
-            </Link>
-            {canManage ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                aria-label={`Delete ${preset.name}`}
-                disabled={remove.isPending}
-                onClick={() => {
-                  remove.mutate()
-                }}
-                className="text-ink-muted hover:text-rose-600"
-              >
-                <Trash2 aria-hidden="true" className="size-4" />
-              </Button>
-            ) : null}
-          </div>
+          ) : null}
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-2 text-xs text-ink-muted">
           <Badge>{preset.spec.kind === 'image' ? 'logo' : preset.spec.kind}</Badge>
