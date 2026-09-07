@@ -59,6 +59,18 @@ describe('embedInvisibleMark / readInvisibleMark', () => {
     expect(readInvisibleMark(data, width, height)).toBe(message)
   })
 
+  it('returns null for a buffer that carries no mark', () => {
+    const width = 64
+    const height = 64
+    // An all-zero buffer has no magic bytes, so the header check rejects it.
+    expect(readInvisibleMark(new Uint8ClampedArray(width * height * 4), width, height)).toBeNull()
+  })
+
+  it('returns null when the buffer is too small to hold a header', () => {
+    // 2x2 = 4 pixels: below the 48-bit header, so there is nothing to read.
+    expect(readInvisibleMark(new Uint8ClampedArray(2 * 2 * 4), 2, 2)).toBeNull()
+  })
+
   it('returns null when a single embedded bit is flipped (integrity guard)', () => {
     // 16x16 sized so every one of the 256 pixels carries a payload bit.
     const width = 16

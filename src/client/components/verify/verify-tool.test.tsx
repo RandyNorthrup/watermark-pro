@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -29,6 +29,13 @@ describe('VerifyTool', () => {
     render(<VerifyTool />)
     await user.upload(screen.getByLabelText('Photo to check'), png())
     expect(await screen.findByText(/No invisible mark/)).toBeInTheDocument()
+  })
+
+  it('does nothing when the picker is dismissed with no file', () => {
+    render(<VerifyTool />)
+    fireEvent.change(screen.getByLabelText('Photo to check'), { target: { files: [] } })
+    expect(readMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Check a PNG' })).toBeInTheDocument()
   })
 
   it('surfaces a decode error', async () => {
