@@ -15,7 +15,7 @@ npm run audit:screenshots# UI milestones: every screen, light and dark
 npm run cf-typegen       # after editing wrangler.jsonc; commit the result
 npm run db:generate      # after editing src/worker/db/schema.ts
 npm run db:migrate:local # apply migrations to the local D1 database
-npm run dev              # local dev server on :5173 (needs .dev.vars + migrations)
+npm run dev              # local dev server on :5273 (needs .dev.vars + migrations)
 ```
 
 ## Non-negotiables
@@ -51,7 +51,10 @@ npm run dev              # local dev server on :5173 (needs .dev.vars + migratio
   `src/client/test-support/fake-auth-module.ts` and render the real router.
 - Never `(await response.json()) as T` in worker tests: Cloudflare types make
   `json<T>()` generic, so ESLint's fixer deletes the assertion. Parse with Zod.
-- `vite dev` and `vite preview` must both serve on :5173 (the `APP_URL`
-  origin); the same-origin guard rejects other origins.
+- `vite dev` and `vite preview` must both serve on :5273 (the `APP_URL`
+  origin); the same-origin guard rejects other origins. The local origin moved
+  off :5173 on 2026-09-07 to stop colliding with another local project that
+  holds :5173; `APP_URL` in `wrangler.jsonc`, both scripts and `e2e/preview.ts`
+  changed together, so keep them in step if you move it again.
 - TypeScript `erasableSyntaxOnly` is on: no enums, namespaces, or constructor
   parameter properties.

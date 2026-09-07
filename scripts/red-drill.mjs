@@ -13,7 +13,7 @@
  *   node scripts/red-drill.mjs "Share"    # drills whose name contains "Share"
  *
  * The e2e drills build and serve the app through Playwright's web server, so
- * port 5173 must be free. Every file is restored byte for byte even when a
+ * port 5273 must be free. Every file is restored byte for byte even when a
  * command throws; the script checks that before it exits. Results land in
  * docs/red-drill/<date>.md.
  */

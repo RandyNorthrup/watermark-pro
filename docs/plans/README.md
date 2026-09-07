@@ -132,13 +132,14 @@ peerDependencies license`, confirm the peer range against what is
       (exit 0 = clean).
    3. `node scripts/red-drill.mjs` (every drill; report lands in
       `docs/red-drill/<local date>.md`). The drill's own e2e entries spin up a
-      Playwright web server on :5173; that is the drill managing its own
-      process. If :5173 is already taken, **do not kill the occupant** — it may
+      Playwright web server on :5273; that is the drill managing its own
+      process. If :5273 is already taken, **do not kill the occupant** — it may
       be Randy's (see `PLAN.md` §9 / the never-stop-processes rule); defer or
-      ask instead.
+      ask instead. (The local origin moved off :5173 to :5273 on 2026-09-07 to
+      stop colliding with Randy's other project, which holds :5173.)
    4. **e2e, Lighthouse and screenshots are deferred to M19** (Randy,
       2026-09-06/07): they cost more wall-clock than the feature code, e2e
-      risks a :5173 collision with Randy's other work, and M19 owns the
+      risks a port collision with Randy's other work, and M19 owns the
       performance budgets and the visual record. Do **not** run
       `npm run test:e2e`, `scripts/lighthouse.mjs` or `scripts/screenshots.mjs`
       per milestone for M12–M18. Instead, in the milestone's `PLAN.md`
@@ -250,9 +251,12 @@ it costs a minute; prefer a unit or browser drill when one exists.
 
 ## Things that bit us (do not rediscover them)
 
-- Port 5173 is the only origin the same-origin guard accepts. Playwright
-  starts its own preview on it; kill any stray `vite preview` first
-  (`Get-NetTCPConnection -LocalPort 5173` in PowerShell).
+- The local origin is `http://localhost:5273` — the only origin the
+  same-origin guard accepts (it moved off :5173 on 2026-09-07 so it no longer
+  collides with Randy's other project on :5173). Playwright starts its own
+  preview on :5273 with `--strictPort`; if something already holds it
+  (`Get-NetTCPConnection -LocalPort 5273` in PowerShell), **do not kill it** —
+  defer or ask (never-stop-processes rule).
 - Playwright's Windows WebKit has no `OffscreenCanvas` and no
   `navigator.share`; Linux WebKit in CI has both. Code paths must work in
   both; tests must not assume either.

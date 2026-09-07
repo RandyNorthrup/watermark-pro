@@ -138,7 +138,7 @@ describe('cross-site request protection', () => {
 
   it('rejects a post that carries no Origin header at all', async () => {
     const response = await harness.app.request(
-      'http://localhost:5173/api/auth/sign-in/email',
+      'http://localhost:5273/api/auth/sign-in/email',
       {
         method: 'POST',
         headers: { 'content-type': 'application/json' },

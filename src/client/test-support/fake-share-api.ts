@@ -10,7 +10,7 @@ export interface FakeShareState {
   shares: ShareDto[]
 }
 
-const ORIGIN = 'http://localhost:5173'
+const ORIGIN = 'http://localhost:5273'
 const ROUTE = /^\/api\/orgs\/(?<org>[^/]+)\/shares(?:\/(?<id>[^/]+))?(?<revoke>\/revoke)?$/
 const PUBLIC_ROUTE =
   /^\/api\/share\/(?<token>[^/]+)(?:\/photos\/(?<photoId>[^/]+)\/(?<kind>file|thumbnail))?$/

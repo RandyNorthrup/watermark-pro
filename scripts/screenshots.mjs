@@ -18,7 +18,7 @@ import { chromium, devices, webkit } from '@playwright/test'
 
 import { waitForLink } from './lib/dev-mailbox.mjs'
 
-const BASE_URL = process.env.APP_URL ?? 'http://localhost:5173'
+const BASE_URL = process.env.APP_URL ?? 'http://localhost:5273'
 const MILESTONE = process.argv[2] ?? 'm1'
 const PROFILE_ARGUMENT = process.argv[3] ?? 'all'
 const PREVIEW_SETTLE_MS = 600

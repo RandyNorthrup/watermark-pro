@@ -19,7 +19,7 @@ import { TEST_SECRET } from '../test-support/test-app'
 const options = buildAuthOptions({
   database: memoryAdapter({}),
   secret: TEST_SECRET,
-  appUrl: 'http://localhost:5173',
+  appUrl: 'http://localhost:5273',
   email: createConsoleEmailSender(),
   audit: createMemoryAuditStore(),
   rateLimit: unlimitedRateLimitStorage,

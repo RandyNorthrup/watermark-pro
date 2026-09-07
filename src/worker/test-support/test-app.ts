@@ -24,7 +24,7 @@ import {
   createMemoryWatermarkStore,
 } from './memory-stores'
 
-export const TEST_APP_URL = 'http://localhost:5173'
+export const TEST_APP_URL = 'http://localhost:5273'
 export const TEST_SECRET = 'test-secret-with-at-least-thirty-two-characters'
 
 /**

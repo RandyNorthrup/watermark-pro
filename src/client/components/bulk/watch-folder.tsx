@@ -149,10 +149,10 @@ export function WatchFolder({ organizationId, specs, settings }: WatchFolderProp
       aria-label="Watch a folder"
     >
       <div className="flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-medium">
+        <span className="flex items-center gap-2 text-sm font-medium">
           <FolderSync aria-hidden="true" className="size-4" />
           Watch a folder
-        </h3>
+        </span>
         {isWatching ? (
           <Button type="button" variant="secondary" size="sm" onClick={stop}>
             Stop

@@ -596,7 +596,7 @@ export function BulkTool({ organizationId, canSave = false }: BulkToolProps) {
                     return (
                       <li
                         key={`${relativePath}:${String(file.size)}`}
-                        className="flex items-center gap-3 px-3 py-2 text-sm"
+                        className="flex items-center gap-2 px-3 py-2 text-sm"
                       >
                         {job === null ? (
                           <span

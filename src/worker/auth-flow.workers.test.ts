@@ -66,7 +66,7 @@ describe('Better Auth over D1', () => {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          origin: 'http://localhost:5173',
+          origin: 'http://localhost:5273',
           'cf-connecting-ip': '203.0.113.9',
         },
         body: JSON.stringify({ email: owner.email, password: 'definitely wrong' }),

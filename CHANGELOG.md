@@ -32,6 +32,10 @@ M14 (completion): the two carried-forward bulk features now ship.
   `WatchFolder` component is driven in jsdom with a stubbed directory picker.
 - New red drills cover both features: batch presets drawn despite an override,
   an adjust that skips its re-run, and a watch that reprocesses seen files.
+- The local dev/preview origin moved from `http://localhost:5173` to
+  `http://localhost:5273` (the `APP_URL` same-origin guard, both npm scripts
+  and the e2e preview move together) so it no longer collides with another
+  local project that holds 5173. Production is unaffected.
 
 ## [1.6.0] - 2026-09-07
 

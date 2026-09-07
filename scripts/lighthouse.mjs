@@ -27,7 +27,7 @@ import desktopConfig from 'lighthouse/core/config/desktop-config.js'
 import { startCompressingProxy } from './lib/compressing-proxy.mjs'
 import { waitForLink } from './lib/dev-mailbox.mjs'
 
-const BASE_URL = process.env.APP_URL ?? 'http://localhost:5173'
+const BASE_URL = process.env.APP_URL ?? 'http://localhost:5273'
 const MILESTONE = process.argv[2] ?? 'm1'
 const FORM_FACTOR = process.argv[3] ?? 'desktop'
 if (FORM_FACTOR !== 'desktop' && FORM_FACTOR !== 'mobile') {

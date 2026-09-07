@@ -35,7 +35,7 @@
     // entry here is validated by src/worker/env.ts on the first request an
     // isolate handles.
     "APP_ENV": "development",
-    "APP_URL": "http://localhost:5173",
+    "APP_URL": "http://localhost:5273",
     "EMAIL_PROVIDER": "console",
     "EMAIL_FROM": "no-reply@watermark.blowmoney.net",
   },

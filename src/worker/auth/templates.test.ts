@@ -4,12 +4,12 @@ import { invitationEmail, resetPasswordEmail, verificationEmail } from './templa
 
 describe('email templates', () => {
   it('include the action link in both text and html bodies', () => {
-    const url = 'http://localhost:5173/api/auth/verify-email?token=abc&callbackURL=%2F'
+    const url = 'http://localhost:5273/api/auth/verify-email?token=abc&callbackURL=%2F'
     const message = verificationEmail('a@example.test', url)
     expect(message.to).toBe('a@example.test')
     expect(message.text).toContain(url)
     expect(message.html).toContain(
-      'href="http://localhost:5173/api/auth/verify-email?token=abc&amp;callbackURL=%2F"',
+      'href="http://localhost:5273/api/auth/verify-email?token=abc&amp;callbackURL=%2F"',
     )
   })
 
@@ -18,7 +18,7 @@ describe('email templates', () => {
       'b@example.test',
       '<script>alert(1)</script>',
       'Eve "Hacker" <eve>',
-      'http://localhost:5173/accept-invitation/x',
+      'http://localhost:5273/accept-invitation/x',
     )
     expect(message.html).not.toContain('<script>')
     expect(message.html).toContain('&lt;script&gt;')
@@ -28,7 +28,7 @@ describe('email templates', () => {
   })
 
   it('tell users an unrequested reset can be ignored', () => {
-    const message = resetPasswordEmail('c@example.test', 'http://localhost:5173/reset?token=t')
+    const message = resetPasswordEmail('c@example.test', 'http://localhost:5273/reset?token=t')
     expect(message.text).toMatch(/ignore this message/)
     expect(message.subject).toMatch(/Reset your/)
   })

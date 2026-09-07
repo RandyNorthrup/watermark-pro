@@ -95,7 +95,7 @@ describe('password reset', () => {
     const resetPath = findLink(harness.mailbox, owner.email, '/api/auth/reset-password/')
     const redirect = await ownerClient.get(resetPath)
     expect(redirect.status).toBe(HTTP_STATUS.found)
-    const location = new URL(redirect.headers.get('location') ?? '', 'http://localhost:5173')
+    const location = new URL(redirect.headers.get('location') ?? '', 'http://localhost:5273')
     expect(location.pathname).toBe('/reset-password')
     const token = location.searchParams.get('token')
     expect(token).not.toBeNull()

@@ -10,7 +10,7 @@ BETTER_AUTH_SECRET=
 
 # Optional overrides of the wrangler.jsonc defaults:
 # APP_ENV=development            # development | test | staging | production
-# APP_URL=http://localhost:5173  # public origin used in auth links
+# APP_URL=http://localhost:5273  # public origin used in auth links
 # EMAIL_PROVIDER=console         # console | cloudflare (console is refused in production)
 # EMAIL_FROM=no-reply@watermark.blowmoney.net
 

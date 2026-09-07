@@ -75,17 +75,19 @@ npm run db:migrate:local         # creates the local D1 database
 ## Development
 
 ```bash
-npm run dev              # Vite dev server on :5173; Worker runs in workerd with HMR
-npm run preview          # serve the production build through workerd on :5173
+npm run dev              # Vite dev server on :5273; Worker runs in workerd with HMR
+npm run preview          # serve the production build through workerd on :5273
 npm run build            # production build into dist/
 npm run cf-typegen       # regenerate worker-configuration.d.ts after editing wrangler.jsonc
 npm run db:generate      # write a new migration after editing src/worker/db/schema.ts
 npm run db:migrate:local # apply migrations to the local D1 database
 ```
 
-Both the dev server and the preview use port 5173 because the Worker only
+Both the dev server and the preview use port 5273 because the Worker only
 accepts state-changing requests from the origin in `APP_URL`. Stop one before
-starting the other.
+starting the other. (The local origin is 5273, not Vite's default 5173, so it
+does not clash with another local project already on 5173; `APP_URL` and both
+scripts move together if you change it.)
 
 With the default `EMAIL_PROVIDER=console`, verification, reset, and invitation
 emails are printed to the Worker log (the terminal running `npm run dev`), so
@@ -484,7 +486,7 @@ exports that carry no EXIF (see "Exports and metadata").
   `compatibility_date` in `wrangler.jsonc` must not exceed the newest date the
   Workers pool's bundled workerd supports (2026-08-22 for pool 0.22.0).
 - **Sign-up returns 403 locally.** The request origin must equal `APP_URL`;
-  serve the app from `http://localhost:5173`.
+  serve the app from `http://localhost:5273`.
 - **Sign-up returns 500 `invalid_configuration`.** `.dev.vars` is missing or
   `BETTER_AUTH_SECRET` is shorter than 32 characters.
 - **Tables do not exist.** Run `npm run db:migrate:local`.
@@ -499,5 +501,5 @@ exports that carry no EXIF (see "Exports and metadata").
   the generated file.
 - **knip reports nothing at all.** Do not add `--strict`; in knip 6 it implies
   `--production` and skips everything without a production suffix.
-- **Playwright says port 5173 is in use.** A previous preview is still running;
+- **Playwright says port 5273 is in use.** A previous preview is still running;
   stop it (the e2e suite never reuses an existing server on purpose).

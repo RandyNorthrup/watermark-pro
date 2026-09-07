@@ -175,7 +175,7 @@ now?"), because it acts in his account.
 az login --use-device-code
 az ad app create --display-name "Watermark Pro" --sign-in-audience AzureADandPersonalMicrosoftAccount --query "{appId:appId,id:id}"
 # add the SPA redirect URIs (Graph PATCH; `az ad app update` has no SPA flag)
-az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/<id>" --headers "Content-Type=application/json" --body "{\"spa\":{\"redirectUris\":[\"https://watermark.blowmoney.net/oauth/microsoft\",\"http://localhost:5173/oauth/microsoft\"]}}"
+az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/<id>" --headers "Content-Type=application/json" --body "{\"spa\":{\"redirectUris\":[\"https://watermark.blowmoney.net/oauth/microsoft\",\"http://localhost:5273/oauth/microsoft\"]}}"
 # delegated Files.Read on Microsoft Graph
 az ad app permission add --id <appId> --api 00000003-0000-0000-c000-000000000000 --api-permissions 10465720-29dd-4523-a11a-6a75c743c9d9=Scope
 ```
@@ -194,10 +194,10 @@ honest, generated from SECURITY.md's data-handling facts); Audience:
 External, then Publish; Data access: add the scope `…/auth/drive.file`;
 Clients → Create client → Web application, name "Watermark Pro web",
 Authorised JavaScript origins `https://watermark.blowmoney.net` and
-`http://localhost:5173`, no redirect URIs (the token client uses a popup);
+`http://localhost:5273`, no redirect URIs (the token client uses a popup);
 copy the client id → `GOOGLE_OAUTH_CLIENT_ID`. Credentials → Create API
 key, restrict to the Picker API and to HTTP referrers
-`https://watermark.blowmoney.net/*` and `http://localhost:5173/*` →
+`https://watermark.blowmoney.net/*` and `http://localhost:5273/*` →
 `GOOGLE_PICKER_API_KEY`. The project number (Dashboard) →
 `GOOGLE_PICKER_APP_ID`.
 
@@ -260,7 +260,7 @@ no config and lists the configured providers with a fake `ImportSource`.
 e2e: the preview Worker in e2e serves the app over plain http and the
 policy requires a public https host, so the successful URL import journey
 lives in the Node and workerd tests only. `e2e/editor.spec.ts`
-(desktop-chrome) opens "From a link", submits `http://localhost:5173/sample-scene.jpg`
+(desktop-chrome) opens "From a link", submits `http://localhost:5273/sample-scene.jpg`
 and asserts the validation message "Only https links can be imported".
 Android share target: not automatable; the service worker is
 unit-tested by importing it into a jsdom test with a fake `self`
