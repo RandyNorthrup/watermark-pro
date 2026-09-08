@@ -6,6 +6,7 @@ import {
   isSupportedLocale,
   LOCALE_CODES,
   localeDirection,
+  localeFromCookieHeader,
   SUPPORTED_LOCALES,
 } from './locales'
 
@@ -41,5 +42,18 @@ describe('supported locales', () => {
     expect(isRtl('ar')).toBe(true)
     expect(isRtl('de')).toBe(false)
     expect(isRtl('not-a-locale')).toBe(false)
+  })
+})
+
+describe('localeFromCookieHeader', () => {
+  it('reads a supported locale from among several cookies', () => {
+    expect(localeFromCookieHeader('theme=dark; watermark-pro-locale=pt-BR; other=1')).toBe('pt-BR')
+  })
+
+  it('returns null for a missing, empty or unsupported cookie', () => {
+    expect(localeFromCookieHeader(null)).toBeNull()
+    expect(localeFromCookieHeader('')).toBeNull()
+    expect(localeFromCookieHeader('theme=dark')).toBeNull()
+    expect(localeFromCookieHeader('watermark-pro-locale=klingon')).toBeNull()
   })
 })

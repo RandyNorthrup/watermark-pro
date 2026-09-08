@@ -25,6 +25,11 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
+- The chosen interface language is now mirrored to an edge-readable cookie
+  (`watermark-pro-locale`) in addition to `localStorage`, so the Worker can serve
+  the right prerendered landing (per-locale static pages, in progress). Locale
+  detection reads the cookie after `localStorage` and before the browser
+  languages; a shared `localeFromCookieHeader` parser is used by both sides.
 - First-paint skeleton: `index.html` now carries a static, theme-correct
   skeleton of the app frame (header with the brand mark, shimmering content
   blocks, and a phone tab bar) that paints before any JavaScript runs and is

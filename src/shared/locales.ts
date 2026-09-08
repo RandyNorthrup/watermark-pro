@@ -49,3 +49,32 @@ export function isRtl(locale: string): boolean {
 
 /** Where the client persists the chosen locale for a signed-out visitor. */
 export const LOCALE_STORAGE_KEY = 'watermark-pro:locale'
+
+/**
+ * Cookie that mirrors an explicitly chosen locale (M19). Unlike `localStorage`,
+ * a cookie is sent with the request, so the Worker can serve the prerendered
+ * landing in the visitor's language. The name is a cookie token (no `:`).
+ */
+export const LOCALE_COOKIE = 'watermark-pro-locale'
+
+/**
+ * Reads a supported locale from a `Cookie` header value, or null. Pure and
+ * shared: the client passes `document.cookie`, the Worker the request header.
+ */
+export function localeFromCookieHeader(header: string | null | undefined): Locale | null {
+  if (header == null || header === '') {
+    return null
+  }
+  for (const part of header.split(';')) {
+    const separator = part.indexOf('=')
+    if (separator === -1) {
+      continue
+    }
+    if (part.slice(0, separator).trim() !== LOCALE_COOKIE) {
+      continue
+    }
+    const value = decodeURIComponent(part.slice(separator + 1).trim())
+    return isSupportedLocale(value) ? value : null
+  }
+  return null
+}

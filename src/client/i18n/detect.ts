@@ -7,9 +7,13 @@ import {
   DEFAULT_LOCALE,
   isSupportedLocale,
   type Locale,
+  LOCALE_COOKIE,
+  localeFromCookieHeader,
   LOCALE_STORAGE_KEY,
   SUPPORTED_LOCALES,
 } from '../../shared/locales'
+
+const COOKIE_MAX_AGE_SECONDS = 31_536_000
 
 /**
  * First supported locale for a list of BCP-47 tags, matching a bare language to
@@ -40,11 +44,33 @@ export function readStoredLocale(): Locale | null {
   }
 }
 
-/** Saved preference → browser languages → English. */
+/** The locale mirrored to a cookie by a previous explicit choice, or null. */
+export function readLocaleCookie(): Locale | null {
+  if (typeof document === 'undefined') {
+    return null
+  }
+  return localeFromCookieHeader(document.cookie)
+}
+
+/**
+ * Mirrors an explicit choice to the {@link LOCALE_COOKIE} so the Worker can
+ * serve the prerendered landing in the same language on the next visit.
+ */
+export function writeLocaleCookie(locale: Locale): void {
+  if (typeof document === 'undefined') {
+    return
+  }
+  const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${LOCALE_COOKIE}=${locale}; Path=/; Max-Age=${String(COOKIE_MAX_AGE_SECONDS)}; SameSite=Lax${secure}`
+}
+
+/** Saved preference (storage or cookie) → browser languages → English. */
 export function detectLocale(
   navigatorLanguages: readonly string[] = typeof navigator === 'undefined'
     ? []
     : navigator.languages,
 ): Locale {
-  return readStoredLocale() ?? matchLocale(navigatorLanguages) ?? DEFAULT_LOCALE
+  return (
+    readStoredLocale() ?? readLocaleCookie() ?? matchLocale(navigatorLanguages) ?? DEFAULT_LOCALE
+  )
 }

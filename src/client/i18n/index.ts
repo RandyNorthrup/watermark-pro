@@ -10,7 +10,7 @@
 import i18next, { changeLanguage, use as registerPlugin } from 'i18next'
 import { initReactI18next, useTranslation } from 'react-i18next'
 
-import { detectLocale } from './detect'
+import { detectLocale, writeLocaleCookie } from './detect'
 import {
   DEFAULT_LOCALE,
   isRtl,
@@ -93,6 +93,9 @@ export async function setLocale(locale: Locale): Promise<void> {
   } catch {
     // A private window may refuse storage; the in-memory switch still applied.
   }
+  // Mirror to a cookie so the Worker serves the prerendered landing in this
+  // language on the next visit (localStorage is invisible to the edge).
+  writeLocaleCookie(locale)
 }
 
 /** The active locale, narrowed to a supported one (defaults to English). */
