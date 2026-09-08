@@ -1,70 +1,112 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ExportPanel } from './export-panel'
 import type { Size } from '../../engine/layout'
+import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
+import type { CloudUpload } from '../../lib/imports/source'
+import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 
-const ROOMY: Size = { width: 1000, height: 1000 }
+vi.mock('../../lib/imports/google-drive-save', () => ({ saveToGoogleDrive: vi.fn() }))
+vi.mock('../../lib/imports/dropbox-save', () => ({ saveToDropbox: vi.fn() }))
+vi.mock('../../lib/imports/onedrive', () => ({ saveToOneDrive: vi.fn() }))
 
-function setup(outputSize: Size = ROOMY) {
-  const onExport = vi.fn()
+const googleSaveMock = vi.mocked(saveToGoogleDrive)
+
+const SIZE: Size = { width: 800, height: 600 }
+const UPLOAD: CloudUpload = { name: 'photo-watermarked.jpg', blob: new Blob(['x']) }
+
+afterEach(() => {
+  googleSaveMock.mockReset()
+})
+
+function renderPanel(onExportBlob: () => Promise<CloudUpload | null>) {
+  const onCloudSaved = vi.fn()
+  const onCloudError = vi.fn()
   render(
     <ExportPanel
-      organizationName="Acme"
-      outputSize={outputSize}
+      outputSize={SIZE}
       isReady
       isExporting={false}
-      onExport={onExport}
+      onExport={vi.fn()}
       onShare={vi.fn()}
       isSharing={false}
+      organizationName="Acme"
+      cloudConfig={ALL_CLOUD_CONFIG}
+      onExportBlob={onExportBlob}
+      onCloudSaved={onCloudSaved}
+      onCloudError={onCloudError}
     />,
   )
-  return { onExport, user: userEvent.setup() }
+  return { user: userEvent.setup(), onCloudSaved, onCloudError }
 }
 
-async function chooseFormat(user: ReturnType<typeof userEvent.setup>, name: string) {
-  await user.click(screen.getByRole('combobox', { name: 'Format' }))
-  await user.click(await screen.findByRole('option', { name }))
-}
-
-describe('ExportPanel invisible mark', () => {
-  it('embeds the message when PNG is chosen and the toggle is on', async () => {
-    const { onExport, user } = setup()
-    await chooseFormat(user, 'PNG')
-    await user.click(screen.getByRole('checkbox', { name: 'Invisible mark' }))
-    expect(screen.getByLabelText('Invisible message')).toHaveValue('Acme')
-    await user.click(screen.getByRole('button', { name: 'Download' }))
-    expect(onExport).toHaveBeenCalledWith(
-      expect.objectContaining({ format: 'image/png', invisible: { message: 'Acme' } }),
-    )
+describe('ExportPanel cloud save', () => {
+  it('shows a save button for each configured provider', () => {
+    renderPanel(() => Promise.resolve(UPLOAD))
+    expect(screen.getByRole('button', { name: 'Save to Google Drive' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save to Dropbox' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save to OneDrive' })).toBeInTheDocument()
   })
 
-  it('disables the toggle for a lossy format and embeds nothing', async () => {
-    const { onExport, user } = setup()
-    expect(screen.getByRole('checkbox', { name: 'Invisible mark' })).toBeDisabled()
-    await user.click(screen.getByRole('button', { name: 'Download' }))
-    expect(onExport).toHaveBeenCalledWith(
-      expect.not.objectContaining({ invisible: expect.anything() }),
+  it('renders the current photo and confirms a successful save', async () => {
+    googleSaveMock.mockResolvedValue()
+    const onExportBlob = vi.fn(() => Promise.resolve(UPLOAD))
+    const { user, onCloudSaved, onCloudError } = renderPanel(onExportBlob)
+
+    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+
+    await waitFor(() => expect(googleSaveMock).toHaveBeenCalledWith(ALL_CLOUD_CONFIG, [UPLOAD]))
+    expect(onExportBlob).toHaveBeenCalledTimes(1)
+    await waitFor(() =>
+      expect(onCloudSaved).toHaveBeenCalledWith(
+        'Saved to your Google Drive “Watermark Pro” folder.',
+      ),
     )
+    expect(onCloudError).not.toHaveBeenCalled()
   })
 
-  it('embeds nothing when the toggle is on but the message is cleared', async () => {
-    const { onExport, user } = setup()
-    await chooseFormat(user, 'PNG')
-    await user.click(screen.getByRole('checkbox', { name: 'Invisible mark' }))
-    await user.clear(screen.getByLabelText('Invisible message'))
-    await user.click(screen.getByRole('button', { name: 'Download' }))
-    expect(onExport).toHaveBeenCalledWith(
-      expect.not.objectContaining({ invisible: expect.anything() }),
+  it('saves nothing when the photo cannot be rendered', async () => {
+    const { user, onCloudSaved, onCloudError } = renderPanel(() => Promise.resolve(null))
+
+    await user.click(screen.getByRole('button', { name: 'Save to Dropbox' }))
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save to Dropbox' })).toBeEnabled(),
     )
+    expect(googleSaveMock).not.toHaveBeenCalled()
+    expect(onCloudSaved).not.toHaveBeenCalled()
+    expect(onCloudError).not.toHaveBeenCalled()
   })
 
-  it('blocks the download when the message will not fit the photo', async () => {
-    const { user } = setup({ width: 8, height: 8 })
-    await chooseFormat(user, 'PNG')
+  it('reports a save failure through onCloudError', async () => {
+    googleSaveMock.mockRejectedValue(new Error('Drive rejected the upload'))
+    const { user, onCloudSaved, onCloudError } = renderPanel(() => Promise.resolve(UPLOAD))
+
+    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+
+    await waitFor(() => expect(onCloudError).toHaveBeenCalledWith('Drive rejected the upload'))
+    expect(onCloudSaved).not.toHaveBeenCalled()
+  })
+
+  it('offers an invisible mark on PNG and blocks an over-long message', async () => {
+    const { user } = renderPanel(() => Promise.resolve(UPLOAD))
+    // Default JPEG shows the "choose PNG" hint; the invisible checkbox is disabled.
+    expect(screen.getByText(/Choose PNG to hide a message/)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: 'Format' }))
+    await user.click(await screen.findByRole('option', { name: 'PNG' }))
     await user.click(screen.getByRole('checkbox', { name: 'Invisible mark' }))
-    expect(screen.getByText(/Too long/)).toBeInTheDocument()
+
+    // Seeded from the organization name; a message that fits keeps Download enabled.
+    const message = screen.getByLabelText('Invisible message')
+    expect(message).toHaveValue('Acme')
+    expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled()
+
+    // Over the pixel budget: the panel warns and blocks export.
+    fireEvent.change(message, { target: { value: 'x'.repeat(100_000) } })
+    expect(screen.getByText(/Too long for a/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Download' })).toBeDisabled()
   })
 })

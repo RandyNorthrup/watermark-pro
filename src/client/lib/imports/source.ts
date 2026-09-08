@@ -10,6 +10,12 @@ import type { PublicConfig } from '../../../shared/api'
 
 export type CloudProviderId = 'google' | 'dropbox' | 'onedrive'
 
+/** A watermarked photo to write back to a cloud provider (M16 save-to-cloud). */
+export interface CloudUpload {
+  readonly name: string
+  readonly blob: Blob
+}
+
 /** Display labels for the import menu. */
 export const PROVIDER_LABELS: Record<CloudProviderId, string> = {
   google: 'Google Drive',

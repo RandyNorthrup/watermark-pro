@@ -1,9 +1,15 @@
 import { vi } from 'vitest'
 
+import { NO_CLOUD_CONFIG } from './cloud-config'
 import { type FakeGalleryState, handleGallery } from './fake-gallery-api'
 import { type FakeShareState, handleShares } from './fake-share-api'
 import { requestUrl } from './request-url'
-import { type AssetDto, saveWatermarkRequestSchema, type WatermarkDto } from '../../shared/api'
+import {
+  type AssetDto,
+  type PublicConfig,
+  saveWatermarkRequestSchema,
+  type WatermarkDto,
+} from '../../shared/api'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
 
 /**
@@ -18,6 +24,8 @@ export interface FakeLibraryState {
   failWith: keyof typeof API_ERROR_CODE | null
   gallery: FakeGalleryState
   shares: FakeShareState
+  /** Served from GET /api/config; defaults to every cloud provider off. */
+  publicConfig: PublicConfig
 }
 
 const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
@@ -104,6 +112,9 @@ const ROUTE =
 let nextId = 1
 
 function handle(state: FakeLibraryState, url: string, init: RequestInit): Response {
+  if (new URL(url, 'http://localhost').pathname === '/api/config') {
+    return Response.json(state.publicConfig)
+  }
   if (state.failWith !== null) {
     return errorResponse(state.failWith)
   }
@@ -200,6 +211,7 @@ export function installLibraryApi(initial: Partial<FakeLibraryState> = {}): Fake
     failWith: null,
     gallery: { photos: [], maxBytes: 2 * 1024 * 1024 * 1024, uploadFailsWith: null },
     shares: { shares: [] },
+    publicConfig: NO_CLOUD_CONFIG,
     ...initial,
   }
   vi.stubGlobal(

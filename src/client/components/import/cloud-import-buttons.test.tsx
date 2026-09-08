@@ -7,6 +7,7 @@ import { CloudImportButtons } from './cloud-import-buttons'
 import type { PublicConfig } from '../../../shared/api'
 import { pickFromDropbox } from '../../lib/imports/dropbox-chooser'
 import { pickFromGoogleDrive } from '../../lib/imports/google-picker'
+import { ALL_CLOUD_CONFIG as ALL, NO_CLOUD_CONFIG as NONE } from '../../test-support/cloud-config'
 
 vi.mock('../../lib/imports/google-picker', () => ({ pickFromGoogleDrive: vi.fn() }))
 vi.mock('../../lib/imports/dropbox-chooser', () => ({ pickFromDropbox: vi.fn() }))
@@ -18,24 +19,6 @@ vi.mock('./onedrive-dialog', () => ({
 
 const googleMock = vi.mocked(pickFromGoogleDrive)
 const dropboxMock = vi.mocked(pickFromDropbox)
-
-const NONE: PublicConfig = {
-  turnstileSiteKey: null,
-  googleOAuthClientId: null,
-  googlePickerApiKey: null,
-  googlePickerAppId: null,
-  microsoftClientId: null,
-  dropboxAppKey: null,
-}
-
-const ALL: PublicConfig = {
-  turnstileSiteKey: null,
-  googleOAuthClientId: 'client',
-  googlePickerApiKey: 'key',
-  googlePickerAppId: 'app',
-  microsoftClientId: 'ms',
-  dropboxAppKey: 'dbx',
-}
 
 afterEach(() => {
   googleMock.mockReset()

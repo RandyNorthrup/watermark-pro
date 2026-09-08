@@ -64,6 +64,7 @@ import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { readImageSize } from '../../lib/image-size'
+import type { CloudUpload } from '../../lib/imports/source'
 import { takeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
 import { readPhotoMetadata } from '../../lib/photo-metadata'
@@ -209,6 +210,7 @@ export function Editor({
   const [isSharing, setIsSharing] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const [saved, setSaved] = useState<string | null>(null)
+  const [cloudSaved, setCloudSaved] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const save = useMutation({
     mutationFn: async (options: EncodeOptions) => {
@@ -487,6 +489,25 @@ export function Editor({
 
   function exportPhoto(options: EncodeOptions) {
     return produce(options, setIsExporting, downloadBlob)
+  }
+
+  /**
+   * Renders the current photo at full resolution and returns it as a cloud
+   * upload (or null when nothing is loaded), so the "Save to cloud" buttons can
+   * write the exact bytes the Download button would produce.
+   */
+  async function exportBlob(options: EncodeOptions): Promise<CloudUpload | null> {
+    const current = renderer.current
+    if (current === null || document.layers.length === 0) {
+      return null
+    }
+    const blob = await current.exportFull(
+      layerSpecs(document),
+      options,
+      documentTransform(document),
+      outputSize,
+    )
+    return { name: exportFileName(options.format), blob }
   }
 
   /** The share sheet is its own feedback; a dismissed sheet needs no message. */
@@ -773,6 +794,16 @@ export function Editor({
                 isSharing={isSharing}
                 onSave={canSave ? save.mutate : undefined}
                 isSaving={save.isPending}
+                cloudConfig={publicConfig.data}
+                onExportBlob={exportBlob}
+                onCloudSaved={(message) => {
+                  setExportError(null)
+                  setCloudSaved(message)
+                }}
+                onCloudError={(message) => {
+                  setCloudSaved(null)
+                  setExportError(message)
+                }}
               />
               {exportError === null ? null : (
                 <Alert tone="error" title="Export failed" className="mt-3">
@@ -786,6 +817,11 @@ export function Editor({
                     gallery
                   </Link>
                   .
+                </Alert>
+              )}
+              {cloudSaved === null ? null : (
+                <Alert tone="success" className="mt-3">
+                  {cloudSaved}
                 </Alert>
               )}
             </Tabs.Content>

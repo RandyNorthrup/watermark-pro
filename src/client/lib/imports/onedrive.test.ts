@@ -5,9 +5,11 @@ import {
   listOneDriveImages,
   mapGraphChildren,
   oneDriveChildrenUrl,
+  oneDriveUploadUrl,
+  uploadOneDriveImage,
   type OneDriveImage,
 } from './onedrive'
-import { MICROSOFT_GRAPH_ROOT } from '../../../shared/constants'
+import { CLOUD_SAVE_FOLDER, MICROSOFT_GRAPH_ROOT } from '../../../shared/constants'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -93,6 +95,46 @@ describe('listOneDriveImages', () => {
     )
 
     await expect(listOneDriveImages('token-abc')).rejects.toThrow(/401/)
+  })
+})
+
+describe('oneDriveUploadUrl', () => {
+  it('addresses the save folder at the root and percent-encodes both segments', () => {
+    expect(oneDriveUploadUrl('a b&c.png')).toBe(
+      `${MICROSOFT_GRAPH_ROOT}/me/drive/root:/${encodeURIComponent(CLOUD_SAVE_FOLDER)}/a%20b%26c.png:/content`,
+    )
+  })
+})
+
+describe('uploadOneDriveImage', () => {
+  it('PUTs the blob with the bearer token to the upload URL', async () => {
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(new Response(null, { status: 201 })),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await uploadOneDriveImage('token-xyz', {
+      name: 'mark.png',
+      blob: new Blob([new Uint8Array([1])], { type: 'image/png' }),
+    })
+
+    const call = fetchMock.mock.calls[0]
+    expect(call?.[0]).toBe(oneDriveUploadUrl('mark.png'))
+    expect(call?.[1]).toMatchObject({
+      method: 'PUT',
+      headers: { Authorization: 'Bearer token-xyz', 'Content-Type': 'image/png' },
+    })
+  })
+
+  it('throws when the upload responds with a non-OK status', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response(null, { status: 507 }))),
+    )
+
+    await expect(
+      uploadOneDriveImage('token-xyz', { name: 'mark.png', blob: new Blob([]) }),
+    ).rejects.toThrow(/mark\.png/)
   })
 })
 

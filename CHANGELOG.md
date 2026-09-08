@@ -7,6 +7,31 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.8.2] - 2026-09-07
+
+M16 (cloud read **and** write): save watermarked photos straight back to Google
+Drive, Dropbox, and OneDrive, and make the whole cloud feature work for every
+user (not just the owner). This completes "read and write to cloud storage".
+
+### Added
+
+- **Save to cloud** from the editor (the export panel gains a "Save to Google
+  Drive / Dropbox / OneDrive" button next to Download) and from the bulk tool
+  (a "Save to <provider>" button after a batch finishes). Each writes the
+  watermarked photos into a "Watermark Pro" folder in the user's account,
+  created if missing. Google uses the same `drive.file` sign-in as the picker;
+  Dropbox signs in with a browser PKCE flow; OneDrive uses Microsoft Graph.
+
+### Changed
+
+- The Google OAuth app is **published to production**, so any Google account can
+  use Drive import and save (no verification — `drive.file` is non-sensitive).
+- The OneDrive app was **re-registered on the correct Microsoft account** and now
+  requests `Files.ReadWrite` (read for the picker, write for save).
+- Dropbox gained `files.content.write` and a PKCE redirect for the save flow.
+- CSP `connect-src` gains the write endpoints (`api.dropboxapi.com`,
+  `content.dropboxapi.com`, and the OneDrive upload hosts). See `public/_headers`.
+
 ## [1.8.1] - 2026-09-07
 
 M16 (cloud pickers): import photos straight from Google Drive, Dropbox, and

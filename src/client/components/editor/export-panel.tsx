@@ -3,7 +3,8 @@ import { useState } from 'react'
 
 import { FORMAT_OPTIONS } from './formats'
 import { MetadataPolicyField } from './metadata-policy'
-import { MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
+import type { PublicConfig } from '../../../shared/api'
+import { CLOUD_SAVE_FOLDER, MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
 import {
   DEFAULT_METADATA_POLICY,
   effectivePolicy,
@@ -14,7 +15,9 @@ import {
 } from '../../engine/encode'
 import { invisibleCapacity } from '../../engine/invisible'
 import type { Size } from '../../engine/layout'
+import { PROVIDER_LABELS, type CloudUpload } from '../../lib/imports/source'
 import { canShareFiles } from '../../lib/share-file'
+import { CloudSaveButtons } from '../import/cloud-save-buttons'
 import { Button } from '../ui/button'
 import { Select } from '../ui/select'
 import { SliderField } from '../ui/slider-field'
@@ -32,6 +35,14 @@ interface ExportPanelProps {
   isSaving?: boolean | undefined
   /** Seeds the default hidden-mark message; the workspace name identifies the owner. */
   organizationName: string
+  /** Public config; when it has configured cloud providers, "Save to cloud" buttons appear. */
+  cloudConfig?: PublicConfig | undefined
+  /** Renders the current photo at full resolution for a cloud save; null when nothing is loaded. */
+  onExportBlob?: ((options: EncodeOptions) => Promise<CloudUpload | null>) | undefined
+  /** Confirms a successful cloud save with a ready-to-show message. */
+  onCloudSaved?: ((message: string) => void) | undefined
+  /** Surfaces a cloud-save failure. */
+  onCloudError?: ((message: string) => void) | undefined
 }
 
 const DEFAULT_QUALITY = 0.9
@@ -59,6 +70,10 @@ export function ExportPanel({
   onSave,
   isSaving = false,
   organizationName,
+  cloudConfig,
+  onExportBlob,
+  onCloudSaved,
+  onCloudError,
 }: ExportPanelProps) {
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
@@ -189,6 +204,24 @@ export function ExportPanel({
             {isSaving ? null : <Images aria-hidden="true" className="size-4" />}
             Save to gallery
           </Button>
+        )}
+        {cloudConfig === undefined || onExportBlob === undefined ? null : (
+          <CloudSaveButtons
+            config={cloudConfig}
+            disabled={!isReady || isBlocked || isBusy}
+            getUploads={async () => {
+              const upload = await onExportBlob(options())
+              return upload === null ? [] : [upload]
+            }}
+            onSaved={(provider) => {
+              onCloudSaved?.(
+                `Saved to your ${PROVIDER_LABELS[provider]} “${CLOUD_SAVE_FOLDER}” folder.`,
+              )
+            }}
+            onError={(message) => {
+              onCloudError?.(message)
+            }}
+          />
         )}
       </div>
     </div>

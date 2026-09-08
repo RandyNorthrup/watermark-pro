@@ -9,14 +9,22 @@
  * folders (for navigation) and image files (`file.mimeType` starting `image/`),
  * discarding everything else. Each image carries the short-lived,
  * pre-authenticated `@microsoft.graph.downloadUrl`, which is fetched without an
- * auth header. The URL builder and the mapper are pure and unit-tested; the
+ * auth header. The URL builders and the mapper are pure and unit-tested; the
  * MSAL and network glue is exercised by the browser, not here.
+ *
+ * Saving back (M16 save-to-cloud) uses the same `Files.ReadWrite` token: each
+ * watermarked photo is PUT to `.../root:/<CLOUD_SAVE_FOLDER>/<name>:/content`,
+ * which creates the folder path if missing and supports the photo sizes this
+ * app produces (Graph's simple upload accepts up to 250 MB).
  */
 import { InteractionRequiredAuthError, PublicClientApplication } from '@azure/msal-browser'
 import { z } from 'zod'
 
 import { toImageFile } from './download'
+import type { CloudUpload } from './source'
+import type { PublicConfig } from '../../../shared/api'
 import {
+  CLOUD_SAVE_FOLDER,
   MICROSOFT_AUTHORITY,
   MICROSOFT_GRAPH_ROOT,
   MICROSOFT_GRAPH_SCOPE,
@@ -181,4 +189,61 @@ export async function downloadOneDriveImage(item: OneDriveImage): Promise<File> 
   }
   const blob = await response.blob()
   return toImageFile(blob, item.name, item.mimeType)
+}
+
+/**
+ * Graph simple-upload URL for a watermarked photo, addressed by path under the
+ * save folder at the drive root. Both path segments are percent-encoded so a
+ * name with spaces or reserved characters cannot break out of the path. Pure,
+ * so it is unit-tested without a network.
+ */
+export function oneDriveUploadUrl(name: string): string {
+  const folder = encodeURIComponent(CLOUD_SAVE_FOLDER)
+  const file = encodeURIComponent(name)
+  return `${MICROSOFT_GRAPH_ROOT}/me/drive/root:/${folder}/${file}:/content`
+}
+
+/** Content type sent with an upload when the blob does not carry one. */
+const DEFAULT_UPLOAD_CONTENT_TYPE = 'application/octet-stream'
+
+/**
+ * Writes one watermarked photo to the save folder via Graph's simple upload,
+ * creating the folder path if it does not exist. A non-OK response throws with
+ * the status so `describeError` can surface it.
+ */
+export async function uploadOneDriveImage(token: string, upload: CloudUpload): Promise<void> {
+  const contentType = upload.blob.type.length > 0 ? upload.blob.type : DEFAULT_UPLOAD_CONTENT_TYPE
+  const response = await fetch(oneDriveUploadUrl(upload.name), {
+    method: 'PUT',
+    headers: {
+      [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${token}`,
+      'Content-Type': contentType,
+    },
+    body: upload.blob,
+  })
+  if (!response.ok) {
+    throw new Error(
+      `Could not save "${upload.name}" to OneDrive (HTTP ${String(response.status)}).`,
+    )
+  }
+}
+
+/**
+ * Signs in with MSAL (`Files.ReadWrite`) and writes every watermarked photo to
+ * the user's OneDrive save folder, in order. Throws a descriptive error when
+ * OneDrive is not configured; a failed sign-in or upload rejects with a readable
+ * message naming the file.
+ */
+export async function saveToOneDrive(
+  config: PublicConfig,
+  uploads: readonly CloudUpload[],
+): Promise<void> {
+  const clientId = config.microsoftClientId
+  if (clientId === null) {
+    throw new Error('OneDrive is not configured for this deployment.')
+  }
+  const token = await acquireGraphToken(clientId)
+  for (const upload of uploads) {
+    await uploadOneDriveImage(token, upload)
+  }
 }

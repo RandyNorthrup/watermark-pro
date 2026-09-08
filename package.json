@@ -1,6 +1,6 @@
 {
   "name": "watermark-pro",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "private": true,
   "description": "Enterprise-grade photo watermarking on Cloudflare Workers: bulk jobs, watermark library, smart placement, editor, sharing, RBAC.",
   "license": "MIT",

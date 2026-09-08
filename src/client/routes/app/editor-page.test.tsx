@@ -3,6 +3,8 @@ import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FILTER_BY_ID } from '../../../shared/adjustments'
+import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
+import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace, seedViewerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { downloads } from '../../test-support/fake-download'
@@ -15,6 +17,9 @@ import {
   resetFakePreview,
 } from '../../test-support/fake-preview'
 import { renderApp } from '../../test-support/render-app'
+
+vi.mock('../../lib/imports/google-drive-save', () => ({ saveToGoogleDrive: vi.fn() }))
+const googleSave = vi.mocked(saveToGoogleDrive)
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
@@ -44,10 +49,24 @@ async function openSquareCrop(user: ReturnType<typeof userEvent.setup>) {
   expect(screen.getByLabelText('Width (px)')).toHaveValue(640)
 }
 
+/** Renders the editor with cloud providers, opens Export, and clicks "Save to Google Drive". */
+async function openExportCloudSave(): Promise<{ user: ReturnType<typeof userEvent.setup> }> {
+  const user = userEvent.setup()
+  seedOwnerWorkspace(client())
+  installLibraryApi({ watermarks: [makeWatermark()], publicConfig: ALL_CLOUD_CONFIG })
+  renderApp('/app/editor?preset=wm-1')
+  await user.click(await screen.findByRole('tab', { name: 'Export' }))
+  const saveButton = await screen.findByRole('button', { name: 'Save to Google Drive' })
+  await waitFor(() => expect(saveButton).toBeEnabled())
+  await user.click(saveButton)
+  return { user }
+}
+
 beforeEach(() => {
   installFakeAuth()
   resetFakePreview()
   downloads.mockClear()
+  googleSave.mockReset()
   Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:unused'), revokeObjectURL: vi.fn() })
   // jsdom has no layout; give the preview image a size so the overlays render.
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
@@ -286,6 +305,24 @@ describe('editor page', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'The limit for this organization has been reached.',
     )
+  })
+
+  it('saves the export to a configured cloud provider', async () => {
+    googleSave.mockResolvedValue()
+    await openExportCloudSave()
+
+    await waitFor(() => expect(googleSave).toHaveBeenCalledTimes(1))
+    expect(googleSave.mock.calls[0]?.[1]).toHaveLength(1)
+    expect(
+      await screen.findByText(/Saved to your Google Drive .Watermark Pro. folder/),
+    ).toBeInTheDocument()
+  })
+
+  it('reports a cloud save failure in the export panel', async () => {
+    googleSave.mockRejectedValue(new Error('Drive is full'))
+    await openExportCloudSave()
+
+    expect(await screen.findByText('Drive is full')).toBeInTheDocument()
   })
 
   it('hides saving from viewers', async () => {

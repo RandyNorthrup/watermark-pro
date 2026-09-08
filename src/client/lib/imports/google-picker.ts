@@ -222,6 +222,20 @@ function loadIdentityServices(): Promise<void> {
   return loadScriptOnce(GOOGLE_IDENTITY_SCRIPT_URL)
 }
 
+/**
+ * Load Google Identity Services and mint a `drive.file` access token through its
+ * popup flow. Exported so the save module (`google-drive-save`) shares the same
+ * token dance rather than duplicating it.
+ */
+export async function acquireGoogleDriveToken(clientId: string): Promise<string> {
+  await loadIdentityServices()
+  const google = window.google
+  if (google === undefined) {
+    throw new Error('The Google Identity SDK did not initialise.')
+  }
+  return await requestAccessToken(google.accounts, clientId)
+}
+
 /** Request a `drive.file` access token via the GIS popup flow. */
 function requestAccessToken(accounts: GoogleAccounts, clientId: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {

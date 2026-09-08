@@ -102,7 +102,9 @@ export default defineConfig({
         // lib/imports/download.ts + lib/imports/source.ts. The OneDrive browse
         // dialog is likewise vendor-token/Graph glue. See PLAN.md §9.
         'src/client/lib/imports/google-picker.ts',
+        'src/client/lib/imports/google-drive-save.ts',
         'src/client/lib/imports/dropbox-chooser.ts',
+        'src/client/lib/imports/dropbox-save.ts',
         'src/client/lib/imports/onedrive.ts',
         'src/client/components/import/onedrive-dialog.tsx',
         // D1 and binding wiring that only executes inside workerd. Covered

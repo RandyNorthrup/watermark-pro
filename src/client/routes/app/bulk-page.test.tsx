@@ -3,6 +3,8 @@ import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FILTER_BY_ID, IDENTITY_ADJUSTMENTS } from '../../../shared/adjustments'
+import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
+import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import {
@@ -14,6 +16,9 @@ import {
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
+
+vi.mock('../../lib/imports/google-drive-save', () => ({ saveToGoogleDrive: vi.fn() }))
+const googleSave = vi.mocked(saveToGoogleDrive)
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../bulk/runtime', () => import('../../test-support/fake-bulk-runtime'))
@@ -48,11 +53,26 @@ async function addTwoPhotoBatch(): Promise<TestUser> {
   return user
 }
 
+/** Runs a two-photo batch to completion with every cloud provider configured. */
+async function runCloudBatch(): Promise<TestUser> {
+  const user = userEvent.setup()
+  seedOwnerWorkspace(client())
+  installLibraryApi({ watermarks: [makeWatermark()], publicConfig: ALL_CLOUD_CONFIG })
+  renderApp('/app/bulk')
+  await screen.findByLabelText('Add photos')
+  await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg'), photo('b.jpg')])
+  await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+  await user.click(screen.getByRole('button', { name: 'Start' }))
+  await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
+  return user
+}
+
 beforeEach(() => {
   installFakeAuth()
   resetFakeBulkRuntime()
   downloads.mockClear()
   zipEntries.mockClear()
+  googleSave.mockReset()
 })
 
 afterEach(() => {
@@ -194,6 +214,26 @@ describe('bulk page', () => {
     await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
     await user.click(screen.getByRole('button', { name: 'Save 2 to gallery' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('2 could not be saved')
+  })
+
+  it('saves a finished batch to a configured cloud provider', async () => {
+    googleSave.mockResolvedValue()
+    const user = await runCloudBatch()
+
+    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await waitFor(() => expect(googleSave).toHaveBeenCalledTimes(1))
+    expect(googleSave.mock.calls[0]?.[1]).toHaveLength(2)
+    expect(
+      await screen.findByText(/to your Google Drive .Watermark Pro. folder/),
+    ).toBeInTheDocument()
+  })
+
+  it('reports a cloud save failure', async () => {
+    googleSave.mockRejectedValue(new Error('Drive is full'))
+    const user = await runCloudBatch()
+
+    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    expect(await screen.findByText('Drive is full')).toBeInTheDocument()
   })
 
   it('accepts dropped files and points at the library when there are no presets', async () => {

@@ -26,7 +26,7 @@ import {
   IDENTITY_ORIENTATION,
   type Orientation,
 } from '../../../shared/adjustments'
-import { MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
+import { CLOUD_SAVE_FOLDER, MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import {
   type BulkFile,
@@ -57,6 +57,7 @@ import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
+import { PROVIDER_LABELS } from '../../lib/imports/source'
 import { takeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
 import { publicConfigQueryOptions } from '../../lib/queries'
@@ -69,6 +70,7 @@ import { FrameControls } from '../editor/frame-controls'
 import { MetadataPolicyField } from '../editor/metadata-policy'
 import { OrientationControls } from '../editor/orientation-controls'
 import { CloudImportButtons } from '../import/cloud-import-buttons'
+import { CloudSaveButtons } from '../import/cloud-save-buttons'
 import { TakePhotoButton } from '../import/take-photo-button'
 import { UrlImportDialog } from '../import/url-import-dialog'
 import { PresetGate } from '../presets/preset-gate'
@@ -203,6 +205,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   const [showAll, setShowAll] = useState(false)
   const [skippedNote, setSkippedNote] = useState<string | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
+  const [cloudSave, setCloudSave] = useState<{ ok: boolean; text: string } | null>(null)
   // The job whose photo is open in the override dialog, or null.
   const [adjusting, setAdjusting] = useState<{ id: string; input: BulkJobInput } | null>(null)
   const canPickFolder = canPickDirectory()
@@ -1008,6 +1011,32 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     .
                   </Alert>
                 ) : null}
+                {publicConfig.data === undefined ? null : (
+                  <CloudSaveButtons
+                    config={publicConfig.data}
+                    disabled={snapshot.isRunning}
+                    getUploads={() =>
+                      results.flatMap((job) =>
+                        job.output === null
+                          ? []
+                          : [{ name: job.output.fileName, blob: job.output.blob }],
+                      )
+                    }
+                    onSaved={(provider, count) => {
+                      const noun = count === 1 ? 'photo' : 'photos'
+                      setCloudSave({
+                        ok: true,
+                        text: `Saved ${String(count)} ${noun} to your ${PROVIDER_LABELS[provider]} “${CLOUD_SAVE_FOLDER}” folder.`,
+                      })
+                    }}
+                    onError={(message) => {
+                      setCloudSave({ ok: false, text: message })
+                    }}
+                  />
+                )}
+                {cloudSave === null ? null : (
+                  <Alert tone={cloudSave.ok ? 'success' : 'error'}>{cloudSave.text}</Alert>
+                )}
                 {zipError === null ? null : <Alert tone="error">{zipError}</Alert>}
               </div>
             ) : null}
