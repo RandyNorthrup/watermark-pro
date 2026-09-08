@@ -35,6 +35,8 @@
     "test:drill": "node scripts/red-drill.mjs",
     "audit:lighthouse": "node scripts/lighthouse.mjs",
     "audit:screenshots": "node scripts/screenshots.mjs",
+    "bundle:report": "node scripts/bundle-report.mjs",
+    "bundle:budget": "node scripts/bundle-budget.mjs",
     "security:audit": "npm audit --audit-level=high",
     "security:secrets": "gitleaks git --redact --no-banner .",
     "security:sast": "semgrep scan --config p/default --config p/typescript --config p/react --config p/secrets --error --metrics=off",

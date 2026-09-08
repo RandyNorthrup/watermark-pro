@@ -7,6 +7,19 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+M19 (performance and production hardening) is in progress.
+
+### Added
+
+- Bundle-size measurement and budget tooling (`npm run bundle:report`,
+  `npm run bundle:budget`): the client build now emits a manifest, and
+  `scripts/lib/bundle-sizes.mjs` computes gzip/brotli sizes from the real chunk
+  graph. The report is written to `docs/bundle/m19.md`; the budget gate enforces
+  the PLAN §5.5 gzip limits (`/` ≤ 90 kB, `/app/*` shell ≤ 140 kB, any route
+  chunk ≤ 60 kB excluding the media-engine chunks). Baseline recorded: initial
+  JS shared by every page is 234.8 kB gzip; the budget gate is not yet part of
+  `npm run quality` until the surfaces are split under budget.
+
 ## [1.10.0] - 2026-09-08
 
 M18 (localisation): the whole interface is available in twelve languages,

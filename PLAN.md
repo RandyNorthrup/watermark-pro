@@ -630,6 +630,22 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   - [ ] competitor re-check done; README status updated
   - [ ] full gates, drills, device matrix, screenshots in `en` and `ar`
   - [ ] 2.0.0 tagged, deployed, released
+- **Progress (2026-09-08):**
+  - Measurement foundation landed. `vite.config.ts` now emits the client
+    manifest (`build.manifest`), and `scripts/lib/bundle-sizes.mjs` computes
+    gzip/brotli from the real chunk graph for both `npm run bundle:report`
+    (writes `docs/bundle/m19.md`) and `npm run bundle:budget` (enforces the
+    §5.5 gzip budgets: `/` ≤ 90 kB, `/app/*` shell ≤ 140 kB, any route chunk
+    ≤ 60 kB excluding the media-engine chunks). Verified the gate fires: it
+    reports the current over-budget state rather than passing it.
+  - **Honest baseline:** initial-load JS shared by every page is **234.8 kB
+    gzip / 206.6 kB brotli** (CSS 9.9 kB gzip). Route chunks already pass
+    (largest is `app/bulk` at 10.6 kB gzip, well under 60 kB). The `/` budget
+    (90 kB) is unreachable by chunk-splitting alone — the boot entry chunk is
+    98.7 kB gzip on its own (react-dom + router + query + i18next core) — so it
+    needs the §1 prerender / public-entry split, not only the §3 diet. The
+    budget gate is therefore **not yet wired into `quality`** (it would fail);
+    it is wired once the surfaces are split and under budget.
 
 ---
 

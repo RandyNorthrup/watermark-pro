@@ -31,6 +31,11 @@ const PDF_CHUNK_GROUP = {
 
 export default defineConfig({
   build: {
+    // The client build emits `.vite/manifest.json` so the bundle report and the
+    // size-budget gate (scripts/bundle-report.mjs, scripts/bundle-budget.mjs)
+    // can trace the initial-load set per route from the real chunk graph
+    // instead of scraping the built HTML. The Worker build ignores this.
+    manifest: true,
     rolldownOptions: {
       output: {
         codeSplitting: { groups: [UI_CHUNK_GROUP, VIDEO_CHUNK_GROUP, PDF_CHUNK_GROUP] },
