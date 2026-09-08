@@ -38,6 +38,11 @@ user (not just the owner). This completes "read and write to cloud storage".
   (6220 ms against a 6000 ms ceiling; real cost is ~250–450 ms). Its headroom is
   raised to ~48x the real cost so a genuine large regression still trips it
   without flaking under gate contention. See PLAN.md §9.
+- The accept-invitation end-to-end navigations wait for the navigation to commit
+  rather than the full `load` event, which WebKit (iPhone/iPad) aborts while the
+  router resolves the route on the client — Playwright reported that abort as
+  "Frame load interrupted". The rendered-page assertions are unchanged. See
+  PLAN.md §9.
 
 ## [1.8.1] - 2026-09-07
 
