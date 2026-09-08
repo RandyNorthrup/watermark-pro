@@ -7,6 +7,14 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Added
+
+- M18 localisation foundation: the i18next runtime (`src/client/i18n`), the
+  supported-locale list (`src/shared/locales.ts`), locale detection (saved →
+  browser → English), a language picker in the app chrome, and a typed English
+  catalogue. String extraction across the app and the twelve translated
+  catalogues follow; the interface is still English until then.
+
 ## [1.9.0] - 2026-09-07
 
 M17 (video and PDF): the same presets, placement and contrast now go onto video

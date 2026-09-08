@@ -1,0 +1,58 @@
+{
+  "language": {
+    "menuLabel": "Change language",
+    "heading": "Language"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "library": "Library",
+      "editor": "Editor",
+      "bulk": "Bulk",
+      "video": "Video",
+      "documents": "Documents",
+      "gallery": "Gallery",
+      "shares": "Shares",
+      "members": "Members",
+      "audit": "Audit log",
+      "admin": "Admin"
+    },
+    "skipToContent": "Skip to content",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "primaryNav": "Primary",
+    "primaryMenuNav": "Primary (menu)",
+    "toolsNav": "Tools",
+    "signOut": "Sign out",
+    "switchOrganization": "Switch organization",
+    "createOrganization": "Create organization",
+    "accountMenu": "Account menu for {{name}}"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "download": "Download",
+    "remove": "Remove",
+    "apply": "Apply",
+    "close": "Close",
+    "retry": "Try again"
+  },
+  "auth": {},
+  "library": {},
+  "designer": {},
+  "editor": {},
+  "bulk": {},
+  "gallery": {},
+  "shares": {},
+  "admin": {},
+  "video": {},
+  "documents": {},
+  "verify": {},
+  "errors": {
+    "fallback": "Something went wrong. Please try again."
+  },
+  "tokens": {},
+  "filters": {},
+  "a11y": {}
+}

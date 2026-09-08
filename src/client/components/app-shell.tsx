@@ -21,6 +21,7 @@ import {
 import { type ReactNode, useState } from 'react'
 
 import { BrandMark } from './brand-mark'
+import { LanguageMenu } from './language-menu'
 import { ThemeToggle } from './theme-toggle'
 import { isPlatformAdmin } from '../lib/admin'
 import { type ActiveOrganization, authClient, type SessionData } from '../lib/auth-client'
@@ -113,6 +114,7 @@ export function AppShell({ session, organization, organizations, children }: App
             <BrandMark to="/app" />
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <LanguageMenu />
             <ThemeToggle />
             <UserMenu session={session} />
           </div>

@@ -1,0 +1,51 @@
+/**
+ * The languages the client ships in (M18). Shared between the browser and the
+ * Worker: the Worker validates the `locale` a user saves against this list, and
+ * the client renders the picker and decides text direction from it. No DOM, no
+ * imports from either side.
+ *
+ * `en` is the source of truth for the catalogues; the other locales are
+ * translated from it. A locale that fails the translation quality process is
+ * removed from this list rather than shipped half-translated (see PLAN.md §4).
+ */
+export const SUPPORTED_LOCALES = [
+  { code: 'en', name: 'English', dir: 'ltr' },
+  { code: 'es', name: 'Español', dir: 'ltr' },
+  { code: 'de', name: 'Deutsch', dir: 'ltr' },
+  { code: 'fr', name: 'Français', dir: 'ltr' },
+  { code: 'it', name: 'Italiano', dir: 'ltr' },
+  { code: 'pt-BR', name: 'Português (Brasil)', dir: 'ltr' },
+  { code: 'nl', name: 'Nederlands', dir: 'ltr' },
+  { code: 'ja', name: '日本語', dir: 'ltr' },
+  { code: 'ko', name: '한국어', dir: 'ltr' },
+  { code: 'zh-Hans', name: '简体中文', dir: 'ltr' },
+  { code: 'ru', name: 'Русский', dir: 'ltr' },
+  { code: 'ar', name: 'العربية', dir: 'rtl' },
+] as const
+
+export type Locale = (typeof SUPPORTED_LOCALES)[number]['code']
+export type TextDirection = (typeof SUPPORTED_LOCALES)[number]['dir']
+
+/** The language the app falls back to and the source of every catalogue. */
+export const DEFAULT_LOCALE: Locale = 'en'
+
+/** Just the codes, in display order; handy for iteration and validation. */
+export const LOCALE_CODES: readonly Locale[] = SUPPORTED_LOCALES.map((locale) => locale.code)
+
+const LOCALE_BY_CODE = new Map(SUPPORTED_LOCALES.map((locale) => [locale.code, locale]))
+
+export function isSupportedLocale(value: string): value is Locale {
+  return LOCALE_BY_CODE.has(value as Locale)
+}
+
+/** `'rtl'` for Arabic, `'ltr'` for the rest; drives `<html dir>`. */
+export function localeDirection(locale: Locale): TextDirection {
+  return LOCALE_BY_CODE.get(locale)?.dir ?? 'ltr'
+}
+
+export function isRtl(locale: string): boolean {
+  return isSupportedLocale(locale) && localeDirection(locale) === 'rtl'
+}
+
+/** Where the client persists the chosen locale for a signed-out visitor. */
+export const LOCALE_STORAGE_KEY = 'watermark-pro:locale'

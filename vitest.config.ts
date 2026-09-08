@@ -78,6 +78,11 @@ export default defineConfig({
         'src/client/lib/auth-client.ts',
         // One-line side-effect import of main.tsx; covered by Playwright.
         'src/client/lib/zod-config.ts',
+        // i18next runtime glue (M18): instance init, code-split catalogue loads
+        // and `<html lang/dir>` mutation. The locale-selection logic it depends
+        // on lives in the fully tested i18n/detect.ts; the instance is set up
+        // for every page test by test-setup.ts. See PLAN.md §9.
+        'src/client/i18n/index.ts',
         // Runs inside a Web Worker thread, which coverage cannot instrument;
         // exercised end to end through worker-client tests in Chromium.
         'src/client/engine/worker.ts',
