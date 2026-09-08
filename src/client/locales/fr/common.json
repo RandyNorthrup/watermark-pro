@@ -1,0 +1,1101 @@
+{
+  "language": {
+    "menuLabel": "Changer de langue"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "library": "Bibliothèque",
+      "editor": "Éditeur",
+      "bulk": "En lot",
+      "video": "Vidéo",
+      "documents": "Documents",
+      "gallery": "Galerie",
+      "shares": "Partages",
+      "members": "Membres",
+      "audit": "Journal d'audit",
+      "admin": "Admin"
+    },
+    "skipToContent": "Aller au contenu",
+    "menu": "Menu",
+    "primaryNav": "Principal",
+    "primaryMenuNav": "Principal (menu)",
+    "toolsNav": "Outils",
+    "signOut": "Se déconnecter",
+    "accountMenu": "Menu du compte de {{name}}",
+    "menuDescription": "Changez d'organisation ou accédez à n'importe quelle partie de Watermark Pro.",
+    "switchOrganizationFor": "Organisation : {{name}}. Changer d'organisation",
+    "chooseOrganization": "Choisir une organisation",
+    "chooseOrganizationShort": "Choisir l'organisation",
+    "organizations": "Organisations",
+    "newOrganization": "Nouvelle organisation",
+    "theme": {
+      "system": "Thème : système. Passer au clair",
+      "light": "Thème : clair. Passer au sombre",
+      "dark": "Thème : sombre. Passer au système"
+    }
+  },
+  "auth": {
+    "backToSignIn": "Retour à la connexion",
+    "fields": {
+      "emailLabel": "E-mail",
+      "passwordLabel": "Mot de passe"
+    },
+    "login": {
+      "title": "Content de vous revoir",
+      "description": "Connectez-vous à votre espace de travail.",
+      "footerPrompt": "Première visite ?",
+      "createAccount": "Créer un compte",
+      "verifyTitle": "Vérifiez d'abord votre e-mail",
+      "verifyBody": "Nous avons envoyé un lien de vérification à {{email}}.",
+      "resendIt": "Renvoyer",
+      "forgotPassword": "Mot de passe oublié ?",
+      "submit": "Se connecter"
+    },
+    "signup": {
+      "title": "Créez votre compte",
+      "description": "Un lien de vérification sera envoyé à votre adresse e-mail.",
+      "footerPrompt": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter",
+      "nameLabel": "Nom",
+      "passwordHint": "Au moins {{min}} caractères. Quelques mots sans rapport font l'affaire.",
+      "submit": "Créer le compte"
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser votre mot de passe",
+      "description": "Saisissez votre e-mail et nous vous enverrons un lien de réinitialisation si un compte existe.",
+      "sentTitle": "Consultez votre boîte de réception",
+      "sentBody": "Si {{email}} correspond à un compte, un lien de réinitialisation est en route. Il expire dans une heure.",
+      "submit": "Envoyer le lien de réinitialisation"
+    },
+    "resetPassword": {
+      "title": "Choisissez un nouveau mot de passe",
+      "invalidTitle": "Ce lien de réinitialisation n'est pas valide",
+      "invalidBody": "Il a peut-être expiré ou déjà été utilisé.",
+      "requestNew": "En demander un nouveau",
+      "invalidEnd": ".",
+      "newPasswordLabel": "Nouveau mot de passe",
+      "passwordHint": "Au moins {{min}} caractères.",
+      "confirmLabel": "Confirmer le mot de passe",
+      "mismatch": "Les mots de passe ne correspondent pas",
+      "submit": "Mettre à jour le mot de passe"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "Invitation indisponible",
+      "title": "Rejoindre {{organizationName}}",
+      "description": "{{inviterEmail}} vous invite à rejoindre en tant que {{role}}.",
+      "roleLabel": "Rôle :",
+      "decline": "Refuser",
+      "accept": "Accepter l'invitation"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "Connecté en tant que {{email}}",
+    "yourWorkspace": "Votre espace de travail",
+    "yourRole": "Votre rôle :",
+    "toolsHeading": "Outils",
+    "tools": {
+      "library": {
+        "label": "Bibliothèque",
+        "body": "Concevez une fois des filigranes texte, symbole et logo, puis conservez-les comme préréglages."
+      },
+      "editor": {
+        "label": "Éditeur",
+        "body": "Filigranez une photo à la main : placez, recadrez, redimensionnez et exportez."
+      },
+      "bulk": {
+        "label": "En lot",
+        "body": "Appliquez un préréglage à toute une séance et téléchargez les résultats au format ZIP."
+      },
+      "gallery": {
+        "label": "Galerie",
+        "body": "Parcourez ce que l'équipe a enregistré, puis partagez des albums via un lien."
+      }
+    },
+    "overviewHeading": "Vue d'ensemble",
+    "members": "Membres",
+    "noPendingInvitations": "Aucune invitation en attente.",
+    "pendingInvitations_one": "{{count}} invitation en attente.",
+    "pendingInvitations_many": "{{count}} invitations en attente.",
+    "pendingInvitations_other": "{{count}} invitations en attente.",
+    "manageMembers": "Gérer les membres",
+    "auditLog": "Journal d'audit",
+    "auditDescription": "Chaque changement d'adhésion et d'organisation est enregistré avec son auteur et sa date.",
+    "viewAuditLog": "Voir le journal d'audit"
+  },
+  "library": {
+    "orgRequired": "Créez ou rejoignez une organisation pour constituer une bibliothèque de filigranes.",
+    "heading": "Bibliothèque de filigranes",
+    "description": "Préréglages partagés par tous les membres de {{name}}. Appliquez-les un par un ou en lot.",
+    "export": "Exporter",
+    "exportPreset": "Exporter {{name}}",
+    "importPresets": "Importer des préréglages",
+    "newPreset": "Nouveau préréglage",
+    "exportErrorTitle": "Impossible d'exporter les préréglages",
+    "loadingPresets": "Chargement des préréglages",
+    "loadErrorTitle": "Impossible de charger la bibliothèque",
+    "empty": "Aucun préréglage pour l'instant. Un préréglage associe une marque (texte, symbole ou logo) à des réglages de placement, de contraste et de style.",
+    "createFirst": "Créer le premier préréglage",
+    "orgRequiredShort": "Créez ou rejoignez d'abord une organisation.",
+    "loadingPreset": "Chargement du préréglage",
+    "loadPresetErrorTitle": "Impossible de charger le préréglage",
+    "presetGone": "Ce préréglage n'existe plus.",
+    "editSubtitleManage": "Les modifications s'appliquent à tous ceux qui utilisent ce préréglage.",
+    "editSubtitleReadOnly": "Vue en lecture seule.",
+    "cannotCreate": "Votre rôle ne permet pas de créer des préréglages.",
+    "newPresetSubtitle": "Concevez la marque, choisissez son emplacement, puis enregistrez-la dans la bibliothèque.",
+    "openInEditor": "Ouvrir {{name}} dans l'éditeur",
+    "deletePreset": "Supprimer {{name}}",
+    "logoBadge": "logo",
+    "autoContrast": "Contraste auto",
+    "manualContrast": "Contraste manuel",
+    "updated": "Mis à jour le {{date}}",
+    "exportLogoTypeError": "Un logo a un type d'image qui ne peut pas être exporté.",
+    "exportMissingLogoError": "Un préréglage renvoie à un logo qui n'est plus dans la bibliothèque.",
+    "describe": {
+      "text": "« {{text}} » en {{fontFamily}}",
+      "glyph": "Glyphe {{glyph}}",
+      "icon": "Icône {{name}}",
+      "logo": "Logo",
+      "qr": "Code QR pour {{content}}"
+    },
+    "shape": {
+      "rectangle": "Rectangle",
+      "roundedRectangle": "Rectangle arrondi",
+      "ellipse": "Ellipse",
+      "line": "Ligne"
+    },
+    "placement": {
+      "smart": "Placement intelligent",
+      "custom": "Position personnalisée",
+      "random": "Placement aléatoire"
+    }
+  },
+  "designer": {
+    "presetName": "Nom du préréglage",
+    "presetNamePlaceholder": "Signature du studio",
+    "nameError": "Donnez au préréglage un nom d'au plus 60 caractères.",
+    "sections": {
+      "label": "Sections du concepteur",
+      "mark": "Marque",
+      "placement": "Placement",
+      "style": "Style"
+    },
+    "markType": "Type de marque",
+    "saveError": "Impossible d'enregistrer le préréglage",
+    "savePreset": "Enregistrer le préréglage",
+    "saveChanges": "Enregistrer les modifications",
+    "readOnlyHint": "Votre rôle permet de consulter les préréglages, mais pas de les modifier.",
+    "notAnImage": "Ce fichier n'est pas une image lisible par le navigateur.",
+    "text": {
+      "label": "Texte",
+      "hint": "Jusqu'à {{max}} caractères sur {{lines}} lignes maximum. Utilisez « Insérer un détail » pour des jetons comme la date ou l'appareil photo, remplis pour chaque photo. {location} inscrit la position GPS de la photo sur l'image."
+    },
+    "qr": {
+      "content": "Contenu du code QR",
+      "hint": "Un lien, généralement. Jusqu'à {{max}} caractères ; le code est toujours foncé sur fond clair pour pouvoir être scanné."
+    },
+    "tokens": {
+      "menu": "Insérer un détail",
+      "heading": "Détails de la photo",
+      "date": "Date",
+      "time": "Heure",
+      "taken": "Date et heure de prise de vue",
+      "filename": "Nom du fichier",
+      "camera": "Appareil photo",
+      "lens": "Objectif",
+      "iso": "ISO",
+      "aperture": "Ouverture",
+      "shutter": "Vitesse d'obturation",
+      "focal": "Distance focale",
+      "location": "Localisation (GPS)",
+      "index": "Numéro de la photo",
+      "count": "Nombre de photos",
+      "width": "Largeur",
+      "height": "Hauteur"
+    },
+    "font": {
+      "family": "Police",
+      "weight": "Graisse",
+      "specimen": "Portez ce vieux whisky au juge blond qui fume"
+    },
+    "symbol": {
+      "icons": "Icônes",
+      "glyphLabel": "Glyphe {{glyph}}",
+      "iconLabel": "Icône {{label}}"
+    },
+    "shape": {
+      "label": "Forme",
+      "rectangle": "Rectangle",
+      "roundedRectangle": "Rectangle arrondi",
+      "ellipse": "Ellipse",
+      "line": "Ligne",
+      "length": "Longueur",
+      "proportions": "Proportions",
+      "fill": "Remplissage",
+      "fillToggle": "Remplir la forme",
+      "fillColour": "Couleur de remplissage",
+      "fillOpacity": "Opacité du remplissage",
+      "strokeWidth": "Épaisseur du trait",
+      "customStrokeColour": "Couleur de trait personnalisée",
+      "strokeColour": "Couleur du trait"
+    },
+    "effects": {
+      "letterSpacing": "Espacement des lettres",
+      "curve": "Courbe",
+      "effect": "Effet",
+      "textEffect": "Effet de texte",
+      "solid": "Plein",
+      "outline": "Contour",
+      "emboss": "Relief",
+      "engrave": "Gravure"
+    },
+    "placement": {
+      "mode": "Mode de placement",
+      "smart": "Intelligent",
+      "smartDescription": "Analyse chaque photo et choisit le coin le plus calme",
+      "corner": "Coin",
+      "cornerDescription": "Position fixe par rapport aux bords",
+      "custom": "Personnalisé",
+      "customDescription": "Position exacte en fraction de la photo",
+      "random": "Aléatoire",
+      "randomDescription": "Un emplacement différent par photo ; plus difficile à retirer automatiquement",
+      "smartHint": "Le moteur évalue chaque coin et chaque bord selon le détail, le contraste et le sujet, puis place la marque là où elle est lisible et la moins intrusive.",
+      "randomHint": "Chaque photo reçoit un coin aléatoire, décalé au maximum de la variation ci-dessous. Une même photo aboutit toujours au même endroit.",
+      "jitter": "Variation",
+      "cornerLegend": "Coin",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "anchor": {
+        "topLeft": "En haut à gauche",
+        "topCenter": "En haut au centre",
+        "topRight": "En haut à droite",
+        "middleLeft": "Au milieu à gauche",
+        "center": "Centre",
+        "middleRight": "Au milieu à droite",
+        "bottomLeft": "En bas à gauche",
+        "bottomCenter": "En bas au centre",
+        "bottomRight": "En bas à droite"
+      }
+    },
+    "style": {
+      "contrast": "Contraste",
+      "contrastMode": "Mode de contraste",
+      "auto": "Auto",
+      "autoDescription": "Encre claire ou foncée choisie pour chaque photo",
+      "manual": "Manuel",
+      "manualDescription": "Encre et intensité de contour fixes",
+      "colour": "Couleur",
+      "colourDescription": "Une couleur d'encre personnalisée",
+      "autoHint": "L'encre passe du clair au foncé selon la zone sous la marque, et un contour n'est ajouté que lorsque l'arrière-plan est de teinte trop proche.",
+      "ink": "Encre",
+      "inkLight": "Encre claire",
+      "inkDark": "Encre foncée",
+      "inkColour": "Couleur de l'encre",
+      "outlineStrength": "Intensité du contour",
+      "appearance": "Apparence",
+      "opacity": "Opacité",
+      "size": "Taille",
+      "ofWidth": "{{percent}} de la largeur",
+      "rotation": "Rotation",
+      "margin": "Marge",
+      "backdrop": "Cadre derrière la marque",
+      "boxOpacity": "Opacité du cadre",
+      "tiling": "Répéter sur toute la photo",
+      "spacing": "Espacement"
+    },
+    "preview": {
+      "heading": "Aperçu",
+      "rendering": "Génération de l'aperçu",
+      "choosePhoto": "Choisissez une photo pour l'aperçu",
+      "tryYourPhoto": "Essayer votre photo",
+      "samplePhoto": "Photo d'exemple",
+      "alt": "Aperçu du filigrane sur la photo",
+      "failed": "Échec de l'aperçu",
+      "chooseLogo": "Choisissez ou importez un logo pour voir l'aperçu.",
+      "nothingToPlace": "Rien à placer.",
+      "inkLight": "encre claire",
+      "inkDark": "encre foncée",
+      "inkColour": "encre {{colour}}",
+      "customPosition": "Position personnalisée, {{ink}}.",
+      "placed": "Placé {{position}}, {{ink}}.",
+      "position": {
+        "topLeft": "en haut à gauche",
+        "topCenter": "en haut au centre",
+        "topRight": "en haut à droite",
+        "middleLeft": "au milieu à gauche",
+        "center": "au centre",
+        "middleRight": "au milieu à droite",
+        "bottomLeft": "en bas à gauche",
+        "bottomCenter": "en bas au centre",
+        "bottomRight": "en bas à droite"
+      }
+    },
+    "logo": {
+      "loading": "Chargement des logos",
+      "loadError": "Impossible de charger les logos",
+      "empty": "Aucun logo pour l'instant. Importez un PNG, JPEG ou WebP à fond transparent pour un meilleur résultat.",
+      "choose": "Choisir un logo",
+      "item": "Logo {{name}}",
+      "delete": "Supprimer le logo {{name}}",
+      "upload": "Importer un fichier de logo",
+      "uploadButton": "Importer un logo",
+      "hint": "PNG, JPEG ou WebP jusqu'à {{max}} Mo, ou une signature dessinée.",
+      "tooLarge": "Les logos doivent faire au plus {{max}} Mo.",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "Préparer le logo",
+        "title": "Préparer « {{name}} »",
+        "description": "Vous pouvez effacer un fond uni et rogner les bords vides, puis l'importer comme PNG transparent.",
+        "before": "Avant",
+        "after": "Après",
+        "previewNeedsCanvas": "L'aperçu nécessite un canvas de navigateur.",
+        "preview": "Aperçu du logo préparé",
+        "removeBackground": "Supprimer le fond",
+        "backgroundTolerance": "Tolérance du fond",
+        "trim": "Rogner les bords transparents",
+        "outputSize": "Taille de sortie : {{size}} px",
+        "use": "Utiliser le logo",
+        "chooseAnother": "En choisir un autre"
+      },
+      "signature": {
+        "draw": "Dessiner une signature",
+        "description": "Signez avec le doigt, un stylet ou la souris. La signature est enregistrée comme logo transparent dans la bibliothèque, rognée au tracé.",
+        "pad": "Zone de signature ; dessinez ici",
+        "pen": "Stylet",
+        "penWidthGroup": "Largeur du stylet",
+        "penWidth": "Stylet de {{width}} pixels",
+        "undo": "Annuler le tracé",
+        "clear": "Effacer",
+        "cancel": "Annuler",
+        "save": "Enregistrer comme logo"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "Créez ou rejoignez une organisation pour utiliser l'éditeur.",
+    "heading": "Éditeur",
+    "description": "Filigranez une photo : choisissez un préréglage, placez-le à la main si vous le souhaitez, recadrez, redimensionnez et téléchargez. Rien ne quitte votre navigateur.",
+    "tabs": {
+      "watermark": "Filigrane",
+      "crop": "Recadrer",
+      "adjust": "Ajuster",
+      "resize": "Redimensionner",
+      "export": "Exporter"
+    },
+    "toolsLabel": "Outils de l'éditeur",
+    "openPhoto": "Ouvrir une photo",
+    "openPhotoLabel": "Ouvrir une photo",
+    "fromLink": "Depuis un lien",
+    "samplePhoto": "Photo d'exemple",
+    "sampleScene": "Scène d'exemple",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "Génération",
+    "renderingPreview": "Génération de l'aperçu",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "altCrop": "Photo avec le cadre de recadrage",
+    "altWatermark": "Photo avec le filigrane appliqué",
+    "choosePresetHint": "Choisissez un préréglage pour placer un filigrane. Déposez une photo n'importe où sur la zone de travail.",
+    "outputSize": "Sortie {{width}} × {{height}} px.",
+    "notAnImage": "Ce fichier n'est pas une image lisible par le navigateur.",
+    "previewFailed": "Échec de l'aperçu",
+    "exportFailed": "Échec de l'exportation",
+    "savedToGallery": "{{name}} enregistré dans la <galleryLink>galerie</galleryLink>.",
+    "applyToPhoto": "Appliquer à cette photo",
+    "applyToAll": "Appliquer à toutes les photos",
+    "removeOverride": "Supprimer la personnalisation",
+    "cancel": "Annuler",
+    "dimensions": {
+      "left": "Gauche",
+      "top": "Haut",
+      "width": "Largeur",
+      "height": "Hauteur",
+      "pxField": "{{label}} (px)"
+    },
+    "watermark": {
+      "emptyHint": "pour l'appliquer ici.",
+      "preset": "Préréglage",
+      "addPreset": "Ajouter un autre préréglage",
+      "maxMarks": "Jusqu'à {{max}} marques par photo",
+      "choosePreset": "Choisir un préréglage",
+      "marksHeading": "Marques sur cette photo",
+      "layersLabel": "Calques, de bas en haut",
+      "removedPreset": "Préréglage supprimé",
+      "removeLayer": "Retirer {{name}} de cette photo",
+      "adjusted": "Ajusté pour cette photo ; le préréglage de la bibliothèque reste inchangé.",
+      "revert": "Réinitialiser",
+      "placement": "Placement"
+    },
+    "crop": {
+      "aspectRatio": "Proportions",
+      "photoSize": "La photo fait {{width}} × {{height}} px.",
+      "reset": "Réinitialiser le recadrage",
+      "area": "Zone de recadrage. Faites glisser pour déplacer ; les flèches ajustent, Maj pour de plus grands pas.",
+      "resizeHandle": "Redimensionner le recadrage depuis {{handle}}",
+      "handles": {
+        "n": "le bord supérieur",
+        "s": "le bord inférieur",
+        "e": "le bord droit",
+        "w": "le bord gauche",
+        "ne": "le coin supérieur droit",
+        "nw": "le coin supérieur gauche",
+        "se": "le coin inférieur droit",
+        "sw": "le coin inférieur gauche"
+      }
+    },
+    "resize": {
+      "keepProportions": "Conserver les proportions",
+      "shortcuts": "Raccourcis",
+      "fit": "Ajuster à {{side}}",
+      "percent": "{{value}} %",
+      "outputUnchanged": "Sortie {{width}} × {{height}} px (inchangée).",
+      "outputChanged": "Sortie {{width}} × {{height}} px à partir de {{baseWidth}} × {{baseHeight}}.",
+      "resetSize": "Réinitialiser la taille"
+    },
+    "adjust": {
+      "filter": "Filtre",
+      "custom": "Ajustements personnalisés",
+      "filterValue": "Filtre : {{name}}",
+      "brightness": "Luminosité",
+      "contrast": "Contraste",
+      "saturation": "Saturation",
+      "warmth": "Chaleur",
+      "sepia": "Sépia",
+      "vignette": "Vignettage",
+      "reset": "Réinitialiser {{name}}",
+      "resetAll": "Tout réinitialiser"
+    },
+    "orientation": {
+      "rotateLeft": "Pivoter à gauche",
+      "rotateRight": "Pivoter à droite",
+      "flipHorizontal": "Retourner horizontalement",
+      "flipVertical": "Retourner verticalement",
+      "straighten": "Redresser"
+    },
+    "frame": {
+      "label": "Cadre",
+      "add": "Ajouter un cadre",
+      "width": "Épaisseur du cadre",
+      "colour": "Couleur du cadre"
+    },
+    "metadata": {
+      "heading": "Métadonnées",
+      "strip": {
+        "label": "Supprimer",
+        "help": "Aucune donnée d'appareil, aucune localisation. Le plus sûr pour le partage."
+      },
+      "keepExceptLocation": {
+        "label": "Conserver sauf la localisation",
+        "help": "L'appareil, l'objectif et l'heure de prise de vue sont conservés ; le GPS est supprimé."
+      },
+      "keep": {
+        "label": "Tout conserver",
+        "help": "Y compris la position GPS, si la photo en a une."
+      },
+      "webpNote": "Les métadonnées sont toujours supprimées des exports WebP."
+    },
+    "export": {
+      "format": "Format",
+      "quality": "Qualité",
+      "invisibleMark": "Marque invisible",
+      "choosePng": "Choisissez le PNG pour cacher un message dans les pixels.",
+      "invisibleMessage": "Message invisible",
+      "tooLong": "Trop long pour une photo {{width}}×{{height}} (capacité {{capacity}} octets).",
+      "invisibleHint": "Caché dans les pixels et lisible dans l'outil Vérifier. Ne survit qu'au PNG.",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}. Généré dans votre navigateur en pleine résolution{{share}}.",
+      "losslessClause": " ; PNG est sans perte",
+      "shareClause": " ; Partager l'envoie vers Photos, Messages ou toute autre application de cet appareil",
+      "download": "Télécharger",
+      "share": "Partager",
+      "saveToGallery": "Enregistrer dans la galerie",
+      "savedToFolder": "Enregistré dans votre dossier « {{folder}} » sur {{provider}}."
+    },
+    "mark": {
+      "position": "Position du filigrane. Faites glisser pour déplacer (il s'aligne sur les marges, les tiers et le centre ; maintenez Alt pour le placer librement), pincez pour redimensionner, tournez pour pivoter ; les flèches ajustent, plus et moins redimensionnent, les crochets pivotent.",
+      "rotate": "Pivoter le filigrane",
+      "resize": "Redimensionner le filigrane"
+    }
+  },
+  "bulk": {
+    "orgRequired": "Créez ou rejoignez une organisation pour filigraner en lot.",
+    "heading": "Filigrane par lot",
+    "description": "Appliquez un préréglage à toute une séance. Les photos sont traitées en parallèle dans votre navigateur et téléchargées au format ZIP ou une par une.",
+    "emptyHint": "pour l'appliquer à un lot.",
+    "addPhotos": "Ajouter des photos",
+    "addFolder": "Ajouter un dossier",
+    "dropHint": "Déposez des photos ou un dossier ici, ou",
+    "fromLink": "Depuis un lien",
+    "capacity_one": "Jusqu'à {{max}} photos par lot. Le traitement s'effectue dans votre navigateur avec {{count}} processus.",
+    "capacity_many": "Jusqu'à {{max}} photos par lot. Le traitement s'effectue dans votre navigateur avec {{count}} processus.",
+    "capacity_other": "Jusqu'à {{max}} photos par lot. Le traitement s'effectue dans votre navigateur avec {{count}} processus.",
+    "skipped_one": "{{count}} fichier ignoré : ce n'est pas une image",
+    "skipped_many": "{{count}} fichiers ignorés : ce ne sont pas des images",
+    "skipped_other": "{{count}} fichiers ignorés : ce ne sont pas des images",
+    "importErrorTitle": "Impossible d'importer depuis le cloud",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_many": "{{count}} photos",
+    "photoCount_other": "{{count}} photos",
+    "clearList": "Vider la liste",
+    "batchProgress": "Progression du lot",
+    "progress": {
+      "finished": "{{done}} sur {{total}} terminées",
+      "failed": ", {{n}} en échec",
+      "cancelled": ", {{n}} annulées",
+      "rate": " en {{seconds}} s ({{rate}} photos/s)",
+      "end": "."
+    },
+    "photosList": "Photos de ce lot",
+    "custom": "Personnalisé",
+    "selected": "Sélectionné",
+    "status": {
+      "queued": "En attente",
+      "processing": "En cours",
+      "done": "Terminé",
+      "failed": "Échec",
+      "cancelled": "Annulé"
+    },
+    "adjustPhoto": "Ajuster {{name}}",
+    "sharePhoto": "Partager {{name}}",
+    "downloadPhoto": "Télécharger {{name}}",
+    "removePhoto": "Retirer {{name}}",
+    "showAll": "Afficher les {{count}} photos",
+    "presetHint": "Cochez-en un ou plusieurs ; ils sont appliqués dans l'ordre coché, les derniers par-dessus les premiers.",
+    "format": "Format",
+    "quality": "Qualité",
+    "invisibleMark": "Marque invisible",
+    "invisibleMessage": "Message invisible",
+    "choosePng": "Choisissez le PNG pour cacher un message dans chaque photo.",
+    "size": {
+      "label": "Taille",
+      "original": "Taille d'origine",
+      "fit": "Ajuster à {{side}} px"
+    },
+    "fileNames": "Noms de fichiers",
+    "tokensLabel": "Jetons : {{tokens}}.",
+    "names": {
+      "example": "Exemple : {{example}}",
+      "mustProduceName": "Le modèle doit produire un nom."
+    },
+    "photoAdjustments": "Ajustements de la photo",
+    "resume": "Reprendre",
+    "pause": "Suspendre",
+    "cancel": "Annuler",
+    "start": "Démarrer",
+    "retry": "Réessayer {{count}}",
+    "downloadZip": "Télécharger {{count}} au format ZIP",
+    "downloadReport": "Télécharger le rapport (CSV)",
+    "saveToGallery": "Enregistrer {{count}} dans la galerie",
+    "savedProgress": "{{done}} sur {{total}} enregistrées",
+    "allSaved": "Tout est enregistré dans la <galleryLink>galerie</galleryLink>.",
+    "someSaved": "{{failed}} n'ont pas pu être enregistrées (quota ou limites de stockage). Les autres sont dans la <galleryLink>galerie</galleryLink>.",
+    "savedToCloud_one": "{{count}} photo enregistrée dans votre dossier « {{folder}} » sur {{provider}}.",
+    "savedToCloud_many": "{{count}} photos enregistrées dans votre dossier « {{folder}} » sur {{provider}}.",
+    "savedToCloud_other": "{{count}} photos enregistrées dans votre dossier « {{folder}} » sur {{provider}}.",
+    "privacyNote": "Le placement intelligent et le contraste automatique sont calculés séparément pour chaque photo. Rien n'est envoyé.",
+    "watch": {
+      "label": "Surveiller un dossier",
+      "stop": "Arrêter",
+      "choose": "Choisir les dossiers",
+      "hint": "Choisissez un dossier d'entrée et un dossier de sortie ; les nouvelles photos déposées dans l'entrée sont filigranées avec les préréglages cochés et écrites dans la sortie. Fonctionne uniquement tant que cette page est ouverte.",
+      "wrote": "{{name}} écrit",
+      "failed": "Échec {{name}} : {{error}}"
+    }
+  },
+  "gallery": {
+    "orgRequired": "Créez ou rejoignez une organisation pour tenir une galerie.",
+    "heading": "Galerie",
+    "description": "Photos filigranées enregistrées par {{name}}. Recherchez, filtrez par préréglage, téléchargez ou supprimez.",
+    "usage_one": "{{count}} photo · {{used}} sur {{max}}",
+    "usage_many": "{{count}} photos · {{used}} sur {{max}}",
+    "usage_other": "{{count}} photos · {{used}} sur {{max}}",
+    "maxCount": "Jusqu'à {{count}} photos par organisation",
+    "storageUsed": "Stockage utilisé",
+    "storagePercent": "{{percent}} % du stockage utilisé",
+    "checkPhoto": "Cocher une photo",
+    "search": "Rechercher",
+    "searchPlaceholder": "Nom de la photo",
+    "preset": "Préréglage",
+    "allPresets": "Tous les préréglages",
+    "selectAll": "Tout sélectionner",
+    "clearSelection": "Effacer la sélection",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_many": "{{count}} photos",
+    "photoCount_other": "{{count}} photos",
+    "share": "Partager",
+    "shareEllipsis": "Partager…",
+    "deleteErrorTitle": "Impossible de supprimer",
+    "loadingPhotos": "Chargement des photos",
+    "loadErrorTitle": "Impossible de charger la galerie",
+    "empty": "Aucune photo pour l'instant. Enregistrez-en une depuis l'éditeur ou tout un lot depuis l'outil En lot.",
+    "emptyFiltered": "Aucune photo ne correspond à ces filtres.",
+    "openEditor": "Ouvrir l'éditeur",
+    "openPhoto": "Ouvrir {{name}}",
+    "selectPhoto": "Sélectionner {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "Afficher plus",
+    "delete": "Supprimer",
+    "deleteConfirmTitle_one": "Supprimer {{count}} photo ?",
+    "deleteConfirmTitle_many": "Supprimer {{count}} photos ?",
+    "deleteConfirmTitle_other": "Supprimer {{count}} photos ?",
+    "deleteConfirmBody": "Les fichiers et les miniatures sont supprimés du stockage. Cette action est irréversible.",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "download": "Télécharger",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_one": "Partager {{count}} photo",
+    "shareTitle_many": "Partager {{count}} photos",
+    "shareTitle_other": "Partager {{count}} photos",
+    "shareDescription": "Toute personne disposant du lien peut voir et télécharger ces photos jusqu'à son expiration ou sa révocation.",
+    "title": "Titre",
+    "expiresAfter": "Expire après",
+    "linkExpiry": "Expiration du lien",
+    "expiry": {
+      "days_one": "{{count}} jour",
+      "days_many": "{{count}} jours",
+      "days_other": "{{count}} jours",
+      "never": "Jamais"
+    },
+    "createErrorTitle": "Impossible de créer le lien",
+    "createLink": "Créer le lien",
+    "link": "Lien",
+    "noExpiry": "Ce lien n'expire pas.",
+    "expires": "Expire {{when}}.",
+    "manageLinks": "Gérez les liens dans Partages.",
+    "linkCopied": "Lien copié dans le presse-papiers.",
+    "linkShared": "Lien partagé.",
+    "copyLink": "Copier le lien"
+  },
+  "shares": {
+    "orgRequired": "Créez ou rejoignez une organisation pour partager des photos.",
+    "noPermission": "Votre rôle n'inclut pas le partage.",
+    "heading": "Partages",
+    "description": "Des liens qui permettent à des personnes extérieures à {{name}} de voir et télécharger des photos sélectionnées. Révoquer un lien le désactive immédiatement.",
+    "loading": "Chargement des partages",
+    "loadErrorTitle": "Impossible de charger les partages",
+    "empty": "Aucun lien pour l'instant. Sélectionnez des photos dans la galerie et choisissez Partager.",
+    "openGallery": "Ouvrir la galerie",
+    "rowCreated_one": "{{count}} photo · créé le {{created}}",
+    "rowCreated_many": "{{count}} photos · créé le {{created}}",
+    "rowCreated_other": "{{count}} photos · créé le {{created}}",
+    "neverExpires": " · n'expire jamais",
+    "expiresOn": " · expire le {{expires}}",
+    "status": {
+      "active": "actif",
+      "expired": "expiré",
+      "revoked": "révoqué"
+    },
+    "copyLink": "Copier le lien",
+    "shareEllipsis": "Partager…",
+    "revoke": "Révoquer {{title}}",
+    "revokeButton": "Révoquer",
+    "linkCopied": "Lien copié dans le presse-papiers.",
+    "linkShared": "Lien partagé."
+  },
+  "admin": {
+    "heading": "Administration",
+    "description": "Tous les utilisateurs et organisations de ce déploiement. Les actions effectuées ici sont enregistrées dans le journal d'audit.",
+    "onlyAdmins": "Seuls les administrateurs de la plateforme peuvent ouvrir cette page.",
+    "sectionsLabel": "Sections d'administration",
+    "tabs": {
+      "users": "Utilisateurs",
+      "organizations": "Organisations",
+      "audit": "Journal d'audit"
+    },
+    "searchLabel": "Rechercher par e-mail",
+    "searchPlaceholder": "nom@exemple.com",
+    "loadingUsers": "Chargement des utilisateurs",
+    "usersErrorTitle": "Impossible de charger les utilisateurs",
+    "userSummary_one": "{{count}} utilisateur{{extra}}.",
+    "userSummary_many": "{{count}} utilisateurs{{extra}}.",
+    "userSummary_other": "{{count}} utilisateurs{{extra}}.",
+    "showingNewest": ", affichage des {{count}} plus récents",
+    "you": "(vous)",
+    "joined": "Inscrit le {{date}}",
+    "emailNotVerified": " · e-mail non vérifié",
+    "platformAdmin": "admin plateforme",
+    "banned": "banni",
+    "bannedReason": "banni : {{reason}}",
+    "unban": "Débannir",
+    "unbanUser": "Débannir {{email}}",
+    "removeAdmin": "Retirer l'admin",
+    "makeAdminShort": "Nommer admin",
+    "removeAdminFrom": "Retirer le rôle d'administrateur à {{email}}",
+    "makeAdmin": "Nommer {{email}} administrateur",
+    "signOutEverywhereButton": "Déconnecter partout",
+    "signOutEverywhere": "Déconnecter {{email}} partout",
+    "ban": "Bannir",
+    "banUser": "Bannir {{email}}",
+    "banConfirmTitle": "Bannir {{email}} ?",
+    "banConfirmBody": "Ses sessions prennent fin immédiatement et cette personne ne pourra plus se connecter jusqu'à son débannissement. Le motif lui est indiqué et conservé dans le journal d'audit.",
+    "reasonLabel": "Motif",
+    "cancel": "Annuler",
+    "banConfirm": "Bannir l'utilisateur",
+    "loadingOrganizations": "Chargement des organisations",
+    "organizationsErrorTitle": "Impossible de charger les organisations",
+    "organizationsTable": "Organisations, les plus récentes d'abord",
+    "th": {
+      "organization": "Organisation",
+      "members": "Membres",
+      "photos": "Photos",
+      "storage": "Stockage",
+      "created": "Création"
+    },
+    "loadingAudit": "Chargement du journal d'audit",
+    "auditErrorTitle": "Impossible de charger le journal d'audit",
+    "auditCaption": "Entrées d'audit de toutes les organisations, les plus récentes d'abord",
+    "auditDetailHeading": "Organisation",
+    "platform": "plateforme"
+  },
+  "members": {
+    "orgRequired": "Créez ou rejoignez une organisation pour gérer les membres.",
+    "heading": "Membres",
+    "description": "Les personnes de {{name}} et ce qu'elles peuvent faire.",
+    "count_one": "{{count}} membre",
+    "count_many": "{{count}} membres",
+    "count_other": "{{count}} membres",
+    "pendingInvitations": "Invitations en attente",
+    "inviteHeading": "Inviter quelqu'un",
+    "emailLabel": "E-mail",
+    "roleLabel": "Rôle",
+    "sendInvitation": "Envoyer l'invitation",
+    "invitationSent": "Invitation envoyée à {{email}}.",
+    "you": "(vous)",
+    "roleFor": "Rôle de {{name}}",
+    "remove": "Retirer",
+    "removeMember": "Retirer {{name}}",
+    "invitedAs": "Invité comme",
+    "cancel": "Annuler",
+    "cancelInvitation": "Annuler l'invitation pour {{email}}"
+  },
+  "audit": {
+    "heading": "Journal d'audit",
+    "description": "Les changements les plus récents dans {{name}}. Les propriétaires et administrateurs peuvent consulter cette page.",
+    "thisOrganization": "cette organisation",
+    "loading": "Chargement du journal d'audit",
+    "loadErrorTitle": "Impossible de charger le journal d'audit",
+    "noAccess": "Votre rôle n'inclut pas l'accès à l'audit.",
+    "empty": "Rien n'a encore été enregistré.",
+    "tableCaption": "Entrées d'audit, les plus récentes d'abord",
+    "detailsHeading": "Détails",
+    "when": "Quand",
+    "who": "Qui",
+    "action": "Action"
+  },
+  "organizations": {
+    "firstTitle": "Créez votre première organisation",
+    "newTitle": "Nouvelle organisation",
+    "description": "Les organisations regroupent vos filigranes, vos photos et votre équipe. Vous en serez le propriétaire.",
+    "createFailed": "L'organisation n'a pas pu être créée.",
+    "nameLabel": "Nom",
+    "slugLabel": "Identifiant d'URL",
+    "slugHint": "Lettres minuscules, chiffres et traits d'union. Utilisé dans les liens et doit être unique.",
+    "submit": "Créer l'organisation"
+  },
+  "import": {
+    "takePhoto": "Prendre une photo",
+    "cancel": "Annuler",
+    "saveToProvider": "Enregistrer sur {{provider}}",
+    "url": {
+      "title": "Importer depuis un lien",
+      "description": "Collez l'adresse d'une image sur le web. Nous la récupérons et l'ajoutons ici.",
+      "linkLabel": "Lien de l'image",
+      "errorTitle": "Impossible d'importer ce lien",
+      "fetch": "Récupérer"
+    },
+    "onedrive": {
+      "title": "Importer depuis OneDrive",
+      "name": "OneDrive",
+      "description": "Connectez-vous à Microsoft, puis choisissez les photos à ajouter.",
+      "loading": "Chargement de OneDrive",
+      "empty": "Aucun dossier ni image ici.",
+      "folderPath": "Chemin du dossier",
+      "errorTitle": "Échec de l'import OneDrive",
+      "tryAgain": "Réessayer",
+      "noneSelected": "Aucune photo sélectionnée",
+      "selectedCount": "{{count}} sélectionnée(s)",
+      "addSelected": "Ajouter la sélection"
+    }
+  },
+  "video": {
+    "orgRequired": "Créez ou rejoignez une organisation pour filigraner des vidéos.",
+    "heading": "Filigrane vidéo",
+    "description": "Appliquez un préréglage à toute une vidéo. Chaque image est filigranée dans votre navigateur et l'audio est conservé ; rien n'est envoyé.",
+    "checkingSupport": "Vérification de la prise en charge vidéo",
+    "unsupportedTitle": "La vidéo n'est pas prise en charge dans ce navigateur",
+    "unsupportedBody": "Votre navigateur ne peut pas encoder de vidéo. Chrome, Edge ou Safari 17 et versions ultérieures le peuvent.",
+    "emptyHint": "pour l'appliquer à une vidéo.",
+    "addVideo": "Ajouter une vidéo",
+    "dropHint": "Déposez une vidéo ici, ou",
+    "formatsHint": "MP4, WebM ou MOV. Tout se passe dans votre navigateur ; rien n'est envoyé, et la galerie n'accepte pas encore les vidéos.",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
+    "choosePresetPreview": "Choisissez un préréglage pour prévisualiser le filigrane sur une image.",
+    "outputSize": "Sortie {{width}} × {{height}} px.",
+    "transcodingProgress": "Progression du transcodage",
+    "progress": {
+      "noEta": "Image {{frame}} · {{percent}} %",
+      "withEta": "Image {{frame}} · {{percent}} % · environ {{seconds}} s restantes"
+    },
+    "cancel": "Annuler",
+    "cancelled": "Transcodage annulé.",
+    "runErrorTitle": "Impossible de filigraner la vidéo",
+    "download": "Télécharger {{fileName}}",
+    "share": "Partager",
+    "presets": "Préréglages",
+    "placement": "Placement",
+    "placementOptions": {
+      "smart": "Intelligent",
+      "bottomRight": "En bas à droite",
+      "bottomLeft": "En bas à gauche",
+      "topRight": "En haut à droite",
+      "topLeft": "En haut à gauche",
+      "center": "Centre"
+    },
+    "quality": "Qualité",
+    "qualityOptions": {
+      "low": "Basse",
+      "standard": "Standard",
+      "high": "Haute"
+    },
+    "resolution": "Résolution",
+    "resolutionOptions": {
+      "original": "Originale",
+      "fit1080p": "Ajuster au 1080p",
+      "fit720p": "Ajuster au 720p"
+    },
+    "watermarking": "Filigranage…",
+    "watermarkVideo": "Filigraner la vidéo",
+    "fixedPlacementNote": "Le filigrane conserve un placement fixe pour toute la vidéo. L'audio est copié tel quel lorsqu'il convient à la sortie, sinon il est réencodé.",
+    "renderingPreview": "Génération de l'aperçu",
+    "previewAlt": "Le filigrane sur une image de la vidéo"
+  },
+  "documents": {
+    "orgRequired": "Créez ou rejoignez une organisation pour filigraner des documents.",
+    "heading": "Documents",
+    "description": "Apposez un préréglage sur chaque page d'un PDF. Les fichiers sont traités dans votre navigateur et téléchargés un par un ou au format ZIP.",
+    "emptyHint": "pour filigraner des documents avec.",
+    "addPdfs": "Ajouter des PDF",
+    "dropHint": "Déposez des PDF ici, ou",
+    "filesHint": "Jusqu'à {{max}} fichiers, {{size}} chacun. Chaque page est filigranée dans votre navigateur ; rien n'est envoyé.",
+    "skipped_one": "{{count}} fichier ignoré : pas un PDF ou supérieur à {{max}}.",
+    "skipped_many": "{{count}} fichiers ignorés : pas un PDF ou supérieurs à {{max}}.",
+    "skipped_other": "{{count}} fichiers ignorés : pas un PDF ou supérieurs à {{max}}.",
+    "fileCount_one": "{{count}} document",
+    "fileCount_many": "{{count}} documents",
+    "fileCount_other": "{{count}} documents",
+    "clearList": "Vider la liste",
+    "watermarkingProgress": "Progression du filigranage",
+    "progressFinished": "{{done}} sur {{total}} terminés",
+    "progressFailed": ", {{count}} en échec",
+    "progressEnd": ".",
+    "listLabel": "Documents à filigraner",
+    "downloadFile": "Télécharger {{fileName}}",
+    "removeFile": "Retirer {{fileName}}",
+    "presetHint": "Cochez-en un ou plusieurs ; ils sont dessinés dans l'ordre coché, les derniers par-dessus les premiers.",
+    "placement": "Placement",
+    "smartPlacementHint": "Le placement intelligent est réservé aux photos ; choisissez un coin ou une position personnalisée pour les documents.",
+    "watermarkEmpty": "Filigraner les documents",
+    "watermarkCount": "Filigraner {{count}}",
+    "downloadZip": "Télécharger {{count}} au format ZIP",
+    "savedAsHint": "Chaque document est enregistré sous {name}-watermarked.pdf. Les PDF chiffrés sont refusés."
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "Consultez votre boîte de réception",
+      "description": "Nous avons envoyé un lien de vérification à {{email}}. Il expire dans une heure.",
+      "resent": "Un nouveau lien de vérification est en route.",
+      "resend": "Renvoyer l'e-mail de vérification"
+    },
+    "tool": {
+      "title": "Vérifier une photo",
+      "description": "Vérifiez si un PNG porte une marque invisible Watermark Pro et lisez son message caché. Rien ne quitte votre navigateur."
+    },
+    "checkPng": "Vérifier un PNG",
+    "checking": "Vérification…",
+    "noneFound": "Aucune marque invisible trouvée dans cette photo."
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "Chargement des préréglages",
+    "loadErrorTitle": "Impossible de charger les préréglages",
+    "emptyTitle": "Aucun préréglage pour l'instant",
+    "createInLibrary": "Créer un préréglage dans la bibliothèque",
+    "legend": "Préréglages",
+    "importTitle": "Importer des préréglages",
+    "importDescription": "Choisissez un fichier de préréglages Watermark Pro. Ses préréglages, ainsi que les logos qu'ils utilisent, sont ajoutés à cette bibliothèque.",
+    "presetFileLabel": "Fichier de préréglages",
+    "noPresets": "Ce fichier de préréglages ne contient aucun préréglage.",
+    "fileCount_one": "{{count}} préréglage dans ce fichier",
+    "fileCount_many": "{{count}} préréglages dans ce fichier",
+    "fileCount_other": "{{count}} préréglages dans ce fichier",
+    "renamed": "Un préréglage nommé « {{name}} » existe déjà ; importé sous « {{finalName}} ».",
+    "cancel": "Annuler",
+    "importButton_one": "Importer {{count}} préréglage",
+    "importButton_many": "Importer {{count}} préréglages",
+    "importButton_other": "Importer {{count}} préréglages"
+  },
+  "landing": {
+    "nav": "Compte",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "eyebrow": "Gratuit et open source",
+    "heroBody": "Protégez vos photographies sans sacrifier l'image. Watermark Pro effectue le gros du travail dans votre navigateur, garde vos originaux privés et donne à votre équipe des rôles qui ont un vrai sens.",
+    "createWorkspace": "Créez votre espace de travail",
+    "featuresHeading": "Ce qu'il fait",
+    "features": {
+      "bulk": {
+        "title": "Traitement par lot",
+        "body": "Déposez des centaines de photos et filigranez-les toutes en une seule passe, dans votre navigateur."
+      },
+      "library": {
+        "title": "Bibliothèque de filigranes",
+        "body": "Enregistrez une fois des marques texte, symbole et logo ; appliquez-les partout d'un clic."
+      },
+      "smart": {
+        "title": "Placement intelligent",
+        "body": "Chaque photo est analysée pour que la marque se place là où elle se lit le mieux, sans empiéter sur le sujet."
+      },
+      "contrast": {
+        "title": "Contraste automatique",
+        "body": "Variante claire ou foncée et intensité du contour choisies pour chaque image, ajustables si vous n'êtes pas d'accord."
+      },
+      "teams": {
+        "title": "Équipes et rôles",
+        "body": "Des organisations avec les rôles propriétaire, administrateur, éditeur et lecteur, appliqués côté serveur."
+      },
+      "trusted": {
+        "title": "Conçu pour inspirer confiance",
+        "body": "Politique de sécurité du contenu stricte, actions auditées et photos qui ne quittent jamais votre navigateur, sauf si vous les enregistrez."
+      }
+    },
+    "footer": "Watermark Pro est un logiciel open source sous licence MIT.",
+    "privacy": "Confidentialité",
+    "terms": "Conditions"
+  },
+  "legal": {
+    "signIn": "Se connecter",
+    "lastUpdated": "Dernière mise à jour le {{date}}",
+    "readSibling": "Consultez <sibling>{{siblingLabel}}</sibling>, ou revenez à la <home>page d'accueil</home>.",
+    "footer": "Watermark Pro est un logiciel open source sous licence MIT.",
+    "privacy": {
+      "title": "Confidentialité",
+      "intro": "Watermark Pro est conçu pour que vos photographies restent les vôtres. Cette page explique en langage clair ce qu'il advient de vos images et des informations de votre compte, à partir des contrôles réellement appliqués par le projet.",
+      "siblingLabel": "les conditions d'utilisation",
+      "photos": {
+        "heading": "Vos photos restent dans votre navigateur",
+        "p1": "Le filigranage s'exécute entièrement sur votre appareil. L'éditeur et l'outil En lot décodent vos photos dans le navigateur, les rendent dans des Web Workers et construisent les fichiers finaux en mémoire. Prévisualiser un filigrane n'envoie jamais la photo à laquelle il s'applique.",
+        "p2": "Les exports sont assemblés localement et vous sont fournis via un lien de téléchargement de même origine, libéré dès que le téléchargement commence. Vos originaux ne sont jamais envoyés à un serveur pour être prévisualisés ou filigranés."
+      },
+      "storage": {
+        "heading": "Ce que nous stockons, et uniquement à votre demande",
+        "p1": "Rien n'est conservé sur nos serveurs à moins que vous ne choisissiez de l'enregistrer. Lorsque vous enregistrez une photo, une miniature ou un logo, l'élément est stocké dans Cloudflare R2 sous des clés limitées à votre organisation, jamais rendu public, et servi uniquement aux membres connectés de cette organisation avec une mise en cache privée.",
+        "p2": "Chaque organisation dispose de quotas de photos, de logos et de stockage. Chaque envoi et chaque suppression sont enregistrés dans le journal d'audit."
+      },
+      "metadata": {
+        "heading": "Les métadonnées sont supprimées par défaut",
+        "p1": "Chaque export est réencodé à partir des pixels, si bien qu'aucune métadonnée n'est conservée à moins que vous ne décidiez de la garder. Le réglage par défaut supprime toutes les données d'appareil et de localisation avant que le fichier n'atteigne votre téléchargement, la feuille de partage ou la galerie.",
+        "p2": "Deux modes facultatifs, choisis à chaque export, vous permettent de conserver les données d'appareil sans la localisation GPS, ou de tout garder tel quel. Les métadonnées sont lues et écrites dans le navigateur ; rien n'est envoyé pour cela."
+      },
+      "sharing": {
+        "heading": "Liens de partage",
+        "p1": "Un lien de partage contient un jeton signé avec une expiration intégrée et peut être révoqué à tout moment. Les pages publiques qu'ouvre un lien ne comportent aucune session et sont limitées en fréquence par adresse.",
+        "p2": "Les liens expirés, révoqués, falsifiés ou inconnus renvoient tous la même réponse neutre « introuvable », de sorte qu'un lien ne révèle rien une fois qu'il cesse de fonctionner. La création et la révocation de liens sont réservées aux membres autorisés et sont auditées."
+      },
+      "account": {
+        "heading": "Votre compte",
+        "p1": "Un compte nécessite une adresse e-mail et un mot de passe, et l'e-mail doit être vérifié avant que le compte ne soit actif. Les sessions sont conservées dans des cookies HttpOnly, SameSite=Lax, marqués Secure sur les origines sécurisées.",
+        "p2": "Les liens de réinitialisation de mot de passe expirent après une heure et déconnectent vos autres sessions lorsqu'ils sont utilisés."
+      },
+      "analytics": {
+        "heading": "Analyses et cookies",
+        "p1": "Nous ne déposons aucun cookie d'analyse ou de publicité tiers. La seule mesure est Cloudflare Web Analytics, qui fonctionne sans cookie et ne vous suit pas d'un site à l'autre.",
+        "p2": "L'application communique avec seulement deux origines tierces, toutes deux de Cloudflare : le widget Turnstile qui filtre les demandes d'inscription et de réinitialisation de mot de passe contre les bots, et la balise d'analyse sans cookie. Les polices, les styles et tout le reste sont servis depuis ce site."
+      },
+      "audit": {
+        "heading": "Journal d'audit",
+        "p1": "Les inscriptions et chaque changement d'organisation, d'adhésion, d'invitation, de bibliothèque, de photo et de partage sont consignés dans un journal d'audit en ajout seul. Ce journal n'est lisible que par les propriétaires et administrateurs d'une organisation."
+      },
+      "reporting": {
+        "heading": "Signaler un problème",
+        "p1": "Les problèmes de sécurité peuvent être signalés en privé via le dépôt GitHub du projet plutôt que par un ticket public. La politique de sécurité du dépôt décrit ce qu'il faut inclure et dans quels délais vous obtiendrez une réponse."
+      }
+    },
+    "terms": {
+      "title": "Conditions d'utilisation",
+      "intro": "Ces conditions couvrent votre utilisation de Watermark Pro. Elles sont rédigées pour être lues et décrivent le comportement réel du service plutôt que d'ajouter des promesses qu'il ne tient pas.",
+      "siblingLabel": "la politique de confidentialité",
+      "accepting": {
+        "heading": "Acceptation de ces conditions",
+        "p1": "Utiliser Watermark Pro signifie que vous acceptez ces conditions. Si vous ne les acceptez pas, veuillez ne pas utiliser le service."
+      },
+      "whatItDoes": {
+        "heading": "Ce que fait le service",
+        "p1": "Watermark Pro filigrane des photographies. Le filigranage lui-même s'exécute dans votre navigateur ; des fonctionnalités facultatives comme l'enregistrement de photos et de logos, le travail en équipe et le partage utilisent un stockage côté serveur sur Cloudflare.",
+        "p2": "Le logiciel est gratuit et open source sous licence MIT."
+      },
+      "account": {
+        "heading": "Votre compte",
+        "p1": "Les fonctionnalités d'équipe nécessitent un compte avec une adresse e-mail vérifiée. Gardez votre mot de passe pour vous ; vous êtes responsable de ce qui se passe sous votre compte.",
+        "p2": "Vous pouvez vous déconnecter de vos sessions à tout moment, et l'utilisation d'un lien de réinitialisation de mot de passe déconnecte vos autres sessions."
+      },
+      "content": {
+        "heading": "Votre contenu",
+        "p1": "Vous conservez tous les droits que vous détenez déjà sur les photos et les filigranes que vous importez ou créez. Il vous incombe de disposer du droit d'utiliser les images que vous apportez au service.",
+        "p2": "L'application ne traite votre contenu que pour fournir les fonctionnalités que vous utilisez, et ne le stocke que lorsque vous choisissez de l'enregistrer. Il n'est jamais utilisé pour entraîner quoi que ce soit ni partagé avec des tiers."
+      },
+      "acceptableUse": {
+        "heading": "Utilisation acceptable",
+        "p1": "N'utilisez pas le service pour enfreindre la loi, ni pour importer ou partager du contenu que vous n'avez pas le droit d'utiliser. N'essayez pas de contourner les contrôles de sécurité ou les limites de fréquence, ni d'accéder à des données appartenant à des organisations dont vous n'êtes pas membre.",
+        "p2": "L'accès au sein d'une organisation dépend de votre rôle, et ces rôles sont appliqués côté serveur."
+      },
+      "teams": {
+        "heading": "Équipes et rôles",
+        "p1": "Une organisation peut avoir les rôles propriétaire, administrateur, éditeur et lecteur. Ce que chaque membre peut voir et faire est limité à son rôle, vérifié à chaque requête plutôt que simplement masqué dans l'interface."
+      },
+      "availability": {
+        "heading": "Disponibilité, garantie et modifications",
+        "p1": "Le service est fourni « tel quel », sans garantie d'aucune sorte, comme le prévoit la licence MIT. Les fonctionnalités peuvent changer et le service peut être indisponible par moments.",
+        "p2": "Ces conditions peuvent être mises à jour ; la date en haut de cette page indique leur dernière modification. Continuer à utiliser le service après une modification signifie que vous acceptez les conditions mises à jour."
+      },
+      "openSource": {
+        "heading": "Open source",
+        "p1": "Le code source de Watermark Pro est disponible sous licence MIT, qui vous permet de l'inspecter, de l'exécuter et de le modifier selon les termes de cette licence."
+      },
+      "contact": {
+        "heading": "Contact",
+        "p1": "Les questions relatives à ces conditions, ainsi que les signalements de problèmes de sécurité, peuvent être soumis via le dépôt GitHub du projet."
+      }
+    }
+  },
+  "share": {
+    "loading": "Chargement des photos",
+    "unavailableTitle": "Ce lien n'est pas disponible",
+    "unavailableBody": "Il a peut-être expiré ou été révoqué, ou l'adresse est incomplète. Demandez-en un nouveau à la personne qui vous l'a envoyé.",
+    "about": "À propos de Watermark Pro",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_many": "{{count}} photos",
+    "photoCount_other": "{{count}} photos",
+    "availableUntil": " · disponible jusqu'au {{date}}",
+    "shareLink": "Partager ce lien",
+    "linkCopied": "Lien copié dans le presse-papiers.",
+    "linkShared": "Lien partagé.",
+    "openPhoto": "Ouvrir {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "Partagé avec <home>Watermark Pro</home>. Les photos restent la propriété de leur propriétaire.",
+    "download": "Télécharger",
+    "close": "Fermer"
+  },
+  "root": {
+    "somethingWentWrong": "Une erreur est survenue",
+    "notFound": {
+      "title": "Page introuvable",
+      "body": "L'adresse est peut-être mal saisie, ou la page a peut-être été déplacée.",
+      "back": "Retour à l'accueil"
+    }
+  }
+}

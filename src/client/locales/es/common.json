@@ -1,0 +1,1101 @@
+{
+  "language": {
+    "menuLabel": "Cambiar idioma"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "Panel",
+      "library": "Biblioteca",
+      "editor": "Editor",
+      "bulk": "Lotes",
+      "video": "Video",
+      "documents": "Documentos",
+      "gallery": "Galería",
+      "shares": "Compartidos",
+      "members": "Miembros",
+      "audit": "Auditoría",
+      "admin": "Admin"
+    },
+    "skipToContent": "Saltar al contenido",
+    "menu": "Menú",
+    "primaryNav": "Principal",
+    "primaryMenuNav": "Principal (menú)",
+    "toolsNav": "Herramientas",
+    "signOut": "Cerrar sesión",
+    "accountMenu": "Menú de cuenta de {{name}}",
+    "menuDescription": "Cambia de organización o ve a cualquier parte de Watermark Pro.",
+    "switchOrganizationFor": "Organización: {{name}}. Cambiar de organización",
+    "chooseOrganization": "Elige una organización",
+    "chooseOrganizationShort": "Elegir organización",
+    "organizations": "Organizaciones",
+    "newOrganization": "Nueva organización",
+    "theme": {
+      "system": "Tema: sigue el sistema. Cambiar a claro",
+      "light": "Tema: claro. Cambiar a oscuro",
+      "dark": "Tema: oscuro. Cambiar al sistema"
+    }
+  },
+  "auth": {
+    "backToSignIn": "Volver a iniciar sesión",
+    "fields": {
+      "emailLabel": "Correo electrónico",
+      "passwordLabel": "Contraseña"
+    },
+    "login": {
+      "title": "Hola de nuevo",
+      "description": "Inicia sesión en tu espacio de trabajo.",
+      "footerPrompt": "¿Primera vez aquí?",
+      "createAccount": "Crear una cuenta",
+      "verifyTitle": "Primero verifica tu correo",
+      "verifyBody": "Enviamos un enlace de verificación a {{email}}.",
+      "resendIt": "Reenviar",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "submit": "Iniciar sesión"
+    },
+    "signup": {
+      "title": "Crea tu cuenta",
+      "description": "Se enviará un enlace de verificación a tu correo.",
+      "footerPrompt": "¿Ya tienes una cuenta?",
+      "signIn": "Iniciar sesión",
+      "nameLabel": "Nombre",
+      "passwordHint": "Al menos {{min}} caracteres. Unas cuantas palabras sin relación funcionan bien.",
+      "submit": "Crear cuenta"
+    },
+    "forgotPassword": {
+      "title": "Restablece tu contraseña",
+      "description": "Escribe tu correo y te enviaremos un enlace para restablecerla si existe una cuenta.",
+      "sentTitle": "Revisa tu bandeja de entrada",
+      "sentBody": "Si {{email}} pertenece a una cuenta, el enlace para restablecerla ya va en camino. Caduca en una hora.",
+      "submit": "Enviar enlace de restablecimiento"
+    },
+    "resetPassword": {
+      "title": "Elige una nueva contraseña",
+      "invalidTitle": "Este enlace de restablecimiento no es válido",
+      "invalidBody": "Puede que haya caducado o que ya se haya usado.",
+      "requestNew": "Solicitar uno nuevo",
+      "invalidEnd": ".",
+      "newPasswordLabel": "Nueva contraseña",
+      "passwordHint": "Al menos {{min}} caracteres.",
+      "confirmLabel": "Confirmar contraseña",
+      "mismatch": "Las contraseñas no coinciden",
+      "submit": "Actualizar contraseña"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "Invitación no disponible",
+      "title": "Unirse a {{organizationName}}",
+      "description": "{{inviterEmail}} te invitó a unirte como {{role}}.",
+      "roleLabel": "Rol:",
+      "decline": "Rechazar",
+      "accept": "Aceptar invitación"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "Sesión iniciada como {{email}}",
+    "yourWorkspace": "Tu espacio de trabajo",
+    "yourRole": "Tu rol:",
+    "toolsHeading": "Herramientas",
+    "tools": {
+      "library": {
+        "label": "Biblioteca",
+        "body": "Diseña marcas de agua de texto, símbolo y logotipo una vez y guárdalas como preajustes."
+      },
+      "editor": {
+        "label": "Editor",
+        "body": "Aplica una marca de agua a una foto a mano: coloca, recorta, redimensiona y exporta."
+      },
+      "bulk": {
+        "label": "Lotes",
+        "body": "Aplica un preajuste a toda una sesión y descarga los resultados en un ZIP."
+      },
+      "gallery": {
+        "label": "Galería",
+        "body": "Explora lo que el equipo ha guardado y comparte álbumes con un enlace."
+      }
+    },
+    "overviewHeading": "Resumen",
+    "members": "Miembros",
+    "noPendingInvitations": "No hay invitaciones pendientes.",
+    "pendingInvitations_one": "{{count}} invitación pendiente.",
+    "pendingInvitations_other": "{{count}} invitaciones pendientes.",
+    "manageMembers": "Gestionar miembros",
+    "auditLog": "Registro de auditoría",
+    "auditDescription": "Cada cambio de miembros y de organización se registra con quién lo hizo y cuándo.",
+    "viewAuditLog": "Ver registro de auditoría",
+    "pendingInvitations_many": "{{count}} invitaciones pendientes."
+  },
+  "library": {
+    "orgRequired": "Crea una organización o únete a una para crear una biblioteca de marcas de agua.",
+    "heading": "Biblioteca de marcas de agua",
+    "description": "Preajustes compartidos por todos en {{name}}. Aplícalos de uno en uno o por lotes.",
+    "export": "Exportar",
+    "exportPreset": "Exportar {{name}}",
+    "importPresets": "Importar preajustes",
+    "newPreset": "Nuevo preajuste",
+    "exportErrorTitle": "No se pudieron exportar los preajustes",
+    "loadingPresets": "Cargando preajustes",
+    "loadErrorTitle": "No se pudo cargar la biblioteca",
+    "empty": "Aún no hay preajustes. Un preajuste combina una marca (texto, símbolo o logotipo) con opciones de colocación, contraste y estilo.",
+    "createFirst": "Crear el primer preajuste",
+    "orgRequiredShort": "Primero crea una organización o únete a una.",
+    "loadingPreset": "Cargando preajuste",
+    "loadPresetErrorTitle": "No se pudo cargar el preajuste",
+    "presetGone": "Ese preajuste ya no existe.",
+    "editSubtitleManage": "Los cambios se aplican a todos los que usan este preajuste.",
+    "editSubtitleReadOnly": "Vista de solo lectura.",
+    "cannotCreate": "Tu rol no permite crear preajustes.",
+    "newPresetSubtitle": "Diseña la marca, decide dónde va y guárdala en la biblioteca.",
+    "openInEditor": "Abrir {{name}} en el editor",
+    "deletePreset": "Eliminar {{name}}",
+    "logoBadge": "logo",
+    "autoContrast": "Contraste automático",
+    "manualContrast": "Contraste manual",
+    "updated": "Actualizado {{date}}",
+    "exportLogoTypeError": "Un logotipo tiene un tipo de imagen que no se puede exportar.",
+    "exportMissingLogoError": "Un preajuste hace referencia a un logotipo que ya no está en la biblioteca.",
+    "describe": {
+      "text": "«{{text}}» en {{fontFamily}}",
+      "glyph": "Glifo {{glyph}}",
+      "icon": "Icono {{name}}",
+      "logo": "Logotipo",
+      "qr": "Código QR de {{content}}"
+    },
+    "shape": {
+      "rectangle": "Rectángulo",
+      "roundedRectangle": "Rectángulo redondeado",
+      "ellipse": "Elipse",
+      "line": "Línea"
+    },
+    "placement": {
+      "smart": "Colocación inteligente",
+      "custom": "Posición personalizada",
+      "random": "Colocación aleatoria"
+    }
+  },
+  "designer": {
+    "presetName": "Nombre del preajuste",
+    "presetNamePlaceholder": "Firma del estudio",
+    "nameError": "Ponle al preajuste un nombre de hasta 60 caracteres.",
+    "sections": {
+      "label": "Secciones del diseñador",
+      "mark": "Marca",
+      "placement": "Colocación",
+      "style": "Estilo"
+    },
+    "markType": "Tipo de marca",
+    "saveError": "No se pudo guardar el preajuste",
+    "savePreset": "Guardar preajuste",
+    "saveChanges": "Guardar cambios",
+    "readOnlyHint": "Tu rol puede ver los preajustes, pero no modificarlos.",
+    "notAnImage": "Ese archivo no es una imagen que el navegador pueda leer.",
+    "text": {
+      "label": "Texto",
+      "hint": "Hasta {{max}} caracteres en un máximo de {{lines}} líneas. Usa «Insertar detalle» para tokens como la fecha o la cámara, que se rellenan en cada foto. {location} imprime la posición GPS de la foto en la imagen."
+    },
+    "qr": {
+      "content": "Contenido del código QR",
+      "hint": "Normalmente un enlace. Hasta {{max}} caracteres; el código siempre es oscuro sobre un fondo claro para que se pueda escanear."
+    },
+    "tokens": {
+      "menu": "Insertar detalle",
+      "heading": "Detalles de la foto",
+      "date": "Fecha",
+      "time": "Hora",
+      "taken": "Fecha y hora de captura",
+      "filename": "Nombre del archivo",
+      "camera": "Cámara",
+      "lens": "Objetivo",
+      "iso": "ISO",
+      "aperture": "Apertura",
+      "shutter": "Velocidad de obturación",
+      "focal": "Distancia focal",
+      "location": "Ubicación (GPS)",
+      "index": "Número de foto",
+      "count": "Total de fotos",
+      "width": "Ancho",
+      "height": "Alto"
+    },
+    "font": {
+      "family": "Fuente",
+      "weight": "Grosor",
+      "specimen": "El veloz murciélago hindú"
+    },
+    "symbol": {
+      "icons": "Iconos",
+      "glyphLabel": "Glifo {{glyph}}",
+      "iconLabel": "Icono {{label}}"
+    },
+    "shape": {
+      "label": "Forma",
+      "rectangle": "Rectángulo",
+      "roundedRectangle": "Rectángulo redondeado",
+      "ellipse": "Elipse",
+      "line": "Línea",
+      "length": "Longitud",
+      "proportions": "Proporciones",
+      "fill": "Relleno",
+      "fillToggle": "Rellenar la forma",
+      "fillColour": "Color de relleno",
+      "fillOpacity": "Opacidad del relleno",
+      "strokeWidth": "Grosor del trazo",
+      "customStrokeColour": "Color de trazo personalizado",
+      "strokeColour": "Color del trazo"
+    },
+    "effects": {
+      "letterSpacing": "Espaciado entre letras",
+      "curve": "Curva",
+      "effect": "Efecto",
+      "textEffect": "Efecto de texto",
+      "solid": "Sólido",
+      "outline": "Contorno",
+      "emboss": "Relieve",
+      "engrave": "Grabado"
+    },
+    "placement": {
+      "mode": "Modo de colocación",
+      "smart": "Inteligente",
+      "smartDescription": "Analiza cada foto y elige la esquina más despejada",
+      "corner": "Esquina",
+      "cornerDescription": "Posición fija respecto a los bordes",
+      "custom": "Personalizada",
+      "customDescription": "Posición exacta como fracción de la foto",
+      "random": "Aleatoria",
+      "randomDescription": "Un lugar distinto en cada foto; más difícil de quitar automáticamente",
+      "smartHint": "El motor evalúa cada esquina y borde según el detalle, el contraste y el sujeto, y luego coloca la marca donde resulta legible y menos intrusiva.",
+      "randomHint": "Cada foto recibe una esquina aleatoria, desplazada como máximo según la variación de abajo. La misma foto siempre queda en el mismo lugar.",
+      "jitter": "Variación",
+      "cornerLegend": "Esquina",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "anchor": {
+        "topLeft": "Arriba a la izquierda",
+        "topCenter": "Arriba en el centro",
+        "topRight": "Arriba a la derecha",
+        "middleLeft": "En medio a la izquierda",
+        "center": "Centro",
+        "middleRight": "En medio a la derecha",
+        "bottomLeft": "Abajo a la izquierda",
+        "bottomCenter": "Abajo en el centro",
+        "bottomRight": "Abajo a la derecha"
+      }
+    },
+    "style": {
+      "contrast": "Contraste",
+      "contrastMode": "Modo de contraste",
+      "auto": "Automático",
+      "autoDescription": "Tinta clara u oscura elegida en cada foto",
+      "manual": "Manual",
+      "manualDescription": "Tinta y grosor de contorno fijos",
+      "colour": "Color",
+      "colourDescription": "Un color de tinta propio",
+      "autoHint": "La tinta alterna entre clara y oscura para adaptarse a la zona bajo la marca, y solo se añade un contorno cuando el fondo tiene un tono demasiado parecido.",
+      "ink": "Tinta",
+      "inkLight": "Tinta clara",
+      "inkDark": "Tinta oscura",
+      "inkColour": "Color de tinta",
+      "outlineStrength": "Intensidad del contorno",
+      "appearance": "Apariencia",
+      "opacity": "Opacidad",
+      "size": "Tamaño",
+      "ofWidth": "{{percent}} del ancho",
+      "rotation": "Rotación",
+      "margin": "Margen",
+      "backdrop": "Caja detrás de la marca",
+      "boxOpacity": "Opacidad de la caja",
+      "tiling": "Repetir en toda la foto",
+      "spacing": "Espaciado"
+    },
+    "preview": {
+      "heading": "Vista previa",
+      "rendering": "Generando la vista previa",
+      "choosePhoto": "Elige una foto para la vista previa",
+      "tryYourPhoto": "Prueba con tu foto",
+      "samplePhoto": "Foto de ejemplo",
+      "alt": "Vista previa de la marca de agua sobre la foto",
+      "failed": "La vista previa falló",
+      "chooseLogo": "Elige o sube un logotipo para ver la vista previa.",
+      "nothingToPlace": "No hay nada que colocar.",
+      "inkLight": "tinta clara",
+      "inkDark": "tinta oscura",
+      "inkColour": "tinta {{colour}}",
+      "customPosition": "Posición personalizada, {{ink}}.",
+      "placed": "Colocada {{position}}, {{ink}}.",
+      "position": {
+        "topLeft": "arriba a la izquierda",
+        "topCenter": "arriba en el centro",
+        "topRight": "arriba a la derecha",
+        "middleLeft": "en medio a la izquierda",
+        "center": "en el centro",
+        "middleRight": "en medio a la derecha",
+        "bottomLeft": "abajo a la izquierda",
+        "bottomCenter": "abajo en el centro",
+        "bottomRight": "abajo a la derecha"
+      }
+    },
+    "logo": {
+      "loading": "Cargando logotipos",
+      "loadError": "No se pudieron cargar los logotipos",
+      "empty": "Aún no hay logotipos. Sube un PNG, JPEG o WebP con fondo transparente para obtener el mejor resultado.",
+      "choose": "Elige un logotipo",
+      "item": "Logotipo {{name}}",
+      "delete": "Eliminar el logotipo {{name}}",
+      "upload": "Subir un archivo de logotipo",
+      "uploadButton": "Subir logotipo",
+      "hint": "PNG, JPEG o WebP de hasta {{max}} MB, o una firma dibujada.",
+      "tooLarge": "Los logotipos deben ocupar {{max}} MB o menos.",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "Preparar logotipo",
+        "title": "Preparar «{{name}}»",
+        "description": "Si quieres, elimina un fondo uniforme y recorta los bordes vacíos, y luego súbelo como un PNG transparente.",
+        "before": "Antes",
+        "after": "Después",
+        "previewNeedsCanvas": "La vista previa necesita un lienzo del navegador.",
+        "preview": "Vista previa del logotipo preparado",
+        "removeBackground": "Eliminar fondo",
+        "backgroundTolerance": "Tolerancia del fondo",
+        "trim": "Recortar bordes transparentes",
+        "outputSize": "Tamaño de salida: {{size}} px",
+        "use": "Usar logotipo",
+        "chooseAnother": "Elegir otro"
+      },
+      "signature": {
+        "draw": "Dibujar una firma",
+        "description": "Firma con el dedo, un lápiz o el ratón. Se guarda como un logotipo transparente en la biblioteca, recortado a la tinta.",
+        "pad": "Panel de firma; dibuja aquí",
+        "pen": "Lápiz",
+        "penWidthGroup": "Grosor del lápiz",
+        "penWidth": "Lápiz de {{width}} píxeles",
+        "undo": "Deshacer trazo",
+        "clear": "Borrar",
+        "cancel": "Cancelar",
+        "save": "Guardar como logotipo"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "Crea una organización o únete a una para usar el editor.",
+    "heading": "Editor",
+    "description": "Aplica una marca de agua a una foto: elige un preajuste, colócalo a mano si quieres, recorta, redimensiona y descarga. Nada sale de tu navegador.",
+    "tabs": {
+      "watermark": "Marca de agua",
+      "crop": "Recortar",
+      "adjust": "Ajustar",
+      "resize": "Redimensionar",
+      "export": "Exportar"
+    },
+    "toolsLabel": "Herramientas del editor",
+    "openPhoto": "Abrir foto",
+    "openPhotoLabel": "Abrir una foto",
+    "fromLink": "Desde un enlace",
+    "samplePhoto": "Foto de ejemplo",
+    "sampleScene": "Escena de ejemplo",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "Generando",
+    "renderingPreview": "Generando la vista previa",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "altCrop": "Foto con el marco de recorte",
+    "altWatermark": "Foto con la marca de agua aplicada",
+    "choosePresetHint": "Elige un preajuste para colocar una marca de agua. Suelta una foto en cualquier parte del lienzo.",
+    "outputSize": "Salida de {{width}} × {{height}} px.",
+    "notAnImage": "Ese archivo no es una imagen que el navegador pueda leer.",
+    "previewFailed": "La vista previa falló",
+    "exportFailed": "La exportación falló",
+    "savedToGallery": "Se guardó {{name}} en la <galleryLink>galería</galleryLink>.",
+    "applyToPhoto": "Aplicar a esta foto",
+    "applyToAll": "Aplicar a todas las fotos",
+    "removeOverride": "Quitar ajuste específico",
+    "cancel": "Cancelar",
+    "dimensions": {
+      "left": "Izquierda",
+      "top": "Arriba",
+      "width": "Ancho",
+      "height": "Alto",
+      "pxField": "{{label}} (px)"
+    },
+    "watermark": {
+      "emptyHint": "para aplicarla aquí.",
+      "preset": "Preajuste",
+      "addPreset": "Añadir otro preajuste",
+      "maxMarks": "Hasta {{max}} marcas por foto",
+      "choosePreset": "Elige un preajuste",
+      "marksHeading": "Marcas en esta foto",
+      "layersLabel": "Capas, de abajo arriba",
+      "removedPreset": "Preajuste eliminado",
+      "removeLayer": "Quitar {{name}} de esta foto",
+      "adjusted": "Ajustada para esta foto; el preajuste de la biblioteca no cambia.",
+      "revert": "Revertir",
+      "placement": "Colocación"
+    },
+    "crop": {
+      "aspectRatio": "Relación de aspecto",
+      "photoSize": "La foto mide {{width}} × {{height}} px.",
+      "reset": "Restablecer recorte",
+      "area": "Área de recorte. Arrastra para mover; las flechas la ajustan y Mayús da pasos más grandes.",
+      "resizeHandle": "Redimensionar el recorte desde {{handle}}",
+      "handles": {
+        "n": "el borde superior",
+        "s": "el borde inferior",
+        "e": "el borde derecho",
+        "w": "el borde izquierdo",
+        "ne": "la esquina superior derecha",
+        "nw": "la esquina superior izquierda",
+        "se": "la esquina inferior derecha",
+        "sw": "la esquina inferior izquierda"
+      }
+    },
+    "resize": {
+      "keepProportions": "Mantener proporciones",
+      "shortcuts": "Atajos",
+      "fit": "Ajustar {{side}}",
+      "percent": "{{value}}%",
+      "outputUnchanged": "Salida de {{width}} × {{height}} px (sin cambios).",
+      "outputChanged": "Salida de {{width}} × {{height}} px desde {{baseWidth}} × {{baseHeight}}.",
+      "resetSize": "Restablecer tamaño"
+    },
+    "adjust": {
+      "filter": "Filtro",
+      "custom": "Ajustes personalizados",
+      "filterValue": "Filtro: {{name}}",
+      "brightness": "Brillo",
+      "contrast": "Contraste",
+      "saturation": "Saturación",
+      "warmth": "Calidez",
+      "sepia": "Sepia",
+      "vignette": "Viñeta",
+      "reset": "Restablecer {{name}}",
+      "resetAll": "Restablecer todo"
+    },
+    "orientation": {
+      "rotateLeft": "Girar a la izquierda",
+      "rotateRight": "Girar a la derecha",
+      "flipHorizontal": "Voltear horizontalmente",
+      "flipVertical": "Voltear verticalmente",
+      "straighten": "Enderezar"
+    },
+    "frame": {
+      "label": "Marco",
+      "add": "Añadir un marco",
+      "width": "Ancho del marco",
+      "colour": "Color del marco"
+    },
+    "metadata": {
+      "heading": "Metadatos",
+      "strip": {
+        "label": "Eliminar",
+        "help": "Sin datos de cámara ni ubicación. Lo más seguro para compartir."
+      },
+      "keepExceptLocation": {
+        "label": "Conservar salvo la ubicación",
+        "help": "Se conservan la cámara, el objetivo y la hora de captura; se elimina el GPS."
+      },
+      "keep": {
+        "label": "Conservar todo",
+        "help": "Incluida la posición GPS, si la foto la tiene."
+      },
+      "webpNote": "Las exportaciones en WebP siempre se limpian de metadatos."
+    },
+    "export": {
+      "format": "Formato",
+      "quality": "Calidad",
+      "invisibleMark": "Marca invisible",
+      "choosePng": "Elige PNG para ocultar un mensaje en los píxeles.",
+      "invisibleMessage": "Mensaje invisible",
+      "tooLong": "Demasiado largo para una foto de {{width}}×{{height}} (caben {{capacity}} bytes).",
+      "invisibleHint": "Oculto en los píxeles y legible en Verificar. Solo se conserva en PNG.",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}. Generado en tu navegador a resolución completa{{share}}.",
+      "losslessClause": "; PNG es sin pérdidas",
+      "shareClause": "; Compartir lo envía a Fotos, Mensajes o cualquier app de este dispositivo",
+      "download": "Descargar",
+      "share": "Compartir",
+      "saveToGallery": "Guardar en la galería",
+      "savedToFolder": "Guardado en tu carpeta «{{folder}}» de {{provider}}."
+    },
+    "mark": {
+      "position": "Posición de la marca de agua. Arrastra para mover (se ajusta a los márgenes, los tercios y el centro; mantén Alt para colocarla libremente), pellizca para redimensionar, gira para rotar; las flechas la ajustan, más y menos redimensionan, y los corchetes rotan.",
+      "rotate": "Rotar la marca de agua",
+      "resize": "Redimensionar la marca de agua"
+    }
+  },
+  "bulk": {
+    "orgRequired": "Crea una organización o únete a una para aplicar marcas de agua por lotes.",
+    "heading": "Marca de agua por lotes",
+    "description": "Aplica un preajuste a toda una sesión. Las fotos se procesan en paralelo en tu navegador y se descargan en un ZIP o de una en una.",
+    "emptyHint": "para aplicarlo a un lote.",
+    "addPhotos": "Añadir fotos",
+    "addFolder": "Añadir una carpeta",
+    "dropHint": "Suelta fotos o una carpeta aquí, o",
+    "fromLink": "Desde un enlace",
+    "capacity_one": "Hasta {{max}} fotos por lote. El procesamiento ocurre en tu navegador con {{count}} proceso.",
+    "capacity_other": "Hasta {{max}} fotos por lote. El procesamiento ocurre en tu navegador con {{count}} procesos.",
+    "skipped_one": "{{count}} archivo omitido: no es una imagen",
+    "skipped_other": "{{count}} archivos omitidos: no son imágenes",
+    "importErrorTitle": "No se pudo importar desde la nube",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} fotos",
+    "clearList": "Vaciar lista",
+    "batchProgress": "Progreso del lote",
+    "progress": {
+      "finished": "{{done}} de {{total}} terminadas",
+      "failed": ", {{n}} fallidas",
+      "cancelled": ", {{n}} canceladas",
+      "rate": " en {{seconds}} s ({{rate}} fotos/s)",
+      "end": "."
+    },
+    "photosList": "Fotos en este lote",
+    "custom": "Personalizado",
+    "selected": "Seleccionada",
+    "status": {
+      "queued": "En cola",
+      "processing": "Procesando",
+      "done": "Listo",
+      "failed": "Fallido",
+      "cancelled": "Cancelado"
+    },
+    "adjustPhoto": "Ajustar {{name}}",
+    "sharePhoto": "Compartir {{name}}",
+    "downloadPhoto": "Descargar {{name}}",
+    "removePhoto": "Quitar {{name}}",
+    "showAll": "Mostrar las {{count}} fotos",
+    "presetHint": "Marca uno o más; se aplican en el orden en que los marcas, los últimos sobre los primeros.",
+    "format": "Formato",
+    "quality": "Calidad",
+    "invisibleMark": "Marca invisible",
+    "invisibleMessage": "Mensaje invisible",
+    "choosePng": "Elige PNG para ocultar un mensaje en cada foto.",
+    "size": {
+      "label": "Tamaño",
+      "original": "Tamaño original",
+      "fit": "Ajustar a {{side}} px"
+    },
+    "fileNames": "Nombres de archivo",
+    "tokensLabel": "Tokens: {{tokens}}.",
+    "names": {
+      "example": "Ejemplo: {{example}}",
+      "mustProduceName": "El patrón debe generar un nombre."
+    },
+    "photoAdjustments": "Ajustes de la foto",
+    "resume": "Reanudar",
+    "pause": "Pausar",
+    "cancel": "Cancelar",
+    "start": "Iniciar",
+    "retry": "Reintentar {{count}}",
+    "downloadZip": "Descargar {{count}} en ZIP",
+    "downloadReport": "Descargar informe (CSV)",
+    "saveToGallery": "Guardar {{count}} en la galería",
+    "savedProgress": "Guardadas {{done}} de {{total}}",
+    "allSaved": "Todas se guardaron en la <galleryLink>galería</galleryLink>.",
+    "someSaved": "No se pudieron guardar {{failed}} (cuota o límites de almacenamiento). El resto están en la <galleryLink>galería</galleryLink>.",
+    "savedToCloud_one": "Se guardó {{count}} foto en tu carpeta «{{folder}}» de {{provider}}.",
+    "savedToCloud_other": "Se guardaron {{count}} fotos en tu carpeta «{{folder}}» de {{provider}}.",
+    "privacyNote": "La colocación inteligente y el contraste automático se calculan por separado para cada foto. No se sube nada.",
+    "watch": {
+      "label": "Vigilar una carpeta",
+      "stop": "Detener",
+      "choose": "Elegir carpetas",
+      "hint": "Elige una carpeta de entrada y otra de salida; las fotos nuevas que se coloquen en la de entrada reciben la marca de agua con los preajustes marcados y se guardan en la de salida. Solo funciona mientras esta página está abierta.",
+      "wrote": "Se guardó {{name}}",
+      "failed": "Falló {{name}}: {{error}}"
+    },
+    "capacity_many": "Hasta {{max}} fotos por lote. El procesamiento ocurre en tu navegador con {{count}} procesos.",
+    "skipped_many": "{{count}} archivos omitidos: no son imágenes",
+    "photoCount_many": "{{count}} fotos",
+    "savedToCloud_many": "Se guardaron {{count}} fotos en tu carpeta «{{folder}}» de {{provider}}."
+  },
+  "gallery": {
+    "orgRequired": "Crea una organización o únete a una para tener una galería.",
+    "heading": "Galería",
+    "description": "Fotos con marca de agua guardadas por {{name}}. Busca, filtra por preajuste, descarga o elimina.",
+    "usage_one": "{{count}} foto · {{used}} de {{max}}",
+    "usage_other": "{{count}} fotos · {{used}} de {{max}}",
+    "maxCount": "Hasta {{count}} fotos por organización",
+    "storageUsed": "Almacenamiento usado",
+    "storagePercent": "{{percent}}% del almacenamiento usado",
+    "checkPhoto": "Comprobar una foto",
+    "search": "Buscar",
+    "searchPlaceholder": "Nombre de la foto",
+    "preset": "Preajuste",
+    "allPresets": "Todos los preajustes",
+    "selectAll": "Seleccionar todo",
+    "clearSelection": "Anular selección",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} fotos",
+    "share": "Compartir",
+    "shareEllipsis": "Compartir…",
+    "deleteErrorTitle": "No se pudo eliminar",
+    "loadingPhotos": "Cargando fotos",
+    "loadErrorTitle": "No se pudo cargar la galería",
+    "empty": "Aún no hay fotos. Guarda una desde el editor o un lote entero desde la herramienta de lotes.",
+    "emptyFiltered": "Ninguna foto coincide con estos filtros.",
+    "openEditor": "Abrir el editor",
+    "openPhoto": "Abrir {{name}}",
+    "selectPhoto": "Seleccionar {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "Cargar más",
+    "delete": "Eliminar",
+    "deleteConfirmTitle_one": "¿Eliminar {{count}} foto?",
+    "deleteConfirmTitle_other": "¿Eliminar {{count}} fotos?",
+    "deleteConfirmBody": "Los archivos y las miniaturas se eliminan del almacenamiento. Esto no se puede deshacer.",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "download": "Descargar",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_one": "Compartir {{count}} foto",
+    "shareTitle_other": "Compartir {{count}} fotos",
+    "shareDescription": "Cualquiera con el enlace puede ver y descargar estas fotos hasta que caduque o lo revoques.",
+    "title": "Título",
+    "expiresAfter": "Caduca después de",
+    "linkExpiry": "Caducidad del enlace",
+    "expiry": {
+      "days_one": "{{count}} día",
+      "days_other": "{{count}} días",
+      "never": "Nunca",
+      "days_many": "{{count}} días"
+    },
+    "createErrorTitle": "No se pudo crear el enlace",
+    "createLink": "Crear enlace",
+    "link": "Enlace",
+    "noExpiry": "Este enlace no caduca.",
+    "expires": "Caduca {{when}}.",
+    "manageLinks": "Gestiona los enlaces en Compartidos.",
+    "linkCopied": "Enlace copiado al portapapeles.",
+    "linkShared": "Enlace compartido.",
+    "copyLink": "Copiar enlace",
+    "usage_many": "{{count}} fotos · {{used}} de {{max}}",
+    "photoCount_many": "{{count}} fotos",
+    "deleteConfirmTitle_many": "¿Eliminar {{count}} fotos?",
+    "shareTitle_many": "Compartir {{count}} fotos"
+  },
+  "shares": {
+    "orgRequired": "Crea una organización o únete a una para compartir fotos.",
+    "noPermission": "Tu rol no incluye compartir.",
+    "heading": "Compartidos",
+    "description": "Enlaces que permiten a personas ajenas a {{name}} ver y descargar fotos seleccionadas. Revocar un enlace lo desactiva de inmediato.",
+    "loading": "Cargando elementos compartidos",
+    "loadErrorTitle": "No se pudieron cargar los elementos compartidos",
+    "empty": "Aún no hay enlaces. Selecciona fotos en la galería y elige Compartir.",
+    "openGallery": "Abrir la galería",
+    "rowCreated_one": "{{count}} foto · creado {{created}}",
+    "rowCreated_other": "{{count}} fotos · creado {{created}}",
+    "neverExpires": " · nunca caduca",
+    "expiresOn": " · caduca {{expires}}",
+    "status": {
+      "active": "activo",
+      "expired": "caducado",
+      "revoked": "revocado"
+    },
+    "copyLink": "Copiar enlace",
+    "shareEllipsis": "Compartir…",
+    "revoke": "Revocar {{title}}",
+    "revokeButton": "Revocar",
+    "linkCopied": "Enlace copiado al portapapeles.",
+    "linkShared": "Enlace compartido.",
+    "rowCreated_many": "{{count}} fotos · creado {{created}}"
+  },
+  "admin": {
+    "heading": "Administración",
+    "description": "Todos los usuarios y organizaciones de esta instancia. Las acciones aquí se registran en el historial de auditoría.",
+    "onlyAdmins": "Solo los administradores de la plataforma pueden abrir esta página.",
+    "sectionsLabel": "Secciones de administración",
+    "tabs": {
+      "users": "Usuarios",
+      "organizations": "Organizaciones",
+      "audit": "Historial de auditoría"
+    },
+    "searchLabel": "Buscar por correo",
+    "searchPlaceholder": "nombre@ejemplo.com",
+    "loadingUsers": "Cargando usuarios",
+    "usersErrorTitle": "No se pudieron cargar los usuarios",
+    "userSummary_one": "{{count}} usuario{{extra}}.",
+    "userSummary_other": "{{count}} usuarios{{extra}}.",
+    "showingNewest": ", se muestran los {{count}} más recientes",
+    "you": "(tú)",
+    "joined": "Se unió el {{date}}",
+    "emailNotVerified": " · correo sin verificar",
+    "platformAdmin": "administrador de la plataforma",
+    "banned": "bloqueado",
+    "bannedReason": "bloqueado: {{reason}}",
+    "unban": "Desbloquear",
+    "unbanUser": "Desbloquear a {{email}}",
+    "removeAdmin": "Quitar admin",
+    "makeAdminShort": "Hacer admin",
+    "removeAdminFrom": "Quitar admin a {{email}}",
+    "makeAdmin": "Hacer administrador a {{email}}",
+    "signOutEverywhereButton": "Cerrar sesión en todas partes",
+    "signOutEverywhere": "Cerrar la sesión de {{email}} en todas partes",
+    "ban": "Bloquear",
+    "banUser": "Bloquear a {{email}}",
+    "banConfirmTitle": "¿Bloquear a {{email}}?",
+    "banConfirmBody": "Sus sesiones terminan ahora y no podrá iniciar sesión hasta que se le desbloquee. El motivo se le muestra y se guarda en el historial de auditoría.",
+    "reasonLabel": "Motivo",
+    "cancel": "Cancelar",
+    "banConfirm": "Bloquear usuario",
+    "loadingOrganizations": "Cargando organizaciones",
+    "organizationsErrorTitle": "No se pudieron cargar las organizaciones",
+    "organizationsTable": "Organizaciones, de la más reciente a la más antigua",
+    "th": {
+      "organization": "Organización",
+      "members": "Miembros",
+      "photos": "Fotos",
+      "storage": "Almacenamiento",
+      "created": "Creada"
+    },
+    "loadingAudit": "Cargando historial de auditoría",
+    "auditErrorTitle": "No se pudo cargar el historial de auditoría",
+    "auditCaption": "Entradas de auditoría de todas las organizaciones, de la más reciente a la más antigua",
+    "auditDetailHeading": "Organización",
+    "platform": "plataforma",
+    "userSummary_many": "{{count}} usuarios{{extra}}."
+  },
+  "members": {
+    "orgRequired": "Crea una organización o únete a una para gestionar los miembros.",
+    "heading": "Miembros",
+    "description": "Personas en {{name}} y lo que pueden hacer.",
+    "count_one": "{{count}} miembro",
+    "count_other": "{{count}} miembros",
+    "pendingInvitations": "Invitaciones pendientes",
+    "inviteHeading": "Invitar a alguien",
+    "emailLabel": "Correo electrónico",
+    "roleLabel": "Rol",
+    "sendInvitation": "Enviar invitación",
+    "invitationSent": "Invitación enviada a {{email}}.",
+    "you": "(tú)",
+    "roleFor": "Rol de {{name}}",
+    "remove": "Quitar",
+    "removeMember": "Quitar a {{name}}",
+    "invitedAs": "Invitado como",
+    "cancel": "Cancelar",
+    "cancelInvitation": "Cancelar la invitación de {{email}}",
+    "count_many": "{{count}} miembros"
+  },
+  "audit": {
+    "heading": "Registro de auditoría",
+    "description": "Los cambios más recientes en {{name}}. Los propietarios y administradores pueden ver esta página.",
+    "thisOrganization": "esta organización",
+    "loading": "Cargando registro de auditoría",
+    "loadErrorTitle": "No se pudo cargar el registro de auditoría",
+    "noAccess": "Tu rol no incluye acceso a la auditoría.",
+    "empty": "Aún no hay nada registrado.",
+    "tableCaption": "Entradas de auditoría, de la más reciente a la más antigua",
+    "detailsHeading": "Detalles",
+    "when": "Cuándo",
+    "who": "Quién",
+    "action": "Acción"
+  },
+  "organizations": {
+    "firstTitle": "Crea tu primera organización",
+    "newTitle": "Nueva organización",
+    "description": "Las organizaciones contienen tus marcas de agua, fotos y equipo. Serás su propietario.",
+    "createFailed": "No se pudo crear la organización.",
+    "nameLabel": "Nombre",
+    "slugLabel": "Identificador de URL",
+    "slugHint": "Letras minúsculas, números y guiones. Se usa en los enlaces y debe ser único.",
+    "submit": "Crear organización"
+  },
+  "import": {
+    "takePhoto": "Hacer una foto",
+    "cancel": "Cancelar",
+    "saveToProvider": "Guardar en {{provider}}",
+    "url": {
+      "title": "Importar desde un enlace",
+      "description": "Pega la dirección de una imagen de la web. La descargamos y la añadimos aquí.",
+      "linkLabel": "Enlace de la imagen",
+      "errorTitle": "No se pudo importar ese enlace",
+      "fetch": "Obtener"
+    },
+    "onedrive": {
+      "title": "Importar desde OneDrive",
+      "name": "OneDrive",
+      "description": "Inicia sesión en Microsoft y luego elige las fotos que quieras añadir.",
+      "loading": "Cargando OneDrive",
+      "empty": "Aquí no hay carpetas ni imágenes.",
+      "folderPath": "Ruta de la carpeta",
+      "errorTitle": "La importación desde OneDrive falló",
+      "tryAgain": "Reintentar",
+      "noneSelected": "No hay fotos seleccionadas",
+      "selectedCount": "{{count}} seleccionadas",
+      "addSelected": "Añadir seleccionadas"
+    }
+  },
+  "video": {
+    "orgRequired": "Crea una organización o únete a una para aplicar marcas de agua a videos.",
+    "heading": "Marca de agua en video",
+    "description": "Aplica un preajuste a todo un video. Cada fotograma recibe la marca de agua en tu navegador y se conserva el audio; no se sube nada.",
+    "checkingSupport": "Comprobando la compatibilidad de video",
+    "unsupportedTitle": "Este navegador no admite video",
+    "unsupportedBody": "Tu navegador no puede codificar video. Chrome, Edge o Safari 17 y posteriores sí pueden.",
+    "emptyHint": "para aplicarlo a un video.",
+    "addVideo": "Añadir un video",
+    "dropHint": "Suelta un video aquí, o",
+    "formatsHint": "MP4, WebM o MOV. Todo ocurre en tu navegador; no se sube nada y la galería aún no admite videos.",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
+    "choosePresetPreview": "Elige un preajuste para ver la marca de agua en un fotograma.",
+    "outputSize": "Salida de {{width}} × {{height}} px.",
+    "transcodingProgress": "Progreso de la transcodificación",
+    "progress": {
+      "noEta": "Fotograma {{frame}} · {{percent}}%",
+      "withEta": "Fotograma {{frame}} · {{percent}}% · quedan unos {{seconds}} s"
+    },
+    "cancel": "Cancelar",
+    "cancelled": "Transcodificación cancelada.",
+    "runErrorTitle": "No se pudo aplicar la marca de agua al video",
+    "download": "Descargar {{fileName}}",
+    "share": "Compartir",
+    "presets": "Preajustes",
+    "placement": "Colocación",
+    "placementOptions": {
+      "smart": "Inteligente",
+      "bottomRight": "Abajo a la derecha",
+      "bottomLeft": "Abajo a la izquierda",
+      "topRight": "Arriba a la derecha",
+      "topLeft": "Arriba a la izquierda",
+      "center": "Centro"
+    },
+    "quality": "Calidad",
+    "qualityOptions": {
+      "low": "Baja",
+      "standard": "Estándar",
+      "high": "Alta"
+    },
+    "resolution": "Resolución",
+    "resolutionOptions": {
+      "original": "Original",
+      "fit1080p": "Ajustar a 1080p",
+      "fit720p": "Ajustar a 720p"
+    },
+    "watermarking": "Aplicando marca de agua…",
+    "watermarkVideo": "Aplicar marca de agua",
+    "fixedPlacementNote": "La marca de agua mantiene una única posición fija durante todo el video. El audio se copia tal cual cuando encaja en la salida; de lo contrario, se vuelve a codificar.",
+    "renderingPreview": "Generando la vista previa",
+    "previewAlt": "La marca de agua en un fotograma del video"
+  },
+  "documents": {
+    "orgRequired": "Crea una organización o únete a una para aplicar marcas de agua a documentos.",
+    "heading": "Documentos",
+    "description": "Estampa un preajuste en todas las páginas de un PDF. Los archivos se procesan en tu navegador y se descargan de uno en uno o en un ZIP.",
+    "emptyHint": "para aplicarlo a los documentos.",
+    "addPdfs": "Añadir PDF",
+    "dropHint": "Suelta PDF aquí, o",
+    "filesHint": "Hasta {{max}} archivos, {{size}} cada uno. Cada página recibe la marca de agua en tu navegador; no se sube nada.",
+    "skipped_one": "{{count}} archivo omitido: no es un PDF o supera {{max}}.",
+    "skipped_other": "{{count}} archivos omitidos: no son PDF o superan {{max}}.",
+    "fileCount_one": "{{count}} documento",
+    "fileCount_other": "{{count}} documentos",
+    "clearList": "Vaciar lista",
+    "watermarkingProgress": "Progreso de la marca de agua",
+    "progressFinished": "{{done}} de {{total}} terminados",
+    "progressFailed": ", {{count}} fallidos",
+    "progressEnd": ".",
+    "listLabel": "Documentos por marcar",
+    "downloadFile": "Descargar {{fileName}}",
+    "removeFile": "Quitar {{fileName}}",
+    "presetHint": "Marca uno o más; se dibujan en el orden en que los marcas, los últimos sobre los primeros.",
+    "placement": "Colocación",
+    "smartPlacementHint": "La colocación inteligente es para fotos; para documentos, elige una esquina o una posición personalizada.",
+    "watermarkEmpty": "Aplicar marca de agua",
+    "watermarkCount": "Marcar {{count}}",
+    "downloadZip": "Descargar {{count}} en ZIP",
+    "savedAsHint": "Cada documento se guarda como {name}-watermarked.pdf. Los PDF cifrados se rechazan.",
+    "skipped_many": "{{count}} archivos omitidos: no son PDF o superan {{max}}.",
+    "fileCount_many": "{{count}} documentos"
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "Revisa tu bandeja de entrada",
+      "description": "Enviamos un enlace de verificación a {{email}}. Caduca en una hora.",
+      "resent": "Un nuevo enlace de verificación va en camino.",
+      "resend": "Reenviar correo de verificación"
+    },
+    "tool": {
+      "title": "Verificar una foto",
+      "description": "Comprueba si un PNG lleva una marca invisible de Watermark Pro y lee su mensaje oculto. Nada sale de tu navegador."
+    },
+    "checkPng": "Comprobar un PNG",
+    "checking": "Comprobando…",
+    "noneFound": "No se encontró ninguna marca invisible en esta foto."
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "Cargando preajustes",
+    "loadErrorTitle": "No se pudieron cargar los preajustes",
+    "emptyTitle": "Aún no hay preajustes",
+    "createInLibrary": "Crea un preajuste en la biblioteca",
+    "legend": "Preajustes",
+    "importTitle": "Importar preajustes",
+    "importDescription": "Elige un archivo de preajustes de Watermark Pro. Sus preajustes, y los logotipos que usen, se añaden a esta biblioteca.",
+    "presetFileLabel": "Archivo de preajustes",
+    "noPresets": "Este archivo de preajustes no tiene preajustes.",
+    "fileCount_one": "{{count}} preajuste en este archivo",
+    "fileCount_other": "{{count}} preajustes en este archivo",
+    "renamed": "Ya existe un preajuste llamado «{{name}}»; se importará como «{{finalName}}».",
+    "cancel": "Cancelar",
+    "importButton_one": "Importar {{count}} preajuste",
+    "importButton_other": "Importar {{count}} preajustes",
+    "fileCount_many": "{{count}} preajustes en este archivo",
+    "importButton_many": "Importar {{count}} preajustes"
+  },
+  "landing": {
+    "nav": "Cuenta",
+    "signIn": "Iniciar sesión",
+    "createAccount": "Crear cuenta",
+    "eyebrow": "Gratis y de código abierto",
+    "heroBody": "Protege tu fotografía sin estropear la imagen. Watermark Pro hace el trabajo pesado en tu navegador, mantiene tus originales en privado y le da a tu equipo roles que de verdad significan algo.",
+    "createWorkspace": "Crea tu espacio de trabajo",
+    "featuresHeading": "Qué hace",
+    "features": {
+      "bulk": {
+        "title": "Trabajos por lotes",
+        "body": "Suelta cientos de fotos y aplícales la marca de agua a todas de una vez, en tu navegador."
+      },
+      "library": {
+        "title": "Biblioteca de marcas de agua",
+        "body": "Guarda marcas de texto, símbolo y logotipo una vez; aplícalas donde quieras con un clic."
+      },
+      "smart": {
+        "title": "Colocación inteligente",
+        "body": "Cada foto se analiza para que la marca quede donde mejor se lee y no tape al sujeto."
+      },
+      "contrast": {
+        "title": "Contraste automático",
+        "body": "Se elige la variante clara u oscura y la intensidad del contorno en cada imagen, y puedes ajustarlas si no estás de acuerdo."
+      },
+      "teams": {
+        "title": "Equipos y roles",
+        "body": "Organizaciones con roles de propietario, administrador, editor y lector, aplicados en el servidor."
+      },
+      "trusted": {
+        "title": "Hecho para inspirar confianza",
+        "body": "Política de seguridad de contenido estricta, acciones auditadas y fotos que nunca salen de tu navegador a menos que las guardes."
+      }
+    },
+    "footer": "Watermark Pro es de código abierto bajo la licencia MIT.",
+    "privacy": "Privacidad",
+    "terms": "Términos"
+  },
+  "legal": {
+    "signIn": "Iniciar sesión",
+    "lastUpdated": "Última actualización: {{date}}",
+    "readSibling": "Lee <sibling>{{siblingLabel}}</sibling> o vuelve a la <home>página de inicio</home>.",
+    "footer": "Watermark Pro es de código abierto bajo la licencia MIT.",
+    "privacy": {
+      "title": "Privacidad",
+      "intro": "Watermark Pro está hecho para que tus fotografías sigan siendo tuyas. Esta página explica en lenguaje sencillo qué ocurre con tus imágenes y con la información de tu cuenta, a partir de los controles que el proyecto realmente aplica.",
+      "siblingLabel": "los términos del servicio",
+      "photos": {
+        "heading": "Tus fotos se quedan en tu navegador",
+        "p1": "La aplicación de la marca de agua se ejecuta por completo en tu dispositivo. El editor y la herramienta de lotes decodifican tus fotos en el navegador, las procesan en Web Workers y crean los archivos finales en memoria. Ver la vista previa de una marca de agua nunca sube la foto a la que se aplica.",
+        "p2": "Las exportaciones se ensamblan localmente y se te entregan mediante un enlace de descarga del mismo origen que se libera en cuanto comienza la descarga. Tus originales nunca se envían a un servidor para previsualizarlos ni para aplicarles la marca de agua."
+      },
+      "storage": {
+        "heading": "Qué almacenamos, y solo cuando lo pides",
+        "p1": "No se guarda nada en nuestros servidores a menos que elijas guardarlo. Cuando guardas una foto, una miniatura o un logotipo, se almacena en Cloudflare R2 con claves limitadas a tu organización, nunca se hace público y solo se sirve a los miembros de esa organización que han iniciado sesión, con almacenamiento en caché privado.",
+        "p2": "Cada organización tiene cuotas de fotos, logotipos y almacenamiento. Cada subida y eliminación se registra en el historial de auditoría."
+      },
+      "metadata": {
+        "heading": "Los metadatos se eliminan de forma predeterminada",
+        "p1": "Cada exportación se vuelve a codificar a partir de los píxeles, así que no se conserva ningún metadato a menos que decidas conservarlo. La opción predeterminada elimina todos los datos de cámara y ubicación antes de que el archivo llegue a tu descarga, al menú de compartir o a la galería.",
+        "p2": "Dos modos opcionales por exportación te permiten conservar los datos de la cámara sin la ubicación GPS, o conservarlo todo tal cual. Los metadatos se leen y se escriben en el navegador; no se sube nada para hacerlo."
+      },
+      "sharing": {
+        "heading": "Enlaces para compartir",
+        "p1": "Un enlace para compartir lleva un token firmado con una caducidad incorporada y se puede revocar en cualquier momento. Las páginas públicas que abre un enlace no tienen sesión y tienen un límite de frecuencia por dirección.",
+        "p2": "Los enlaces caducados, revocados, manipulados y desconocidos devuelven todos la misma respuesta neutra de «no encontrado», de modo que un enlace no revela nada una vez que deja de funcionar. La creación y revocación de enlaces está limitada a los miembros con permiso y queda auditada."
+      },
+      "account": {
+        "heading": "Tu cuenta",
+        "p1": "Una cuenta necesita una dirección de correo electrónico y una contraseña, y el correo debe verificarse antes de que la cuenta esté activa. Las sesiones se guardan en cookies HttpOnly y SameSite=Lax, marcadas como Secure en los orígenes seguros.",
+        "p2": "Los enlaces para restablecer la contraseña caducan al cabo de una hora y cierran tus demás sesiones cuando se usan."
+      },
+      "analytics": {
+        "heading": "Analítica y cookies",
+        "p1": "No usamos cookies de analítica ni de publicidad de terceros. La única medición es Cloudflare Web Analytics, que no usa cookies y no te rastrea entre sitios.",
+        "p2": "La app se comunica con solo dos orígenes de terceros, ambos de Cloudflare: el widget Turnstile que filtra las solicitudes de registro y de restablecimiento de contraseña en busca de bots, y la baliza de analítica sin cookies. Las fuentes, los estilos y todo lo demás se sirven desde este sitio."
+      },
+      "audit": {
+        "heading": "Historial de auditoría",
+        "p1": "Los registros de nuevas cuentas y cada cambio de organización, membresía, invitación, biblioteca, foto y elemento compartido se escriben en un registro de auditoría de solo anexión. Ese registro solo pueden leerlo los propietarios y administradores de una organización."
+      },
+      "reporting": {
+        "heading": "Informar de un problema",
+        "p1": "Los problemas de seguridad se pueden informar de forma privada a través del repositorio del proyecto en GitHub en lugar de en una incidencia pública. La política de seguridad del repositorio describe qué incluir y en cuánto tiempo recibirás respuesta."
+      }
+    },
+    "terms": {
+      "title": "Términos del servicio",
+      "intro": "Estos términos cubren tu uso de Watermark Pro. Están escritos para leerse y describen cómo se comporta el servicio en realidad, en lugar de añadir promesas que no cumple.",
+      "siblingLabel": "la política de privacidad",
+      "accepting": {
+        "heading": "Aceptación de estos términos",
+        "p1": "Usar Watermark Pro significa que aceptas estos términos. Si no estás de acuerdo, no uses el servicio."
+      },
+      "whatItDoes": {
+        "heading": "Qué hace el servicio",
+        "p1": "Watermark Pro aplica marcas de agua a fotografías. La aplicación de la marca de agua en sí se ejecuta en tu navegador; las funciones opcionales, como guardar fotos y logotipos, trabajar en equipo y compartir, usan almacenamiento en el servidor de Cloudflare.",
+        "p2": "El software es gratuito y de código abierto bajo la licencia MIT."
+      },
+      "account": {
+        "heading": "Tu cuenta",
+        "p1": "Las funciones de equipo necesitan una cuenta con una dirección de correo verificada. No compartas tu contraseña; eres responsable de lo que ocurra en tu cuenta.",
+        "p2": "Puedes cerrar tus sesiones en cualquier momento, y usar un enlace para restablecer la contraseña cierra tus demás sesiones."
+      },
+      "content": {
+        "heading": "Tu contenido",
+        "p1": "Conservas todos los derechos que ya tienes sobre las fotos y las marcas de agua que subes o creas. Eres responsable de tener el derecho de usar las imágenes que traes al servicio.",
+        "p2": "La app procesa tu contenido solo para ofrecer las funciones que usas, y lo almacena solo cuando eliges guardarlo. Nunca se usa para entrenar nada ni se comparte con terceros."
+      },
+      "acceptableUse": {
+        "heading": "Uso aceptable",
+        "p1": "No uses el servicio para infringir la ley ni para subir o compartir contenido que no tienes derecho a usar. No intentes eludir los controles de seguridad o los límites de frecuencia, ni acceder a datos que pertenecen a organizaciones de las que no eres miembro.",
+        "p2": "El acceso dentro de una organización depende de tu rol, y esos roles se aplican en el servidor."
+      },
+      "teams": {
+        "heading": "Equipos y roles",
+        "p1": "Una organización puede tener roles de propietario, administrador, editor y lector. Lo que cada miembro puede ver y hacer se limita a su rol, que se comprueba en cada solicitud en lugar de solo ocultarse en la interfaz."
+      },
+      "availability": {
+        "heading": "Disponibilidad, garantía y cambios",
+        "p1": "El servicio se ofrece «tal cual», sin garantía de ningún tipo, según lo establecido en la licencia MIT. Las funciones pueden cambiar y el servicio puede no estar disponible en algunos momentos.",
+        "p2": "Estos términos pueden actualizarse; la fecha en la parte superior de esta página indica cuándo cambiaron por última vez. Seguir usando el servicio después de un cambio significa que aceptas los términos actualizados."
+      },
+      "openSource": {
+        "heading": "Código abierto",
+        "p1": "El código fuente de Watermark Pro está disponible bajo la licencia MIT, que te permite inspeccionarlo, ejecutarlo y modificarlo según los términos de esa licencia."
+      },
+      "contact": {
+        "heading": "Contacto",
+        "p1": "Las preguntas sobre estos términos y los informes de problemas de seguridad se pueden plantear a través del repositorio del proyecto en GitHub."
+      }
+    }
+  },
+  "share": {
+    "loading": "Cargando fotos",
+    "unavailableTitle": "Este enlace no está disponible",
+    "unavailableBody": "Puede que haya caducado o se haya revocado, o que la dirección esté incompleta. Pídele uno nuevo a quien te lo envió.",
+    "about": "Acerca de Watermark Pro",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} fotos",
+    "availableUntil": " · disponible hasta {{date}}",
+    "shareLink": "Comparte este enlace",
+    "linkCopied": "Enlace copiado al portapapeles.",
+    "linkShared": "Enlace compartido.",
+    "openPhoto": "Abrir {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "Compartido con <home>Watermark Pro</home>. Las fotos siguen siendo propiedad de su dueño.",
+    "download": "Descargar",
+    "close": "Cerrar",
+    "photoCount_many": "{{count}} fotos"
+  },
+  "root": {
+    "somethingWentWrong": "Algo salió mal",
+    "notFound": {
+      "title": "Página no encontrada",
+      "body": "Puede que la dirección esté mal escrita o que la página se haya movido.",
+      "back": "Volver al inicio"
+    }
+  }
+}

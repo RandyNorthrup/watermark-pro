@@ -1,0 +1,1083 @@
+{
+  "language": {
+    "menuLabel": "Sprache ändern"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "library": "Bibliothek",
+      "editor": "Editor",
+      "bulk": "Stapel",
+      "video": "Video",
+      "documents": "Dokumente",
+      "gallery": "Galerie",
+      "shares": "Freigaben",
+      "members": "Mitglieder",
+      "audit": "Audit-Log",
+      "admin": "Admin"
+    },
+    "skipToContent": "Zum Inhalt springen",
+    "menu": "Menü",
+    "primaryNav": "Primär",
+    "primaryMenuNav": "Primär (Menü)",
+    "toolsNav": "Tools",
+    "signOut": "Abmelden",
+    "accountMenu": "Kontomenü für {{name}}",
+    "menuDescription": "Organisation wechseln oder zu einem beliebigen Bereich von Watermark Pro springen.",
+    "switchOrganizationFor": "Organisation: {{name}}. Organisation wechseln",
+    "chooseOrganization": "Organisation auswählen",
+    "chooseOrganizationShort": "Organisation wählen",
+    "organizations": "Organisationen",
+    "newOrganization": "Neue Organisation",
+    "theme": {
+      "system": "Design: folgt System. Zu Hell wechseln",
+      "light": "Design: hell. Zu Dunkel wechseln",
+      "dark": "Design: dunkel. Zu System wechseln"
+    }
+  },
+  "auth": {
+    "backToSignIn": "Zurück zur Anmeldung",
+    "fields": {
+      "emailLabel": "E-Mail",
+      "passwordLabel": "Passwort"
+    },
+    "login": {
+      "title": "Willkommen zurück",
+      "description": "Melden Sie sich bei Ihrem Workspace an.",
+      "footerPrompt": "Neu hier?",
+      "createAccount": "Konto erstellen",
+      "verifyTitle": "Bestätigen Sie zuerst Ihre E-Mail",
+      "verifyBody": "Wir haben einen Bestätigungslink an {{email}} gesendet.",
+      "resendIt": "Erneut senden",
+      "forgotPassword": "Passwort vergessen?",
+      "submit": "Anmelden"
+    },
+    "signup": {
+      "title": "Konto erstellen",
+      "description": "Ein Bestätigungslink wird an Ihre E-Mail-Adresse gesendet.",
+      "footerPrompt": "Bereits ein Konto?",
+      "signIn": "Anmelden",
+      "nameLabel": "Name",
+      "passwordHint": "Mindestens {{min}} Zeichen. Ein paar zusammenhanglose Wörter eignen sich gut.",
+      "submit": "Konto erstellen"
+    },
+    "forgotPassword": {
+      "title": "Passwort zurücksetzen",
+      "description": "Geben Sie Ihre E-Mail-Adresse ein; wir senden einen Link zum Zurücksetzen, falls ein Konto existiert.",
+      "sentTitle": "Prüfen Sie Ihren Posteingang",
+      "sentBody": "Falls {{email}} zu einem Konto gehört, ist ein Link zum Zurücksetzen unterwegs. Er läuft in einer Stunde ab.",
+      "submit": "Link zum Zurücksetzen senden"
+    },
+    "resetPassword": {
+      "title": "Neues Passwort wählen",
+      "invalidTitle": "Dieser Link zum Zurücksetzen ist ungültig",
+      "invalidBody": "Er ist möglicherweise abgelaufen oder wurde bereits verwendet.",
+      "requestNew": "Neuen anfordern",
+      "invalidEnd": ".",
+      "newPasswordLabel": "Neues Passwort",
+      "passwordHint": "Mindestens {{min}} Zeichen.",
+      "confirmLabel": "Passwort bestätigen",
+      "mismatch": "Passwörter stimmen nicht überein",
+      "submit": "Passwort aktualisieren"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "Einladung nicht verfügbar",
+      "title": "{{organizationName}} beitreten",
+      "description": "{{inviterEmail}} hat Sie eingeladen, als {{role}} beizutreten.",
+      "roleLabel": "Rolle:",
+      "decline": "Ablehnen",
+      "accept": "Einladung annehmen"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "Angemeldet als {{email}}",
+    "yourWorkspace": "Ihr Workspace",
+    "yourRole": "Ihre Rolle:",
+    "toolsHeading": "Tools",
+    "tools": {
+      "library": {
+        "label": "Bibliothek",
+        "body": "Text-, Symbol- und Logo-Wasserzeichen einmal gestalten und als Presets speichern."
+      },
+      "editor": {
+        "label": "Editor",
+        "body": "Ein Foto von Hand mit einem Wasserzeichen versehen: platzieren, zuschneiden, skalieren und exportieren."
+      },
+      "bulk": {
+        "label": "Stapel",
+        "body": "Ein Preset auf ein ganzes Shooting anwenden und die Ergebnisse als ZIP herunterladen."
+      },
+      "gallery": {
+        "label": "Galerie",
+        "body": "Durchsuchen, was das Team gespeichert hat, und Alben per Link teilen."
+      }
+    },
+    "overviewHeading": "Übersicht",
+    "members": "Mitglieder",
+    "noPendingInvitations": "Keine ausstehenden Einladungen.",
+    "pendingInvitations_one": "{{count}} ausstehende Einladung.",
+    "pendingInvitations_other": "{{count}} ausstehende Einladungen.",
+    "manageMembers": "Mitglieder verwalten",
+    "auditLog": "Audit-Log",
+    "auditDescription": "Jede Änderung an Mitgliedschaften und der Organisation wird mit Urheber und Zeitpunkt aufgezeichnet.",
+    "viewAuditLog": "Audit-Log ansehen"
+  },
+  "library": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um eine Wasserzeichen-Bibliothek aufzubauen.",
+    "heading": "Wasserzeichen-Bibliothek",
+    "description": "Presets, die alle in {{name}} teilen. Einzeln oder im Stapel anwenden.",
+    "export": "Exportieren",
+    "exportPreset": "{{name}} exportieren",
+    "importPresets": "Presets importieren",
+    "newPreset": "Neues Preset",
+    "exportErrorTitle": "Presets konnten nicht exportiert werden",
+    "loadingPresets": "Presets werden geladen",
+    "loadErrorTitle": "Bibliothek konnte nicht geladen werden",
+    "empty": "Noch keine Presets. Ein Preset kombiniert eine Markierung (Text, Symbol oder Logo) mit Platzierung, Kontrast und Stileinstellungen.",
+    "createFirst": "Erstes Preset erstellen",
+    "orgRequiredShort": "Erstellen Sie zuerst eine Organisation oder treten Sie einer bei.",
+    "loadingPreset": "Preset wird geladen",
+    "loadPresetErrorTitle": "Preset konnte nicht geladen werden",
+    "presetGone": "Dieses Preset existiert nicht mehr.",
+    "editSubtitleManage": "Änderungen gelten für alle, die dieses Preset verwenden.",
+    "editSubtitleReadOnly": "Schreibgeschützte Ansicht.",
+    "cannotCreate": "Ihre Rolle erlaubt das Erstellen von Presets nicht.",
+    "newPresetSubtitle": "Gestalten Sie die Markierung, legen Sie ihre Position fest und speichern Sie sie in der Bibliothek.",
+    "openInEditor": "{{name}} im Editor öffnen",
+    "deletePreset": "{{name}} löschen",
+    "logoBadge": "Logo",
+    "autoContrast": "Auto-Kontrast",
+    "manualContrast": "Manueller Kontrast",
+    "updated": "Aktualisiert {{date}}",
+    "exportLogoTypeError": "Ein Logo hat einen Bildtyp, der nicht exportiert werden kann.",
+    "exportMissingLogoError": "Ein Preset verweist auf ein Logo, das nicht mehr in der Bibliothek ist.",
+    "describe": {
+      "text": "„{{text}}“ in {{fontFamily}}",
+      "glyph": "Glyphe {{glyph}}",
+      "icon": "Icon {{name}}",
+      "logo": "Logo",
+      "qr": "QR-Code für {{content}}"
+    },
+    "shape": {
+      "rectangle": "Rechteck",
+      "roundedRectangle": "Abgerundetes Rechteck",
+      "ellipse": "Ellipse",
+      "line": "Linie"
+    },
+    "placement": {
+      "smart": "Intelligente Platzierung",
+      "custom": "Eigene Position",
+      "random": "Zufällige Platzierung"
+    }
+  },
+  "designer": {
+    "presetName": "Preset-Name",
+    "presetNamePlaceholder": "Studio-Signatur",
+    "nameError": "Geben Sie dem Preset einen Namen mit bis zu 60 Zeichen.",
+    "sections": {
+      "label": "Designer-Abschnitte",
+      "mark": "Markierung",
+      "placement": "Platzierung",
+      "style": "Stil"
+    },
+    "markType": "Markierungstyp",
+    "saveError": "Preset konnte nicht gespeichert werden",
+    "savePreset": "Preset speichern",
+    "saveChanges": "Änderungen speichern",
+    "readOnlyHint": "Ihre Rolle kann Presets ansehen, aber nicht ändern.",
+    "notAnImage": "Diese Datei ist kein Bild, das der Browser lesen kann.",
+    "text": {
+      "label": "Text",
+      "hint": "Bis zu {{max}} Zeichen auf bis zu {{lines}} Zeilen. Verwenden Sie „Detail einfügen“ für Platzhalter wie Datum oder Kamera, die je Foto ausgefüllt werden. {location} druckt die GPS-Position des Fotos auf das Bild."
+    },
+    "qr": {
+      "content": "QR-Code-Inhalt",
+      "hint": "Meist ein Link. Bis zu {{max}} Zeichen; der Code ist stets dunkel auf hellem Grund, damit er scanbar bleibt."
+    },
+    "tokens": {
+      "menu": "Detail einfügen",
+      "heading": "Foto-Details",
+      "date": "Datum",
+      "time": "Uhrzeit",
+      "taken": "Aufnahmedatum und -zeit",
+      "filename": "Dateiname",
+      "camera": "Kamera",
+      "lens": "Objektiv",
+      "iso": "ISO",
+      "aperture": "Blende",
+      "shutter": "Verschlusszeit",
+      "focal": "Brennweite",
+      "location": "Standort (GPS)",
+      "index": "Fotonummer",
+      "count": "Fotoanzahl",
+      "width": "Breite",
+      "height": "Höhe"
+    },
+    "font": {
+      "family": "Schriftart",
+      "weight": "Schriftstärke",
+      "specimen": "Zwölf Boxkämpfer jagen Viktor"
+    },
+    "symbol": {
+      "icons": "Icons",
+      "glyphLabel": "Glyphe {{glyph}}",
+      "iconLabel": "Icon {{label}}"
+    },
+    "shape": {
+      "label": "Form",
+      "rectangle": "Rechteck",
+      "roundedRectangle": "Abgerundetes Rechteck",
+      "ellipse": "Ellipse",
+      "line": "Linie",
+      "length": "Länge",
+      "proportions": "Proportionen",
+      "fill": "Füllung",
+      "fillToggle": "Form füllen",
+      "fillColour": "Füllfarbe",
+      "fillOpacity": "Deckkraft der Füllung",
+      "strokeWidth": "Konturstärke",
+      "customStrokeColour": "Eigene Konturfarbe",
+      "strokeColour": "Konturfarbe"
+    },
+    "effects": {
+      "letterSpacing": "Zeichenabstand",
+      "curve": "Krümmung",
+      "effect": "Effekt",
+      "textEffect": "Texteffekt",
+      "solid": "Voll",
+      "outline": "Umriss",
+      "emboss": "Erhaben",
+      "engrave": "Vertieft"
+    },
+    "placement": {
+      "mode": "Platzierungsmodus",
+      "smart": "Intelligent",
+      "smartDescription": "Analysiert jedes Foto und wählt die ruhigste Ecke",
+      "corner": "Ecke",
+      "cornerDescription": "Feste Position relativ zu den Rändern",
+      "custom": "Eigene",
+      "customDescription": "Exakte Position als Anteil des Fotos",
+      "random": "Zufällig",
+      "randomDescription": "Eine andere Stelle je Foto; schwerer automatisch zu entfernen",
+      "smartHint": "Die Engine bewertet jede Ecke und Kante nach Detail, Kontrast und Motiv und platziert die Markierung dort, wo sie gut lesbar und am wenigsten störend ist.",
+      "randomHint": "Jedes Foto erhält eine zufällige Ecke, verschoben um bis zum unten festgelegten Jitter. Dasselbe Foto landet immer an derselben Stelle.",
+      "jitter": "Jitter",
+      "cornerLegend": "Ecke",
+      "horizontal": "Horizontal",
+      "vertical": "Vertikal",
+      "anchor": {
+        "topLeft": "Oben links",
+        "topCenter": "Oben mittig",
+        "topRight": "Oben rechts",
+        "middleLeft": "Mitte links",
+        "center": "Mitte",
+        "middleRight": "Mitte rechts",
+        "bottomLeft": "Unten links",
+        "bottomCenter": "Unten mittig",
+        "bottomRight": "Unten rechts"
+      }
+    },
+    "style": {
+      "contrast": "Kontrast",
+      "contrastMode": "Kontrastmodus",
+      "auto": "Auto",
+      "autoDescription": "Helle oder dunkle Tinte je Foto gewählt",
+      "manual": "Manuell",
+      "manualDescription": "Feste Tinte und Umrissstärke",
+      "colour": "Farbe",
+      "colourDescription": "Eine eigene Tintenfarbe",
+      "autoHint": "Die Tinte wechselt zwischen hell und dunkel, passend zum Bereich unter der Markierung, und ein Umriss wird nur hinzugefügt, wenn der Hintergrund farblich zu ähnlich ist.",
+      "ink": "Tinte",
+      "inkLight": "Helle Tinte",
+      "inkDark": "Dunkle Tinte",
+      "inkColour": "Tintenfarbe",
+      "outlineStrength": "Umrissstärke",
+      "appearance": "Darstellung",
+      "opacity": "Deckkraft",
+      "size": "Größe",
+      "ofWidth": "{{percent}} der Breite",
+      "rotation": "Drehung",
+      "margin": "Randabstand",
+      "backdrop": "Feld hinter der Markierung",
+      "boxOpacity": "Deckkraft des Felds",
+      "tiling": "Über das Foto wiederholen",
+      "spacing": "Abstand"
+    },
+    "preview": {
+      "heading": "Vorschau",
+      "rendering": "Vorschau wird gerendert",
+      "choosePhoto": "Foto für die Vorschau wählen",
+      "tryYourPhoto": "Eigenes Foto testen",
+      "samplePhoto": "Beispielfoto",
+      "alt": "Wasserzeichen-Vorschau auf dem Motivfoto",
+      "failed": "Vorschau fehlgeschlagen",
+      "chooseLogo": "Wählen Sie ein Logo oder laden Sie eines hoch, um die Vorschau zu sehen.",
+      "nothingToPlace": "Nichts zu platzieren.",
+      "inkLight": "helle Tinte",
+      "inkDark": "dunkle Tinte",
+      "inkColour": "Tinte {{colour}}",
+      "customPosition": "Eigene Position, {{ink}}.",
+      "placed": "Platziert {{position}}, {{ink}}.",
+      "position": {
+        "topLeft": "oben links",
+        "topCenter": "oben mittig",
+        "topRight": "oben rechts",
+        "middleLeft": "mittig links",
+        "center": "zentriert",
+        "middleRight": "mittig rechts",
+        "bottomLeft": "unten links",
+        "bottomCenter": "unten mittig",
+        "bottomRight": "unten rechts"
+      }
+    },
+    "logo": {
+      "loading": "Logos werden geladen",
+      "loadError": "Logos konnten nicht geladen werden",
+      "empty": "Noch keine Logos. Laden Sie für beste Ergebnisse ein PNG, JPEG oder WebP mit transparentem Hintergrund hoch.",
+      "choose": "Logo auswählen",
+      "item": "Logo {{name}}",
+      "delete": "Logo {{name}} löschen",
+      "upload": "Logodatei hochladen",
+      "uploadButton": "Logo hochladen",
+      "hint": "PNG, JPEG oder WebP bis {{max}} MB, oder eine gezeichnete Signatur.",
+      "tooLarge": "Logos müssen {{max}} MB oder kleiner sein.",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "Logo vorbereiten",
+        "title": "„{{name}}“ vorbereiten",
+        "description": "Optional einen einfarbigen Hintergrund entfernen und leere Ränder beschneiden, dann als transparentes PNG hochladen.",
+        "before": "Vorher",
+        "after": "Nachher",
+        "previewNeedsCanvas": "Die Vorschau benötigt ein Browser-Canvas.",
+        "preview": "Vorschau des vorbereiteten Logos",
+        "removeBackground": "Hintergrund entfernen",
+        "backgroundTolerance": "Hintergrundtoleranz",
+        "trim": "Transparente Ränder beschneiden",
+        "outputSize": "Ausgabegröße: {{size}} px",
+        "use": "Logo verwenden",
+        "chooseAnother": "Anderes wählen"
+      },
+      "signature": {
+        "draw": "Signatur zeichnen",
+        "description": "Unterschreiben Sie mit dem Finger, einem Stift oder der Maus. Sie wird als transparentes Logo in der Bibliothek gespeichert, auf die Tinte zugeschnitten.",
+        "pad": "Signaturfeld; hier zeichnen",
+        "pen": "Stift",
+        "penWidthGroup": "Stiftbreite",
+        "penWidth": "{{width}}-Pixel-Stift",
+        "undo": "Strich rückgängig",
+        "clear": "Löschen",
+        "cancel": "Abbrechen",
+        "save": "Als Logo speichern"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um den Editor zu nutzen.",
+    "heading": "Editor",
+    "description": "Ein Foto mit Wasserzeichen versehen: Preset wählen, bei Bedarf von Hand platzieren, zuschneiden, skalieren und herunterladen. Nichts verlässt Ihren Browser.",
+    "tabs": {
+      "watermark": "Wasserzeichen",
+      "crop": "Zuschneiden",
+      "adjust": "Anpassen",
+      "resize": "Größe",
+      "export": "Export"
+    },
+    "toolsLabel": "Editor-Werkzeuge",
+    "openPhoto": "Foto öffnen",
+    "openPhotoLabel": "Ein Foto öffnen",
+    "fromLink": "Von einem Link",
+    "samplePhoto": "Beispielfoto",
+    "sampleScene": "Beispielszene",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "Wird gerendert",
+    "renderingPreview": "Vorschau wird gerendert",
+    "undo": "Rückgängig",
+    "redo": "Wiederholen",
+    "altCrop": "Foto mit dem Zuschnittrahmen",
+    "altWatermark": "Foto mit angewendetem Wasserzeichen",
+    "choosePresetHint": "Wählen Sie ein Preset, um ein Wasserzeichen zu platzieren. Ziehen Sie ein Foto an eine beliebige Stelle der Arbeitsfläche.",
+    "outputSize": "Ausgabe {{width}} × {{height}} px.",
+    "notAnImage": "Diese Datei ist kein Bild, das der Browser lesen kann.",
+    "previewFailed": "Vorschau fehlgeschlagen",
+    "exportFailed": "Export fehlgeschlagen",
+    "savedToGallery": "{{name}} in der <galleryLink>Galerie</galleryLink> gespeichert.",
+    "applyToPhoto": "Auf dieses Foto anwenden",
+    "applyToAll": "Auf alle Fotos anwenden",
+    "removeOverride": "Anpassung entfernen",
+    "cancel": "Abbrechen",
+    "dimensions": {
+      "left": "Links",
+      "top": "Oben",
+      "width": "Breite",
+      "height": "Höhe",
+      "pxField": "{{label}} (px)"
+    },
+    "watermark": {
+      "emptyHint": "um es hier anzuwenden.",
+      "preset": "Preset",
+      "addPreset": "Weiteres Preset hinzufügen",
+      "maxMarks": "Bis zu {{max}} Markierungen pro Foto",
+      "choosePreset": "Preset auswählen",
+      "marksHeading": "Markierungen auf diesem Foto",
+      "layersLabel": "Ebenen, von unten nach oben",
+      "removedPreset": "Entferntes Preset",
+      "removeLayer": "{{name}} von diesem Foto entfernen",
+      "adjusted": "Für dieses Foto angepasst; das Preset in der Bibliothek bleibt unverändert.",
+      "revert": "Zurücksetzen",
+      "placement": "Platzierung"
+    },
+    "crop": {
+      "aspectRatio": "Seitenverhältnis",
+      "photoSize": "Foto ist {{width}} × {{height}} px.",
+      "reset": "Zuschnitt zurücksetzen",
+      "area": "Zuschnittbereich. Zum Verschieben ziehen; Pfeiltasten verschieben schrittweise, Umschalt für größere Schritte.",
+      "resizeHandle": "Zuschnitt an {{handle}} anpassen",
+      "handles": {
+        "n": "der oberen Kante",
+        "s": "der unteren Kante",
+        "e": "der rechten Kante",
+        "w": "der linken Kante",
+        "ne": "der oberen rechten Ecke",
+        "nw": "der oberen linken Ecke",
+        "se": "der unteren rechten Ecke",
+        "sw": "der unteren linken Ecke"
+      }
+    },
+    "resize": {
+      "keepProportions": "Proportionen beibehalten",
+      "shortcuts": "Kurzbefehle",
+      "fit": "Auf {{side}} anpassen",
+      "percent": "{{value}} %",
+      "outputUnchanged": "Ausgabe {{width}} × {{height}} px (unverändert).",
+      "outputChanged": "Ausgabe {{width}} × {{height}} px von {{baseWidth}} × {{baseHeight}}.",
+      "resetSize": "Größe zurücksetzen"
+    },
+    "adjust": {
+      "filter": "Filter",
+      "custom": "Eigene Anpassungen",
+      "filterValue": "Filter: {{name}}",
+      "brightness": "Helligkeit",
+      "contrast": "Kontrast",
+      "saturation": "Sättigung",
+      "warmth": "Wärme",
+      "sepia": "Sepia",
+      "vignette": "Vignette",
+      "reset": "{{name}} zurücksetzen",
+      "resetAll": "Alle zurücksetzen"
+    },
+    "orientation": {
+      "rotateLeft": "Nach links drehen",
+      "rotateRight": "Nach rechts drehen",
+      "flipHorizontal": "Horizontal spiegeln",
+      "flipVertical": "Vertikal spiegeln",
+      "straighten": "Begradigen"
+    },
+    "frame": {
+      "label": "Rahmen",
+      "add": "Rahmen hinzufügen",
+      "width": "Rahmenbreite",
+      "colour": "Rahmenfarbe"
+    },
+    "metadata": {
+      "heading": "Metadaten",
+      "strip": {
+        "label": "Entfernen",
+        "help": "Keine Kameradaten, kein Standort. Am sichersten zum Teilen."
+      },
+      "keepExceptLocation": {
+        "label": "Außer Standort behalten",
+        "help": "Kamera, Objektiv und Aufnahmezeit bleiben; GPS wird entfernt."
+      },
+      "keep": {
+        "label": "Alles behalten",
+        "help": "Einschließlich der GPS-Position, falls das Foto eine hat."
+      },
+      "webpNote": "Bei WebP-Exporten werden Metadaten immer entfernt."
+    },
+    "export": {
+      "format": "Format",
+      "quality": "Qualität",
+      "invisibleMark": "Unsichtbare Markierung",
+      "choosePng": "Wählen Sie PNG, um eine Nachricht in den Pixeln zu verbergen.",
+      "invisibleMessage": "Unsichtbare Nachricht",
+      "tooLong": "Zu lang für ein Foto mit {{width}}×{{height}} (Platz für {{capacity}} Bytes).",
+      "invisibleHint": "In den Pixeln verborgen und unter „Prüfen“ lesbar. Bleibt nur bei PNG erhalten.",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}. In Ihrem Browser in voller Auflösung gerendert{{share}}.",
+      "losslessClause": "; PNG ist verlustfrei",
+      "shareClause": "; Teilen sendet es an Fotos, Nachrichten oder eine beliebige App auf diesem Gerät",
+      "download": "Herunterladen",
+      "share": "Teilen",
+      "saveToGallery": "In Galerie speichern",
+      "savedToFolder": "In Ihrem {{provider}}-Ordner „{{folder}}“ gespeichert."
+    },
+    "mark": {
+      "position": "Wasserzeichen-Position. Zum Verschieben ziehen (rastet an Rändern, Dritteln und Mitte ein; Alt halten für freie Platzierung), zum Skalieren zusammenziehen, zum Drehen verdrehen; Pfeiltasten verschieben, Plus und Minus skalieren, eckige Klammern drehen.",
+      "rotate": "Wasserzeichen drehen",
+      "resize": "Wasserzeichen skalieren"
+    }
+  },
+  "bulk": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um im Stapel mit Wasserzeichen zu versehen.",
+    "heading": "Wasserzeichen im Stapel",
+    "description": "Ein Preset auf ein ganzes Shooting anwenden. Fotos werden parallel in Ihrem Browser verarbeitet und als ZIP oder einzeln heruntergeladen.",
+    "emptyHint": "um es auf einen Stapel anzuwenden.",
+    "addPhotos": "Fotos hinzufügen",
+    "addFolder": "Ordner hinzufügen",
+    "dropHint": "Fotos oder einen Ordner hier ablegen, oder",
+    "fromLink": "Von einem Link",
+    "capacity_one": "Bis zu {{max}} Fotos pro Stapel. Die Verarbeitung erfolgt in Ihrem Browser mit {{count}} Worker.",
+    "capacity_other": "Bis zu {{max}} Fotos pro Stapel. Die Verarbeitung erfolgt in Ihrem Browser mit {{count}} Workern.",
+    "skipped_one": "{{count}} Datei übersprungen: keine Bilder",
+    "skipped_other": "{{count}} Dateien übersprungen: keine Bilder",
+    "importErrorTitle": "Import aus der Cloud fehlgeschlagen",
+    "photoCount_one": "{{count}} Foto",
+    "photoCount_other": "{{count}} Fotos",
+    "clearList": "Liste leeren",
+    "batchProgress": "Stapelfortschritt",
+    "progress": {
+      "finished": "{{done}} von {{total}} fertig",
+      "failed": ", {{n}} fehlgeschlagen",
+      "cancelled": ", {{n}} abgebrochen",
+      "rate": " in {{seconds}} s ({{rate}} Fotos/s)",
+      "end": "."
+    },
+    "photosList": "Fotos in diesem Stapel",
+    "custom": "Eigene",
+    "selected": "Ausgewählt",
+    "status": {
+      "queued": "Wartet",
+      "processing": "Läuft",
+      "done": "Fertig",
+      "failed": "Fehlgeschlagen",
+      "cancelled": "Abgebrochen"
+    },
+    "adjustPhoto": "{{name}} anpassen",
+    "sharePhoto": "{{name}} teilen",
+    "downloadPhoto": "{{name}} herunterladen",
+    "removePhoto": "{{name}} entfernen",
+    "showAll": "Alle {{count}} Fotos anzeigen",
+    "presetHint": "Wählen Sie eines oder mehrere aus; sie werden in der Reihenfolge der Auswahl angewendet, spätere über früheren.",
+    "format": "Format",
+    "quality": "Qualität",
+    "invisibleMark": "Unsichtbare Markierung",
+    "invisibleMessage": "Unsichtbare Nachricht",
+    "choosePng": "Wählen Sie PNG, um in jedem Foto eine Nachricht zu verbergen.",
+    "size": {
+      "label": "Größe",
+      "original": "Originalgröße",
+      "fit": "Auf {{side}} px anpassen"
+    },
+    "fileNames": "Dateinamen",
+    "tokensLabel": "Platzhalter: {{tokens}}.",
+    "names": {
+      "example": "Beispiel: {{example}}",
+      "mustProduceName": "Das Muster muss einen Namen ergeben."
+    },
+    "photoAdjustments": "Fotoanpassungen",
+    "resume": "Fortsetzen",
+    "pause": "Pausieren",
+    "cancel": "Abbrechen",
+    "start": "Starten",
+    "retry": "{{count}} wiederholen",
+    "downloadZip": "{{count}} als ZIP herunterladen",
+    "downloadReport": "Bericht herunterladen (CSV)",
+    "saveToGallery": "{{count}} in Galerie speichern",
+    "savedProgress": "{{done}} von {{total}} gespeichert",
+    "allSaved": "Alle in der <galleryLink>Galerie</galleryLink> gespeichert.",
+    "someSaved": "{{failed}} konnten nicht gespeichert werden (Speicherkontingent oder Limits). Der Rest ist in der <galleryLink>Galerie</galleryLink>.",
+    "savedToCloud_one": "{{count}} Foto in Ihrem {{provider}}-Ordner „{{folder}}“ gespeichert.",
+    "savedToCloud_other": "{{count}} Fotos in Ihrem {{provider}}-Ordner „{{folder}}“ gespeichert.",
+    "privacyNote": "Intelligente Platzierung und Auto-Kontrast werden für jedes Foto separat ermittelt. Nichts wird hochgeladen.",
+    "watch": {
+      "label": "Ordner überwachen",
+      "stop": "Stoppen",
+      "choose": "Ordner wählen",
+      "hint": "Wählen Sie einen Eingabe- und einen Ausgabeordner; neue Fotos, die in den Eingabeordner gelegt werden, erhalten die gewählten Presets als Wasserzeichen und werden in den Ausgabeordner geschrieben. Läuft nur, solange diese Seite geöffnet ist.",
+      "wrote": "{{name}} geschrieben",
+      "failed": "Fehlgeschlagen {{name}}: {{error}}"
+    }
+  },
+  "gallery": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um eine Galerie zu führen.",
+    "heading": "Galerie",
+    "description": "Von {{name}} gespeicherte Fotos mit Wasserzeichen. Suchen, nach Preset filtern, herunterladen oder löschen.",
+    "usage_one": "{{count}} Foto · {{used}} von {{max}}",
+    "usage_other": "{{count}} Fotos · {{used}} von {{max}}",
+    "maxCount": "Bis zu {{count}} Fotos pro Organisation",
+    "storageUsed": "Belegter Speicher",
+    "storagePercent": "{{percent}} % des Speichers belegt",
+    "checkPhoto": "Foto prüfen",
+    "search": "Suche",
+    "searchPlaceholder": "Fotoname",
+    "preset": "Preset",
+    "allPresets": "Alle Presets",
+    "selectAll": "Alle auswählen",
+    "clearSelection": "Auswahl aufheben",
+    "photoCount_one": "{{count}} Foto",
+    "photoCount_other": "{{count}} Fotos",
+    "share": "Teilen",
+    "shareEllipsis": "Teilen…",
+    "deleteErrorTitle": "Löschen fehlgeschlagen",
+    "loadingPhotos": "Fotos werden geladen",
+    "loadErrorTitle": "Galerie konnte nicht geladen werden",
+    "empty": "Noch keine Fotos. Speichern Sie eines aus dem Editor oder einen ganzen Stapel aus der Stapelverarbeitung.",
+    "emptyFiltered": "Keine Fotos entsprechen diesen Filtern.",
+    "openEditor": "Editor öffnen",
+    "openPhoto": "{{name}} öffnen",
+    "selectPhoto": "{{name}} auswählen",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "Mehr laden",
+    "delete": "Löschen",
+    "deleteConfirmTitle_one": "{{count}} Foto löschen?",
+    "deleteConfirmTitle_other": "{{count}} Fotos löschen?",
+    "deleteConfirmBody": "Die Dateien und Miniaturansichten werden aus dem Speicher entfernt. Dies kann nicht rückgängig gemacht werden.",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "download": "Herunterladen",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_one": "{{count}} Foto teilen",
+    "shareTitle_other": "{{count}} Fotos teilen",
+    "shareDescription": "Jeder mit dem Link kann diese Fotos ansehen und herunterladen, bis er abläuft oder Sie ihn widerrufen.",
+    "title": "Titel",
+    "expiresAfter": "Läuft ab nach",
+    "linkExpiry": "Ablauf des Links",
+    "expiry": {
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "never": "Nie"
+    },
+    "createErrorTitle": "Link konnte nicht erstellt werden",
+    "createLink": "Link erstellen",
+    "link": "Link",
+    "noExpiry": "Dieser Link läuft nicht ab.",
+    "expires": "Läuft {{when}} ab.",
+    "manageLinks": "Links unter „Freigaben“ verwalten.",
+    "linkCopied": "Link in die Zwischenablage kopiert.",
+    "linkShared": "Link geteilt.",
+    "copyLink": "Link kopieren"
+  },
+  "shares": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Fotos zu teilen.",
+    "noPermission": "Ihre Rolle umfasst kein Teilen.",
+    "heading": "Freigaben",
+    "description": "Links, mit denen Personen außerhalb von {{name}} ausgewählte Fotos ansehen und herunterladen können. Ein Widerruf stoppt den Link sofort.",
+    "loading": "Freigaben werden geladen",
+    "loadErrorTitle": "Freigaben konnten nicht geladen werden",
+    "empty": "Noch keine Links. Wählen Sie Fotos in der Galerie aus und klicken Sie auf „Teilen“.",
+    "openGallery": "Galerie öffnen",
+    "rowCreated_one": "{{count}} Foto · erstellt {{created}}",
+    "rowCreated_other": "{{count}} Fotos · erstellt {{created}}",
+    "neverExpires": " · läuft nie ab",
+    "expiresOn": " · läuft ab {{expires}}",
+    "status": {
+      "active": "aktiv",
+      "expired": "abgelaufen",
+      "revoked": "widerrufen"
+    },
+    "copyLink": "Link kopieren",
+    "shareEllipsis": "Teilen…",
+    "revoke": "{{title}} widerrufen",
+    "revokeButton": "Widerrufen",
+    "linkCopied": "Link in die Zwischenablage kopiert.",
+    "linkShared": "Link geteilt."
+  },
+  "admin": {
+    "heading": "Administration",
+    "description": "Alle Benutzer und Organisationen dieser Instanz. Aktionen hier werden im Audit-Trail aufgezeichnet.",
+    "onlyAdmins": "Nur Plattform-Administratoren können diese Seite öffnen.",
+    "sectionsLabel": "Administrationsbereiche",
+    "tabs": {
+      "users": "Benutzer",
+      "organizations": "Organisationen",
+      "audit": "Audit-Trail"
+    },
+    "searchLabel": "Nach E-Mail suchen",
+    "searchPlaceholder": "name@example.com",
+    "loadingUsers": "Benutzer werden geladen",
+    "usersErrorTitle": "Benutzer konnten nicht geladen werden",
+    "userSummary_one": "{{count}} Benutzer{{extra}}.",
+    "userSummary_other": "{{count}} Benutzer{{extra}}.",
+    "showingNewest": ", die neuesten {{count}} werden angezeigt",
+    "you": "(Sie)",
+    "joined": "Beigetreten {{date}}",
+    "emailNotVerified": " · E-Mail nicht bestätigt",
+    "platformAdmin": "Plattform-Admin",
+    "banned": "gesperrt",
+    "bannedReason": "gesperrt: {{reason}}",
+    "unban": "Entsperren",
+    "unbanUser": "{{email}} entsperren",
+    "removeAdmin": "Admin entfernen",
+    "makeAdminShort": "Zum Admin machen",
+    "removeAdminFrom": "Admin-Rechte von {{email}} entfernen",
+    "makeAdmin": "{{email}} zum Admin machen",
+    "signOutEverywhereButton": "Überall abmelden",
+    "signOutEverywhere": "{{email}} überall abmelden",
+    "ban": "Sperren",
+    "banUser": "{{email}} sperren",
+    "banConfirmTitle": "{{email}} sperren?",
+    "banConfirmBody": "Ihre Sitzungen enden sofort und sie können sich erst nach der Entsperrung wieder anmelden. Der Grund wird ihnen angezeigt und im Audit-Trail festgehalten.",
+    "reasonLabel": "Grund",
+    "cancel": "Abbrechen",
+    "banConfirm": "Benutzer sperren",
+    "loadingOrganizations": "Organisationen werden geladen",
+    "organizationsErrorTitle": "Organisationen konnten nicht geladen werden",
+    "organizationsTable": "Organisationen, neueste zuerst",
+    "th": {
+      "organization": "Organisation",
+      "members": "Mitglieder",
+      "photos": "Fotos",
+      "storage": "Speicher",
+      "created": "Erstellt"
+    },
+    "loadingAudit": "Audit-Trail wird geladen",
+    "auditErrorTitle": "Audit-Trail konnte nicht geladen werden",
+    "auditCaption": "Audit-Einträge über alle Organisationen, neueste zuerst",
+    "auditDetailHeading": "Organisation",
+    "platform": "Plattform"
+  },
+  "members": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Mitglieder zu verwalten.",
+    "heading": "Mitglieder",
+    "description": "Personen in {{name}} und was sie tun können.",
+    "count_one": "{{count}} Mitglied",
+    "count_other": "{{count}} Mitglieder",
+    "pendingInvitations": "Ausstehende Einladungen",
+    "inviteHeading": "Jemanden einladen",
+    "emailLabel": "E-Mail",
+    "roleLabel": "Rolle",
+    "sendInvitation": "Einladung senden",
+    "invitationSent": "Einladung an {{email}} gesendet.",
+    "you": "(Sie)",
+    "roleFor": "Rolle für {{name}}",
+    "remove": "Entfernen",
+    "removeMember": "{{name}} entfernen",
+    "invitedAs": "Eingeladen als",
+    "cancel": "Abbrechen",
+    "cancelInvitation": "Einladung für {{email}} zurückziehen"
+  },
+  "audit": {
+    "heading": "Audit-Log",
+    "description": "Die neuesten Änderungen in {{name}}. Inhaber und Admins können diese Seite ansehen.",
+    "thisOrganization": "diese Organisation",
+    "loading": "Audit-Log wird geladen",
+    "loadErrorTitle": "Audit-Log konnte nicht geladen werden",
+    "noAccess": "Ihre Rolle umfasst keinen Zugriff auf das Audit-Log.",
+    "empty": "Noch nichts aufgezeichnet.",
+    "tableCaption": "Audit-Einträge, neueste zuerst",
+    "detailsHeading": "Details",
+    "when": "Wann",
+    "who": "Wer",
+    "action": "Aktion"
+  },
+  "organizations": {
+    "firstTitle": "Erstellen Sie Ihre erste Organisation",
+    "newTitle": "Neue Organisation",
+    "description": "Organisationen enthalten Ihre Wasserzeichen, Fotos und Ihr Team. Sie werden ihr Inhaber.",
+    "createFailed": "Die Organisation konnte nicht erstellt werden.",
+    "nameLabel": "Name",
+    "slugLabel": "URL-Kennung",
+    "slugHint": "Kleinbuchstaben, Zahlen und Bindestriche. Wird in Links verwendet und muss eindeutig sein.",
+    "submit": "Organisation erstellen"
+  },
+  "import": {
+    "takePhoto": "Foto aufnehmen",
+    "cancel": "Abbrechen",
+    "saveToProvider": "In {{provider}} speichern",
+    "url": {
+      "title": "Von einem Link importieren",
+      "description": "Fügen Sie die Adresse eines Bildes aus dem Web ein. Wir rufen es ab und fügen es hier hinzu.",
+      "linkLabel": "Bild-Link",
+      "errorTitle": "Dieser Link konnte nicht importiert werden",
+      "fetch": "Abrufen"
+    },
+    "onedrive": {
+      "title": "Aus OneDrive importieren",
+      "name": "OneDrive",
+      "description": "Bei Microsoft anmelden, dann Fotos zum Hinzufügen auswählen.",
+      "loading": "OneDrive wird geladen",
+      "empty": "Keine Ordner oder Bilder hier.",
+      "folderPath": "Ordnerpfad",
+      "errorTitle": "OneDrive-Import fehlgeschlagen",
+      "tryAgain": "Erneut versuchen",
+      "noneSelected": "Keine Fotos ausgewählt",
+      "selectedCount": "{{count}} ausgewählt",
+      "addSelected": "Auswahl hinzufügen"
+    }
+  },
+  "video": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Videos mit Wasserzeichen zu versehen.",
+    "heading": "Video-Wasserzeichen",
+    "description": "Ein Preset auf ein ganzes Video anwenden. Jedes Bild wird in Ihrem Browser mit einem Wasserzeichen versehen und der Ton bleibt erhalten; nichts wird hochgeladen.",
+    "checkingSupport": "Video-Unterstützung wird geprüft",
+    "unsupportedTitle": "Video wird in diesem Browser nicht unterstützt",
+    "unsupportedBody": "Ihr Browser kann kein Video codieren. Chrome, Edge oder Safari 17 und neuer können es.",
+    "emptyHint": "um es auf ein Video anzuwenden.",
+    "addVideo": "Video hinzufügen",
+    "dropHint": "Ein Video hier ablegen, oder",
+    "formatsHint": "MP4, WebM oder MOV. Alles geschieht in Ihrem Browser; nichts wird hochgeladen, und die Galerie nimmt noch keine Videos auf.",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
+    "choosePresetPreview": "Wählen Sie ein Preset, um das Wasserzeichen auf einem Bild in der Vorschau zu sehen.",
+    "outputSize": "Ausgabe {{width}} × {{height}} px.",
+    "transcodingProgress": "Transkodierungsfortschritt",
+    "progress": {
+      "noEta": "Bild {{frame}} · {{percent}} %",
+      "withEta": "Bild {{frame}} · {{percent}} % · noch etwa {{seconds}} s"
+    },
+    "cancel": "Abbrechen",
+    "cancelled": "Transkodierung abgebrochen.",
+    "runErrorTitle": "Video konnte nicht mit Wasserzeichen versehen werden",
+    "download": "{{fileName}} herunterladen",
+    "share": "Teilen",
+    "presets": "Presets",
+    "placement": "Platzierung",
+    "placementOptions": {
+      "smart": "Intelligent",
+      "bottomRight": "Unten rechts",
+      "bottomLeft": "Unten links",
+      "topRight": "Oben rechts",
+      "topLeft": "Oben links",
+      "center": "Mitte"
+    },
+    "quality": "Qualität",
+    "qualityOptions": {
+      "low": "Niedrig",
+      "standard": "Standard",
+      "high": "Hoch"
+    },
+    "resolution": "Auflösung",
+    "resolutionOptions": {
+      "original": "Original",
+      "fit1080p": "Auf 1080p",
+      "fit720p": "Auf 720p"
+    },
+    "watermarking": "Wird versehen…",
+    "watermarkVideo": "Video mit Wasserzeichen versehen",
+    "fixedPlacementNote": "Das Wasserzeichen behält eine feste Platzierung für das gesamte Video. Der Ton wird durchgereicht, wenn er zur Ausgabe passt, andernfalls neu codiert.",
+    "renderingPreview": "Vorschau wird gerendert",
+    "previewAlt": "Das Wasserzeichen auf einem Bild des Videos"
+  },
+  "documents": {
+    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Dokumente mit Wasserzeichen zu versehen.",
+    "heading": "Dokumente",
+    "description": "Ein Preset auf jede Seite eines PDFs stempeln. Dateien werden in Ihrem Browser verarbeitet und einzeln oder als ZIP heruntergeladen.",
+    "emptyHint": "um damit Dokumente mit Wasserzeichen zu versehen.",
+    "addPdfs": "PDFs hinzufügen",
+    "dropHint": "PDFs hier ablegen, oder",
+    "filesHint": "Bis zu {{max}} Dateien, je {{size}}. Jede Seite wird in Ihrem Browser mit einem Wasserzeichen versehen; nichts wird hochgeladen.",
+    "skipped_one": "{{count}} Datei übersprungen: kein PDF oder über {{max}}.",
+    "skipped_other": "{{count}} Dateien übersprungen: kein PDF oder über {{max}}.",
+    "fileCount_one": "{{count}} Dokument",
+    "fileCount_other": "{{count}} Dokumente",
+    "clearList": "Liste leeren",
+    "watermarkingProgress": "Wasserzeichen-Fortschritt",
+    "progressFinished": "{{done}} von {{total}} fertig",
+    "progressFailed": ", {{count}} fehlgeschlagen",
+    "progressEnd": ".",
+    "listLabel": "Dokumente für Wasserzeichen",
+    "downloadFile": "{{fileName}} herunterladen",
+    "removeFile": "{{fileName}} entfernen",
+    "presetHint": "Wählen Sie eines oder mehrere aus; sie werden in der Reihenfolge der Auswahl gezeichnet, spätere über früheren.",
+    "placement": "Platzierung",
+    "smartPlacementHint": "Intelligente Platzierung ist für Fotos; wählen Sie für Dokumente eine Ecke oder eine eigene Position.",
+    "watermarkEmpty": "Dokumente mit Wasserzeichen versehen",
+    "watermarkCount": "{{count}} mit Wasserzeichen versehen",
+    "downloadZip": "{{count}} als ZIP herunterladen",
+    "savedAsHint": "Jedes Dokument wird als {name}-watermarked.pdf gespeichert. Verschlüsselte PDFs werden abgelehnt."
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "Prüfen Sie Ihren Posteingang",
+      "description": "Wir haben einen Bestätigungslink an {{email}} gesendet. Er läuft in einer Stunde ab.",
+      "resent": "Ein neuer Bestätigungslink ist unterwegs.",
+      "resend": "Bestätigungs-E-Mail erneut senden"
+    },
+    "tool": {
+      "title": "Foto prüfen",
+      "description": "Prüfen, ob ein PNG eine unsichtbare Markierung von Watermark Pro enthält, und die verborgene Nachricht lesen. Nichts verlässt Ihren Browser."
+    },
+    "checkPng": "PNG prüfen",
+    "checking": "Wird geprüft…",
+    "noneFound": "Keine unsichtbare Markierung in diesem Foto gefunden."
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "Presets werden geladen",
+    "loadErrorTitle": "Presets konnten nicht geladen werden",
+    "emptyTitle": "Noch keine Presets",
+    "createInLibrary": "Ein Preset in der Bibliothek erstellen",
+    "legend": "Presets",
+    "importTitle": "Presets importieren",
+    "importDescription": "Wählen Sie eine Preset-Datei von Watermark Pro. Ihre Presets und alle darin verwendeten Logos werden dieser Bibliothek hinzugefügt.",
+    "presetFileLabel": "Preset-Datei",
+    "noPresets": "Diese Preset-Datei enthält keine Presets.",
+    "fileCount_one": "{{count}} Preset in dieser Datei",
+    "fileCount_other": "{{count}} Presets in dieser Datei",
+    "renamed": "Ein Preset namens „{{name}}“ existiert bereits; wird als „{{finalName}}“ importiert.",
+    "cancel": "Abbrechen",
+    "importButton_one": "{{count}} Preset importieren",
+    "importButton_other": "{{count}} Presets importieren"
+  },
+  "landing": {
+    "nav": "Konto",
+    "signIn": "Anmelden",
+    "createAccount": "Konto erstellen",
+    "eyebrow": "Kostenlos und quelloffen",
+    "heroBody": "Schützen Sie Ihre Fotografie, ohne das Bild zu verlieren. Watermark Pro erledigt die schwere Arbeit in Ihrem Browser, hält Ihre Originale privat und gibt Ihrem Team Rollen, die wirklich etwas bedeuten.",
+    "createWorkspace": "Workspace erstellen",
+    "featuresHeading": "Was es kann",
+    "features": {
+      "bulk": {
+        "title": "Stapelaufträge",
+        "body": "Hunderte Fotos ablegen und alle in einem Durchgang in Ihrem Browser mit Wasserzeichen versehen."
+      },
+      "library": {
+        "title": "Wasserzeichen-Bibliothek",
+        "body": "Text-, Symbol- und Logo-Markierungen einmal speichern; überall mit einem Klick anwenden."
+      },
+      "smart": {
+        "title": "Intelligente Platzierung",
+        "body": "Jedes Foto wird analysiert, damit die Markierung dort landet, wo sie am besten lesbar ist, und das Motiv freibleibt."
+      },
+      "contrast": {
+        "title": "Auto-Kontrast",
+        "body": "Helle oder dunkle Variante und Umrissstärke je Bild gewählt, anpassbar, wenn Sie anderer Meinung sind."
+      },
+      "teams": {
+        "title": "Teams und Rollen",
+        "body": "Organisationen mit den Rollen Inhaber, Admin, Bearbeiter und Betrachter, serverseitig durchgesetzt."
+      },
+      "trusted": {
+        "title": "Auf Vertrauen gebaut",
+        "body": "Strenge Content-Security-Policy, protokollierte Aktionen und Fotos, die Ihren Browser nie verlassen, sofern Sie sie nicht speichern."
+      }
+    },
+    "footer": "Watermark Pro ist Open Source unter der MIT-Lizenz.",
+    "privacy": "Datenschutz",
+    "terms": "Nutzungsbedingungen"
+  },
+  "legal": {
+    "signIn": "Anmelden",
+    "lastUpdated": "Zuletzt aktualisiert {{date}}",
+    "readSibling": "Lesen Sie die <sibling>{{siblingLabel}}</sibling> oder kehren Sie zur <home>Startseite</home> zurück.",
+    "footer": "Watermark Pro ist Open Source unter der MIT-Lizenz.",
+    "privacy": {
+      "title": "Datenschutz",
+      "intro": "Watermark Pro ist so gebaut, dass Ihre Fotografien Ihre bleiben. Diese Seite erklärt in klarer Sprache, was mit Ihren Bildern und Ihren Kontodaten geschieht, basierend auf den Kontrollen, die das Projekt tatsächlich durchsetzt.",
+      "siblingLabel": "Nutzungsbedingungen",
+      "photos": {
+        "heading": "Ihre Fotos bleiben in Ihrem Browser",
+        "p1": "Die Wasserzeichen-Erstellung läuft vollständig auf Ihrem Gerät. Der Editor und das Stapel-Tool decodieren Ihre Fotos im Browser, rendern sie in Web Workern und erstellen die fertigen Dateien im Arbeitsspeicher. Bei der Vorschau eines Wasserzeichens wird das Foto, auf das es angewendet wird, nie hochgeladen.",
+        "p2": "Exporte werden lokal zusammengestellt und Ihnen über einen Same-Origin-Download-Link übergeben, der freigegeben wird, sobald der Download startet. Ihre Originale werden nie an einen Server gesendet, um in der Vorschau angezeigt oder mit einem Wasserzeichen versehen zu werden."
+      },
+      "storage": {
+        "heading": "Was wir speichern, und nur, wenn Sie es möchten",
+        "p1": "Nichts wird auf unseren Servern gespeichert, sofern Sie es nicht speichern. Wenn Sie ein Foto, eine Miniaturansicht oder ein Logo speichern, wird es in Cloudflare R2 unter auf Ihre Organisation beschränkten Schlüsseln gespeichert, nie öffentlich gemacht und nur angemeldeten Mitgliedern dieser Organisation mit privatem Caching bereitgestellt.",
+        "p2": "Jede Organisation hat Kontingente für Fotos, Logos und Speicher. Jeder Upload und jede Löschung wird im Audit-Trail aufgezeichnet."
+      },
+      "metadata": {
+        "heading": "Metadaten werden standardmäßig entfernt",
+        "p1": "Jeder Export wird aus Pixeln neu codiert, sodass keine Metadaten übernommen werden, sofern Sie sie nicht behalten möchten. Standardmäßig werden alle Kamera- und Standortdaten entfernt, bevor die Datei Ihren Download, das Teilen-Menü oder die Galerie erreicht.",
+        "p2": "Zwei optionale Modi pro Export erlauben Ihnen, die Kameradaten mit entfernter GPS-Position zu behalten oder alles unverändert zu behalten. Metadaten werden im Browser gelesen und geschrieben; dafür wird nichts hochgeladen."
+      },
+      "sharing": {
+        "heading": "Freigabelinks",
+        "p1": "Ein Freigabelink trägt ein signiertes Token mit integriertem Ablaufdatum und kann jederzeit widerrufen werden. Die öffentlichen Seiten, die ein Link öffnet, enthalten keine Sitzung und sind pro Adresse ratenbegrenzt.",
+        "p2": "Abgelaufene, widerrufene, manipulierte und unbekannte Links geben alle dieselbe neutrale Antwort „nicht gefunden“ zurück, sodass ein Link nichts preisgibt, sobald er nicht mehr funktioniert. Das Erstellen und Widerrufen von Links ist auf berechtigte Mitglieder beschränkt und wird protokolliert."
+      },
+      "account": {
+        "heading": "Ihr Konto",
+        "p1": "Ein Konto benötigt eine E-Mail-Adresse und ein Passwort, und die E-Mail muss bestätigt werden, bevor das Konto aktiv ist. Sitzungen werden in HttpOnly-, SameSite=Lax-Cookies gehalten, auf sicheren Origins als Secure markiert.",
+        "p2": "Links zum Zurücksetzen des Passworts laufen nach einer Stunde ab und melden bei Verwendung Ihre anderen Sitzungen ab."
+      },
+      "analytics": {
+        "heading": "Analyse und Cookies",
+        "p1": "Wir setzen keine Analyse- oder Werbe-Cookies von Drittanbietern. Die einzige Messung ist Cloudflare Web Analytics, das ohne Cookies auskommt und Sie nicht über Websites hinweg verfolgt.",
+        "p2": "Die App kommuniziert mit nur zwei Origins von Drittanbietern, beide von Cloudflare: dem Turnstile-Widget, das Registrierungs- und Passwort-Zurücksetzungs-Anfragen auf Bots prüft, und dem cookielosen Analyse-Beacon. Schriftarten, Stile und alles andere werden von dieser Website bereitgestellt."
+      },
+      "audit": {
+        "heading": "Audit-Trail",
+        "p1": "Registrierungen und jede Änderung an Organisation, Mitgliedschaft, Einladung, Bibliothek, Foto und Freigabe werden in ein nur erweiterbares Audit-Log geschrieben. Dieses Log ist nur für die Inhaber und Admins einer Organisation lesbar."
+      },
+      "reporting": {
+        "heading": "Ein Problem melden",
+        "p1": "Sicherheitsprobleme können privat über das GitHub-Repository des Projekts gemeldet werden, statt über ein öffentliches Issue. Die Sicherheitsrichtlinie im Repository beschreibt, was anzugeben ist und wie schnell Sie eine Antwort erhalten."
+      }
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen",
+      "intro": "Diese Bedingungen regeln Ihre Nutzung von Watermark Pro. Sie sind zum Lesen geschrieben und beschreiben, wie der Dienst sich tatsächlich verhält, statt Behauptungen aufzustellen, die er nicht einhält.",
+      "siblingLabel": "Datenschutzerklärung",
+      "accepting": {
+        "heading": "Annahme dieser Bedingungen",
+        "p1": "Die Nutzung von Watermark Pro bedeutet, dass Sie diesen Bedingungen zustimmen. Wenn Sie nicht zustimmen, nutzen Sie den Dienst bitte nicht."
+      },
+      "whatItDoes": {
+        "heading": "Was der Dienst leistet",
+        "p1": "Watermark Pro versieht Fotografien mit Wasserzeichen. Das Erstellen der Wasserzeichen selbst läuft in Ihrem Browser; optionale Funktionen wie das Speichern von Fotos und Logos, die Arbeit im Team und das Teilen nutzen serverseitigen Speicher bei Cloudflare.",
+        "p2": "Die Software ist kostenlos und quelloffen unter der MIT-Lizenz."
+      },
+      "account": {
+        "heading": "Ihr Konto",
+        "p1": "Team-Funktionen erfordern ein Konto mit bestätigter E-Mail-Adresse. Behalten Sie Ihr Passwort für sich; Sie sind für alles verantwortlich, was unter Ihrem Konto geschieht.",
+        "p2": "Sie können sich jederzeit von Ihren Sitzungen abmelden, und die Verwendung eines Links zum Zurücksetzen des Passworts meldet Ihre anderen Sitzungen ab."
+      },
+      "content": {
+        "heading": "Ihre Inhalte",
+        "p1": "Sie behalten alle Rechte, die Sie an den Fotos und Wasserzeichen, die Sie hochladen oder erstellen, bereits haben. Sie sind dafür verantwortlich, die Rechte an den Bildern zu besitzen, die Sie in den Dienst einbringen.",
+        "p2": "Die App verarbeitet Ihre Inhalte nur, um die von Ihnen genutzten Funktionen bereitzustellen, und speichert sie nur, wenn Sie sie speichern. Sie werden nie zum Trainieren von irgendetwas verwendet oder an Dritte weitergegeben."
+      },
+      "acceptableUse": {
+        "heading": "Zulässige Nutzung",
+        "p1": "Nutzen Sie den Dienst nicht, um gegen Gesetze zu verstoßen oder Inhalte hochzuladen oder zu teilen, zu deren Nutzung Sie nicht berechtigt sind. Versuchen Sie nicht, Sicherheitskontrollen oder Ratenbegrenzungen zu umgehen oder auf Daten von Organisationen zuzugreifen, denen Sie nicht angehören.",
+        "p2": "Der Zugriff innerhalb einer Organisation richtet sich nach Ihrer Rolle, und diese Rollen werden auf dem Server durchgesetzt."
+      },
+      "teams": {
+        "heading": "Teams und Rollen",
+        "p1": "Eine Organisation kann die Rollen Inhaber, Admin, Bearbeiter und Betrachter haben. Was jedes Mitglied sehen und tun kann, ist auf seine Rolle beschränkt und wird bei jeder Anfrage geprüft, statt nur in der Oberfläche ausgeblendet zu werden."
+      },
+      "availability": {
+        "heading": "Verfügbarkeit, Gewährleistung und Änderungen",
+        "p1": "Der Dienst wird „wie besehen“ bereitgestellt, ohne jegliche Gewährleistung, wie in der MIT-Lizenz festgelegt. Funktionen können sich ändern, und der Dienst kann zeitweise nicht verfügbar sein.",
+        "p2": "Diese Bedingungen können aktualisiert werden; das Datum oben auf dieser Seite zeigt, wann sie zuletzt geändert wurden. Wenn Sie den Dienst nach einer Änderung weiter nutzen, akzeptieren Sie die aktualisierten Bedingungen."
+      },
+      "openSource": {
+        "heading": "Open Source",
+        "p1": "Der Quellcode von Watermark Pro ist unter der MIT-Lizenz verfügbar, die es Ihnen erlaubt, ihn zu den Bedingungen dieser Lizenz einzusehen, auszuführen und zu ändern."
+      },
+      "contact": {
+        "heading": "Kontakt",
+        "p1": "Fragen zu diesen Bedingungen sowie Meldungen von Sicherheitsproblemen können über das GitHub-Repository des Projekts eingereicht werden."
+      }
+    }
+  },
+  "share": {
+    "loading": "Fotos werden geladen",
+    "unavailableTitle": "Dieser Link ist nicht verfügbar",
+    "unavailableBody": "Er ist möglicherweise abgelaufen oder wurde widerrufen, oder die Adresse ist unvollständig. Bitten Sie den Absender um einen neuen.",
+    "about": "Über Watermark Pro",
+    "photoCount_one": "{{count}} Foto",
+    "photoCount_other": "{{count}} Fotos",
+    "availableUntil": " · verfügbar bis {{date}}",
+    "shareLink": "Diesen Link teilen",
+    "linkCopied": "Link in die Zwischenablage kopiert.",
+    "linkShared": "Link geteilt.",
+    "openPhoto": "{{name}} öffnen",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "Geteilt mit <home>Watermark Pro</home>. Fotos bleiben Eigentum ihres Inhabers.",
+    "download": "Herunterladen",
+    "close": "Schließen"
+  },
+  "root": {
+    "somethingWentWrong": "Etwas ist schiefgelaufen",
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "body": "Die Adresse ist möglicherweise falsch geschrieben, oder die Seite wurde verschoben.",
+      "back": "Zurück zum Anfang"
+    }
+  }
+}
