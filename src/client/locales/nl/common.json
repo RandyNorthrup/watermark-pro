@@ -1,0 +1,1083 @@
+{
+  "language": {
+    "menuLabel": "Taal wijzigen"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "library": "Bibliotheek",
+      "editor": "Editor",
+      "bulk": "Bulk",
+      "video": "Video",
+      "documents": "Documenten",
+      "gallery": "Galerie",
+      "shares": "Gedeelde links",
+      "members": "Leden",
+      "audit": "Auditlogboek",
+      "admin": "Beheer"
+    },
+    "skipToContent": "Naar inhoud gaan",
+    "menu": "Menu",
+    "primaryNav": "Primair",
+    "primaryMenuNav": "Primair (menu)",
+    "toolsNav": "Tools",
+    "signOut": "Afmelden",
+    "accountMenu": "Accountmenu voor {{name}}",
+    "menuDescription": "Wissel van organisatie of ga naar een onderdeel van Watermark Pro.",
+    "switchOrganizationFor": "Organisatie: {{name}}. Wissel van organisatie",
+    "chooseOrganization": "Kies een organisatie",
+    "chooseOrganizationShort": "Organisatie kiezen",
+    "organizations": "Organisaties",
+    "newOrganization": "Nieuwe organisatie",
+    "theme": {
+      "system": "Thema: volgt systeem. Wissel naar licht",
+      "light": "Thema: licht. Wissel naar donker",
+      "dark": "Thema: donker. Wissel naar systeem"
+    }
+  },
+  "auth": {
+    "backToSignIn": "Terug naar aanmelden",
+    "fields": {
+      "emailLabel": "E-mail",
+      "passwordLabel": "Wachtwoord"
+    },
+    "login": {
+      "title": "Welkom terug",
+      "description": "Meld je aan bij je werkruimte.",
+      "footerPrompt": "Nieuw hier?",
+      "createAccount": "Account aanmaken",
+      "verifyTitle": "Bevestig eerst je e-mail",
+      "verifyBody": "We hebben een bevestigingslink naar {{email}} gestuurd.",
+      "resendIt": "Opnieuw versturen",
+      "forgotPassword": "Wachtwoord vergeten?",
+      "submit": "Aanmelden"
+    },
+    "signup": {
+      "title": "Maak je account aan",
+      "description": "Er wordt een bevestigingslink naar je e-mail gestuurd.",
+      "footerPrompt": "Heb je al een account?",
+      "signIn": "Aanmelden",
+      "nameLabel": "Naam",
+      "passwordHint": "Minstens {{min}} tekens. Een paar niet-verwante woorden werken goed.",
+      "submit": "Account aanmaken"
+    },
+    "forgotPassword": {
+      "title": "Wachtwoord opnieuw instellen",
+      "description": "Voer je e-mail in; we sturen een herstellink als er een account bestaat.",
+      "sentTitle": "Controleer je inbox",
+      "sentBody": "Als {{email}} bij een account hoort, is er een herstellink onderweg. Deze verloopt binnen een uur.",
+      "submit": "Herstellink versturen"
+    },
+    "resetPassword": {
+      "title": "Kies een nieuw wachtwoord",
+      "invalidTitle": "Deze herstellink is niet geldig",
+      "invalidBody": "Deze is mogelijk verlopen of al gebruikt.",
+      "requestNew": "Vraag een nieuwe aan",
+      "invalidEnd": ".",
+      "newPasswordLabel": "Nieuw wachtwoord",
+      "passwordHint": "Minstens {{min}} tekens.",
+      "confirmLabel": "Wachtwoord bevestigen",
+      "mismatch": "Wachtwoorden komen niet overeen",
+      "submit": "Wachtwoord bijwerken"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "Uitnodiging niet beschikbaar",
+      "title": "Word lid van {{organizationName}}",
+      "description": "{{inviterEmail}} heeft je uitgenodigd om lid te worden als {{role}}.",
+      "roleLabel": "Rol:",
+      "decline": "Weigeren",
+      "accept": "Uitnodiging accepteren"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "Aangemeld als {{email}}",
+    "yourWorkspace": "Je werkruimte",
+    "yourRole": "Je rol:",
+    "toolsHeading": "Tools",
+    "tools": {
+      "library": {
+        "label": "Bibliotheek",
+        "body": "Ontwerp tekst-, symbool- en logowatermerken één keer en bewaar ze als presets."
+      },
+      "editor": {
+        "label": "Editor",
+        "body": "Watermerk één foto met de hand: plaatsen, bijsnijden, formaat wijzigen en exporteren."
+      },
+      "bulk": {
+        "label": "Bulk",
+        "body": "Pas een preset toe op een hele shoot en download de resultaten als ZIP."
+      },
+      "gallery": {
+        "label": "Galerie",
+        "body": "Blader door wat het team heeft opgeslagen en deel albums met een link."
+      }
+    },
+    "overviewHeading": "Overzicht",
+    "members": "Leden",
+    "noPendingInvitations": "Geen openstaande uitnodigingen.",
+    "pendingInvitations_one": "{{count}} openstaande uitnodiging.",
+    "pendingInvitations_other": "{{count}} openstaande uitnodigingen.",
+    "manageMembers": "Leden beheren",
+    "auditLog": "Auditlogboek",
+    "auditDescription": "Elke wijziging in lidmaatschap en organisatie wordt vastgelegd, met wie het deed en wanneer.",
+    "viewAuditLog": "Auditlogboek bekijken"
+  },
+  "library": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om een watermerkbibliotheek op te bouwen.",
+    "heading": "Watermerkbibliotheek",
+    "description": "Presets die iedereen in {{name}} deelt. Pas ze één voor één of in bulk toe.",
+    "export": "Exporteren",
+    "exportPreset": "{{name}} exporteren",
+    "importPresets": "Presets importeren",
+    "newPreset": "Nieuwe preset",
+    "exportErrorTitle": "Kon de presets niet exporteren",
+    "loadingPresets": "Presets worden geladen",
+    "loadErrorTitle": "Kon de bibliotheek niet laden",
+    "empty": "Nog geen presets. Een preset combineert een markering (tekst, symbool of logo) met plaatsing, contrast en stijlinstellingen.",
+    "createFirst": "Maak de eerste preset",
+    "orgRequiredShort": "Maak eerst een organisatie aan of word er lid van.",
+    "loadingPreset": "Preset wordt geladen",
+    "loadPresetErrorTitle": "Kon de preset niet laden",
+    "presetGone": "Die preset bestaat niet meer.",
+    "editSubtitleManage": "Wijzigingen gelden voor iedereen die deze preset gebruikt.",
+    "editSubtitleReadOnly": "Alleen-lezen weergave.",
+    "cannotCreate": "Je rol staat het maken van presets niet toe.",
+    "newPresetSubtitle": "Ontwerp de markering, bepaal waar die komt en sla haar op in de bibliotheek.",
+    "openInEditor": "{{name}} openen in de editor",
+    "deletePreset": "{{name}} verwijderen",
+    "logoBadge": "logo",
+    "autoContrast": "Automatisch contrast",
+    "manualContrast": "Handmatig contrast",
+    "updated": "Bijgewerkt {{date}}",
+    "exportLogoTypeError": "Een logo heeft een afbeeldingstype dat niet kan worden geëxporteerd.",
+    "exportMissingLogoError": "Een preset verwijst naar een logo dat niet meer in de bibliotheek staat.",
+    "describe": {
+      "text": "“{{text}}” in {{fontFamily}}",
+      "glyph": "Teken {{glyph}}",
+      "icon": "Icoon {{name}}",
+      "logo": "Logo",
+      "qr": "QR-code voor {{content}}"
+    },
+    "shape": {
+      "rectangle": "Rechthoek",
+      "roundedRectangle": "Afgeronde rechthoek",
+      "ellipse": "Ellips",
+      "line": "Lijn"
+    },
+    "placement": {
+      "smart": "Slimme plaatsing",
+      "custom": "Aangepaste positie",
+      "random": "Willekeurige plaatsing"
+    }
+  },
+  "designer": {
+    "presetName": "Presetnaam",
+    "presetNamePlaceholder": "Studiosignatuur",
+    "nameError": "Geef de preset een naam van maximaal 60 tekens.",
+    "sections": {
+      "label": "Ontwerpersecties",
+      "mark": "Markering",
+      "placement": "Plaatsing",
+      "style": "Stijl"
+    },
+    "markType": "Markeringstype",
+    "saveError": "Kon de preset niet opslaan",
+    "savePreset": "Preset opslaan",
+    "saveChanges": "Wijzigingen opslaan",
+    "readOnlyHint": "Je rol kan presets bekijken maar niet wijzigen.",
+    "notAnImage": "Dat bestand is geen afbeelding die de browser kan lezen.",
+    "text": {
+      "label": "Tekst",
+      "hint": "Tot {{max}} tekens op maximaal {{lines}} regels. Gebruik “Detail invoegen” voor tokens zoals de datum of camera, die per foto worden ingevuld. {location} drukt de GPS-positie van de foto op het beeld af."
+    },
+    "qr": {
+      "content": "QR-code-inhoud",
+      "hint": "Meestal een link. Tot {{max}} tekens; de code is altijd donker op een licht vlak, zodat hij scanbaar is."
+    },
+    "tokens": {
+      "menu": "Detail invoegen",
+      "heading": "Fotodetails",
+      "date": "Datum",
+      "time": "Tijd",
+      "taken": "Opnamedatum en -tijd",
+      "filename": "Bestandsnaam",
+      "camera": "Camera",
+      "lens": "Objectief",
+      "iso": "ISO",
+      "aperture": "Diafragma",
+      "shutter": "Sluitertijd",
+      "focal": "Brandpuntsafstand",
+      "location": "Locatie (GPS)",
+      "index": "Fotonummer",
+      "count": "Aantal foto's",
+      "width": "Breedte",
+      "height": "Hoogte"
+    },
+    "font": {
+      "family": "Lettertype",
+      "weight": "Dikte",
+      "specimen": "Pa's wijze lynx bezag vroom het fikse aquaduct"
+    },
+    "symbol": {
+      "icons": "Iconen",
+      "glyphLabel": "Teken {{glyph}}",
+      "iconLabel": "Icoon {{label}}"
+    },
+    "shape": {
+      "label": "Vorm",
+      "rectangle": "Rechthoek",
+      "roundedRectangle": "Afgeronde rechthoek",
+      "ellipse": "Ellips",
+      "line": "Lijn",
+      "length": "Lengte",
+      "proportions": "Verhoudingen",
+      "fill": "Vulling",
+      "fillToggle": "Vorm vullen",
+      "fillColour": "Vulkleur",
+      "fillOpacity": "Dekking van vulling",
+      "strokeWidth": "Lijndikte",
+      "customStrokeColour": "Aangepaste lijnkleur",
+      "strokeColour": "Lijnkleur"
+    },
+    "effects": {
+      "letterSpacing": "Letterafstand",
+      "curve": "Kromming",
+      "effect": "Effect",
+      "textEffect": "Teksteffect",
+      "solid": "Effen",
+      "outline": "Omtrek",
+      "emboss": "Reliëf",
+      "engrave": "Gegraveerd"
+    },
+    "placement": {
+      "mode": "Plaatsingsmodus",
+      "smart": "Slim",
+      "smartDescription": "Analyseert elke foto en kiest de rustigste hoek",
+      "corner": "Hoek",
+      "cornerDescription": "Vaste positie ten opzichte van de randen",
+      "custom": "Aangepast",
+      "customDescription": "Exacte positie als fractie van de foto",
+      "random": "Willekeurig",
+      "randomDescription": "Een andere plek per foto; lastiger automatisch te verwijderen",
+      "smartHint": "De engine beoordeelt elke hoek en rand op detail, contrast en onderwerp en plaatst de markering waar die leesbaar en het minst storend is.",
+      "randomHint": "Elke foto krijgt een willekeurige hoek, verschoven tot maximaal de jitter hieronder. Dezelfde foto komt altijd op dezelfde plek terecht.",
+      "jitter": "Jitter",
+      "cornerLegend": "Hoek",
+      "horizontal": "Horizontaal",
+      "vertical": "Verticaal",
+      "anchor": {
+        "topLeft": "Linksboven",
+        "topCenter": "Middenboven",
+        "topRight": "Rechtsboven",
+        "middleLeft": "Middenlinks",
+        "center": "Midden",
+        "middleRight": "Middenrechts",
+        "bottomLeft": "Linksonder",
+        "bottomCenter": "Middenonder",
+        "bottomRight": "Rechtsonder"
+      }
+    },
+    "style": {
+      "contrast": "Contrast",
+      "contrastMode": "Contrastmodus",
+      "auto": "Auto",
+      "autoDescription": "Lichte of donkere inkt per foto gekozen",
+      "manual": "Handmatig",
+      "manualDescription": "Vaste inkt en omtreksterkte",
+      "colour": "Kleur",
+      "colourDescription": "Een eigen inktkleur",
+      "autoHint": "De inkt wisselt tussen licht en donker, passend bij het gebied onder de markering, en er wordt alleen een omtrek toegevoegd als de achtergrond qua tint te dichtbij ligt.",
+      "ink": "Inkt",
+      "inkLight": "Lichte inkt",
+      "inkDark": "Donkere inkt",
+      "inkColour": "Inktkleur",
+      "outlineStrength": "Omtreksterkte",
+      "appearance": "Weergave",
+      "opacity": "Dekking",
+      "size": "Grootte",
+      "ofWidth": "{{percent}} van breedte",
+      "rotation": "Rotatie",
+      "margin": "Marge",
+      "backdrop": "Vak achter de markering",
+      "boxOpacity": "Dekking van vak",
+      "tiling": "Over de foto herhalen",
+      "spacing": "Tussenruimte"
+    },
+    "preview": {
+      "heading": "Voorbeeld",
+      "rendering": "Voorbeeld wordt gerenderd",
+      "choosePhoto": "Kies een foto voor het voorbeeld",
+      "tryYourPhoto": "Eigen foto proberen",
+      "samplePhoto": "Voorbeeldfoto",
+      "alt": "Watermerkvoorbeeld op de onderwerpsfoto",
+      "failed": "Voorbeeld mislukt",
+      "chooseLogo": "Kies of upload een logo om het voorbeeld te zien.",
+      "nothingToPlace": "Niets om te plaatsen.",
+      "inkLight": "lichte inkt",
+      "inkDark": "donkere inkt",
+      "inkColour": "inkt {{colour}}",
+      "customPosition": "Aangepaste positie, {{ink}}.",
+      "placed": "Geplaatst {{position}}, {{ink}}.",
+      "position": {
+        "topLeft": "linksboven",
+        "topCenter": "middenboven",
+        "topRight": "rechtsboven",
+        "middleLeft": "middenlinks",
+        "center": "midden",
+        "middleRight": "middenrechts",
+        "bottomLeft": "linksonder",
+        "bottomCenter": "middenonder",
+        "bottomRight": "rechtsonder"
+      }
+    },
+    "logo": {
+      "loading": "Logo's worden geladen",
+      "loadError": "Kon logo's niet laden",
+      "empty": "Nog geen logo's. Upload een PNG, JPEG of WebP met een transparante achtergrond voor het beste resultaat.",
+      "choose": "Een logo kiezen",
+      "item": "Logo {{name}}",
+      "delete": "Logo {{name}} verwijderen",
+      "upload": "Een logobestand uploaden",
+      "uploadButton": "Logo uploaden",
+      "hint": "PNG, JPEG of WebP tot {{max}} MB, of een getekende handtekening.",
+      "tooLarge": "Logo's mogen maximaal {{max}} MB zijn.",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "Logo voorbereiden",
+        "title": "“{{name}}” voorbereiden",
+        "description": "Verwijder desgewenst een egale achtergrond en snijd lege randen bij, en upload het dan als een transparante PNG.",
+        "before": "Voor",
+        "after": "Na",
+        "previewNeedsCanvas": "Voor het voorbeeld is een browsercanvas nodig.",
+        "preview": "Voorbeeld van het voorbereide logo",
+        "removeBackground": "Achtergrond verwijderen",
+        "backgroundTolerance": "Achtergrondtolerantie",
+        "trim": "Transparante randen bijsnijden",
+        "outputSize": "Uitvoergrootte: {{size}} px",
+        "use": "Logo gebruiken",
+        "chooseAnother": "Een ander kiezen"
+      },
+      "signature": {
+        "draw": "Handtekening tekenen",
+        "description": "Onderteken met een vinger, een pen of de muis. De handtekening wordt als transparant logo in de bibliotheek opgeslagen, bijgesneden tot de inkt.",
+        "pad": "Handtekeningveld; teken hier",
+        "pen": "Pen",
+        "penWidthGroup": "Penbreedte",
+        "penWidth": "Pen van {{width}} pixel",
+        "undo": "Streek ongedaan maken",
+        "clear": "Wissen",
+        "cancel": "Annuleren",
+        "save": "Opslaan als logo"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om de editor te gebruiken.",
+    "heading": "Editor",
+    "description": "Watermerk één foto: kies een preset, plaats het desgewenst met de hand, snijd bij, wijzig de grootte en download. Niets verlaat je browser.",
+    "tabs": {
+      "watermark": "Watermerk",
+      "crop": "Bijsnijden",
+      "adjust": "Aanpassen",
+      "resize": "Grootte",
+      "export": "Export"
+    },
+    "toolsLabel": "Editor-tools",
+    "openPhoto": "Foto openen",
+    "openPhotoLabel": "Een foto openen",
+    "fromLink": "Van een link",
+    "samplePhoto": "Voorbeeldfoto",
+    "sampleScene": "Voorbeeldscène",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "Bezig met renderen",
+    "renderingPreview": "Voorbeeld wordt gerenderd",
+    "undo": "Ongedaan maken",
+    "redo": "Opnieuw",
+    "altCrop": "Foto met het uitsnedekader",
+    "altWatermark": "Foto met het toegepaste watermerk",
+    "choosePresetHint": "Kies een preset om een watermerk te plaatsen. Sleep een foto naar een willekeurige plek op het canvas.",
+    "outputSize": "Uitvoer {{width}} × {{height}} px.",
+    "notAnImage": "Dat bestand is geen afbeelding die de browser kan lezen.",
+    "previewFailed": "Voorbeeld mislukt",
+    "exportFailed": "Export mislukt",
+    "savedToGallery": "{{name}} opgeslagen in de <galleryLink>galerie</galleryLink>.",
+    "applyToPhoto": "Toepassen op deze foto",
+    "applyToAll": "Toepassen op alle foto's",
+    "removeOverride": "Aanpassing verwijderen",
+    "cancel": "Annuleren",
+    "dimensions": {
+      "left": "Links",
+      "top": "Boven",
+      "width": "Breedte",
+      "height": "Hoogte",
+      "pxField": "{{label}} (px)"
+    },
+    "watermark": {
+      "emptyHint": "om het hier toe te passen.",
+      "preset": "Preset",
+      "addPreset": "Nog een preset toevoegen",
+      "maxMarks": "Tot {{max}} markeringen per foto",
+      "choosePreset": "Een preset kiezen",
+      "marksHeading": "Markeringen op deze foto",
+      "layersLabel": "Lagen, van onder naar boven",
+      "removedPreset": "Verwijderde preset",
+      "removeLayer": "{{name}} van deze foto verwijderen",
+      "adjusted": "Aangepast voor deze foto; de preset in de bibliotheek blijft ongewijzigd.",
+      "revert": "Terugzetten",
+      "placement": "Plaatsing"
+    },
+    "crop": {
+      "aspectRatio": "Beeldverhouding",
+      "photoSize": "Foto is {{width}} × {{height}} px.",
+      "reset": "Uitsnede herstellen",
+      "area": "Uitsnedegebied. Sleep om te verplaatsen; pijltjestoetsen verplaatsen stap voor stap, Shift voor grotere stappen.",
+      "resizeHandle": "Uitsnede aanpassen vanaf {{handle}}",
+      "handles": {
+        "n": "bovenrand",
+        "s": "onderrand",
+        "e": "rechterrand",
+        "w": "linkerrand",
+        "ne": "hoek rechtsboven",
+        "nw": "hoek linksboven",
+        "se": "hoek rechtsonder",
+        "sw": "hoek linksonder"
+      }
+    },
+    "resize": {
+      "keepProportions": "Verhoudingen behouden",
+      "shortcuts": "Snelkoppelingen",
+      "fit": "Passend {{side}}",
+      "percent": "{{value}}%",
+      "outputUnchanged": "Uitvoer {{width}} × {{height}} px (ongewijzigd).",
+      "outputChanged": "Uitvoer {{width}} × {{height}} px van {{baseWidth}} × {{baseHeight}}.",
+      "resetSize": "Grootte herstellen"
+    },
+    "adjust": {
+      "filter": "Filter",
+      "custom": "Eigen aanpassingen",
+      "filterValue": "Filter: {{name}}",
+      "brightness": "Helderheid",
+      "contrast": "Contrast",
+      "saturation": "Verzadiging",
+      "warmth": "Warmte",
+      "sepia": "Sepia",
+      "vignette": "Vignet",
+      "reset": "{{name}} herstellen",
+      "resetAll": "Alles herstellen"
+    },
+    "orientation": {
+      "rotateLeft": "Naar links draaien",
+      "rotateRight": "Naar rechts draaien",
+      "flipHorizontal": "Horizontaal spiegelen",
+      "flipVertical": "Verticaal spiegelen",
+      "straighten": "Rechtzetten"
+    },
+    "frame": {
+      "label": "Kader",
+      "add": "Kader toevoegen",
+      "width": "Kaderbreedte",
+      "colour": "Kaderkleur"
+    },
+    "metadata": {
+      "heading": "Metadata",
+      "strip": {
+        "label": "Verwijderen",
+        "help": "Geen cameragegevens, geen locatie. Het veiligst om te delen."
+      },
+      "keepExceptLocation": {
+        "label": "Behouden, behalve locatie",
+        "help": "Camera, objectief en opnametijd blijven; GPS wordt verwijderd."
+      },
+      "keep": {
+        "label": "Alles behouden",
+        "help": "Inclusief de GPS-positie, als de foto die heeft."
+      },
+      "webpNote": "Bij WebP-export worden metadata altijd verwijderd."
+    },
+    "export": {
+      "format": "Formaat",
+      "quality": "Kwaliteit",
+      "invisibleMark": "Onzichtbare markering",
+      "choosePng": "Kies PNG om een bericht in de pixels te verbergen.",
+      "invisibleMessage": "Onzichtbaar bericht",
+      "tooLong": "Te lang voor een foto van {{width}}×{{height}} (past {{capacity}} bytes).",
+      "invisibleHint": "Verborgen in de pixels en leesbaar onder Verifiëren. Blijft alleen bij PNG behouden.",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}. In je browser gerenderd op volledige resolutie{{share}}.",
+      "losslessClause": "; PNG is verliesvrij",
+      "shareClause": "; Delen stuurt het naar Foto's, Berichten of een andere app op dit apparaat",
+      "download": "Downloaden",
+      "share": "Delen",
+      "saveToGallery": "Opslaan in galerie",
+      "savedToFolder": "Opgeslagen in je {{provider}}-map “{{folder}}”."
+    },
+    "mark": {
+      "position": "Watermerkpositie. Sleep om te verplaatsen (klikt vast op de marges, derden en het midden; houd Alt ingedrukt om het vrij te plaatsen), knijp om het formaat te wijzigen, draai om te roteren; pijltjestoetsen verplaatsen, plus en min wijzigen het formaat, blokhaken draaien.",
+      "rotate": "Watermerk draaien",
+      "resize": "Watermerk schalen"
+    }
+  },
+  "bulk": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om in bulk te watermerken.",
+    "heading": "Watermerken in bulk",
+    "description": "Pas één preset toe op een hele shoot. Foto's worden parallel in je browser verwerkt en als ZIP of één voor één gedownload.",
+    "emptyHint": "om het op een batch toe te passen.",
+    "addPhotos": "Foto's toevoegen",
+    "addFolder": "Map toevoegen",
+    "dropHint": "Sleep hier foto's of een map, of",
+    "fromLink": "Van een link",
+    "capacity_one": "Tot {{max}} foto's per batch. Verwerking gebeurt in je browser met {{count}} worker.",
+    "capacity_other": "Tot {{max}} foto's per batch. Verwerking gebeurt in je browser met {{count}} workers.",
+    "skipped_one": "{{count}} bestand overgeslagen: geen afbeelding",
+    "skipped_other": "{{count}} bestanden overgeslagen: geen afbeeldingen",
+    "importErrorTitle": "Kon niet importeren uit de cloud",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} foto's",
+    "clearList": "Lijst wissen",
+    "batchProgress": "Batchvoortgang",
+    "progress": {
+      "finished": "{{done}} van {{total}} klaar",
+      "failed": ", {{n}} mislukt",
+      "cancelled": ", {{n}} geannuleerd",
+      "rate": " in {{seconds}} s ({{rate}} foto's/s)",
+      "end": "."
+    },
+    "photosList": "Foto's in deze batch",
+    "custom": "Aangepast",
+    "selected": "Geselecteerd",
+    "status": {
+      "queued": "In wachtrij",
+      "processing": "Bezig",
+      "done": "Klaar",
+      "failed": "Mislukt",
+      "cancelled": "Geannuleerd"
+    },
+    "adjustPhoto": "{{name}} aanpassen",
+    "sharePhoto": "{{name}} delen",
+    "downloadPhoto": "{{name}} downloaden",
+    "removePhoto": "{{name}} verwijderen",
+    "showAll": "Alle {{count}} foto's tonen",
+    "presetHint": "Vink er een of meer aan; ze worden toegepast in de aangevinkte volgorde, latere over eerdere.",
+    "format": "Formaat",
+    "quality": "Kwaliteit",
+    "invisibleMark": "Onzichtbare markering",
+    "invisibleMessage": "Onzichtbaar bericht",
+    "choosePng": "Kies PNG om in elke foto een bericht te verbergen.",
+    "size": {
+      "label": "Grootte",
+      "original": "Oorspronkelijke grootte",
+      "fit": "Passend {{side}} px"
+    },
+    "fileNames": "Bestandsnamen",
+    "tokensLabel": "Tokens: {{tokens}}.",
+    "names": {
+      "example": "Voorbeeld: {{example}}",
+      "mustProduceName": "Het patroon moet een naam opleveren."
+    },
+    "photoAdjustments": "Fotoaanpassingen",
+    "resume": "Hervatten",
+    "pause": "Pauzeren",
+    "cancel": "Annuleren",
+    "start": "Starten",
+    "retry": "{{count}} opnieuw proberen",
+    "downloadZip": "{{count}} downloaden als ZIP",
+    "downloadReport": "Rapport downloaden (CSV)",
+    "saveToGallery": "{{count}} opslaan in galerie",
+    "savedProgress": "{{done}} van {{total}} opgeslagen",
+    "allSaved": "Alles opgeslagen in de <galleryLink>galerie</galleryLink>.",
+    "someSaved": "{{failed}} kon niet worden opgeslagen (opslagquotum of limieten). De rest staat in de <galleryLink>galerie</galleryLink>.",
+    "savedToCloud_one": "{{count}} foto opgeslagen in je {{provider}}-map “{{folder}}”.",
+    "savedToCloud_other": "{{count}} foto's opgeslagen in je {{provider}}-map “{{folder}}”.",
+    "privacyNote": "Slimme plaatsing en automatisch contrast worden voor elke foto apart bepaald. Er wordt niets geüpload.",
+    "watch": {
+      "label": "Map bewaken",
+      "stop": "Stoppen",
+      "choose": "Mappen kiezen",
+      "hint": "Kies een invoer- en een uitvoermap; nieuwe foto's die in de invoermap worden geplaatst, krijgen de aangevinkte presets als watermerk en worden naar de uitvoermap geschreven. Werkt alleen zolang deze pagina open is.",
+      "wrote": "{{name}} geschreven",
+      "failed": "Mislukt {{name}}: {{error}}"
+    }
+  },
+  "gallery": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om een galerie bij te houden.",
+    "heading": "Galerie",
+    "description": "Foto's met watermerk die door {{name}} zijn opgeslagen. Zoek, filter op preset, download of verwijder.",
+    "usage_one": "{{count}} foto · {{used}} van {{max}}",
+    "usage_other": "{{count}} foto's · {{used}} van {{max}}",
+    "maxCount": "Tot {{count}} foto's per organisatie",
+    "storageUsed": "Gebruikte opslag",
+    "storagePercent": "{{percent}}% van de opslag gebruikt",
+    "checkPhoto": "Een foto controleren",
+    "search": "Zoeken",
+    "searchPlaceholder": "Fotonaam",
+    "preset": "Preset",
+    "allPresets": "Alle presets",
+    "selectAll": "Alles selecteren",
+    "clearSelection": "Selectie wissen",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} foto's",
+    "share": "Delen",
+    "shareEllipsis": "Delen…",
+    "deleteErrorTitle": "Kon niet verwijderen",
+    "loadingPhotos": "Foto's worden geladen",
+    "loadErrorTitle": "Kon de galerie niet laden",
+    "empty": "Nog geen foto's. Sla er een op vanuit de editor of een hele batch vanuit de bulktool.",
+    "emptyFiltered": "Geen foto's voldoen aan deze filters.",
+    "openEditor": "De editor openen",
+    "openPhoto": "{{name}} openen",
+    "selectPhoto": "{{name}} selecteren",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "Meer laden",
+    "delete": "Verwijderen",
+    "deleteConfirmTitle_one": "{{count}} foto verwijderen?",
+    "deleteConfirmTitle_other": "{{count}} foto's verwijderen?",
+    "deleteConfirmBody": "De bestanden en miniaturen worden uit de opslag verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "download": "Downloaden",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_one": "{{count}} foto delen",
+    "shareTitle_other": "{{count}} foto's delen",
+    "shareDescription": "Iedereen met de link kan deze foto's bekijken en downloaden totdat de link verloopt of je hem intrekt.",
+    "title": "Titel",
+    "expiresAfter": "Verloopt na",
+    "linkExpiry": "Verloop van de link",
+    "expiry": {
+      "days_one": "{{count}} dag",
+      "days_other": "{{count}} dagen",
+      "never": "Nooit"
+    },
+    "createErrorTitle": "Kon de link niet aanmaken",
+    "createLink": "Link aanmaken",
+    "link": "Link",
+    "noExpiry": "Deze link verloopt niet.",
+    "expires": "Verloopt {{when}}.",
+    "manageLinks": "Beheer links onder Gedeelde links.",
+    "linkCopied": "Link gekopieerd naar het klembord.",
+    "linkShared": "Link gedeeld.",
+    "copyLink": "Link kopiëren"
+  },
+  "shares": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om foto's te delen.",
+    "noPermission": "Je rol omvat geen deelrechten.",
+    "heading": "Gedeelde links",
+    "description": "Links waarmee mensen buiten {{name}} geselecteerde foto's kunnen bekijken en downloaden. Een link intrekken stopt hem meteen.",
+    "loading": "Gedeelde links worden geladen",
+    "loadErrorTitle": "Kon gedeelde links niet laden",
+    "empty": "Nog geen links. Selecteer foto's in de galerie en kies Delen.",
+    "openGallery": "De galerie openen",
+    "rowCreated_one": "{{count}} foto · aangemaakt {{created}}",
+    "rowCreated_other": "{{count}} foto's · aangemaakt {{created}}",
+    "neverExpires": " · verloopt nooit",
+    "expiresOn": " · verloopt {{expires}}",
+    "status": {
+      "active": "actief",
+      "expired": "verlopen",
+      "revoked": "ingetrokken"
+    },
+    "copyLink": "Link kopiëren",
+    "shareEllipsis": "Delen…",
+    "revoke": "{{title}} intrekken",
+    "revokeButton": "Intrekken",
+    "linkCopied": "Link gekopieerd naar het klembord.",
+    "linkShared": "Link gedeeld."
+  },
+  "admin": {
+    "heading": "Beheer",
+    "description": "Elke gebruiker en organisatie op deze installatie. Acties hier worden vastgelegd in het auditspoor.",
+    "onlyAdmins": "Alleen platformbeheerders kunnen deze pagina openen.",
+    "sectionsLabel": "Beheersecties",
+    "tabs": {
+      "users": "Gebruikers",
+      "organizations": "Organisaties",
+      "audit": "Auditspoor"
+    },
+    "searchLabel": "Zoeken op e-mail",
+    "searchPlaceholder": "name@example.com",
+    "loadingUsers": "Gebruikers worden geladen",
+    "usersErrorTitle": "Kon gebruikers niet laden",
+    "userSummary_one": "{{count}} gebruiker{{extra}}.",
+    "userSummary_other": "{{count}} gebruikers{{extra}}.",
+    "showingNewest": ", de nieuwste {{count}} worden getoond",
+    "you": "(jij)",
+    "joined": "Lid geworden {{date}}",
+    "emailNotVerified": " · e-mail niet geverifieerd",
+    "platformAdmin": "platformbeheerder",
+    "banned": "geblokkeerd",
+    "bannedReason": "geblokkeerd: {{reason}}",
+    "unban": "Deblokkeren",
+    "unbanUser": "{{email}} deblokkeren",
+    "removeAdmin": "Beheerder verwijderen",
+    "makeAdminShort": "Beheerder maken",
+    "removeAdminFrom": "Beheerdersrechten van {{email}} verwijderen",
+    "makeAdmin": "{{email}} beheerder maken",
+    "signOutEverywhereButton": "Overal afmelden",
+    "signOutEverywhere": "{{email}} overal afmelden",
+    "ban": "Blokkeren",
+    "banUser": "{{email}} blokkeren",
+    "banConfirmTitle": "{{email}} blokkeren?",
+    "banConfirmBody": "Hun sessies eindigen nu en ze kunnen zich niet aanmelden totdat ze worden gedeblokkeerd. De reden wordt aan hen getoond en bewaard in het auditspoor.",
+    "reasonLabel": "Reden",
+    "cancel": "Annuleren",
+    "banConfirm": "Gebruiker blokkeren",
+    "loadingOrganizations": "Organisaties worden geladen",
+    "organizationsErrorTitle": "Kon organisaties niet laden",
+    "organizationsTable": "Organisaties, nieuwste eerst",
+    "th": {
+      "organization": "Organisatie",
+      "members": "Leden",
+      "photos": "Foto's",
+      "storage": "Opslag",
+      "created": "Aangemaakt"
+    },
+    "loadingAudit": "Auditspoor wordt geladen",
+    "auditErrorTitle": "Kon het auditspoor niet laden",
+    "auditCaption": "Auditvermeldingen over alle organisaties, nieuwste eerst",
+    "auditDetailHeading": "Organisatie",
+    "platform": "platform"
+  },
+  "members": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om leden te beheren.",
+    "heading": "Leden",
+    "description": "Personen in {{name}} en wat ze kunnen doen.",
+    "count_one": "{{count}} lid",
+    "count_other": "{{count}} leden",
+    "pendingInvitations": "Openstaande uitnodigingen",
+    "inviteHeading": "Iemand uitnodigen",
+    "emailLabel": "E-mail",
+    "roleLabel": "Rol",
+    "sendInvitation": "Uitnodiging versturen",
+    "invitationSent": "Uitnodiging verstuurd naar {{email}}.",
+    "you": "(jij)",
+    "roleFor": "Rol voor {{name}}",
+    "remove": "Verwijderen",
+    "removeMember": "{{name}} verwijderen",
+    "invitedAs": "Uitgenodigd als",
+    "cancel": "Annuleren",
+    "cancelInvitation": "Uitnodiging voor {{email}} intrekken"
+  },
+  "audit": {
+    "heading": "Auditlogboek",
+    "description": "De meest recente wijzigingen in {{name}}. Eigenaren en beheerders kunnen deze pagina bekijken.",
+    "thisOrganization": "deze organisatie",
+    "loading": "Auditlogboek wordt geladen",
+    "loadErrorTitle": "Kon het auditlogboek niet laden",
+    "noAccess": "Je rol omvat geen toegang tot het auditlogboek.",
+    "empty": "Nog niets vastgelegd.",
+    "tableCaption": "Auditvermeldingen, nieuwste eerst",
+    "detailsHeading": "Details",
+    "when": "Wanneer",
+    "who": "Wie",
+    "action": "Actie"
+  },
+  "organizations": {
+    "firstTitle": "Maak je eerste organisatie aan",
+    "newTitle": "Nieuwe organisatie",
+    "description": "Organisaties bevatten je watermerken, foto's en team. Jij wordt de eigenaar.",
+    "createFailed": "De organisatie kon niet worden aangemaakt.",
+    "nameLabel": "Naam",
+    "slugLabel": "URL-identificatie",
+    "slugHint": "Kleine letters, cijfers en koppeltekens. Wordt in links gebruikt en moet uniek zijn.",
+    "submit": "Organisatie aanmaken"
+  },
+  "import": {
+    "takePhoto": "Een foto maken",
+    "cancel": "Annuleren",
+    "saveToProvider": "Opslaan in {{provider}}",
+    "url": {
+      "title": "Importeren vanaf een link",
+      "description": "Plak het adres van een afbeelding op het web. We halen die op en voegen haar hier toe.",
+      "linkLabel": "Afbeeldingslink",
+      "errorTitle": "Kon die link niet importeren",
+      "fetch": "Ophalen"
+    },
+    "onedrive": {
+      "title": "Importeren uit OneDrive",
+      "name": "OneDrive",
+      "description": "Meld je aan bij Microsoft en kies daarna foto's om toe te voegen.",
+      "loading": "OneDrive wordt geladen",
+      "empty": "Hier zijn geen mappen of afbeeldingen.",
+      "folderPath": "Mappad",
+      "errorTitle": "OneDrive-import mislukt",
+      "tryAgain": "Opnieuw proberen",
+      "noneSelected": "Geen foto's geselecteerd",
+      "selectedCount": "{{count}} geselecteerd",
+      "addSelected": "Selectie toevoegen"
+    }
+  },
+  "video": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om video te watermerken.",
+    "heading": "Video watermerken",
+    "description": "Pas een preset toe op een hele video. Elk frame wordt in je browser gewatermerkt en de audio blijft behouden; er wordt niets geüpload.",
+    "checkingSupport": "Videoondersteuning wordt gecontroleerd",
+    "unsupportedTitle": "Video wordt niet ondersteund in deze browser",
+    "unsupportedBody": "Je browser kan geen video coderen. Chrome, Edge of Safari 17 en nieuwer wel.",
+    "emptyHint": "om het op een video toe te passen.",
+    "addVideo": "Video toevoegen",
+    "dropHint": "Sleep hier één video, of",
+    "formatsHint": "MP4, WebM of MOV. Alles gebeurt in je browser; er wordt niets geüpload, en de galerie neemt nog geen video's op.",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
+    "choosePresetPreview": "Kies een preset om het watermerk op een frame te bekijken.",
+    "outputSize": "Uitvoer {{width}} × {{height}} px.",
+    "transcodingProgress": "Transcoderingsvoortgang",
+    "progress": {
+      "noEta": "Frame {{frame}} · {{percent}}%",
+      "withEta": "Frame {{frame}} · {{percent}}% · nog ongeveer {{seconds}} s"
+    },
+    "cancel": "Annuleren",
+    "cancelled": "Transcodering geannuleerd.",
+    "runErrorTitle": "Kon de video niet watermerken",
+    "download": "{{fileName}} downloaden",
+    "share": "Delen",
+    "presets": "Presets",
+    "placement": "Plaatsing",
+    "placementOptions": {
+      "smart": "Slim",
+      "bottomRight": "Rechtsonder",
+      "bottomLeft": "Linksonder",
+      "topRight": "Rechtsboven",
+      "topLeft": "Linksboven",
+      "center": "Midden"
+    },
+    "quality": "Kwaliteit",
+    "qualityOptions": {
+      "low": "Laag",
+      "standard": "Standaard",
+      "high": "Hoog"
+    },
+    "resolution": "Resolutie",
+    "resolutionOptions": {
+      "original": "Origineel",
+      "fit1080p": "Passend 1080p",
+      "fit720p": "Passend 720p"
+    },
+    "watermarking": "Watermerken…",
+    "watermarkVideo": "Video watermerken",
+    "fixedPlacementNote": "Het watermerk behoudt één vaste plaatsing voor de hele video. Audio wordt doorgekopieerd als die bij de uitvoer past, anders opnieuw gecodeerd.",
+    "renderingPreview": "Voorbeeld wordt gerenderd",
+    "previewAlt": "Het watermerk op een frame van de video"
+  },
+  "documents": {
+    "orgRequired": "Maak een organisatie aan of word er lid van om documenten te watermerken.",
+    "heading": "Documenten",
+    "description": "Stempel een preset op elke pagina van een PDF. Bestanden worden in je browser verwerkt en één voor één of als ZIP gedownload.",
+    "emptyHint": "om er documenten mee te watermerken.",
+    "addPdfs": "PDF's toevoegen",
+    "dropHint": "Sleep hier PDF's, of",
+    "filesHint": "Tot {{max}} bestanden, elk {{size}}. Elke pagina wordt in je browser gewatermerkt; er wordt niets geüpload.",
+    "skipped_one": "{{count}} bestand overgeslagen: geen PDF of groter dan {{max}}.",
+    "skipped_other": "{{count}} bestanden overgeslagen: geen PDF of groter dan {{max}}.",
+    "fileCount_one": "{{count}} document",
+    "fileCount_other": "{{count}} documenten",
+    "clearList": "Lijst wissen",
+    "watermarkingProgress": "Watermerkvoortgang",
+    "progressFinished": "{{done}} van {{total}} klaar",
+    "progressFailed": ", {{count}} mislukt",
+    "progressEnd": ".",
+    "listLabel": "Te watermerken documenten",
+    "downloadFile": "{{fileName}} downloaden",
+    "removeFile": "{{fileName}} verwijderen",
+    "presetHint": "Vink er een of meer aan; ze worden getekend in de aangevinkte volgorde, latere over eerdere.",
+    "placement": "Plaatsing",
+    "smartPlacementHint": "Slimme plaatsing is voor foto's; kies voor documenten een hoek of een aangepaste positie.",
+    "watermarkEmpty": "Documenten watermerken",
+    "watermarkCount": "{{count}} watermerken",
+    "downloadZip": "{{count}} downloaden als ZIP",
+    "savedAsHint": "Elk document wordt opgeslagen als {name}-watermarked.pdf. Versleutelde PDF's worden geweigerd."
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "Controleer je inbox",
+      "description": "We hebben een bevestigingslink naar {{email}} gestuurd. Deze verloopt binnen een uur.",
+      "resent": "Er is een nieuwe bevestigingslink onderweg.",
+      "resend": "Bevestigingsmail opnieuw versturen"
+    },
+    "tool": {
+      "title": "Foto verifiëren",
+      "description": "Controleer of een PNG een onzichtbare markering van Watermark Pro bevat en lees het verborgen bericht. Niets verlaat je browser."
+    },
+    "checkPng": "Een PNG controleren",
+    "checking": "Bezig met controleren…",
+    "noneFound": "Geen onzichtbare markering gevonden in deze foto."
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "Presets worden geladen",
+    "loadErrorTitle": "Kon presets niet laden",
+    "emptyTitle": "Nog geen presets",
+    "createInLibrary": "Maak een preset in de bibliotheek",
+    "legend": "Presets",
+    "importTitle": "Presets importeren",
+    "importDescription": "Kies een presetbestand van Watermark Pro. De presets, en alle logo's die ze gebruiken, worden aan deze bibliotheek toegevoegd.",
+    "presetFileLabel": "Presetbestand",
+    "noPresets": "Dit presetbestand bevat geen presets.",
+    "fileCount_one": "{{count}} preset in dit bestand",
+    "fileCount_other": "{{count}} presets in dit bestand",
+    "renamed": "Er bestaat al een preset met de naam “{{name}}”; wordt geïmporteerd als “{{finalName}}”.",
+    "cancel": "Annuleren",
+    "importButton_one": "{{count}} preset importeren",
+    "importButton_other": "{{count}} presets importeren"
+  },
+  "landing": {
+    "nav": "Account",
+    "signIn": "Aanmelden",
+    "createAccount": "Account aanmaken",
+    "eyebrow": "Gratis en opensource",
+    "heroBody": "Bescherm je fotografie zonder het beeld te verliezen. Watermark Pro doet het zware werk in je browser, houdt je originelen privé en geeft je team rollen die echt iets betekenen.",
+    "createWorkspace": "Maak je werkruimte",
+    "featuresHeading": "Wat het doet",
+    "features": {
+      "bulk": {
+        "title": "Bulktaken",
+        "body": "Sleep honderden foto's en watermerk ze allemaal in één keer, in je browser."
+      },
+      "library": {
+        "title": "Watermerkbibliotheek",
+        "body": "Sla tekst-, symbool- en logomarkeringen één keer op; pas ze overal met één klik toe."
+      },
+      "smart": {
+        "title": "Slimme plaatsing",
+        "body": "Elke foto wordt geanalyseerd, zodat de markering belandt waar die het best leesbaar is en van het onderwerp af blijft."
+      },
+      "contrast": {
+        "title": "Automatisch contrast",
+        "body": "Lichte of donkere variant en omtreksterkte per afbeelding gekozen, aanpasbaar als je het er niet mee eens bent."
+      },
+      "teams": {
+        "title": "Teams en rollen",
+        "body": "Organisaties met de rollen eigenaar, beheerder, bewerker en kijker, afgedwongen op de server."
+      },
+      "trusted": {
+        "title": "Gebouwd op vertrouwen",
+        "body": "Streng content-securitybeleid, gecontroleerde acties en foto's die je browser nooit verlaten tenzij je ze opslaat."
+      }
+    },
+    "footer": "Watermark Pro is opensource onder de MIT-licentie.",
+    "privacy": "Privacy",
+    "terms": "Voorwaarden"
+  },
+  "legal": {
+    "signIn": "Aanmelden",
+    "lastUpdated": "Laatst bijgewerkt {{date}}",
+    "readSibling": "Lees de <sibling>{{siblingLabel}}</sibling> of ga terug naar de <home>startpagina</home>.",
+    "footer": "Watermark Pro is opensource onder de MIT-licentie.",
+    "privacy": {
+      "title": "Privacy",
+      "intro": "Watermark Pro is zo gebouwd dat je foto's van jou blijven. Deze pagina legt in gewone taal uit wat er met je afbeeldingen en je accountgegevens gebeurt, gebaseerd op de maatregelen die het project daadwerkelijk afdwingt.",
+      "siblingLabel": "gebruiksvoorwaarden",
+      "photos": {
+        "heading": "Je foto's blijven in je browser",
+        "p1": "Watermerken gebeurt volledig op je apparaat. De editor en de bulktool decoderen je foto's in de browser, renderen ze in Web Workers en bouwen de voltooide bestanden in het geheugen op. Bij het bekijken van een watermerk wordt de foto waarop het wordt toegepast nooit geüpload.",
+        "p2": "Exports worden lokaal samengesteld en aan je overhandigd via een same-origin-downloadlink die wordt vrijgegeven zodra de download begint. Je originelen worden nooit naar een server gestuurd om te bekijken of te watermerken."
+      },
+      "storage": {
+        "heading": "Wat we opslaan, en alleen als je daarom vraagt",
+        "p1": "Er wordt niets op onze servers bewaard tenzij je ervoor kiest het op te slaan. Wanneer je een foto, een miniatuur of een logo opslaat, wordt het bewaard in Cloudflare R2 onder sleutels die tot je organisatie beperkt zijn, nooit openbaar gemaakt en alleen geleverd aan aangemelde leden van die organisatie met privécaching.",
+        "p2": "Elke organisatie heeft quota voor foto's, logo's en opslag. Elke upload en verwijdering wordt vastgelegd in het auditspoor."
+      },
+      "metadata": {
+        "heading": "Metadata worden standaard verwijderd",
+        "p1": "Elke export wordt opnieuw uit pixels gecodeerd, zodat er geen metadata worden meegenomen tenzij je besluit ze te behouden. Standaard worden alle camera- en locatiegegevens verwijderd voordat het bestand je download, het deelmenu of de galerie bereikt.",
+        "p2": "Twee optionele modi per export laten je de cameragegevens behouden met de GPS-locatie verwijderd, of alles ongewijzigd behouden. Metadata worden in de browser gelezen en geschreven; daarvoor wordt niets geüpload."
+      },
+      "sharing": {
+        "heading": "Deellinks",
+        "p1": "Een deellink bevat een ondertekend token met een ingebouwde vervaldatum en kan op elk moment worden ingetrokken. De openbare pagina's die een link opent, bevatten geen sessie en zijn per adres in snelheid begrensd.",
+        "p2": "Verlopen, ingetrokken, gemanipuleerde en onbekende links geven allemaal dezelfde neutrale reactie “niet gevonden”, zodat een link niets prijsgeeft zodra hij niet meer werkt. Het aanmaken en intrekken van links is beperkt tot leden met toestemming en wordt gecontroleerd."
+      },
+      "account": {
+        "heading": "Je account",
+        "p1": "Een account heeft een e-mailadres en een wachtwoord nodig, en de e-mail moet worden geverifieerd voordat het account actief is. Sessies worden bewaard in HttpOnly-, SameSite=Lax-cookies, gemarkeerd als Secure op beveiligde origins.",
+        "p2": "Wachtwoordherstellinks verlopen na een uur en melden je andere sessies af wanneer ze worden gebruikt."
+      },
+      "analytics": {
+        "heading": "Analyse en cookies",
+        "p1": "We plaatsen geen analyse- of advertentiecookies van derden. De enige meting is Cloudflare Web Analytics, dat zonder cookies werkt en je niet over websites heen volgt.",
+        "p2": "De app communiceert met slechts twee origins van derden, beide van Cloudflare: de Turnstile-widget die aanmeld- en wachtwoordherstelverzoeken op bots controleert, en de cookieloze analysebeacon. Lettertypen, stijlen en al het andere worden vanaf deze site geleverd."
+      },
+      "audit": {
+        "heading": "Auditspoor",
+        "p1": "Aanmeldingen en elke wijziging in organisatie, lidmaatschap, uitnodiging, bibliotheek, foto en deling worden naar een alleen-toevoegen auditlogboek geschreven. Dat logboek is alleen leesbaar voor de eigenaren en beheerders van een organisatie."
+      },
+      "reporting": {
+        "heading": "Een probleem melden",
+        "p1": "Beveiligingsproblemen kunnen privé worden gemeld via de GitHub-repository van het project in plaats van via een openbaar issue. Het beveiligingsbeleid in de repository beschrijft wat je moet vermelden en hoe snel je een reactie krijgt."
+      }
+    },
+    "terms": {
+      "title": "Gebruiksvoorwaarden",
+      "intro": "Deze voorwaarden regelen je gebruik van Watermark Pro. Ze zijn geschreven om gelezen te worden en beschrijven hoe de dienst zich werkelijk gedraagt, in plaats van beloftes toe te voegen die hij niet nakomt.",
+      "siblingLabel": "privacybeleid",
+      "accepting": {
+        "heading": "Deze voorwaarden accepteren",
+        "p1": "Door Watermark Pro te gebruiken ga je akkoord met deze voorwaarden. Als je niet akkoord gaat, gebruik de dienst dan niet."
+      },
+      "whatItDoes": {
+        "heading": "Wat de dienst doet",
+        "p1": "Watermark Pro voorziet foto's van een watermerk. Het watermerken zelf gebeurt in je browser; optionele functies zoals het opslaan van foto's en logo's, in een team werken en delen gebruiken serveropslag bij Cloudflare.",
+        "p2": "De software is gratis en opensource onder de MIT-licentie."
+      },
+      "account": {
+        "heading": "Je account",
+        "p1": "Teamfuncties vereisen een account met een geverifieerd e-mailadres. Houd je wachtwoord voor jezelf; je bent verantwoordelijk voor wat er onder je account gebeurt.",
+        "p2": "Je kunt je op elk moment van je sessies afmelden, en het gebruik van een wachtwoordherstellink meldt je andere sessies af."
+      },
+      "content": {
+        "heading": "Je content",
+        "p1": "Je behoudt alle rechten die je al hebt op de foto's en watermerken die je uploadt of maakt. Je bent er zelf verantwoordelijk voor dat je het recht hebt om de afbeeldingen die je naar de dienst brengt te gebruiken.",
+        "p2": "De app verwerkt je content alleen om de functies die je gebruikt te leveren, en slaat deze alleen op als je ervoor kiest die op te slaan. Ze wordt nooit gebruikt om iets te trainen of gedeeld met derden."
+      },
+      "acceptableUse": {
+        "heading": "Aanvaardbaar gebruik",
+        "p1": "Gebruik de dienst niet om de wet te overtreden of om content te uploaden of te delen waarvoor je geen gebruiksrecht hebt. Probeer geen beveiligingsmaatregelen of snelheidslimieten te omzeilen, of gegevens te bereiken van organisaties waarvan je geen lid bent.",
+        "p2": "Toegang binnen een organisatie volgt je rol, en die rollen worden op de server afgedwongen."
+      },
+      "teams": {
+        "heading": "Teams en rollen",
+        "p1": "Een organisatie kan de rollen eigenaar, beheerder, bewerker en kijker hebben. Wat elk lid kan zien en doen is beperkt tot zijn rol, gecontroleerd bij elk verzoek in plaats van alleen verborgen in de interface."
+      },
+      "availability": {
+        "heading": "Beschikbaarheid, garantie en wijzigingen",
+        "p1": "De dienst wordt geleverd “as is”, zonder enige vorm van garantie, zoals vastgelegd in de MIT-licentie. Functies kunnen veranderen en de dienst kan soms niet beschikbaar zijn.",
+        "p2": "Deze voorwaarden kunnen worden bijgewerkt; de datum boven aan deze pagina toont wanneer ze het laatst zijn gewijzigd. Als je de dienst na een wijziging blijft gebruiken, aanvaard je de bijgewerkte voorwaarden."
+      },
+      "openSource": {
+        "heading": "Opensource",
+        "p1": "De broncode van Watermark Pro is beschikbaar onder de MIT-licentie, waarmee je hem kunt inspecteren, uitvoeren en aanpassen onder de voorwaarden van die licentie."
+      },
+      "contact": {
+        "heading": "Contact",
+        "p1": "Vragen over deze voorwaarden en meldingen van beveiligingsproblemen kunnen worden ingediend via de GitHub-repository van het project."
+      }
+    }
+  },
+  "share": {
+    "loading": "Foto's worden geladen",
+    "unavailableTitle": "Deze link is niet beschikbaar",
+    "unavailableBody": "Deze is mogelijk verlopen of ingetrokken, of het adres is onvolledig. Vraag degene die hem heeft gestuurd om een nieuwe.",
+    "about": "Over Watermark Pro",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} foto's",
+    "availableUntil": " · beschikbaar tot {{date}}",
+    "shareLink": "Deze link delen",
+    "linkCopied": "Link gekopieerd naar het klembord.",
+    "linkShared": "Link gedeeld.",
+    "openPhoto": "{{name}} openen",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "Gedeeld met <home>Watermark Pro</home>. Foto's blijven eigendom van hun eigenaar.",
+    "download": "Downloaden",
+    "close": "Sluiten"
+  },
+  "root": {
+    "somethingWentWrong": "Er is iets misgegaan",
+    "notFound": {
+      "title": "Pagina niet gevonden",
+      "body": "Het adres is mogelijk verkeerd getypt, of de pagina is verplaatst.",
+      "back": "Terug naar het begin"
+    }
+  }
+}

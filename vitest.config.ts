@@ -69,6 +69,9 @@ export default defineConfig({
       exclude: [
         'src/**/*.test.{ts,tsx}',
         'src/**/test-support/**',
+        // Non-code assets under src/ (the translator glossary); coverage's
+        // instrumenter would try to parse them and warn.
+        'src/**/*.md',
         'src/client/test-setup.ts',
         // Bootstraps the DOM; exercised by the Playwright smoke test instead.
         'src/client/main.tsx',

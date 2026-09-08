@@ -1,0 +1,1065 @@
+{
+  "language": {
+    "menuLabel": "언어 변경"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "대시보드",
+      "library": "라이브러리",
+      "editor": "편집기",
+      "bulk": "일괄",
+      "video": "동영상",
+      "documents": "문서",
+      "gallery": "갤러리",
+      "shares": "공유",
+      "members": "멤버",
+      "audit": "감사 로그",
+      "admin": "관리자"
+    },
+    "skipToContent": "본문으로 건너뛰기",
+    "menu": "메뉴",
+    "primaryNav": "기본",
+    "primaryMenuNav": "기본 (메뉴)",
+    "toolsNav": "도구",
+    "signOut": "로그아웃",
+    "accountMenu": "{{name}}의 계정 메뉴",
+    "menuDescription": "조직을 전환하거나 Watermark Pro의 어느 부분으로든 이동하세요.",
+    "switchOrganizationFor": "조직: {{name}}. 조직 전환",
+    "chooseOrganization": "조직 선택",
+    "chooseOrganizationShort": "조직 선택",
+    "organizations": "조직",
+    "newOrganization": "새 조직",
+    "theme": {
+      "system": "테마: 시스템 설정에 따름. 밝게로 전환",
+      "light": "테마: 밝게. 어둡게로 전환",
+      "dark": "테마: 어둡게. 시스템 설정으로 전환"
+    }
+  },
+  "auth": {
+    "backToSignIn": "로그인으로 돌아가기",
+    "fields": {
+      "emailLabel": "이메일",
+      "passwordLabel": "비밀번호"
+    },
+    "login": {
+      "title": "다시 오신 것을 환영합니다",
+      "description": "워크스페이스에 로그인하세요.",
+      "footerPrompt": "처음이신가요?",
+      "createAccount": "계정 만들기",
+      "verifyTitle": "먼저 이메일을 인증하세요",
+      "verifyBody": "{{email}}(으)로 인증 링크를 보냈습니다.",
+      "resendIt": "다시 보내기",
+      "forgotPassword": "비밀번호를 잊으셨나요?",
+      "submit": "로그인"
+    },
+    "signup": {
+      "title": "계정 만들기",
+      "description": "이메일로 인증 링크가 전송됩니다.",
+      "footerPrompt": "이미 계정이 있으신가요?",
+      "signIn": "로그인",
+      "nameLabel": "이름",
+      "passwordHint": "최소 {{min}}자. 서로 관련 없는 단어 몇 개를 조합하면 좋습니다.",
+      "submit": "계정 만들기"
+    },
+    "forgotPassword": {
+      "title": "비밀번호 재설정",
+      "description": "이메일을 입력하시면 계정이 있는 경우 재설정 링크를 보내드립니다.",
+      "sentTitle": "받은 편지함을 확인하세요",
+      "sentBody": "{{email}}이(가) 계정에 연결되어 있다면 재설정 링크가 전송됩니다. 링크는 1시간 후 만료됩니다.",
+      "submit": "재설정 링크 보내기"
+    },
+    "resetPassword": {
+      "title": "새 비밀번호 선택",
+      "invalidTitle": "이 재설정 링크는 유효하지 않습니다",
+      "invalidBody": "만료되었거나 이미 사용되었을 수 있습니다.",
+      "requestNew": "새로 요청하기",
+      "invalidEnd": ".",
+      "newPasswordLabel": "새 비밀번호",
+      "passwordHint": "최소 {{min}}자.",
+      "confirmLabel": "비밀번호 확인",
+      "mismatch": "비밀번호가 일치하지 않습니다",
+      "submit": "비밀번호 업데이트"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "초대를 사용할 수 없습니다",
+      "title": "{{organizationName}} 참여",
+      "description": "{{inviterEmail}}님이 {{role}}(으)로 참여하도록 초대했습니다.",
+      "roleLabel": "역할:",
+      "decline": "거절",
+      "accept": "초대 수락"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "{{email}}(으)로 로그인됨",
+    "yourWorkspace": "내 워크스페이스",
+    "yourRole": "내 역할:",
+    "toolsHeading": "도구",
+    "tools": {
+      "library": {
+        "label": "라이브러리",
+        "body": "텍스트, 심볼, 로고 워터마크를 한 번 디자인하고 프리셋으로 저장하세요."
+      },
+      "editor": {
+        "label": "편집기",
+        "body": "사진 한 장을 직접 워터마킹하세요: 배치, 자르기, 크기 조정, 내보내기."
+      },
+      "bulk": {
+        "label": "일괄",
+        "body": "촬영본 전체에 프리셋을 적용하고 결과를 ZIP으로 다운로드하세요."
+      },
+      "gallery": {
+        "label": "갤러리",
+        "body": "팀이 저장한 항목을 둘러보고 링크로 앨범을 공유하세요."
+      }
+    },
+    "overviewHeading": "개요",
+    "members": "멤버",
+    "noPendingInvitations": "대기 중인 초대가 없습니다.",
+    "pendingInvitations_other": "대기 중인 초대 {{count}}건.",
+    "manageMembers": "멤버 관리",
+    "auditLog": "감사 로그",
+    "auditDescription": "모든 멤버십 및 조직 변경 사항이 수행한 사람과 시각과 함께 기록됩니다.",
+    "viewAuditLog": "감사 로그 보기"
+  },
+  "library": {
+    "orgRequired": "워터마크 라이브러리를 만들려면 조직을 만들거나 참여하세요.",
+    "heading": "워터마크 라이브러리",
+    "description": "{{name}}의 모두가 공유하는 프리셋입니다. 하나씩 또는 일괄로 적용하세요.",
+    "export": "내보내기",
+    "exportPreset": "{{name}} 내보내기",
+    "importPresets": "프리셋 가져오기",
+    "newPreset": "새 프리셋",
+    "exportErrorTitle": "프리셋을 내보낼 수 없습니다",
+    "loadingPresets": "프리셋 불러오는 중",
+    "loadErrorTitle": "라이브러리를 불러올 수 없습니다",
+    "empty": "아직 프리셋이 없습니다. 프리셋은 마크(텍스트, 심볼 또는 로고)와 배치, 대비, 스타일 설정을 결합한 것입니다.",
+    "createFirst": "첫 프리셋 만들기",
+    "orgRequiredShort": "먼저 조직을 만들거나 참여하세요.",
+    "loadingPreset": "프리셋 불러오는 중",
+    "loadPresetErrorTitle": "프리셋을 불러올 수 없습니다",
+    "presetGone": "해당 프리셋이 더 이상 존재하지 않습니다.",
+    "editSubtitleManage": "변경 사항은 이 프리셋을 사용하는 모든 사람에게 적용됩니다.",
+    "editSubtitleReadOnly": "읽기 전용 보기.",
+    "cannotCreate": "역할에 프리셋 생성 권한이 없습니다.",
+    "newPresetSubtitle": "마크를 디자인하고 위치를 정한 다음 라이브러리에 저장하세요.",
+    "openInEditor": "편집기에서 {{name}} 열기",
+    "deletePreset": "{{name}} 삭제",
+    "logoBadge": "로고",
+    "autoContrast": "자동 대비",
+    "manualContrast": "수동 대비",
+    "updated": "{{date}} 업데이트됨",
+    "exportLogoTypeError": "로고 중 하나가 내보낼 수 없는 이미지 형식입니다.",
+    "exportMissingLogoError": "프리셋이 더 이상 라이브러리에 없는 로고를 참조합니다.",
+    "describe": {
+      "text": "{{fontFamily}} 글꼴의 “{{text}}”",
+      "glyph": "글리프 {{glyph}}",
+      "icon": "아이콘 {{name}}",
+      "logo": "로고",
+      "qr": "{{content}}에 대한 QR 코드"
+    },
+    "shape": {
+      "rectangle": "사각형",
+      "roundedRectangle": "둥근 사각형",
+      "ellipse": "타원",
+      "line": "선"
+    },
+    "placement": {
+      "smart": "스마트 배치",
+      "custom": "사용자 지정 위치",
+      "random": "무작위 배치"
+    }
+  },
+  "designer": {
+    "presetName": "프리셋 이름",
+    "presetNamePlaceholder": "스튜디오 서명",
+    "nameError": "프리셋 이름을 60자 이내로 지정하세요.",
+    "sections": {
+      "label": "디자이너 섹션",
+      "mark": "마크",
+      "placement": "배치",
+      "style": "스타일"
+    },
+    "markType": "마크 유형",
+    "saveError": "프리셋을 저장할 수 없습니다",
+    "savePreset": "프리셋 저장",
+    "saveChanges": "변경 사항 저장",
+    "readOnlyHint": "역할에서 프리셋을 볼 수는 있지만 변경할 수는 없습니다.",
+    "notAnImage": "이 파일은 브라우저에서 읽을 수 있는 이미지가 아닙니다.",
+    "text": {
+      "label": "텍스트",
+      "hint": "최대 {{lines}}줄에 걸쳐 최대 {{max}}자까지. 날짜나 카메라처럼 사진마다 채워지는 토큰은 \"세부정보 삽입\"을 사용하세요. {location}은(는) 사진의 GPS 위치를 사진 위에 표시합니다."
+    },
+    "qr": {
+      "content": "QR 코드 내용",
+      "hint": "보통은 링크입니다. 최대 {{max}}자까지 가능하며, 스캔이 되도록 코드는 항상 밝은 바탕에 어둡게 표시됩니다."
+    },
+    "tokens": {
+      "menu": "세부정보 삽입",
+      "heading": "사진 세부정보",
+      "date": "날짜",
+      "time": "시간",
+      "taken": "촬영 날짜 및 시간",
+      "filename": "파일 이름",
+      "camera": "카메라",
+      "lens": "렌즈",
+      "iso": "ISO",
+      "aperture": "조리개",
+      "shutter": "셔터 속도",
+      "focal": "초점 거리",
+      "location": "위치 (GPS)",
+      "index": "사진 번호",
+      "count": "사진 수",
+      "width": "너비",
+      "height": "높이"
+    },
+    "font": {
+      "family": "글꼴",
+      "weight": "굵기",
+      "specimen": "다람쥐 헌 쳇바퀴에 타고파"
+    },
+    "symbol": {
+      "icons": "아이콘",
+      "glyphLabel": "글리프 {{glyph}}",
+      "iconLabel": "아이콘 {{label}}"
+    },
+    "shape": {
+      "label": "도형",
+      "rectangle": "사각형",
+      "roundedRectangle": "둥근 사각형",
+      "ellipse": "타원",
+      "line": "선",
+      "length": "길이",
+      "proportions": "비율",
+      "fill": "채우기",
+      "fillToggle": "도형 채우기",
+      "fillColour": "채우기 색상",
+      "fillOpacity": "채우기 불투명도",
+      "strokeWidth": "획 두께",
+      "customStrokeColour": "사용자 지정 획 색상",
+      "strokeColour": "획 색상"
+    },
+    "effects": {
+      "letterSpacing": "자간",
+      "curve": "곡선",
+      "effect": "효과",
+      "textEffect": "텍스트 효과",
+      "solid": "솔리드",
+      "outline": "외곽선",
+      "emboss": "양각",
+      "engrave": "음각"
+    },
+    "placement": {
+      "mode": "배치 모드",
+      "smart": "스마트",
+      "smartDescription": "사진마다 분석하여 가장 차분한 모서리를 선택합니다",
+      "corner": "모서리",
+      "cornerDescription": "가장자리를 기준으로 한 고정 위치",
+      "custom": "사용자 지정",
+      "customDescription": "사진의 비율로 나타낸 정확한 위치",
+      "random": "무작위",
+      "randomDescription": "사진마다 다른 위치; 자동 제거가 더 어렵습니다",
+      "smartHint": "엔진이 모든 모서리와 가장자리의 디테일, 대비, 피사체를 평가한 뒤 마크가 가장 잘 보이면서 방해가 적은 곳에 배치합니다.",
+      "randomHint": "각 사진은 무작위 모서리에 배치되며 아래 흔들림 값만큼 이동합니다. 같은 사진은 항상 같은 위치에 놓입니다.",
+      "jitter": "흔들림",
+      "cornerLegend": "모서리",
+      "horizontal": "가로",
+      "vertical": "세로",
+      "anchor": {
+        "topLeft": "왼쪽 위",
+        "topCenter": "가운데 위",
+        "topRight": "오른쪽 위",
+        "middleLeft": "왼쪽 가운데",
+        "center": "가운데",
+        "middleRight": "오른쪽 가운데",
+        "bottomLeft": "왼쪽 아래",
+        "bottomCenter": "가운데 아래",
+        "bottomRight": "오른쪽 아래"
+      }
+    },
+    "style": {
+      "contrast": "대비",
+      "contrastMode": "대비 모드",
+      "auto": "자동",
+      "autoDescription": "사진마다 밝은 잉크 또는 어두운 잉크를 선택",
+      "manual": "수동",
+      "manualDescription": "고정된 잉크와 외곽선 강도",
+      "colour": "색상",
+      "colourDescription": "직접 정한 잉크 색상",
+      "autoHint": "잉크는 마크 아래 영역에 맞춰 밝은색과 어두운색 사이에서 전환되며, 배경 색조가 너무 비슷할 때만 외곽선이 추가됩니다.",
+      "ink": "잉크",
+      "inkLight": "밝은 잉크",
+      "inkDark": "어두운 잉크",
+      "inkColour": "잉크 색상",
+      "outlineStrength": "외곽선 강도",
+      "appearance": "모양",
+      "opacity": "불투명도",
+      "size": "크기",
+      "ofWidth": "너비의 {{percent}}",
+      "rotation": "회전",
+      "margin": "여백",
+      "backdrop": "마크 뒤 상자",
+      "boxOpacity": "상자 불투명도",
+      "tiling": "사진 전체에 반복",
+      "spacing": "간격"
+    },
+    "preview": {
+      "heading": "미리보기",
+      "rendering": "미리보기 렌더링 중",
+      "choosePhoto": "미리볼 사진 선택",
+      "tryYourPhoto": "내 사진으로 시도",
+      "samplePhoto": "샘플 사진",
+      "alt": "대상 사진에 적용된 워터마크 미리보기",
+      "failed": "미리보기 실패",
+      "chooseLogo": "미리보기를 보려면 로고를 선택하거나 업로드하세요.",
+      "nothingToPlace": "배치할 것이 없습니다.",
+      "inkLight": "밝은 잉크",
+      "inkDark": "어두운 잉크",
+      "inkColour": "잉크 {{colour}}",
+      "customPosition": "사용자 지정 위치, {{ink}}.",
+      "placed": "{{position}}에 배치됨, {{ink}}.",
+      "position": {
+        "topLeft": "왼쪽 위",
+        "topCenter": "가운데 위",
+        "topRight": "오른쪽 위",
+        "middleLeft": "왼쪽 가운데",
+        "center": "가운데",
+        "middleRight": "오른쪽 가운데",
+        "bottomLeft": "왼쪽 아래",
+        "bottomCenter": "가운데 아래",
+        "bottomRight": "오른쪽 아래"
+      }
+    },
+    "logo": {
+      "loading": "로고 불러오는 중",
+      "loadError": "로고를 불러올 수 없습니다",
+      "empty": "아직 로고가 없습니다. 가장 좋은 결과를 위해 투명 배경의 PNG, JPEG 또는 WebP를 업로드하세요.",
+      "choose": "로고 선택",
+      "item": "로고 {{name}}",
+      "delete": "로고 {{name}} 삭제",
+      "upload": "로고 파일 업로드",
+      "uploadButton": "로고 업로드",
+      "hint": "PNG, JPEG 또는 WebP, 최대 {{max}} MB, 또는 그린 서명.",
+      "tooLarge": "로고는 {{max}} MB 이하여야 합니다.",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "로고 준비",
+        "title": "“{{name}}” 준비",
+        "description": "선택적으로 단색 배경을 지우고 빈 가장자리를 잘라낸 다음 투명 PNG로 업로드하세요.",
+        "before": "이전",
+        "after": "이후",
+        "previewNeedsCanvas": "미리보기에는 브라우저 캔버스가 필요합니다.",
+        "preview": "준비된 로고 미리보기",
+        "removeBackground": "배경 제거",
+        "backgroundTolerance": "배경 허용 범위",
+        "trim": "투명한 가장자리 잘라내기",
+        "outputSize": "출력 크기: {{size}} px",
+        "use": "로고 사용",
+        "chooseAnother": "다른 항목 선택"
+      },
+      "signature": {
+        "draw": "서명 그리기",
+        "description": "손가락, 펜 또는 마우스로 서명하세요. 잉크에 맞춰 잘린 투명 로고로 라이브러리에 저장됩니다.",
+        "pad": "서명 패드; 여기에 그리세요",
+        "pen": "펜",
+        "penWidthGroup": "펜 두께",
+        "penWidth": "{{width}}픽셀 펜",
+        "undo": "획 실행 취소",
+        "clear": "지우기",
+        "cancel": "취소",
+        "save": "로고로 저장"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "편집기를 사용하려면 조직을 만들거나 참여하세요.",
+    "heading": "편집기",
+    "description": "사진 한 장을 워터마킹하세요: 프리셋을 선택하고 원하면 직접 배치한 뒤 자르고 크기를 조정하여 다운로드합니다. 어떤 것도 브라우저를 벗어나지 않습니다.",
+    "tabs": {
+      "watermark": "워터마크",
+      "crop": "자르기",
+      "adjust": "조정",
+      "resize": "크기 조정",
+      "export": "내보내기"
+    },
+    "toolsLabel": "편집기 도구",
+    "openPhoto": "사진 열기",
+    "openPhotoLabel": "사진 열기",
+    "fromLink": "링크에서",
+    "samplePhoto": "샘플 사진",
+    "sampleScene": "샘플 장면",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "렌더링 중",
+    "renderingPreview": "미리보기 렌더링 중",
+    "undo": "실행 취소",
+    "redo": "다시 실행",
+    "altCrop": "자르기 프레임이 있는 사진",
+    "altWatermark": "워터마크가 적용된 사진",
+    "choosePresetHint": "워터마크를 배치하려면 프리셋을 선택하세요. 캔버스 아무 곳에나 사진을 놓으세요.",
+    "outputSize": "출력 {{width}} × {{height}} px.",
+    "notAnImage": "이 파일은 브라우저에서 읽을 수 있는 이미지가 아닙니다.",
+    "previewFailed": "미리보기 실패",
+    "exportFailed": "내보내기 실패",
+    "savedToGallery": "{{name}}을(를) <galleryLink>갤러리</galleryLink>에 저장했습니다.",
+    "applyToPhoto": "이 사진에 적용",
+    "applyToAll": "모든 사진에 적용",
+    "removeOverride": "재정의 제거",
+    "cancel": "취소",
+    "dimensions": {
+      "left": "왼쪽",
+      "top": "위",
+      "width": "너비",
+      "height": "높이",
+      "pxField": "{{label}} (px)"
+    },
+    "watermark": {
+      "emptyHint": "여기에 적용하세요.",
+      "preset": "프리셋",
+      "addPreset": "프리셋 추가",
+      "maxMarks": "사진당 최대 {{max}}개 마크",
+      "choosePreset": "프리셋 선택",
+      "marksHeading": "이 사진의 마크",
+      "layersLabel": "레이어, 아래에서 위로",
+      "removedPreset": "제거된 프리셋",
+      "removeLayer": "이 사진에서 {{name}} 제거",
+      "adjusted": "이 사진에 맞게 조정됨; 라이브러리 프리셋은 변경되지 않습니다.",
+      "revert": "되돌리기",
+      "placement": "배치"
+    },
+    "crop": {
+      "aspectRatio": "가로세로 비율",
+      "photoSize": "사진 크기는 {{width}} × {{height}} px입니다.",
+      "reset": "자르기 초기화",
+      "area": "자르기 영역. 드래그하여 이동; 화살표 키로 미세 조정, Shift로 더 크게 이동.",
+      "resizeHandle": "{{handle}}에서 자르기 크기 조정",
+      "handles": {
+        "n": "위쪽 가장자리",
+        "s": "아래쪽 가장자리",
+        "e": "오른쪽 가장자리",
+        "w": "왼쪽 가장자리",
+        "ne": "오른쪽 위 모서리",
+        "nw": "왼쪽 위 모서리",
+        "se": "오른쪽 아래 모서리",
+        "sw": "왼쪽 아래 모서리"
+      }
+    },
+    "resize": {
+      "keepProportions": "비율 유지",
+      "shortcuts": "바로가기",
+      "fit": "{{side}}에 맞춤",
+      "percent": "{{value}}%",
+      "outputUnchanged": "출력 {{width}} × {{height}} px (변경 없음).",
+      "outputChanged": "출력 {{width}} × {{height}} px ({{baseWidth}} × {{baseHeight}}에서).",
+      "resetSize": "크기 초기화"
+    },
+    "adjust": {
+      "filter": "필터",
+      "custom": "사용자 지정 조정",
+      "filterValue": "필터: {{name}}",
+      "brightness": "밝기",
+      "contrast": "대비",
+      "saturation": "채도",
+      "warmth": "따뜻함",
+      "sepia": "세피아",
+      "vignette": "비네트",
+      "reset": "{{name}} 초기화",
+      "resetAll": "모두 초기화"
+    },
+    "orientation": {
+      "rotateLeft": "왼쪽으로 회전",
+      "rotateRight": "오른쪽으로 회전",
+      "flipHorizontal": "좌우 반전",
+      "flipVertical": "상하 반전",
+      "straighten": "수평 맞추기"
+    },
+    "frame": {
+      "label": "테두리",
+      "add": "테두리 추가",
+      "width": "테두리 두께",
+      "colour": "테두리 색상"
+    },
+    "metadata": {
+      "heading": "메타데이터",
+      "strip": {
+        "label": "제거",
+        "help": "카메라 데이터 없음, 위치 없음. 공유에 가장 안전합니다."
+      },
+      "keepExceptLocation": {
+        "label": "위치 제외 유지",
+        "help": "카메라, 렌즈, 촬영 시간은 유지되고 GPS는 제거됩니다."
+      },
+      "keep": {
+        "label": "모두 유지",
+        "help": "사진에 GPS 위치가 있다면 그것까지 포함합니다."
+      },
+      "webpNote": "WebP 내보내기는 항상 제거됩니다."
+    },
+    "export": {
+      "format": "형식",
+      "quality": "품질",
+      "invisibleMark": "보이지 않는 마크",
+      "choosePng": "픽셀에 메시지를 숨기려면 PNG를 선택하세요.",
+      "invisibleMessage": "보이지 않는 메시지",
+      "tooLong": "{{width}}×{{height}} 사진에 너무 깁니다 ({{capacity}}바이트까지 가능).",
+      "invisibleHint": "픽셀에 숨겨지며 검증에서 읽을 수 있습니다. PNG에서만 유지됩니다.",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}. 브라우저에서 전체 해상도로 렌더링됩니다{{share}}.",
+      "losslessClause": "; PNG는 무손실",
+      "shareClause": "; 공유하면 이 기기의 사진, 메시지 또는 모든 앱으로 전송됩니다",
+      "download": "다운로드",
+      "share": "공유",
+      "saveToGallery": "갤러리에 저장",
+      "savedToFolder": "{{provider}}의 “{{folder}}” 폴더에 저장되었습니다."
+    },
+    "mark": {
+      "position": "워터마크 위치. 드래그하여 이동(여백, 3등분선, 가운데에 스냅됨; Alt을 누르면 자유롭게 배치), 손가락을 오므려 크기 조정, 비틀어 회전; 화살표 키로 미세 조정, 플러스와 마이너스로 크기 조정, 대괄호로 회전.",
+      "rotate": "워터마크 회전",
+      "resize": "워터마크 크기 조정"
+    }
+  },
+  "bulk": {
+    "orgRequired": "일괄로 워터마킹하려면 조직을 만들거나 참여하세요.",
+    "heading": "일괄 워터마킹",
+    "description": "촬영본 전체에 프리셋 하나를 적용하세요. 사진은 브라우저에서 병렬로 처리되어 ZIP으로 또는 하나씩 다운로드됩니다.",
+    "emptyHint": "일괄 작업에 적용하세요.",
+    "addPhotos": "사진 추가",
+    "addFolder": "폴더 추가",
+    "dropHint": "여기에 사진이나 폴더를 놓거나,",
+    "fromLink": "링크에서",
+    "capacity_other": "일괄 작업당 최대 {{max}}장. 처리는 브라우저에서 워커 {{count}}개를 사용해 이루어집니다.",
+    "skipped_other": "{{count}}개 파일 건너뜀: 이미지가 아님",
+    "importErrorTitle": "클라우드에서 가져올 수 없습니다",
+    "photoCount_other": "사진 {{count}}장",
+    "clearList": "목록 지우기",
+    "batchProgress": "일괄 작업 진행 상황",
+    "progress": {
+      "finished": "{{total}}개 중 {{done}}개 완료",
+      "failed": ", {{n}}개 실패",
+      "cancelled": ", {{n}}개 취소됨",
+      "rate": " · {{seconds}}초 만에 초당 {{rate}}장",
+      "end": "."
+    },
+    "photosList": "이 일괄 작업의 사진",
+    "custom": "사용자 지정",
+    "selected": "선택됨",
+    "status": {
+      "queued": "대기 중",
+      "processing": "처리 중",
+      "done": "완료",
+      "failed": "실패",
+      "cancelled": "취소됨"
+    },
+    "adjustPhoto": "{{name}} 조정",
+    "sharePhoto": "{{name}} 공유",
+    "downloadPhoto": "{{name}} 다운로드",
+    "removePhoto": "{{name}} 제거",
+    "showAll": "사진 {{count}}장 모두 표시",
+    "presetHint": "하나 이상 선택하세요; 선택한 순서대로 적용되며 나중 것이 먼저 것 위에 놓입니다.",
+    "format": "형식",
+    "quality": "품질",
+    "invisibleMark": "보이지 않는 마크",
+    "invisibleMessage": "보이지 않는 메시지",
+    "choosePng": "모든 사진에 메시지를 숨기려면 PNG를 선택하세요.",
+    "size": {
+      "label": "크기",
+      "original": "원본 크기",
+      "fit": "{{side}} px에 맞춤"
+    },
+    "fileNames": "파일 이름",
+    "tokensLabel": "토큰: {{tokens}}.",
+    "names": {
+      "example": "예: {{example}}",
+      "mustProduceName": "패턴은 이름을 만들어야 합니다."
+    },
+    "photoAdjustments": "사진 조정",
+    "resume": "재개",
+    "pause": "일시정지",
+    "cancel": "취소",
+    "start": "시작",
+    "retry": "{{count}}개 재시도",
+    "downloadZip": "{{count}}개를 ZIP으로 다운로드",
+    "downloadReport": "보고서 다운로드 (CSV)",
+    "saveToGallery": "{{count}}개를 갤러리에 저장",
+    "savedProgress": "{{total}}개 중 {{done}}개 저장됨",
+    "allSaved": "모두 <galleryLink>갤러리</galleryLink>에 저장되었습니다.",
+    "someSaved": "{{failed}}개는 저장할 수 없었습니다(저장 공간 할당량 또는 제한). 나머지는 <galleryLink>갤러리</galleryLink>에 있습니다.",
+    "savedToCloud_other": "{{count}}장을 {{provider}}의 “{{folder}}” 폴더에 저장했습니다.",
+    "privacyNote": "스마트 배치와 자동 대비는 사진마다 개별적으로 계산됩니다. 아무것도 업로드되지 않습니다.",
+    "watch": {
+      "label": "폴더 감시",
+      "stop": "중지",
+      "choose": "폴더 선택",
+      "hint": "입력 폴더와 출력 폴더를 선택하세요; 입력 폴더에 새로 놓인 사진은 선택한 프리셋으로 워터마킹되어 출력 폴더에 기록됩니다. 이 페이지가 열려 있는 동안에만 작동합니다.",
+      "wrote": "{{name}} 기록됨",
+      "failed": "{{name}} 실패: {{error}}"
+    }
+  },
+  "gallery": {
+    "orgRequired": "갤러리를 유지하려면 조직을 만들거나 참여하세요.",
+    "heading": "갤러리",
+    "description": "{{name}}이(가) 저장한 워터마킹된 사진입니다. 검색하고, 프리셋으로 필터링하고, 다운로드하거나 삭제하세요.",
+    "usage_other": "사진 {{count}}장 · {{max}} 중 {{used}}",
+    "maxCount": "조직당 최대 {{count}}장",
+    "storageUsed": "사용된 저장 공간",
+    "storagePercent": "저장 공간 {{percent}}% 사용됨",
+    "checkPhoto": "사진 선택",
+    "search": "검색",
+    "searchPlaceholder": "사진 이름",
+    "preset": "프리셋",
+    "allPresets": "모든 프리셋",
+    "selectAll": "전체 선택",
+    "clearSelection": "선택 해제",
+    "photoCount_other": "사진 {{count}}장",
+    "share": "공유",
+    "shareEllipsis": "공유…",
+    "deleteErrorTitle": "삭제할 수 없습니다",
+    "loadingPhotos": "사진 불러오는 중",
+    "loadErrorTitle": "갤러리를 불러올 수 없습니다",
+    "empty": "아직 사진이 없습니다. 편집기에서 한 장을 저장하거나 일괄 도구에서 배치 전체를 저장하세요.",
+    "emptyFiltered": "이 필터에 맞는 사진이 없습니다.",
+    "openEditor": "편집기 열기",
+    "openPhoto": "{{name}} 열기",
+    "selectPhoto": "{{name}} 선택",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "더 보기",
+    "delete": "삭제",
+    "deleteConfirmTitle_other": "사진 {{count}}장을 삭제하시겠습니까?",
+    "deleteConfirmBody": "파일과 썸네일이 저장소에서 제거됩니다. 이 작업은 되돌릴 수 없습니다.",
+    "cancel": "취소",
+    "close": "닫기",
+    "download": "다운로드",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_other": "사진 {{count}}장 공유",
+    "shareDescription": "링크가 있는 사람은 링크가 만료되거나 취소될 때까지 이 사진을 보고 다운로드할 수 있습니다.",
+    "title": "제목",
+    "expiresAfter": "만료 기간",
+    "linkExpiry": "링크 만료",
+    "expiry": {
+      "days_other": "{{count}}일",
+      "never": "없음"
+    },
+    "createErrorTitle": "링크를 만들 수 없습니다",
+    "createLink": "링크 만들기",
+    "link": "링크",
+    "noExpiry": "이 링크는 만료되지 않습니다.",
+    "expires": "{{when}} 만료.",
+    "manageLinks": "공유에서 링크를 관리하세요.",
+    "linkCopied": "링크가 클립보드에 복사되었습니다.",
+    "linkShared": "링크가 공유되었습니다.",
+    "copyLink": "링크 복사"
+  },
+  "shares": {
+    "orgRequired": "사진을 공유하려면 조직을 만들거나 참여하세요.",
+    "noPermission": "역할에 공유 권한이 포함되어 있지 않습니다.",
+    "heading": "공유",
+    "description": "{{name}} 외부 사람들이 선택된 사진을 보고 다운로드할 수 있게 하는 링크입니다. 링크를 해제하면 즉시 중단됩니다.",
+    "loading": "공유 불러오는 중",
+    "loadErrorTitle": "공유를 불러올 수 없습니다",
+    "empty": "아직 링크가 없습니다. 갤러리에서 사진을 선택하고 공유를 선택하세요.",
+    "openGallery": "갤러리 열기",
+    "rowCreated_other": "사진 {{count}}장 · {{created}}에 생성됨",
+    "neverExpires": " · 만료되지 않음",
+    "expiresOn": " · {{expires}} 만료",
+    "status": {
+      "active": "활성",
+      "expired": "만료됨",
+      "revoked": "해제됨"
+    },
+    "copyLink": "링크 복사",
+    "shareEllipsis": "공유…",
+    "revoke": "{{title}} 해제",
+    "revokeButton": "해제",
+    "linkCopied": "링크가 클립보드에 복사되었습니다.",
+    "linkShared": "링크가 공유되었습니다."
+  },
+  "admin": {
+    "heading": "관리",
+    "description": "이 배포의 모든 사용자와 조직입니다. 여기에서 수행한 작업은 감사 기록에 기록됩니다.",
+    "onlyAdmins": "플랫폼 관리자만 이 페이지를 열 수 있습니다.",
+    "sectionsLabel": "관리 섹션",
+    "tabs": {
+      "users": "사용자",
+      "organizations": "조직",
+      "audit": "감사 기록"
+    },
+    "searchLabel": "이메일로 검색",
+    "searchPlaceholder": "name@example.com",
+    "loadingUsers": "사용자 불러오는 중",
+    "usersErrorTitle": "사용자를 불러올 수 없습니다",
+    "userSummary_other": "사용자 {{count}}명{{extra}}.",
+    "showingNewest": ", 최신 {{count}}명 표시",
+    "you": "(나)",
+    "joined": "{{date}} 가입",
+    "emailNotVerified": " · 이메일 미인증",
+    "platformAdmin": "플랫폼 관리자",
+    "banned": "차단됨",
+    "bannedReason": "차단됨: {{reason}}",
+    "unban": "차단 해제",
+    "unbanUser": "{{email}} 차단 해제",
+    "removeAdmin": "관리자 해제",
+    "makeAdminShort": "관리자 지정",
+    "removeAdminFrom": "{{email}}의 관리자 권한 해제",
+    "makeAdmin": "{{email}}을(를) 관리자로 지정",
+    "signOutEverywhereButton": "모든 기기에서 로그아웃",
+    "signOutEverywhere": "{{email}}을(를) 모든 기기에서 로그아웃",
+    "ban": "차단",
+    "banUser": "{{email}} 차단",
+    "banConfirmTitle": "{{email}}을(를) 차단하시겠습니까?",
+    "banConfirmBody": "해당 사용자의 세션이 즉시 종료되며 차단이 해제될 때까지 로그인할 수 없습니다. 사유는 사용자에게 표시되고 감사 기록에 보관됩니다.",
+    "reasonLabel": "사유",
+    "cancel": "취소",
+    "banConfirm": "사용자 차단",
+    "loadingOrganizations": "조직 불러오는 중",
+    "organizationsErrorTitle": "조직을 불러올 수 없습니다",
+    "organizationsTable": "조직, 최신순",
+    "th": {
+      "organization": "조직",
+      "members": "멤버",
+      "photos": "사진",
+      "storage": "저장 공간",
+      "created": "생성일"
+    },
+    "loadingAudit": "감사 기록 불러오는 중",
+    "auditErrorTitle": "감사 기록을 불러올 수 없습니다",
+    "auditCaption": "모든 조직의 감사 항목, 최신순",
+    "auditDetailHeading": "조직",
+    "platform": "플랫폼"
+  },
+  "members": {
+    "orgRequired": "멤버를 관리하려면 조직을 만들거나 참여하세요.",
+    "heading": "멤버",
+    "description": "{{name}}의 사람들과 각자가 할 수 있는 일입니다.",
+    "count_other": "멤버 {{count}}명",
+    "pendingInvitations": "대기 중인 초대",
+    "inviteHeading": "사람 초대",
+    "emailLabel": "이메일",
+    "roleLabel": "역할",
+    "sendInvitation": "초대 보내기",
+    "invitationSent": "{{email}}에 초대를 보냈습니다.",
+    "you": "(나)",
+    "roleFor": "{{name}}의 역할",
+    "remove": "제거",
+    "removeMember": "{{name}} 제거",
+    "invitedAs": "초대된 역할",
+    "cancel": "취소",
+    "cancelInvitation": "{{email}}에 대한 초대 취소"
+  },
+  "audit": {
+    "heading": "감사 로그",
+    "description": "{{name}}의 가장 최근 변경 사항입니다. 소유자와 관리자가 이 페이지를 볼 수 있습니다.",
+    "thisOrganization": "이 조직",
+    "loading": "감사 로그 불러오는 중",
+    "loadErrorTitle": "감사 로그를 불러올 수 없습니다",
+    "noAccess": "역할에 감사 접근 권한이 포함되어 있지 않습니다.",
+    "empty": "아직 기록된 항목이 없습니다.",
+    "tableCaption": "감사 항목, 최신순",
+    "detailsHeading": "세부정보",
+    "when": "시각",
+    "who": "수행자",
+    "action": "작업"
+  },
+  "organizations": {
+    "firstTitle": "첫 조직 만들기",
+    "newTitle": "새 조직",
+    "description": "조직은 워터마크, 사진, 팀을 보관합니다. 회원님이 소유자가 됩니다.",
+    "createFailed": "조직을 만들 수 없습니다.",
+    "nameLabel": "이름",
+    "slugLabel": "URL 식별자",
+    "slugHint": "소문자, 숫자, 하이픈. 링크에 사용되며 고유해야 합니다.",
+    "submit": "조직 만들기"
+  },
+  "import": {
+    "takePhoto": "사진 촬영",
+    "cancel": "취소",
+    "saveToProvider": "{{provider}}에 저장",
+    "url": {
+      "title": "링크에서 가져오기",
+      "description": "웹에 있는 이미지 주소를 붙여넣으세요. 가져와서 여기에 추가합니다.",
+      "linkLabel": "이미지 링크",
+      "errorTitle": "해당 링크를 가져올 수 없습니다",
+      "fetch": "가져오기"
+    },
+    "onedrive": {
+      "title": "OneDrive에서 가져오기",
+      "name": "OneDrive",
+      "description": "Microsoft에 로그인한 다음 추가할 사진을 선택하세요.",
+      "loading": "OneDrive 불러오는 중",
+      "empty": "여기에 폴더나 이미지가 없습니다.",
+      "folderPath": "폴더 경로",
+      "errorTitle": "OneDrive 가져오기 실패",
+      "tryAgain": "다시 시도",
+      "noneSelected": "선택된 사진 없음",
+      "selectedCount": "{{count}}개 선택됨",
+      "addSelected": "선택 항목 추가"
+    }
+  },
+  "video": {
+    "orgRequired": "동영상을 워터마킹하려면 조직을 만들거나 참여하세요.",
+    "heading": "동영상 워터마킹",
+    "description": "동영상 전체에 프리셋을 적용하세요. 모든 프레임이 브라우저에서 워터마킹되고 오디오는 유지되며, 아무것도 업로드되지 않습니다.",
+    "checkingSupport": "동영상 지원 확인 중",
+    "unsupportedTitle": "이 브라우저에서는 동영상이 지원되지 않습니다",
+    "unsupportedBody": "이 브라우저는 동영상을 인코딩할 수 없습니다. Chrome, Edge 또는 Safari 17 이상에서 가능합니다.",
+    "emptyHint": "동영상에 적용하세요.",
+    "addVideo": "동영상 추가",
+    "dropHint": "여기에 동영상 하나를 놓거나,",
+    "formatsHint": "MP4, WebM 또는 MOV. 모든 작업은 브라우저에서 이루어지며 아무것도 업로드되지 않습니다. 갤러리는 아직 동영상을 지원하지 않습니다.",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}}초 · {{size}} · {{audio}}",
+    "choosePresetPreview": "프레임에서 워터마크를 미리 보려면 프리셋을 선택하세요.",
+    "outputSize": "출력 {{width}} × {{height}} px.",
+    "transcodingProgress": "트랜스코딩 진행 상황",
+    "progress": {
+      "noEta": "프레임 {{frame}} · {{percent}}%",
+      "withEta": "프레임 {{frame}} · {{percent}}% · 약 {{seconds}}초 남음"
+    },
+    "cancel": "취소",
+    "cancelled": "트랜스코딩이 취소되었습니다.",
+    "runErrorTitle": "동영상을 워터마킹할 수 없습니다",
+    "download": "{{fileName}} 다운로드",
+    "share": "공유",
+    "presets": "프리셋",
+    "placement": "배치",
+    "placementOptions": {
+      "smart": "스마트",
+      "bottomRight": "오른쪽 아래",
+      "bottomLeft": "왼쪽 아래",
+      "topRight": "오른쪽 위",
+      "topLeft": "왼쪽 위",
+      "center": "가운데"
+    },
+    "quality": "품질",
+    "qualityOptions": {
+      "low": "낮음",
+      "standard": "표준",
+      "high": "높음"
+    },
+    "resolution": "해상도",
+    "resolutionOptions": {
+      "original": "원본",
+      "fit1080p": "1080p에 맞춤",
+      "fit720p": "720p에 맞춤"
+    },
+    "watermarking": "워터마킹 중…",
+    "watermarkVideo": "동영상 워터마킹",
+    "fixedPlacementNote": "워터마크는 동영상 전체에 하나의 고정된 배치를 유지합니다. 오디오는 출력에 맞으면 그대로 복사되고, 그렇지 않으면 다시 인코딩됩니다.",
+    "renderingPreview": "미리보기 렌더링 중",
+    "previewAlt": "동영상 한 프레임에 적용된 워터마크"
+  },
+  "documents": {
+    "orgRequired": "문서를 워터마킹하려면 조직을 만들거나 참여하세요.",
+    "heading": "문서",
+    "description": "PDF의 모든 페이지에 프리셋을 찍으세요. 파일은 브라우저에서 처리되어 하나씩 또는 ZIP으로 다운로드됩니다.",
+    "emptyHint": "문서에 워터마크를 적용하세요.",
+    "addPdfs": "PDF 추가",
+    "dropHint": "여기에 PDF를 놓거나,",
+    "filesHint": "최대 {{max}}개 파일, 각 {{size}}. 모든 페이지가 브라우저에서 워터마킹되며 아무것도 업로드되지 않습니다.",
+    "skipped_other": "{{count}}개 파일 건너뜀: PDF가 아니거나 {{max}} 초과.",
+    "fileCount_other": "문서 {{count}}개",
+    "clearList": "목록 지우기",
+    "watermarkingProgress": "워터마킹 진행 상황",
+    "progressFinished": "{{total}}개 중 {{done}}개 완료",
+    "progressFailed": ", {{count}}개 실패",
+    "progressEnd": ".",
+    "listLabel": "워터마킹할 문서",
+    "downloadFile": "{{fileName}} 다운로드",
+    "removeFile": "{{fileName}} 제거",
+    "presetHint": "하나 이상 선택하세요; 선택한 순서대로 그려지며 나중 것이 먼저 것 위에 놓입니다.",
+    "placement": "배치",
+    "smartPlacementHint": "스마트 배치는 사진용입니다; 문서에는 모서리나 사용자 지정 위치를 선택하세요.",
+    "watermarkEmpty": "문서 워터마킹",
+    "watermarkCount": "{{count}}개 워터마킹",
+    "downloadZip": "{{count}}개를 ZIP으로 다운로드",
+    "savedAsHint": "각 문서는 {name}-watermarked.pdf로 저장됩니다. 암호화된 PDF는 거부됩니다."
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "받은 편지함을 확인하세요",
+      "description": "{{email}}(으)로 인증 링크를 보냈습니다. 링크는 1시간 후 만료됩니다.",
+      "resent": "새 인증 링크가 전송됩니다.",
+      "resend": "인증 이메일 다시 보내기"
+    },
+    "tool": {
+      "title": "사진 검증",
+      "description": "PNG에 보이지 않는 Watermark Pro 마크가 있는지 확인하고 숨겨진 메시지를 읽어보세요. 어떤 것도 브라우저를 벗어나지 않습니다."
+    },
+    "checkPng": "PNG 확인",
+    "checking": "확인 중…",
+    "noneFound": "이 사진에서 보이지 않는 마크를 찾지 못했습니다."
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "프리셋 불러오는 중",
+    "loadErrorTitle": "프리셋을 불러올 수 없습니다",
+    "emptyTitle": "아직 프리셋이 없습니다",
+    "createInLibrary": "라이브러리에서 프리셋을 만들어",
+    "legend": "프리셋",
+    "importTitle": "프리셋 가져오기",
+    "importDescription": "Watermark Pro 프리셋 파일을 선택하세요. 파일의 프리셋과 사용된 로고가 이 라이브러리에 추가됩니다.",
+    "presetFileLabel": "프리셋 파일",
+    "noPresets": "이 프리셋 파일에는 프리셋이 없습니다.",
+    "fileCount_other": "이 파일의 프리셋 {{count}}개",
+    "renamed": "“{{name}}”(이)라는 이름의 프리셋이 이미 있어 “{{finalName}}”(으)로 가져옵니다.",
+    "cancel": "취소",
+    "importButton_other": "프리셋 {{count}}개 가져오기"
+  },
+  "landing": {
+    "nav": "계정",
+    "signIn": "로그인",
+    "createAccount": "계정 만들기",
+    "eyebrow": "무료 오픈 소스",
+    "heroBody": "이미지를 해치지 않고 사진 작품을 보호하세요. Watermark Pro는 무거운 작업을 브라우저에서 처리하고, 원본을 비공개로 유지하며, 팀에 실질적인 의미가 있는 역할을 부여합니다.",
+    "createWorkspace": "워크스페이스 만들기",
+    "featuresHeading": "기능",
+    "features": {
+      "bulk": {
+        "title": "일괄 작업",
+        "body": "수백 장의 사진을 놓고 브라우저에서 한 번에 모두 워터마킹하세요."
+      },
+      "library": {
+        "title": "워터마크 라이브러리",
+        "body": "텍스트, 심볼, 로고 마크를 한 번 저장하고 클릭 한 번으로 어디에나 적용하세요."
+      },
+      "smart": {
+        "title": "스마트 배치",
+        "body": "각 사진을 분석하여 마크가 가장 잘 보이면서 피사체를 벗어난 곳에 배치합니다."
+      },
+      "contrast": {
+        "title": "자동 대비",
+        "body": "이미지마다 밝은/어두운 변형과 외곽선 강도를 선택하며, 마음에 들지 않으면 조정할 수 있습니다."
+      },
+      "teams": {
+        "title": "팀과 역할",
+        "body": "소유자, 관리자, 편집자, 뷰어 역할이 있는 조직으로, 서버에서 적용됩니다."
+      },
+      "trusted": {
+        "title": "신뢰할 수 있도록 구축",
+        "body": "엄격한 콘텐츠 보안 정책, 감사된 작업, 저장하지 않는 한 브라우저를 벗어나지 않는 사진."
+      }
+    },
+    "footer": "Watermark Pro는 MIT 라이선스로 배포되는 오픈 소스입니다.",
+    "privacy": "개인정보처리방침",
+    "terms": "이용약관"
+  },
+  "legal": {
+    "signIn": "로그인",
+    "lastUpdated": "마지막 업데이트: {{date}}",
+    "readSibling": "<sibling>{{siblingLabel}}</sibling>을(를) 읽거나 <home>홈페이지</home>로 돌아가세요.",
+    "footer": "Watermark Pro는 MIT 라이선스로 배포되는 오픈 소스입니다.",
+    "privacy": {
+      "title": "개인정보처리방침",
+      "intro": "Watermark Pro는 회원님의 사진이 회원님의 것으로 남도록 만들어졌습니다. 이 페이지는 프로젝트가 실제로 시행하는 제어를 바탕으로, 회원님의 이미지와 계정 정보가 어떻게 처리되는지 쉬운 말로 설명합니다.",
+      "siblingLabel": "이용약관",
+      "photos": {
+        "heading": "사진은 브라우저 안에 머뭅니다",
+        "p1": "워터마킹은 전적으로 회원님의 기기에서 실행됩니다. 편집기와 일괄 도구는 브라우저에서 사진을 디코딩하고 Web Worker에서 렌더링하며 완성된 파일을 메모리에서 만듭니다. 워터마크를 미리 볼 때 적용 대상 사진이 업로드되는 일은 없습니다.",
+        "p2": "내보내기 파일은 로컬에서 조합되어 같은 출처의 다운로드 링크를 통해 제공되며, 이 링크는 다운로드가 시작되는 즉시 해제됩니다. 원본은 미리보기나 워터마킹을 위해 서버로 전송되지 않습니다."
+      },
+      "storage": {
+        "heading": "저장하는 것, 그리고 요청하실 때만",
+        "p1": "회원님이 저장을 선택하지 않는 한 어떤 것도 당사 서버에 보관되지 않습니다. 사진, 썸네일 또는 로고를 저장하면 회원님의 조직으로 범위가 한정된 키 아래 Cloudflare R2에 저장되고, 공개되지 않으며, 비공개 캐싱으로 해당 조직의 로그인한 멤버에게만 제공됩니다.",
+        "p2": "각 조직에는 사진, 로고, 저장 공간 할당량이 있습니다. 모든 업로드와 삭제는 감사 기록에 기록됩니다."
+      },
+      "metadata": {
+        "heading": "메타데이터는 기본적으로 제거됩니다",
+        "p1": "모든 내보내기는 픽셀에서 다시 인코딩되므로, 회원님이 유지하기로 선택하지 않는 한 어떤 메타데이터도 넘어가지 않습니다. 기본 설정은 파일이 다운로드, 공유 시트 또는 갤러리에 도달하기 전에 모든 카메라 및 위치 데이터를 제거합니다.",
+        "p2": "내보내기마다 선택할 수 있는 두 가지 모드를 통해 GPS 위치는 제거하고 카메라 데이터는 유지하거나, 모든 것을 그대로 유지할 수 있습니다. 메타데이터는 브라우저에서 읽고 쓰며, 이를 위해 업로드되는 것은 없습니다."
+      },
+      "sharing": {
+        "heading": "공유 링크",
+        "p1": "공유 링크에는 만료 시간이 내장된 서명 토큰이 담기며 언제든지 해제할 수 있습니다. 링크가 여는 공개 페이지에는 세션이 없으며 주소별로 요청 속도가 제한됩니다.",
+        "p2": "만료, 해제, 변조, 알 수 없는 링크는 모두 동일한 중립적인 “찾을 수 없음” 응답을 반환하므로, 링크는 작동을 멈추면 아무것도 드러내지 않습니다. 링크 생성과 해제는 권한이 있는 멤버로 제한되며 감사됩니다."
+      },
+      "account": {
+        "heading": "회원님의 계정",
+        "p1": "계정에는 이메일 주소와 비밀번호가 필요하며, 계정이 활성화되기 전에 이메일을 인증해야 합니다. 세션은 HttpOnly, SameSite=Lax 쿠키에 보관되며 보안 출처에서는 Secure로 표시됩니다.",
+        "p2": "비밀번호 재설정 링크는 1시간 후 만료되며, 사용 시 회원님의 다른 세션을 로그아웃합니다."
+      },
+      "analytics": {
+        "heading": "분석 및 쿠키",
+        "p1": "당사는 제3자 분석이나 광고 쿠키를 설정하지 않습니다. 유일한 측정은 쿠키를 사용하지 않고 사이트 간에 회원님을 추적하지 않는 Cloudflare Web Analytics뿐입니다.",
+        "p2": "앱은 단 두 개의 제3자 출처와 통신하며 둘 다 Cloudflare의 것입니다: 가입 및 비밀번호 재설정 요청에서 봇을 걸러내는 Turnstile 위젯과 쿠키 없는 분석 비컨입니다. 글꼴, 스타일 및 그 밖의 모든 것은 이 사이트에서 제공됩니다."
+      },
+      "audit": {
+        "heading": "감사 기록",
+        "p1": "가입과 모든 조직, 멤버십, 초대, 라이브러리, 사진, 공유 변경 사항은 추가 전용 감사 로그에 기록됩니다. 이 로그는 조직의 소유자와 관리자만 읽을 수 있습니다."
+      },
+      "reporting": {
+        "heading": "문제 신고",
+        "p1": "보안 문제는 공개 이슈가 아니라 프로젝트의 GitHub 저장소를 통해 비공개로 신고할 수 있습니다. 저장소의 보안 정책은 무엇을 포함해야 하는지와 얼마나 빨리 답변을 받을 수 있는지 설명합니다."
+      }
+    },
+    "terms": {
+      "title": "이용약관",
+      "intro": "이 약관은 회원님의 Watermark Pro 사용에 적용됩니다. 읽기 쉽게 작성되었으며, 지키지 않는 주장을 덧붙이기보다 서비스가 실제로 어떻게 동작하는지 설명합니다.",
+      "siblingLabel": "개인정보처리방침",
+      "accepting": {
+        "heading": "약관 동의",
+        "p1": "Watermark Pro를 사용하는 것은 이 약관에 동의함을 의미합니다. 동의하지 않으시면 서비스를 사용하지 마세요."
+      },
+      "whatItDoes": {
+        "heading": "서비스가 하는 일",
+        "p1": "Watermark Pro는 사진에 워터마크를 넣습니다. 워터마킹 자체는 브라우저에서 실행되며, 사진과 로고 저장, 팀 작업, 공유 같은 선택적 기능은 Cloudflare의 서버 측 저장소를 사용합니다.",
+        "p2": "이 소프트웨어는 MIT 라이선스로 배포되는 무료 오픈 소스입니다."
+      },
+      "account": {
+        "heading": "회원님의 계정",
+        "p1": "팀 기능에는 인증된 이메일 주소가 있는 계정이 필요합니다. 비밀번호는 본인만 알고 계세요; 회원님의 계정에서 일어나는 일에 대한 책임은 회원님에게 있습니다.",
+        "p2": "언제든지 세션에서 로그아웃할 수 있으며, 비밀번호 재설정 링크를 사용하면 다른 세션이 로그아웃됩니다."
+      },
+      "content": {
+        "heading": "회원님의 콘텐츠",
+        "p1": "업로드하거나 만든 사진과 워터마크에 대해 이미 보유한 모든 권리는 회원님이 그대로 보유합니다. 서비스에 가져오는 이미지를 사용할 권리를 갖추는 것은 회원님의 책임입니다.",
+        "p2": "앱은 회원님이 사용하는 기능을 제공하기 위해서만 콘텐츠를 처리하며, 저장을 선택할 때만 보관합니다. 콘텐츠는 어떤 것도 학습에 사용되거나 제3자와 공유되지 않습니다."
+      },
+      "acceptableUse": {
+        "heading": "허용되는 사용",
+        "p1": "법을 어기거나, 사용할 권리가 없는 콘텐츠를 업로드하거나 공유하는 데 서비스를 사용하지 마세요. 보안 제어나 요청 속도 제한을 우회하거나, 회원이 아닌 조직에 속한 데이터에 접근하려 하지 마세요.",
+        "p2": "조직 내 접근은 회원님의 역할에 따르며, 이러한 역할은 서버에서 적용됩니다."
+      },
+      "teams": {
+        "heading": "팀과 역할",
+        "p1": "조직에는 소유자, 관리자, 편집자, 뷰어 역할이 있을 수 있습니다. 각 멤버가 보고 할 수 있는 일은 역할로 제한되며, 인터페이스에서 숨기기만 하는 것이 아니라 모든 요청에서 확인됩니다."
+      },
+      "availability": {
+        "heading": "가용성, 보증, 변경",
+        "p1": "서비스는 MIT 라이선스에 명시된 대로 어떠한 종류의 보증도 없이 “있는 그대로” 제공됩니다. 기능은 변경될 수 있으며, 서비스는 때때로 이용할 수 없을 수 있습니다.",
+        "p2": "이 약관은 업데이트될 수 있습니다; 이 페이지 상단의 날짜는 마지막으로 변경된 시점을 나타냅니다. 변경 후에도 서비스를 계속 사용하는 것은 업데이트된 약관에 동의함을 의미합니다."
+      },
+      "openSource": {
+        "heading": "오픈 소스",
+        "p1": "Watermark Pro의 소스 코드는 MIT 라이선스로 제공되며, 해당 라이선스 조건에 따라 검사, 실행, 수정할 수 있습니다."
+      },
+      "contact": {
+        "heading": "연락처",
+        "p1": "이 약관에 대한 질문과 보안 문제 신고는 프로젝트의 GitHub 저장소를 통해 제기할 수 있습니다."
+      }
+    }
+  },
+  "share": {
+    "loading": "사진 불러오는 중",
+    "unavailableTitle": "이 링크를 사용할 수 없습니다",
+    "unavailableBody": "만료되었거나 해제되었거나 주소가 불완전할 수 있습니다. 보낸 사람에게 새 링크를 요청하세요.",
+    "about": "Watermark Pro 소개",
+    "photoCount_other": "사진 {{count}}장",
+    "availableUntil": " · {{date}}까지 이용 가능",
+    "shareLink": "이 링크 공유",
+    "linkCopied": "링크가 클립보드에 복사되었습니다.",
+    "linkShared": "링크가 공유되었습니다.",
+    "openPhoto": "{{name}} 열기",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "<home>Watermark Pro</home>(으)로 공유됨. 사진은 소유자의 자산으로 유지됩니다.",
+    "download": "다운로드",
+    "close": "닫기"
+  },
+  "root": {
+    "somethingWentWrong": "문제가 발생했습니다",
+    "notFound": {
+      "title": "페이지를 찾을 수 없습니다",
+      "body": "주소를 잘못 입력했거나 페이지가 이동되었을 수 있습니다.",
+      "back": "처음으로 돌아가기"
+    }
+  }
+}

@@ -1,0 +1,1155 @@
+{
+  "language": {
+    "menuLabel": "تغيير اللغة"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "library": "المكتبة",
+      "editor": "المحرّر",
+      "bulk": "بالجملة",
+      "video": "الفيديو",
+      "documents": "المستندات",
+      "gallery": "المعرض",
+      "shares": "المشاركات",
+      "members": "الأعضاء",
+      "audit": "سجل التدقيق",
+      "admin": "الإدارة"
+    },
+    "skipToContent": "تخطّي إلى المحتوى",
+    "menu": "القائمة",
+    "primaryNav": "الرئيسية",
+    "primaryMenuNav": "الرئيسية (القائمة)",
+    "toolsNav": "الأدوات",
+    "signOut": "تسجيل الخروج",
+    "accountMenu": "قائمة الحساب لـ {{name}}",
+    "menuDescription": "بدّل المؤسسة أو انتقل إلى أي جزء من Watermark Pro.",
+    "switchOrganizationFor": "المؤسسة: {{name}}. تبديل المؤسسة",
+    "chooseOrganization": "اختر مؤسسة",
+    "chooseOrganizationShort": "اختر مؤسسة",
+    "organizations": "المؤسسات",
+    "newOrganization": "مؤسسة جديدة",
+    "theme": {
+      "system": "المظهر: يتبع النظام. التبديل إلى الفاتح",
+      "light": "المظهر: فاتح. التبديل إلى الداكن",
+      "dark": "المظهر: داكن. التبديل إلى النظام"
+    }
+  },
+  "auth": {
+    "backToSignIn": "العودة إلى تسجيل الدخول",
+    "fields": {
+      "emailLabel": "البريد الإلكتروني",
+      "passwordLabel": "كلمة المرور"
+    },
+    "login": {
+      "title": "مرحباً بعودتك",
+      "description": "سجّل الدخول إلى مساحة عملك.",
+      "footerPrompt": "جديد هنا؟",
+      "createAccount": "إنشاء حساب",
+      "verifyTitle": "تحقّق من بريدك الإلكتروني أولاً",
+      "verifyBody": "أرسلنا رابط تحقّق إلى {{email}}.",
+      "resendIt": "إعادة الإرسال",
+      "forgotPassword": "هل نسيت كلمة المرور؟",
+      "submit": "تسجيل الدخول"
+    },
+    "signup": {
+      "title": "أنشئ حسابك",
+      "description": "سيُرسَل رابط تحقّق إلى بريدك الإلكتروني.",
+      "footerPrompt": "هل لديك حساب بالفعل؟",
+      "signIn": "تسجيل الدخول",
+      "nameLabel": "الاسم",
+      "passwordHint": "{{min}} حرفاً على الأقل. تعمل بضع كلمات غير مترابطة جيداً.",
+      "submit": "إنشاء الحساب"
+    },
+    "forgotPassword": {
+      "title": "إعادة تعيين كلمة المرور",
+      "description": "أدخل بريدك الإلكتروني وسنرسل رابط إعادة تعيين إذا كان هناك حساب.",
+      "sentTitle": "تحقّق من صندوق الوارد",
+      "sentBody": "إذا كان {{email}} مرتبطاً بحساب، فإن رابط إعادة التعيين في طريقه إليك. تنتهي صلاحيته خلال ساعة واحدة.",
+      "submit": "إرسال رابط إعادة التعيين"
+    },
+    "resetPassword": {
+      "title": "اختر كلمة مرور جديدة",
+      "invalidTitle": "رابط إعادة التعيين هذا غير صالح",
+      "invalidBody": "ربما انتهت صلاحيته أو استُخدم من قبل.",
+      "requestNew": "اطلب رابطاً جديداً",
+      "invalidEnd": ".",
+      "newPasswordLabel": "كلمة المرور الجديدة",
+      "passwordHint": "{{min}} حرفاً على الأقل.",
+      "confirmLabel": "تأكيد كلمة المرور",
+      "mismatch": "كلمتا المرور غير متطابقتين",
+      "submit": "تحديث كلمة المرور"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "الدعوة غير متاحة",
+      "title": "الانضمام إلى {{organizationName}}",
+      "description": "دعاك {{inviterEmail}} للانضمام بصفة {{role}}.",
+      "roleLabel": "الدور:",
+      "decline": "رفض",
+      "accept": "قبول الدعوة"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "مسجّل الدخول باسم {{email}}",
+    "yourWorkspace": "مساحة عملك",
+    "yourRole": "دورك:",
+    "toolsHeading": "الأدوات",
+    "tools": {
+      "library": {
+        "label": "المكتبة",
+        "body": "صمّم علامات مائية نصية ورمزية وشعارات مرة واحدة واحتفظ بها كإعدادات مسبقة."
+      },
+      "editor": {
+        "label": "المحرّر",
+        "body": "ضع علامة مائية على صورة واحدة يدوياً: حدّد الموضع، وقُصّ، وغيّر الحجم، وصدّر."
+      },
+      "bulk": {
+        "label": "بالجملة",
+        "body": "طبّق إعداداً مسبقاً على جلسة تصوير كاملة ونزّل النتائج كملف ZIP."
+      },
+      "gallery": {
+        "label": "المعرض",
+        "body": "تصفّح ما حفظه الفريق، ثم شارك الألبومات عبر رابط."
+      }
+    },
+    "overviewHeading": "نظرة عامة",
+    "members": "الأعضاء",
+    "noPendingInvitations": "لا دعوات معلّقة.",
+    "pendingInvitations_zero": "{{count}} دعوة معلّقة.",
+    "pendingInvitations_one": "دعوة معلّقة واحدة.",
+    "pendingInvitations_two": "دعوتان معلّقتان.",
+    "pendingInvitations_few": "{{count}} دعوات معلّقة.",
+    "pendingInvitations_many": "{{count}} دعوة معلّقة.",
+    "pendingInvitations_other": "{{count}} دعوة معلّقة.",
+    "manageMembers": "إدارة الأعضاء",
+    "auditLog": "سجل التدقيق",
+    "auditDescription": "يُسجَّل كل تغيير في العضوية والمؤسسة مع تحديد من قام به ومتى.",
+    "viewAuditLog": "عرض سجل التدقيق"
+  },
+  "library": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة لبناء مكتبة علامات مائية.",
+    "heading": "مكتبة العلامات المائية",
+    "description": "إعدادات مسبقة يشاركها الجميع في {{name}}. طبّقها واحداً تلو الآخر أو بالجملة.",
+    "export": "تصدير",
+    "exportPreset": "تصدير {{name}}",
+    "importPresets": "استيراد إعدادات مسبقة",
+    "newPreset": "إعداد مسبق جديد",
+    "exportErrorTitle": "تعذّر تصدير الإعدادات المسبقة",
+    "loadingPresets": "جارٍ تحميل الإعدادات المسبقة",
+    "loadErrorTitle": "تعذّر تحميل المكتبة",
+    "empty": "لا إعدادات مسبقة بعد. يجمع الإعداد المسبق بين علامة (نص أو رمز أو شعار) وإعدادات الموضع والتباين والنمط.",
+    "createFirst": "أنشئ أول إعداد مسبق",
+    "orgRequiredShort": "أنشئ مؤسسة أو انضم إلى واحدة أولاً.",
+    "loadingPreset": "جارٍ تحميل الإعداد المسبق",
+    "loadPresetErrorTitle": "تعذّر تحميل الإعداد المسبق",
+    "presetGone": "لم يعد هذا الإعداد المسبق موجوداً.",
+    "editSubtitleManage": "تُطبَّق التغييرات على كل من يستخدم هذا الإعداد المسبق.",
+    "editSubtitleReadOnly": "عرض للقراءة فقط.",
+    "cannotCreate": "لا يسمح دورك بإنشاء إعدادات مسبقة.",
+    "newPresetSubtitle": "صمّم العلامة، وحدّد موضعها، ثم احفظها في المكتبة.",
+    "openInEditor": "افتح {{name}} في المحرّر",
+    "deletePreset": "حذف {{name}}",
+    "logoBadge": "شعار",
+    "autoContrast": "تباين تلقائي",
+    "manualContrast": "تباين يدوي",
+    "updated": "حُدّث في {{date}}",
+    "exportLogoTypeError": "لأحد الشعارات نوع صورة لا يمكن تصديره.",
+    "exportMissingLogoError": "يشير أحد الإعدادات المسبقة إلى شعار لم يعد في المكتبة.",
+    "describe": {
+      "text": "«{{text}}» بخط {{fontFamily}}",
+      "glyph": "المحرف {{glyph}}",
+      "icon": "الأيقونة {{name}}",
+      "logo": "شعار",
+      "qr": "رمز QR لـ {{content}}"
+    },
+    "shape": {
+      "rectangle": "مستطيل",
+      "roundedRectangle": "مستطيل مستدير الزوايا",
+      "ellipse": "قطع ناقص",
+      "line": "خط"
+    },
+    "placement": {
+      "smart": "التموضع الذكي",
+      "custom": "موضع مخصص",
+      "random": "تموضع عشوائي"
+    }
+  },
+  "designer": {
+    "presetName": "اسم الإعداد المسبق",
+    "presetNamePlaceholder": "توقيع الاستوديو",
+    "nameError": "امنح الإعداد المسبق اسماً لا يتجاوز 60 حرفاً.",
+    "sections": {
+      "label": "أقسام المصمّم",
+      "mark": "العلامة",
+      "placement": "التموضع",
+      "style": "النمط"
+    },
+    "markType": "نوع العلامة",
+    "saveError": "تعذّر حفظ الإعداد المسبق",
+    "savePreset": "حفظ الإعداد المسبق",
+    "saveChanges": "حفظ التغييرات",
+    "readOnlyHint": "يمكن لدورك عرض الإعدادات المسبقة لكن لا يمكنه تغييرها.",
+    "notAnImage": "هذا الملف ليس صورة يمكن للمتصفح قراءتها.",
+    "text": {
+      "label": "نص",
+      "hint": "حتى {{max}} حرفاً على ما يصل إلى {{lines}} أسطر. استخدم «إدراج تفصيل» لعناصر مثل التاريخ أو الكاميرا، تُملأ لكل صورة. يطبع {location} موقع GPS للصورة على الصورة."
+    },
+    "qr": {
+      "content": "محتوى رمز QR",
+      "hint": "رابط، عادةً. حتى {{max}} حرفاً؛ يكون الرمز دائماً داكناً على أرضية فاتحة لكي يُمسَح."
+    },
+    "tokens": {
+      "menu": "إدراج تفصيل",
+      "heading": "تفاصيل الصورة",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "taken": "تاريخ ووقت الالتقاط",
+      "filename": "اسم الملف",
+      "camera": "الكاميرا",
+      "lens": "العدسة",
+      "iso": "ISO",
+      "aperture": "فتحة العدسة",
+      "shutter": "سرعة الغالق",
+      "focal": "البُعد البؤري",
+      "location": "الموقع (GPS)",
+      "index": "رقم الصورة",
+      "count": "عدد الصور",
+      "width": "العرض",
+      "height": "الارتفاع"
+    },
+    "font": {
+      "family": "الخط",
+      "weight": "السماكة",
+      "specimen": "نص حكيم له سر قاطع وذو شأن عظيم مكتوب على ثوب أخضر"
+    },
+    "symbol": {
+      "icons": "أيقونات",
+      "glyphLabel": "المحرف {{glyph}}",
+      "iconLabel": "الأيقونة {{label}}"
+    },
+    "shape": {
+      "label": "الشكل",
+      "rectangle": "مستطيل",
+      "roundedRectangle": "مستطيل مستدير الزوايا",
+      "ellipse": "قطع ناقص",
+      "line": "خط",
+      "length": "الطول",
+      "proportions": "النِّسَب",
+      "fill": "التعبئة",
+      "fillToggle": "تعبئة الشكل",
+      "fillColour": "لون التعبئة",
+      "fillOpacity": "عتامة التعبئة",
+      "strokeWidth": "سماكة الخط",
+      "customStrokeColour": "لون خط مخصص",
+      "strokeColour": "لون الخط"
+    },
+    "effects": {
+      "letterSpacing": "تباعد الأحرف",
+      "curve": "الانحناء",
+      "effect": "التأثير",
+      "textEffect": "تأثير النص",
+      "solid": "صلب",
+      "outline": "مُحدَّد",
+      "emboss": "نقش بارز",
+      "engrave": "نقش غائر"
+    },
+    "placement": {
+      "mode": "نمط التموضع",
+      "smart": "ذكي",
+      "smartDescription": "يحلّل كل صورة ويختار أهدأ ركن",
+      "corner": "ركن",
+      "cornerDescription": "موضع ثابت بالنسبة إلى الحواف",
+      "custom": "مخصص",
+      "customDescription": "موضع دقيق كنسبة من الصورة",
+      "random": "عشوائي",
+      "randomDescription": "موضع مختلف لكل صورة؛ أصعب في الإزالة تلقائياً",
+      "smartHint": "يقيّم المحرّك كل ركن وحافة من حيث التفاصيل والتباين والموضوع، ثم يضع العلامة حيث تكون مقروءة وأقل تطفّلاً.",
+      "randomHint": "تحصل كل صورة على ركن عشوائي، مُزاح بمقدار الاهتزاز أدناه كحد أقصى. تستقر الصورة نفسها دائماً في المكان نفسه.",
+      "jitter": "الاهتزاز",
+      "cornerLegend": "الركن",
+      "horizontal": "أفقي",
+      "vertical": "رأسي",
+      "anchor": {
+        "topLeft": "أعلى اليسار",
+        "topCenter": "أعلى الوسط",
+        "topRight": "أعلى اليمين",
+        "middleLeft": "منتصف اليسار",
+        "center": "الوسط",
+        "middleRight": "منتصف اليمين",
+        "bottomLeft": "أسفل اليسار",
+        "bottomCenter": "أسفل الوسط",
+        "bottomRight": "أسفل اليمين"
+      }
+    },
+    "style": {
+      "contrast": "التباين",
+      "contrastMode": "نمط التباين",
+      "auto": "تلقائي",
+      "autoDescription": "حبر فاتح أو داكن يُختار لكل صورة",
+      "manual": "يدوي",
+      "manualDescription": "حبر وقوة حدّ ثابتان",
+      "colour": "لون",
+      "colourDescription": "لون حبر خاص بك",
+      "autoHint": "يتبدّل الحبر بين الفاتح والداكن ليلائم المنطقة تحت العلامة، ويُضاف حدّ فقط عندما يكون لون الخلفية قريباً جداً في الدرجة.",
+      "ink": "الحبر",
+      "inkLight": "حبر فاتح",
+      "inkDark": "حبر داكن",
+      "inkColour": "لون الحبر",
+      "outlineStrength": "قوة الحدّ",
+      "appearance": "المظهر",
+      "opacity": "العتامة",
+      "size": "الحجم",
+      "ofWidth": "{{percent}} من العرض",
+      "rotation": "التدوير",
+      "margin": "الهامش",
+      "backdrop": "صندوق خلف العلامة",
+      "boxOpacity": "عتامة الصندوق",
+      "tiling": "التكرار عبر الصورة",
+      "spacing": "التباعد"
+    },
+    "preview": {
+      "heading": "المعاينة",
+      "rendering": "جارٍ تصيير المعاينة",
+      "choosePhoto": "اختر صورة للمعاينة عليها",
+      "tryYourPhoto": "جرّب صورتك",
+      "samplePhoto": "صورة نموذجية",
+      "alt": "معاينة العلامة المائية على صورة الموضوع",
+      "failed": "فشلت المعاينة",
+      "chooseLogo": "اختر أو ارفع شعاراً لرؤية المعاينة.",
+      "nothingToPlace": "لا شيء لوضعه.",
+      "inkLight": "حبر فاتح",
+      "inkDark": "حبر داكن",
+      "inkColour": "حبر {{colour}}",
+      "customPosition": "موضع مخصص، {{ink}}.",
+      "placed": "مُوضَع {{position}}، {{ink}}.",
+      "position": {
+        "topLeft": "أعلى اليسار",
+        "topCenter": "أعلى الوسط",
+        "topRight": "أعلى اليمين",
+        "middleLeft": "منتصف اليسار",
+        "center": "الوسط",
+        "middleRight": "منتصف اليمين",
+        "bottomLeft": "أسفل اليسار",
+        "bottomCenter": "أسفل الوسط",
+        "bottomRight": "أسفل اليمين"
+      }
+    },
+    "logo": {
+      "loading": "جارٍ تحميل الشعارات",
+      "loadError": "تعذّر تحميل الشعارات",
+      "empty": "لا شعارات بعد. ارفع ملف PNG أو JPEG أو WebP بخلفية شفافة للحصول على أفضل النتائج.",
+      "choose": "اختر شعاراً",
+      "item": "شعار {{name}}",
+      "delete": "حذف الشعار {{name}}",
+      "upload": "رفع ملف شعار",
+      "uploadButton": "رفع شعار",
+      "hint": "PNG أو JPEG أو WebP حتى {{max}} ميغابايت، أو توقيع مرسوم.",
+      "tooLarge": "يجب ألا يتجاوز حجم الشعارات {{max}} ميغابايت.",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "تحضير الشعار",
+        "title": "تحضير «{{name}}»",
+        "description": "يمكنك اختيارياً إزالة خلفية مسطّحة وقصّ الحواف الفارغة، ثم رفعه كملف PNG شفاف.",
+        "before": "قبل",
+        "after": "بعد",
+        "previewNeedsCanvas": "تحتاج المعاينة إلى لوحة رسم في المتصفح.",
+        "preview": "معاينة الشعار المُحضَّر",
+        "removeBackground": "إزالة الخلفية",
+        "backgroundTolerance": "تسامح الخلفية",
+        "trim": "قصّ الحواف الشفافة",
+        "outputSize": "حجم المُخرَج: {{size}} بكسل",
+        "use": "استخدام الشعار",
+        "chooseAnother": "اختر آخر"
+      },
+      "signature": {
+        "draw": "ارسم توقيعاً",
+        "description": "وقّع بإصبعك أو بقلم أو بالفأرة. يُحفَظ كشعار شفاف في المكتبة، مقصوصاً على الحبر.",
+        "pad": "لوحة التوقيع؛ ارسم هنا",
+        "pen": "قلم",
+        "penWidthGroup": "سماكة القلم",
+        "penWidth": "قلم بعرض {{width}} بكسل",
+        "undo": "تراجع عن الرسمة",
+        "clear": "مسح",
+        "cancel": "إلغاء",
+        "save": "حفظ كشعار"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة لاستخدام المحرّر.",
+    "heading": "المحرّر",
+    "description": "ضع علامة مائية على صورة واحدة: اختر إعداداً مسبقاً، وضعه يدوياً إن شئت، وقُصّ، وغيّر الحجم، ونزّل. لا شيء يغادر متصفحك.",
+    "tabs": {
+      "watermark": "علامة مائية",
+      "crop": "قصّ",
+      "adjust": "ضبط",
+      "resize": "تغيير الحجم",
+      "export": "تصدير"
+    },
+    "toolsLabel": "أدوات المحرّر",
+    "openPhoto": "فتح صورة",
+    "openPhotoLabel": "فتح صورة",
+    "fromLink": "من رابط",
+    "samplePhoto": "صورة نموذجية",
+    "sampleScene": "مشهد نموذجي",
+    "photoMeta": "{{name}} · {{width}} × {{height}} بكسل",
+    "rendering": "جارٍ التصيير",
+    "renderingPreview": "جارٍ تصيير المعاينة",
+    "undo": "تراجع",
+    "redo": "إعادة",
+    "altCrop": "الصورة مع إطار القصّ",
+    "altWatermark": "الصورة بعد تطبيق العلامة المائية",
+    "choosePresetHint": "اختر إعداداً مسبقاً لوضع علامة مائية. أفلِت صورة في أي مكان على لوحة الرسم.",
+    "outputSize": "المُخرَج {{width}} × {{height}} بكسل.",
+    "notAnImage": "هذا الملف ليس صورة يمكن للمتصفح قراءتها.",
+    "previewFailed": "فشلت المعاينة",
+    "exportFailed": "فشل التصدير",
+    "savedToGallery": "حُفظت {{name}} في <galleryLink>المعرض</galleryLink>.",
+    "applyToPhoto": "تطبيق على هذه الصورة",
+    "applyToAll": "تطبيق على جميع الصور",
+    "removeOverride": "إزالة التجاوز",
+    "cancel": "إلغاء",
+    "dimensions": {
+      "left": "يسار",
+      "top": "أعلى",
+      "width": "العرض",
+      "height": "الارتفاع",
+      "pxField": "{{label}} (بكسل)"
+    },
+    "watermark": {
+      "emptyHint": "لتطبيقها هنا.",
+      "preset": "إعداد مسبق",
+      "addPreset": "إضافة إعداد مسبق آخر",
+      "maxMarks": "حتى {{max}} علامة لكل صورة",
+      "choosePreset": "اختر إعداداً مسبقاً",
+      "marksHeading": "العلامات على هذه الصورة",
+      "layersLabel": "الطبقات، من الأسفل إلى الأعلى",
+      "removedPreset": "إعداد مسبق مُزال",
+      "removeLayer": "إزالة {{name}} من هذه الصورة",
+      "adjusted": "مُعدَّلة لهذه الصورة؛ يبقى الإعداد المسبق في المكتبة دون تغيير.",
+      "revert": "استرجاع",
+      "placement": "التموضع"
+    },
+    "crop": {
+      "aspectRatio": "نسبة العرض إلى الارتفاع",
+      "photoSize": "حجم الصورة {{width}} × {{height}} بكسل.",
+      "reset": "إعادة تعيين القصّ",
+      "area": "منطقة القصّ. اسحب للتحريك؛ تحرّكها مفاتيح الأسهم قليلاً، مع Shift لخطوات أكبر.",
+      "resizeHandle": "تغيير حجم القصّ من {{handle}}",
+      "handles": {
+        "n": "الحافة العلوية",
+        "s": "الحافة السفلية",
+        "e": "الحافة اليمنى",
+        "w": "الحافة اليسرى",
+        "ne": "الركن العلوي الأيمن",
+        "nw": "الركن العلوي الأيسر",
+        "se": "الركن السفلي الأيمن",
+        "sw": "الركن السفلي الأيسر"
+      }
+    },
+    "resize": {
+      "keepProportions": "الحفاظ على النِّسَب",
+      "shortcuts": "اختصارات",
+      "fit": "ملاءمة {{side}}",
+      "percent": "{{value}}%",
+      "outputUnchanged": "المُخرَج {{width}} × {{height}} بكسل (دون تغيير).",
+      "outputChanged": "المُخرَج {{width}} × {{height}} بكسل من {{baseWidth}} × {{baseHeight}}.",
+      "resetSize": "إعادة تعيين الحجم"
+    },
+    "adjust": {
+      "filter": "مرشّح",
+      "custom": "تعديلات مخصصة",
+      "filterValue": "المرشّح: {{name}}",
+      "brightness": "السطوع",
+      "contrast": "التباين",
+      "saturation": "التشبّع",
+      "warmth": "الدفء",
+      "sepia": "سيبيا",
+      "vignette": "تظليل الحواف",
+      "reset": "إعادة تعيين {{name}}",
+      "resetAll": "إعادة تعيين الكل"
+    },
+    "orientation": {
+      "rotateLeft": "تدوير لليسار",
+      "rotateRight": "تدوير لليمين",
+      "flipHorizontal": "قلب أفقي",
+      "flipVertical": "قلب رأسي",
+      "straighten": "تسوية"
+    },
+    "frame": {
+      "label": "إطار",
+      "add": "إضافة إطار",
+      "width": "سماكة الإطار",
+      "colour": "لون الإطار"
+    },
+    "metadata": {
+      "heading": "البيانات الوصفية",
+      "strip": {
+        "label": "إزالة",
+        "help": "لا بيانات كاميرا، ولا موقع. الأكثر أماناً للمشاركة."
+      },
+      "keepExceptLocation": {
+        "label": "الاحتفاظ عدا الموقع",
+        "help": "تبقى الكاميرا والعدسة ووقت الالتقاط؛ يُزال GPS."
+      },
+      "keep": {
+        "label": "الاحتفاظ بكل شيء",
+        "help": "بما في ذلك موقع GPS، إن وُجد في الصورة."
+      },
+      "webpNote": "تُزال البيانات الوصفية دائماً من مخرجات WebP."
+    },
+    "export": {
+      "format": "الصيغة",
+      "quality": "الجودة",
+      "invisibleMark": "علامة غير مرئية",
+      "choosePng": "اختر PNG لإخفاء رسالة في وحدات البكسل.",
+      "invisibleMessage": "رسالة غير مرئية",
+      "tooLong": "طويلة جداً لصورة {{width}}×{{height}} (تتّسع لـ {{capacity}} بايت).",
+      "invisibleHint": "مخفيّة في وحدات البكسل وقابلة للقراءة عبر «تحقّق». تبقى في PNG فقط.",
+      "renderNote": "{{width}} × {{height}} بكسل{{lossless}}. مُصيَّرة في متصفحك بالدقة الكاملة{{share}}.",
+      "losslessClause": "؛ PNG بلا فقدان",
+      "shareClause": "؛ ترسلها «مشاركة» إلى الصور أو الرسائل أو أي تطبيق على هذا الجهاز",
+      "download": "تنزيل",
+      "share": "مشاركة",
+      "saveToGallery": "حفظ في المعرض",
+      "savedToFolder": "حُفظت في مجلد «{{folder}}» على {{provider}}."
+    },
+    "mark": {
+      "position": "موضع العلامة المائية. اسحب للتحريك (تنجذب إلى الهوامش والأثلاث والوسط؛ اضغط Alt لوضعها بحرية)، اقرص لتغيير الحجم، ألوِ للتدوير؛ تحرّكها مفاتيح الأسهم قليلاً، ويكبّرها ويصغّرها مفتاحا زائد وناقص، ويدوّرها القوسان المعقوفان.",
+      "rotate": "تدوير العلامة المائية",
+      "resize": "تغيير حجم العلامة المائية"
+    }
+  },
+  "bulk": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة لوضع علامات مائية بالجملة.",
+    "heading": "وضع العلامات المائية بالجملة",
+    "description": "طبّق إعداداً مسبقاً واحداً على جلسة تصوير كاملة. تُعالَج الصور بالتوازي في متصفحك وتُنزَّل كملف ZIP أو واحدة تلو الأخرى.",
+    "emptyHint": "لتطبيقه على دفعة.",
+    "addPhotos": "إضافة صور",
+    "addFolder": "إضافة مجلد",
+    "dropHint": "أفلِت صوراً أو مجلداً هنا، أو",
+    "fromLink": "من رابط",
+    "capacity_zero": "حتى {{max}} صورة لكل دفعة. تجري المعالجة في متصفحك باستخدام {{count}} عامل.",
+    "capacity_one": "حتى {{max}} صورة لكل دفعة. تجري المعالجة في متصفحك باستخدام عامل واحد.",
+    "capacity_two": "حتى {{max}} صورة لكل دفعة. تجري المعالجة في متصفحك باستخدام عاملين.",
+    "capacity_few": "حتى {{max}} صورة لكل دفعة. تجري المعالجة في متصفحك باستخدام {{count}} عمّال.",
+    "capacity_many": "حتى {{max}} صورة لكل دفعة. تجري المعالجة في متصفحك باستخدام {{count}} عامل.",
+    "capacity_other": "حتى {{max}} صورة لكل دفعة. تجري المعالجة في متصفحك باستخدام {{count}} عامل.",
+    "skipped_zero": "تم تخطّي {{count}} ملف: ليست صورًا",
+    "skipped_one": "تم تخطّي ملف واحد: ليس صورة",
+    "skipped_two": "تم تخطّي ملفين: ليسا صورتين",
+    "skipped_few": "تم تخطّي {{count}} ملفات: ليست صورًا",
+    "skipped_many": "تم تخطّي {{count}} ملف: ليست صورًا",
+    "skipped_other": "تم تخطّي {{count}} ملف: ليست صورًا",
+    "importErrorTitle": "تعذّر الاستيراد من السحابة",
+    "photoCount_zero": "{{count}} صورة",
+    "photoCount_one": "صورة واحدة",
+    "photoCount_two": "صورتان",
+    "photoCount_few": "{{count}} صور",
+    "photoCount_many": "{{count}} صورة",
+    "photoCount_other": "{{count}} صورة",
+    "clearList": "مسح القائمة",
+    "batchProgress": "تقدّم الدفعة",
+    "progress": {
+      "finished": "اكتملت {{done}} من {{total}}",
+      "failed": "، فشلت {{n}}",
+      "cancelled": "، أُلغيت {{n}}",
+      "rate": " في {{seconds}} ثانية ({{rate}} صورة/ثانية)",
+      "end": "."
+    },
+    "photosList": "الصور في هذه الدفعة",
+    "custom": "مخصص",
+    "selected": "محدَّدة",
+    "status": {
+      "queued": "في الانتظار",
+      "processing": "قيد المعالجة",
+      "done": "تم",
+      "failed": "فشل",
+      "cancelled": "أُلغي"
+    },
+    "adjustPhoto": "ضبط {{name}}",
+    "sharePhoto": "مشاركة {{name}}",
+    "downloadPhoto": "تنزيل {{name}}",
+    "removePhoto": "إزالة {{name}}",
+    "showAll": "عرض جميع الصور ({{count}})",
+    "presetHint": "أشِّر على واحد أو أكثر؛ تُطبَّق بالترتيب الذي أشّرت به، اللاحقة فوق السابقة.",
+    "format": "الصيغة",
+    "quality": "الجودة",
+    "invisibleMark": "علامة غير مرئية",
+    "invisibleMessage": "رسالة غير مرئية",
+    "choosePng": "اختر PNG لإخفاء رسالة في كل صورة.",
+    "size": {
+      "label": "الحجم",
+      "original": "الحجم الأصلي",
+      "fit": "ملاءمة {{side}} بكسل"
+    },
+    "fileNames": "أسماء الملفات",
+    "tokensLabel": "الرموز: {{tokens}}.",
+    "names": {
+      "example": "مثال: {{example}}",
+      "mustProduceName": "يجب أن ينتج النمط اسماً."
+    },
+    "photoAdjustments": "تعديلات الصورة",
+    "resume": "استئناف",
+    "pause": "إيقاف مؤقت",
+    "cancel": "إلغاء",
+    "start": "بدء",
+    "retry": "إعادة المحاولة {{count}}",
+    "downloadZip": "تنزيل {{count}} كملف ZIP",
+    "downloadReport": "تنزيل التقرير (CSV)",
+    "saveToGallery": "حفظ {{count}} في المعرض",
+    "savedProgress": "حُفظت {{done}} من {{total}}",
+    "allSaved": "حُفظت الكل في <galleryLink>المعرض</galleryLink>.",
+    "someSaved": "تعذّر حفظ {{failed}} (حصة التخزين أو الحدود). الباقي في <galleryLink>المعرض</galleryLink>.",
+    "savedToCloud_zero": "تم حفظ {{count}} صورة في مجلد «{{folder}}» على {{provider}}.",
+    "savedToCloud_one": "تم حفظ صورة واحدة في مجلد «{{folder}}» على {{provider}}.",
+    "savedToCloud_two": "تم حفظ صورتين في مجلد «{{folder}}» على {{provider}}.",
+    "savedToCloud_few": "تم حفظ {{count}} صور في مجلد «{{folder}}» على {{provider}}.",
+    "savedToCloud_many": "تم حفظ {{count}} صورة في مجلد «{{folder}}» على {{provider}}.",
+    "savedToCloud_other": "تم حفظ {{count}} صورة في مجلد «{{folder}}» على {{provider}}.",
+    "privacyNote": "يُحسَب التموضع الذكي والتباين التلقائي لكل صورة على حدة. لا يُرفَع أي شيء.",
+    "watch": {
+      "label": "مراقبة مجلد",
+      "stop": "إيقاف",
+      "choose": "اختر المجلدات",
+      "hint": "اختر مجلد إدخال ومجلد إخراج؛ تُوضَع علامة مائية على الصور الجديدة المُفلَتة في الإدخال باستخدام الإعدادات المسبقة المؤشَّرة وتُكتَب في الإخراج. يعمل فقط أثناء فتح هذه الصفحة.",
+      "wrote": "كُتبت {{name}}",
+      "failed": "فشلت {{name}}: {{error}}"
+    }
+  },
+  "gallery": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة للاحتفاظ بمعرض.",
+    "heading": "المعرض",
+    "description": "صور بعلامة مائية حفظها {{name}}. ابحث، وصفِّ حسب الإعداد المسبق، ونزّل أو احذف.",
+    "usage_zero": "{{count}} صورة · {{used}} من {{max}}",
+    "usage_one": "صورة واحدة · {{used}} من {{max}}",
+    "usage_two": "صورتان · {{used}} من {{max}}",
+    "usage_few": "{{count}} صور · {{used}} من {{max}}",
+    "usage_many": "{{count}} صورة · {{used}} من {{max}}",
+    "usage_other": "{{count}} صورة · {{used}} من {{max}}",
+    "maxCount": "حتى {{count}} صورة لكل مؤسسة",
+    "storageUsed": "التخزين المُستخدَم",
+    "storagePercent": "{{percent}}% من التخزين مُستخدَم",
+    "checkPhoto": "تحديد صورة",
+    "search": "بحث",
+    "searchPlaceholder": "اسم الصورة",
+    "preset": "الإعداد المسبق",
+    "allPresets": "كل الإعدادات المسبقة",
+    "selectAll": "تحديد الكل",
+    "clearSelection": "إلغاء التحديد",
+    "photoCount_zero": "{{count}} صورة",
+    "photoCount_one": "صورة واحدة",
+    "photoCount_two": "صورتان",
+    "photoCount_few": "{{count}} صور",
+    "photoCount_many": "{{count}} صورة",
+    "photoCount_other": "{{count}} صورة",
+    "share": "مشاركة",
+    "shareEllipsis": "مشاركة…",
+    "deleteErrorTitle": "تعذّر الحذف",
+    "loadingPhotos": "جارٍ تحميل الصور",
+    "loadErrorTitle": "تعذّر تحميل المعرض",
+    "empty": "لا صور بعد. احفظ واحدة من المحرّر أو دفعة كاملة من أداة الجملة.",
+    "emptyFiltered": "لا صور تطابق هذه المرشّحات.",
+    "openEditor": "فتح المحرّر",
+    "openPhoto": "فتح {{name}}",
+    "selectPhoto": "تحديد {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "تحميل المزيد",
+    "delete": "حذف",
+    "deleteConfirmTitle_zero": "حذف {{count}} صورة؟",
+    "deleteConfirmTitle_one": "حذف صورة واحدة؟",
+    "deleteConfirmTitle_two": "حذف صورتين؟",
+    "deleteConfirmTitle_few": "حذف {{count}} صور؟",
+    "deleteConfirmTitle_many": "حذف {{count}} صورة؟",
+    "deleteConfirmTitle_other": "حذف {{count}} صورة؟",
+    "deleteConfirmBody": "تُزال الملفات والصور المصغّرة من التخزين. لا يمكن التراجع عن هذا.",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "download": "تنزيل",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_zero": "مشاركة {{count}} صورة",
+    "shareTitle_one": "مشاركة صورة واحدة",
+    "shareTitle_two": "مشاركة صورتين",
+    "shareTitle_few": "مشاركة {{count}} صور",
+    "shareTitle_many": "مشاركة {{count}} صورة",
+    "shareTitle_other": "مشاركة {{count}} صورة",
+    "shareDescription": "يمكن لأي شخص لديه الرابط عرض هذه الصور وتنزيلها حتى تنتهي صلاحيته أو تُبطِله.",
+    "title": "العنوان",
+    "expiresAfter": "تنتهي الصلاحية بعد",
+    "linkExpiry": "انتهاء صلاحية الرابط",
+    "expiry": {
+      "days_zero": "{{count}} يوم",
+      "days_one": "يوم واحد",
+      "days_two": "يومان",
+      "days_few": "{{count}} أيام",
+      "days_many": "{{count}} يوم",
+      "days_other": "{{count}} يوم",
+      "never": "أبداً"
+    },
+    "createErrorTitle": "تعذّر إنشاء الرابط",
+    "createLink": "إنشاء رابط",
+    "link": "الرابط",
+    "noExpiry": "لا تنتهي صلاحية هذا الرابط.",
+    "expires": "تنتهي الصلاحية {{when}}.",
+    "manageLinks": "أدِر الروابط ضمن المشاركات.",
+    "linkCopied": "نُسخ الرابط إلى الحافظة.",
+    "linkShared": "تمت مشاركة الرابط.",
+    "copyLink": "نسخ الرابط"
+  },
+  "shares": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة لمشاركة الصور.",
+    "noPermission": "لا يشمل دورك المشاركة.",
+    "heading": "المشاركات",
+    "description": "روابط تتيح لأشخاص خارج {{name}} عرض صور محددة وتنزيلها. إبطال الرابط يوقفه فوراً.",
+    "loading": "جارٍ تحميل المشاركات",
+    "loadErrorTitle": "تعذّر تحميل المشاركات",
+    "empty": "لا روابط بعد. حدّد صوراً في المعرض واختر «مشاركة».",
+    "openGallery": "فتح المعرض",
+    "rowCreated_zero": "{{count}} صورة · أُنشئ في {{created}}",
+    "rowCreated_one": "صورة واحدة · أُنشئ في {{created}}",
+    "rowCreated_two": "صورتان · أُنشئ في {{created}}",
+    "rowCreated_few": "{{count}} صور · أُنشئ في {{created}}",
+    "rowCreated_many": "{{count}} صورة · أُنشئ في {{created}}",
+    "rowCreated_other": "{{count}} صورة · أُنشئ في {{created}}",
+    "neverExpires": " · لا تنتهي صلاحيته أبداً",
+    "expiresOn": " · تنتهي صلاحيته في {{expires}}",
+    "status": {
+      "active": "نشط",
+      "expired": "منتهي الصلاحية",
+      "revoked": "مُبطَل"
+    },
+    "copyLink": "نسخ الرابط",
+    "shareEllipsis": "مشاركة…",
+    "revoke": "إبطال {{title}}",
+    "revokeButton": "إبطال",
+    "linkCopied": "نُسخ الرابط إلى الحافظة.",
+    "linkShared": "تمت مشاركة الرابط."
+  },
+  "admin": {
+    "heading": "الإدارة",
+    "description": "كل المستخدمين والمؤسسات في هذا النشر. تُسجَّل الإجراءات هنا في سجل التدقيق.",
+    "onlyAdmins": "يمكن لمديري المنصة فقط فتح هذه الصفحة.",
+    "sectionsLabel": "أقسام الإدارة",
+    "tabs": {
+      "users": "المستخدمون",
+      "organizations": "المؤسسات",
+      "audit": "سجل التدقيق"
+    },
+    "searchLabel": "البحث بالبريد الإلكتروني",
+    "searchPlaceholder": "name@example.com",
+    "loadingUsers": "جارٍ تحميل المستخدمين",
+    "usersErrorTitle": "تعذّر تحميل المستخدمين",
+    "userSummary_zero": "{{count}} مستخدم{{extra}}.",
+    "userSummary_one": "مستخدم واحد{{extra}}.",
+    "userSummary_two": "مستخدمان{{extra}}.",
+    "userSummary_few": "{{count}} مستخدمين{{extra}}.",
+    "userSummary_many": "{{count}} مستخدم{{extra}}.",
+    "userSummary_other": "{{count}} مستخدم{{extra}}.",
+    "showingNewest": "، مع عرض أحدث {{count}}",
+    "you": "(أنت)",
+    "joined": "انضم في {{date}}",
+    "emailNotVerified": " · البريد الإلكتروني غير مُتحقَّق منه",
+    "platformAdmin": "مدير المنصة",
+    "banned": "محظور",
+    "bannedReason": "محظور: {{reason}}",
+    "unban": "رفع الحظر",
+    "unbanUser": "رفع الحظر عن {{email}}",
+    "removeAdmin": "إزالة صفة المدير",
+    "makeAdminShort": "تعيين مديراً",
+    "removeAdminFrom": "إزالة صفة المدير عن {{email}}",
+    "makeAdmin": "تعيين {{email}} مديراً",
+    "signOutEverywhereButton": "تسجيل الخروج من كل مكان",
+    "signOutEverywhere": "تسجيل خروج {{email}} من كل مكان",
+    "ban": "حظر",
+    "banUser": "حظر {{email}}",
+    "banConfirmTitle": "حظر {{email}}؟",
+    "banConfirmBody": "تنتهي جلساته الآن ولا يمكنه تسجيل الدخول حتى يُرفَع الحظر. يظهر له السبب ويُحفَظ في سجل التدقيق.",
+    "reasonLabel": "السبب",
+    "cancel": "إلغاء",
+    "banConfirm": "حظر المستخدم",
+    "loadingOrganizations": "جارٍ تحميل المؤسسات",
+    "organizationsErrorTitle": "تعذّر تحميل المؤسسات",
+    "organizationsTable": "المؤسسات، الأحدث أولاً",
+    "th": {
+      "organization": "المؤسسة",
+      "members": "الأعضاء",
+      "photos": "الصور",
+      "storage": "التخزين",
+      "created": "الإنشاء"
+    },
+    "loadingAudit": "جارٍ تحميل سجل التدقيق",
+    "auditErrorTitle": "تعذّر تحميل سجل التدقيق",
+    "auditCaption": "إدخالات التدقيق عبر كل المؤسسات، الأحدث أولاً",
+    "auditDetailHeading": "المؤسسة",
+    "platform": "المنصة"
+  },
+  "members": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة لإدارة الأعضاء.",
+    "heading": "الأعضاء",
+    "description": "الأشخاص في {{name}} وما يمكنهم فعله.",
+    "count_zero": "{{count}} عضو",
+    "count_one": "عضو واحد",
+    "count_two": "عضوان",
+    "count_few": "{{count}} أعضاء",
+    "count_many": "{{count}} عضو",
+    "count_other": "{{count}} عضو",
+    "pendingInvitations": "الدعوات المعلّقة",
+    "inviteHeading": "دعوة شخص",
+    "emailLabel": "البريد الإلكتروني",
+    "roleLabel": "الدور",
+    "sendInvitation": "إرسال الدعوة",
+    "invitationSent": "أُرسلت الدعوة إلى {{email}}.",
+    "you": "(أنت)",
+    "roleFor": "دور {{name}}",
+    "remove": "إزالة",
+    "removeMember": "إزالة {{name}}",
+    "invitedAs": "مدعوّ بصفة",
+    "cancel": "إلغاء",
+    "cancelInvitation": "إلغاء الدعوة لـ {{email}}"
+  },
+  "audit": {
+    "heading": "سجل التدقيق",
+    "description": "أحدث التغييرات في {{name}}. يمكن للمالكين والمديرين عرض هذه الصفحة.",
+    "thisOrganization": "هذه المؤسسة",
+    "loading": "جارٍ تحميل سجل التدقيق",
+    "loadErrorTitle": "تعذّر تحميل سجل التدقيق",
+    "noAccess": "لا يشمل دورك الوصول إلى التدقيق.",
+    "empty": "لا شيء مُسجَّل بعد.",
+    "tableCaption": "إدخالات التدقيق، الأحدث أولاً",
+    "detailsHeading": "التفاصيل",
+    "when": "متى",
+    "who": "من",
+    "action": "الإجراء"
+  },
+  "organizations": {
+    "firstTitle": "أنشئ مؤسستك الأولى",
+    "newTitle": "مؤسسة جديدة",
+    "description": "تحتوي المؤسسات على علاماتك المائية وصورك وفريقك. ستكون مالكها.",
+    "createFailed": "تعذّر إنشاء المؤسسة.",
+    "nameLabel": "الاسم",
+    "slugLabel": "معرّف الرابط",
+    "slugHint": "أحرف لاتينية صغيرة وأرقام وواصلات. يُستخدَم في الروابط ويجب أن يكون فريداً.",
+    "submit": "إنشاء المؤسسة"
+  },
+  "import": {
+    "takePhoto": "التقاط صورة",
+    "cancel": "إلغاء",
+    "saveToProvider": "الحفظ في {{provider}}",
+    "url": {
+      "title": "الاستيراد من رابط",
+      "description": "الصق عنوان صورة على الويب. سنجلبها ونضيفها هنا.",
+      "linkLabel": "رابط الصورة",
+      "errorTitle": "تعذّر استيراد هذا الرابط",
+      "fetch": "جلب"
+    },
+    "onedrive": {
+      "title": "الاستيراد من OneDrive",
+      "name": "OneDrive",
+      "description": "سجّل الدخول إلى Microsoft، ثم اختر الصور لإضافتها.",
+      "loading": "جارٍ تحميل OneDrive",
+      "empty": "لا مجلدات أو صور هنا.",
+      "folderPath": "مسار المجلد",
+      "errorTitle": "فشل الاستيراد من OneDrive",
+      "tryAgain": "إعادة المحاولة",
+      "noneSelected": "لم تُحدَّد صور",
+      "selectedCount": "{{count}} محدَّدة",
+      "addSelected": "إضافة المحدَّدة"
+    }
+  },
+  "video": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة لوضع علامة مائية على الفيديو.",
+    "heading": "وضع العلامة المائية على الفيديو",
+    "description": "طبّق إعداداً مسبقاً على فيديو كامل. تُوضَع علامة مائية على كل إطار في متصفحك ويُحتفَظ بالصوت؛ لا يُرفَع أي شيء.",
+    "checkingSupport": "جارٍ التحقق من دعم الفيديو",
+    "unsupportedTitle": "الفيديو غير مدعوم في هذا المتصفح",
+    "unsupportedBody": "لا يستطيع متصفحك ترميز الفيديو. تستطيع ذلك متصفحات Chrome أو Edge أو Safari 17 والأحدث.",
+    "emptyHint": "لتطبيقه على فيديو.",
+    "addVideo": "إضافة فيديو",
+    "dropHint": "أفلِت فيديو واحداً هنا، أو",
+    "formatsHint": "MP4 أو WebM أو MOV. كل شيء يحدث في متصفحك؛ لا يُرفَع أي شيء، والمعرض لا يقبل مقاطع الفيديو بعد.",
+    "fileMeta": "{{width}} × {{height}} بكسل · {{duration}} ثانية · {{size}} · {{audio}}",
+    "choosePresetPreview": "اختر إعداداً مسبقاً لمعاينة العلامة المائية على إطار.",
+    "outputSize": "المُخرَج {{width}} × {{height}} بكسل.",
+    "transcodingProgress": "تقدّم إعادة الترميز",
+    "progress": {
+      "noEta": "الإطار {{frame}} · {{percent}}%",
+      "withEta": "الإطار {{frame}} · {{percent}}% · يتبقى نحو {{seconds}} ثانية"
+    },
+    "cancel": "إلغاء",
+    "cancelled": "أُلغيت إعادة الترميز.",
+    "runErrorTitle": "تعذّر وضع علامة مائية على الفيديو",
+    "download": "تنزيل {{fileName}}",
+    "share": "مشاركة",
+    "presets": "الإعدادات المسبقة",
+    "placement": "التموضع",
+    "placementOptions": {
+      "smart": "ذكي",
+      "bottomRight": "أسفل اليمين",
+      "bottomLeft": "أسفل اليسار",
+      "topRight": "أعلى اليمين",
+      "topLeft": "أعلى اليسار",
+      "center": "الوسط"
+    },
+    "quality": "الجودة",
+    "qualityOptions": {
+      "low": "منخفضة",
+      "standard": "قياسية",
+      "high": "عالية"
+    },
+    "resolution": "الدقة",
+    "resolutionOptions": {
+      "original": "الأصلية",
+      "fit1080p": "ملاءمة 1080p",
+      "fit720p": "ملاءمة 720p"
+    },
+    "watermarking": "جارٍ وضع العلامة المائية…",
+    "watermarkVideo": "وضع علامة مائية على الفيديو",
+    "fixedPlacementNote": "تحتفظ العلامة المائية بموضع ثابت واحد طوال الفيديو. يُنسَخ الصوت كما هو عندما يلائم المُخرَج، وإلا فيُعاد ترميزه.",
+    "renderingPreview": "جارٍ تصيير المعاينة",
+    "previewAlt": "العلامة المائية على إطار من الفيديو"
+  },
+  "documents": {
+    "orgRequired": "أنشئ مؤسسة أو انضم إلى واحدة لوضع علامة مائية على المستندات.",
+    "heading": "المستندات",
+    "description": "اطبع إعداداً مسبقاً على كل صفحة من ملف PDF. تُعالَج الملفات في متصفحك وتُنزَّل واحداً تلو الآخر أو كملف ZIP.",
+    "emptyHint": "لوضع علامة مائية على المستندات به.",
+    "addPdfs": "إضافة ملفات PDF",
+    "dropHint": "أفلِت ملفات PDF هنا، أو",
+    "filesHint": "حتى {{max}} ملف، {{size}} لكل منها. تُوضَع علامة مائية على كل صفحة في متصفحك؛ لا يُرفَع أي شيء.",
+    "skipped_zero": "تم تخطّي {{count}} ملف: ليست بصيغة PDF أو تتجاوز {{max}}.",
+    "skipped_one": "تم تخطّي ملف واحد: ليس بصيغة PDF أو يتجاوز {{max}}.",
+    "skipped_two": "تم تخطّي ملفين: ليسا بصيغة PDF أو يتجاوزان {{max}}.",
+    "skipped_few": "تم تخطّي {{count}} ملفات: ليست بصيغة PDF أو تتجاوز {{max}}.",
+    "skipped_many": "تم تخطّي {{count}} ملف: ليست بصيغة PDF أو تتجاوز {{max}}.",
+    "skipped_other": "تم تخطّي {{count}} ملف: ليست بصيغة PDF أو تتجاوز {{max}}.",
+    "fileCount_zero": "{{count}} مستند",
+    "fileCount_one": "مستند واحد",
+    "fileCount_two": "مستندان",
+    "fileCount_few": "{{count}} مستندات",
+    "fileCount_many": "{{count}} مستند",
+    "fileCount_other": "{{count}} مستند",
+    "clearList": "مسح القائمة",
+    "watermarkingProgress": "تقدّم وضع العلامة المائية",
+    "progressFinished": "اكتمل {{done}} من {{total}}",
+    "progressFailed": "، فشل {{count}}",
+    "progressEnd": ".",
+    "listLabel": "المستندات لوضع علامة مائية",
+    "downloadFile": "تنزيل {{fileName}}",
+    "removeFile": "إزالة {{fileName}}",
+    "presetHint": "أشِّر على واحد أو أكثر؛ تُرسَم بالترتيب الذي أشّرت به، اللاحقة فوق السابقة.",
+    "placement": "التموضع",
+    "smartPlacementHint": "التموضع الذكي مخصص للصور؛ اختر ركناً أو موضعاً مخصصاً للمستندات.",
+    "watermarkEmpty": "وضع علامة مائية على المستندات",
+    "watermarkCount": "وضع علامة مائية على {{count}}",
+    "downloadZip": "تنزيل {{count}} كملف ZIP",
+    "savedAsHint": "يُحفَظ كل مستند باسم {name}-watermarked.pdf. تُرفَض ملفات PDF المشفّرة."
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "تحقّق من صندوق الوارد",
+      "description": "أرسلنا رابط تحقّق إلى {{email}}. تنتهي صلاحيته خلال ساعة واحدة.",
+      "resent": "رابط تحقّق جديد في طريقه إليك.",
+      "resend": "إعادة إرسال بريد التحقّق"
+    },
+    "tool": {
+      "title": "التحقّق من صورة",
+      "description": "تحقّق مما إذا كانت صورة PNG تحمل علامة Watermark Pro غير مرئية واقرأ رسالتها المخفيّة. لا شيء يغادر متصفحك."
+    },
+    "checkPng": "التحقّق من ملف PNG",
+    "checking": "جارٍ التحقق…",
+    "noneFound": "لم يُعثَر على علامة غير مرئية في هذه الصورة."
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "جارٍ تحميل الإعدادات المسبقة",
+    "loadErrorTitle": "تعذّر تحميل الإعدادات المسبقة",
+    "emptyTitle": "لا إعدادات مسبقة بعد",
+    "createInLibrary": "أنشئ إعداداً مسبقاً في المكتبة",
+    "legend": "الإعدادات المسبقة",
+    "importTitle": "استيراد إعدادات مسبقة",
+    "importDescription": "اختر ملف إعدادات مسبقة من Watermark Pro. تُضاف إعداداته المسبقة، وأي شعارات يستخدمها، إلى هذه المكتبة.",
+    "presetFileLabel": "ملف الإعدادات المسبقة",
+    "noPresets": "لا يحتوي ملف الإعدادات المسبقة هذا على إعدادات مسبقة.",
+    "fileCount_zero": "{{count}} إعداد مسبق في هذا الملف",
+    "fileCount_one": "إعداد مسبق واحد في هذا الملف",
+    "fileCount_two": "إعدادان مسبقان في هذا الملف",
+    "fileCount_few": "{{count}} إعدادات مسبقة في هذا الملف",
+    "fileCount_many": "{{count}} إعداد مسبق في هذا الملف",
+    "fileCount_other": "{{count}} إعداد مسبق في هذا الملف",
+    "renamed": "يوجد بالفعل إعداد مسبق باسم «{{name}}»؛ يُستورَد باسم «{{finalName}}».",
+    "cancel": "إلغاء",
+    "importButton_zero": "استيراد {{count}} إعداد مسبق",
+    "importButton_one": "استيراد إعداد مسبق واحد",
+    "importButton_two": "استيراد إعدادين مسبقين",
+    "importButton_few": "استيراد {{count}} إعدادات مسبقة",
+    "importButton_many": "استيراد {{count}} إعداد مسبق",
+    "importButton_other": "استيراد {{count}} إعداد مسبق"
+  },
+  "landing": {
+    "nav": "الحساب",
+    "signIn": "تسجيل الدخول",
+    "createAccount": "إنشاء حساب",
+    "eyebrow": "مجاني ومفتوح المصدر",
+    "heroBody": "احمِ تصويرك دون أن تفقد الصورة. يُجري Watermark Pro العمل الثقيل في متصفحك، ويُبقي أصولك خاصة، ويمنح فريقك أدواراً ذات معنى حقيقي.",
+    "createWorkspace": "أنشئ مساحة عملك",
+    "featuresHeading": "ما الذي يفعله",
+    "features": {
+      "bulk": {
+        "title": "مهام بالجملة",
+        "body": "أفلِت مئات الصور وضع علامة مائية عليها جميعاً في تمريرة واحدة، في متصفحك."
+      },
+      "library": {
+        "title": "مكتبة العلامات المائية",
+        "body": "احفظ علامات نصية ورمزية وشعارات مرة واحدة؛ طبّقها في أي مكان بنقرة."
+      },
+      "smart": {
+        "title": "التموضع الذكي",
+        "body": "تُحلَّل كل صورة لتستقر العلامة حيث تُقرأ أفضل وتبقى بعيدة عن الموضوع."
+      },
+      "contrast": {
+        "title": "التباين التلقائي",
+        "body": "تُختار النسخة الفاتحة أو الداكنة وقوة الحدّ لكل صورة، قابلة للتعديل عند اختلافك."
+      },
+      "teams": {
+        "title": "الفِرق والأدوار",
+        "body": "مؤسسات بأدوار المالك والمدير والمحرّر والمشاهد، مُطبَّقة على الخادم."
+      },
+      "trusted": {
+        "title": "مبنيّ ليكون موثوقاً",
+        "body": "سياسة أمان محتوى صارمة، وإجراءات مُدقَّقة، وصور لا تغادر متصفحك أبداً إلا إذا حفظتها."
+      }
+    },
+    "footer": "Watermark Pro برنامج مفتوح المصدر بموجب رخصة MIT.",
+    "privacy": "الخصوصية",
+    "terms": "الشروط"
+  },
+  "legal": {
+    "signIn": "تسجيل الدخول",
+    "lastUpdated": "آخر تحديث في {{date}}",
+    "readSibling": "اقرأ <sibling>{{siblingLabel}}</sibling>، أو عُد إلى <home>الصفحة الرئيسية</home>.",
+    "footer": "Watermark Pro برنامج مفتوح المصدر بموجب رخصة MIT.",
+    "privacy": {
+      "title": "الخصوصية",
+      "intro": "صُمّم Watermark Pro لتبقى صورك ملكاً لك. تشرح هذه الصفحة بلغة واضحة ما يحدث لصورك ومعلومات حسابك، استناداً إلى الضوابط التي يطبّقها المشروع فعلياً.",
+      "siblingLabel": "شروط الخدمة",
+      "photos": {
+        "heading": "تبقى صورك في متصفحك",
+        "p1": "يجري وضع العلامة المائية بالكامل على جهازك. يفكّ المحرّر وأداة الجملة تشفير صورك في المتصفح، ويصيّرانها في Web Workers، ويبنيان الملفات النهائية في الذاكرة. معاينة علامة مائية لا ترفع أبداً الصورة المطبَّقة عليها.",
+        "p2": "تُجمَّع الصادرات محلياً وتُسلَّم إليك عبر رابط تنزيل من المصدر نفسه يُحرَّر لحظة بدء التنزيل. لا تُرسَل أصولك أبداً إلى خادم لمعاينتها أو وضع علامة مائية عليها."
+      },
+      "storage": {
+        "heading": "ما نخزّنه، وفقط عندما تطلب",
+        "p1": "لا يُحفَظ شيء على خوادمنا ما لم تختر حفظه. عند حفظ صورة أو صورة مصغّرة أو شعار، يُخزَّن في Cloudflare R2 تحت مفاتيح محصورة بمؤسستك، ولا يُتاح للعموم أبداً، ويُقدَّم فقط لأعضاء تلك المؤسسة المسجّلين الدخول بتخزين مؤقت خاص.",
+        "p2": "لكل مؤسسة حصص للصور والشعارات والتخزين. يُسجَّل كل رفع وكل حذف في سجل التدقيق."
+      },
+      "metadata": {
+        "heading": "تُزال البيانات الوصفية افتراضياً",
+        "p1": "يُعاد ترميز كل صادر من وحدات البكسل، لذا لا تُنقَل أي بيانات وصفية ما لم تقرر الاحتفاظ بها. يزيل الإعداد الافتراضي كل بيانات الكاميرا والموقع قبل أن يصل الملف إلى تنزيلك أو ورقة المشاركة أو المعرض.",
+        "p2": "يتيح لك وضعان اختياريان لكل عملية تصدير الاحتفاظ ببيانات الكاميرا مع إزالة موقع GPS، أو الاحتفاظ بكل شيء كما هو. تُقرأ البيانات الوصفية وتُكتَب في المتصفح؛ لا يُرفَع أي شيء لذلك."
+      },
+      "sharing": {
+        "heading": "روابط المشاركة",
+        "p1": "يحمل رابط المشاركة رمزاً موقّعاً بانتهاء صلاحية مدمج ويمكن إبطاله في أي وقت. الصفحات العامة التي يفتحها الرابط لا تحمل أي جلسة ومحدودة المعدل حسب العنوان.",
+        "p2": "الروابط المنتهية والمُبطَلة والمُعبَث بها والمجهولة تُعيد كلها الاستجابة المحايدة نفسها «غير موجود»، فلا يكشف الرابط شيئاً بمجرد توقفه عن العمل. إنشاء الروابط وإبطالها مقصوران على الأعضاء المخوَّلين ويخضعان للتدقيق."
+      },
+      "account": {
+        "heading": "حسابك",
+        "p1": "يحتاج الحساب إلى بريد إلكتروني وكلمة مرور، ويجب التحقق من البريد قبل أن يصبح الحساب نشطاً. تُحفَظ الجلسات في ملفات تعريف ارتباط HttpOnly وSameSite=Lax، ومُعلَّمة Secure على المصادر الآمنة.",
+        "p2": "تنتهي صلاحية روابط إعادة تعيين كلمة المرور بعد ساعة وتُسجّل الخروج من جلساتك الأخرى عند استخدامها."
+      },
+      "analytics": {
+        "heading": "التحليلات وملفات تعريف الارتباط",
+        "p1": "لا نضع أي ملفات تعريف ارتباط لتحليلات أو إعلانات من طرف ثالث. القياس الوحيد هو Cloudflare Web Analytics، وهو بلا ملفات تعريف ارتباط ولا يتعقّبك عبر المواقع.",
+        "p2": "يتواصل التطبيق مع مصدرَين خارجيَّين فقط، كلاهما من Cloudflare: أداة Turnstile التي تفحص طلبات التسجيل وإعادة تعيين كلمة المرور بحثاً عن الروبوتات، وإشارة التحليلات بلا ملفات تعريف ارتباط. تُقدَّم الخطوط والأنماط وكل شيء آخر من هذا الموقع."
+      },
+      "audit": {
+        "heading": "سجل التدقيق",
+        "p1": "تُكتَب عمليات التسجيل وكل تغيير في المؤسسة والعضوية والدعوة والمكتبة والصورة والمشاركة في سجل تدقيق للإلحاق فقط. لا يمكن قراءة هذا السجل إلا لمالكي المؤسسة ومديريها."
+      },
+      "reporting": {
+        "heading": "الإبلاغ عن مشكلة",
+        "p1": "يمكن الإبلاغ عن مشكلات الأمان بشكل خاص عبر مستودع المشروع على GitHub بدلاً من مشكلة عامة. تصف سياسة الأمان في المستودع ما ينبغي تضمينه ومدى سرعة تلقّيك للرد."
+      }
+    },
+    "terms": {
+      "title": "شروط الخدمة",
+      "intro": "تغطّي هذه الشروط استخدامك لـ Watermark Pro. كُتبت لتُقرأ، وتصف كيف تتصرف الخدمة فعلياً بدلاً من إضافة ادعاءات لا تفي بها.",
+      "siblingLabel": "سياسة الخصوصية",
+      "accepting": {
+        "heading": "قبول هذه الشروط",
+        "p1": "يعني استخدام Watermark Pro موافقتك على هذه الشروط. إذا لم توافق، فيُرجى عدم استخدام الخدمة."
+      },
+      "whatItDoes": {
+        "heading": "ما تفعله الخدمة",
+        "p1": "يضع Watermark Pro علامات مائية على الصور. يجري وضع العلامة المائية نفسه في متصفحك؛ أما الميزات الاختيارية مثل حفظ الصور والشعارات، والعمل ضمن فريق، والمشاركة فتستخدم تخزيناً على الخادم لدى Cloudflare.",
+        "p2": "البرنامج مجاني ومفتوح المصدر بموجب رخصة MIT."
+      },
+      "account": {
+        "heading": "حسابك",
+        "p1": "تحتاج ميزات الفريق إلى حساب ببريد إلكتروني مُتحقَّق منه. احتفظ بكلمة مرورك لنفسك؛ أنت مسؤول عمّا يحدث تحت حسابك.",
+        "p2": "يمكنك تسجيل الخروج من جلساتك في أي وقت، ويؤدي استخدام رابط إعادة تعيين كلمة المرور إلى تسجيل الخروج من جلساتك الأخرى."
+      },
+      "content": {
+        "heading": "محتواك",
+        "p1": "تحتفظ بكل حق تملكه بالفعل في الصور والعلامات المائية التي ترفعها أو تنشئها. أنت مسؤول عن امتلاك حق استخدام الصور التي تجلبها إلى الخدمة.",
+        "p2": "يعالج التطبيق محتواك فقط لتقديم الميزات التي تستخدمها، ويخزّنه فقط عندما تختار حفظه. لا يُستخدَم أبداً لتدريب أي شيء ولا يُشارَك مع أطراف ثالثة."
+      },
+      "acceptableUse": {
+        "heading": "الاستخدام المقبول",
+        "p1": "لا تستخدم الخدمة لمخالفة القانون، أو لرفع أو مشاركة محتوى لا تملك حق استخدامه. لا تحاول تجاوز ضوابط الأمان أو حدود المعدل، أو الوصول إلى بيانات تخص مؤسسات لست عضواً فيها.",
+        "p2": "يتبع الوصول داخل المؤسسة دورك، وتُطبَّق تلك الأدوار على الخادم."
+      },
+      "teams": {
+        "heading": "الفِرق والأدوار",
+        "p1": "يمكن أن يكون للمؤسسة أدوار المالك والمدير والمحرّر والمشاهد. ما يمكن لكل عضو رؤيته وفعله محصور بدوره، ويُتحقَّق منه في كل طلب بدلاً من مجرد إخفائه في الواجهة."
+      },
+      "availability": {
+        "heading": "التوفّر والضمان والتغييرات",
+        "p1": "تُقدَّم الخدمة «كما هي»، دون أي ضمان من أي نوع، وفق ما تنص عليه رخصة MIT. قد تتغير الميزات، وقد تكون الخدمة غير متاحة أحياناً.",
+        "p2": "قد تُحدَّث هذه الشروط؛ ويبيّن التاريخ أعلى هذه الصفحة موعد آخر تغيير لها. يعني استمرارك في استخدام الخدمة بعد أي تغيير قبولك للشروط المُحدَّثة."
+      },
+      "openSource": {
+        "heading": "المصدر المفتوح",
+        "p1": "شيفرة Watermark Pro المصدرية متاحة بموجب رخصة MIT، التي تتيح لك فحصها وتشغيلها وتعديلها وفق شروط تلك الرخصة."
+      },
+      "contact": {
+        "heading": "التواصل",
+        "p1": "يمكن طرح الأسئلة حول هذه الشروط، والإبلاغ عن مشكلات الأمان، عبر مستودع المشروع على GitHub."
+      }
+    }
+  },
+  "share": {
+    "loading": "جارٍ تحميل الصور",
+    "unavailableTitle": "هذا الرابط غير متاح",
+    "unavailableBody": "ربما انتهت صلاحيته أو أُبطِل، أو العنوان غير مكتمل. اطلب رابطاً جديداً ممن أرسله إليك.",
+    "about": "عن Watermark Pro",
+    "photoCount_zero": "{{count}} صورة",
+    "photoCount_one": "صورة واحدة",
+    "photoCount_two": "صورتان",
+    "photoCount_few": "{{count}} صور",
+    "photoCount_many": "{{count}} صورة",
+    "photoCount_other": "{{count}} صورة",
+    "availableUntil": " · متاح حتى {{date}}",
+    "shareLink": "شارك هذا الرابط",
+    "linkCopied": "نُسخ الرابط إلى الحافظة.",
+    "linkShared": "تمت مشاركة الرابط.",
+    "openPhoto": "فتح {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "تمت المشاركة عبر <home>Watermark Pro</home>. تبقى الصور ملكاً لأصحابها.",
+    "download": "تنزيل",
+    "close": "إغلاق"
+  },
+  "root": {
+    "somethingWentWrong": "حدث خطأ ما",
+    "notFound": {
+      "title": "الصفحة غير موجودة",
+      "body": "قد يكون العنوان مكتوباً بشكل خاطئ، أو ربما نُقلت الصفحة.",
+      "back": "العودة إلى البداية"
+    }
+  }
+}

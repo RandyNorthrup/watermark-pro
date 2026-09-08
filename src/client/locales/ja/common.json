@@ -1,0 +1,1065 @@
+{
+  "language": {
+    "menuLabel": "言語を変更"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "ダッシュボード",
+      "library": "ライブラリ",
+      "editor": "エディター",
+      "bulk": "一括",
+      "video": "動画",
+      "documents": "ドキュメント",
+      "gallery": "ギャラリー",
+      "shares": "共有",
+      "members": "メンバー",
+      "audit": "監査ログ",
+      "admin": "管理"
+    },
+    "skipToContent": "コンテンツにスキップ",
+    "menu": "メニュー",
+    "primaryNav": "メイン",
+    "primaryMenuNav": "メイン（メニュー）",
+    "toolsNav": "ツール",
+    "signOut": "サインアウト",
+    "accountMenu": "{{name}}のアカウントメニュー",
+    "menuDescription": "組織を切り替えるか、Watermark Proの各機能に移動します。",
+    "switchOrganizationFor": "組織：{{name}}。組織を切り替える",
+    "chooseOrganization": "組織を選択",
+    "chooseOrganizationShort": "組織を選択",
+    "organizations": "組織",
+    "newOrganization": "新しい組織",
+    "theme": {
+      "system": "テーマ：システムに従う。ライトに切り替える",
+      "light": "テーマ：ライト。ダークに切り替える",
+      "dark": "テーマ：ダーク。システムに切り替える"
+    }
+  },
+  "auth": {
+    "backToSignIn": "サインインに戻る",
+    "fields": {
+      "emailLabel": "メールアドレス",
+      "passwordLabel": "パスワード"
+    },
+    "login": {
+      "title": "おかえりなさい",
+      "description": "ワークスペースにサインインします。",
+      "footerPrompt": "初めてですか？",
+      "createAccount": "アカウントを作成",
+      "verifyTitle": "先にメールアドレスを確認してください",
+      "verifyBody": "{{email}}に確認リンクを送信しました。",
+      "resendIt": "再送信",
+      "forgotPassword": "パスワードをお忘れですか？",
+      "submit": "サインイン"
+    },
+    "signup": {
+      "title": "アカウントを作成",
+      "description": "確認リンクをメールアドレスに送信します。",
+      "footerPrompt": "すでにアカウントをお持ちですか？",
+      "signIn": "サインイン",
+      "nameLabel": "名前",
+      "passwordHint": "{{min}}文字以上。関連のない単語をいくつか組み合わせると効果的です。",
+      "submit": "アカウントを作成"
+    },
+    "forgotPassword": {
+      "title": "パスワードをリセット",
+      "description": "メールアドレスを入力してください。アカウントが存在する場合はリセットリンクを送信します。",
+      "sentTitle": "受信トレイをご確認ください",
+      "sentBody": "{{email}}がアカウントに登録されている場合、リセットリンクを送信します。リンクは1時間で期限切れになります。",
+      "submit": "リセットリンクを送信"
+    },
+    "resetPassword": {
+      "title": "新しいパスワードを設定",
+      "invalidTitle": "このリセットリンクは無効です",
+      "invalidBody": "期限切れになったか、すでに使用された可能性があります。",
+      "requestNew": "新しいリンクをリクエスト",
+      "invalidEnd": "。",
+      "newPasswordLabel": "新しいパスワード",
+      "passwordHint": "{{min}}文字以上。",
+      "confirmLabel": "パスワードの確認",
+      "mismatch": "パスワードが一致しません",
+      "submit": "パスワードを更新"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "招待は利用できません",
+      "title": "{{organizationName}}に参加",
+      "description": "{{inviterEmail}}があなたを{{role}}として招待しました。",
+      "roleLabel": "ロール：",
+      "decline": "辞退",
+      "accept": "招待を受ける"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "{{email}}でサインイン中",
+    "yourWorkspace": "あなたのワークスペース",
+    "yourRole": "あなたのロール：",
+    "toolsHeading": "ツール",
+    "tools": {
+      "library": {
+        "label": "ライブラリ",
+        "body": "テキスト・シンボル・ロゴのウォーターマークを一度デザインし、プリセットとして保存できます。"
+      },
+      "editor": {
+        "label": "エディター",
+        "body": "写真1枚を手作業でウォーターマーク。配置・切り抜き・リサイズ・エクスポートができます。"
+      },
+      "bulk": {
+        "label": "一括",
+        "body": "撮影全体にプリセットを適用し、結果をZIPでダウンロードできます。"
+      },
+      "gallery": {
+        "label": "ギャラリー",
+        "body": "チームが保存した写真を閲覧し、アルバムをリンクで共有できます。"
+      }
+    },
+    "overviewHeading": "概要",
+    "members": "メンバー",
+    "noPendingInvitations": "保留中の招待はありません。",
+    "pendingInvitations_other": "保留中の招待が{{count}}件あります。",
+    "manageMembers": "メンバーを管理",
+    "auditLog": "監査ログ",
+    "auditDescription": "メンバーシップと組織のすべての変更は、実行者と日時とともに記録されます。",
+    "viewAuditLog": "監査ログを表示"
+  },
+  "library": {
+    "orgRequired": "ウォーターマークライブラリを作成するには、組織を作成するか参加してください。",
+    "heading": "ウォーターマークライブラリ",
+    "description": "{{name}}のメンバー全員で共有するプリセット。1件ずつまたは一括で適用できます。",
+    "export": "エクスポート",
+    "exportPreset": "{{name}}をエクスポート",
+    "importPresets": "プリセットをインポート",
+    "newPreset": "新規プリセット",
+    "exportErrorTitle": "プリセットをエクスポートできませんでした",
+    "loadingPresets": "プリセットを読み込み中",
+    "loadErrorTitle": "ライブラリを読み込めませんでした",
+    "empty": "プリセットはまだありません。プリセットは、マーク（テキスト・シンボル・ロゴ）と、配置・コントラスト・スタイルの設定を組み合わせたものです。",
+    "createFirst": "最初のプリセットを作成",
+    "orgRequiredShort": "まず組織を作成するか参加してください。",
+    "loadingPreset": "プリセットを読み込み中",
+    "loadPresetErrorTitle": "プリセットを読み込めませんでした",
+    "presetGone": "そのプリセットは存在しません。",
+    "editSubtitleManage": "変更は、このプリセットを使用するすべての人に適用されます。",
+    "editSubtitleReadOnly": "閲覧専用ビュー。",
+    "cannotCreate": "あなたのロールではプリセットを作成できません。",
+    "newPresetSubtitle": "マークをデザインし、配置を決めて、ライブラリに保存します。",
+    "openInEditor": "{{name}}をエディターで開く",
+    "deletePreset": "{{name}}を削除",
+    "logoBadge": "ロゴ",
+    "autoContrast": "自動コントラスト",
+    "manualContrast": "手動コントラスト",
+    "updated": "{{date}}更新",
+    "exportLogoTypeError": "エクスポートできない画像形式のロゴがあります。",
+    "exportMissingLogoError": "ライブラリに存在しないロゴを参照しているプリセットがあります。",
+    "describe": {
+      "text": "「{{text}}」（{{fontFamily}}）",
+      "glyph": "グリフ{{glyph}}",
+      "icon": "アイコン{{name}}",
+      "logo": "ロゴ",
+      "qr": "{{content}}のQRコード"
+    },
+    "shape": {
+      "rectangle": "長方形",
+      "roundedRectangle": "角丸長方形",
+      "ellipse": "楕円",
+      "line": "直線"
+    },
+    "placement": {
+      "smart": "スマート配置",
+      "custom": "カスタム位置",
+      "random": "ランダム配置"
+    }
+  },
+  "designer": {
+    "presetName": "プリセット名",
+    "presetNamePlaceholder": "スタジオの署名",
+    "nameError": "プリセット名は60文字以内で入力してください。",
+    "sections": {
+      "label": "デザイナーのセクション",
+      "mark": "マーク",
+      "placement": "配置",
+      "style": "スタイル"
+    },
+    "markType": "マークの種類",
+    "saveError": "プリセットを保存できませんでした",
+    "savePreset": "プリセットを保存",
+    "saveChanges": "変更を保存",
+    "readOnlyHint": "あなたのロールではプリセットを閲覧できますが、変更はできません。",
+    "notAnImage": "そのファイルは、ブラウザーが読み取れる画像ではありません。",
+    "text": {
+      "label": "テキスト",
+      "hint": "最大{{lines}}行、{{max}}文字まで。日付やカメラなどのトークンは「詳細を挿入」から追加でき、写真ごとに差し込まれます。{location}は写真のGPS位置を画像に表示します。"
+    },
+    "qr": {
+      "content": "QRコードの内容",
+      "hint": "通常はリンクです。{{max}}文字まで。コードは常に明るい背景に濃い色で描画されるため、読み取り可能です。"
+    },
+    "tokens": {
+      "menu": "詳細を挿入",
+      "heading": "写真の詳細",
+      "date": "日付",
+      "time": "時刻",
+      "taken": "撮影日時",
+      "filename": "ファイル名",
+      "camera": "カメラ",
+      "lens": "レンズ",
+      "iso": "ISO",
+      "aperture": "絞り",
+      "shutter": "シャッタースピード",
+      "focal": "焦点距離",
+      "location": "位置情報（GPS）",
+      "index": "写真番号",
+      "count": "写真枚数",
+      "width": "幅",
+      "height": "高さ"
+    },
+    "font": {
+      "family": "フォント",
+      "weight": "太さ",
+      "specimen": "The quick brown fox"
+    },
+    "symbol": {
+      "icons": "アイコン",
+      "glyphLabel": "グリフ{{glyph}}",
+      "iconLabel": "アイコン{{label}}"
+    },
+    "shape": {
+      "label": "図形",
+      "rectangle": "長方形",
+      "roundedRectangle": "角丸長方形",
+      "ellipse": "楕円",
+      "line": "直線",
+      "length": "長さ",
+      "proportions": "比率",
+      "fill": "塗りつぶし",
+      "fillToggle": "図形を塗りつぶす",
+      "fillColour": "塗りつぶしの色",
+      "fillOpacity": "塗りつぶしの不透明度",
+      "strokeWidth": "線の太さ",
+      "customStrokeColour": "カスタムの線の色",
+      "strokeColour": "線の色"
+    },
+    "effects": {
+      "letterSpacing": "文字間隔",
+      "curve": "カーブ",
+      "effect": "効果",
+      "textEffect": "テキスト効果",
+      "solid": "ソリッド",
+      "outline": "アウトライン",
+      "emboss": "エンボス",
+      "engrave": "彫刻"
+    },
+    "placement": {
+      "mode": "配置モード",
+      "smart": "スマート",
+      "smartDescription": "各写真を解析し、最も落ち着いた隅を選びます",
+      "corner": "隅",
+      "cornerDescription": "端からの相対的な固定位置",
+      "custom": "カスタム",
+      "customDescription": "写真に対する割合で指定する正確な位置",
+      "random": "ランダム",
+      "randomDescription": "写真ごとに異なる位置。自動での除去が難しくなります",
+      "smartHint": "エンジンがすべての隅と端を、ディテール・コントラスト・被写体の観点で評価し、読みやすく最も邪魔にならない位置にマークを配置します。",
+      "randomHint": "各写真はランダムな隅に配置され、下のジッターの範囲でずらされます。同じ写真は常に同じ位置になります。",
+      "jitter": "ジッター",
+      "cornerLegend": "隅",
+      "horizontal": "水平",
+      "vertical": "垂直",
+      "anchor": {
+        "topLeft": "左上",
+        "topCenter": "上中央",
+        "topRight": "右上",
+        "middleLeft": "左中央",
+        "center": "中央",
+        "middleRight": "右中央",
+        "bottomLeft": "左下",
+        "bottomCenter": "下中央",
+        "bottomRight": "右下"
+      }
+    },
+    "style": {
+      "contrast": "コントラスト",
+      "contrastMode": "コントラストモード",
+      "auto": "自動",
+      "autoDescription": "写真ごとに明色または暗色のインクを選択",
+      "manual": "手動",
+      "manualDescription": "固定のインクと輪郭の強さ",
+      "colour": "色",
+      "colourDescription": "独自のインクの色",
+      "autoHint": "マークの下の領域に合わせてインクが明暗を切り替え、背景と色調が近すぎる場合にのみ輪郭を追加します。",
+      "ink": "インク",
+      "inkLight": "明色インク",
+      "inkDark": "暗色インク",
+      "inkColour": "インクの色",
+      "outlineStrength": "輪郭の強さ",
+      "appearance": "外観",
+      "opacity": "不透明度",
+      "size": "サイズ",
+      "ofWidth": "幅の{{percent}}",
+      "rotation": "回転",
+      "margin": "余白",
+      "backdrop": "マークの背面のボックス",
+      "boxOpacity": "ボックスの不透明度",
+      "tiling": "写真全体に繰り返す",
+      "spacing": "間隔"
+    },
+    "preview": {
+      "heading": "プレビュー",
+      "rendering": "プレビューを生成中",
+      "choosePhoto": "プレビューする写真を選択",
+      "tryYourPhoto": "自分の写真で試す",
+      "samplePhoto": "サンプル写真",
+      "alt": "対象写真のウォーターマークプレビュー",
+      "failed": "プレビューに失敗しました",
+      "chooseLogo": "プレビューを表示するには、ロゴを選択またはアップロードしてください。",
+      "nothingToPlace": "配置するものがありません。",
+      "inkLight": "明色インク",
+      "inkDark": "暗色インク",
+      "inkColour": "インク{{colour}}",
+      "customPosition": "カスタム位置、{{ink}}。",
+      "placed": "{{position}}に配置、{{ink}}。",
+      "position": {
+        "topLeft": "左上",
+        "topCenter": "上中央",
+        "topRight": "右上",
+        "middleLeft": "左中央",
+        "center": "中央",
+        "middleRight": "右中央",
+        "bottomLeft": "左下",
+        "bottomCenter": "下中央",
+        "bottomRight": "右下"
+      }
+    },
+    "logo": {
+      "loading": "ロゴを読み込み中",
+      "loadError": "ロゴを読み込めませんでした",
+      "empty": "ロゴはまだありません。透明な背景のPNG・JPEG・WebPをアップロードすると最適な結果が得られます。",
+      "choose": "ロゴを選択",
+      "item": "ロゴ{{name}}",
+      "delete": "ロゴ{{name}}を削除",
+      "upload": "ロゴファイルをアップロード",
+      "uploadButton": "ロゴをアップロード",
+      "hint": "PNG・JPEG・WebP（最大{{max}} MB）、または手書きの署名。",
+      "tooLarge": "ロゴは{{max}} MB以下にしてください。",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "ロゴを準備",
+        "title": "「{{name}}」を準備",
+        "description": "必要に応じて単色の背景を除去し、余白をトリミングして、透明なPNGとしてアップロードします。",
+        "before": "処理前",
+        "after": "処理後",
+        "previewNeedsCanvas": "プレビューにはブラウザーのキャンバスが必要です。",
+        "preview": "準備したロゴのプレビュー",
+        "removeBackground": "背景を除去",
+        "backgroundTolerance": "背景の許容値",
+        "trim": "透明な余白をトリミング",
+        "outputSize": "出力サイズ：{{size}} px",
+        "use": "このロゴを使用",
+        "chooseAnother": "別のロゴを選択"
+      },
+      "signature": {
+        "draw": "署名を描く",
+        "description": "指・ペン・マウスで署名します。インク部分に切り抜かれ、透明なロゴとしてライブラリに保存されます。",
+        "pad": "署名パッド。ここに描画します",
+        "pen": "ペン",
+        "penWidthGroup": "ペンの太さ",
+        "penWidth": "{{width}}ピクセルのペン",
+        "undo": "ストロークを元に戻す",
+        "clear": "消去",
+        "cancel": "キャンセル",
+        "save": "ロゴとして保存"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "エディターを使用するには、組織を作成するか参加してください。",
+    "heading": "エディター",
+    "description": "写真1枚にウォーターマークを追加します。プリセットを選び、必要に応じて手作業で配置し、切り抜き・リサイズ・ダウンロードできます。データがブラウザーの外に出ることはありません。",
+    "tabs": {
+      "watermark": "ウォーターマーク",
+      "crop": "切り抜き",
+      "adjust": "調整",
+      "resize": "リサイズ",
+      "export": "エクスポート"
+    },
+    "toolsLabel": "エディターツール",
+    "openPhoto": "写真を開く",
+    "openPhotoLabel": "写真を開く",
+    "fromLink": "リンクから",
+    "samplePhoto": "サンプル写真",
+    "sampleScene": "サンプルシーン",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "生成中",
+    "renderingPreview": "プレビューを生成中",
+    "undo": "元に戻す",
+    "redo": "やり直す",
+    "altCrop": "切り抜き枠付きの写真",
+    "altWatermark": "ウォーターマークを適用した写真",
+    "choosePresetHint": "プリセットを選んでウォーターマークを配置します。写真はキャンバスの任意の場所にドロップできます。",
+    "outputSize": "出力：{{width}} × {{height}} px。",
+    "notAnImage": "そのファイルは、ブラウザーが読み取れる画像ではありません。",
+    "previewFailed": "プレビューに失敗しました",
+    "exportFailed": "エクスポートに失敗しました",
+    "savedToGallery": "{{name}}を<galleryLink>ギャラリー</galleryLink>に保存しました。",
+    "applyToPhoto": "この写真に適用",
+    "applyToAll": "すべての写真に適用",
+    "removeOverride": "個別設定を解除",
+    "cancel": "キャンセル",
+    "dimensions": {
+      "left": "左",
+      "top": "上",
+      "width": "幅",
+      "height": "高さ",
+      "pxField": "{{label}}（px）"
+    },
+    "watermark": {
+      "emptyHint": "して、この写真に適用しましょう。",
+      "preset": "プリセット",
+      "addPreset": "別のプリセットを追加",
+      "maxMarks": "写真1枚につき最大{{max}}マーク",
+      "choosePreset": "プリセットを選択",
+      "marksHeading": "この写真のマーク",
+      "layersLabel": "レイヤー（下から上へ）",
+      "removedPreset": "削除されたプリセット",
+      "removeLayer": "{{name}}をこの写真から削除",
+      "adjusted": "この写真用に調整済み。ライブラリのプリセットは変更されません。",
+      "revert": "プリセットに戻す",
+      "placement": "配置"
+    },
+    "crop": {
+      "aspectRatio": "アスペクト比",
+      "photoSize": "写真は{{width}} × {{height}} pxです。",
+      "reset": "切り抜きをリセット",
+      "area": "切り抜き範囲。ドラッグで移動、矢印キーで微調整、Shiftで大きく移動します。",
+      "resizeHandle": "{{handle}}から切り抜きをリサイズ",
+      "handles": {
+        "n": "上端",
+        "s": "下端",
+        "e": "右端",
+        "w": "左端",
+        "ne": "右上隅",
+        "nw": "左上隅",
+        "se": "右下隅",
+        "sw": "左下隅"
+      }
+    },
+    "resize": {
+      "keepProportions": "縦横比を保持",
+      "shortcuts": "ショートカット",
+      "fit": "{{side}}に合わせる",
+      "percent": "{{value}}%",
+      "outputUnchanged": "出力：{{width}} × {{height}} px（変更なし）。",
+      "outputChanged": "出力：{{baseWidth}} × {{baseHeight}} から {{width}} × {{height}} px。",
+      "resetSize": "サイズをリセット"
+    },
+    "adjust": {
+      "filter": "フィルター",
+      "custom": "カスタム調整",
+      "filterValue": "フィルター：{{name}}",
+      "brightness": "明るさ",
+      "contrast": "コントラスト",
+      "saturation": "彩度",
+      "warmth": "色温度",
+      "sepia": "セピア",
+      "vignette": "ビネット",
+      "reset": "{{name}}をリセット",
+      "resetAll": "すべてリセット"
+    },
+    "orientation": {
+      "rotateLeft": "左に回転",
+      "rotateRight": "右に回転",
+      "flipHorizontal": "左右反転",
+      "flipVertical": "上下反転",
+      "straighten": "傾き補正"
+    },
+    "frame": {
+      "label": "フレーム",
+      "add": "フレームを追加",
+      "width": "フレームの幅",
+      "colour": "フレームの色"
+    },
+    "metadata": {
+      "heading": "メタデータ",
+      "strip": {
+        "label": "削除",
+        "help": "カメラ情報も位置情報も残しません。共有に最も安全です。"
+      },
+      "keepExceptLocation": {
+        "label": "位置情報以外を保持",
+        "help": "カメラ・レンズ・撮影日時は残り、GPSは削除されます。"
+      },
+      "keep": {
+        "label": "すべて保持",
+        "help": "写真にGPS位置情報があれば、それも含みます。"
+      },
+      "webpNote": "WebPのエクスポートでは常に削除されます。"
+    },
+    "export": {
+      "format": "形式",
+      "quality": "画質",
+      "invisibleMark": "不可視マーク",
+      "choosePng": "ピクセルにメッセージを埋め込むにはPNGを選択してください。",
+      "invisibleMessage": "不可視メッセージ",
+      "tooLong": "{{width}}×{{height}} の写真には長すぎます（{{capacity}}バイトまで）。",
+      "invisibleHint": "ピクセルに隠され、「検証」で読み取れます。PNGでのみ保持されます。",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}。フル解像度でブラウザー内でレンダリングされます{{share}}。",
+      "losslessClause": "、PNGは可逆圧縮",
+      "shareClause": "、「共有」で写真・メッセージなどこのデバイスの任意のアプリに送信できます",
+      "download": "ダウンロード",
+      "share": "共有",
+      "saveToGallery": "ギャラリーに保存",
+      "savedToFolder": "{{provider}}の「{{folder}}」フォルダに保存しました。"
+    },
+    "mark": {
+      "position": "ウォーターマークの位置。ドラッグで移動（余白・三分割・中央にスナップします。Altを押しながらで自由に配置）、ピンチでリサイズ、ひねって回転。矢印キーで微調整、プラスとマイナスでリサイズ、角括弧で回転します。",
+      "rotate": "ウォーターマークを回転",
+      "resize": "ウォーターマークをリサイズ"
+    }
+  },
+  "bulk": {
+    "orgRequired": "一括でウォーターマークを追加するには、組織を作成するか参加してください。",
+    "heading": "一括ウォーターマーク",
+    "description": "撮影全体に1つのプリセットを適用します。写真はブラウザー内で並列処理され、ZIPまたは1枚ずつダウンロードできます。",
+    "emptyHint": "して、バッチに適用しましょう。",
+    "addPhotos": "写真を追加",
+    "addFolder": "フォルダを追加",
+    "dropHint": "写真またはフォルダをここにドロップ、または",
+    "fromLink": "リンクから",
+    "capacity_other": "1バッチにつき最大{{max}}枚。処理は{{count}}個のワーカーを使ってブラウザー内で行われます。",
+    "skipped_other": "{{count}}件のファイルをスキップしました（画像ではありません）",
+    "importErrorTitle": "クラウドからインポートできませんでした",
+    "photoCount_other": "写真{{count}}枚",
+    "clearList": "リストをクリア",
+    "batchProgress": "バッチの進捗",
+    "progress": {
+      "finished": "全{{total}}枚中{{done}}枚完了",
+      "failed": "、{{n}}枚失敗",
+      "cancelled": "、{{n}}枚キャンセル",
+      "rate": "、{{seconds}}秒（{{rate}}枚/秒）",
+      "end": "。"
+    },
+    "photosList": "このバッチの写真",
+    "custom": "カスタム",
+    "selected": "選択中",
+    "status": {
+      "queued": "待機中",
+      "processing": "処理中",
+      "done": "完了",
+      "failed": "失敗",
+      "cancelled": "キャンセル"
+    },
+    "adjustPhoto": "{{name}}を調整",
+    "sharePhoto": "{{name}}を共有",
+    "downloadPhoto": "{{name}}をダウンロード",
+    "removePhoto": "{{name}}を削除",
+    "showAll": "{{count}}枚すべてを表示",
+    "presetHint": "1つ以上にチェックを入れてください。選択した順に適用され、後のものが先のものの上に重なります。",
+    "format": "形式",
+    "quality": "画質",
+    "invisibleMark": "不可視マーク",
+    "invisibleMessage": "不可視メッセージ",
+    "choosePng": "すべての写真にメッセージを埋め込むにはPNGを選択してください。",
+    "size": {
+      "label": "サイズ",
+      "original": "元のサイズ",
+      "fit": "{{side}} pxに合わせる"
+    },
+    "fileNames": "ファイル名",
+    "tokensLabel": "トークン：{{tokens}}。",
+    "names": {
+      "example": "例：{{example}}",
+      "mustProduceName": "パターンは名前を生成する必要があります。"
+    },
+    "photoAdjustments": "写真の調整",
+    "resume": "再開",
+    "pause": "一時停止",
+    "cancel": "キャンセル",
+    "start": "開始",
+    "retry": "{{count}}件を再試行",
+    "downloadZip": "{{count}}件をZIPでダウンロード",
+    "downloadReport": "レポートをダウンロード（CSV）",
+    "saveToGallery": "{{count}}件をギャラリーに保存",
+    "savedProgress": "全{{total}}件中{{done}}件を保存",
+    "allSaved": "すべて<galleryLink>ギャラリー</galleryLink>に保存しました。",
+    "someSaved": "{{failed}}件を保存できませんでした（ストレージ容量または制限）。残りは<galleryLink>ギャラリー</galleryLink>にあります。",
+    "savedToCloud_other": "{{count}}枚の写真を{{provider}}の「{{folder}}」フォルダに保存しました。",
+    "privacyNote": "スマート配置と自動コントラストは写真ごとに個別に計算されます。アップロードは一切行われません。",
+    "watch": {
+      "label": "フォルダを監視",
+      "stop": "停止",
+      "choose": "フォルダを選択",
+      "hint": "入力フォルダと出力フォルダを選択してください。入力フォルダに追加された新しい写真は、チェックしたプリセットでウォーターマークが追加され、出力フォルダに書き込まれます。このページを開いている間のみ動作します。",
+      "wrote": "{{name}}を書き込みました",
+      "failed": "{{name}}が失敗しました：{{error}}"
+    }
+  },
+  "gallery": {
+    "orgRequired": "ギャラリーを保持するには、組織を作成するか参加してください。",
+    "heading": "ギャラリー",
+    "description": "{{name}}が保存したウォーターマーク済みの写真。検索、プリセットでの絞り込み、ダウンロード、削除ができます。",
+    "usage_other": "写真{{count}}枚 · {{used}}/{{max}}",
+    "maxCount": "組織ごとに最大{{count}}枚",
+    "storageUsed": "使用ストレージ",
+    "storagePercent": "ストレージの{{percent}}%を使用",
+    "checkPhoto": "写真を選択",
+    "search": "検索",
+    "searchPlaceholder": "写真名",
+    "preset": "プリセット",
+    "allPresets": "すべてのプリセット",
+    "selectAll": "すべて選択",
+    "clearSelection": "選択を解除",
+    "photoCount_other": "写真{{count}}枚",
+    "share": "共有",
+    "shareEllipsis": "共有…",
+    "deleteErrorTitle": "削除できませんでした",
+    "loadingPhotos": "写真を読み込み中",
+    "loadErrorTitle": "ギャラリーを読み込めませんでした",
+    "empty": "写真はまだありません。エディターから1枚、または一括ツールからまとめて保存できます。",
+    "emptyFiltered": "これらの絞り込み条件に一致する写真はありません。",
+    "openEditor": "エディターを開く",
+    "openPhoto": "{{name}}を開く",
+    "selectPhoto": "{{name}}を選択",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "さらに読み込む",
+    "delete": "削除",
+    "deleteConfirmTitle_other": "{{count}}枚の写真を削除しますか？",
+    "deleteConfirmBody": "ファイルとサムネイルがストレージから削除されます。この操作は取り消せません。",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "download": "ダウンロード",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_other": "{{count}}枚の写真を共有",
+    "shareDescription": "リンクを知っている人は誰でも、有効期限が切れるか取り消すまで、これらの写真を閲覧・ダウンロードできます。",
+    "title": "タイトル",
+    "expiresAfter": "有効期限",
+    "linkExpiry": "リンクの有効期限",
+    "expiry": {
+      "days_other": "{{count}}日",
+      "never": "無期限"
+    },
+    "createErrorTitle": "リンクを作成できませんでした",
+    "createLink": "リンクを作成",
+    "link": "リンク",
+    "noExpiry": "このリンクに有効期限はありません。",
+    "expires": "有効期限：{{when}}。",
+    "manageLinks": "リンクは「共有」で管理できます。",
+    "linkCopied": "リンクをクリップボードにコピーしました。",
+    "linkShared": "リンクを共有しました。",
+    "copyLink": "リンクをコピー"
+  },
+  "shares": {
+    "orgRequired": "写真を共有するには、組織を作成するか参加してください。",
+    "noPermission": "あなたのロールには共有の権限が含まれていません。",
+    "heading": "共有",
+    "description": "{{name}}外の人が、選択した写真を閲覧・ダウンロードできるリンク。リンクを取り消すと直ちに無効になります。",
+    "loading": "共有を読み込み中",
+    "loadErrorTitle": "共有を読み込めませんでした",
+    "empty": "リンクはまだありません。ギャラリーで写真を選択し、「共有」を選んでください。",
+    "openGallery": "ギャラリーを開く",
+    "rowCreated_other": "写真{{count}}枚 · {{created}}に作成",
+    "neverExpires": " · 無期限",
+    "expiresOn": " · {{expires}}に期限切れ",
+    "status": {
+      "active": "有効",
+      "expired": "期限切れ",
+      "revoked": "取り消し済み"
+    },
+    "copyLink": "リンクをコピー",
+    "shareEllipsis": "共有…",
+    "revoke": "{{title}}を取り消す",
+    "revokeButton": "取り消す",
+    "linkCopied": "リンクをクリップボードにコピーしました。",
+    "linkShared": "リンクを共有しました。"
+  },
+  "admin": {
+    "heading": "管理",
+    "description": "このデプロイのすべてのユーザーと組織。ここでの操作は監査証跡に記録されます。",
+    "onlyAdmins": "このページを開けるのはプラットフォーム管理者のみです。",
+    "sectionsLabel": "管理セクション",
+    "tabs": {
+      "users": "ユーザー",
+      "organizations": "組織",
+      "audit": "監査証跡"
+    },
+    "searchLabel": "メールアドレスで検索",
+    "searchPlaceholder": "name@example.com",
+    "loadingUsers": "ユーザーを読み込み中",
+    "usersErrorTitle": "ユーザーを読み込めませんでした",
+    "userSummary_other": "ユーザー{{count}}人{{extra}}。",
+    "showingNewest": "、新しい{{count}}件を表示",
+    "you": "（あなた）",
+    "joined": "{{date}}に参加",
+    "emailNotVerified": " · メール未確認",
+    "platformAdmin": "プラットフォーム管理者",
+    "banned": "利用停止中",
+    "bannedReason": "利用停止：{{reason}}",
+    "unban": "停止を解除",
+    "unbanUser": "{{email}}の停止を解除",
+    "removeAdmin": "管理者権限を削除",
+    "makeAdminShort": "管理者にする",
+    "removeAdminFrom": "{{email}}から管理者権限を削除",
+    "makeAdmin": "{{email}}を管理者にする",
+    "signOutEverywhereButton": "すべての端末からサインアウト",
+    "signOutEverywhere": "{{email}}をすべての端末からサインアウト",
+    "ban": "利用停止",
+    "banUser": "{{email}}を利用停止",
+    "banConfirmTitle": "{{email}}を利用停止しますか？",
+    "banConfirmBody": "セッションは直ちに終了し、停止が解除されるまでサインインできなくなります。理由は本人に表示され、監査証跡に記録されます。",
+    "reasonLabel": "理由",
+    "cancel": "キャンセル",
+    "banConfirm": "ユーザーを利用停止",
+    "loadingOrganizations": "組織を読み込み中",
+    "organizationsErrorTitle": "組織を読み込めませんでした",
+    "organizationsTable": "組織（新しい順）",
+    "th": {
+      "organization": "組織",
+      "members": "メンバー",
+      "photos": "写真",
+      "storage": "ストレージ",
+      "created": "作成日"
+    },
+    "loadingAudit": "監査証跡を読み込み中",
+    "auditErrorTitle": "監査証跡を読み込めませんでした",
+    "auditCaption": "全組織の監査エントリ（新しい順）",
+    "auditDetailHeading": "組織",
+    "platform": "プラットフォーム"
+  },
+  "members": {
+    "orgRequired": "メンバーを管理するには、組織を作成するか参加してください。",
+    "heading": "メンバー",
+    "description": "{{name}}のメンバーと、それぞれができること。",
+    "count_other": "メンバー{{count}}人",
+    "pendingInvitations": "保留中の招待",
+    "inviteHeading": "メンバーを招待",
+    "emailLabel": "メールアドレス",
+    "roleLabel": "ロール",
+    "sendInvitation": "招待を送信",
+    "invitationSent": "{{email}}に招待を送信しました。",
+    "you": "（あなた）",
+    "roleFor": "{{name}}のロール",
+    "remove": "削除",
+    "removeMember": "{{name}}を削除",
+    "invitedAs": "招待時のロール",
+    "cancel": "キャンセル",
+    "cancelInvitation": "{{email}}への招待をキャンセル"
+  },
+  "audit": {
+    "heading": "監査ログ",
+    "description": "{{name}}の最近の変更。オーナーと管理者がこのページを閲覧できます。",
+    "thisOrganization": "この組織",
+    "loading": "監査ログを読み込み中",
+    "loadErrorTitle": "監査ログを読み込めませんでした",
+    "noAccess": "あなたのロールには監査ログへのアクセス権が含まれていません。",
+    "empty": "まだ何も記録されていません。",
+    "tableCaption": "監査エントリ（新しい順）",
+    "detailsHeading": "詳細",
+    "when": "日時",
+    "who": "実行者",
+    "action": "操作"
+  },
+  "organizations": {
+    "firstTitle": "最初の組織を作成",
+    "newTitle": "新しい組織",
+    "description": "組織には、ウォーターマーク・写真・チームが含まれます。あなたがそのオーナーになります。",
+    "createFailed": "組織を作成できませんでした。",
+    "nameLabel": "名前",
+    "slugLabel": "URL識別子",
+    "slugHint": "英小文字・数字・ハイフンが使えます。リンクで使用され、一意である必要があります。",
+    "submit": "組織を作成"
+  },
+  "import": {
+    "takePhoto": "写真を撮影",
+    "cancel": "キャンセル",
+    "saveToProvider": "{{provider}}に保存",
+    "url": {
+      "title": "リンクからインポート",
+      "description": "ウェブ上の画像のアドレスを貼り付けてください。取得してここに追加します。",
+      "linkLabel": "画像のリンク",
+      "errorTitle": "そのリンクをインポートできませんでした",
+      "fetch": "取得"
+    },
+    "onedrive": {
+      "title": "OneDriveからインポート",
+      "name": "OneDrive",
+      "description": "Microsoftにサインインし、追加する写真を選択してください。",
+      "loading": "OneDriveを読み込み中",
+      "empty": "ここにはフォルダや画像がありません。",
+      "folderPath": "フォルダのパス",
+      "errorTitle": "OneDriveのインポートに失敗しました",
+      "tryAgain": "再試行",
+      "noneSelected": "写真が選択されていません",
+      "selectedCount": "{{count}}件選択中",
+      "addSelected": "選択した写真を追加"
+    }
+  },
+  "video": {
+    "orgRequired": "動画にウォーターマークを追加するには、組織を作成するか参加してください。",
+    "heading": "動画ウォーターマーク",
+    "description": "動画全体にプリセットを適用します。すべてのフレームがブラウザー内でウォーターマークされ、音声は保持されます。アップロードは一切行われません。",
+    "checkingSupport": "動画サポートを確認中",
+    "unsupportedTitle": "このブラウザーは動画に対応していません",
+    "unsupportedBody": "お使いのブラウザーは動画をエンコードできません。Chrome・Edge・Safari 17以降で利用できます。",
+    "emptyHint": "して、動画に適用しましょう。",
+    "addVideo": "動画を追加",
+    "dropHint": "動画を1つここにドロップ、または",
+    "formatsHint": "MP4・WebM・MOV。すべてブラウザー内で処理され、アップロードは行われません。ギャラリーはまだ動画に対応していません。",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
+    "choosePresetPreview": "プリセットを選ぶと、フレーム上でウォーターマークをプレビューできます。",
+    "outputSize": "出力：{{width}} × {{height}} px。",
+    "transcodingProgress": "変換の進捗",
+    "progress": {
+      "noEta": "フレーム{{frame}} · {{percent}}%",
+      "withEta": "フレーム{{frame}} · {{percent}}% · 残り約{{seconds}}秒"
+    },
+    "cancel": "キャンセル",
+    "cancelled": "変換をキャンセルしました。",
+    "runErrorTitle": "動画にウォーターマークを追加できませんでした",
+    "download": "{{fileName}}をダウンロード",
+    "share": "共有",
+    "presets": "プリセット",
+    "placement": "配置",
+    "placementOptions": {
+      "smart": "スマート",
+      "bottomRight": "右下",
+      "bottomLeft": "左下",
+      "topRight": "右上",
+      "topLeft": "左上",
+      "center": "中央"
+    },
+    "quality": "画質",
+    "qualityOptions": {
+      "low": "低",
+      "standard": "標準",
+      "high": "高"
+    },
+    "resolution": "解像度",
+    "resolutionOptions": {
+      "original": "元のまま",
+      "fit1080p": "1080pに合わせる",
+      "fit720p": "720pに合わせる"
+    },
+    "watermarking": "ウォーターマークを追加中…",
+    "watermarkVideo": "動画にウォーターマークを追加",
+    "fixedPlacementNote": "ウォーターマークは動画全体で1つの固定位置を保ちます。音声は出力に適合する場合はそのままコピーされ、それ以外は再エンコードされます。",
+    "renderingPreview": "プレビューを生成中",
+    "previewAlt": "動画のフレーム上のウォーターマーク"
+  },
+  "documents": {
+    "orgRequired": "ドキュメントにウォーターマークを追加するには、組織を作成するか参加してください。",
+    "heading": "ドキュメント",
+    "description": "PDFの全ページにプリセットをスタンプします。ファイルはブラウザー内で処理され、1つずつまたはZIPでダウンロードできます。",
+    "emptyHint": "して、ドキュメントに適用しましょう。",
+    "addPdfs": "PDFを追加",
+    "dropHint": "PDFをここにドロップ、または",
+    "filesHint": "最大{{max}}ファイル、各{{size}}まで。すべてのページがブラウザー内でウォーターマークされ、アップロードは行われません。",
+    "skipped_other": "{{count}}件のファイルをスキップしました（PDFでないか、{{max}}を超えています）。",
+    "fileCount_other": "{{count}}件のドキュメント",
+    "clearList": "リストをクリア",
+    "watermarkingProgress": "ウォーターマークの進捗",
+    "progressFinished": "全{{total}}件中{{done}}件完了",
+    "progressFailed": "、{{count}}件失敗",
+    "progressEnd": "。",
+    "listLabel": "ウォーターマークを追加するドキュメント",
+    "downloadFile": "{{fileName}}をダウンロード",
+    "removeFile": "{{fileName}}を削除",
+    "presetHint": "1つ以上にチェックを入れてください。チェックした順に描画され、後のものが先のものの上に重なります。",
+    "placement": "配置",
+    "smartPlacementHint": "スマート配置は写真向けです。ドキュメントでは隅またはカスタム位置を選択してください。",
+    "watermarkEmpty": "ドキュメントにウォーターマークを追加",
+    "watermarkCount": "{{count}}件にウォーターマークを追加",
+    "downloadZip": "{{count}}件をZIPでダウンロード",
+    "savedAsHint": "各ドキュメントは {name}-watermarked.pdf として保存されます。暗号化されたPDFは受け付けられません。"
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "受信トレイをご確認ください",
+      "description": "{{email}}に確認リンクを送信しました。リンクは1時間で期限切れになります。",
+      "resent": "新しい確認リンクを送信しました。",
+      "resend": "確認メールを再送信"
+    },
+    "tool": {
+      "title": "写真を検証",
+      "description": "PNGに不可視のWatermark Proマークが含まれているかを確認し、隠されたメッセージを読み取ります。データがブラウザーの外に出ることはありません。"
+    },
+    "checkPng": "PNGを確認",
+    "checking": "確認中…",
+    "noneFound": "この写真に不可視マークは見つかりませんでした。"
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "プリセットを読み込み中",
+    "loadErrorTitle": "プリセットを読み込めませんでした",
+    "emptyTitle": "プリセットはまだありません",
+    "createInLibrary": "ライブラリでプリセットを作成",
+    "legend": "プリセット",
+    "importTitle": "プリセットをインポート",
+    "importDescription": "Watermark Proのプリセットファイルを選択してください。そのプリセットと、使用されているロゴがこのライブラリに追加されます。",
+    "presetFileLabel": "プリセットファイル",
+    "noPresets": "このプリセットファイルにはプリセットが含まれていません。",
+    "fileCount_other": "このファイル内の{{count}}件のプリセット",
+    "renamed": "「{{name}}」という名前のプリセットは既に存在するため、「{{finalName}}」としてインポートします。",
+    "cancel": "キャンセル",
+    "importButton_other": "{{count}}件のプリセットをインポート"
+  },
+  "landing": {
+    "nav": "アカウント",
+    "signIn": "サインイン",
+    "createAccount": "アカウントを作成",
+    "eyebrow": "無料・オープンソース",
+    "heroBody": "写真の見栄えを損なわずに作品を保護します。Watermark Proは重い処理をブラウザー内で実行し、オリジナルを非公開に保ち、実際に機能するロールをチームに提供します。",
+    "createWorkspace": "ワークスペースを作成",
+    "featuresHeading": "できること",
+    "features": {
+      "bulk": {
+        "title": "一括処理",
+        "body": "数百枚の写真をドロップし、ブラウザー内で一度にすべてウォーターマークします。"
+      },
+      "library": {
+        "title": "ウォーターマークライブラリ",
+        "body": "テキスト・シンボル・ロゴのマークを一度保存すれば、どこでもワンクリックで適用できます。"
+      },
+      "smart": {
+        "title": "スマート配置",
+        "body": "各写真を解析し、マークが最も読みやすく被写体にかからない位置に配置されます。"
+      },
+      "contrast": {
+        "title": "自動コントラスト",
+        "body": "画像ごとに明色・暗色のバリエーションと輪郭の強さが選ばれ、気に入らなければ調整できます。"
+      },
+      "teams": {
+        "title": "チームとロール",
+        "body": "オーナー・管理者・編集者・閲覧者のロールを持つ組織。ロールはサーバー側で適用されます。"
+      },
+      "trusted": {
+        "title": "信頼できる設計",
+        "body": "厳格なコンテンツセキュリティポリシー、監査される操作、そして保存しない限りブラウザーの外に出ない写真。"
+      }
+    },
+    "footer": "Watermark ProはMITライセンスのオープンソースです。",
+    "privacy": "プライバシー",
+    "terms": "利用規約"
+  },
+  "legal": {
+    "signIn": "サインイン",
+    "lastUpdated": "最終更新：{{date}}",
+    "readSibling": "<sibling>{{siblingLabel}}</sibling>をお読みいただくか、<home>ホームページ</home>にお戻りください。",
+    "footer": "Watermark ProはMITライセンスのオープンソースです。",
+    "privacy": {
+      "title": "プライバシー",
+      "intro": "Watermark Proは、あなたの写真があなたのものであり続けるように作られています。このページでは、あなたの画像とアカウント情報がどのように扱われるかを、プロジェクトが実際に適用している制御に基づいて分かりやすく説明します。",
+      "siblingLabel": "利用規約",
+      "photos": {
+        "heading": "写真はブラウザー内にとどまります",
+        "p1": "ウォーターマークの処理は完全にお使いのデバイス上で実行されます。エディターと一括ツールは、ブラウザー内で写真をデコードし、Web Workerでレンダリングし、完成したファイルをメモリ内で構築します。ウォーターマークをプレビューしても、適用対象の写真がアップロードされることはありません。",
+        "p2": "エクスポートはローカルで組み立てられ、ダウンロード開始と同時に解放される同一オリジンのダウンロードリンクを通じて渡されます。オリジナルがプレビューやウォーターマークのためにサーバーへ送信されることは一切ありません。"
+      },
+      "storage": {
+        "heading": "保存する情報と、それが保存されるタイミング",
+        "p1": "保存を選択しない限り、当社のサーバーには何も保持されません。写真・サムネイル・ロゴを保存すると、組織にスコープされたキーの下でCloudflare R2に保存され、公開されることはなく、その組織にサインイン済みのメンバーにのみプライベートキャッシュで配信されます。",
+        "p2": "各組織には、写真・ロゴ・ストレージの容量制限があります。すべてのアップロードと削除は監査証跡に記録されます。"
+      },
+      "metadata": {
+        "heading": "メタデータは既定で削除されます",
+        "p1": "すべてのエクスポートはピクセルから再エンコードされるため、保持を選択しない限りメタデータは引き継がれません。既定では、ファイルがダウンロード・共有シート・ギャラリーに渡る前に、すべてのカメラ情報と位置情報を削除します。",
+        "p2": "エクスポートごとに選べる2つのオプトインモードにより、GPS位置情報を削除してカメラ情報を残すか、すべてをそのまま保持できます。メタデータの読み書きはブラウザー内で行われ、そのために何かがアップロードされることはありません。"
+      },
+      "sharing": {
+        "heading": "共有リンク",
+        "p1": "共有リンクには有効期限が組み込まれた署名付きトークンが含まれ、いつでも取り消せます。リンクが開く公開ページはセッションを持たず、アドレスごとにレート制限されます。",
+        "p2": "期限切れ・取り消し済み・改ざん・不明なリンクはすべて、同じ中立的な「見つかりません」という応答を返すため、リンクが無効になると何も明らかになりません。リンクの作成と取り消しは権限を持つメンバーに限定され、監査されます。"
+      },
+      "account": {
+        "heading": "あなたのアカウント",
+        "p1": "アカウントにはメールアドレスとパスワードが必要で、アカウントが有効になる前にメールアドレスの確認が必要です。セッションはHttpOnly・SameSite=LaxのCookieに保持され、セキュアなオリジンではSecureが付与されます。",
+        "p2": "パスワードリセットリンクは1時間で期限切れになり、使用すると他のセッションからサインアウトされます。"
+      },
+      "analytics": {
+        "heading": "分析とCookie",
+        "p1": "当社はサードパーティの分析Cookieや広告Cookieを設定しません。唯一の計測はCloudflare Web Analyticsで、Cookieを使用せず、サイトを横断してあなたを追跡しません。",
+        "p2": "このアプリが通信するサードパーティのオリジンは、いずれもCloudflareの2つだけです。サインアップとパスワードリセットのリクエストでボットを選別するTurnstileウィジェットと、Cookieを使用しない分析ビーコンです。フォント・スタイルなどそれ以外はすべてこのサイトから配信されます。"
+      },
+      "audit": {
+        "heading": "監査証跡",
+        "p1": "サインアップと、組織・メンバーシップ・招待・ライブラリ・写真・共有のすべての変更は、追記専用の監査ログに記録されます。そのログを閲覧できるのは、組織のオーナーと管理者のみです。"
+      },
+      "reporting": {
+        "heading": "問題の報告",
+        "p1": "セキュリティの問題は、公開のissueではなく、プロジェクトのGitHubリポジトリを通じて非公開で報告できます。リポジトリのセキュリティポリシーに、報告に含める内容と返信までの目安が記載されています。"
+      }
+    },
+    "terms": {
+      "title": "利用規約",
+      "intro": "本規約は、あなたによるWatermark Proの利用を対象とします。読まれることを前提に書かれており、守れない主張を加えるのではなく、サービスが実際にどのように動作するかを説明しています。",
+      "siblingLabel": "プライバシーポリシー",
+      "accepting": {
+        "heading": "本規約への同意",
+        "p1": "Watermark Proを利用することは、本規約に同意したことを意味します。同意されない場合は、本サービスを利用しないでください。"
+      },
+      "whatItDoes": {
+        "heading": "サービスの内容",
+        "p1": "Watermark Proは写真にウォーターマークを追加します。ウォーターマークの処理自体はブラウザー内で実行されます。写真やロゴの保存、チームでの作業、共有などの任意の機能では、Cloudflare上のサーバー側ストレージを使用します。",
+        "p2": "本ソフトウェアは、MITライセンスの無料のオープンソースです。"
+      },
+      "account": {
+        "heading": "あなたのアカウント",
+        "p1": "チーム機能には、確認済みのメールアドレスを持つアカウントが必要です。パスワードは他人に教えないでください。あなたのアカウントで行われたことについては、あなたが責任を負います。",
+        "p2": "いつでもセッションからサインアウトでき、パスワードリセットリンクを使用すると他のセッションからサインアウトされます。"
+      },
+      "content": {
+        "heading": "あなたのコンテンツ",
+        "p1": "アップロードまたは作成した写真とウォーターマークについて、あなたが既に有するすべての権利はあなたに帰属します。本サービスに持ち込む画像を使用する権利を有していることについては、あなたが責任を負います。",
+        "p2": "このアプリは、あなたが使用する機能を提供するためにのみコンテンツを処理し、あなたが保存を選択した場合にのみ保存します。コンテンツが何かの学習に使用されたり、第三者と共有されたりすることは一切ありません。"
+      },
+      "acceptableUse": {
+        "heading": "許容される利用",
+        "p1": "法律に違反する目的や、使用する権利のないコンテンツをアップロード・共有する目的で本サービスを利用しないでください。セキュリティ制御やレート制限を回避しようとしたり、あなたがメンバーでない組織のデータにアクセスしようとしたりしないでください。",
+        "p2": "組織内のアクセスはあなたのロールに従い、それらのロールはサーバー側で適用されます。"
+      },
+      "teams": {
+        "heading": "チームとロール",
+        "p1": "組織は、オーナー・管理者・編集者・閲覧者のロールを持つことができます。各メンバーが閲覧・実行できる範囲はそのロールに限定され、インターフェース上で隠されるだけでなく、すべてのリクエストで確認されます。"
+      },
+      "availability": {
+        "heading": "可用性・保証・変更",
+        "p1": "本サービスは、MITライセンスに定めるとおり、いかなる保証もなく「現状のまま」提供されます。機能は変更されることがあり、サービスが利用できない場合もあります。",
+        "p2": "本規約は更新されることがあります。このページ上部の日付は、最後に変更された日を示します。変更後も本サービスの利用を継続することは、更新された規約に同意したことを意味します。"
+      },
+      "openSource": {
+        "heading": "オープンソース",
+        "p1": "Watermark Proのソースコードは、MITライセンスの下で公開されており、そのライセンスの条件に従って検査・実行・改変できます。"
+      },
+      "contact": {
+        "heading": "お問い合わせ",
+        "p1": "本規約に関する質問やセキュリティ問題の報告は、プロジェクトのGitHubリポジトリを通じて行えます。"
+      }
+    }
+  },
+  "share": {
+    "loading": "写真を読み込み中",
+    "unavailableTitle": "このリンクは利用できません",
+    "unavailableBody": "期限切れか取り消されたか、アドレスが不完全な可能性があります。送信者に新しいリンクを依頼してください。",
+    "about": "Watermark Proについて",
+    "photoCount_other": "写真{{count}}枚",
+    "availableUntil": " · {{date}}まで有効",
+    "shareLink": "このリンクを共有",
+    "linkCopied": "リンクをクリップボードにコピーしました。",
+    "linkShared": "リンクを共有しました。",
+    "openPhoto": "{{name}}を開く",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "<home>Watermark Pro</home>で共有されています。写真は所有者の財産です。",
+    "download": "ダウンロード",
+    "close": "閉じる"
+  },
+  "root": {
+    "somethingWentWrong": "問題が発生しました",
+    "notFound": {
+      "title": "ページが見つかりません",
+      "body": "アドレスが間違っているか、ページが移動した可能性があります。",
+      "back": "最初に戻る"
+    }
+  }
+}

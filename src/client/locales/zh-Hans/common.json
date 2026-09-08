@@ -1,0 +1,1065 @@
+{
+  "language": {
+    "menuLabel": "切换语言"
+  },
+  "shell": {
+    "nav": {
+      "dashboard": "仪表盘",
+      "library": "水印库",
+      "editor": "编辑器",
+      "bulk": "批量",
+      "video": "视频",
+      "documents": "文档",
+      "gallery": "图库",
+      "shares": "分享",
+      "members": "成员",
+      "audit": "审计日志",
+      "admin": "管理"
+    },
+    "skipToContent": "跳到内容",
+    "menu": "菜单",
+    "primaryNav": "主导航",
+    "primaryMenuNav": "主导航（菜单）",
+    "toolsNav": "工具",
+    "signOut": "退出登录",
+    "accountMenu": "{{name}} 的账户菜单",
+    "menuDescription": "切换组织，或前往 Watermark Pro 的任意部分。",
+    "switchOrganizationFor": "组织：{{name}}。切换组织",
+    "chooseOrganization": "选择一个组织",
+    "chooseOrganizationShort": "选择组织",
+    "organizations": "组织",
+    "newOrganization": "新建组织",
+    "theme": {
+      "system": "主题：跟随系统。切换为浅色",
+      "light": "主题：浅色。切换为深色",
+      "dark": "主题：深色。切换为跟随系统"
+    }
+  },
+  "auth": {
+    "backToSignIn": "返回登录",
+    "fields": {
+      "emailLabel": "电子邮箱",
+      "passwordLabel": "密码"
+    },
+    "login": {
+      "title": "欢迎回来",
+      "description": "登录到您的工作区。",
+      "footerPrompt": "第一次来？",
+      "createAccount": "创建账户",
+      "verifyTitle": "请先验证您的电子邮箱",
+      "verifyBody": "我们已向 {{email}} 发送了验证链接。",
+      "resendIt": "重新发送",
+      "forgotPassword": "忘记密码？",
+      "submit": "登录"
+    },
+    "signup": {
+      "title": "创建您的账户",
+      "description": "验证链接将发送到您的电子邮箱。",
+      "footerPrompt": "已有账户？",
+      "signIn": "登录",
+      "nameLabel": "姓名",
+      "passwordHint": "至少 {{min}} 个字符。使用几个不相关的词效果很好。",
+      "submit": "创建账户"
+    },
+    "forgotPassword": {
+      "title": "重置密码",
+      "description": "输入您的电子邮箱，如果该账户存在，我们将发送重置链接。",
+      "sentTitle": "请查看您的收件箱",
+      "sentBody": "如果 {{email}} 属于某个账户，重置链接即将送达。它将在一小时后失效。",
+      "submit": "发送重置链接"
+    },
+    "resetPassword": {
+      "title": "设置新密码",
+      "invalidTitle": "此重置链接无效",
+      "invalidBody": "它可能已失效或已被使用。",
+      "requestNew": "申请新的链接",
+      "invalidEnd": "。",
+      "newPasswordLabel": "新密码",
+      "passwordHint": "至少 {{min}} 个字符。",
+      "confirmLabel": "确认密码",
+      "mismatch": "两次输入的密码不一致",
+      "submit": "更新密码"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "邀请不可用",
+      "title": "加入 {{organizationName}}",
+      "description": "{{inviterEmail}} 邀请您以{{role}}身份加入。",
+      "roleLabel": "角色：",
+      "decline": "拒绝",
+      "accept": "接受邀请"
+    }
+  },
+  "dashboard": {
+    "signedInAs": "已以 {{email}} 登录",
+    "yourWorkspace": "您的工作区",
+    "yourRole": "您的角色：",
+    "toolsHeading": "工具",
+    "tools": {
+      "library": {
+        "label": "水印库",
+        "body": "一次性设计文字、符号和 Logo 水印，并将它们保存为预设。"
+      },
+      "editor": {
+        "label": "编辑器",
+        "body": "手动为一张照片添加水印：放置、裁剪、调整大小并导出。"
+      },
+      "bulk": {
+        "label": "批量",
+        "body": "将预设应用于整组照片，并以 ZIP 形式下载结果。"
+      },
+      "gallery": {
+        "label": "图库",
+        "body": "浏览团队已保存的内容，然后通过链接分享相册。"
+      }
+    },
+    "overviewHeading": "概览",
+    "members": "成员",
+    "noPendingInvitations": "没有待处理的邀请。",
+    "pendingInvitations_other": "{{count}} 个待处理的邀请。",
+    "manageMembers": "管理成员",
+    "auditLog": "审计日志",
+    "auditDescription": "每一次成员和组织变更都会记录操作人和时间。",
+    "viewAuditLog": "查看审计日志"
+  },
+  "library": {
+    "orgRequired": "创建或加入一个组织，以构建水印库。",
+    "heading": "水印库",
+    "description": "由 {{name}} 中所有成员共享的预设。可逐个应用，也可批量应用。",
+    "export": "导出",
+    "exportPreset": "导出 {{name}}",
+    "importPresets": "导入预设",
+    "newPreset": "新建预设",
+    "exportErrorTitle": "无法导出预设",
+    "loadingPresets": "正在加载预设",
+    "loadErrorTitle": "无法加载水印库",
+    "empty": "还没有预设。预设将一个标记（文字、符号或 Logo）与放置、对比度和样式设置组合在一起。",
+    "createFirst": "创建第一个预设",
+    "orgRequiredShort": "请先创建或加入一个组织。",
+    "loadingPreset": "正在加载预设",
+    "loadPresetErrorTitle": "无法加载该预设",
+    "presetGone": "该预设已不存在。",
+    "editSubtitleManage": "更改将应用于使用此预设的所有人。",
+    "editSubtitleReadOnly": "只读视图。",
+    "cannotCreate": "您的角色不允许创建预设。",
+    "newPresetSubtitle": "设计标记，决定它的位置，然后将其保存到水印库。",
+    "openInEditor": "在编辑器中打开 {{name}}",
+    "deletePreset": "删除 {{name}}",
+    "logoBadge": "Logo",
+    "autoContrast": "自动对比度",
+    "manualContrast": "手动对比度",
+    "updated": "更新于 {{date}}",
+    "exportLogoTypeError": "某个 Logo 的图片类型无法导出。",
+    "exportMissingLogoError": "某个预设引用了已不在水印库中的 Logo。",
+    "describe": {
+      "text": "“{{text}}”（{{fontFamily}}）",
+      "glyph": "字形 {{glyph}}",
+      "icon": "图标 {{name}}",
+      "logo": "Logo",
+      "qr": "{{content}} 的二维码"
+    },
+    "shape": {
+      "rectangle": "矩形",
+      "roundedRectangle": "圆角矩形",
+      "ellipse": "椭圆",
+      "line": "直线"
+    },
+    "placement": {
+      "smart": "智能放置",
+      "custom": "自定义位置",
+      "random": "随机放置"
+    }
+  },
+  "designer": {
+    "presetName": "预设名称",
+    "presetNamePlaceholder": "工作室签名",
+    "nameError": "为预设取一个不超过 60 个字符的名称。",
+    "sections": {
+      "label": "设计器分区",
+      "mark": "标记",
+      "placement": "放置",
+      "style": "样式"
+    },
+    "markType": "标记类型",
+    "saveError": "无法保存预设",
+    "savePreset": "保存预设",
+    "saveChanges": "保存更改",
+    "readOnlyHint": "您的角色可以查看预设，但不能更改。",
+    "notAnImage": "该文件不是浏览器可以读取的图片。",
+    "text": {
+      "label": "文字",
+      "hint": "最多 {{max}} 个字符，最多 {{lines}} 行。使用“插入详情”可添加日期或相机等令牌，每张照片会分别填入。{location} 会将照片的 GPS 位置打印在图片上。"
+    },
+    "qr": {
+      "content": "二维码内容",
+      "hint": "通常是一个链接。最多 {{max}} 个字符；二维码始终为浅底深色，以便扫描。"
+    },
+    "tokens": {
+      "menu": "插入详情",
+      "heading": "照片详情",
+      "date": "日期",
+      "time": "时间",
+      "taken": "拍摄日期和时间",
+      "filename": "文件名",
+      "camera": "相机",
+      "lens": "镜头",
+      "iso": "ISO",
+      "aperture": "光圈",
+      "shutter": "快门速度",
+      "focal": "焦距",
+      "location": "位置（GPS）",
+      "index": "照片编号",
+      "count": "照片数量",
+      "width": "宽度",
+      "height": "高度"
+    },
+    "font": {
+      "family": "字体",
+      "weight": "字重",
+      "specimen": "敏捷的棕色狐狸跃过懒狗"
+    },
+    "symbol": {
+      "icons": "图标",
+      "glyphLabel": "字形 {{glyph}}",
+      "iconLabel": "图标 {{label}}"
+    },
+    "shape": {
+      "label": "形状",
+      "rectangle": "矩形",
+      "roundedRectangle": "圆角矩形",
+      "ellipse": "椭圆",
+      "line": "直线",
+      "length": "长度",
+      "proportions": "比例",
+      "fill": "填充",
+      "fillToggle": "填充形状",
+      "fillColour": "填充颜色",
+      "fillOpacity": "填充不透明度",
+      "strokeWidth": "描边宽度",
+      "customStrokeColour": "自定义描边颜色",
+      "strokeColour": "描边颜色"
+    },
+    "effects": {
+      "letterSpacing": "字间距",
+      "curve": "弯曲",
+      "effect": "效果",
+      "textEffect": "文字效果",
+      "solid": "实心",
+      "outline": "轮廓",
+      "emboss": "浮雕",
+      "engrave": "雕刻"
+    },
+    "placement": {
+      "mode": "放置方式",
+      "smart": "智能",
+      "smartDescription": "分析每张照片，选择最简洁的角落",
+      "corner": "边角",
+      "cornerDescription": "相对于边缘的固定位置",
+      "custom": "自定义",
+      "customDescription": "以照片比例表示的精确位置",
+      "random": "随机",
+      "randomDescription": "每张照片位置各不相同；更难被自动移除",
+      "smartHint": "引擎会根据细节、对比度和主体为每个角落和边缘评分，然后将标记放在清晰可辨且干扰最小的位置。",
+      "randomHint": "每张照片会获得一个随机角落，并在下方抖动范围内微调。同一张照片始终落在相同的位置。",
+      "jitter": "抖动",
+      "cornerLegend": "边角",
+      "horizontal": "水平",
+      "vertical": "垂直",
+      "anchor": {
+        "topLeft": "左上",
+        "topCenter": "中上",
+        "topRight": "右上",
+        "middleLeft": "左中",
+        "center": "居中",
+        "middleRight": "右中",
+        "bottomLeft": "左下",
+        "bottomCenter": "中下",
+        "bottomRight": "右下"
+      }
+    },
+    "style": {
+      "contrast": "对比度",
+      "contrastMode": "对比度模式",
+      "auto": "自动",
+      "autoDescription": "为每张照片选择浅色或深色墨水",
+      "manual": "手动",
+      "manualDescription": "固定的墨水和轮廓强度",
+      "colour": "颜色",
+      "colourDescription": "您自定义的墨水颜色",
+      "autoHint": "墨水会在浅色与深色之间切换，以适应标记下方的区域；仅当背景色调过于接近时才会添加轮廓。",
+      "ink": "墨水",
+      "inkLight": "浅色墨水",
+      "inkDark": "深色墨水",
+      "inkColour": "墨水颜色",
+      "outlineStrength": "轮廓强度",
+      "appearance": "外观",
+      "opacity": "不透明度",
+      "size": "大小",
+      "ofWidth": "宽度的 {{percent}}",
+      "rotation": "旋转",
+      "margin": "边距",
+      "backdrop": "标记后的背景框",
+      "boxOpacity": "背景框不透明度",
+      "tiling": "在整张照片上重复",
+      "spacing": "间距"
+    },
+    "preview": {
+      "heading": "预览",
+      "rendering": "正在渲染预览",
+      "choosePhoto": "选择一张照片进行预览",
+      "tryYourPhoto": "试用您的照片",
+      "samplePhoto": "示例照片",
+      "alt": "水印在目标照片上的预览",
+      "failed": "预览失败",
+      "chooseLogo": "选择或上传一个 Logo 以查看预览。",
+      "nothingToPlace": "没有可放置的内容。",
+      "inkLight": "浅色墨水",
+      "inkDark": "深色墨水",
+      "inkColour": "{{colour}} 墨水",
+      "customPosition": "自定义位置，{{ink}}。",
+      "placed": "已放置于{{position}}，{{ink}}。",
+      "position": {
+        "topLeft": "左上",
+        "topCenter": "中上",
+        "topRight": "右上",
+        "middleLeft": "左中",
+        "center": "居中",
+        "middleRight": "右中",
+        "bottomLeft": "左下",
+        "bottomCenter": "中下",
+        "bottomRight": "右下"
+      }
+    },
+    "logo": {
+      "loading": "正在加载 Logo",
+      "loadError": "无法加载 Logo",
+      "empty": "还没有 Logo。上传带透明背景的 PNG、JPEG 或 WebP 可获得最佳效果。",
+      "choose": "选择一个 Logo",
+      "item": "Logo {{name}}",
+      "delete": "删除 Logo {{name}}",
+      "upload": "上传 Logo 文件",
+      "uploadButton": "上传 Logo",
+      "hint": "PNG、JPEG 或 WebP，最大 {{max}} MB，或手绘签名。",
+      "tooLarge": "Logo 必须不超过 {{max}} MB。",
+      "dimensions": "{{width}} × {{height}}",
+      "prepare": {
+        "region": "准备 Logo",
+        "title": "准备“{{name}}”",
+        "description": "可选择清除纯色背景并裁去空白边缘，然后将其作为透明 PNG 上传。",
+        "before": "之前",
+        "after": "之后",
+        "previewNeedsCanvas": "预览需要浏览器画布。",
+        "preview": "已准备的 Logo 预览",
+        "removeBackground": "移除背景",
+        "backgroundTolerance": "背景容差",
+        "trim": "裁去透明边缘",
+        "outputSize": "输出尺寸：{{size}} px",
+        "use": "使用 Logo",
+        "chooseAnother": "另选一个"
+      },
+      "signature": {
+        "draw": "手绘签名",
+        "description": "用手指、触控笔或鼠标签名。它将作为透明 Logo 保存到水印库，并裁剪到笔迹范围。",
+        "pad": "签名板；在此绘制",
+        "pen": "画笔",
+        "penWidthGroup": "画笔宽度",
+        "penWidth": "{{width}} 像素画笔",
+        "undo": "撤销笔画",
+        "clear": "清除",
+        "cancel": "取消",
+        "save": "保存为 Logo"
+      }
+    }
+  },
+  "editor": {
+    "orgRequired": "创建或加入一个组织，以使用编辑器。",
+    "heading": "编辑器",
+    "description": "为一张照片添加水印：选择一个预设，可手动放置，裁剪、调整大小并下载。任何内容都不会离开您的浏览器。",
+    "tabs": {
+      "watermark": "水印",
+      "crop": "裁剪",
+      "adjust": "调整",
+      "resize": "调整大小",
+      "export": "导出"
+    },
+    "toolsLabel": "编辑器工具",
+    "openPhoto": "打开照片",
+    "openPhotoLabel": "打开一张照片",
+    "fromLink": "从链接",
+    "samplePhoto": "示例照片",
+    "sampleScene": "示例场景",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "正在渲染",
+    "renderingPreview": "正在渲染预览",
+    "undo": "撤销",
+    "redo": "重做",
+    "altCrop": "带裁剪框的照片",
+    "altWatermark": "已应用水印的照片",
+    "choosePresetHint": "选择一个预设以放置水印。将照片拖放到画布上的任意位置。",
+    "outputSize": "输出 {{width}} × {{height}} px。",
+    "notAnImage": "该文件不是浏览器可以读取的图片。",
+    "previewFailed": "预览失败",
+    "exportFailed": "导出失败",
+    "savedToGallery": "已将 {{name}} 保存到<galleryLink>图库</galleryLink>。",
+    "applyToPhoto": "应用到这张照片",
+    "applyToAll": "应用到所有照片",
+    "removeOverride": "移除覆盖设置",
+    "cancel": "取消",
+    "dimensions": {
+      "left": "左",
+      "top": "上",
+      "width": "宽度",
+      "height": "高度",
+      "pxField": "{{label}}（px）"
+    },
+    "watermark": {
+      "emptyHint": "即可将其应用到此处。",
+      "preset": "预设",
+      "addPreset": "添加另一个预设",
+      "maxMarks": "每张照片最多 {{max}} 个标记",
+      "choosePreset": "选择一个预设",
+      "marksHeading": "这张照片上的标记",
+      "layersLabel": "图层，从下到上",
+      "removedPreset": "已移除的预设",
+      "removeLayer": "从这张照片中移除 {{name}}",
+      "adjusted": "已针对这张照片调整；水印库中的预设保持不变。",
+      "revert": "还原",
+      "placement": "放置"
+    },
+    "crop": {
+      "aspectRatio": "宽高比",
+      "photoSize": "照片为 {{width}} × {{height}} px。",
+      "reset": "重置裁剪",
+      "area": "裁剪区域。拖动以移动；方向键微调，按 Shift 可加大步长。",
+      "resizeHandle": "从{{handle}}调整裁剪框",
+      "handles": {
+        "n": "上边缘",
+        "s": "下边缘",
+        "e": "右边缘",
+        "w": "左边缘",
+        "ne": "右上角",
+        "nw": "左上角",
+        "se": "右下角",
+        "sw": "左下角"
+      }
+    },
+    "resize": {
+      "keepProportions": "保持比例",
+      "shortcuts": "快捷方式",
+      "fit": "适应 {{side}}",
+      "percent": "{{value}}%",
+      "outputUnchanged": "输出 {{width}} × {{height}} px（未更改）。",
+      "outputChanged": "输出 {{width}} × {{height}} px，源自 {{baseWidth}} × {{baseHeight}}。",
+      "resetSize": "重置大小"
+    },
+    "adjust": {
+      "filter": "滤镜",
+      "custom": "自定义调整",
+      "filterValue": "滤镜：{{name}}",
+      "brightness": "亮度",
+      "contrast": "对比度",
+      "saturation": "饱和度",
+      "warmth": "色温",
+      "sepia": "棕褐色",
+      "vignette": "暗角",
+      "reset": "重置 {{name}}",
+      "resetAll": "全部重置"
+    },
+    "orientation": {
+      "rotateLeft": "向左旋转",
+      "rotateRight": "向右旋转",
+      "flipHorizontal": "水平翻转",
+      "flipVertical": "垂直翻转",
+      "straighten": "拉直"
+    },
+    "frame": {
+      "label": "边框",
+      "add": "添加边框",
+      "width": "边框宽度",
+      "colour": "边框颜色"
+    },
+    "metadata": {
+      "heading": "元数据",
+      "strip": {
+        "label": "去除",
+        "help": "不含相机数据，不含位置信息。分享最安全。"
+      },
+      "keepExceptLocation": {
+        "label": "保留但移除位置",
+        "help": "保留相机、镜头和拍摄时间；移除 GPS。"
+      },
+      "keep": {
+        "label": "全部保留",
+        "help": "包括 GPS 位置（如果照片有的话）。"
+      },
+      "webpNote": "WebP 导出始终会去除元数据。"
+    },
+    "export": {
+      "format": "格式",
+      "quality": "质量",
+      "invisibleMark": "隐形标记",
+      "choosePng": "选择 PNG 以在像素中隐藏一段信息。",
+      "invisibleMessage": "隐形信息",
+      "tooLong": "对于 {{width}}×{{height}} 的照片来说太长了（可容纳 {{capacity}} 字节）。",
+      "invisibleHint": "隐藏在像素中，可在“验证”中读取。仅 PNG 格式可保留。",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}。在您的浏览器中以全分辨率渲染{{share}}。",
+      "losslessClause": "；PNG 为无损格式",
+      "shareClause": "；“分享”会将其发送到“照片”“信息”或此设备上的任意应用",
+      "download": "下载",
+      "share": "分享",
+      "saveToGallery": "保存到图库",
+      "savedToFolder": "已保存到您的 {{provider}}“{{folder}}”文件夹。"
+    },
+    "mark": {
+      "position": "水印位置。拖动以移动（会吸附到边距、三等分线和中心；按住 Alt 可自由放置），双指捏合以调整大小，旋转手势以旋转；方向键微调，加号和减号调整大小，方括号旋转。",
+      "rotate": "旋转水印",
+      "resize": "调整水印大小"
+    }
+  },
+  "bulk": {
+    "orgRequired": "创建或加入一个组织，以批量添加水印。",
+    "heading": "批量添加水印",
+    "description": "将一个预设应用于整组照片。照片会在您的浏览器中并行处理，并以 ZIP 形式或逐个下载。",
+    "emptyHint": "即可将其应用于批量处理。",
+    "addPhotos": "添加照片",
+    "addFolder": "添加文件夹",
+    "dropHint": "将照片或文件夹拖放到此处，或",
+    "fromLink": "从链接",
+    "capacity_other": "每批最多 {{max}} 张照片。处理在您的浏览器中使用 {{count}} 个工作线程完成。",
+    "skipped_other": "已跳过 {{count}} 个文件：非图片",
+    "importErrorTitle": "无法从云端导入",
+    "photoCount_other": "{{count}} 张照片",
+    "clearList": "清空列表",
+    "batchProgress": "批量进度",
+    "progress": {
+      "finished": "{{done}}/{{total}} 已完成",
+      "failed": "，{{n}} 个失败",
+      "cancelled": "，{{n}} 个已取消",
+      "rate": "，用时 {{seconds}} 秒（{{rate}} 张/秒）",
+      "end": "。"
+    },
+    "photosList": "此批次中的照片",
+    "custom": "自定义",
+    "selected": "已选择",
+    "status": {
+      "queued": "排队中",
+      "processing": "处理中",
+      "done": "已完成",
+      "failed": "失败",
+      "cancelled": "已取消"
+    },
+    "adjustPhoto": "调整 {{name}}",
+    "sharePhoto": "分享 {{name}}",
+    "downloadPhoto": "下载 {{name}}",
+    "removePhoto": "移除 {{name}}",
+    "showAll": "显示全部 {{count}} 张照片",
+    "presetHint": "勾选一个或多个；它们会按勾选顺序应用，后勾选的覆盖先勾选的。",
+    "format": "格式",
+    "quality": "质量",
+    "invisibleMark": "隐形标记",
+    "invisibleMessage": "隐形信息",
+    "choosePng": "选择 PNG 以在每张照片中隐藏一段信息。",
+    "size": {
+      "label": "大小",
+      "original": "原始大小",
+      "fit": "适应 {{side}} px"
+    },
+    "fileNames": "文件名",
+    "tokensLabel": "令牌：{{tokens}}。",
+    "names": {
+      "example": "示例：{{example}}",
+      "mustProduceName": "该模式必须生成一个名称。"
+    },
+    "photoAdjustments": "照片调整",
+    "resume": "继续",
+    "pause": "暂停",
+    "cancel": "取消",
+    "start": "开始",
+    "retry": "重试 {{count}}",
+    "downloadZip": "以 ZIP 下载 {{count}} 张",
+    "downloadReport": "下载报告（CSV）",
+    "saveToGallery": "将 {{count}} 张保存到图库",
+    "savedProgress": "已保存 {{done}}/{{total}}",
+    "allSaved": "全部已保存到<galleryLink>图库</galleryLink>。",
+    "someSaved": "{{failed}} 张无法保存（存储配额或限制）。其余的已在<galleryLink>图库</galleryLink>中。",
+    "savedToCloud_other": "已将 {{count}} 张照片保存到您的 {{provider}}“{{folder}}”文件夹。",
+    "privacyNote": "智能放置和自动对比度会为每张照片单独计算。任何内容都不会上传。",
+    "watch": {
+      "label": "监视文件夹",
+      "stop": "停止",
+      "choose": "选择文件夹",
+      "hint": "选择一个输入文件夹和一个输出文件夹；放入输入文件夹的新照片会使用勾选的预设添加水印，并写入输出文件夹。仅在此页面打开时运行。",
+      "wrote": "已写入 {{name}}",
+      "failed": "{{name}} 失败：{{error}}"
+    }
+  },
+  "gallery": {
+    "orgRequired": "创建或加入一个组织，以保存图库。",
+    "heading": "图库",
+    "description": "由 {{name}} 保存的已加水印照片。可搜索、按预设筛选、下载或删除。",
+    "usage_other": "{{count}} 张照片 · {{used}}/{{max}}",
+    "maxCount": "每个组织最多 {{count}} 张照片",
+    "storageUsed": "已用存储",
+    "storagePercent": "已使用 {{percent}}% 的存储空间",
+    "checkPhoto": "勾选一张照片",
+    "search": "搜索",
+    "searchPlaceholder": "照片名称",
+    "preset": "预设",
+    "allPresets": "所有预设",
+    "selectAll": "全选",
+    "clearSelection": "清除选择",
+    "photoCount_other": "{{count}} 张照片",
+    "share": "分享",
+    "shareEllipsis": "分享…",
+    "deleteErrorTitle": "无法删除",
+    "loadingPhotos": "正在加载照片",
+    "loadErrorTitle": "无法加载图库",
+    "empty": "还没有照片。可从编辑器保存一张，或从批量工具保存整批。",
+    "emptyFiltered": "没有符合这些筛选条件的照片。",
+    "openEditor": "打开编辑器",
+    "openPhoto": "打开 {{name}}",
+    "selectPhoto": "选择 {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "dimensionsWithPreset": "{{width}} × {{height}} · {{preset}}",
+    "loadMore": "加载更多",
+    "delete": "删除",
+    "deleteConfirmTitle_other": "删除 {{count}} 张照片？",
+    "deleteConfirmBody": "文件和缩略图将从存储中删除。此操作无法撤销。",
+    "cancel": "取消",
+    "close": "关闭",
+    "download": "下载",
+    "lightboxMeta": "{{width}} × {{height}} · {{size}} · {{date}}",
+    "lightboxMetaWithPreset": "{{width}} × {{height}} · {{size}} · {{preset}} · {{date}}",
+    "shareTitle_other": "分享 {{count}} 张照片",
+    "shareDescription": "任何拥有该链接的人都可以查看和下载这些照片，直到链接过期或您撤销它。",
+    "title": "标题",
+    "expiresAfter": "有效期",
+    "linkExpiry": "链接有效期",
+    "expiry": {
+      "days_other": "{{count}} 天",
+      "never": "永不"
+    },
+    "createErrorTitle": "无法创建链接",
+    "createLink": "创建链接",
+    "link": "链接",
+    "noExpiry": "此链接永不过期。",
+    "expires": "将于 {{when}} 过期。",
+    "manageLinks": "在“分享”中管理链接。",
+    "linkCopied": "链接已复制到剪贴板。",
+    "linkShared": "链接已分享。",
+    "copyLink": "复制链接"
+  },
+  "shares": {
+    "orgRequired": "创建或加入一个组织，以分享照片。",
+    "noPermission": "您的角色不包含分享权限。",
+    "heading": "分享",
+    "description": "让 {{name}} 以外的人查看和下载选定照片的链接。撤销链接会立即使其失效。",
+    "loading": "正在加载分享",
+    "loadErrorTitle": "无法加载分享",
+    "empty": "还没有链接。在图库中选择照片，然后选择“分享”。",
+    "openGallery": "打开图库",
+    "rowCreated_other": "{{count}} 张照片 · 创建于 {{created}}",
+    "neverExpires": " · 永不过期",
+    "expiresOn": " · 于 {{expires}} 过期",
+    "status": {
+      "active": "有效",
+      "expired": "已过期",
+      "revoked": "已撤销"
+    },
+    "copyLink": "复制链接",
+    "shareEllipsis": "分享…",
+    "revoke": "撤销 {{title}}",
+    "revokeButton": "撤销",
+    "linkCopied": "链接已复制到剪贴板。",
+    "linkShared": "链接已分享。"
+  },
+  "admin": {
+    "heading": "管理",
+    "description": "此部署上的所有用户和组织。此处的操作会记录在审计追踪中。",
+    "onlyAdmins": "只有平台管理员才能打开此页面。",
+    "sectionsLabel": "管理分区",
+    "tabs": {
+      "users": "用户",
+      "organizations": "组织",
+      "audit": "审计追踪"
+    },
+    "searchLabel": "按电子邮箱搜索",
+    "searchPlaceholder": "name@example.com",
+    "loadingUsers": "正在加载用户",
+    "usersErrorTitle": "无法加载用户",
+    "userSummary_other": "{{count}} 位用户{{extra}}。",
+    "showingNewest": "，显示最新的 {{count}} 位",
+    "you": "（您）",
+    "joined": "加入于 {{date}}",
+    "emailNotVerified": " · 邮箱未验证",
+    "platformAdmin": "平台管理员",
+    "banned": "已封禁",
+    "bannedReason": "已封禁：{{reason}}",
+    "unban": "解除封禁",
+    "unbanUser": "解除封禁 {{email}}",
+    "removeAdmin": "移除管理员",
+    "makeAdminShort": "设为管理员",
+    "removeAdminFrom": "移除 {{email}} 的管理员权限",
+    "makeAdmin": "将 {{email}} 设为管理员",
+    "signOutEverywhereButton": "在所有设备上退出登录",
+    "signOutEverywhere": "让 {{email}} 在所有设备上退出登录",
+    "ban": "封禁",
+    "banUser": "封禁 {{email}}",
+    "banConfirmTitle": "封禁 {{email}}？",
+    "banConfirmBody": "他们的会话将立即结束，并且在解除封禁之前无法登录。封禁原因会向他们显示，并保存在审计追踪中。",
+    "reasonLabel": "原因",
+    "cancel": "取消",
+    "banConfirm": "封禁用户",
+    "loadingOrganizations": "正在加载组织",
+    "organizationsErrorTitle": "无法加载组织",
+    "organizationsTable": "组织，最新在前",
+    "th": {
+      "organization": "组织",
+      "members": "成员",
+      "photos": "照片",
+      "storage": "存储",
+      "created": "创建时间"
+    },
+    "loadingAudit": "正在加载审计追踪",
+    "auditErrorTitle": "无法加载审计追踪",
+    "auditCaption": "所有组织的审计条目，最新在前",
+    "auditDetailHeading": "组织",
+    "platform": "平台"
+  },
+  "members": {
+    "orgRequired": "创建或加入一个组织，以管理成员。",
+    "heading": "成员",
+    "description": "{{name}} 中的成员及其权限。",
+    "count_other": "{{count}} 位成员",
+    "pendingInvitations": "待处理的邀请",
+    "inviteHeading": "邀请他人",
+    "emailLabel": "电子邮箱",
+    "roleLabel": "角色",
+    "sendInvitation": "发送邀请",
+    "invitationSent": "邀请已发送至 {{email}}。",
+    "you": "（您）",
+    "roleFor": "{{name}} 的角色",
+    "remove": "移除",
+    "removeMember": "移除 {{name}}",
+    "invitedAs": "受邀角色",
+    "cancel": "取消",
+    "cancelInvitation": "取消对 {{email}} 的邀请"
+  },
+  "audit": {
+    "heading": "审计日志",
+    "description": "{{name}} 中的最近更改。所有者和管理员可以查看此页面。",
+    "thisOrganization": "此组织",
+    "loading": "正在加载审计日志",
+    "loadErrorTitle": "无法加载审计日志",
+    "noAccess": "您的角色不包含审计访问权限。",
+    "empty": "尚无记录。",
+    "tableCaption": "审计条目，最新在前",
+    "detailsHeading": "详情",
+    "when": "时间",
+    "who": "操作人",
+    "action": "操作"
+  },
+  "organizations": {
+    "firstTitle": "创建您的第一个组织",
+    "newTitle": "新建组织",
+    "description": "组织包含您的水印、照片和团队。您将成为它的所有者。",
+    "createFailed": "无法创建该组织。",
+    "nameLabel": "名称",
+    "slugLabel": "URL 标识符",
+    "slugHint": "小写字母、数字和连字符。用于链接，且必须唯一。",
+    "submit": "创建组织"
+  },
+  "import": {
+    "takePhoto": "拍照",
+    "cancel": "取消",
+    "saveToProvider": "保存到 {{provider}}",
+    "url": {
+      "title": "从链接导入",
+      "description": "粘贴网络上某张图片的地址。我们会获取它并添加到此处。",
+      "linkLabel": "图片链接",
+      "errorTitle": "无法导入该链接",
+      "fetch": "获取"
+    },
+    "onedrive": {
+      "title": "从 OneDrive 导入",
+      "name": "OneDrive",
+      "description": "登录 Microsoft，然后选择要添加的照片。",
+      "loading": "正在加载 OneDrive",
+      "empty": "这里没有文件夹或图片。",
+      "folderPath": "文件夹路径",
+      "errorTitle": "OneDrive 导入失败",
+      "tryAgain": "重试",
+      "noneSelected": "未选择照片",
+      "selectedCount": "已选择 {{count}} 张",
+      "addSelected": "添加所选"
+    }
+  },
+  "video": {
+    "orgRequired": "创建或加入一个组织，以为视频添加水印。",
+    "heading": "视频添加水印",
+    "description": "将预设应用于整个视频。每一帧都会在您的浏览器中添加水印，并保留音频；任何内容都不会上传。",
+    "checkingSupport": "正在检查视频支持",
+    "unsupportedTitle": "此浏览器不支持视频",
+    "unsupportedBody": "您的浏览器无法编码视频。Chrome、Edge 或 Safari 17 及更高版本可以。",
+    "emptyHint": "即可将其应用于视频。",
+    "addVideo": "添加视频",
+    "dropHint": "将一个视频拖放到此处，或",
+    "formatsHint": "MP4、WebM 或 MOV。一切都在您的浏览器中完成；任何内容都不会上传，且图库暂不支持视频。",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}} 秒 · {{size}} · {{audio}}",
+    "choosePresetPreview": "选择一个预设，以在某一帧上预览水印。",
+    "outputSize": "输出 {{width}} × {{height}} px。",
+    "transcodingProgress": "转码进度",
+    "progress": {
+      "noEta": "第 {{frame}} 帧 · {{percent}}%",
+      "withEta": "第 {{frame}} 帧 · {{percent}}% · 剩余约 {{seconds}} 秒"
+    },
+    "cancel": "取消",
+    "cancelled": "转码已取消。",
+    "runErrorTitle": "无法为视频添加水印",
+    "download": "下载 {{fileName}}",
+    "share": "分享",
+    "presets": "预设",
+    "placement": "放置",
+    "placementOptions": {
+      "smart": "智能",
+      "bottomRight": "右下",
+      "bottomLeft": "左下",
+      "topRight": "右上",
+      "topLeft": "左上",
+      "center": "居中"
+    },
+    "quality": "质量",
+    "qualityOptions": {
+      "low": "低",
+      "standard": "标准",
+      "high": "高"
+    },
+    "resolution": "分辨率",
+    "resolutionOptions": {
+      "original": "原始",
+      "fit1080p": "适应 1080p",
+      "fit720p": "适应 720p"
+    },
+    "watermarking": "正在添加水印…",
+    "watermarkVideo": "为视频添加水印",
+    "fixedPlacementNote": "水印在整个视频中保持一个固定位置。音频在符合输出条件时会直接复制，否则会重新编码。",
+    "renderingPreview": "正在渲染预览",
+    "previewAlt": "视频某一帧上的水印"
+  },
+  "documents": {
+    "orgRequired": "创建或加入一个组织，以为文档添加水印。",
+    "heading": "文档",
+    "description": "将预设加盖到 PDF 的每一页上。文件会在您的浏览器中处理，并逐个下载或以 ZIP 形式下载。",
+    "emptyHint": "即可用它为文档添加水印。",
+    "addPdfs": "添加 PDF",
+    "dropHint": "将 PDF 拖放到此处，或",
+    "filesHint": "最多 {{max}} 个文件，每个 {{size}}。每一页都会在您的浏览器中添加水印；任何内容都不会上传。",
+    "skipped_other": "已跳过 {{count}} 个文件：非 PDF 或超过 {{max}}。",
+    "fileCount_other": "{{count}} 个文档",
+    "clearList": "清空列表",
+    "watermarkingProgress": "加水印进度",
+    "progressFinished": "{{done}}/{{total}} 已完成",
+    "progressFailed": "，{{count}} 个失败",
+    "progressEnd": "。",
+    "listLabel": "要加水印的文档",
+    "downloadFile": "下载 {{fileName}}",
+    "removeFile": "移除 {{fileName}}",
+    "presetHint": "勾选一个或多个；它们会按勾选顺序绘制，后勾选的覆盖先勾选的。",
+    "placement": "放置",
+    "smartPlacementHint": "智能放置适用于照片；文档请选择边角或自定义位置。",
+    "watermarkEmpty": "为文档添加水印",
+    "watermarkCount": "为 {{count}} 个添加水印",
+    "downloadZip": "以 ZIP 下载 {{count}} 个",
+    "savedAsHint": "每个文档都会保存为 {name}-watermarked.pdf。加密的 PDF 会被拒绝。"
+  },
+  "verify": {
+    "checkEmail": {
+      "title": "请查看您的收件箱",
+      "description": "我们已向 {{email}} 发送了验证链接。它将在一小时后失效。",
+      "resent": "新的验证链接即将送达。",
+      "resend": "重新发送验证邮件"
+    },
+    "tool": {
+      "title": "验证照片",
+      "description": "检查 PNG 是否带有隐形的 Watermark Pro 标记，并读取其隐藏信息。任何内容都不会离开您的浏览器。"
+    },
+    "checkPng": "检查 PNG",
+    "checking": "正在检查…",
+    "noneFound": "在这张照片中未找到隐形标记。"
+  },
+  "errors": {},
+  "tokens": {},
+  "filters": {},
+  "a11y": {},
+  "presets": {
+    "loading": "正在加载预设",
+    "loadErrorTitle": "无法加载预设",
+    "emptyTitle": "还没有预设",
+    "createInLibrary": "在水印库中创建预设",
+    "legend": "预设",
+    "importTitle": "导入预设",
+    "importDescription": "选择一个 Watermark Pro 预设文件。其中的预设及其使用的所有 Logo 都会添加到此水印库。",
+    "presetFileLabel": "预设文件",
+    "noPresets": "此预设文件不含任何预设。",
+    "fileCount_other": "此文件中有 {{count}} 个预设",
+    "renamed": "名为“{{name}}”的预设已存在；将以“{{finalName}}”导入。",
+    "cancel": "取消",
+    "importButton_other": "导入 {{count}} 个预设"
+  },
+  "landing": {
+    "nav": "账户",
+    "signIn": "登录",
+    "createAccount": "创建账户",
+    "eyebrow": "免费且开源",
+    "heroBody": "保护您的摄影作品，同时不损失画面本身。Watermark Pro 在您的浏览器中完成繁重的处理，让您的原图保持私密，并为您的团队提供真正有意义的角色。",
+    "createWorkspace": "创建您的工作区",
+    "featuresHeading": "功能介绍",
+    "features": {
+      "bulk": {
+        "title": "批量任务",
+        "body": "拖入数百张照片，在您的浏览器中一次性为它们全部添加水印。"
+      },
+      "library": {
+        "title": "水印库",
+        "body": "一次性保存文字、符号和 Logo 标记；随处一键应用。"
+      },
+      "smart": {
+        "title": "智能放置",
+        "body": "系统会分析每张照片，使标记落在最易辨识且不遮挡主体的位置。"
+      },
+      "contrast": {
+        "title": "自动对比度",
+        "body": "为每张图片选择浅色或深色版本以及轮廓强度，若您有不同意见可自行调整。"
+      },
+      "teams": {
+        "title": "团队与角色",
+        "body": "组织具备所有者、管理员、编辑者和查看者角色，并在服务器端强制执行。"
+      },
+      "trusted": {
+        "title": "值得信赖",
+        "body": "严格的内容安全策略、经过审计的操作，以及除非您主动保存、否则永不离开浏览器的照片。"
+      }
+    },
+    "footer": "Watermark Pro 是基于 MIT 许可证的开源软件。",
+    "privacy": "隐私",
+    "terms": "条款"
+  },
+  "legal": {
+    "signIn": "登录",
+    "lastUpdated": "最后更新于 {{date}}",
+    "readSibling": "阅读<sibling>{{siblingLabel}}</sibling>，或返回<home>主页</home>。",
+    "footer": "Watermark Pro 是基于 MIT 许可证的开源软件。",
+    "privacy": {
+      "title": "隐私",
+      "intro": "Watermark Pro 的设计宗旨是让您的照片始终属于您。本页面以通俗的语言说明您的图片和账户信息会经历什么，内容源自本项目实际执行的各项控制措施。",
+      "siblingLabel": "服务条款",
+      "photos": {
+        "heading": "您的照片保留在您的浏览器中",
+        "p1": "添加水印完全在您的设备上运行。编辑器和批量工具会在浏览器中解码您的照片，在 Web Workers 中渲染它们，并在内存中构建最终文件。预览水印绝不会上传所应用的照片。",
+        "p2": "导出文件在本地组装，并通过同源下载链接交给您，该链接在下载开始的瞬间即被释放。您的原图绝不会被发送到服务器进行预览或添加水印。"
+      },
+      "storage": {
+        "heading": "我们存储什么，且仅在您要求时",
+        "p1": "除非您选择保存，否则我们的服务器上不会保留任何内容。当您保存照片、缩略图或 Logo 时，它会存储在 Cloudflare R2 中，使用限定于您组织的键，绝不公开，并仅通过私有缓存提供给该组织中已登录的成员。",
+        "p2": "每个组织都有照片、Logo 和存储配额。每一次上传和删除都会记录在审计追踪中。"
+      },
+      "metadata": {
+        "heading": "默认移除元数据",
+        "p1": "每次导出都会从像素重新编码，因此除非您决定保留，否则不会带过任何元数据。默认设置会在文件到达您的下载、分享面板或图库之前，去除所有相机和位置数据。",
+        "p2": "两种可选的按导出模式允许您在移除 GPS 位置的同时保留相机数据，或原样保留全部内容。元数据在浏览器中读取和写入；为此不会上传任何内容。"
+      },
+      "sharing": {
+        "heading": "分享链接",
+        "p1": "分享链接携带一个带内置有效期的签名令牌，可随时撤销。链接打开的公开页面不携带任何会话，并按地址进行速率限制。",
+        "p2": "已过期、已撤销、被篡改和未知的链接都会返回相同的中性“未找到”响应，因此链接一旦失效便不会泄露任何信息。创建和撤销链接仅限于具有权限的成员，并会被审计。"
+      },
+      "account": {
+        "heading": "您的账户",
+        "p1": "账户需要电子邮箱和密码，且在账户激活之前必须验证电子邮箱。会话保存在 HttpOnly、SameSite=Lax 的 Cookie 中，并在安全来源上标记为 Secure。",
+        "p2": "密码重置链接在一小时后失效，使用时会让您的其他会话退出登录。"
+      },
+      "analytics": {
+        "heading": "分析与 Cookie",
+        "p1": "我们不设置任何第三方分析或广告 Cookie。唯一的测量工具是 Cloudflare Web Analytics，它不使用 Cookie，也不会跨站点跟踪您。",
+        "p2": "本应用仅与两个第三方来源通信，二者均属于 Cloudflare：用于筛查注册和密码重置请求中机器人的 Turnstile 组件，以及无 Cookie 的分析信标。字体、样式及其他一切均由本站点提供。"
+      },
+      "audit": {
+        "heading": "审计追踪",
+        "p1": "注册以及每一次组织、成员、邀请、水印库、照片和分享的变更都会写入仅可追加的审计日志。该日志仅可由组织的所有者和管理员读取。"
+      },
+      "reporting": {
+        "heading": "报告问题",
+        "p1": "安全问题可以通过本项目的 GitHub 仓库私下报告，而不是发布公开 issue。仓库中的安全策略说明了应包含哪些内容以及您将多快收到回复。"
+      }
+    },
+    "terms": {
+      "title": "服务条款",
+      "intro": "本条款涵盖您对 Watermark Pro 的使用。它们旨在便于阅读，并描述本服务的实际行为，而非添加它无法兑现的声明。",
+      "siblingLabel": "隐私政策",
+      "accepting": {
+        "heading": "接受本条款",
+        "p1": "使用 Watermark Pro 即表示您同意本条款。如果您不同意，请勿使用本服务。"
+      },
+      "whatItDoes": {
+        "heading": "本服务的功能",
+        "p1": "Watermark Pro 为照片添加水印。添加水印本身在您的浏览器中运行；诸如保存照片和 Logo、团队协作以及分享等可选功能会使用 Cloudflare 上的服务器端存储。",
+        "p2": "本软件是基于 MIT 许可证的免费开源软件。"
+      },
+      "account": {
+        "heading": "您的账户",
+        "p1": "团队功能需要一个已验证电子邮箱的账户。请妥善保管您的密码；您需对您账户下发生的一切负责。",
+        "p2": "您可以随时退出您的会话，使用密码重置链接会让您的其他会话退出登录。"
+      },
+      "content": {
+        "heading": "您的内容",
+        "p1": "您对上传或创建的照片和水印所拥有的一切权利仍归您所有。您需负责确保您有权使用带入本服务的图片。",
+        "p2": "本应用仅为提供您使用的功能而处理您的内容，并仅在您选择保存时才存储它。它绝不会被用于训练任何模型，也不会与第三方共享。"
+      },
+      "acceptableUse": {
+        "heading": "可接受的使用",
+        "p1": "请勿使用本服务违反法律，或上传、分享您无权使用的内容。请勿试图绕过安全控制或速率限制，或访问属于您并非成员的组织的数据。",
+        "p2": "组织内的访问权限遵循您的角色，且这些角色会在服务器端强制执行。"
+      },
+      "teams": {
+        "heading": "团队与角色",
+        "p1": "组织可以拥有所有者、管理员、编辑者和查看者角色。每位成员能看到和执行的内容都受其角色限制，并在每次请求时进行检查，而不仅仅是在界面中隐藏。"
+      },
+      "availability": {
+        "heading": "可用性、担保与变更",
+        "p1": "本服务按“原样”提供，不附带任何形式的担保，如 MIT 许可证所述。功能可能会变更，服务有时可能不可用。",
+        "p2": "本条款可能会更新；本页面顶部的日期显示了它们最后一次变更的时间。变更后继续使用本服务即表示您接受更新后的条款。"
+      },
+      "openSource": {
+        "heading": "开源",
+        "p1": "Watermark Pro 的源代码基于 MIT 许可证提供，您可以在该许可证的条款下检查、运行和修改它。"
+      },
+      "contact": {
+        "heading": "联系方式",
+        "p1": "有关本条款的问题以及安全问题的报告，均可通过本项目的 GitHub 仓库提出。"
+      }
+    }
+  },
+  "share": {
+    "loading": "正在加载照片",
+    "unavailableTitle": "此链接不可用",
+    "unavailableBody": "它可能已过期或被撤销，或者地址不完整。请向发送者索取新的链接。",
+    "about": "关于 Watermark Pro",
+    "photoCount_other": "{{count}} 张照片",
+    "availableUntil": " · 有效期至 {{date}}",
+    "shareLink": "分享此链接",
+    "linkCopied": "链接已复制到剪贴板。",
+    "linkShared": "链接已分享。",
+    "openPhoto": "打开 {{name}}",
+    "dimensions": "{{width}} × {{height}}",
+    "footer": "通过<home>Watermark Pro</home>分享。照片仍归其所有者所有。",
+    "download": "下载",
+    "close": "关闭"
+  },
+  "root": {
+    "somethingWentWrong": "出了点问题",
+    "notFound": {
+      "title": "页面未找到",
+      "body": "地址可能输入有误，或页面可能已移动。",
+      "back": "返回首页"
+    }
+  }
+}
