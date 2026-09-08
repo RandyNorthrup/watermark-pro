@@ -690,6 +690,22 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
     session (offline `beforeLoad` cannot reach `/api/auth/get-session`), so it
     lands with §2. The existing e2e suite runs against the SW-registered preview,
     so it guards against the worker breaking the app.
+  - **§2 persister + non-blocking boot (attempted 2026-09-08; deferred).** Built a
+    `localStorage` query persister (dehydrate/hydrate, filtered to the session/org
+    queries) and a non-blocking `/app` `beforeLoad` that reads the cache
+    (`getQueryData`) and revalidates in the background, with `AppLayout`
+    redirecting on a revalidation that finds no session. It hit a real
+    cache-coherence problem: `.query()` fetches only when stale, but rendering the
+    **organization list** from a stale cache after a mutation (e.g. just after
+    creating the first organization) shows the old empty list and mis-redirects —
+    the create-organization page test caught it. And offline boot fundamentally
+    needs `beforeLoad` to read the cache with no fetch, which conflicts with that
+    mutation coherence. This is a genuine design problem (stale-after-mutation vs.
+    render-from-cache vs. offline), not a quick fix, so the whole §2 change was
+    reverted rather than shipped half-right. A correct version needs mutation
+    hooks to update the persisted cache (not just invalidate) and a deliberate
+    policy for which redirect decisions may use cache. Deferred to a focused
+    follow-up. §4's SW (assets + Clear-Site-Data) shipped independently.
   - **§6 observability (done, no dashboard).** Request-id on every API request
     (echoed as `X-Request-Id`, in error logs). Client error reporting:
     `POST /api/client-errors` (rate-limited via the shared limiter, 2 kB cap,
