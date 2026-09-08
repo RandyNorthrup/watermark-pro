@@ -40,6 +40,17 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   const resolveServices = options.resolveServices ?? getServices
   const app = new Hono<AppContext>()
 
+  // A correlation id for every request: taken from an inbound X-Request-Id when
+  // present (so a value assigned upstream is preserved), otherwise generated.
+  // Echoed on the response and included in error logs so a report from the
+  // client (POST /api/client-errors) can be tied to a Worker log line.
+  app.use(async (c, next) => {
+    const requestId = c.req.header('x-request-id') ?? crypto.randomUUID()
+    c.set('requestId', requestId)
+    c.header('x-request-id', requestId)
+    await next()
+  })
+
   app.use(
     secureHeaders({
       // API responses never render HTML, so the policy can be fully locked
@@ -111,7 +122,13 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
       const body: ApiError = { error: API_ERROR_CODE.invalidConfiguration }
       return c.json(body, HTTP_STATUS.internalServerError)
     }
-    console.error('Unhandled error while serving', c.req.method, c.req.path, error)
+    console.error(
+      'Unhandled error while serving',
+      c.get('requestId'),
+      c.req.method,
+      c.req.path,
+      error,
+    )
     const body: ApiError = { error: API_ERROR_CODE.internalError }
     return c.json(body, HTTP_STATUS.internalServerError)
   })

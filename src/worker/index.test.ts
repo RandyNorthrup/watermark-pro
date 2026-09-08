@@ -33,6 +33,20 @@ describe('GET /api/health', () => {
     })
   })
 
+  it('echoes an inbound X-Request-Id and generates one otherwise', async () => {
+    const { app, env } = createTestHarness()
+
+    const passedThrough = await app.request(
+      HEALTH_PATH,
+      { headers: { 'x-request-id': 'upstream-123' } },
+      env,
+    )
+    expect(passedThrough.headers.get('x-request-id')).toBe('upstream-123')
+
+    const generated = await app.request(HEALTH_PATH, {}, env)
+    expect(generated.headers.get('x-request-id')).toMatch(/[0-9a-f-]{36}/)
+  })
+
   it('sets hardened security headers on every response', async () => {
     const { app, env } = createTestHarness()
     const response = await app.request(HEALTH_PATH, {}, env)

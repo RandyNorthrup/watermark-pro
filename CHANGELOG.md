@@ -25,6 +25,10 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
+- Every API request now carries a correlation id: the Worker takes an inbound
+  `X-Request-Id` or generates one, echoes it on the response, and includes it in
+  the unhandled-error log line, so a client error report can be tied back to a
+  Worker log line (PLAN §6 observability).
 - The Worker now serves the front door (`GET /`) as a prerendered, per-locale
   static landing: it picks the language from the `watermark-pro-locale` cookie,
   then `Accept-Language`, then English, and serves the matching
