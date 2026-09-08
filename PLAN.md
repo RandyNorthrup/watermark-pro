@@ -630,7 +630,17 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   - [ ] competitor re-check done; README status updated
   - [ ] full gates, drills, device matrix, screenshots in `en` and `ar`
   - [ ] 2.0.0 tagged, deployed, released
-- **Progress (2026-09-08):**
+- **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
+  (not relaxed budgets) for the perf work; landing it in small green increments.
+  - **§1 first-paint skeleton (done).** `index.html` carries a static,
+    theme-correct skeleton inside `#root` (header + brand mark, shimmer content
+    blocks, phone tab bar) that paints before JavaScript and is replaced by
+    React's first render. An inline theme script mirrors `lib/theme.ts` and sets
+    `data-theme` pre-paint so the skeleton never flashes; the
+    `inline-script-csp-hash` Vite plugin hashes it into the `_headers`
+    `script-src` at build time (verified byte-exact), so the strict CSP keeps no
+    `'unsafe-inline'` for scripts. e2e verification (theme-flash drill) lands
+    with the §5 gate step (`e2e/performance.spec.ts`).
   - Measurement foundation landed. `vite.config.ts` now emits the client
     manifest (`build.manifest`), and `scripts/lib/bundle-sizes.mjs` computes
     gzip/brotli from the real chunk graph for both `npm run bundle:report`

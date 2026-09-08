@@ -11,6 +11,14 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
+- First-paint skeleton: `index.html` now carries a static, theme-correct
+  skeleton of the app frame (header with the brand mark, shimmering content
+  blocks, and a phone tab bar) that paints before any JavaScript runs and is
+  replaced by React's first render. A tiny inline script resolves the stored
+  theme (mirroring `lib/theme.ts`) before the skeleton paints so it never
+  flashes the wrong colour; a Vite plugin hashes that inline script into the
+  `_headers` `script-src` at build time, keeping the strict CSP (no
+  `'unsafe-inline'` for scripts) intact.
 - Bundle-size measurement and budget tooling (`npm run bundle:report`,
   `npm run bundle:budget`): the client build now emits a manifest, and
   `scripts/lib/bundle-sizes.mjs` computes gzip/brotli sizes from the real chunk
