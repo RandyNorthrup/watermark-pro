@@ -1,6 +1,7 @@
 import { Download } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { type ReactNode, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { describeError } from '../../lib/errors'
 import { importFromUrl } from '../../lib/imports/url'
@@ -23,6 +24,7 @@ interface UrlImportDialogProps {
  * an alert without closing the dialog.
  */
 export function UrlImportDialog({ organizationId, onImport, trigger }: UrlImportDialogProps) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [url, setUrl] = useState('')
   const [isFetching, setIsFetching] = useState(false)
@@ -59,9 +61,9 @@ export function UrlImportDialog({ organizationId, onImport, trigger }: UrlImport
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
         <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card">
           <div>
-            <Dialog.Title className="text-lg font-semibold">Import from a link</Dialog.Title>
+            <Dialog.Title className="text-lg font-semibold">{t('import.url.title')}</Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-ink-muted">
-              Paste the address of an image on the web. We fetch it and add it here.
+              {t('import.url.description')}
             </Dialog.Description>
           </div>
           <form
@@ -71,7 +73,7 @@ export function UrlImportDialog({ organizationId, onImport, trigger }: UrlImport
               void fetchPhoto()
             }}
           >
-            <Field label="Image link">
+            <Field label={t('import.url.linkLabel')}>
               {(controlProps) => (
                 <Input
                   {...controlProps}
@@ -86,19 +88,19 @@ export function UrlImportDialog({ organizationId, onImport, trigger }: UrlImport
               )}
             </Field>
             {error === null ? null : (
-              <Alert tone="error" title="Could not import that link">
+              <Alert tone="error" title={t('import.url.errorTitle')}>
                 {error}
               </Alert>
             )}
             <div className="flex justify-end gap-2">
               <Dialog.Close asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  {t('import.cancel')}
                 </Button>
               </Dialog.Close>
               <Button type="submit" isPending={isFetching} disabled={url.trim().length === 0}>
                 <Download aria-hidden="true" className="size-4" />
-                Fetch
+                {t('import.url.fetch')}
               </Button>
             </div>
           </form>

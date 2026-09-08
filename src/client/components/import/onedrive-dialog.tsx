@@ -1,6 +1,7 @@
 import { ChevronRight, Cloud, FileImage, Folder } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { type ReactNode, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { PublicConfig } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
@@ -33,6 +34,7 @@ interface OneDriveDialogProps {
  * unconditionally.
  */
 export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProps) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<string | null>(null)
   const [items, setItems] = useState<OneDriveItem[]>([])
@@ -133,14 +135,14 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
     if (isLoading) {
       return (
         <div className="flex h-40 items-center justify-center">
-          <Spinner className="size-6 text-ink-muted" label="Loading OneDrive" />
+          <Spinner className="size-6 text-ink-muted" label={t('import.onedrive.loading')} />
         </div>
       )
     }
     if (items.length === 0) {
       return (
         <p className="flex h-40 items-center justify-center px-4 text-center text-sm text-ink-muted">
-          No folders or images here.
+          {t('import.onedrive.empty')}
         </p>
       )
     }
@@ -203,13 +205,18 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
         <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card">
           <div>
-            <Dialog.Title className="text-lg font-semibold">Import from OneDrive</Dialog.Title>
+            <Dialog.Title className="text-lg font-semibold">
+              {t('import.onedrive.title')}
+            </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-ink-muted">
-              Sign in to Microsoft, then choose photos to add.
+              {t('import.onedrive.description')}
             </Dialog.Description>
           </div>
 
-          <nav aria-label="Folder path" className="flex flex-wrap items-center gap-1 text-sm">
+          <nav
+            aria-label={t('import.onedrive.folderPath')}
+            className="flex flex-wrap items-center gap-1 text-sm"
+          >
             <button
               type="button"
               className="inline-flex items-center gap-1 rounded px-1 font-medium text-brand-600 hover:underline disabled:text-ink disabled:no-underline dark:text-brand-300"
@@ -247,7 +254,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
           </div>
 
           {error === null ? null : (
-            <Alert tone="error" title="OneDrive import failed">
+            <Alert tone="error" title={t('import.onedrive.errorTitle')}>
               {error}
               <div className="mt-2">
                 <Button
@@ -258,7 +265,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
                     void connect()
                   }}
                 >
-                  Try again
+                  {t('import.onedrive.tryAgain')}
                 </Button>
               </div>
             </Alert>
@@ -266,12 +273,14 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
 
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm text-ink-muted">
-              {selectedCount === 0 ? 'No photos selected' : `${String(selectedCount)} selected`}
+              {selectedCount === 0
+                ? t('import.onedrive.noneSelected')
+                : t('import.onedrive.selectedCount', { count: selectedCount })}
             </span>
             <div className="flex gap-2">
               <Dialog.Close asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  {t('import.cancel')}
                 </Button>
               </Dialog.Close>
               <Button
@@ -282,7 +291,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
                   void addSelected()
                 }}
               >
-                Add selected
+                {t('import.onedrive.addSelected')}
               </Button>
             </div>
           </div>

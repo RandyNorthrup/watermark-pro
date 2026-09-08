@@ -1,5 +1,6 @@
 import { Camera } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CAMERA_ACCEPT } from '../../../shared/constants'
 import { isCaptureSupported } from '../../lib/capture'
@@ -16,6 +17,7 @@ interface TakePhotoButtonProps {
  * not offered (desktops), so callers can drop it in unconditionally.
  */
 export function TakePhotoButton({ onCapture }: TakePhotoButtonProps) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
   // `capture` is not a typed React attribute; set it on the element so the input
   // opens the rear camera rather than a file picker (same technique as
@@ -34,7 +36,7 @@ export function TakePhotoButton({ onCapture }: TakePhotoButtonProps) {
         ref={inputRef}
         type="file"
         accept={CAMERA_ACCEPT}
-        aria-label="Take a photo"
+        aria-label={t('import.takePhoto')}
         className="sr-only"
         onChange={(event) => {
           const file = event.currentTarget.files?.[0]
@@ -52,7 +54,7 @@ export function TakePhotoButton({ onCapture }: TakePhotoButtonProps) {
         }}
       >
         <Camera aria-hidden="true" className="size-4" />
-        Take a photo
+        {t('import.takePhoto')}
       </Button>
     </>
   )

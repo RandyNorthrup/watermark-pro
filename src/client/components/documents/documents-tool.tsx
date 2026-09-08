@@ -9,6 +9,7 @@ import {
   X,
 } from 'lucide-react'
 import { type DragEvent, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { MAX_PDF_BYTES, MAX_PDF_FILES } from '../../../shared/constants'
 import { zipEntries } from '../../bulk/zip'
@@ -33,8 +34,6 @@ interface DocumentsToolProps {
 }
 
 const ACCEPTED_PDF_TYPES = 'application/pdf'
-const SMART_PLACEMENT_HINT =
-  'Smart placement is for photos; choose a corner or a custom position for documents.'
 
 /** One finished (or failed) document, kept in input order for the results list. */
 interface Outcome {
@@ -89,6 +88,7 @@ function dedupe(existing: readonly File[], incoming: readonly File[]): File[] {
  * once per distinct page size and drawn onto every page; nothing is uploaded.
  */
 export function DocumentsTool({ organizationId }: DocumentsToolProps) {
+  const { t } = useTranslation()
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const inputRef = useRef<HTMLInputElement>(null)
   const [files, setFiles] = useState<File[]>([])
@@ -116,7 +116,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
     setSkippedNote(
       skipped === 0
         ? null
-        : `${String(skipped)} file${skipped === 1 ? '' : 's'} skipped: not a PDF or over ${formatBytes(MAX_PDF_BYTES)}.`,
+        : t('documents.skipped', { count: skipped, max: formatBytes(MAX_PDF_BYTES) }),
     )
   }
 
@@ -201,7 +201,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
   const failedCount = outcomes?.filter((outcome) => outcome.output === null).length ?? 0
 
   return (
-    <PresetGate query={presets} emptyHint="to watermark documents with it.">
+    <PresetGate query={presets} emptyHint={t('documents.emptyHint')}>
       {(list) => (
         <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
           <Card className="flex flex-col gap-4 p-4">
@@ -217,7 +217,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                 type="file"
                 accept={ACCEPTED_PDF_TYPES}
                 multiple
-                aria-label="Add PDFs"
+                aria-label={t('documents.addPdfs')}
                 className="sr-only"
                 onChange={(event) => {
                   if (event.currentTarget.files !== null) {
@@ -228,7 +228,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
               />
               <FileText aria-hidden="true" className="size-8 text-ink-muted" />
               <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
-                Drop PDFs here, or
+                {t('documents.dropHint')}
                 <Button
                   type="button"
                   variant="secondary"
@@ -238,12 +238,14 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                     inputRef.current?.click()
                   }}
                 >
-                  Add PDFs
+                  {t('documents.addPdfs')}
                 </Button>
               </p>
               <p className="text-xs text-ink-muted">
-                Up to {String(MAX_PDF_FILES)} files, {formatBytes(MAX_PDF_BYTES)} each. Every page
-                is watermarked in your browser; nothing is uploaded.
+                {t('documents.filesHint', {
+                  max: MAX_PDF_FILES,
+                  size: formatBytes(MAX_PDF_BYTES),
+                })}
               </p>
             </div>
 
@@ -257,7 +259,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
               <section aria-labelledby="documents-files-heading" className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <h2 id="documents-files-heading" className="text-sm font-semibold">
-                    {String(files.length)} document{files.length === 1 ? '' : 's'}
+                    {t('documents.fileCount', { count: files.length })}
                   </h2>
                   {isRunning ? null : (
                     <Button
@@ -271,26 +273,30 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                       }}
                     >
                       <Trash2 aria-hidden="true" className="size-4" />
-                      Clear list
+                      {t('documents.clearList')}
                     </Button>
                   )}
                 </div>
                 {progress === null ? null : (
                   <>
                     <progress
-                      aria-label="Watermarking progress"
+                      aria-label={t('documents.watermarkingProgress')}
                       max={progress.total}
                       value={progress.done}
                       className="h-2 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-line [&::-webkit-progress-value]:bg-brand-600"
                     />
                     <p className="text-xs text-ink-muted" aria-live="polite">
-                      {String(progress.done)} of {String(progress.total)} finished
-                      {failedCount > 0 ? `, ${String(failedCount)} failed` : ''}.
+                      {t('documents.progressFinished', {
+                        done: progress.done,
+                        total: progress.total,
+                      })}
+                      {failedCount > 0 ? t('documents.progressFailed', { count: failedCount }) : ''}
+                      .
                     </p>
                   </>
                 )}
                 <ul
-                  aria-label="Documents to watermark"
+                  aria-label={t('documents.listLabel')}
                   className="divide-y divide-line rounded-lg border border-line"
                 >
                   {files.map((file) => {
@@ -313,7 +319,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            aria-label={`Download ${output.fileName}`}
+                            aria-label={t('documents.downloadFile', { fileName: output.fileName })}
                             onClick={() => {
                               downloadBlob(output.blob, output.fileName)
                             }}
@@ -326,7 +332,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            aria-label={`Remove ${file.name}`}
+                            aria-label={t('documents.removeFile', { fileName: file.name })}
                             onClick={() => {
                               setFiles((previous) =>
                                 previous.filter((candidate) => candidate !== file),
@@ -352,12 +358,12 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
               selectedIds={presetIds}
               disabled={isRunning}
               onToggle={togglePreset}
-              hint="Tick one or more; they are drawn in the order ticked, later ones over earlier ones."
+              hint={t('documents.presetHint')}
             />
 
             {hasSmartPreset ? (
-              <Alert tone="info" title="Placement">
-                {SMART_PLACEMENT_HINT}
+              <Alert tone="info" title={t('documents.placement')}>
+                {t('documents.smartPlacementHint')}
               </Alert>
             ) : null}
 
@@ -369,7 +375,9 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                 void run()
               }}
             >
-              Watermark {files.length === 0 ? 'documents' : String(files.length)}
+              {files.length === 0
+                ? t('documents.watermarkEmpty')
+                : t('documents.watermarkCount', { count: files.length })}
             </Button>
 
             {!isRunning && done.length > 0 ? (
@@ -383,15 +391,13 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                   }}
                 >
                   {isZipping ? null : <FolderArchive aria-hidden="true" className="size-4" />}
-                  Download {String(done.length)} as ZIP
+                  {t('documents.downloadZip', { count: done.length })}
                 </Button>
                 {zipError === null ? null : <Alert tone="error">{zipError}</Alert>}
               </div>
             ) : null}
 
-            <p className="text-xs text-ink-muted">
-              Each document is saved as {'{name}'}-watermarked.pdf. Encrypted PDFs are refused.
-            </p>
+            <p className="text-xs text-ink-muted">{t('documents.savedAsHint')}</p>
           </Card>
         </div>
       )}

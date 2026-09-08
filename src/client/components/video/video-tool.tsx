@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Download, Film, Loader2, Share2, X } from 'lucide-react'
 import { type DragEvent, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { MILLISECONDS_PER_SECOND } from '../../../shared/constants'
 import type { Anchor, WatermarkSpec } from '../../../shared/watermark'
@@ -49,26 +50,26 @@ const ACCEPTED_VIDEO_TYPES = 'video/mp4,video/webm,video/quicktime'
 type PlacementChoice =
   'smart' | Extract<Anchor, 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center'>
 
-const PLACEMENT_OPTIONS: readonly SelectOption<PlacementChoice>[] = [
-  { value: 'smart', label: 'Smart' },
-  { value: 'bottom-right', label: 'Bottom right' },
-  { value: 'bottom-left', label: 'Bottom left' },
-  { value: 'top-right', label: 'Top right' },
-  { value: 'top-left', label: 'Top left' },
-  { value: 'center', label: 'Center' },
-]
+const PLACEMENT_OPTIONS = [
+  { value: 'smart', labelKey: 'video.placementOptions.smart' },
+  { value: 'bottom-right', labelKey: 'video.placementOptions.bottomRight' },
+  { value: 'bottom-left', labelKey: 'video.placementOptions.bottomLeft' },
+  { value: 'top-right', labelKey: 'video.placementOptions.topRight' },
+  { value: 'top-left', labelKey: 'video.placementOptions.topLeft' },
+  { value: 'center', labelKey: 'video.placementOptions.center' },
+] as const satisfies readonly { value: PlacementChoice; labelKey: string }[]
 
-const QUALITY_OPTIONS: readonly SelectOption<VideoQuality>[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'standard', label: 'Standard' },
-  { value: 'high', label: 'High' },
-]
+const QUALITY_OPTIONS = [
+  { value: 'low', labelKey: 'video.qualityOptions.low' },
+  { value: 'standard', labelKey: 'video.qualityOptions.standard' },
+  { value: 'high', labelKey: 'video.qualityOptions.high' },
+] as const satisfies readonly { value: VideoQuality; labelKey: string }[]
 
-const RESOLUTION_OPTIONS: readonly SelectOption<VideoResolution>[] = [
-  { value: 'original', label: 'Original' },
-  { value: '1080p', label: 'Fit 1080p' },
-  { value: '720p', label: 'Fit 720p' },
-]
+const RESOLUTION_OPTIONS = [
+  { value: 'original', labelKey: 'video.resolutionOptions.original' },
+  { value: '1080p', labelKey: 'video.resolutionOptions.fit1080p' },
+  { value: '720p', labelKey: 'video.resolutionOptions.fit720p' },
+] as const satisfies readonly { value: VideoResolution; labelKey: string }[]
 
 const PERCENT = 100
 /** Preview and transcode both take the placement map from the first frame (see transcode.ts). */
@@ -122,14 +123,15 @@ interface Outcome {
  * the unsupported message.
  */
 export function VideoTool({ organizationId, organizationName, canSave = false }: VideoToolProps) {
+  const { t } = useTranslation()
   const capability = useVideoCapability()
   if (capability === null) {
-    return <Spinner className="size-6" label="Checking video support" />
+    return <Spinner className="size-6" label={t('video.checkingSupport')} />
   }
   if (!capability.supported) {
     return (
-      <Alert tone="info" title="Video is not supported in this browser">
-        Your browser cannot encode video. Chrome, Edge or Safari 17 and later can.
+      <Alert tone="info" title={t('video.unsupportedTitle')}>
+        {t('video.unsupportedBody')}
       </Alert>
     )
   }
@@ -148,6 +150,7 @@ interface WorkbenchProps extends VideoToolProps {
 }
 
 function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
+  const { t } = useTranslation()
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const inputRef = useRef<HTMLInputElement>(null)
   const transcoderRef = useRef<VideoTranscoder | null>(null)
@@ -276,8 +279,19 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
   const mime = capability.container === 'mp4' ? 'video/mp4' : 'video/webm'
   const canShare = canShareFiles(mime)
 
+  const placementOptions: readonly SelectOption<PlacementChoice>[] = PLACEMENT_OPTIONS.map(
+    (option) => ({ value: option.value, label: t(option.labelKey) }),
+  )
+  const qualityOptions: readonly SelectOption<VideoQuality>[] = QUALITY_OPTIONS.map((option) => ({
+    value: option.value,
+    label: t(option.labelKey),
+  }))
+  const resolutionOptions: readonly SelectOption<VideoResolution>[] = RESOLUTION_OPTIONS.map(
+    (option) => ({ value: option.value, label: t(option.labelKey) }),
+  )
+
   return (
-    <PresetGate query={presets} emptyHint="to apply it to a video.">
+    <PresetGate query={presets} emptyHint={t('video.emptyHint')}>
       {(list) => (
         <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
           <Card className="flex flex-col gap-4 p-4">
@@ -290,7 +304,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                 ref={inputRef}
                 type="file"
                 className="sr-only"
-                aria-label="Add a video"
+                aria-label={t('video.addVideo')}
                 accept={ACCEPTED_VIDEO_TYPES}
                 onChange={(event) => {
                   const picked = event.currentTarget.files?.[0]
@@ -302,7 +316,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
               />
               <Film aria-hidden="true" className="size-8 text-ink-muted" />
               <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
-                Drop one video here, or
+                {t('video.dropHint')}
                 <Button
                   type="button"
                   variant="secondary"
@@ -312,14 +326,11 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                     inputRef.current?.click()
                   }}
                 >
-                  Add a video
+                  {t('video.addVideo')}
                 </Button>
               </p>
               <p className="text-sm font-medium text-ink">{capability.label}</p>
-              <p className="text-xs text-ink-muted">
-                MP4, WebM or MOV. Everything happens in your browser; nothing is uploaded, and the
-                gallery does not take videos yet.
-              </p>
+              <p className="text-xs text-ink-muted">{t('video.formatsHint')}</p>
             </div>
 
             {loadError === null ? null : <Alert tone="error">{loadError}</Alert>}
@@ -330,20 +341,24 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                   {video.file.name}
                 </h2>
                 <p className="text-xs text-ink-muted">
-                  {String(video.probe.width)} × {String(video.probe.height)} px ·{' '}
-                  {video.probe.durationSeconds.toFixed(1)} s · {formatBytes(video.file.size)} ·{' '}
-                  {describeAudio(
-                    planAudio(
-                      video.probe.audioCodec,
-                      capability.container,
-                      capability.canEncodeAudio,
+                  {t('video.fileMeta', {
+                    width: video.probe.width,
+                    height: video.probe.height,
+                    duration: video.probe.durationSeconds.toFixed(1),
+                    size: formatBytes(video.file.size),
+                    audio: describeAudio(
+                      planAudio(
+                        video.probe.audioCodec,
+                        capability.container,
+                        capability.canEncodeAudio,
+                      ),
                     ),
-                  )}
+                  })}
                 </p>
                 <div className="overflow-hidden rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
                   {resolvedSpecs.length === 0 ? (
                     <p className="p-6 text-center text-sm text-ink-muted">
-                      Choose a preset to preview the watermark on a frame.
+                      {t('video.choosePresetPreview')}
                     </p>
                   ) : (
                     <VideoPreview
@@ -355,7 +370,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                   )}
                 </div>
                 <p className="text-xs text-ink-muted">
-                  Output {String(outputSize.width)} × {String(outputSize.height)} px.
+                  {t('video.outputSize', { width: outputSize.width, height: outputSize.height })}
                 </p>
               </section>
             )}
@@ -363,13 +378,13 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
             {progress === null ? null : (
               <div className="flex flex-col gap-2">
                 <progress
-                  aria-label="Transcoding progress"
+                  aria-label={t('video.transcodingProgress')}
                   max={1}
                   value={progressFraction(progress.timestamp, progress.durationSeconds)}
                   className="h-2 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-line [&::-webkit-progress-value]:bg-brand-600"
                 />
                 <p className="text-xs text-ink-muted" aria-live="polite">
-                  {progressLabel(progress)}
+                  {progressLabel(progress, t)}
                 </p>
                 <Button
                   type="button"
@@ -380,14 +395,14 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                   }}
                 >
                   <X aria-hidden="true" className="size-4" />
-                  Cancel
+                  {t('video.cancel')}
                 </Button>
               </div>
             )}
 
-            {wasCancelled ? <Alert tone="info">Transcoding cancelled.</Alert> : null}
+            {wasCancelled ? <Alert tone="info">{t('video.cancelled')}</Alert> : null}
             {runError === null ? null : (
-              <Alert tone="error" title="Could not watermark the video">
+              <Alert tone="error" title={t('video.runErrorTitle')}>
                 {runError}
               </Alert>
             )}
@@ -401,7 +416,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                   }}
                 >
                   <Download aria-hidden="true" className="size-4" />
-                  Download {outcome.fileName}
+                  {t('video.download', { fileName: outcome.fileName })}
                 </Button>
                 {canShare ? (
                   <Button
@@ -412,7 +427,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                     }}
                   >
                     <Share2 aria-hidden="true" className="size-4" />
-                    Share
+                    {t('video.share')}
                   </Button>
                 ) : null}
               </div>
@@ -421,7 +436,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
 
           <Card className="flex flex-col gap-5">
             <fieldset className="flex flex-col gap-2">
-              <legend className="mb-1.5 text-sm font-medium">Presets</legend>
+              <legend className="mb-1.5 text-sm font-medium">{t('video.presets')}</legend>
               <ul className="flex flex-col gap-1">
                 {list.map((candidate) => {
                   const order = presetIds.indexOf(candidate.id)
@@ -450,11 +465,11 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
               </ul>
             </fieldset>
             <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium">Placement</span>
+              <span className="text-sm font-medium">{t('video.placement')}</span>
               <Select
-                aria-label="Placement"
+                aria-label={t('video.placement')}
                 value={placement}
-                options={PLACEMENT_OPTIONS}
+                options={placementOptions}
                 disabled={isRunning}
                 onChange={(next) => {
                   if (isPlacementChoice(next)) {
@@ -464,11 +479,11 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium">Quality</span>
+              <span className="text-sm font-medium">{t('video.quality')}</span>
               <Select
-                aria-label="Quality"
+                aria-label={t('video.quality')}
                 value={quality}
-                options={QUALITY_OPTIONS}
+                options={qualityOptions}
                 disabled={isRunning}
                 onChange={(next) => {
                   if (isQuality(next)) {
@@ -478,11 +493,11 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium">Resolution</span>
+              <span className="text-sm font-medium">{t('video.resolution')}</span>
               <Select
-                aria-label="Resolution"
+                aria-label={t('video.resolution')}
                 value={resolution}
-                options={RESOLUTION_OPTIONS}
+                options={resolutionOptions}
                 disabled={isRunning}
                 onChange={(next) => {
                   if (isResolution(next)) {
@@ -503,12 +518,9 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
               ) : (
                 <Film aria-hidden="true" className="size-4" />
               )}
-              {isRunning ? 'Watermarking…' : 'Watermark video'}
+              {t(isRunning ? 'video.watermarking' : 'video.watermarkVideo')}
             </Button>
-            <p className="text-xs text-ink-muted">
-              The watermark keeps one fixed placement for the whole video. Audio is copied through
-              when it fits the output, otherwise re-encoded.
-            </p>
+            <p className="text-xs text-ink-muted">{t('video.fixedPlacementNote')}</p>
           </Card>
         </div>
       )}
@@ -525,17 +537,20 @@ async function shareOutcome(outcome: Outcome, onError: (message: string) => void
   }
 }
 
-function progressLabel(progress: Progress): string {
+function progressLabel(progress: Progress, t: ReturnType<typeof useTranslation>['t']): string {
   const elapsed = performance.now() - progress.startedAt
   const remaining = estimateRemainingMs(progress.timestamp, progress.durationSeconds, elapsed)
   const percent = Math.round(
     progressFraction(progress.timestamp, progress.durationSeconds) * PERCENT,
   )
-  const frames = `Frame ${String(progress.frames)}`
   if (remaining === null) {
-    return `${frames} · ${String(percent)}%`
+    return t('video.progress.noEta', { frame: progress.frames, percent })
   }
-  return `${frames} · ${String(percent)}% · about ${String(Math.ceil(remaining / MILLISECONDS_PER_SECOND))} s left`
+  return t('video.progress.withEta', {
+    frame: progress.frames,
+    percent,
+    seconds: Math.ceil(remaining / MILLISECONDS_PER_SECOND),
+  })
 }
 
 interface PreviewProps {
@@ -547,6 +562,7 @@ interface PreviewProps {
 
 /** Renders the chosen layers on the video's first frame through the editor preview path. */
 function VideoPreview({ organizationId, file, specs, size }: PreviewProps) {
+  const { t } = useTranslation()
   const { result, setSubject } = useRenderer(organizationId, specs, undefined, size)
   const [frameError, setFrameError] = useState<string | null>(null)
 
@@ -581,14 +597,14 @@ function VideoPreview({ organizationId, file, specs, size }: PreviewProps) {
   if (result === null) {
     return (
       <div className="flex items-center justify-center p-6">
-        <Spinner className="size-6" label="Rendering preview" />
+        <Spinner className="size-6" label={t('video.renderingPreview')} />
       </div>
     )
   }
   return (
     <img
       src={result.url}
-      alt="The watermark on a frame of the video"
+      alt={t('video.previewAlt')}
       width={result.width}
       height={result.height}
       className="mx-auto block max-h-[42svh] max-w-full lg:max-h-[60vh]"

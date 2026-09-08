@@ -1,5 +1,6 @@
 import { UploadCloud } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { PublicConfig } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
@@ -52,6 +53,7 @@ export function CloudSaveButtons({
   onError,
   disabled = false,
 }: CloudSaveButtonsProps) {
+  const { t } = useTranslation()
   const [pending, setPending] = useState<CloudProviderId | null>(null)
   const providers = configuredProviders(config)
   if (providers.length === 0) {
@@ -89,7 +91,7 @@ export function CloudSaveButtons({
           }}
         >
           <UploadCloud aria-hidden="true" className="size-4" />
-          Save to {PROVIDER_LABELS[provider]}
+          {t('import.saveToProvider', { provider: PROVIDER_LABELS[provider] })}
         </Button>
       ))}
     </>

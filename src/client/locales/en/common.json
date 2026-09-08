@@ -581,8 +581,103 @@
   },
   "shares": {},
   "admin": {},
-  "video": {},
-  "documents": {},
+  "import": {
+    "takePhoto": "Take a photo",
+    "cancel": "Cancel",
+    "saveToProvider": "Save to {{provider}}",
+    "url": {
+      "title": "Import from a link",
+      "description": "Paste the address of an image on the web. We fetch it and add it here.",
+      "linkLabel": "Image link",
+      "errorTitle": "Could not import that link",
+      "fetch": "Fetch"
+    },
+    "onedrive": {
+      "title": "Import from OneDrive",
+      "description": "Sign in to Microsoft, then choose photos to add.",
+      "loading": "Loading OneDrive",
+      "empty": "No folders or images here.",
+      "folderPath": "Folder path",
+      "errorTitle": "OneDrive import failed",
+      "tryAgain": "Try again",
+      "noneSelected": "No photos selected",
+      "selectedCount": "{{count}} selected",
+      "addSelected": "Add selected"
+    }
+  },
+  "video": {
+    "checkingSupport": "Checking video support",
+    "unsupportedTitle": "Video is not supported in this browser",
+    "unsupportedBody": "Your browser cannot encode video. Chrome, Edge or Safari 17 and later can.",
+    "emptyHint": "to apply it to a video.",
+    "addVideo": "Add a video",
+    "dropHint": "Drop one video here, or",
+    "formatsHint": "MP4, WebM or MOV. Everything happens in your browser; nothing is uploaded, and the gallery does not take videos yet.",
+    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
+    "choosePresetPreview": "Choose a preset to preview the watermark on a frame.",
+    "outputSize": "Output {{width}} × {{height}} px.",
+    "transcodingProgress": "Transcoding progress",
+    "progress": {
+      "noEta": "Frame {{frame}} · {{percent}}%",
+      "withEta": "Frame {{frame}} · {{percent}}% · about {{seconds}} s left"
+    },
+    "cancel": "Cancel",
+    "cancelled": "Transcoding cancelled.",
+    "runErrorTitle": "Could not watermark the video",
+    "download": "Download {{fileName}}",
+    "share": "Share",
+    "presets": "Presets",
+    "placement": "Placement",
+    "placementOptions": {
+      "smart": "Smart",
+      "bottomRight": "Bottom right",
+      "bottomLeft": "Bottom left",
+      "topRight": "Top right",
+      "topLeft": "Top left",
+      "center": "Center"
+    },
+    "quality": "Quality",
+    "qualityOptions": {
+      "low": "Low",
+      "standard": "Standard",
+      "high": "High"
+    },
+    "resolution": "Resolution",
+    "resolutionOptions": {
+      "original": "Original",
+      "fit1080p": "Fit 1080p",
+      "fit720p": "Fit 720p"
+    },
+    "watermarking": "Watermarking…",
+    "watermarkVideo": "Watermark video",
+    "fixedPlacementNote": "The watermark keeps one fixed placement for the whole video. Audio is copied through when it fits the output, otherwise re-encoded.",
+    "renderingPreview": "Rendering preview",
+    "previewAlt": "The watermark on a frame of the video"
+  },
+  "documents": {
+    "emptyHint": "to watermark documents with it.",
+    "addPdfs": "Add PDFs",
+    "dropHint": "Drop PDFs here, or",
+    "filesHint": "Up to {{max}} files, {{size}} each. Every page is watermarked in your browser; nothing is uploaded.",
+    "skipped_one": "{{count}} file skipped: not a PDF or over {{max}}.",
+    "skipped_other": "{{count}} files skipped: not a PDF or over {{max}}.",
+    "fileCount_one": "{{count}} document",
+    "fileCount_other": "{{count}} documents",
+    "clearList": "Clear list",
+    "watermarkingProgress": "Watermarking progress",
+    "progressFinished": "{{done}} of {{total}} finished",
+    "progressFailed": ", {{count}} failed",
+    "listLabel": "Documents to watermark",
+    "downloadFile": "Download {{fileName}}",
+    "removeFile": "Remove {{fileName}}",
+    "presetHint": "Tick one or more; they are drawn in the order ticked, later ones over earlier ones.",
+    "placement": "Placement",
+    "smartPlacementHint": "Smart placement is for photos; choose a corner or a custom position for documents.",
+    "watermarkEmpty": "Watermark documents",
+    "watermarkCount": "Watermark {{count}}",
+    "downloadZip": "Download {{count}} as ZIP",
+    "savedAsHint": "Each document is saved as {name}-watermarked.pdf. Encrypted PDFs are refused."
+  },
   "verify": {
     "checkEmail": {
       "title": "Check your inbox",
