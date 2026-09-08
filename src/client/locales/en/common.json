@@ -1,7 +1,6 @@
 {
   "language": {
-    "menuLabel": "Change language",
-    "heading": "Language"
+    "menuLabel": "Change language"
   },
   "shell": {
     "nav": {
@@ -19,13 +18,10 @@
     },
     "skipToContent": "Skip to content",
     "menu": "Menu",
-    "closeMenu": "Close menu",
     "primaryNav": "Primary",
     "primaryMenuNav": "Primary (menu)",
     "toolsNav": "Tools",
     "signOut": "Sign out",
-    "switchOrganization": "Switch organization",
-    "createOrganization": "Create organization",
     "accountMenu": "Account menu for {{name}}",
     "menuDescription": "Switch organization or go to any part of Watermark Pro.",
     "switchOrganizationFor": "Organization: {{name}}. Switch organization",
@@ -38,16 +34,6 @@
       "light": "Theme: light. Switch to dark",
       "dark": "Theme: dark. Switch to system"
     }
-  },
-  "actions": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "download": "Download",
-    "remove": "Remove",
-    "apply": "Apply",
-    "close": "Close",
-    "retry": "Try again"
   },
   "auth": {
     "backToSignIn": "Back to sign in",
@@ -915,9 +901,7 @@
     "checking": "Checking…",
     "noneFound": "No invisible mark found in this photo."
   },
-  "errors": {
-    "fallback": "Something went wrong. Please try again."
-  },
+  "errors": {},
   "tokens": {},
   "filters": {},
   "a11y": {},

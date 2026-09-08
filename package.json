@@ -26,6 +26,7 @@
     "lint:dup": "jscpd .",
     "typecheck": "tsc -b",
     "deadcode": "knip --treat-config-hints-as-errors",
+    "i18n:check": "node scripts/i18n-extract.mjs",
     "test": "vitest run --coverage --project unit-client --project unit-worker --project browser && vitest run --project workers",
     "test:unit": "vitest run --project unit-client --project unit-worker",
     "test:workers": "vitest run --project workers",
@@ -37,7 +38,7 @@
     "security:audit": "npm audit --audit-level=high",
     "security:secrets": "gitleaks git --redact --no-banner .",
     "security:sast": "semgrep scan --config p/default --config p/typescript --config p/react --config p/secrets --error --metrics=off",
-    "quality": "npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run deadcode && npm run lint:cycles && npm run lint:dup && npm run security:secrets && npm run security:audit && npm run test && npm run build",
+    "quality": "npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run deadcode && npm run i18n:check && npm run lint:cycles && npm run lint:dup && npm run security:secrets && npm run security:audit && npm run test && npm run build",
     "quality:ci": "npm run quality",
     "prepare": "husky",
     "test:browser": "vitest run --project browser"
