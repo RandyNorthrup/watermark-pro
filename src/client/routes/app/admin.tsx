@@ -63,7 +63,7 @@ function AdminSections({ selfId }: { selfId: string }) {
     <Tabs.Root defaultValue="users" className="flex flex-col gap-4">
       <Tabs.List
         aria-label={t('admin.sectionsLabel')}
-        className="inline-flex self-start rounded-lg border border-line bg-surface-raised p-1"
+        className="flex max-w-full flex-wrap gap-1 self-start rounded-lg border border-line bg-surface-raised p-1"
       >
         <Tabs.Trigger value="users" className={tabClassName}>
           {t('admin.tabs.users')}
