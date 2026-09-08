@@ -7,17 +7,27 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-09-08
+
+M18 (localisation): the whole interface is available in twelve languages,
+including one right-to-left script, and follows the user's preference.
+
 ### Added
 
-- M18 localisation foundation: the i18next runtime (`src/client/i18n`), the
-  supported-locale list (`src/shared/locales.ts`), locale detection (saved →
-  browser → English), a language picker in the app chrome, and a typed English
-  catalogue. String extraction across the app and the twelve translated
-  catalogues follow; the interface is still English until then.
-- M18 per-account locale: a nullable `locale` column on `user` and a validated
-  `PATCH /api/me` so a signed-in member's language follows them across devices;
-  the picker saves to the account (best-effort) as well as `localStorage`.
-- M18 right-to-left: the client layout mirrors under `dir="rtl"` (Arabic). A
+- **Twelve languages**: English, Spanish, German, French, Italian, Brazilian
+  Portuguese, Dutch, Japanese, Korean, Simplified Chinese, Russian, and Arabic
+  (right-to-left). A language picker in the header and on the signed-out pages
+  applies a choice immediately, remembers it in the browser, and — when signed
+  in — saves it to the account (a new `user.locale` column via a validated
+  `PATCH /api/me`) so it follows the member across devices. Before a choice is
+  made the app picks from the saved preference, then the browser's languages,
+  then English; `<html lang>`/`dir` follow the locale.
+- Every user-visible string now comes from the i18next catalogues under
+  `src/client/locales/` (English is the typed source of truth; the eleven
+  translations were produced and self-checked against a product-term glossary,
+  with the plural forms each locale's `Intl.PluralRules` requires). Catalogues
+  are code-split and loaded on demand.
+- Right-to-left support: the client layout mirrors under `dir="rtl"` (Arabic). A
   one-off codemod (`scripts/logical-utilities.mjs`) rewrote physical Tailwind
   utilities to logical ones across the client (`ml`/`mr`→`ms`/`me`,
   `pl`/`pr`→`ps`/`pe`, `left`/`right`→`start`/`end`, `text-left`/`text-right`→
@@ -28,6 +38,19 @@ what was planned; superseded entries stay.
   modals keep physical geometry on purpose (marked `physical: geometry`; see
   PLAN §9), since pointer/keyboard coordinates and `translate` are not mirrored
   by `dir`.
+
+### Gates
+
+- New: the `no-literal-string` ESLint gate (a hard-coded string in a component
+  fails lint), a catalogue completeness test (every locale has English's keys,
+  no empty values, placeholder and plural parity), and `i18n:check` (no dead or
+  missing keys) — all part of `npm run quality`.
+
+### Notes
+
+- Date, number and file-size formatting still follow the browser default rather
+  than the active locale, and error-message and email text stay English — a
+  localisation follow-up (PLAN §4).
 
 ## [1.9.0] - 2026-09-07
 

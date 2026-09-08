@@ -436,6 +436,27 @@ secret) and carry their expiry, so nothing secret is stored and a link can be
 shown again later; revocation is recorded in the database. Public routes are
 rate limited per address and answer every refusal with the same 404.
 
+## Languages
+
+The interface is available in twelve languages: English, Spanish, German,
+French, Italian, Brazilian Portuguese, Dutch, Japanese, Korean, Simplified
+Chinese, Russian, and Arabic (right-to-left). The language picker (the
+`Languages` icon in the header and on the signed-out pages) applies a choice
+immediately, remembers it in the browser, and — when you are signed in — saves
+it to your account so it follows you across devices. Before you pick, the app
+chooses from your saved preference, then your browser's languages, then English;
+`<html lang>`/`dir` follow the locale, and Arabic mirrors the layout.
+
+Every string comes from the i18next catalogues under `src/client/locales/`, and
+an ESLint gate (`no-literal-string`) stops an untranslated string reaching a
+component. **To add a language:** copy `locales/en/common.json`, translate it
+(the terms in `locales/GLOSSARY.md` must stay consistent; keep every
+`{{placeholder}}` and provide the plural forms `Intl.PluralRules(<locale>)`
+lists), add the code to `SUPPORTED_LOCALES` in `src/shared/locales.ts`, then run
+`npm run quality` — the completeness test and `i18n:check` verify it. See
+`docs/i18n/` for the translation-quality record. Date and number formatting and
+the error/email text are not yet localised (PLAN §4).
+
 ## Project structure
 
 ```

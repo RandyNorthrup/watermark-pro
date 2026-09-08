@@ -633,6 +633,34 @@ export const DRILLS = [
     replace: 'className="ms-auto ml-2 flex items-center gap-2"',
     ...gate('lint', /\d+ problems?/),
   },
+  {
+    name: 'i18n: a hard-coded string slips into JSX',
+    file: 'src/client/components/language-menu.tsx',
+    find: '<Languages aria-hidden />',
+    replace: '<Languages aria-hidden />Untranslated text',
+    ...gate('lint', /\d+ problems?/),
+  },
+  {
+    name: 'i18n: a language misses a key',
+    file: 'src/client/locales/de/common.json',
+    find: '"skipToContent": "Zum Inhalt springen"',
+    replace: '"skipToContentMISSING": "Zum Inhalt springen"',
+    ...unitClient('src/client/i18n/catalogues.test.ts'),
+  },
+  {
+    name: 'i18n: a placeholder is dropped in a translation',
+    file: 'src/client/locales/fr/common.json',
+    find: '"accountMenu": "Menu du compte de {{name}}"',
+    replace: '"accountMenu": "Menu du compte de"',
+    ...unitClient('src/client/i18n/catalogues.test.ts'),
+  },
+  {
+    name: 'i18n: an unsupported locale is saved',
+    file: 'src/worker/routes/me.ts',
+    find: 'locale: z.union(LOCALE_CODES.map((code) => z.literal(code))),',
+    replace: 'locale: z.string(),',
+    ...unitWorker('src/worker/routes/me.test.ts'),
+  },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
     name: 'Gate: ESLint rejects `any`',
