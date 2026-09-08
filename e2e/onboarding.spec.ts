@@ -10,6 +10,7 @@
 import {
   expect,
   expectAccessible,
+  gotoRetrying,
   latestLinkFor,
   navigateTo,
   signIn,
@@ -75,11 +76,9 @@ test('owner invites a viewer who accepts and is limited to reading', async ({
   const viewerContext = await browser.newContext()
   const viewerPage = await viewerContext.newPage()
   await signUpAndVerify(viewerPage, request, viewer)
-  // WebKit aborts the document `load` event while TanStack Router resolves this
-  // route on the client (session query + invitation loader), which Playwright
-  // surfaces as "Frame load interrupted". Wait only for the navigation to
-  // commit; the heading assertion below auto-waits for the rendered page.
-  await viewerPage.goto(acceptPath, { waitUntil: 'commit' })
+  // WebKit intermittently aborts the client-side load of this route; retry the
+  // commit-wait navigation (see gotoRetrying).
+  await gotoRetrying(viewerPage, acceptPath)
   await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText(`Join ${organizationName}`)
   await expectAccessible(viewerPage)
   await viewerPage.getByRole('button', { name: 'Accept invitation' }).click()

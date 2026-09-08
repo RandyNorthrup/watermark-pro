@@ -18,6 +18,28 @@ import { PREVIEW_ORIGIN } from './preview'
 
 export { expect } from '@playwright/test'
 
+/**
+ * Navigates to `url`, retrying on WebKit's intermittent "Frame load
+ * interrupted": on the iPhone/iPad projects the client-side load of a route
+ * that resolves immediately (the accept-invitation route runs a session query
+ * and an invitation loader) sometimes aborts the document load even when
+ * waiting only for the navigation to commit. A re-navigation clears it; a
+ * genuine failure still surfaces after the last attempt.
+ */
+export async function gotoRetrying(page: Page, url: string): Promise<void> {
+  const MAX_ATTEMPTS = 3
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      await page.goto(url, { waitUntil: 'commit' })
+      return
+    } catch (error) {
+      if (attempt === MAX_ATTEMPTS) {
+        throw error
+      }
+    }
+  }
+}
+
 /** Octets of the documentation range each test's address is drawn from. */
 const ADDRESS_PREFIX = '203.0.113'
 const OCTET_RANGE = 256

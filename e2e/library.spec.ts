@@ -10,6 +10,7 @@ import {
   createWorkspace,
   expect,
   expectAccessible,
+  gotoRetrying,
   latestLinkFor,
   navigateTo,
   pngFixture,
@@ -127,11 +128,9 @@ test('a viewer can browse presets but cannot change them', async ({ browser, pag
   const viewerContext = await browser.newContext()
   const viewerPage = await viewerContext.newPage()
   await signUpAndVerify(viewerPage, request, viewer)
-  // WebKit aborts the document `load` event while TanStack Router resolves this
-  // route on the client (session query + invitation loader), which Playwright
-  // surfaces as "Frame load interrupted". Wait only for the navigation to
-  // commit; the button locator below auto-waits for the rendered page.
-  await viewerPage.goto(acceptPath, { waitUntil: 'commit' })
+  // WebKit intermittently aborts the client-side load of this route; retry the
+  // commit-wait navigation (see gotoRetrying).
+  await gotoRetrying(viewerPage, acceptPath)
   await viewerPage.getByRole('button', { name: 'Accept invitation' }).click()
   await navigateTo(viewerPage, 'Library')
   await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
