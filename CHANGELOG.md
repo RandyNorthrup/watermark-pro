@@ -25,6 +25,13 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
+- Landing prerender tooling (`npm run prerender`, `scripts/prerender.mjs`): renders
+  the React landing once per shipped language against a preview, strips the
+  application bundle, and writes a static `dist/client/landing/<locale>.html` that
+  paints instantly and ships no application JavaScript (largest is ~4 kB gzip).
+  The theme toggle is replaced with a no-JS `<details>` language switcher whose
+  `/?lang=xx` links the Worker honours; the React landing stays the single source
+  of the markup so the static pages cannot drift. (Serving is wired next.)
 - The chosen interface language is now mirrored to an edge-readable cookie
   (`watermark-pro-locale`) in addition to `localStorage`, so the Worker can serve
   the right prerendered landing (per-locale static pages, in progress). Locale

@@ -13,8 +13,14 @@ const THEME_LABEL_KEY = {
   dark: 'shell.theme.dark',
 } as const
 
-/** Cycles system → light → dark; the choice persists per browser. */
-export function ThemeToggle() {
+/**
+ * Cycles system → light → dark; the choice persists per browser. `data-prerender`
+ * marks the landing's toggle so the prerender script (scripts/prerender.mjs) can
+ * find and replace it with the no-JS language switcher on the static landing.
+ */
+export function ThemeToggle({
+  'data-prerender': dataPrerender,
+}: { 'data-prerender'?: string } = {}) {
   const { t } = useTranslation()
   const [theme, setTheme] = useState<Theme>(readTheme)
 
@@ -26,6 +32,7 @@ export function ThemeToggle() {
       size="icon"
       aria-label={label}
       title={label}
+      data-prerender={dataPrerender}
       onClick={() => {
         const next = NEXT_THEME[theme]
         applyTheme(next)

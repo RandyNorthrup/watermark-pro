@@ -652,6 +652,21 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
     limits) is met by prerender-for-paint + the skeleton while keeping hydration.
     **Raised with Randy** for a decision (accept score-not-bytes with an honest
     `/` byte budget, vs. de-hydrate the landing and drop its localisation).
+  - **Resolution (2026-09-08): Randy chose "per-locale static".** Prerender 12
+    static landing variants and serve the right one by cookie / `Accept-Language`
+    at the edge — keeps M18 localisation AND hits the byte budget. Built in stages,
+    flipping the live `/` serving only once the static path is proven.
+    - Locale cookie (`watermark-pro-locale`) mirrored on explicit choice, read in
+      detection after localStorage; shared `localeFromCookieHeader` parser. Done.
+    - `scripts/prerender.mjs` (`npm run prerender`): renders the React landing per
+      locale against a preview, strips the app bundle, replaces the theme toggle
+      with a no-JS `<details>` `/?lang=` switcher, writes `dist/client/landing/
+<locale>.html`. Verified: 12 localized static pages, **largest 4.2 kB gzip,
+      zero app JS**, correct `lang`/`dir` (incl. `ar` rtl). Done.
+    - Next: the Worker serves `/` from the locale cookie / `Accept-Language`
+      (falling back to the SPA index.html when a landing file is absent, e.g. dev
+      and CI without a prerender), honours `?lang=`, and redirects a signed-in
+      visitor to `/app`; prerender runs in the deploy before upload.
   - **§1 first-paint skeleton (done).** `index.html` carries a static,
     theme-correct skeleton inside `#root` (header + brand mark, shimmer content
     blocks, phone tab bar) that paints before JavaScript and is replaced by
