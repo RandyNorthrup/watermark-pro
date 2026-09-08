@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DEFAULT_BACKGROUND_TOLERANCE, MAX_BACKGROUND_TOLERANCE } from '../../../shared/constants'
 import { mainThreadBackend } from '../../lib/canvas-backend'
@@ -12,7 +13,6 @@ import { SliderField } from '../ui/slider-field'
 
 /** The tolerance slider moves in whole colour-distance units. */
 const TOLERANCE_STEP = 1
-const NOT_AN_IMAGE = 'That file is not an image the browser can read.'
 
 /** Turns a cleaned buffer back into the ImageData a canvas paints. */
 function toImageData(buffer: PixelBuffer): ImageData {
@@ -56,6 +56,7 @@ interface LogoPrepareProps {
  * the browser.
  */
 export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepareProps) {
+  const { t } = useTranslation()
   const [source, setSource] = useState<PixelBuffer | null>(null)
   const [sourceSize, setSourceSize] = useState<{ width: number; height: number } | null>(null)
   const [remove, setRemove] = useState(false)
@@ -86,7 +87,7 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
       } catch {
         if (isStillActive()) {
           setSourceSize(null)
-          setError(NOT_AN_IMAGE)
+          setError(t('designer.notAnImage'))
         }
         return
       }
@@ -108,7 +109,7 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
     return () => {
       isActive = false
     }
-  }, [file])
+  }, [file, t])
 
   const cleaned = useMemo(() => {
     if (source === null) {
@@ -166,35 +167,40 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
 
   return (
     <section
-      aria-label="Prepare logo"
+      aria-label={t('designer.logo.prepare.region')}
       className="flex flex-col gap-4 rounded-lg border border-line bg-surface-raised p-4"
     >
       <div>
-        <p className="text-sm font-medium">Prepare “{file.name}”</p>
-        <p className="mt-1 text-xs text-ink-muted">
-          Optionally clear a flat background and trim empty edges, then upload it as a transparent
-          PNG.
+        <p className="text-sm font-medium">
+          {t('designer.logo.prepare.title', { name: file.name })}
         </p>
+        <p className="mt-1 text-xs text-ink-muted">{t('designer.logo.prepare.description')}</p>
       </div>
 
       {isReady ? (
         <>
           <div className="grid grid-cols-2 gap-3">
             <figure className="flex flex-col gap-1">
-              <figcaption className="text-xs font-medium text-ink-muted">Before</figcaption>
+              <figcaption className="text-xs font-medium text-ink-muted">
+                {t('designer.logo.prepare.before')}
+              </figcaption>
               <span className="flex h-24 items-center justify-center rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
                 <img src={sourceUrl} alt="" className="max-h-20 max-w-full object-contain" />
               </span>
             </figure>
             <figure className="flex flex-col gap-1">
-              <figcaption className="text-xs font-medium text-ink-muted">After</figcaption>
+              <figcaption className="text-xs font-medium text-ink-muted">
+                {t('designer.logo.prepare.after')}
+              </figcaption>
               <span className="flex h-24 items-center justify-center rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
                 {source === null ? (
-                  <span className="text-xs text-ink-muted">Preview needs a browser canvas.</span>
+                  <span className="text-xs text-ink-muted">
+                    {t('designer.logo.prepare.previewNeedsCanvas')}
+                  </span>
                 ) : (
                   <canvas
                     ref={afterCanvasRef}
-                    aria-label="Prepared logo preview"
+                    aria-label={t('designer.logo.prepare.preview')}
                     className="max-h-20 max-w-full object-contain"
                   />
                 )}
@@ -211,10 +217,10 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
               }}
               className="size-4 accent-brand-600"
             />
-            <span className="font-medium">Remove background</span>
+            <span className="font-medium">{t('designer.logo.prepare.removeBackground')}</span>
           </label>
           <SliderField
-            label="Background tolerance"
+            label={t('designer.logo.prepare.backgroundTolerance')}
             value={tolerance}
             min={0}
             max={MAX_BACKGROUND_TOLERANCE}
@@ -231,12 +237,14 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
               }}
               className="size-4 accent-brand-600"
             />
-            <span className="font-medium">Trim transparent edges</span>
+            <span className="font-medium">{t('designer.logo.prepare.trim')}</span>
           </label>
 
           {outputSize === null ? null : (
             <p className="text-xs text-ink-muted">
-              Output size: {describeSize(outputSize.width, outputSize.height)} px
+              {t('designer.logo.prepare.outputSize', {
+                size: describeSize(outputSize.width, outputSize.height),
+              })}
             </p>
           )}
         </>
@@ -253,10 +261,10 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
             void applyLogo()
           }}
         >
-          Use logo
+          {t('designer.logo.prepare.use')}
         </Button>
         <Button type="button" variant="secondary" disabled={isSaving} onClick={onCancel}>
-          Choose another
+          {t('designer.logo.prepare.chooseAnother')}
         </Button>
       </div>
     </section>

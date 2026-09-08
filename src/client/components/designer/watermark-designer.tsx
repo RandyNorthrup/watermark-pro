@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Tabs } from 'radix-ui'
 import { type SubmitEvent, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { FontPicker } from './font-picker'
 import { LogoPicker } from './logo-picker'
@@ -48,14 +49,10 @@ const tabTriggerClassName =
   'rounded-md px-3 py-1.5 text-sm font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white'
 
 const SECTION_TABS = [
-  { value: 'mark', label: 'Mark' },
-  { value: 'placement', label: 'Placement' },
-  { value: 'style', label: 'Style' },
+  { value: 'mark', label: 'designer.sections.mark' },
+  { value: 'placement', label: 'designer.sections.placement' },
+  { value: 'style', label: 'designer.sections.style' },
 ] as const
-
-/** Written as a plain string so the literal `{location}` is not read as an interpolation. */
-const LOCATION_NOTE = "{location} prints the photo's GPS position on the picture."
-const TEXT_HINT = `Up to ${String(MAX_TEXT_LENGTH)} characters on up to ${String(MAX_TEXT_LINES)} lines. Use "Insert detail" for tokens like the date or camera, filled in per photo. ${LOCATION_NOTE}`
 
 /** Keeps a typed or pasted value within the line limit; extra line breaks join the last line. */
 function limitLines(text: string): string {
@@ -84,6 +81,7 @@ export function WatermarkDesigner({
   canManageLogos,
   onSaved,
 }: WatermarkDesignerProps) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [name, setName] = useState(initial?.name ?? '')
   const [nameError, setNameError] = useState<string | null>(null)
@@ -132,7 +130,7 @@ export function WatermarkDesigner({
     event.preventDefault()
     const parsedName = presetNameSchema.safeParse(name)
     if (!parsedName.success) {
-      setNameError('Give the preset a name of up to 60 characters.')
+      setNameError(t('designer.nameError'))
       return
     }
     setNameError(null)
@@ -144,13 +142,13 @@ export function WatermarkDesigner({
   return (
     <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[minmax(0,26rem)_1fr]">
       <Card className="flex flex-col gap-5">
-        <Field label="Preset name" error={nameError ?? undefined}>
+        <Field label={t('designer.presetName')} error={nameError ?? undefined}>
           {(controlProps) => (
             <Input
               {...controlProps}
               value={name}
               maxLength={60}
-              placeholder="Studio signature"
+              placeholder={t('designer.presetNamePlaceholder')}
               readOnly={!canManage}
               onChange={(event) => {
                 setName(event.currentTarget.value)
@@ -161,12 +159,12 @@ export function WatermarkDesigner({
 
         <Tabs.Root defaultValue="mark" className="flex flex-col gap-4">
           <Tabs.List
-            aria-label="Designer sections"
+            aria-label={t('designer.sections.label')}
             className="inline-flex self-start rounded-lg border border-line bg-surface-raised p-1"
           >
             {SECTION_TABS.map((tab) => (
               <Tabs.Trigger key={tab.value} value={tab.value} className={tabTriggerClassName}>
-                {tab.label}
+                {t(tab.label)}
               </Tabs.Trigger>
             ))}
           </Tabs.List>
@@ -181,7 +179,10 @@ export function WatermarkDesigner({
               }}
               className="flex flex-col gap-4"
             >
-              <Tabs.List aria-label="Mark type" className="flex gap-1 border-b border-line">
+              <Tabs.List
+                aria-label={t('designer.markType')}
+                className="flex gap-1 border-b border-line"
+              >
                 {MARK_KINDS.map((kind) => (
                   <Tabs.Trigger
                     key={kind.value}
@@ -195,7 +196,13 @@ export function WatermarkDesigner({
               <Tabs.Content value="text" className="flex flex-col gap-4 outline-none">
                 {spec.kind === 'text' ? (
                   <>
-                    <Field label="Text" hint={TEXT_HINT}>
+                    <Field
+                      label={t('designer.text.label')}
+                      hint={t('designer.text.hint', {
+                        max: MAX_TEXT_LENGTH,
+                        lines: MAX_TEXT_LINES,
+                      })}
+                    >
                       {(controlProps) => (
                         <Textarea
                           {...controlProps}
@@ -252,8 +259,8 @@ export function WatermarkDesigner({
               <Tabs.Content value="qr" className="flex flex-col gap-4 outline-none">
                 {spec.kind === 'qr' ? (
                   <Field
-                    label="QR code content"
-                    hint={`A link, usually. Up to ${String(MAX_QR_CONTENT_LENGTH)} characters; the code is always dark on a light field so it scans.`}
+                    label={t('designer.qr.content')}
+                    hint={t('designer.qr.hint', { max: MAX_QR_CONTENT_LENGTH })}
                   >
                     {(controlProps) => (
                       <Input
@@ -287,7 +294,7 @@ export function WatermarkDesigner({
         </Tabs.Root>
 
         {save.isError ? (
-          <Alert tone="error" title="Could not save the preset">
+          <Alert tone="error" title={t('designer.saveError')}>
             {describeError(save.error)}
           </Alert>
         ) : null}
@@ -298,10 +305,10 @@ export function WatermarkDesigner({
             disabled={isIncomplete}
             className="self-start"
           >
-            {initial === undefined ? 'Save preset' : 'Save changes'}
+            {t(initial === undefined ? 'designer.savePreset' : 'designer.saveChanges')}
           </Button>
         ) : (
-          <p className="text-sm text-ink-muted">Your role can view presets but not change them.</p>
+          <p className="text-sm text-ink-muted">{t('designer.readOnlyHint')}</p>
         )}
       </Card>
       <PreviewPanel organizationId={organizationId} spec={spec} />

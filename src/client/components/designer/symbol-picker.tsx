@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { FontPicker } from './font-picker'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import { DEFAULT_FONT_FAMILY } from '../../fonts/catalogue'
@@ -33,6 +35,7 @@ const tileClassName =
 
 /** Glyph groups and the icon catalogue as pressable tiles. */
 export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-5">
       {GLYPH_GROUPS.map((group) => (
@@ -43,7 +46,7 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
               <button
                 key={glyph}
                 type="button"
-                aria-label={`Glyph ${glyph}`}
+                aria-label={t('designer.symbol.glyphLabel', { glyph })}
                 aria-pressed={symbol.type === 'glyph' && symbol.glyph === glyph}
                 className={tileClassName}
                 onClick={() => {
@@ -58,13 +61,13 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
         </fieldset>
       ))}
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">Icons</legend>
+        <legend className="text-sm font-medium">{t('designer.symbol.icons')}</legend>
         <div className="flex flex-wrap gap-1.5">
           {ICON_CATALOGUE.map((icon) => (
             <button
               key={icon.name}
               type="button"
-              aria-label={`Icon ${icon.label}`}
+              aria-label={t('designer.symbol.iconLabel', { label: icon.label })}
               title={icon.label}
               aria-pressed={symbol.type === 'icon' && symbol.name === icon.name}
               className={tileClassName}

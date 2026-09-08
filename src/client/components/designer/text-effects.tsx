@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   MAX_CURVE,
   MAX_LETTER_SPACING,
@@ -20,12 +22,12 @@ const PERCENT = 100
 const SPACING_STEP = 0.01
 const CURVE_STEP = 0.01
 
-const EFFECT_CHOICES: readonly Choice<TextEffect>[] = [
-  { value: 'solid', label: 'Solid' },
-  { value: 'outline', label: 'Outline' },
-  { value: 'emboss', label: 'Emboss' },
-  { value: 'engrave', label: 'Engrave' },
-]
+const EFFECT_CHOICES = [
+  { value: 'solid', label: 'designer.effects.solid' },
+  { value: 'outline', label: 'designer.effects.outline' },
+  { value: 'emboss', label: 'designer.effects.emboss' },
+  { value: 'engrave', label: 'designer.effects.engrave' },
+] as const satisfies readonly Choice<TextEffect>[]
 
 function percent(value: number): string {
   const rounded = Math.round(value * PERCENT)
@@ -34,10 +36,12 @@ function percent(value: number): string {
 
 /** Letter spacing, curve and paint effect for a text mark. */
 export function TextEffects({ spec, onChange }: TextEffectsProps) {
+  const { t } = useTranslation()
+  const effectChoices = EFFECT_CHOICES.map((choice) => ({ ...choice, label: t(choice.label) }))
   return (
     <div className="flex flex-col gap-4">
       <SliderField
-        label="Letter spacing"
+        label={t('designer.effects.letterSpacing')}
         value={spec.letterSpacing}
         min={MIN_LETTER_SPACING}
         max={MAX_LETTER_SPACING}
@@ -48,7 +52,7 @@ export function TextEffects({ spec, onChange }: TextEffectsProps) {
         }}
       />
       <SliderField
-        label="Curve"
+        label={t('designer.effects.curve')}
         value={spec.curve}
         min={-MAX_CURVE}
         max={MAX_CURVE}
@@ -59,11 +63,11 @@ export function TextEffects({ spec, onChange }: TextEffectsProps) {
         }}
       />
       <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium">Effect</span>
+        <span className="text-sm font-medium">{t('designer.effects.effect')}</span>
         <ChoiceGroup
-          label="Text effect"
+          label={t('designer.effects.textEffect')}
           value={spec.effect}
-          choices={EFFECT_CHOICES}
+          choices={effectChoices}
           onChange={(effect) => {
             onChange({ ...spec, effect: TEXT_EFFECTS.includes(effect) ? effect : 'solid' })
           }}

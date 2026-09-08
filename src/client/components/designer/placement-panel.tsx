@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   type Anchor,
   ANCHORS,
@@ -18,31 +20,39 @@ interface PlacementPanelProps {
 const MODE_CHOICES = [
   {
     value: 'smart',
-    label: 'Smart',
-    description: 'Analyses each photo and picks the calmest corner',
+    label: 'designer.placement.smart',
+    description: 'designer.placement.smartDescription',
   },
-  { value: 'anchor', label: 'Corner', description: 'Fixed position relative to the edges' },
-  { value: 'custom', label: 'Custom', description: 'Exact position as a fraction of the photo' },
+  {
+    value: 'anchor',
+    label: 'designer.placement.corner',
+    description: 'designer.placement.cornerDescription',
+  },
+  {
+    value: 'custom',
+    label: 'designer.placement.custom',
+    description: 'designer.placement.customDescription',
+  },
   {
     value: 'random',
-    label: 'Random',
-    description: 'A different spot per photo; harder to auto-remove',
+    label: 'designer.placement.random',
+    description: 'designer.placement.randomDescription',
   },
 ] as const
 
 const JITTER_STEP = 0.01
 
-const ANCHOR_LABELS: Record<Anchor, string> = {
-  'top-left': 'Top left',
-  'top-center': 'Top centre',
-  'top-right': 'Top right',
-  'middle-left': 'Middle left',
-  center: 'Centre',
-  'middle-right': 'Middle right',
-  'bottom-left': 'Bottom left',
-  'bottom-center': 'Bottom centre',
-  'bottom-right': 'Bottom right',
-}
+const ANCHOR_LABELS = {
+  'top-left': 'designer.placement.anchor.topLeft',
+  'top-center': 'designer.placement.anchor.topCenter',
+  'top-right': 'designer.placement.anchor.topRight',
+  'middle-left': 'designer.placement.anchor.middleLeft',
+  center: 'designer.placement.anchor.center',
+  'middle-right': 'designer.placement.anchor.middleRight',
+  'bottom-left': 'designer.placement.anchor.bottomLeft',
+  'bottom-center': 'designer.placement.anchor.bottomCenter',
+  'bottom-right': 'designer.placement.anchor.bottomRight',
+} as const satisfies Record<Anchor, string>
 
 const DEFAULT_ANCHOR: Anchor = 'bottom-right'
 const CENTRE = 0.5
@@ -54,12 +64,18 @@ function percent(value: number): string {
 }
 
 export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
+  const { t } = useTranslation()
+  const modeChoices = MODE_CHOICES.map((choice) => ({
+    ...choice,
+    label: t(choice.label),
+    description: t(choice.description),
+  }))
   return (
     <div className="flex flex-col gap-4">
       <ChoiceGroup
-        label="Placement mode"
+        label={t('designer.placement.mode')}
         value={placement.mode}
-        choices={MODE_CHOICES}
+        choices={modeChoices}
         onChange={(mode) => {
           switch (mode) {
             case 'anchor': {
@@ -81,19 +97,13 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
         }}
       />
       {placement.mode === 'smart' ? (
-        <p className="text-sm text-ink-muted">
-          The engine scores every corner and edge for detail, contrast and subject, then places the
-          mark where it is legible and least intrusive.
-        </p>
+        <p className="text-sm text-ink-muted">{t('designer.placement.smartHint')}</p>
       ) : null}
       {placement.mode === 'random' ? (
         <div className="flex flex-col gap-2">
-          <p className="text-sm text-ink-muted">
-            Each photo gets a random corner, nudged by up to the jitter below. The same photo always
-            lands in the same place.
-          </p>
+          <p className="text-sm text-ink-muted">{t('designer.placement.randomHint')}</p>
           <SliderField
-            label="Jitter"
+            label={t('designer.placement.jitter')}
             value={placement.jitter}
             min={0}
             max={MAX_JITTER}
@@ -107,13 +117,13 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
       ) : null}
       {placement.mode === 'anchor' ? (
         <fieldset className="flex flex-col gap-2">
-          <legend className="text-sm font-medium">Corner</legend>
+          <legend className="text-sm font-medium">{t('designer.placement.cornerLegend')}</legend>
           <div className="grid w-40 grid-cols-3 gap-1.5">
             {ANCHORS.map((anchor) => (
               <button
                 key={anchor}
                 type="button"
-                aria-label={ANCHOR_LABELS[anchor]}
+                aria-label={t(ANCHOR_LABELS[anchor])}
                 aria-pressed={placement.anchor === anchor}
                 onClick={() => {
                   onChange({ mode: 'anchor', anchor })
@@ -129,7 +139,7 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
       {placement.mode === 'custom' ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <SliderField
-            label="Horizontal"
+            label={t('designer.placement.horizontal')}
             value={placement.x}
             min={0}
             max={1}
@@ -140,7 +150,7 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
             }}
           />
           <SliderField
-            label="Vertical"
+            label={t('designer.placement.vertical')}
             value={placement.y}
             min={0}
             max={1}

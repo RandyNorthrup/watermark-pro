@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   MAX_LINE_ASPECT,
   MAX_SHAPE_ASPECT,
@@ -23,12 +25,12 @@ const ASPECT_STEP = 0.05
 const STROKE_STEP = 0.005
 const DEFAULT_FILL_COLOUR = '#6d4de6'
 
-const SHAPE_OPTIONS: readonly SelectOption<Shape>[] = [
-  { value: 'rectangle', label: 'Rectangle' },
-  { value: 'rounded-rectangle', label: 'Rounded rectangle' },
-  { value: 'ellipse', label: 'Ellipse' },
-  { value: 'line', label: 'Line' },
-]
+const SHAPE_OPTIONS = [
+  { value: 'rectangle', label: 'designer.shape.rectangle' },
+  { value: 'rounded-rectangle', label: 'designer.shape.roundedRectangle' },
+  { value: 'ellipse', label: 'designer.shape.ellipse' },
+  { value: 'line', label: 'designer.shape.line' },
+] as const satisfies readonly SelectOption<Shape>[]
 
 function isShape(value: string): value is Shape {
   return (SHAPES as readonly string[]).includes(value)
@@ -39,15 +41,17 @@ const SWITCH_CLASS =
 
 /** Shape kind, proportions, fill and stroke for a shape mark. */
 export function ShapePanel({ spec, onChange }: ShapePanelProps) {
+  const { t } = useTranslation()
   const isLine = spec.shape === 'line'
+  const shapeOptions = SHAPE_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium">Shape</span>
+        <span className="text-sm font-medium">{t('designer.shape.label')}</span>
         <Select
-          aria-label="Shape"
+          aria-label={t('designer.shape.label')}
           value={spec.shape}
-          options={SHAPE_OPTIONS}
+          options={shapeOptions}
           onChange={(shape) => {
             if (!isShape(shape)) {
               return
@@ -60,7 +64,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
         />
       </div>
       <SliderField
-        label={isLine ? 'Length' : 'Proportions'}
+        label={t(isLine ? 'designer.shape.length' : 'designer.shape.proportions')}
         value={spec.aspect}
         min={isLine ? MIN_LINE_ASPECT : MIN_SHAPE_ASPECT}
         max={isLine ? MAX_LINE_ASPECT : MAX_SHAPE_ASPECT}
@@ -73,12 +77,12 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
 
       <fieldset className="flex flex-col gap-2">
         <label className="flex items-center justify-between text-sm font-medium">
-          Fill
+          {t('designer.shape.fill')}
           <input
             type="checkbox"
             className={SWITCH_CLASS}
             role="switch"
-            aria-label="Fill the shape"
+            aria-label={t('designer.shape.fillToggle')}
             checked={spec.fill.enabled}
             onChange={(event) => {
               onChange({ ...spec, fill: { ...spec.fill, enabled: event.currentTarget.checked } })
@@ -88,10 +92,10 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
         {spec.fill.enabled ? (
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm">
-              <span className="w-24">Fill colour</span>
+              <span className="w-24">{t('designer.shape.fillColour')}</span>
               <input
                 type="color"
-                aria-label="Fill colour"
+                aria-label={t('designer.shape.fillColour')}
                 value={spec.fill.colour}
                 onChange={(event) => {
                   onChange({ ...spec, fill: { ...spec.fill, colour: event.currentTarget.value } })
@@ -99,7 +103,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
               />
             </label>
             <SliderField
-              label="Fill opacity"
+              label={t('designer.shape.fillOpacity')}
               value={spec.fill.opacity}
               min={0}
               max={1}
@@ -115,7 +119,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
 
       <fieldset className="flex flex-col gap-2">
         <SliderField
-          label="Stroke width"
+          label={t('designer.shape.strokeWidth')}
           value={spec.stroke.width}
           min={0}
           max={MAX_STROKE_RATIO}
@@ -140,12 +144,12 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
             }}
             className="size-4 accent-brand-600"
           />
-          Custom stroke colour
+          {t('designer.shape.customStrokeColour')}
         </label>
         {spec.stroke.colour === null ? null : (
           <input
             type="color"
-            aria-label="Stroke colour"
+            aria-label={t('designer.shape.strokeColour')}
             value={spec.stroke.colour}
             onChange={(event) => {
               onChange({ ...spec, stroke: { ...spec.stroke, colour: event.currentTarget.value } })

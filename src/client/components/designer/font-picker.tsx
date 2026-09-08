@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { FONT_WEIGHTS } from '../../../shared/constants'
 import {
@@ -38,6 +39,7 @@ export function FontPicker({
   onWeightChange,
   className,
 }: FontPickerProps) {
+  const { t } = useTranslation()
   const familyId = useId()
   const weightId = useId()
   const font = findFont(family)
@@ -46,7 +48,7 @@ export function FontPicker({
     <div className={cn('grid gap-4 sm:grid-cols-[1fr_auto]', className)}>
       <div className="flex flex-col gap-1.5">
         <label htmlFor={familyId} className="text-sm font-medium">
-          Font
+          {t('designer.font.family')}
         </label>
         <select
           id={familyId}
@@ -69,13 +71,13 @@ export function FontPicker({
           ))}
         </select>
         <p className="truncate text-lg" style={{ fontFamily: `"${family}"` }} aria-hidden="true">
-          The quick brown fox
+          {t('designer.font.specimen')}
         </p>
       </div>
       {weight === undefined || onWeightChange === undefined ? null : (
         <div className="flex flex-col gap-1.5">
           <label htmlFor={weightId} className="text-sm font-medium">
-            Weight
+            {t('designer.font.weight')}
           </label>
           <select
             id={weightId}

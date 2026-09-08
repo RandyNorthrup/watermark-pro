@@ -1,6 +1,7 @@
 import { Eraser, PenLine, Undo2 } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { type PointerEvent, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   DEFAULT_PEN_WIDTH,
@@ -62,6 +63,7 @@ async function exportSignature(strokes: readonly Stroke[]): Promise<{
  * saved image is rendered at full resolution rather than from the screen.
  */
 export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [strokes, setStrokes] = useState<Stroke[]>([])
   const [penWidth, setPenWidth] = useState<number>(DEFAULT_PEN_WIDTH)
@@ -142,17 +144,18 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
       <Dialog.Trigger asChild>
         <Button type="button" variant="secondary">
           <PenLine aria-hidden="true" className="size-4" />
-          Draw a signature
+          {t('designer.logo.signature.draw')}
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
         <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(96vw,44rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-4 shadow-card sm:p-6">
           <div>
-            <Dialog.Title className="text-lg font-semibold">Draw a signature</Dialog.Title>
+            <Dialog.Title className="text-lg font-semibold">
+              {t('designer.logo.signature.draw')}
+            </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-ink-muted">
-              Sign with a finger, a pen or the mouse. It is saved as a transparent logo in the
-              library, cropped to the ink.
+              {t('designer.logo.signature.description')}
             </Dialog.Description>
           </div>
           <canvas
@@ -163,7 +166,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
             width={PAD_WIDTH}
             height={PAD_HEIGHT}
             role="img"
-            aria-label="Signature pad; draw here"
+            aria-label={t('designer.logo.signature.pad')}
             className="w-full touch-none rounded-lg border border-line bg-white shadow-inner"
             style={{ aspectRatio: `${String(PAD_WIDTH)} / ${String(PAD_HEIGHT)}` }}
             onPointerDown={begin}
@@ -172,15 +175,19 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
             onPointerCancel={finish}
           />
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium">Pen</span>
-            <div role="radiogroup" aria-label="Pen width" className="flex gap-1">
+            <span className="text-sm font-medium">{t('designer.logo.signature.pen')}</span>
+            <div
+              role="radiogroup"
+              aria-label={t('designer.logo.signature.penWidthGroup')}
+              className="flex gap-1"
+            >
               {PEN_WIDTHS.map((width) => (
                 <button
                   key={width}
                   type="button"
                   role="radio"
                   aria-checked={penWidth === width}
-                  aria-label={`${String(width)} pixel pen`}
+                  aria-label={t('designer.logo.signature.penWidth', { width })}
                   onClick={() => {
                     setPenWidth(width)
                   }}
@@ -206,7 +213,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
                 onClick={undo}
               >
                 <Undo2 aria-hidden="true" className="size-4" />
-                Undo stroke
+                {t('designer.logo.signature.undo')}
               </Button>
               <Button
                 type="button"
@@ -216,7 +223,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
                 onClick={clear}
               >
                 <Eraser aria-hidden="true" className="size-4" />
-                Clear
+                {t('designer.logo.signature.clear')}
               </Button>
             </div>
           </div>
@@ -228,7 +235,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
           <div className="flex justify-end gap-2">
             <Dialog.Close asChild>
               <Button type="button" variant="secondary">
-                Cancel
+                {t('designer.logo.signature.cancel')}
               </Button>
             </Dialog.Close>
             <Button
@@ -239,7 +246,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
                 void save()
               }}
             >
-              Save as logo
+              {t('designer.logo.signature.save')}
             </Button>
           </div>
         </Dialog.Content>

@@ -1,5 +1,6 @@
 import { Switch } from 'radix-ui'
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   CONTRAST_VARIANTS,
@@ -22,16 +23,29 @@ interface StylePanelProps {
 }
 
 const CONTRAST_CHOICES = [
-  { value: 'auto', label: 'Auto', description: 'Light or dark ink chosen per photo' },
-  { value: 'manual', label: 'Manual', description: 'Fixed ink and outline strength' },
-  { value: 'colour', label: 'Colour', description: 'An ink colour of your own' },
+  { value: 'auto', label: 'designer.style.auto', description: 'designer.style.autoDescription' },
+  {
+    value: 'manual',
+    label: 'designer.style.manual',
+    description: 'designer.style.manualDescription',
+  },
+  {
+    value: 'colour',
+    label: 'designer.style.colour',
+    description: 'designer.style.colourDescription',
+  },
 ] as const
 
 /** A brand-ish default for the colour picker: the app's own accent. */
 const DEFAULT_INK_COLOUR = '#6d4de6'
 
-const VARIANT_CHOICES: readonly { value: ContrastVariant; label: string }[] = CONTRAST_VARIANTS.map(
-  (variant) => ({ value: variant, label: variant === 'light' ? 'Light ink' : 'Dark ink' }),
+type InkKey = 'designer.style.inkLight' | 'designer.style.inkDark'
+
+const VARIANT_CHOICES: readonly { value: ContrastVariant; label: InkKey }[] = CONTRAST_VARIANTS.map(
+  (variant) => ({
+    value: variant,
+    label: variant === 'light' ? 'designer.style.inkLight' : 'designer.style.inkDark',
+  }),
 )
 
 const DEFAULT_MANUAL_OUTLINE = 0.5
@@ -76,43 +90,47 @@ function contrastFor(
 }
 
 export function StylePanel({ spec, onChange }: StylePanelProps) {
+  const { t } = useTranslation()
   const tilingId = useId()
   const backdropId = useId()
   const { style, contrast } = spec
   const hasBackdrop = spec.kind === 'text' || spec.kind === 'symbol'
+  const contrastChoices = CONTRAST_CHOICES.map((choice) => ({
+    ...choice,
+    label: t(choice.label),
+    description: t(choice.description),
+  }))
+  const variantChoices = VARIANT_CHOICES.map((choice) => ({ ...choice, label: t(choice.label) }))
   return (
     <div className="flex flex-col gap-6">
       <section aria-labelledby="contrast-heading" className="flex flex-col gap-3">
         <h2 id="contrast-heading" className="text-sm font-semibold">
-          Contrast
+          {t('designer.style.contrast')}
         </h2>
         <ChoiceGroup
-          label="Contrast mode"
+          label={t('designer.style.contrastMode')}
           value={contrast.mode}
-          choices={CONTRAST_CHOICES}
+          choices={contrastChoices}
           onChange={(mode) => {
             onChange(withContrast(spec, contrastFor(mode, contrast)))
           }}
         />
         {contrast.mode === 'auto' ? (
-          <p className="text-sm text-ink-muted">
-            Ink switches between light and dark to suit the area under the mark, and an outline is
-            added only when the background is too close in tone.
-          </p>
+          <p className="text-sm text-ink-muted">{t('designer.style.autoHint')}</p>
         ) : (
           <div className="flex flex-col gap-4">
             {contrast.mode === 'manual' ? (
               <ChoiceGroup
-                label="Ink"
+                label={t('designer.style.ink')}
                 value={contrast.variant}
-                choices={VARIANT_CHOICES}
+                choices={variantChoices}
                 onChange={(variant) => {
                   onChange(withContrast(spec, { ...contrast, variant }))
                 }}
               />
             ) : (
               <label className="flex items-center justify-between gap-3 text-sm font-medium">
-                Ink colour
+                {t('designer.style.inkColour')}
                 <span className="flex items-center gap-2 font-mono text-xs text-ink-muted">
                   {contrast.colour}
                   <input
@@ -127,7 +145,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
               </label>
             )}
             <SliderField
-              label="Outline strength"
+              label={t('designer.style.outlineStrength')}
               value={contrast.outline}
               min={0}
               max={1}
@@ -143,10 +161,10 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
 
       <section aria-labelledby="appearance-heading" className="flex flex-col gap-4">
         <h2 id="appearance-heading" className="text-sm font-semibold">
-          Appearance
+          {t('designer.style.appearance')}
         </h2>
         <SliderField
-          label="Opacity"
+          label={t('designer.style.opacity')}
           value={style.opacity}
           min={0}
           max={1}
@@ -157,18 +175,18 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           }}
         />
         <SliderField
-          label="Size"
+          label={t('designer.style.size')}
           value={style.scale}
           min={MIN_SCALE}
           max={MAX_SCALE}
           step={FRACTION_STEP}
-          format={(value) => `${percent(value)} of width`}
+          format={(value) => t('designer.style.ofWidth', { percent: percent(value) })}
           onChange={(scale) => {
             onChange(withStyle(spec, { scale }))
           }}
         />
         <SliderField
-          label="Rotation"
+          label={t('designer.style.rotation')}
           value={style.rotation}
           min={-MAX_ROTATION_DEGREES}
           max={MAX_ROTATION_DEGREES}
@@ -179,7 +197,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           }}
         />
         <SliderField
-          label="Margin"
+          label={t('designer.style.margin')}
           value={style.margin}
           min={0}
           max={MAX_MARGIN}
@@ -196,7 +214,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
         <section aria-labelledby="backdrop-heading" className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 id="backdrop-heading" className="text-sm font-semibold">
-              <label htmlFor={backdropId}>Box behind the mark</label>
+              <label htmlFor={backdropId}>{t('designer.style.backdrop')}</label>
             </h2>
             <Switch.Root
               id={backdropId}
@@ -210,7 +228,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
             </Switch.Root>
           </div>
           <SliderField
-            label="Box opacity"
+            label={t('designer.style.boxOpacity')}
             value={style.backdrop.opacity}
             min={0}
             max={1}
@@ -227,7 +245,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
       <section aria-labelledby="tiling-heading" className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 id="tiling-heading" className="text-sm font-semibold">
-            <label htmlFor={tilingId}>Repeat across the photo</label>
+            <label htmlFor={tilingId}>{t('designer.style.tiling')}</label>
           </h2>
           <Switch.Root
             id={tilingId}
@@ -241,7 +259,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           </Switch.Root>
         </div>
         <SliderField
-          label="Spacing"
+          label={t('designer.style.spacing')}
           value={style.tiling.spacing}
           min={MIN_TILE_SPACING}
           max={MAX_TILE_SPACING}

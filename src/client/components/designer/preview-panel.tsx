@@ -1,7 +1,8 @@
 import { ImagePlus, RotateCcw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
-import type { WatermarkSpec } from '../../../shared/watermark'
+import type { Anchor, WatermarkSpec } from '../../../shared/watermark'
 import { INK } from '../../engine/contrast'
 import { apiRequest } from '../../lib/api'
 import { describeError } from '../../lib/errors'
@@ -25,21 +26,18 @@ function isRenderable(spec: WatermarkSpec): boolean {
   return spec.kind !== 'image' || spec.assetId !== ''
 }
 
-function describePlacement(result: PreviewResult): string {
-  const mark = result.marks[0]
-  if (mark === undefined) {
-    return 'Nothing to place.'
-  }
-  const ink =
-    mark.contrast.isAuto || mark.contrast.fill === INK[mark.contrast.variant].fill
-      ? `${mark.contrast.variant} ink`
-      : `ink ${mark.contrast.fill}`
-  const anchor = mark.placement.anchor
-  if (anchor === null) {
-    return `Custom position, ${ink}.`
-  }
-  return `Placed ${anchor.replaceAll('-', ' ')}, ${ink}.`
-}
+/** Catalogue keys for the lower-case position phrase in the placement readout. */
+const PLACED_POSITION_KEYS = {
+  'top-left': 'designer.preview.position.topLeft',
+  'top-center': 'designer.preview.position.topCenter',
+  'top-right': 'designer.preview.position.topRight',
+  'middle-left': 'designer.preview.position.middleLeft',
+  center: 'designer.preview.position.center',
+  'middle-right': 'designer.preview.position.middleRight',
+  'bottom-left': 'designer.preview.position.bottomLeft',
+  'bottom-center': 'designer.preview.position.bottomCenter',
+  'bottom-right': 'designer.preview.position.bottomRight',
+} as const satisfies Record<Anchor, string>
 
 /** What the preview area shows before the engine's first frame. */
 function PendingPreview({
@@ -49,15 +47,14 @@ function PendingPreview({
   isRenderable: boolean
   hasOwnPhoto: boolean
 }) {
+  const { t } = useTranslation()
   if (!isSpecRenderable) {
     return (
-      <p className="p-6 text-center text-sm text-ink-muted">
-        Choose or upload a logo to see the preview.
-      </p>
+      <p className="p-6 text-center text-sm text-ink-muted">{t('designer.preview.chooseLogo')}</p>
     )
   }
   if (hasOwnPhoto) {
-    return <Spinner className="size-6" label="Rendering preview" />
+    return <Spinner className="size-6" label={t('designer.preview.rendering')} />
   }
   return <SampleScene className="max-h-[70vh] w-full object-contain" />
 }
@@ -67,6 +64,7 @@ function PendingPreview({
  * Uses a bundled sample scene until the user drops in a photo of their own.
  */
 export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
+  const { t } = useTranslation()
   const rendererRef = useRef<PreviewRenderer | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [result, setResult] = useState<PreviewResult | null>(null)
@@ -146,20 +144,43 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
     }
   }
 
+  /** One-line readout of where the top mark landed and which ink it uses. */
+  function describePlacement(result: PreviewResult): string {
+    const mark = result.marks[0]
+    if (mark === undefined) {
+      return t('designer.preview.nothingToPlace')
+    }
+    const ink =
+      mark.contrast.isAuto || mark.contrast.fill === INK[mark.contrast.variant].fill
+        ? t(
+            mark.contrast.variant === 'light'
+              ? 'designer.preview.inkLight'
+              : 'designer.preview.inkDark',
+          )
+        : t('designer.preview.inkColour', { colour: mark.contrast.fill })
+    const anchor = mark.placement.anchor
+    if (anchor === null) {
+      return t('designer.preview.customPosition', { ink })
+    }
+    return t('designer.preview.placed', { position: t(PLACED_POSITION_KEYS[anchor]), ink })
+  }
+
   return (
     <section aria-labelledby="preview-heading" className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 id="preview-heading" className="text-sm font-semibold">
-          Preview
+          {t('designer.preview.heading')}
         </h2>
         <div className="flex items-center gap-2">
-          {isRendering ? <Spinner className="size-4" label="Rendering preview" /> : null}
+          {isRendering ? (
+            <Spinner className="size-4" label={t('designer.preview.rendering')} />
+          ) : null}
           <input
             ref={inputRef}
             type="file"
             accept={ACCEPTED_PHOTO_TYPES}
             className="sr-only"
-            aria-label="Choose a photo to preview on"
+            aria-label={t('designer.preview.choosePhoto')}
             onChange={(event) => {
               const file = event.currentTarget.files?.[0]
               if (file !== undefined) {
@@ -177,7 +198,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
             }}
           >
             <ImagePlus aria-hidden="true" className="size-4" />
-            Try your photo
+            {t('designer.preview.tryYourPhoto')}
           </Button>
           {hasOwnPhoto ? (
             <Button
@@ -189,7 +210,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
               }}
             >
               <RotateCcw aria-hidden="true" className="size-4" />
-              Sample photo
+              {t('designer.preview.samplePhoto')}
             </Button>
           ) : null}
         </div>
@@ -200,7 +221,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
         ) : (
           <img
             src={shownResult.url}
-            alt="Watermark preview on the subject photo"
+            alt={t('designer.preview.alt')}
             width={shownResult.width}
             height={shownResult.height}
             className="max-h-[70vh] w-full object-contain"
@@ -213,7 +234,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
         </p>
       )}
       {error === null ? null : (
-        <Alert tone="error" title="Preview failed">
+        <Alert tone="error" title={t('designer.preview.failed')}>
           {error}
         </Alert>
       )}

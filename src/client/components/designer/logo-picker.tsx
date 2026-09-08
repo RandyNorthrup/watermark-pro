@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Trash2, Upload } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { LogoPrepare } from './logo-prepare'
 import { SignaturePad } from './signature-pad'
@@ -36,6 +37,7 @@ function stripExtension(fileName: string): string {
 
 /** Organization logos as a radio grid, with upload and delete for managers. */
 export function LogoPicker({ organizationId, assetId, onChange, canManage }: LogoPickerProps) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const assets = useQuery(assetsQueryOptions(organizationId))
   const inputId = useId()
@@ -51,13 +53,13 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
   const upload = useMutation({
     mutationFn: async (file: File) => {
       if (file.size > MAX_LOGO_BYTES) {
-        throw new Error(`Logos must be ${String(MAX_LOGO_MEGABYTES)} MB or smaller.`)
+        throw new Error(t('designer.logo.tooLarge', { max: MAX_LOGO_MEGABYTES }))
       }
       let size
       try {
         size = await readImageSize(file)
       } catch {
-        throw new Error('That file is not an image the browser can read.')
+        throw new Error(t('designer.notAnImage'))
       }
       return await uploadLogo(organizationId, { file, name: stripExtension(file.name), ...size })
     },
@@ -101,11 +103,11 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
   })
 
   if (assets.isPending) {
-    return <Spinner className="size-5" label="Loading logos" />
+    return <Spinner className="size-5" label={t('designer.logo.loading')} />
   }
   if (assets.isError) {
     return (
-      <Alert tone="error" title="Could not load logos">
+      <Alert tone="error" title={t('designer.logo.loadError')}>
         {describeError(assets.error)}
       </Alert>
     )
@@ -114,19 +116,17 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
   return (
     <div className="flex flex-col gap-4">
       {assets.data.length === 0 ? (
-        <p className="text-sm text-ink-muted">
-          No logos yet. Upload a PNG, JPEG or WebP with a transparent background for best results.
-        </p>
+        <p className="text-sm text-ink-muted">{t('designer.logo.empty')}</p>
       ) : (
         <fieldset className="flex flex-col gap-2">
-          <legend className="text-sm font-medium">Choose a logo</legend>
+          <legend className="text-sm font-medium">{t('designer.logo.choose')}</legend>
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {assets.data.map((asset) => (
               <li key={asset.id} className="relative">
                 <button
                   type="button"
                   aria-pressed={asset.id === assetId}
-                  aria-label={`Logo ${asset.name}`}
+                  aria-label={t('designer.logo.item', { name: asset.name })}
                   onClick={() => {
                     onChange(asset.id)
                   }}
@@ -149,7 +149,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={`Delete logo ${asset.name}`}
+                    aria-label={t('designer.logo.delete', { name: asset.name })}
                     className="absolute top-1 right-1 size-7 text-ink-muted hover:text-rose-600"
                     disabled={remove.isPending}
                     onClick={() => {
@@ -171,7 +171,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
             id={inputId}
             type="file"
             accept={ACCEPT}
-            aria-label="Upload a logo file"
+            aria-label={t('designer.logo.upload')}
             className="sr-only"
             onChange={(event) => {
               const file = event.currentTarget.files?.[0]
@@ -192,7 +192,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
               }}
             >
               {upload.isPending ? null : <Upload aria-hidden="true" className="size-4" />}
-              Upload logo
+              {t('designer.logo.uploadButton')}
             </Button>
             <SignaturePad
               isSaving={signature.isPending}
@@ -202,7 +202,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
             />
           </div>
           <p className="text-xs text-ink-muted">
-            PNG, JPEG or WebP up to {String(MAX_LOGO_MEGABYTES)} MB, or a drawn signature.
+            {t('designer.logo.hint', { max: MAX_LOGO_MEGABYTES })}
           </p>
           {pendingFile === null ? null : (
             <LogoPrepare
