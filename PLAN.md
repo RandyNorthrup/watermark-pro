@@ -632,6 +632,15 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   - [ ] 2.0.0 tagged, deployed, released
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
   (not relaxed budgets) for the perf work; landing it in small green increments.
+  - **§3 diet, first pass (done).** Dropped the `ui` chunk group (it forced all
+    of radix + lucide onto the first paint) and code-split the authenticated
+    layout from the entry (removed the `splitBehavior` that pinned `/app` in the
+    entry). Initial-load JS shared by every page: **234.8 → 188.6 kB gzip**;
+    route chunks unchanged and within budget. Remaining boot fat traced: the
+    landing route's session check pulls `auth-client` + `shared/api` (which pulls
+    the 26 kB `watermark` schema module) onto the public boot — the next lever.
+    The `/` ≤ 90 kB target still needs a minimal public entry (react-dom + router
+    - i18next + query already floor near 130 kB); tracked for the boot-split step.
   - **§1 first-paint skeleton (done).** `index.html` carries a static,
     theme-correct skeleton inside `#root` (header + brand mark, shimmer content
     blocks, phone tab bar) that paints before JavaScript and is replaced by

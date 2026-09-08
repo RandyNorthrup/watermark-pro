@@ -9,6 +9,15 @@ what was planned; superseded entries stay.
 
 M19 (performance and production hardening) is in progress.
 
+### Changed
+
+- JavaScript diet, first pass (PLAN §5.5): the `ui` chunk group (all of radix-ui
+  + lucide bundled together) is gone and the authenticated layout is now
+  code-split from the entry, so a first paint no longer downloads every UI
+  primitive or the app shell. Initial-load JS shared by every page dropped from
+  234.8 kB to 188.6 kB gzip. Route chunks stay small (largest own chunk 10.6 kB
+  gzip, well under the 60 kB budget).
+
 ### Added
 
 - First-paint skeleton: `index.html` now carries a static, theme-correct

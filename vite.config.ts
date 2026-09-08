@@ -62,20 +62,16 @@ function inlineScriptCspHashPlugin(): Plugin {
 }
 
 /**
- * Chunking for phones on slow networks (PLAN.md §5.5 mobile budget). The UI
- * primitives and every icon in use are one long-cached chunk instead of
- * thirty 1 kB files, each costing a round trip on HTTP/1.1; React, the
- * router and the query client stay in the entry chunk they already share.
- */
-const UI_CHUNK_GROUP = {
-  name: 'ui',
-  test: /node_modules[\\/](lucide-react|radix-ui|@radix-ui|class-variance-authority|clsx|tailwind-merge)[\\/]/,
-}
-
-/**
  * mediabunny (video, M17) and pdf-lib (documents, M17) are large and each is
  * reached only from its own route, so they ride in their own long-cached chunk
  * instead of weighing down any page that does not watermark that media type.
+ *
+ * The UI primitives (radix-ui, lucide-react) are deliberately NOT grouped
+ * (M19): grouping every primitive into one `ui` chunk pulled all of radix onto
+ * the first paint even though the shell needs only a handful, costing ~40 kB
+ * gzip. Cloudflare serves HTTP/2, so the many-small-files round-trip cost the
+ * grouping avoided no longer applies; letting rolldown split them per route
+ * keeps the public boot lean (PLAN.md §5.5).
  */
 const VIDEO_CHUNK_GROUP = {
   name: 'video',
@@ -95,7 +91,7 @@ export default defineConfig({
     manifest: true,
     rolldownOptions: {
       output: {
-        codeSplitting: { groups: [UI_CHUNK_GROUP, VIDEO_CHUNK_GROUP, PDF_CHUNK_GROUP] },
+        codeSplitting: { groups: [VIDEO_CHUNK_GROUP, PDF_CHUNK_GROUP] },
       },
     },
   },
@@ -104,11 +100,6 @@ export default defineConfig({
     tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
-      codeSplittingOptions: {
-        // The authenticated layout (shell, navigation) is needed by every
-        // signed-in page; keeping it in the entry saves a round trip.
-        splitBehavior: ({ routeId }) => (routeId === '/app' ? [] : undefined),
-      },
       routesDirectory: './src/client/routes',
       generatedRouteTree: './src/client/routeTree.gen.ts',
       // Co-located tests live beside routes but are not routes.
