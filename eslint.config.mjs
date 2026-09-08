@@ -14,6 +14,7 @@
 
 import js from '@eslint/js'
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
+import i18next from 'eslint-plugin-i18next'
 import { flatConfigs as importXFlatConfigs } from 'eslint-plugin-import-x'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefreshPlugin from 'eslint-plugin-react-refresh'
@@ -215,6 +216,34 @@ export default defineEslintConfig(
   },
 
   {
+    // Localisation gate (M18): every user-visible string in a client component
+    // must come from the i18next catalogue, not a JSX literal. The ignored
+    // attributes are non-textual (identifiers, routing, variants); the brand
+    // name is the one allowed literal. Test files are exempt (the block below
+    // turns it off for them).
+    files: ['src/client/**/*.tsx'],
+    plugins: { i18next },
+    rules: {
+      'i18next/no-literal-string': [
+        'error',
+        {
+          mode: 'jsx-text-only',
+          'should-validate-template': false,
+          message: 'Wrap this string in the i18next catalogue via t() — see M18.',
+          'jsx-attributes': {
+            include: ['alt', 'aria-label', 'placeholder', 'title'],
+          },
+          words: {
+            // The brand name is the one allowed word; the middot is a decorative
+            // separator (always in an aria-hidden span), not translatable text.
+            exclude: ['Watermark Pro', '·'],
+          },
+        },
+      ],
+    },
+  },
+
+  {
     // Constants modules are the one place literals belong; the rule would be
     // unsatisfiable there.
     files: ['src/shared/constants.ts', 'src/**/constants.ts'],
@@ -248,6 +277,8 @@ export default defineEslintConfig(
       // Vitest fixtures are assigned in beforeEach and read by every test in
       // the file; that is the framework's documented pattern.
       'unicorn/no-top-level-assignment-in-function': 'off',
+      // Tests assert on literal English; they are not localised (M18).
+      'i18next/no-literal-string': 'off',
     },
   },
 

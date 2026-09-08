@@ -101,7 +101,7 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
                 apply(scaleSize(base, factor))
               }}
             >
-              {String(Math.round(factor * PERCENT))}%
+              {t('editor.resize.percent', { value: Math.round(factor * PERCENT) })}
             </Button>
           ))}
           {LONG_EDGE_PRESETS.map((side) => (

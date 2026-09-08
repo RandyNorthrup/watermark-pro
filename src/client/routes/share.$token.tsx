@@ -154,7 +154,7 @@ function SharePage() {
                       {open.name}
                     </Dialog.Title>
                     <Dialog.Description className="text-xs text-ink-muted">
-                      {String(open.width)} × {String(open.height)}
+                      {t('share.dimensions', { width: open.width, height: open.height })}
                     </Dialog.Description>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">

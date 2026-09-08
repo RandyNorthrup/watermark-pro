@@ -226,7 +226,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
               disabled={path.length === 0 || isLoading}
             >
               <Cloud aria-hidden="true" className="size-4" />
-              OneDrive
+              {t('import.onedrive.name')}
             </button>
             {path.map((folder, index) => {
               const isCurrent = index === path.length - 1

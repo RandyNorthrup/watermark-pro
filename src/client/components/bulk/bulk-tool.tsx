@@ -669,7 +669,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                             seconds: elapsedSeconds.toFixed(1),
                             rate: (counts.done / elapsedSeconds).toFixed(1),
                           })}
-                      .
+                      {t('bulk.progress.end')}
                     </p>
                   </>
                 ) : null}

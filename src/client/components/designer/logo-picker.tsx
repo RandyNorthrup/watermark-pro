@@ -141,7 +141,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
                   </span>
                   <span className="truncate font-medium">{asset.name}</span>
                   <span className="text-ink-muted">
-                    {String(asset.width)} × {String(asset.height)}
+                    {t('designer.logo.dimensions', { width: asset.width, height: asset.height })}
                   </span>
                 </button>
                 {canManage ? (

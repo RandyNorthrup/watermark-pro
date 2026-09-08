@@ -291,7 +291,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                         total: progress.total,
                       })}
                       {failedCount > 0 ? t('documents.progressFailed', { count: failedCount }) : ''}
-                      .
+                      {t('documents.progressEnd')}
                     </p>
                   </>
                 )}

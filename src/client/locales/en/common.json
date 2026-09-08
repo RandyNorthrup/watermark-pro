@@ -87,6 +87,7 @@
       "invalidTitle": "This reset link is not valid",
       "invalidBody": "It may have expired or already been used.",
       "requestNew": "Request a new one",
+      "invalidEnd": ".",
       "newPasswordLabel": "New password",
       "passwordHint": "At least {{min}} characters.",
       "confirmLabel": "Confirm password",
@@ -354,6 +355,7 @@
       "uploadButton": "Upload logo",
       "hint": "PNG, JPEG or WebP up to {{max}} MB, or a drawn signature.",
       "tooLarge": "Logos must be {{max}} MB or smaller.",
+      "dimensions": "{{width}} × {{height}}",
       "prepare": {
         "region": "Prepare logo",
         "title": "Prepare “{{name}}”",
@@ -459,6 +461,7 @@
       "keepProportions": "Keep proportions",
       "shortcuts": "Shortcuts",
       "fit": "Fit {{side}}",
+      "percent": "{{value}}%",
       "outputUnchanged": "Output {{width}} × {{height}} px (unchanged).",
       "outputChanged": "Output {{width}} × {{height}} px from {{baseWidth}} × {{baseHeight}}.",
       "resetSize": "Reset size"
@@ -549,7 +552,8 @@
       "finished": "{{done}} of {{total}} finished",
       "failed": ", {{n}} failed",
       "cancelled": ", {{n}} cancelled",
-      "rate": " in {{seconds}} s ({{rate}} photos/s)"
+      "rate": " in {{seconds}} s ({{rate}} photos/s)",
+      "end": "."
     },
     "photosList": "Photos in this batch",
     "custom": "Custom",
@@ -776,7 +780,10 @@
     "noAccess": "Your role does not include audit access.",
     "empty": "Nothing recorded yet.",
     "tableCaption": "Audit entries, newest first",
-    "detailsHeading": "Details"
+    "detailsHeading": "Details",
+    "when": "When",
+    "who": "Who",
+    "action": "Action"
   },
   "organizations": {
     "firstTitle": "Create your first organization",
@@ -801,6 +808,7 @@
     },
     "onedrive": {
       "title": "Import from OneDrive",
+      "name": "OneDrive",
       "description": "Sign in to Microsoft, then choose photos to add.",
       "loading": "Loading OneDrive",
       "empty": "No folders or images here.",
@@ -880,6 +888,7 @@
     "watermarkingProgress": "Watermarking progress",
     "progressFinished": "{{done}} of {{total}} finished",
     "progressFailed": ", {{count}} failed",
+    "progressEnd": ".",
     "listLabel": "Documents to watermark",
     "downloadFile": "Download {{fileName}}",
     "removeFile": "Remove {{fileName}}",
@@ -901,7 +910,10 @@
     "tool": {
       "title": "Verify a photo",
       "description": "Check whether a PNG carries an invisible Watermark Pro mark and read its hidden message. Nothing leaves your browser."
-    }
+    },
+    "checkPng": "Check a PNG",
+    "checking": "Checking…",
+    "noneFound": "No invisible mark found in this photo."
   },
   "errors": {
     "fallback": "Something went wrong. Please try again."
@@ -914,7 +926,17 @@
     "loadErrorTitle": "Could not load presets",
     "emptyTitle": "No presets yet",
     "createInLibrary": "Create a preset in the library",
-    "legend": "Presets"
+    "legend": "Presets",
+    "importTitle": "Import presets",
+    "importDescription": "Choose a Watermark Pro preset file. Its presets, and any logos they use, are added to this library.",
+    "presetFileLabel": "Preset file",
+    "noPresets": "This preset file has no presets.",
+    "fileCount_one": "{{count}} preset in this file",
+    "fileCount_other": "{{count}} presets in this file",
+    "renamed": "A preset named “{{name}}” already exists; importing as “{{finalName}}”.",
+    "cancel": "Cancel",
+    "importButton_one": "Import {{count}} preset",
+    "importButton_other": "Import {{count}} presets"
   },
   "landing": {
     "nav": "Account",
@@ -1061,6 +1083,7 @@
     "linkCopied": "Link copied to the clipboard.",
     "linkShared": "Link shared.",
     "openPhoto": "Open {{name}}",
+    "dimensions": "{{width}} × {{height}}",
     "footer": "Shared with <home>Watermark Pro</home>. Photos stay the property of their owner.",
     "download": "Download",
     "close": "Close"

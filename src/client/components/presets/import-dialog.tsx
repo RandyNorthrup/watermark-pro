@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FileUp } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { type ReactNode, useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { collisionRename, type PresetFile, type PresetFileEntry } from '../../../shared/preset-file'
 import { describeError } from '../../lib/errors'
@@ -30,6 +31,7 @@ function kindLabel(entry: PresetFileEntry): string {
  * numeric suffix before importing, and the clash is flagged in the list.
  */
 export function ImportDialog({ organizationId, existingNames, trigger }: ImportDialogProps) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const inputId = useId()
   const [isOpen, setIsOpen] = useState(false)
@@ -101,16 +103,17 @@ export function ImportDialog({ organizationId, existingNames, trigger }: ImportD
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
         <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex max-h-[90vh] w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-y-auto rounded-card border border-line bg-surface-raised p-6 shadow-card">
           <div>
-            <Dialog.Title className="text-lg font-semibold">Import presets</Dialog.Title>
+            <Dialog.Title className="text-lg font-semibold">
+              {t('presets.importTitle')}
+            </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-ink-muted">
-              Choose a Watermark Pro preset file. Its presets, and any logos they use, are added to
-              this library.
+              {t('presets.importDescription')}
             </Dialog.Description>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor={inputId} className="text-sm font-medium">
-              Preset file
+              {t('presets.presetFileLabel')}
             </label>
             <input
               id={inputId}
@@ -130,14 +133,13 @@ export function ImportDialog({ organizationId, existingNames, trigger }: ImportD
           {parseError === null ? null : <Alert tone="error">{parseError}</Alert>}
 
           {parsed !== null && parsed.presets.length === 0 ? (
-            <p className="text-sm text-ink-muted">This preset file has no presets.</p>
+            <p className="text-sm text-ink-muted">{t('presets.noPresets')}</p>
           ) : null}
 
           {parsed !== null && parsed.presets.length > 0 ? (
             <fieldset className="flex flex-col gap-1">
               <legend className="mb-1 text-sm font-medium">
-                {String(parsed.presets.length)} preset{parsed.presets.length === 1 ? '' : 's'} in
-                this file
+                {t('presets.fileCount', { count: parsed.presets.length })}
               </legend>
               <ul className="flex flex-col divide-y divide-line rounded-lg border border-line">
                 {parsed.presets.map((entry, index) => {
@@ -163,9 +165,7 @@ export function ImportDialog({ organizationId, existingNames, trigger }: ImportD
                           </span>
                           {isRenamed ? (
                             <span className="block text-xs text-amber-600">
-                              A preset named “{entry.name}” already exists; importing as “
-                              {finalName}
-                              ”.
+                              {t('presets.renamed', { name: entry.name, finalName })}
                             </span>
                           ) : null}
                         </span>
@@ -186,7 +186,7 @@ export function ImportDialog({ organizationId, existingNames, trigger }: ImportD
           <div className="flex justify-end gap-2">
             <Dialog.Close asChild>
               <Button type="button" variant="secondary">
-                Cancel
+                {t('presets.cancel')}
               </Button>
             </Dialog.Close>
             <Button
@@ -198,7 +198,7 @@ export function ImportDialog({ organizationId, existingNames, trigger }: ImportD
               }}
             >
               <FileUp aria-hidden="true" className="size-4" />
-              Import {String(selectedCount)} preset{selectedCount === 1 ? '' : 's'}
+              {t('presets.importButton', { count: selectedCount })}
             </Button>
           </div>
         </Dialog.Content>

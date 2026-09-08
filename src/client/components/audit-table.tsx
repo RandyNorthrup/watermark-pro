@@ -4,6 +4,7 @@
  * one is whatever the caller wants to show for an entry.
  */
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
 import type { auditEntrySchema } from '../../shared/api'
@@ -20,6 +21,7 @@ interface AuditTableProps {
 }
 
 export function AuditTable({ caption, entries, detailHeading, renderDetail }: AuditTableProps) {
+  const { t } = useTranslation()
   return (
     <Card
       className="overflow-x-auto p-0 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
@@ -33,13 +35,13 @@ export function AuditTable({ caption, entries, detailHeading, renderDetail }: Au
         <thead className="text-left text-xs text-ink-muted uppercase">
           <tr>
             <th scope="col" className="px-3 py-3 md:px-4">
-              When
+              {t('audit.when')}
             </th>
             <th scope="col" className="px-3 py-3 md:px-4">
-              Who
+              {t('audit.who')}
             </th>
             <th scope="col" className="px-3 py-3 md:px-4">
-              Action
+              {t('audit.action')}
             </th>
             <th scope="col" className="px-3 py-3 md:px-4">
               {detailHeading}

@@ -76,7 +76,7 @@ function ResetPasswordPage() {
           <Link to="/forgot-password" className="font-medium underline">
             {t('auth.resetPassword.requestNew')}
           </Link>
-          .
+          {t('auth.resetPassword.invalidEnd')}
         </Alert>
       ) : (
         <form
