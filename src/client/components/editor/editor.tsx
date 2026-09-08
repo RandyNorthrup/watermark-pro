@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Tabs } from 'radix-ui'
 import { type DragEvent, useEffect, useReducer, useRef, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { AdjustPanel } from './adjust-panel'
 import { CropOverlay, type CropGesture } from './crop-overlay'
@@ -108,13 +109,13 @@ interface EditorProps {
 
 type Tool = 'watermark' | 'crop' | 'adjust' | 'resize' | 'export'
 
-const TOOLS: readonly { value: Tool; label: string; icon: typeof Stamp }[] = [
-  { value: 'watermark', label: 'Watermark', icon: Stamp },
-  { value: 'crop', label: 'Crop', icon: Crop },
-  { value: 'adjust', label: 'Adjust', icon: SlidersHorizontal },
-  { value: 'resize', label: 'Resize', icon: Scaling },
-  { value: 'export', label: 'Export', icon: Download },
-]
+const TOOLS = [
+  { value: 'watermark', label: 'editor.tabs.watermark', icon: Stamp },
+  { value: 'crop', label: 'editor.tabs.crop', icon: Crop },
+  { value: 'adjust', label: 'editor.tabs.adjust', icon: SlidersHorizontal },
+  { value: 'resize', label: 'editor.tabs.resize', icon: Scaling },
+  { value: 'export', label: 'editor.tabs.export', icon: Download },
+] as const satisfies readonly { value: Tool; label: string; icon: typeof Stamp }[]
 
 const ACCEPTED_PHOTO_TYPES = 'image/png,image/jpeg,image/webp,image/avif,image/gif'
 const SAMPLE_SIZE: Size = { width: SAMPLE_PHOTO_WIDTH, height: SAMPLE_PHOTO_HEIGHT }
@@ -174,8 +175,9 @@ function isEditableTarget(target: EventTarget | null): boolean {
 
 /** Before the first frame: the sample scene itself, or a spinner while a chosen photo renders. */
 function PendingPreview({ hasPhoto }: { hasPhoto: boolean }) {
+  const { t } = useTranslation()
   return hasPhoto ? (
-    <Spinner className="size-6" label="Rendering preview" />
+    <Spinner className="size-6" label={t('editor.renderingPreview')} />
   ) : (
     <SampleScene className="max-h-[42svh] lg:max-h-[70vh]" />
   )
@@ -193,6 +195,7 @@ export function Editor({
   canSave = false,
   embedded,
 }: EditorProps) {
+  const { t } = useTranslation()
   const [history, dispatch] = useReducer(editorReducer, undefined, () =>
     createHistory(embedded?.document),
   )
@@ -300,13 +303,13 @@ export function Editor({
         setPhoto({ file: embeddedFile, size })
         await setSubject(embeddedFile, metadata)
       } catch {
-        setPhotoError('That file is not an image the browser can read.')
+        setPhotoError(t('editor.notAnImage'))
       }
     })()
     return () => {
       live.current = false
     }
-  }, [embeddedFile, setSubject])
+  }, [embeddedFile, setSubject, t])
 
   // A single photo opened through the OS (installed-PWA file handling) loads
   // into the standalone editor once, on mount.
@@ -364,7 +367,7 @@ export function Editor({
       })
       await setSubject(file, metadata)
     } catch {
-      setPhotoError('That file is not an image the browser can read.')
+      setPhotoError(t('editor.notAnImage'))
     }
   }
 
@@ -550,7 +553,7 @@ export function Editor({
             ref={inputRef}
             type="file"
             accept={ACCEPTED_PHOTO_TYPES}
-            aria-label="Open a photo"
+            aria-label={t('editor.openPhotoLabel')}
             className="sr-only"
             onChange={(event) => {
               const file = event.currentTarget.files?.[0]
@@ -569,7 +572,7 @@ export function Editor({
             }}
           >
             <ImagePlus aria-hidden="true" className="size-4" />
-            Open photo
+            {t('editor.openPhoto')}
           </Button>
           {embedded === undefined ? (
             <>
@@ -586,7 +589,7 @@ export function Editor({
                 trigger={
                   <Button type="button" variant="secondary" size="sm">
                     <Link2 aria-hidden="true" className="size-4" />
-                    From a link
+                    {t('editor.fromLink')}
                   </Button>
                 }
               />
@@ -617,20 +620,23 @@ export function Editor({
               }}
             >
               <RotateCcw aria-hidden="true" className="size-4" />
-              Sample photo
+              {t('editor.samplePhoto')}
             </Button>
           )}
           <span className="truncate text-sm text-ink-muted">
-            {photo === null ? 'Sample scene' : photo.file.name} · {String(sourceSize.width)} ×{' '}
-            {String(sourceSize.height)} px
+            {t('editor.photoMeta', {
+              name: photo === null ? t('editor.sampleScene') : photo.file.name,
+              width: sourceSize.width,
+              height: sourceSize.height,
+            })}
           </span>
           <div className="ml-auto flex items-center gap-1">
-            {isRendering ? <Spinner className="size-4" label="Rendering" /> : null}
+            {isRendering ? <Spinner className="size-4" label={t('editor.rendering')} /> : null}
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              aria-label="Undo"
+              aria-label={t('editor.undo')}
               aria-keyshortcuts="Control+Z"
               disabled={!canUndo(history)}
               onClick={() => {
@@ -643,7 +649,7 @@ export function Editor({
               type="button"
               variant="ghost"
               size="icon"
-              aria-label="Redo"
+              aria-label={t('editor.redo')}
               aria-keyshortcuts="Control+Shift+Z Control+Y"
               disabled={!canRedo(history)}
               onClick={() => {
@@ -668,7 +674,7 @@ export function Editor({
               <img
                 ref={setImageElement}
                 src={result.url}
-                alt={isCropping ? 'Photo with the crop frame' : 'Photo with the watermark applied'}
+                alt={t(isCropping ? 'editor.altCrop' : 'editor.altWatermark')}
                 width={result.width}
                 height={result.height}
                 className="block max-h-[42svh] max-w-full lg:max-h-[70vh]"
@@ -698,12 +704,12 @@ export function Editor({
         </div>
         <p className="text-xs text-ink-muted" aria-live="polite">
           {document.layers.length === 0
-            ? 'Choose a preset to place a watermark. Drop a photo anywhere on the canvas.'
-            : `Output ${String(outputSize.width)} × ${String(outputSize.height)} px.`}
+            ? t('editor.choosePresetHint')
+            : t('editor.outputSize', { width: outputSize.width, height: outputSize.height })}
         </p>
         {photoError === null ? null : <Alert tone="error">{photoError}</Alert>}
         {error === null ? null : (
-          <Alert tone="error" title="Preview failed">
+          <Alert tone="error" title={t('editor.previewFailed')}>
             {error}
           </Alert>
         )}
@@ -720,7 +726,7 @@ export function Editor({
           className="flex flex-col gap-4"
         >
           <Tabs.List
-            aria-label="Editor tools"
+            aria-label={t('editor.toolsLabel')}
             className={`grid ${embedded === undefined ? 'grid-cols-5' : 'grid-cols-4'} gap-1 rounded-lg border border-line bg-surface-raised p-1`}
           >
             {visibleTools.map(({ value, label, icon: Icon }) => (
@@ -730,7 +736,7 @@ export function Editor({
                 className="flex flex-col items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
               >
                 <Icon aria-hidden="true" className="size-4" />
-                {label}
+                {t(label)}
               </Tabs.Trigger>
             ))}
           </Tabs.List>
@@ -806,17 +812,19 @@ export function Editor({
                 }}
               />
               {exportError === null ? null : (
-                <Alert tone="error" title="Export failed" className="mt-3">
+                <Alert tone="error" title={t('editor.exportFailed')} className="mt-3">
                   {exportError}
                 </Alert>
               )}
               {saved === null ? null : (
                 <Alert tone="success" className="mt-3">
-                  Saved {saved} to the{' '}
-                  <Link to="/app/gallery" className="font-medium underline">
-                    gallery
-                  </Link>
-                  .
+                  <Trans
+                    i18nKey="editor.savedToGallery"
+                    values={{ name: saved }}
+                    components={{
+                      galleryLink: <Link to="/app/gallery" className="font-medium underline" />,
+                    }}
+                  />
                 </Alert>
               )}
               {cloudSaved === null ? null : (
@@ -836,7 +844,7 @@ export function Editor({
                 embedded.onApply(document)
               }}
             >
-              Apply to this photo
+              {t('editor.applyToPhoto')}
             </Button>
             <Button
               type="button"
@@ -846,15 +854,15 @@ export function Editor({
                 embedded.onApplyToAll(document)
               }}
             >
-              Apply to all photos
+              {t('editor.applyToAll')}
             </Button>
             {embedded.hasOverride ? (
               <Button type="button" variant="secondary" onClick={embedded.onRemove}>
-                Remove override
+                {t('editor.removeOverride')}
               </Button>
             ) : null}
             <Button type="button" variant="ghost" onClick={embedded.onCancel}>
-              Cancel
+              {t('editor.cancel')}
             </Button>
           </div>
         )}

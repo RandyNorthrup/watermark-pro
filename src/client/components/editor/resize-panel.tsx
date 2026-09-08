@@ -1,5 +1,6 @@
 import { Switch } from 'radix-ui'
 import { useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { LONG_EDGE_PRESETS, SCALE_PRESETS } from '../../editor/constants'
 import {
@@ -23,10 +24,14 @@ interface ResizePanelProps {
 }
 
 const PERCENT = 100
-const DIMENSION_LABELS: Record<keyof Size, string> = { width: 'Width', height: 'Height' }
+const DIMENSION_LABELS = {
+  width: 'editor.dimensions.width',
+  height: 'editor.dimensions.height',
+} as const satisfies Record<keyof Size, string>
 
 /** Output dimensions with an aspect lock, percentage and long-edge shortcuts. */
 export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) {
+  const { t } = useTranslation()
   const id = useId()
   const [isLocked, setIsLocked] = useState(true)
   const current = resize ?? base
@@ -52,7 +57,7 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
         {(['width', 'height'] as const).map((dimension) => (
           <div key={dimension} className="flex flex-col gap-1">
             <label htmlFor={`${id}-${dimension}`} className="text-xs font-medium text-ink-muted">
-              {DIMENSION_LABELS[dimension]} (px)
+              {t('editor.dimensions.pxField', { label: t(DIMENSION_LABELS[dimension]) })}
             </label>
             <Input
               id={`${id}-${dimension}`}
@@ -70,7 +75,7 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
       </div>
       <div className="flex items-center justify-between">
         <label htmlFor={`${id}-lock`} className="text-sm font-medium">
-          Keep proportions
+          {t('editor.resize.keepProportions')}
         </label>
         <Switch.Root
           id={`${id}-lock`}
@@ -82,7 +87,9 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
         </Switch.Root>
       </div>
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-xs font-medium text-ink-muted">Shortcuts</legend>
+        <legend className="text-xs font-medium text-ink-muted">
+          {t('editor.resize.shortcuts')}
+        </legend>
         <div className="flex flex-wrap gap-1.5">
           {SCALE_PRESETS.map((factor) => (
             <Button
@@ -108,14 +115,20 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
                 apply(fitLongestSide(base, side))
               }}
             >
-              Fit {String(side)}
+              {t('editor.resize.fit', { side })}
             </Button>
           ))}
         </div>
       </fieldset>
       <p className="text-xs text-ink-muted">
-        Output {String(current.width)} × {String(current.height)} px
-        {resize === null ? ' (unchanged)' : ` from ${String(base.width)} × ${String(base.height)}`}.
+        {resize === null
+          ? t('editor.resize.outputUnchanged', { width: current.width, height: current.height })
+          : t('editor.resize.outputChanged', {
+              width: current.width,
+              height: current.height,
+              baseWidth: base.width,
+              baseHeight: base.height,
+            })}
       </p>
       <Button
         type="button"
@@ -127,7 +140,7 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
           onResizeChange(null)
         }}
       >
-        Reset size
+        {t('editor.resize.resetSize')}
       </Button>
     </div>
   )

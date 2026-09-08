@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { X } from 'lucide-react'
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { WatermarkDto } from '../../../shared/api'
 import type { WatermarkSpec } from '../../../shared/watermark'
@@ -38,11 +39,12 @@ function isSameSpec(a: WatermarkSpec, b: WatermarkSpec): boolean {
  * no longer want.
  */
 export function WatermarkPanel({ organizationId, ...props }: WatermarkPanelProps) {
+  const { t } = useTranslation()
   const selectId = useId()
   const presets = useQuery(watermarksQueryOptions(organizationId))
 
   return (
-    <PresetGate query={presets} emptyHint="to apply it here.">
+    <PresetGate query={presets} emptyHint={t('editor.watermark.emptyHint')}>
       {(list) => <PanelBody list={list} selectId={selectId} {...props} />}
     </PresetGate>
   )
@@ -63,6 +65,7 @@ function PanelBody({
   onRemoveLayer,
   onSpecChange,
 }: PanelBodyProps) {
+  const { t } = useTranslation()
   const active = layers.find((layer) => layer.id === activeLayerId)
   const activePreset = list.find((candidate) => candidate.id === active?.presetId)
   const isModified =
@@ -76,7 +79,7 @@ function PanelBody({
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
         <label htmlFor={selectId} className="text-sm font-medium">
-          {layers.length === 0 ? 'Preset' : 'Add another preset'}
+          {t(layers.length === 0 ? 'editor.watermark.preset' : 'editor.watermark.addPreset')}
         </label>
         <select
           id={selectId}
@@ -92,7 +95,9 @@ function PanelBody({
           className={selectClassName}
         >
           <option value="" disabled>
-            {isFull ? `Up to ${String(MAX_LAYERS)} marks per photo` : 'Choose a preset'}
+            {isFull
+              ? t('editor.watermark.maxMarks', { max: MAX_LAYERS })
+              : t('editor.watermark.choosePreset')}
           </option>
           {list.map((candidate) => (
             <option key={candidate.id} value={candidate.id}>
@@ -105,12 +110,12 @@ function PanelBody({
       {layers.length === 0 ? null : (
         <section aria-labelledby="editor-layers-heading" className="flex flex-col gap-2">
           <h2 id="editor-layers-heading" className="text-sm font-semibold">
-            Marks on this photo
+            {t('editor.watermark.marksHeading')}
           </h2>
-          <ul className="flex flex-col gap-1" aria-label="Layers, bottom to top">
+          <ul className="flex flex-col gap-1" aria-label={t('editor.watermark.layersLabel')}>
             {layers.map((layer, index) => {
               const preset = list.find((candidate) => candidate.id === layer.presetId)
-              const name = preset?.name ?? 'Removed preset'
+              const name = preset?.name ?? t('editor.watermark.removedPreset')
               const isActive = layer.id === active?.id
               return (
                 <li key={layer.id} className="flex items-center gap-1">
@@ -134,7 +139,7 @@ function PanelBody({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={`Remove ${name} from this photo`}
+                    aria-label={t('editor.watermark.removeLayer', { name })}
                     onClick={() => {
                       onRemoveLayer(layer.id)
                     }}
@@ -147,7 +152,7 @@ function PanelBody({
           </ul>
           {isModified ? (
             <div className="flex items-center justify-between gap-2 text-xs text-ink-muted">
-              <span>Adjusted for this photo; the library preset is unchanged.</span>
+              <span>{t('editor.watermark.adjusted')}</span>
               <Button
                 type="button"
                 variant="ghost"
@@ -158,7 +163,7 @@ function PanelBody({
                   }
                 }}
               >
-                Revert
+                {t('editor.watermark.revert')}
               </Button>
             </div>
           ) : null}
@@ -169,7 +174,7 @@ function PanelBody({
         <>
           <section aria-labelledby="editor-placement-heading" className="flex flex-col gap-3">
             <h2 id="editor-placement-heading" className="text-sm font-semibold">
-              Placement
+              {t('editor.watermark.placement')}
             </h2>
             <PlacementPanel
               placement={active.spec.placement}

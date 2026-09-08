@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   canCarryMetadata,
   effectivePolicy,
@@ -18,27 +20,32 @@ interface PolicyChoice {
   help: string
 }
 
-const CHOICES: readonly PolicyChoice[] = [
-  { value: 'strip', label: 'Strip', help: 'No camera data, no location. Safest for sharing.' },
+const CHOICES = [
+  {
+    value: 'strip',
+    label: 'editor.metadata.strip.label',
+    help: 'editor.metadata.strip.help',
+  },
   {
     value: 'keep-except-location',
-    label: 'Keep except location',
-    help: 'Camera, lens and capture time stay; GPS is removed.',
+    label: 'editor.metadata.keepExceptLocation.label',
+    help: 'editor.metadata.keepExceptLocation.help',
   },
   {
     value: 'keep',
-    label: 'Keep everything',
-    help: 'Including the GPS position, if the photo has one.',
+    label: 'editor.metadata.keep.label',
+    help: 'editor.metadata.keep.help',
   },
-]
+] as const satisfies readonly PolicyChoice[]
 
 /** Radio list choosing how much of a photo's metadata an export keeps. */
 export function MetadataPolicyField({ policy, format, onChange }: MetadataPolicyFieldProps) {
+  const { t } = useTranslation()
   const isKeepDisabled = !canCarryMetadata(format)
   const selected = effectivePolicy(policy, format)
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="text-sm font-medium">Metadata</legend>
+      <legend className="text-sm font-medium">{t('editor.metadata.heading')}</legend>
       {CHOICES.map((choice) => {
         const isDisabled = isKeepDisabled && choice.value !== 'strip'
         return (
@@ -59,14 +66,14 @@ export function MetadataPolicyField({ policy, format, onChange }: MetadataPolicy
               }}
             />
             <span className="flex flex-col">
-              <span className="font-medium">{choice.label}</span>
-              <span className="text-xs text-ink-muted">{choice.help}</span>
+              <span className="font-medium">{t(choice.label)}</span>
+              <span className="text-xs text-ink-muted">{t(choice.help)}</span>
             </span>
           </label>
         )
       })}
       {isKeepDisabled ? (
-        <p className="text-xs text-ink-muted">WebP exports are always stripped.</p>
+        <p className="text-xs text-ink-muted">{t('editor.metadata.webpNote')}</p>
       ) : null}
     </fieldset>
   )

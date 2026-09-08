@@ -1,4 +1,5 @@
 import { FlipHorizontal2, FlipVertical2, RotateCcw, RotateCw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import {
   MAX_STRAIGHTEN_DEGREES,
@@ -28,6 +29,7 @@ export function OrientationControls({
   onChange,
   showStraighten = false,
 }: OrientationControlsProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-1.5">
@@ -35,7 +37,7 @@ export function OrientationControls({
           type="button"
           variant="secondary"
           size="icon"
-          aria-label="Rotate left"
+          aria-label={t('editor.orientation.rotateLeft')}
           onClick={() => {
             onChange({ ...orientation, turns: turnBy(orientation.turns, -1) })
           }}
@@ -46,7 +48,7 @@ export function OrientationControls({
           type="button"
           variant="secondary"
           size="icon"
-          aria-label="Rotate right"
+          aria-label={t('editor.orientation.rotateRight')}
           onClick={() => {
             onChange({ ...orientation, turns: turnBy(orientation.turns, 1) })
           }}
@@ -57,7 +59,7 @@ export function OrientationControls({
           type="button"
           variant={orientation.flipX ? 'primary' : 'secondary'}
           size="icon"
-          aria-label="Flip horizontally"
+          aria-label={t('editor.orientation.flipHorizontal')}
           aria-pressed={orientation.flipX}
           onClick={() => {
             onChange({ ...orientation, flipX: !orientation.flipX })
@@ -69,7 +71,7 @@ export function OrientationControls({
           type="button"
           variant={orientation.flipY ? 'primary' : 'secondary'}
           size="icon"
-          aria-label="Flip vertically"
+          aria-label={t('editor.orientation.flipVertical')}
           aria-pressed={orientation.flipY}
           onClick={() => {
             onChange({ ...orientation, flipY: !orientation.flipY })
@@ -80,7 +82,7 @@ export function OrientationControls({
       </div>
       {showStraighten ? (
         <SliderField
-          label="Straighten"
+          label={t('editor.orientation.straighten')}
           value={orientation.straighten}
           min={-MAX_STRAIGHTEN_DEGREES}
           max={MAX_STRAIGHTEN_DEGREES}

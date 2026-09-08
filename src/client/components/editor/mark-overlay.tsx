@@ -1,4 +1,5 @@
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { MAX_ROTATION_DEGREES, MAX_SCALE, MIN_SCALE } from '../../../shared/watermark'
 import type { Size } from '../../engine/layout'
@@ -174,6 +175,7 @@ export function MarkOverlay({
   margin,
   onGesture,
 }: MarkOverlayProps) {
+  const { t } = useTranslation()
   const dragRef = useRef<DragState | null>(null)
   /** Every pointer currently down on the frame, for the pinch gesture. */
   const pointersRef = useRef(new Map<number, Point>())
@@ -393,7 +395,7 @@ export function MarkOverlay({
       <div
         role="group"
         tabIndex={0}
-        aria-label="Watermark position. Drag to move (it snaps to the margins, thirds and centre; hold Alt to place it freely), pinch to resize, twist to rotate; arrow keys nudge, plus and minus resize, square brackets rotate."
+        aria-label={t('editor.mark.position')}
         aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight + - [ ]"
         onPointerDown={frameDown}
         onPointerMove={move}
@@ -412,7 +414,7 @@ export function MarkOverlay({
       >
         <button
           type="button"
-          aria-label="Rotate watermark"
+          aria-label={t('editor.mark.rotate')}
           onPointerDown={(event) => {
             beginSingle(event, 'rotate')
           }}
@@ -432,7 +434,7 @@ export function MarkOverlay({
         />
         <button
           type="button"
-          aria-label="Resize watermark"
+          aria-label={t('editor.mark.resize')}
           onPointerDown={(event) => {
             beginSingle(event, 'scale')
           }}

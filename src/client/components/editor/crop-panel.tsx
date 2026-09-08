@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   ASPECT_PRESETS,
@@ -22,12 +23,12 @@ interface CropPanelProps {
 
 type Edge = keyof CropRect
 
-const EDGE_LABELS: Record<Edge, string> = {
-  x: 'Left',
-  y: 'Top',
-  width: 'Width',
-  height: 'Height',
-}
+const EDGE_LABELS = {
+  x: 'editor.dimensions.left',
+  y: 'editor.dimensions.top',
+  width: 'editor.dimensions.width',
+  height: 'editor.dimensions.height',
+} as const satisfies Record<Edge, string>
 
 /** Aspect presets and numeric fields for the crop; the overlay handles pointer work. */
 export function CropPanel({
@@ -37,6 +38,7 @@ export function CropPanel({
   onAspectChange,
   onCropChange,
 }: CropPanelProps) {
+  const { t } = useTranslation()
   const fieldId = useId()
   const current = crop ?? fullCrop(source)
   const preset = ASPECT_PRESETS.find((candidate) => candidate.id === aspectId)
@@ -53,7 +55,7 @@ export function CropPanel({
   return (
     <div className="flex flex-col gap-4">
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">Aspect ratio</legend>
+        <legend className="text-sm font-medium">{t('editor.crop.aspectRatio')}</legend>
         <div className="flex flex-wrap gap-1.5">
           {ASPECT_PRESETS.map((candidate) => (
             <button
@@ -76,7 +78,7 @@ export function CropPanel({
         {(Object.keys(EDGE_LABELS) as Edge[]).map((edge) => (
           <div key={edge} className="flex flex-col gap-1">
             <label htmlFor={`${fieldId}-${edge}`} className="text-xs font-medium text-ink-muted">
-              {EDGE_LABELS[edge]} (px)
+              {t('editor.dimensions.pxField', { label: t(EDGE_LABELS[edge]) })}
             </label>
             <Input
               id={`${fieldId}-${edge}`}
@@ -93,7 +95,7 @@ export function CropPanel({
         ))}
       </div>
       <p className="text-xs text-ink-muted">
-        Photo is {String(source.width)} × {String(source.height)} px.
+        {t('editor.crop.photoSize', { width: source.width, height: source.height })}
       </p>
       <Button
         type="button"
@@ -106,7 +108,7 @@ export function CropPanel({
           onCropChange(null)
         }}
       >
-        Reset crop
+        {t('editor.crop.reset')}
       </Button>
     </div>
   )

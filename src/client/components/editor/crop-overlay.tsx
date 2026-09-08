@@ -1,4 +1,5 @@
 import { type KeyboardEvent, type PointerEvent, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { GesturePhase } from './mark-overlay'
 import {
@@ -33,16 +34,16 @@ interface DragState {
 
 const NUDGE_FRACTION = 0.01
 const NUDGE_FRACTION_LARGE = 0.05
-const HANDLE_LABELS: Record<CropHandle, string> = {
-  n: 'top edge',
-  s: 'bottom edge',
-  e: 'right edge',
-  w: 'left edge',
-  ne: 'top right corner',
-  nw: 'top left corner',
-  se: 'bottom right corner',
-  sw: 'bottom left corner',
-}
+const HANDLE_LABELS = {
+  n: 'editor.crop.handles.n',
+  s: 'editor.crop.handles.s',
+  e: 'editor.crop.handles.e',
+  w: 'editor.crop.handles.w',
+  ne: 'editor.crop.handles.ne',
+  nw: 'editor.crop.handles.nw',
+  se: 'editor.crop.handles.se',
+  sw: 'editor.crop.handles.sw',
+} as const satisfies Record<CropHandle, string>
 const HANDLE_POSITIONS: Record<CropHandle, string> = {
   n: 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-ns-resize',
   s: 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 cursor-ns-resize',
@@ -60,6 +61,7 @@ const HANDLE_POSITIONS: Record<CropHandle, string> = {
  * frame, Shift for larger steps.
  */
 export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: CropOverlayProps) {
+  const { t } = useTranslation()
   const dragRef = useRef<DragState | null>(null)
   const k = displaySize.width / source.width
   if (!(k > 0) || !Number.isFinite(k)) {
@@ -137,7 +139,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
       <div
         role="group"
         tabIndex={0}
-        aria-label="Crop area. Drag to move; arrow keys nudge, Shift for larger steps."
+        aria-label={t('editor.crop.area')}
         aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"
         onPointerDown={(event) => {
           begin(event, 'move')
@@ -157,7 +159,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
           <button
             key={handle}
             type="button"
-            aria-label={`Resize crop from the ${HANDLE_LABELS[handle]}`}
+            aria-label={t('editor.crop.resizeHandle', { handle: t(HANDLE_LABELS[handle]) })}
             onPointerDown={(event) => {
               begin(event, handle)
             }}

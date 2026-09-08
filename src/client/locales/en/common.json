@@ -104,7 +104,147 @@
   },
   "library": {},
   "designer": {},
-  "editor": {},
+  "editor": {
+    "tabs": {
+      "watermark": "Watermark",
+      "crop": "Crop",
+      "adjust": "Adjust",
+      "resize": "Resize",
+      "export": "Export"
+    },
+    "toolsLabel": "Editor tools",
+    "openPhoto": "Open photo",
+    "openPhotoLabel": "Open a photo",
+    "fromLink": "From a link",
+    "samplePhoto": "Sample photo",
+    "sampleScene": "Sample scene",
+    "photoMeta": "{{name}} · {{width}} × {{height}} px",
+    "rendering": "Rendering",
+    "renderingPreview": "Rendering preview",
+    "undo": "Undo",
+    "redo": "Redo",
+    "altCrop": "Photo with the crop frame",
+    "altWatermark": "Photo with the watermark applied",
+    "choosePresetHint": "Choose a preset to place a watermark. Drop a photo anywhere on the canvas.",
+    "outputSize": "Output {{width}} × {{height}} px.",
+    "notAnImage": "That file is not an image the browser can read.",
+    "previewFailed": "Preview failed",
+    "exportFailed": "Export failed",
+    "savedToGallery": "Saved {{name}} to the <galleryLink>gallery</galleryLink>.",
+    "applyToPhoto": "Apply to this photo",
+    "applyToAll": "Apply to all photos",
+    "removeOverride": "Remove override",
+    "cancel": "Cancel",
+    "dimensions": {
+      "left": "Left",
+      "top": "Top",
+      "width": "Width",
+      "height": "Height",
+      "pxField": "{{label}} (px)"
+    },
+    "watermark": {
+      "emptyHint": "to apply it here.",
+      "preset": "Preset",
+      "addPreset": "Add another preset",
+      "maxMarks": "Up to {{max}} marks per photo",
+      "choosePreset": "Choose a preset",
+      "marksHeading": "Marks on this photo",
+      "layersLabel": "Layers, bottom to top",
+      "removedPreset": "Removed preset",
+      "removeLayer": "Remove {{name}} from this photo",
+      "adjusted": "Adjusted for this photo; the library preset is unchanged.",
+      "revert": "Revert",
+      "placement": "Placement"
+    },
+    "crop": {
+      "aspectRatio": "Aspect ratio",
+      "photoSize": "Photo is {{width}} × {{height}} px.",
+      "reset": "Reset crop",
+      "area": "Crop area. Drag to move; arrow keys nudge, Shift for larger steps.",
+      "resizeHandle": "Resize crop from the {{handle}}",
+      "handles": {
+        "n": "top edge",
+        "s": "bottom edge",
+        "e": "right edge",
+        "w": "left edge",
+        "ne": "top right corner",
+        "nw": "top left corner",
+        "se": "bottom right corner",
+        "sw": "bottom left corner"
+      }
+    },
+    "resize": {
+      "keepProportions": "Keep proportions",
+      "shortcuts": "Shortcuts",
+      "fit": "Fit {{side}}",
+      "outputUnchanged": "Output {{width}} × {{height}} px (unchanged).",
+      "outputChanged": "Output {{width}} × {{height}} px from {{baseWidth}} × {{baseHeight}}.",
+      "resetSize": "Reset size"
+    },
+    "adjust": {
+      "filter": "Filter",
+      "custom": "Custom adjustments",
+      "filterValue": "Filter: {{name}}",
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "saturation": "Saturation",
+      "warmth": "Warmth",
+      "sepia": "Sepia",
+      "vignette": "Vignette",
+      "reset": "Reset {{name}}",
+      "resetAll": "Reset all"
+    },
+    "orientation": {
+      "rotateLeft": "Rotate left",
+      "rotateRight": "Rotate right",
+      "flipHorizontal": "Flip horizontally",
+      "flipVertical": "Flip vertically",
+      "straighten": "Straighten"
+    },
+    "frame": {
+      "label": "Frame",
+      "add": "Add a frame",
+      "width": "Frame width",
+      "colour": "Frame colour"
+    },
+    "metadata": {
+      "heading": "Metadata",
+      "strip": {
+        "label": "Strip",
+        "help": "No camera data, no location. Safest for sharing."
+      },
+      "keepExceptLocation": {
+        "label": "Keep except location",
+        "help": "Camera, lens and capture time stay; GPS is removed."
+      },
+      "keep": {
+        "label": "Keep everything",
+        "help": "Including the GPS position, if the photo has one."
+      },
+      "webpNote": "WebP exports are always stripped."
+    },
+    "export": {
+      "format": "Format",
+      "quality": "Quality",
+      "invisibleMark": "Invisible mark",
+      "choosePng": "Choose PNG to hide a message in the pixels.",
+      "invisibleMessage": "Invisible message",
+      "tooLong": "Too long for a {{width}}×{{height}} photo (fits {{capacity}} bytes).",
+      "invisibleHint": "Hidden in the pixels and readable under Verify. Survives PNG only.",
+      "renderNote": "{{width}} × {{height}} px{{lossless}}. Rendered in your browser at full resolution{{share}}.",
+      "losslessClause": "; PNG is lossless",
+      "shareClause": "; Share sends it to Photos, Messages or any app on this device",
+      "download": "Download",
+      "share": "Share",
+      "saveToGallery": "Save to gallery",
+      "savedToFolder": "Saved to your {{provider}} “{{folder}}” folder."
+    },
+    "mark": {
+      "position": "Watermark position. Drag to move (it snaps to the margins, thirds and centre; hold Alt to place it freely), pinch to resize, twist to rotate; arrow keys nudge, plus and minus resize, square brackets rotate.",
+      "rotate": "Rotate watermark",
+      "resize": "Resize watermark"
+    }
+  },
   "bulk": {},
   "gallery": {},
   "shares": {},

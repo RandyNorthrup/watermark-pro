@@ -1,6 +1,7 @@
 import { RotateCcw } from 'lucide-react'
 import { RadioGroup } from 'radix-ui'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   type Adjustments,
@@ -30,14 +31,14 @@ interface ChannelConfig {
   min: number
 }
 
-const CHANNELS: readonly ChannelConfig[] = [
-  { key: 'brightness', label: 'Brightness', min: -1 },
-  { key: 'contrast', label: 'Contrast', min: -1 },
-  { key: 'saturation', label: 'Saturation', min: -1 },
-  { key: 'warmth', label: 'Warmth', min: -1 },
-  { key: 'sepia', label: 'Sepia', min: 0 },
-  { key: 'vignette', label: 'Vignette', min: 0 },
-]
+const CHANNELS = [
+  { key: 'brightness', label: 'editor.adjust.brightness', min: -1 },
+  { key: 'contrast', label: 'editor.adjust.contrast', min: -1 },
+  { key: 'saturation', label: 'editor.adjust.saturation', min: -1 },
+  { key: 'warmth', label: 'editor.adjust.warmth', min: -1 },
+  { key: 'sepia', label: 'editor.adjust.sepia', min: 0 },
+  { key: 'vignette', label: 'editor.adjust.vignette', min: 0 },
+] as const satisfies readonly ChannelConfig[]
 
 const PERCENT = 100
 const SLIDER_STEP = 0.01
@@ -49,6 +50,7 @@ function percent(value: number): string {
 
 /** Colour-adjustment sliders and the named-filter strip for the editor's Adjust tab. */
 export function AdjustPanel({ adjust, onChange, photoFile }: AdjustPanelProps) {
+  const { t } = useTranslation()
   const [thumbnails, setThumbnails] = useState<Map<FilterId, string>>(new Map())
   const activeFilter = filterFor(adjust)
 
@@ -83,7 +85,7 @@ export function AdjustPanel({ adjust, onChange, photoFile }: AdjustPanelProps) {
   return (
     <div className="flex flex-col gap-4">
       <RadioGroup.Root
-        aria-label="Filter"
+        aria-label={t('editor.adjust.filter')}
         value={activeFilter}
         onValueChange={(value) => {
           const match = FILTERS.find((filter) => filter.id === value)
@@ -119,38 +121,41 @@ export function AdjustPanel({ adjust, onChange, photoFile }: AdjustPanelProps) {
       </RadioGroup.Root>
       <p className="text-xs text-ink-muted" aria-live="polite">
         {activeFilter === 'custom'
-          ? 'Custom adjustments'
-          : `Filter: ${FILTER_BY_ID[activeFilter].label}`}
+          ? t('editor.adjust.custom')
+          : t('editor.adjust.filterValue', { name: FILTER_BY_ID[activeFilter].label })}
       </p>
       <div className="flex flex-col gap-3">
-        {CHANNELS.map(({ key, label, min }) => (
-          <div key={key} className="flex items-end gap-2">
-            <SliderField
-              className="flex-1"
-              label={label}
-              value={adjust[key]}
-              min={min}
-              max={1}
-              step={SLIDER_STEP}
-              format={percent}
-              onChange={(value) => {
-                onChange({ ...adjust, [key]: value })
-              }}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label={`Reset ${label}`}
-              disabled={adjust[key] === IDENTITY_ADJUSTMENTS[key]}
-              onClick={() => {
-                onChange({ ...adjust, [key]: IDENTITY_ADJUSTMENTS[key] })
-              }}
-            >
-              <RotateCcw aria-hidden="true" className="size-4" />
-            </Button>
-          </div>
-        ))}
+        {CHANNELS.map(({ key, label: labelKey, min }) => {
+          const label = t(labelKey)
+          return (
+            <div key={key} className="flex items-end gap-2">
+              <SliderField
+                className="flex-1"
+                label={label}
+                value={adjust[key]}
+                min={min}
+                max={1}
+                step={SLIDER_STEP}
+                format={percent}
+                onChange={(value) => {
+                  onChange({ ...adjust, [key]: value })
+                }}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={t('editor.adjust.reset', { name: label })}
+                disabled={adjust[key] === IDENTITY_ADJUSTMENTS[key]}
+                onClick={() => {
+                  onChange({ ...adjust, [key]: IDENTITY_ADJUSTMENTS[key] })
+                }}
+              >
+                <RotateCcw aria-hidden="true" className="size-4" />
+              </Button>
+            </div>
+          )
+        })}
       </div>
       <Button
         type="button"
@@ -162,7 +167,7 @@ export function AdjustPanel({ adjust, onChange, photoFile }: AdjustPanelProps) {
           onChange(IDENTITY_ADJUSTMENTS)
         }}
       >
-        Reset all
+        {t('editor.adjust.resetAll')}
       </Button>
     </div>
   )

@@ -1,5 +1,6 @@
 import { Download, Images, Share2 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { FORMAT_OPTIONS } from './formats'
 import { MetadataPolicyField } from './metadata-policy'
@@ -75,6 +76,7 @@ export function ExportPanel({
   onCloudSaved,
   onCloudError,
 }: ExportPanelProps) {
+  const { t } = useTranslation()
   const [format, setFormat] = useState<OutputFormat>('image/jpeg')
   const [quality, setQuality] = useState(DEFAULT_QUALITY)
   const [policy, setPolicy] = useState<MetadataPolicy>(DEFAULT_METADATA_POLICY)
@@ -100,10 +102,10 @@ export function ExportPanel({
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <span id="export-format-label" className="text-sm font-medium">
-          Format
+          {t('editor.export.format')}
         </span>
         <Select
-          aria-label="Format"
+          aria-label={t('editor.export.format')}
           value={format}
           options={FORMAT_OPTIONS}
           onChange={(next) => {
@@ -114,7 +116,7 @@ export function ExportPanel({
         />
       </div>
       <SliderField
-        label="Quality"
+        label={t('editor.export.quality')}
         value={quality}
         min={MIN_QUALITY}
         max={1}
@@ -135,16 +137,14 @@ export function ExportPanel({
               setWantsInvisible(event.currentTarget.checked)
             }}
           />
-          Invisible mark
+          {t('editor.export.invisibleMark')}
         </label>
-        {isLossy ? (
-          <p className="text-xs text-ink-muted">Choose PNG to hide a message in the pixels.</p>
-        ) : null}
+        {isLossy ? <p className="text-xs text-ink-muted">{t('editor.export.choosePng')}</p> : null}
         {!isLossy && wantsInvisible ? (
           <>
             <input
               type="text"
-              aria-label="Invisible message"
+              aria-label={t('editor.export.invisibleMessage')}
               value={message}
               maxLength={MAX_INVISIBLE_MESSAGE_LENGTH}
               onChange={(event) => {
@@ -154,16 +154,23 @@ export function ExportPanel({
             />
             <p className={`text-xs ${isOverCapacity ? 'text-rose-600' : 'text-ink-muted'}`}>
               {isOverCapacity
-                ? `Too long for a ${String(outputSize.width)}×${String(outputSize.height)} photo (fits ${String(capacity)} bytes).`
-                : `Hidden in the pixels and readable under Verify. Survives PNG only.`}
+                ? t('editor.export.tooLong', {
+                    width: outputSize.width,
+                    height: outputSize.height,
+                    capacity,
+                  })
+                : t('editor.export.invisibleHint')}
             </p>
           </>
         ) : null}
       </div>
       <p className="text-xs text-ink-muted">
-        {String(outputSize.width)} × {String(outputSize.height)} px
-        {isLossy ? '' : '; PNG is lossless'}. Rendered in your browser at full resolution
-        {isShareable ? '; Share sends it to Photos, Messages or any app on this device' : ''}.
+        {t('editor.export.renderNote', {
+          width: outputSize.width,
+          height: outputSize.height,
+          lossless: isLossy ? '' : t('editor.export.losslessClause'),
+          share: isShareable ? t('editor.export.shareClause') : '',
+        })}
       </p>
       <div className="flex flex-wrap gap-2">
         <Button
@@ -175,7 +182,7 @@ export function ExportPanel({
           }}
         >
           {isExporting ? null : <Download aria-hidden="true" className="size-4" />}
-          Download
+          {t('editor.export.download')}
         </Button>
         {isShareable ? (
           <Button
@@ -188,7 +195,7 @@ export function ExportPanel({
             }}
           >
             {isSharing ? null : <Share2 aria-hidden="true" className="size-4" />}
-            Share
+            {t('editor.export.share')}
           </Button>
         ) : null}
         {onSave === undefined ? null : (
@@ -202,7 +209,7 @@ export function ExportPanel({
             }}
           >
             {isSaving ? null : <Images aria-hidden="true" className="size-4" />}
-            Save to gallery
+            {t('editor.export.saveToGallery')}
           </Button>
         )}
         {cloudConfig === undefined || onExportBlob === undefined ? null : (
@@ -215,7 +222,10 @@ export function ExportPanel({
             }}
             onSaved={(provider) => {
               onCloudSaved?.(
-                `Saved to your ${PROVIDER_LABELS[provider]} “${CLOUD_SAVE_FOLDER}” folder.`,
+                t('editor.export.savedToFolder', {
+                  provider: PROVIDER_LABELS[provider],
+                  folder: CLOUD_SAVE_FOLDER,
+                }),
               )
             }}
             onError={(message) => {
