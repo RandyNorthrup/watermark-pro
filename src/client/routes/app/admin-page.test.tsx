@@ -56,6 +56,46 @@ function stubAdminApi(failure: number | null = null) {
           }),
         )
       }
+      if (url.endsWith('/api/admin/health')) {
+        return Promise.resolve(
+          Response.json({
+            checks: [
+              {
+                id: 'h1',
+                ok: true,
+                detail: null,
+                durationMs: 12,
+                createdAt: '2026-09-08T10:00:00.000Z',
+              },
+              {
+                id: 'h2',
+                ok: false,
+                detail: 'db unreachable',
+                durationMs: 30,
+                createdAt: '2026-09-08T09:55:00.000Z',
+              },
+            ],
+          }),
+        )
+      }
+      if (url.endsWith('/api/admin/client-errors')) {
+        return Promise.resolve(
+          Response.json({
+            errors: [
+              {
+                id: 'e1',
+                message: 'Cannot read properties of undefined',
+                source: 'at render (app.js:1:2)',
+                route: '/app/editor',
+                userAgent: 'test',
+                requestId: 'req-1',
+                userId: null,
+                createdAt: '2026-09-08T10:00:00.000Z',
+              },
+            ],
+          }),
+        )
+      }
       return Promise.reject(new Error(`unexpected fetch ${url}`))
     }),
   )
@@ -68,6 +108,18 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals()
 })
+
+/** Signs in as a platform admin, stubs the admin API, renders the page, and waits for it. */
+async function renderAsAdmin(failure: number | null = null) {
+  const user = userEvent.setup()
+  seedOwnerWorkspace(client())
+  client().state.user = { ...OWNER, role: 'admin' }
+  client().state.allUsers = [{ ...OWNER, role: 'admin' }]
+  stubAdminApi(failure)
+  renderApp('/app/admin')
+  await screen.findByRole('heading', { level: 1 })
+  return user
+}
 
 describe('administration page', () => {
   it('is hidden from ordinary users', async () => {
@@ -128,13 +180,7 @@ describe('administration page', () => {
   })
 
   it('shows organizations and the global audit trail', async () => {
-    const user = userEvent.setup()
-    seedOwnerWorkspace(client())
-    client().state.user = { ...OWNER, role: 'admin' }
-    client().state.allUsers = [{ ...OWNER, role: 'admin' }]
-    stubAdminApi()
-    renderApp('/app/admin')
-    await screen.findByRole('heading', { level: 1 })
+    const user = await renderAsAdmin()
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
     const table = await screen.findByRole('table', { name: /Organizations/ })
     expect(within(table).getByText('Acme Studio')).toBeInTheDocument()
@@ -145,14 +191,19 @@ describe('administration page', () => {
     expect(within(audit).getByText('platform')).toBeInTheDocument()
   })
 
+  it('shows recent health checks and reported client errors', async () => {
+    const user = await renderAsAdmin()
+    await user.click(screen.getByRole('tab', { name: 'Health' }))
+    expect(await screen.findByText('1 of 2 recent checks passed.')).toBeInTheDocument()
+    expect(screen.getByText('db unreachable')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('tab', { name: 'Client errors' }))
+    expect(await screen.findByText('Cannot read properties of undefined')).toBeInTheDocument()
+    expect(screen.getByText(/on \/app\/editor/)).toBeInTheDocument()
+  })
+
   it('reports failed admin loads', async () => {
-    const user = userEvent.setup()
-    seedOwnerWorkspace(client())
-    client().state.user = { ...OWNER, role: 'admin' }
-    client().state.allUsers = [{ ...OWNER, role: 'admin' }]
-    stubAdminApi(HTTP_STATUS.forbidden)
-    renderApp('/app/admin')
-    await screen.findByRole('heading', { level: 1 })
+    const user = await renderAsAdmin(HTTP_STATUS.forbidden)
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
   })

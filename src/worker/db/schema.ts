@@ -282,3 +282,46 @@ export const share = sqliteTable(
     index('share_organization_id_created_at_idx').on(table.organizationId, table.createdAt),
   ],
 )
+
+/**
+ * Uncaught client errors reported by the browser (M19 observability). Bounded
+ * and low-PII: the message, the single top stack frame, the route, the request
+ * id (to tie back to a Worker log line) and — when signed in — the user id.
+ * Rows older than the retention window are pruned on insert.
+ */
+export const clientError = sqliteTable(
+  'client_error',
+  {
+    id: text('id').primaryKey(),
+    message: text('message').notNull(),
+    /** The single top stack frame, or null; never the full stack. */
+    source: text('source'),
+    /** The client route the error happened on. */
+    route: text('route'),
+    userAgent: text('user_agent'),
+    /** Correlation id echoed by the Worker as `X-Request-Id`, when known. */
+    requestId: text('request_id'),
+    userId: text('user_id'),
+    createdAt: createdAtColumn(),
+  },
+  (table) => [index('client_error_created_at_idx').on(table.createdAt)],
+)
+
+/**
+ * Result of the scheduled health check (M19): a cron trigger fetches
+ * `/api/health` and does one D1 read every few minutes and records the outcome
+ * here so the admin console can show recent uptime without any dashboard. Rows
+ * older than the retention window are pruned on insert.
+ */
+export const healthCheck = sqliteTable(
+  'health_check',
+  {
+    id: text('id').primaryKey(),
+    ok: integer('ok', { mode: 'boolean' }).notNull(),
+    /** Failure detail when `ok` is false; null on success. */
+    detail: text('detail'),
+    durationMs: integer('duration_ms').notNull(),
+    createdAt: createdAtColumn(),
+  },
+  (table) => [index('health_check_created_at_idx').on(table.createdAt)],
+)

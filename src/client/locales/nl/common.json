@@ -691,7 +691,29 @@
     "tabs": {
       "users": "Gebruikers",
       "organizations": "Organisaties",
-      "audit": "Auditspoor"
+      "audit": "Auditspoor",
+      "health": "Status",
+      "clientErrors": "Clientfouten"
+    },
+    "health": {
+      "loading": "Statuscontroles worden geladen",
+      "errorTitle": "Kon statuscontroles niet laden",
+      "table": "Recente statuscontroles, nieuwste eerst",
+      "empty": "Nog geen statuscontroles vastgelegd.",
+      "summary": "{{ok}} van {{total}} recente controles geslaagd.",
+      "ok": "OK",
+      "failed": "Mislukt",
+      "duration": "{{ms}} ms",
+      "th": { "time": "Tijd", "status": "Status", "duration": "Duur" }
+    },
+    "clientErrors": {
+      "loading": "Clientfouten worden geladen",
+      "errorTitle": "Kon clientfouten niet laden",
+      "table": "Gemelde clientfouten, nieuwste eerst",
+      "empty": "Geen clientfouten gemeld.",
+      "route": "op {{route}}",
+      "request": "verzoek {{id}}",
+      "unknownRoute": "onbekende route"
     },
     "searchLabel": "Zoeken op e-mail",
     "searchPlaceholder": "name@example.com",

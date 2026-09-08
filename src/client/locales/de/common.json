@@ -691,7 +691,29 @@
     "tabs": {
       "users": "Benutzer",
       "organizations": "Organisationen",
-      "audit": "Audit-Trail"
+      "audit": "Audit-Trail",
+      "health": "Zustand",
+      "clientErrors": "Client-Fehler"
+    },
+    "health": {
+      "loading": "Zustandsprüfungen werden geladen",
+      "errorTitle": "Zustandsprüfungen konnten nicht geladen werden",
+      "table": "Aktuelle Zustandsprüfungen, neueste zuerst",
+      "empty": "Noch keine Zustandsprüfungen aufgezeichnet.",
+      "summary": "{{ok}} von {{total}} aktuellen Prüfungen bestanden.",
+      "ok": "OK",
+      "failed": "Fehlgeschlagen",
+      "duration": "{{ms}} ms",
+      "th": { "time": "Zeit", "status": "Status", "duration": "Dauer" }
+    },
+    "clientErrors": {
+      "loading": "Client-Fehler werden geladen",
+      "errorTitle": "Client-Fehler konnten nicht geladen werden",
+      "table": "Gemeldete Client-Fehler, neueste zuerst",
+      "empty": "Keine Client-Fehler gemeldet.",
+      "route": "auf {{route}}",
+      "request": "Anfrage {{id}}",
+      "unknownRoute": "unbekannte Route"
     },
     "searchLabel": "Nach E-Mail suchen",
     "searchPlaceholder": "name@example.com",

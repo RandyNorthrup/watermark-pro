@@ -675,6 +675,19 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
     - Still to do: run the prerender in the deploy before upload (orchestrated at
       the 2.0.0 cut); e2e landing coverage; the bundle-budget gate can then be
       wired into `quality` for the `/` surface.
+  - **§6 observability (done, no dashboard).** Request-id on every API request
+    (echoed as `X-Request-Id`, in error logs). Client error reporting:
+    `POST /api/client-errors` (rate-limited via the shared limiter, 2 kB cap,
+    Zod-bounded, low-PII — message + top frame + route + request id), a
+    `client_error` table + store, the browser reporter (`lib/report-error.ts`,
+    installed in production only via `sendBeacon`), and an admin **Client errors**
+    tab. Cron health check: a `scheduled` handler (wrangler `triggers.crons`
+    `*/5 * * * *`, both envs) does one D1 read, records to a `health_check` table,
+    and an admin **Health** tab shows recent checks; rows prune past 7 days on
+    insert. Migration `0005`. Tests: client-errors route (4), admin RBAC (both
+    endpoints), the D1 store + health check on real D1 (workers), the reporter
+    unit (8), the scheduled wrapper (node), and the admin page tabs. New admin
+    strings translated into all twelve languages by parallel agents.
   - **§1 first-paint skeleton (done).** `index.html` carries a static,
     theme-correct skeleton inside `#root` (header + brand mark, shimmer content
     blocks, phone tab bar) that paints before JavaScript and is replaced by

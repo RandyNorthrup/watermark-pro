@@ -9,6 +9,9 @@ import { z } from 'zod'
 import {
   API_ERROR_CODE,
   APP_ENVIRONMENTS,
+  CLIENT_ERROR_MAX_MESSAGE_LENGTH,
+  CLIENT_ERROR_MAX_ROUTE_LENGTH,
+  CLIENT_ERROR_MAX_SOURCE_LENGTH,
   MAX_BULK_DELETE,
   MAX_CURSOR_LENGTH,
   MAX_PHOTO_NAME_LENGTH,
@@ -228,4 +231,41 @@ export const adminOrganizationSchema = z.object({
 
 export const adminOrganizationListSchema = z.object({
   organizations: z.array(adminOrganizationSchema),
+})
+
+/** Body of `POST /api/client-errors`: bounded, low-PII (M19 observability). */
+export const clientErrorReportSchema = z.object({
+  message: z.string().trim().min(1).max(CLIENT_ERROR_MAX_MESSAGE_LENGTH),
+  /** The single top stack frame; the client never sends the whole stack. */
+  source: z.string().trim().max(CLIENT_ERROR_MAX_SOURCE_LENGTH).optional(),
+  route: z.string().trim().max(CLIENT_ERROR_MAX_ROUTE_LENGTH).optional(),
+})
+
+export type ClientErrorReport = z.infer<typeof clientErrorReportSchema>
+
+export const adminClientErrorSchema = z.object({
+  id: z.string(),
+  message: z.string(),
+  source: z.string().nullable(),
+  route: z.string().nullable(),
+  userAgent: z.string().nullable(),
+  requestId: z.string().nullable(),
+  userId: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+})
+
+export const adminClientErrorListSchema = z.object({
+  errors: z.array(adminClientErrorSchema),
+})
+
+export const adminHealthCheckSchema = z.object({
+  id: z.string(),
+  ok: z.boolean(),
+  detail: z.string().nullable(),
+  durationMs: z.number().int().nonnegative(),
+  createdAt: z.iso.datetime(),
+})
+
+export const adminHealthListSchema = z.object({
+  checks: z.array(adminHealthCheckSchema),
 })

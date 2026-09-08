@@ -691,7 +691,9 @@
     "tabs": {
       "users": "Users",
       "organizations": "Organizations",
-      "audit": "Audit trail"
+      "audit": "Audit trail",
+      "health": "Health",
+      "clientErrors": "Client errors"
     },
     "searchLabel": "Search by email",
     "searchPlaceholder": "name@example.com",
@@ -735,7 +737,31 @@
     "auditErrorTitle": "Could not load the audit trail",
     "auditCaption": "Audit entries across all organizations, newest first",
     "auditDetailHeading": "Organization",
-    "platform": "platform"
+    "platform": "platform",
+    "health": {
+      "loading": "Loading health checks",
+      "errorTitle": "Could not load health checks",
+      "table": "Recent health checks, newest first",
+      "empty": "No health checks recorded yet.",
+      "summary": "{{ok}} of {{total}} recent checks passed.",
+      "ok": "OK",
+      "failed": "Failed",
+      "duration": "{{ms}} ms",
+      "th": {
+        "time": "Time",
+        "status": "Status",
+        "duration": "Duration"
+      }
+    },
+    "clientErrors": {
+      "loading": "Loading client errors",
+      "errorTitle": "Could not load client errors",
+      "table": "Reported client errors, newest first",
+      "empty": "No client errors reported.",
+      "route": "on {{route}}",
+      "request": "request {{id}}",
+      "unknownRoute": "unknown route"
+    }
   },
   "members": {
     "orgRequired": "Create or join an organization to manage members.",

@@ -680,7 +680,29 @@
     "tabs": {
       "users": "사용자",
       "organizations": "조직",
-      "audit": "감사 기록"
+      "audit": "감사 기록",
+      "health": "상태 점검",
+      "clientErrors": "클라이언트 오류"
+    },
+    "health": {
+      "loading": "상태 점검 불러오는 중",
+      "errorTitle": "상태 점검을 불러올 수 없습니다",
+      "table": "최근 상태 점검, 최신순",
+      "empty": "아직 기록된 상태 점검이 없습니다.",
+      "summary": "최근 점검 {{total}}건 중 {{ok}}건 통과.",
+      "ok": "OK",
+      "failed": "실패",
+      "duration": "{{ms}} ms",
+      "th": { "time": "시각", "status": "상태", "duration": "소요 시간" }
+    },
+    "clientErrors": {
+      "loading": "클라이언트 오류 불러오는 중",
+      "errorTitle": "클라이언트 오류를 불러올 수 없습니다",
+      "table": "보고된 클라이언트 오류, 최신순",
+      "empty": "보고된 클라이언트 오류가 없습니다.",
+      "route": "{{route}}에서",
+      "request": "요청 {{id}}",
+      "unknownRoute": "알 수 없는 경로"
     },
     "searchLabel": "이메일로 검색",
     "searchPlaceholder": "name@example.com",

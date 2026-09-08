@@ -702,7 +702,29 @@
     "tabs": {
       "users": "Utilisateurs",
       "organizations": "Organisations",
-      "audit": "Journal d'audit"
+      "audit": "Journal d'audit",
+      "health": "Santé",
+      "clientErrors": "Erreurs client"
+    },
+    "health": {
+      "loading": "Chargement des contrôles de santé",
+      "errorTitle": "Impossible de charger les contrôles de santé",
+      "table": "Contrôles de santé récents, les plus récents d'abord",
+      "empty": "Aucun contrôle de santé enregistré pour l'instant.",
+      "summary": "{{ok}} contrôles récents sur {{total}} réussis.",
+      "ok": "OK",
+      "failed": "Échec",
+      "duration": "{{ms}} ms",
+      "th": { "time": "Heure", "status": "Statut", "duration": "Durée" }
+    },
+    "clientErrors": {
+      "loading": "Chargement des erreurs client",
+      "errorTitle": "Impossible de charger les erreurs client",
+      "table": "Erreurs client signalées, les plus récentes d'abord",
+      "empty": "Aucune erreur client signalée.",
+      "route": "sur {{route}}",
+      "request": "requête {{id}}",
+      "unknownRoute": "route inconnue"
     },
     "searchLabel": "Rechercher par e-mail",
     "searchPlaceholder": "nom@exemple.com",

@@ -680,7 +680,29 @@
     "tabs": {
       "users": "ユーザー",
       "organizations": "組織",
-      "audit": "監査証跡"
+      "audit": "監査証跡",
+      "health": "ヘルスチェック",
+      "clientErrors": "クライアントエラー"
+    },
+    "health": {
+      "loading": "ヘルスチェックを読み込み中",
+      "errorTitle": "ヘルスチェックを読み込めませんでした",
+      "table": "最近のヘルスチェック（新しい順）",
+      "empty": "ヘルスチェックはまだ記録されていません。",
+      "summary": "最近の{{total}}件のチェックのうち{{ok}}件が成功しました。",
+      "ok": "OK",
+      "failed": "失敗",
+      "duration": "{{ms}} ms",
+      "th": { "time": "時刻", "status": "ステータス", "duration": "所要時間" }
+    },
+    "clientErrors": {
+      "loading": "クライアントエラーを読み込み中",
+      "errorTitle": "クライアントエラーを読み込めませんでした",
+      "table": "報告されたクライアントエラー（新しい順）",
+      "empty": "報告されたクライアントエラーはありません。",
+      "route": "{{route}}にて",
+      "request": "リクエスト {{id}}",
+      "unknownRoute": "不明なルート"
     },
     "searchLabel": "メールアドレスで検索",
     "searchPlaceholder": "name@example.com",

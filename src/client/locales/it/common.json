@@ -702,7 +702,29 @@
     "tabs": {
       "users": "Utenti",
       "organizations": "Organizzazioni",
-      "audit": "Traccia di controllo"
+      "audit": "Traccia di controllo",
+      "health": "Stato",
+      "clientErrors": "Errori client"
+    },
+    "health": {
+      "loading": "Caricamento dei controlli di stato",
+      "errorTitle": "Impossibile caricare i controlli di stato",
+      "table": "Controlli di stato recenti, dal più recente",
+      "empty": "Ancora nessun controllo di stato registrato.",
+      "summary": "{{ok}} di {{total}} controlli recenti superati.",
+      "ok": "OK",
+      "failed": "Non riuscito",
+      "duration": "{{ms}} ms",
+      "th": { "time": "Ora", "status": "Stato", "duration": "Durata" }
+    },
+    "clientErrors": {
+      "loading": "Caricamento degli errori client",
+      "errorTitle": "Impossibile caricare gli errori client",
+      "table": "Errori client segnalati, dal più recente",
+      "empty": "Nessun errore client segnalato.",
+      "route": "su {{route}}",
+      "request": "richiesta {{id}}",
+      "unknownRoute": "percorso sconosciuto"
     },
     "searchLabel": "Cerca per email",
     "searchPlaceholder": "nome@esempio.com",

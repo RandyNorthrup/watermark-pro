@@ -702,7 +702,29 @@
     "tabs": {
       "users": "Usuarios",
       "organizations": "Organizaciones",
-      "audit": "Historial de auditoría"
+      "audit": "Historial de auditoría",
+      "health": "Estado",
+      "clientErrors": "Errores de cliente"
+    },
+    "health": {
+      "loading": "Cargando comprobaciones de estado",
+      "errorTitle": "No se pudieron cargar las comprobaciones de estado",
+      "table": "Comprobaciones de estado recientes, de la más reciente a la más antigua",
+      "empty": "Aún no se ha registrado ninguna comprobación de estado.",
+      "summary": "{{ok}} de {{total}} comprobaciones recientes superadas.",
+      "ok": "OK",
+      "failed": "Fallida",
+      "duration": "{{ms}} ms",
+      "th": { "time": "Hora", "status": "Estado", "duration": "Duración" }
+    },
+    "clientErrors": {
+      "loading": "Cargando errores de cliente",
+      "errorTitle": "No se pudieron cargar los errores de cliente",
+      "table": "Errores de cliente notificados, del más reciente al más antiguo",
+      "empty": "No se ha notificado ningún error de cliente.",
+      "route": "en {{route}}",
+      "request": "solicitud {{id}}",
+      "unknownRoute": "ruta desconocida"
     },
     "searchLabel": "Buscar por correo",
     "searchPlaceholder": "nombre@ejemplo.com",

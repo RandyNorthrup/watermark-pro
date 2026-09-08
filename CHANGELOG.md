@@ -25,6 +25,14 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
+- Observability console (PLAN §6, no dashboard): the browser now reports uncaught
+  errors and unhandled rejections to a rate-limited, size-capped, low-PII
+  `POST /api/client-errors` (message, single top stack frame, route, request id);
+  a cron trigger runs a `scheduled` health check every five minutes that confirms
+  the database is reachable and records the result; and the admin console gains a
+  **Health** tab (recent checks with status and duration) and a **Client errors**
+  tab (recent reports). Both tables keep seven days of rows, pruned on insert. The
+  new admin strings are translated into all twelve languages.
 - Every API request now carries a correlation id: the Worker takes an inbound
   `X-Request-Id` or generates one, echoes it on the response, and includes it in
   the unhandled-error log line, so a client error report can be tied back to a

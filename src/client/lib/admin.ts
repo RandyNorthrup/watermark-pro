@@ -7,7 +7,12 @@ import { z } from 'zod'
 
 import { ApiRequestError, fetchJson } from './api'
 import { authClient } from './auth-client'
-import { adminOrganizationListSchema, auditListResponseSchema } from '../../shared/api'
+import {
+  adminClientErrorListSchema,
+  adminHealthListSchema,
+  adminOrganizationListSchema,
+  auditListResponseSchema,
+} from '../../shared/api'
 import { PLATFORM_ADMIN_ROLE } from '../../shared/constants'
 
 export const ADMIN_USER_PAGE_SIZE = 50
@@ -83,6 +88,22 @@ export const adminAuditQueryOptions = queryOptions({
   queryFn: async () => {
     const response = await fetchJson('/api/admin/audit', auditListResponseSchema)
     return response.entries
+  },
+})
+
+export const adminClientErrorsQueryOptions = queryOptions({
+  queryKey: [...ADMIN_QUERY_KEY, 'client-errors'],
+  queryFn: async () => {
+    const response = await fetchJson('/api/admin/client-errors', adminClientErrorListSchema)
+    return response.errors
+  },
+})
+
+export const adminHealthQueryOptions = queryOptions({
+  queryKey: [...ADMIN_QUERY_KEY, 'health'],
+  queryFn: async () => {
+    const response = await fetchJson('/api/admin/health', adminHealthListSchema)
+    return response.checks
   },
 })
 

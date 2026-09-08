@@ -35,6 +35,12 @@
   "observability": {
     "enabled": true,
   },
+  // Scheduled health check (M19): the `scheduled` handler in src/worker/index.ts
+  // confirms the database is reachable every five minutes and records the result
+  // for the admin console. No dashboard.
+  "triggers": {
+    "crons": ["*/5 * * * *"],
+  },
   "vars": {
     // Non-secret configuration. Secrets (BETTER_AUTH_SECRET) go in .dev.vars
     // locally and `wrangler secret put --env production` in production. Every
@@ -111,6 +117,9 @@
       ],
       "observability": {
         "enabled": true,
+      },
+      "triggers": {
+        "crons": ["*/5 * * * *"],
       },
       // Repeated from the top level so production has the ASSETS binding and the
       // `/` worker-first route regardless of environment inheritance rules.

@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { errorCodeOf, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
 import {
+  adminClientErrorListSchema,
+  adminHealthListSchema,
   adminOrganizationListSchema,
   auditListResponseSchema,
   publicConfigSchema,
@@ -171,6 +173,42 @@ describe('platform administration', () => {
     const denied = await otherClient.get('/api/admin/audit')
     // Otto is an admin now but his session was revoked by the ban; a fresh sign-in works.
     expect([HTTP_STATUS.unauthorized, HTTP_STATUS.ok]).toContain(denied.status)
+  })
+
+  it('exposes client errors and health checks to platform admins only', async () => {
+    await harness.services.observability.recordClientError({
+      message: 'boom',
+      source: 'at foo (a.js:1:2)',
+      route: '/app/editor',
+      userAgent: 'test-agent',
+      requestId: 'req-1',
+      userId: null,
+    })
+    await harness.services.observability.recordHealthCheck({
+      ok: true,
+      detail: null,
+      durationMs: 12,
+    })
+
+    const otherClient = new TestClient(harness.app, harness.env)
+    await otherClient.signUpAndVerify(harness.mailbox, other)
+    expect(await statusOf(otherClient.get('/api/admin/client-errors'))).toBe(HTTP_STATUS.forbidden)
+    expect(await statusOf(otherClient.get('/api/admin/health'))).toBe(HTTP_STATUS.forbidden)
+    expect(
+      await statusOf(new TestClient(harness.app, harness.env).get('/api/admin/client-errors')),
+    ).toBe(HTTP_STATUS.unauthorized)
+
+    const errors = await adminClient.get('/api/admin/client-errors')
+    expect(errors.status).toBe(HTTP_STATUS.ok)
+    const { errors: rows } = adminClientErrorListSchema.parse(await errors.json())
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({ message: 'boom', route: '/app/editor', requestId: 'req-1' })
+
+    const health = await adminClient.get('/api/admin/health')
+    expect(health.status).toBe(HTTP_STATUS.ok)
+    const { checks } = adminHealthListSchema.parse(await health.json())
+    expect(checks).toHaveLength(1)
+    expect(checks[0]).toMatchObject({ ok: true, durationMs: 12 })
   })
 
   it('publishes the Turnstile site key only when bot protection is configured', async () => {

@@ -17,6 +17,7 @@ import {
   createDrizzleWatermarkStore,
   createR2ObjectStore,
 } from './db/library-stores'
+import { createDrizzleObservabilityStore } from './db/observability-store'
 import { createDrizzleOrganizationStore } from './db/organization-store'
 import * as schema from './db/schema'
 import { createDrizzleUserStore } from './db/user-store'
@@ -27,6 +28,7 @@ import { validateEnv, type ValidatedEnv } from './env'
 import type {
   AssetStore,
   ObjectStore,
+  ObservabilityStore,
   OrganizationStore,
   PhotoStore,
   ShareStore,
@@ -46,6 +48,7 @@ export interface Services {
   shares: ShareStore
   organizations: OrganizationStore
   users: UserStore
+  observability: ObservabilityStore
   objects: ObjectStore
   /** Per-address limiter shared with Better Auth; public routes consume it too. */
   rateLimit: RateLimitStorage
@@ -111,6 +114,7 @@ export function buildServices(config: ValidatedEnv): Services {
     shares: createDrizzleShareStore(db),
     organizations: createDrizzleOrganizationStore(db),
     users: createDrizzleUserStore(db),
+    observability: createDrizzleObservabilityStore(db),
     objects: createR2ObjectStore(config.BUCKET),
     rateLimit,
     importLimiter: async (key) => {

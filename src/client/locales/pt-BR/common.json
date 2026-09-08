@@ -702,7 +702,29 @@
     "tabs": {
       "users": "Usuários",
       "organizations": "Organizações",
-      "audit": "Trilha de auditoria"
+      "audit": "Trilha de auditoria",
+      "health": "Integridade",
+      "clientErrors": "Erros do cliente"
+    },
+    "health": {
+      "loading": "Carregando verificações de integridade",
+      "errorTitle": "Não foi possível carregar as verificações de integridade",
+      "table": "Verificações de integridade recentes, das mais recentes às mais antigas",
+      "empty": "Nenhuma verificação de integridade registrada ainda.",
+      "summary": "{{ok}} de {{total}} verificações recentes passaram.",
+      "ok": "OK",
+      "failed": "Falhou",
+      "duration": "{{ms}} ms",
+      "th": { "time": "Horário", "status": "Status", "duration": "Duração" }
+    },
+    "clientErrors": {
+      "loading": "Carregando erros do cliente",
+      "errorTitle": "Não foi possível carregar os erros do cliente",
+      "table": "Erros do cliente relatados, dos mais recentes aos mais antigos",
+      "empty": "Nenhum erro do cliente relatado.",
+      "route": "em {{route}}",
+      "request": "requisição {{id}}",
+      "unknownRoute": "rota desconhecida"
     },
     "searchLabel": "Pesquisar por e-mail",
     "searchPlaceholder": "nome@exemplo.com",

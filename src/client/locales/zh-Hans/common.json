@@ -680,7 +680,29 @@
     "tabs": {
       "users": "用户",
       "organizations": "组织",
-      "audit": "审计追踪"
+      "audit": "审计追踪",
+      "health": "健康检查",
+      "clientErrors": "客户端错误"
+    },
+    "health": {
+      "loading": "正在加载健康检查",
+      "errorTitle": "无法加载健康检查",
+      "table": "最近的健康检查，最新在前",
+      "empty": "尚无健康检查记录。",
+      "summary": "最近 {{total}} 次检查中有 {{ok}} 次通过。",
+      "ok": "OK",
+      "failed": "失败",
+      "duration": "{{ms}} ms",
+      "th": { "time": "时间", "status": "状态", "duration": "时长" }
+    },
+    "clientErrors": {
+      "loading": "正在加载客户端错误",
+      "errorTitle": "无法加载客户端错误",
+      "table": "已报告的客户端错误，最新在前",
+      "empty": "尚无客户端错误报告。",
+      "route": "位于 {{route}}",
+      "request": "请求 {{id}}",
+      "unknownRoute": "未知路由"
     },
     "searchLabel": "按电子邮箱搜索",
     "searchPlaceholder": "name@example.com",

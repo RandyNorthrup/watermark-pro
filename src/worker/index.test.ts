@@ -94,6 +94,33 @@ describe('default worker handler', () => {
       environment: 'test',
     })
   })
+
+  it('schedules the health check on the cron trigger', async () => {
+    const consoleError = silenceConsoleError()
+    const pending: Promise<unknown>[] = []
+    const ctx = {
+      waitUntil(promise: Promise<unknown>) {
+        pending.push(promise)
+      },
+      passThroughOnException() {
+        // no-op in tests
+      },
+      props: {},
+    } as unknown as ExecutionContext
+    const controller = {
+      scheduledTime: Date.now(),
+      cron: '*/5 * * * *',
+      noRetry() {
+        // no-op in tests
+      },
+    } as unknown as ScheduledController
+    // The test env has no real D1, so the check records a failure and logs it;
+    // this covers the cron wiring and the health-check error path.
+    handler.scheduled(controller, createTestEnv(), ctx)
+    expect(pending).toHaveLength(1)
+    await Promise.all(pending)
+    consoleError.mockRestore()
+  })
 })
 
 describe('error handling', () => {

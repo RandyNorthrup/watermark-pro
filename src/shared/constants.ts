@@ -115,6 +115,21 @@ export const AUDIT_PAGE_SIZE = 50
 /** Organizations shown to a platform admin, newest first. */
 export const ADMIN_ORGANIZATION_PAGE_SIZE = 200
 
+/** M19 observability. Client error reports are bounded and low-PII. */
+export const CLIENT_ERROR_MAX_BODY_BYTES = 2048
+export const CLIENT_ERROR_MAX_MESSAGE_LENGTH = 1000
+export const CLIENT_ERROR_MAX_SOURCE_LENGTH = 500
+export const CLIENT_ERROR_MAX_ROUTE_LENGTH = 200
+/** How long client-error and health-check rows are kept before an insert prunes them. */
+export const OBSERVABILITY_RETENTION_DAYS = 7
+const SECONDS_PER_DAY = 86_400
+/** The retention window in milliseconds; an insert prunes rows older than this. */
+export const OBSERVABILITY_RETENTION_MS =
+  OBSERVABILITY_RETENTION_DAYS * SECONDS_PER_DAY * MILLISECONDS_PER_SECOND
+/** Rows shown on the admin observability tabs, newest first. */
+export const CLIENT_ERROR_PAGE_SIZE = 100
+export const HEALTH_CHECK_PAGE_SIZE = 288
+
 /** Ring buffer size for the console email provider's captured messages (dev/test only). */
 export const DEV_MAILBOX_CAPACITY = 20
 

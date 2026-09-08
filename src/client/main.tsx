@@ -8,6 +8,7 @@ import { initI18n } from './i18n'
 import { launchTarget, setLaunchFiles } from './lib/launch-files'
 import { preloadRouteImages } from './lib/preload'
 import { createQueryClient } from './lib/query-client'
+import { installErrorReporting } from './lib/report-error'
 import { applyTheme, readTheme, watchSystemTheme } from './lib/theme'
 import { createAppRouter } from './router'
 import '@fontsource-variable/inter'
@@ -20,6 +21,12 @@ if (rootElement === null) {
 
 applyTheme(readTheme())
 watchSystemTheme()
+
+// Report uncaught errors to the admin console in production only (development
+// and the e2e run surface errors directly and would otherwise flood the table).
+if (import.meta.env.PROD) {
+  installErrorReporting()
+}
 
 const queryClient = createQueryClient()
 const router = createAppRouter(queryClient)

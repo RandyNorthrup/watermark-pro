@@ -17,6 +17,7 @@ import { createMemoryAuditStore } from './memory-audit-store'
 import {
   createMemoryAssetStore,
   createMemoryObjectStore,
+  createMemoryObservabilityStore,
   createMemoryOrganizationStore,
   createMemoryUserStore,
   createMemoryPhotoStore,
@@ -144,6 +145,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     shares: createMemoryShareStore(),
     organizations: createMemoryOrganizationStore(tables),
     users: createMemoryUserStore(tables),
+    observability: createMemoryObservabilityStore(),
     objects,
     rateLimit: options.rateLimit ?? unlimitedRateLimitStorage,
     importLimiter: options.importLimiter ?? (() => Promise.resolve(true)),

@@ -18,6 +18,7 @@ import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '
 import { requireSameOrigin } from './middleware/same-origin'
 import { adminRoutes } from './routes/admin'
 import { auditRoutes } from './routes/audit'
+import { clientErrorRoutes } from './routes/client-errors'
 import { devRoutes } from './routes/dev'
 import { importRoutes } from './routes/imports'
 import { serveLanding } from './routes/landing'
@@ -98,6 +99,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   })
 
   app.route('/api', auditRoutes)
+  app.route('/api', clientErrorRoutes)
   app.route('/api', libraryRoutes)
   app.route('/api', importRoutes)
   app.route('/api', meRoutes)
@@ -139,15 +141,47 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
 const app = createApp()
 
 /**
+ * Scheduled health check (M19 observability, wrangler `triggers.crons`). Confirms
+ * the database is reachable with one D1 read, times it, and records the outcome
+ * so the admin console can show recent uptime without any dashboard. Never
+ * throws: a failure is recorded and logged, not propagated. Exported so the
+ * Workers test can await it directly (the cron wrapper only schedules it).
+ */
+export async function runHealthCheck(env: Env): Promise<void> {
+  const services = getServices(env)
+  const started = Date.now()
+  let isHealthy = true
+  let detail: string | null = null
+  try {
+    await services.observability.listHealthChecks()
+  } catch (error) {
+    isHealthy = false
+    detail = error instanceof Error ? error.message : String(error)
+  }
+  const durationMs = Date.now() - started
+  try {
+    await services.observability.recordHealthCheck({ ok: isHealthy, detail, durationMs })
+  } catch (error) {
+    console.error('health check: could not record the result', error)
+  }
+  if (!isHealthy) {
+    console.error('health check failed', detail)
+  }
+}
+
+/**
  * The Worker serves the front door (GET /) as a prerendered, per-locale static
  * landing before the API app runs (src/worker/routes/landing.ts). Everything
  * else — the JSON API — is the Hono app. `run_worker_first` in wrangler.jsonc
  * routes `/api/*` and `/` here; all other paths are served from the asset store
- * without invoking this Worker.
+ * without invoking this Worker. The cron trigger runs the health check.
  */
 export default {
   async fetch(request, env, ctx) {
     const landing = await serveLanding(request, env)
     return landing ?? (await app.fetch(request, env, ctx))
+  },
+  scheduled(_event, env, ctx) {
+    ctx.waitUntil(runHealthCheck(env))
   },
 } satisfies ExportedHandler<Env>

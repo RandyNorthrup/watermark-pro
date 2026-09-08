@@ -1,8 +1,16 @@
-import { ADMIN_ORGANIZATION_PAGE_SIZE, PLATFORM_ADMIN_ROLE } from '../../shared/constants'
+import {
+  ADMIN_ORGANIZATION_PAGE_SIZE,
+  CLIENT_ERROR_PAGE_SIZE,
+  HEALTH_CHECK_PAGE_SIZE,
+  PLATFORM_ADMIN_ROLE,
+} from '../../shared/constants'
 import type {
   AssetRecord,
   AssetStore,
+  ClientErrorRecord,
+  HealthCheckRecord,
   ObjectStore,
+  ObservabilityStore,
   OrganizationStore,
   PhotoRecord,
   PhotoStore,
@@ -264,6 +272,28 @@ export function createMemoryOrganizationStore(tables: MemoryTenantTables): Organ
           memberCount: tables.member.filter((entry) => entry.organizationId === row.id).length,
         }))
       return Promise.resolve(summaries)
+    },
+  }
+}
+
+/** In-memory client-error and health-check store for Node tests (newest first). */
+export function createMemoryObservabilityStore(): ObservabilityStore {
+  const errors: ClientErrorRecord[] = []
+  const checks: HealthCheckRecord[] = []
+  return {
+    recordClientError(input) {
+      errors.unshift({ id: crypto.randomUUID(), createdAt: new Date(), ...input })
+      return Promise.resolve()
+    },
+    listClientErrors() {
+      return Promise.resolve(errors.slice(0, CLIENT_ERROR_PAGE_SIZE))
+    },
+    recordHealthCheck(input) {
+      checks.unshift({ id: crypto.randomUUID(), createdAt: new Date(), ...input })
+      return Promise.resolve()
+    },
+    listHealthChecks() {
+      return Promise.resolve(checks.slice(0, HEALTH_CHECK_PAGE_SIZE))
     },
   }
 }

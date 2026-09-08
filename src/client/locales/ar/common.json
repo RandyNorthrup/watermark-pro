@@ -735,7 +735,29 @@
     "tabs": {
       "users": "المستخدمون",
       "organizations": "المؤسسات",
-      "audit": "سجل التدقيق"
+      "audit": "سجل التدقيق",
+      "health": "الصحة",
+      "clientErrors": "أخطاء العميل"
+    },
+    "health": {
+      "loading": "جارٍ تحميل فحوصات الصحة",
+      "errorTitle": "تعذّر تحميل فحوصات الصحة",
+      "table": "فحوصات الصحة الأخيرة، الأحدث أولاً",
+      "empty": "لم تُسجَّل أي فحوصات صحة بعد.",
+      "summary": "نجح {{ok}} من {{total}} من الفحوصات الأخيرة.",
+      "ok": "OK",
+      "failed": "فشل",
+      "duration": "{{ms}} ms",
+      "th": { "time": "الوقت", "status": "الحالة", "duration": "المدة" }
+    },
+    "clientErrors": {
+      "loading": "جارٍ تحميل أخطاء العميل",
+      "errorTitle": "تعذّر تحميل أخطاء العميل",
+      "table": "أخطاء العميل المُبلَّغ عنها، الأحدث أولاً",
+      "empty": "لم يُبلَّغ عن أي أخطاء عميل.",
+      "route": "في {{route}}",
+      "request": "الطلب {{id}}",
+      "unknownRoute": "مسار غير معروف"
     },
     "searchLabel": "البحث بالبريد الإلكتروني",
     "searchPlaceholder": "name@example.com",

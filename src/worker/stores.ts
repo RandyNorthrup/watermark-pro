@@ -161,3 +161,34 @@ export interface UserStore {
    */
   promoteToPlatformAdmin(email: string): Promise<boolean>
 }
+
+export interface ClientErrorRecord {
+  id: string
+  message: string
+  source: string | null
+  route: string | null
+  userAgent: string | null
+  requestId: string | null
+  userId: string | null
+  createdAt: Date
+}
+
+export interface HealthCheckRecord {
+  id: string
+  ok: boolean
+  detail: string | null
+  durationMs: number
+  createdAt: Date
+}
+
+/**
+ * Client error reports and scheduled health checks (M19 observability). Both
+ * are append-only from the app's point of view; writes prune rows past the
+ * retention window so the tables cannot grow without bound.
+ */
+export interface ObservabilityStore {
+  recordClientError(input: Omit<ClientErrorRecord, 'id' | 'createdAt'>): Promise<void>
+  listClientErrors(): Promise<ClientErrorRecord[]>
+  recordHealthCheck(input: Omit<HealthCheckRecord, 'id' | 'createdAt'>): Promise<void>
+  listHealthChecks(): Promise<HealthCheckRecord[]>
+}

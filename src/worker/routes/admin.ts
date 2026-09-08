@@ -7,6 +7,8 @@
 import { Hono } from 'hono'
 
 import {
+  adminClientErrorListSchema,
+  adminHealthListSchema,
   adminOrganizationListSchema,
   auditListResponseSchema,
   publicConfigSchema,
@@ -57,6 +59,39 @@ export const adminRoutes = new Hono<AppContext>()
     const records = await c.get('services').audit.listAll()
     return c.json(
       auditListResponseSchema.parse({ entries: records.map((record) => auditToDto(record)) }),
+      HTTP_STATUS.ok,
+    )
+  })
+  .get('/admin/client-errors', requireSession, requirePlatformAdmin, async (c) => {
+    const errors = await c.get('services').observability.listClientErrors()
+    return c.json(
+      adminClientErrorListSchema.parse({
+        errors: errors.map((error) => ({
+          id: error.id,
+          message: error.message,
+          source: error.source,
+          route: error.route,
+          userAgent: error.userAgent,
+          requestId: error.requestId,
+          userId: error.userId,
+          createdAt: error.createdAt.toISOString(),
+        })),
+      }),
+      HTTP_STATUS.ok,
+    )
+  })
+  .get('/admin/health', requireSession, requirePlatformAdmin, async (c) => {
+    const checks = await c.get('services').observability.listHealthChecks()
+    return c.json(
+      adminHealthListSchema.parse({
+        checks: checks.map((check) => ({
+          id: check.id,
+          ok: check.ok,
+          detail: check.detail,
+          durationMs: check.durationMs,
+          createdAt: check.createdAt.toISOString(),
+        })),
+      }),
       HTTP_STATUS.ok,
     )
   })

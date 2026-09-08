@@ -16,6 +16,8 @@ import { Spinner } from '../../components/ui/spinner'
 import {
   ADMIN_QUERY_KEY,
   adminAuditQueryOptions,
+  adminClientErrorsQueryOptions,
+  adminHealthQueryOptions,
   adminOrganizationsQueryOptions,
   type AdminUser,
   adminUsersQueryOptions,
@@ -72,6 +74,12 @@ function AdminSections({ selfId }: { selfId: string }) {
         <Tabs.Trigger value="audit" className={tabClassName}>
           {t('admin.tabs.audit')}
         </Tabs.Trigger>
+        <Tabs.Trigger value="health" className={tabClassName}>
+          {t('admin.tabs.health')}
+        </Tabs.Trigger>
+        <Tabs.Trigger value="client-errors" className={tabClassName}>
+          {t('admin.tabs.clientErrors')}
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="users" className="outline-none">
         <UsersPanel selfId={selfId} />
@@ -81,6 +89,12 @@ function AdminSections({ selfId }: { selfId: string }) {
       </Tabs.Content>
       <Tabs.Content value="audit" className="outline-none">
         <AuditPanel />
+      </Tabs.Content>
+      <Tabs.Content value="health" className="outline-none">
+        <HealthPanel />
+      </Tabs.Content>
+      <Tabs.Content value="client-errors" className="outline-none">
+        <ClientErrorsPanel />
       </Tabs.Content>
     </Tabs.Root>
   )
@@ -410,5 +424,120 @@ function AuditPanel() {
         </td>
       )}
     />
+  )
+}
+
+function HealthPanel() {
+  const { t } = useTranslation()
+  const checks = useQuery(adminHealthQueryOptions)
+  if (checks.isPending) {
+    return <Spinner className="size-6" label={t('admin.health.loading')} />
+  }
+  if (checks.isError) {
+    return (
+      <Alert tone="error" title={t('admin.health.errorTitle')}>
+        {describeError(checks.error)}
+      </Alert>
+    )
+  }
+  if (checks.data.length === 0) {
+    return <p className="text-sm text-ink-muted">{t('admin.health.empty')}</p>
+  }
+  const passed = checks.data.filter((check) => check.ok).length
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-sm text-ink-muted">
+        {t('admin.health.summary', { ok: passed, total: checks.data.length })}
+      </p>
+      <Card
+        className="overflow-x-auto p-0 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
+        tabIndex={0}
+        role="region"
+        aria-label={t('admin.health.table')}
+      >
+        <table className="w-full text-sm">
+          <caption className="sr-only">{t('admin.health.table')}</caption>
+          <thead className="text-start text-xs text-ink-muted uppercase">
+            <tr>
+              <th scope="col" className="px-4 py-3">
+                {t('admin.health.th.time')}
+              </th>
+              <th scope="col" className="px-4 py-3">
+                {t('admin.health.th.status')}
+              </th>
+              <th scope="col" className="px-4 py-3">
+                {t('admin.health.th.duration')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {checks.data.map((check) => (
+              <tr key={check.id} className="border-t border-line">
+                <td className="px-4 py-3 whitespace-nowrap">
+                  {dateTimeFormatter.format(new Date(check.createdAt))}
+                </td>
+                <td className="px-4 py-3">
+                  {check.ok ? (
+                    <Badge>{t('admin.health.ok')}</Badge>
+                  ) : (
+                    <Badge className="bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-100">
+                      {check.detail ?? t('admin.health.failed')}
+                    </Badge>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  {t('admin.health.duration', { ms: check.durationMs })}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  )
+}
+
+function ClientErrorsPanel() {
+  const { t } = useTranslation()
+  const errors = useQuery(adminClientErrorsQueryOptions)
+  if (errors.isPending) {
+    return <Spinner className="size-6" label={t('admin.clientErrors.loading')} />
+  }
+  if (errors.isError) {
+    return (
+      <Alert tone="error" title={t('admin.clientErrors.errorTitle')}>
+        {describeError(errors.error)}
+      </Alert>
+    )
+  }
+  if (errors.data.length === 0) {
+    return <p className="text-sm text-ink-muted">{t('admin.clientErrors.empty')}</p>
+  }
+  return (
+    <ul className="flex flex-col gap-2" aria-label={t('admin.clientErrors.table')}>
+      {errors.data.map((error) => (
+        <li key={error.id}>
+          <Card className="flex flex-col gap-1 p-4">
+            <p className="font-medium wrap-break-word">{error.message}</p>
+            {error.source === null ? null : (
+              <p className="font-mono text-xs break-all text-ink-muted">{error.source}</p>
+            )}
+            <p className="text-xs text-ink-muted">
+              {t('admin.clientErrors.route', {
+                route: error.route ?? t('admin.clientErrors.unknownRoute'),
+              })}
+              {' · '}
+              {dateTimeFormatter.format(new Date(error.createdAt))}
+              {error.requestId === null ? null : (
+                <>
+                  {' · '}
+                  {t('admin.clientErrors.request', { id: error.requestId })}
+                </>
+              )}
+            </p>
+          </Card>
+        </li>
+      ))}
+    </ul>
   )
 }
