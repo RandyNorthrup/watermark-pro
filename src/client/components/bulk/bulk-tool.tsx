@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react'
 import { type DragEvent, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { OverrideDialog } from './override-dialog'
 import { useBulkQueue } from './use-bulk-queue'
@@ -110,12 +111,10 @@ const PREVIEW_HEIGHT = 900
 
 type SizeChoice = 'original' | `${(typeof LONG_EDGE_PRESETS)[number]}`
 
-const SIZE_OPTIONS: readonly SelectOption<SizeChoice>[] = [
-  { value: 'original', label: 'Original size' },
-  ...LONG_EDGE_PRESETS.map((side) => ({
-    value: String(side) as SizeChoice,
-    label: `Fit ${String(side)} px`,
-  })),
+/** The valid size choices; the dropdown labels are translated at render. */
+const SIZE_VALUES: readonly SizeChoice[] = [
+  'original',
+  ...LONG_EDGE_PRESETS.map((side) => String(side) as SizeChoice),
 ]
 
 function isOutputFormat(value: string): value is OutputFormat {
@@ -123,7 +122,7 @@ function isOutputFormat(value: string): value is OutputFormat {
 }
 
 function isSizeChoice(value: string): value is SizeChoice {
-  return SIZE_OPTIONS.some((option) => option.value === value)
+  return (SIZE_VALUES as readonly string[]).includes(value)
 }
 
 interface Timing {
@@ -180,13 +179,14 @@ function StatusIcon({ job }: { job: JobState<BulkJobInput, BulkResult> }) {
   }
 }
 
-const STATUS_LABELS: Record<JobState<BulkJobInput, BulkResult>['status'], string> = {
-  queued: 'Queued',
-  running: 'Processing',
-  done: 'Done',
-  failed: 'Failed',
-  cancelled: 'Cancelled',
-}
+/** Catalogue keys for each job status; translated where the row is drawn. */
+const STATUS_LABELS = {
+  queued: 'bulk.status.queued',
+  running: 'bulk.status.processing',
+  done: 'bulk.status.done',
+  failed: 'bulk.status.failed',
+  cancelled: 'bulk.status.cancelled',
+} as const satisfies Record<JobState<BulkJobInput, BulkResult>['status'], string>
 
 /**
  * Bulk watermarking: pick photos, a preset and output settings, run them
@@ -194,6 +194,7 @@ const STATUS_LABELS: Record<JobState<BulkJobInput, BulkResult>['status'], string
  * everything as one ZIP or file by file.
  */
 export function BulkTool({ organizationId, organizationName, canSave = false }: BulkToolProps) {
+  const { t } = useTranslation()
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const publicConfig = useQuery(publicConfigQueryOptions)
   const { snapshot, workers, add, start, setOverride, pause, resume, cancel, retry, clear } =
@@ -277,6 +278,13 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   const visibleRows = showAll ? rows : rows.slice(0, VISIBLE_ROW_LIMIT)
 
   const isShareable = canShareFiles(format)
+  const sizeOptions: readonly SelectOption<SizeChoice>[] = [
+    { value: 'original', label: t('bulk.size.original') },
+    ...LONG_EDGE_PRESETS.map((side) => ({
+      value: String(side) as SizeChoice,
+      label: t('bulk.size.fit', { side }),
+    })),
+  ]
 
   /** One photo to the platform share sheet; a refusal shows where ZIP errors do. */
   async function shareOutput(output: BulkResult) {
@@ -301,9 +309,9 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
         width: PREVIEW_WIDTH,
         height: PREVIEW_HEIGHT,
       })
-      return `Example: ${example}.${extensionFor(format)}`
+      return t('bulk.names.example', { example: `${example}.${extensionFor(format)}` })
     } catch {
-      return 'The pattern must produce a name.'
+      return t('bulk.names.mustProduceName')
     }
   })()
 
@@ -370,11 +378,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
 
   function addScan(scan: { files: BulkFile[]; skipped: number }) {
     setFiles((previous) => dedupe(previous, scan.files))
-    setSkippedNote(
-      scan.skipped === 0
-        ? null
-        : `${String(scan.skipped)} file${scan.skipped === 1 ? '' : 's'} skipped: not images`,
-    )
+    setSkippedNote(scan.skipped === 0 ? null : t('bulk.skipped', { count: scan.skipped }))
   }
 
   function addFiles(list: FileList | File[]) {
@@ -498,7 +502,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   }
 
   return (
-    <PresetGate query={presets} emptyHint="to apply it to a batch.">
+    <PresetGate query={presets} emptyHint={t('bulk.emptyHint')}>
       {(list) => (
         <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
           <Card className="flex flex-col gap-4 p-4">
@@ -516,7 +520,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 type="file"
                 accept={ACCEPTED_PHOTO_TYPES}
                 multiple
-                aria-label="Add photos"
+                aria-label={t('bulk.addPhotos')}
                 className="sr-only"
                 onChange={(event) => {
                   if (event.currentTarget.files !== null) {
@@ -530,7 +534,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 type="file"
                 accept={ACCEPTED_PHOTO_TYPES}
                 multiple
-                aria-label="Add a folder"
+                aria-label={t('bulk.addFolder')}
                 className="sr-only"
                 onChange={(event) => {
                   if (event.currentTarget.files !== null) {
@@ -541,7 +545,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               />
               <ImagePlus aria-hidden="true" className="size-8 text-ink-muted" />
               <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
-                Drop photos or a folder here, or
+                {t('bulk.dropHint')}
                 <Button
                   type="button"
                   variant="secondary"
@@ -551,7 +555,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     inputRef.current?.click()
                   }}
                 >
-                  Add photos
+                  {t('bulk.addPhotos')}
                 </Button>
                 {canPickFolder ? (
                   <Button
@@ -563,7 +567,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                       folderInputRef.current?.click()
                     }}
                   >
-                    Add a folder
+                    {t('bulk.addFolder')}
                   </Button>
                 ) : null}
                 <TakePhotoButton
@@ -584,7 +588,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                       disabled={snapshot.isRunning}
                     >
                       <Link2 aria-hidden="true" className="size-4" />
-                      From a link
+                      {t('bulk.fromLink')}
                     </Button>
                   }
                 />
@@ -603,8 +607,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 )}
               </p>
               <p className="text-xs text-ink-muted">
-                Up to {String(MAX_BULK_FILES)} photos per batch. Processing happens in your browser
-                using {String(workers)} worker{workers === 1 ? '' : 's'}.
+                {t('bulk.capacity', { max: MAX_BULK_FILES, count: workers })}
               </p>
             </div>
 
@@ -614,7 +617,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               </p>
             )}
             {importError === null ? null : (
-              <Alert tone="error" title="Could not import from the cloud">
+              <Alert tone="error" title={t('bulk.importErrorTitle')}>
                 {importError}
               </Alert>
             )}
@@ -625,7 +628,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               <section aria-labelledby="bulk-files-heading" className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <h2 id="bulk-files-heading" className="text-sm font-semibold">
-                    {String(files.length)} photo{files.length === 1 ? '' : 's'}
+                    {t('bulk.photoCount', { count: files.length })}
                   </h2>
                   {snapshot.isRunning ? null : (
                     <Button
@@ -639,31 +642,39 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                       }}
                     >
                       <Trash2 aria-hidden="true" className="size-4" />
-                      Clear list
+                      {t('bulk.clearList')}
                     </Button>
                   )}
                 </div>
                 {hasStarted ? (
                   <>
                     <progress
-                      aria-label="Batch progress"
+                      aria-label={t('bulk.batchProgress')}
                       max={snapshot.jobs.length}
                       value={finished}
                       className="h-2 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-line [&::-webkit-progress-value]:bg-brand-600"
                     />
                     <p className="text-xs text-ink-muted" aria-live="polite">
-                      {String(finished)} of {String(snapshot.jobs.length)} finished
-                      {counts.failed > 0 ? `, ${String(counts.failed)} failed` : ''}
-                      {counts.cancelled > 0 ? `, ${String(counts.cancelled)} cancelled` : ''}
+                      {t('bulk.progress.finished', {
+                        done: finished,
+                        total: snapshot.jobs.length,
+                      })}
+                      {counts.failed > 0 ? t('bulk.progress.failed', { n: counts.failed }) : ''}
+                      {counts.cancelled > 0
+                        ? t('bulk.progress.cancelled', { n: counts.cancelled })
+                        : ''}
                       {elapsedSeconds === null || elapsedSeconds === 0
                         ? ''
-                        : ` in ${elapsedSeconds.toFixed(1)} s (${(counts.done / elapsedSeconds).toFixed(1)} photos/s)`}
+                        : t('bulk.progress.rate', {
+                            seconds: elapsedSeconds.toFixed(1),
+                            rate: (counts.done / elapsedSeconds).toFixed(1),
+                          })}
                       .
                     </p>
                   </>
                 ) : null}
                 <ul
-                  aria-label="Photos in this batch"
+                  aria-label={t('bulk.photosList')}
                   className="divide-y divide-line rounded-lg border border-line"
                 >
                   {visibleRows.map((row) => {
@@ -687,14 +698,14 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                         <span className="text-xs text-ink-muted">{formatBytes(file.size)}</span>
                         {job !== null && job.input.override !== null ? (
                           <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-800 dark:bg-brand-900/50 dark:text-brand-100">
-                            Custom
+                            {t('bulk.custom')}
                           </span>
                         ) : null}
                         {job === null ? (
-                          <span className="sr-only">Selected</span>
+                          <span className="sr-only">{t('bulk.selected')}</span>
                         ) : (
                           <span className="w-20 text-right text-xs text-ink-muted">
-                            {STATUS_LABELS[job.status]}
+                            {t(STATUS_LABELS[job.status])}
                           </span>
                         )}
                         {job === null ? null : (
@@ -702,7 +713,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                             type="button"
                             variant="ghost"
                             size="icon"
-                            aria-label={`Adjust ${relativePath}`}
+                            aria-label={t('bulk.adjustPhoto', { name: relativePath })}
                             onClick={() => {
                               setAdjusting({ id: job.id, input: job.input })
                             }}
@@ -722,7 +733,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                aria-label={`Share ${job.output.fileName}`}
+                                aria-label={t('bulk.sharePhoto', { name: job.output.fileName })}
                                 onClick={() => {
                                   if (job.output !== null) {
                                     void shareOutput(job.output)
@@ -736,7 +747,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                               type="button"
                               variant="ghost"
                               size="icon"
-                              aria-label={`Download ${job.output.fileName}`}
+                              aria-label={t('bulk.downloadPhoto', { name: job.output.fileName })}
                               onClick={() => {
                                 if (job.output !== null) {
                                   downloadBlob(job.output.blob, job.output.fileName)
@@ -752,7 +763,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                             type="button"
                             variant="ghost"
                             size="icon"
-                            aria-label={`Remove ${relativePath}`}
+                            aria-label={t('bulk.removePhoto', { name: relativePath })}
                             onClick={() => {
                               setFiles((previous) =>
                                 previous.filter((candidate) => candidate.file !== file),
@@ -776,7 +787,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                       setShowAll(true)
                     }}
                   >
-                    Show all {String(rows.length)} photos
+                    {t('bulk.showAll', { count: rows.length })}
                   </Button>
                 ) : null}
               </section>
@@ -789,12 +800,12 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               selectedIds={presetIds}
               disabled={snapshot.isRunning}
               onToggle={togglePreset}
-              hint="Tick one or more; they are applied in the order ticked, later ones over earlier ones."
+              hint={t('bulk.presetHint')}
             />
             <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium">Format</span>
+              <span className="text-sm font-medium">{t('bulk.format')}</span>
               <Select
-                aria-label="Format"
+                aria-label={t('bulk.format')}
                 value={format}
                 options={FORMAT_OPTIONS}
                 disabled={snapshot.isRunning}
@@ -806,7 +817,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               />
             </div>
             <SliderField
-              label="Quality"
+              label={t('bulk.quality')}
               value={quality}
               min={MIN_QUALITY}
               max={1}
@@ -827,12 +838,12 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     setWantsInvisible(event.currentTarget.checked)
                   }}
                 />
-                Invisible mark
+                {t('bulk.invisibleMark')}
               </label>
               {format === 'image/png' ? (
                 wantsInvisible ? (
                   <Input
-                    aria-label="Invisible message"
+                    aria-label={t('bulk.invisibleMessage')}
                     value={invisibleMessage}
                     maxLength={MAX_INVISIBLE_MESSAGE_LENGTH}
                     disabled={snapshot.isRunning}
@@ -842,17 +853,15 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                   />
                 ) : null
               ) : (
-                <p className="text-xs text-ink-muted">
-                  Choose PNG to hide a message in every photo.
-                </p>
+                <p className="text-xs text-ink-muted">{t('bulk.choosePng')}</p>
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium">Size</span>
+              <span className="text-sm font-medium">{t('bulk.size.label')}</span>
               <Select
-                aria-label="Size"
+                aria-label={t('bulk.size.label')}
                 value={size}
-                options={SIZE_OPTIONS}
+                options={sizeOptions}
                 disabled={snapshot.isRunning}
                 onChange={(next) => {
                   if (isSizeChoice(next)) {
@@ -863,7 +872,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
             </div>
             <div className="flex flex-col gap-1.5">
               <label htmlFor={namePatternId} className="text-sm font-medium">
-                File names
+                {t('bulk.fileNames')}
               </label>
               <Input
                 id={namePatternId}
@@ -874,13 +883,16 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 }}
               />
               <p className="text-xs text-ink-muted">
-                Tokens: {'{name} {index} {count} {date} {preset} {width} {height}'}. {namePreview}
+                {t('bulk.tokensLabel', {
+                  tokens: '{name} {index} {count} {date} {preset} {width} {height}',
+                })}{' '}
+                {namePreview}
               </p>
             </div>
 
             <details className="rounded-lg border border-line" data-testid="bulk-adjustments">
               <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
-                Photo adjustments
+                {t('bulk.photoAdjustments')}
               </summary>
               <div className="flex flex-col gap-4 border-t border-line p-3">
                 <OrientationControls orientation={orientation} onChange={setOrientation} />
@@ -904,15 +916,15 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                         void resume()
                       }}
                     >
-                      Resume
+                      {t('bulk.resume')}
                     </Button>
                   ) : (
                     <Button type="button" variant="secondary" onClick={pause}>
-                      Pause
+                      {t('bulk.pause')}
                     </Button>
                   )}
                   <Button type="button" variant="danger" onClick={cancel}>
-                    Cancel
+                    {t('bulk.cancel')}
                   </Button>
                 </>
               ) : (
@@ -923,7 +935,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     void run()
                   }}
                 >
-                  Start
+                  {t('bulk.start')}
                 </Button>
               )}
               {!snapshot.isRunning && counts.failed + counts.cancelled > 0 ? (
@@ -935,7 +947,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                   }}
                 >
                   <RotateCcw aria-hidden="true" className="size-4" />
-                  Retry {String(counts.failed + counts.cancelled)}
+                  {t('bulk.retry', { count: counts.failed + counts.cancelled })}
                 </Button>
               ) : null}
             </div>
@@ -950,10 +962,10 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                   }}
                 >
                   {isZipping ? null : <FolderArchive aria-hidden="true" className="size-4" />}
-                  Download {String(results.length)} as ZIP
+                  {t('bulk.downloadZip', { count: results.length })}
                 </Button>
                 <Button type="button" variant="ghost" size="sm" onClick={downloadReport}>
-                  Download report (CSV)
+                  {t('bulk.downloadReport')}
                 </Button>
                 {canSave ? (
                   <Button
@@ -967,19 +979,22 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                   >
                     {saving === null ? <Images aria-hidden="true" className="size-4" /> : null}
                     {saving === null
-                      ? `Save ${String(results.length)} to gallery`
-                      : `Saved ${String(saving.done - saving.failed)} of ${String(saving.total)}`}
+                      ? t('bulk.saveToGallery', { count: results.length })
+                      : t('bulk.savedProgress', {
+                          done: saving.done - saving.failed,
+                          total: saving.total,
+                        })}
                   </Button>
                 ) : null}
                 {saving !== null && saving.done === saving.total ? (
                   <Alert tone={saving.failed === 0 ? 'success' : 'error'}>
-                    {saving.failed === 0
-                      ? 'All saved to the '
-                      : `${String(saving.failed)} could not be saved (storage quota or limits). The rest are in the `}
-                    <Link to="/app/gallery" className="font-medium underline">
-                      gallery
-                    </Link>
-                    .
+                    <Trans
+                      i18nKey={saving.failed === 0 ? 'bulk.allSaved' : 'bulk.someSaved'}
+                      values={{ failed: saving.failed }}
+                      components={{
+                        galleryLink: <Link to="/app/gallery" className="font-medium underline" />,
+                      }}
+                    />
                   </Alert>
                 ) : null}
                 {publicConfig.data === undefined ? null : (
@@ -994,10 +1009,13 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                       )
                     }
                     onSaved={(provider, count) => {
-                      const noun = count === 1 ? 'photo' : 'photos'
                       setCloudSave({
                         ok: true,
-                        text: `Saved ${String(count)} ${noun} to your ${PROVIDER_LABELS[provider]} “${CLOUD_SAVE_FOLDER}” folder.`,
+                        text: t('bulk.savedToCloud', {
+                          count,
+                          provider: PROVIDER_LABELS[provider],
+                          folder: CLOUD_SAVE_FOLDER,
+                        }),
                       })
                     }}
                     onError={(message) => {
@@ -1011,10 +1029,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 {zipError === null ? null : <Alert tone="error">{zipError}</Alert>}
               </div>
             ) : null}
-            <p className="text-xs text-ink-muted">
-              Smart placement and auto contrast are worked out for every photo separately. Nothing
-              is uploaded.
-            </p>
+            <p className="text-xs text-ink-muted">{t('bulk.privacyNote')}</p>
           </Card>
           {adjusting === null ? null : (
             <OverrideDialog

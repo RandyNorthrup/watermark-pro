@@ -1,5 +1,6 @@
 import { FolderSync } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { WatermarkSpec } from '../../../shared/watermark'
 import type { BulkSettings } from '../../bulk/processor'
@@ -35,6 +36,7 @@ const LOG_LIMIT = 20
 const MOBILE = /Mobi|Android/i
 
 export function WatchFolder({ organizationId, specs, settings }: WatchFolderProps) {
+  const { t } = useTranslation()
   const [isWatching, setIsWatching] = useState(false)
   const [log, setLog] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -44,10 +46,12 @@ export function WatchFolder({ organizationId, specs, settings }: WatchFolderProp
   const runtimeRef = useRef<BulkRuntime | null>(null)
   const specsRef = useRef(specs)
   const settingsRef = useRef(settings)
+  const tRef = useRef(t)
   // Keep the refs the polling loop reads in step with the latest props each render.
   useEffect(() => {
     specsRef.current = specs
     settingsRef.current = settings
+    tRef.current = t
   })
 
   const isSupported = canWatchFolder(MOBILE.test(navigator.userAgent))
@@ -75,10 +79,16 @@ export function WatchFolder({ organizationId, specs, settings }: WatchFolderProp
           )
         },
         {
-          wrote: (name) => setLog((previous) => [`Wrote ${name}`, ...previous].slice(0, LOG_LIMIT)),
+          wrote: (name) =>
+            setLog((previous) =>
+              [tRef.current('bulk.watch.wrote', { name }), ...previous].slice(0, LOG_LIMIT),
+            ),
           failed: (name, error) =>
             setLog((previous) =>
-              [`Failed ${name}: ${describeError(error)}`, ...previous].slice(0, LOG_LIMIT),
+              [
+                tRef.current('bulk.watch.failed', { name, error: describeError(error) }),
+                ...previous,
+              ].slice(0, LOG_LIMIT),
             ),
         },
       )
@@ -146,16 +156,16 @@ export function WatchFolder({ organizationId, specs, settings }: WatchFolderProp
   return (
     <section
       className="flex flex-col gap-2 rounded-lg border border-line p-3"
-      aria-label="Watch a folder"
+      aria-label={t('bulk.watch.label')}
     >
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-2 text-sm font-medium">
           <FolderSync aria-hidden="true" className="size-4" />
-          Watch a folder
+          {t('bulk.watch.label')}
         </span>
         {isWatching ? (
           <Button type="button" variant="secondary" size="sm" onClick={stop}>
-            Stop
+            {t('bulk.watch.stop')}
           </Button>
         ) : (
           <Button
@@ -167,14 +177,11 @@ export function WatchFolder({ organizationId, specs, settings }: WatchFolderProp
               void begin()
             }}
           >
-            Choose folders
+            {t('bulk.watch.choose')}
           </Button>
         )}
       </div>
-      <p className="text-xs text-ink-muted">
-        Pick an input and an output folder; new photos dropped into the input are watermarked with
-        the ticked presets and written to the output. Runs only while this page is open.
-      </p>
+      <p className="text-xs text-ink-muted">{t('bulk.watch.hint')}</p>
       {error === null ? null : <Alert tone="error">{error}</Alert>}
       {log.length === 0 ? null : (
         <ul className="max-h-32 overflow-y-auto text-xs text-ink-muted" aria-live="polite">

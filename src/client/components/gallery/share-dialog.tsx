@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Check, Copy, Link2, Share2 } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { type ReactNode, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { SHARE_EXPIRY_DAYS } from '../../../shared/constants'
 import { describeError } from '../../lib/errors'
@@ -22,14 +23,6 @@ interface ShareDialogProps {
 
 type ExpiryChoice = 'never' | `${(typeof SHARE_EXPIRY_DAYS)[number]}`
 
-const EXPIRY_CHOICES: readonly { value: ExpiryChoice; label: string }[] = [
-  ...SHARE_EXPIRY_DAYS.map((days) => ({
-    value: String(days) as ExpiryChoice,
-    label: days === 1 ? '1 day' : `${String(days)} days`,
-  })),
-  { value: 'never', label: 'Never' },
-]
-
 function isExpiryDays(value: number): value is (typeof SHARE_EXPIRY_DAYS)[number] {
   return (SHARE_EXPIRY_DAYS as readonly number[]).includes(value)
 }
@@ -39,7 +32,15 @@ function isExpiryDays(value: number): value is (typeof SHARE_EXPIRY_DAYS)[number
  * the platform share sheet or the clipboard.
  */
 export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }: ShareDialogProps) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const expiryChoices: readonly { value: ExpiryChoice; label: string }[] = [
+    ...SHARE_EXPIRY_DAYS.map((days) => ({
+      value: String(days) as ExpiryChoice,
+      label: t('gallery.expiry.days', { count: days }),
+    })),
+    { value: 'never', label: t('gallery.expiry.never') },
+  ]
   const [isOpen, setIsOpen] = useState(false)
   const [title, setTitle] = useState(defaultTitle)
   const [expiry, setExpiry] = useState<ExpiryChoice>('7')
@@ -90,16 +91,15 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
         <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(92vw,28rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card">
           <div>
             <Dialog.Title className="text-lg font-semibold">
-              Share {String(photoIds.length)} photo{photoIds.length === 1 ? '' : 's'}
+              {t('gallery.shareTitle', { count: photoIds.length })}
             </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-ink-muted">
-              Anyone with the link can view and download these photos until it expires or you revoke
-              it.
+              {t('gallery.shareDescription')}
             </Dialog.Description>
           </div>
           {create.data === undefined ? (
             <>
-              <Field label="Title">
+              <Field label={t('gallery.title')}>
                 {(controlProps) => (
                   <Input
                     {...controlProps}
@@ -112,23 +112,23 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
                 )}
               </Field>
               <div className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium">Expires after</span>
+                <span className="text-sm font-medium">{t('gallery.expiresAfter')}</span>
                 <ChoiceGroup
-                  label="Link expiry"
+                  label={t('gallery.linkExpiry')}
                   value={expiry}
-                  choices={EXPIRY_CHOICES}
+                  choices={expiryChoices}
                   onChange={setExpiry}
                 />
               </div>
               {create.isError ? (
-                <Alert tone="error" title="Could not create the link">
+                <Alert tone="error" title={t('gallery.createErrorTitle')}>
                   {describeError(create.error)}
                 </Alert>
               ) : null}
               <div className="flex justify-end gap-2">
                 <Dialog.Close asChild>
                   <Button type="button" variant="secondary">
-                    Cancel
+                    {t('gallery.cancel')}
                   </Button>
                 </Dialog.Close>
                 <Button
@@ -139,13 +139,13 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
                   }}
                 >
                   <Link2 aria-hidden="true" className="size-4" />
-                  Create link
+                  {t('gallery.createLink')}
                 </Button>
               </div>
             </>
           ) : (
             <>
-              <Field label="Link">
+              <Field label={t('gallery.link')}>
                 {(controlProps) => (
                   <Input
                     {...controlProps}
@@ -159,13 +159,15 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
               </Field>
               <p className="text-xs text-ink-muted">
                 {create.data.expiresAt === null
-                  ? 'This link does not expire.'
-                  : `Expires ${new Date(create.data.expiresAt).toLocaleString()}.`}{' '}
-                Manage links under Shares.
+                  ? t('gallery.noExpiry')
+                  : t('gallery.expires', {
+                      when: new Date(create.data.expiresAt).toLocaleString(),
+                    })}{' '}
+                {t('gallery.manageLinks')}
               </p>
               {outcome === null ? null : (
                 <Alert tone="success">
-                  {outcome === 'copied' ? 'Link copied to the clipboard.' : 'Link shared.'}
+                  {t(outcome === 'copied' ? 'gallery.linkCopied' : 'gallery.linkShared')}
                 </Alert>
               )}
               {shareError === null ? null : <Alert tone="error">{shareError}</Alert>}
@@ -182,7 +184,7 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
                   ) : (
                     <Copy aria-hidden="true" className="size-4" />
                   )}
-                  Copy link
+                  {t('gallery.copyLink')}
                 </Button>
                 <Button
                   type="button"
@@ -191,7 +193,7 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
                   }}
                 >
                   <Share2 aria-hidden="true" className="size-4" />
-                  Share…
+                  {t('gallery.shareEllipsis')}
                 </Button>
               </div>
             </>

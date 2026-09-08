@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { AlertDialog, Dialog } from 'radix-ui'
 import { useDeferredValue, useId, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { ShareDialog } from './share-dialog'
 import type { PhotoDto } from '../../../shared/api'
@@ -51,6 +52,7 @@ const selectClassName =
  * for the full-size image.
  */
 export function Gallery({ organizationId, role }: GalleryProps) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const searchId = useId()
   const presetId = useId()
@@ -101,21 +103,26 @@ export function Gallery({ organizationId, role }: GalleryProps) {
         <Card className="flex flex-col gap-2 p-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
             <span data-testid="usage-summary">
-              {`${String(usage.data.count)} photo${usage.data.count === 1 ? '' : 's'} · ${formatBytes(usage.data.bytes)} of ${formatBytes(usage.data.maxBytes)}`}
+              {t('gallery.usage', {
+                count: usage.data.count,
+                used: formatBytes(usage.data.bytes),
+                max: formatBytes(usage.data.maxBytes),
+              })}
             </span>
             <span className="text-xs text-ink-muted">
-              Up to {String(usage.data.maxCount)} photos per organization
+              {t('gallery.maxCount', { count: usage.data.maxCount })}
             </span>
           </div>
           <progress
-            aria-label="Storage used"
+            aria-label={t('gallery.storageUsed')}
             max={usage.data.maxBytes}
             value={usage.data.bytes}
             className="h-2 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-line [&::-webkit-progress-value]:bg-brand-600"
           />
           <p className="sr-only">
-            {String(Math.round((usage.data.bytes / usage.data.maxBytes) * PERCENT))}% of storage
-            used
+            {t('gallery.storagePercent', {
+              percent: Math.round((usage.data.bytes / usage.data.maxBytes) * PERCENT),
+            })}
           </p>
         </Card>
       )}
@@ -123,14 +130,14 @@ export function Gallery({ organizationId, role }: GalleryProps) {
       <div className="flex justify-end">
         <Link to="/app/verify" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
           <FileSearch aria-hidden="true" className="size-4" />
-          Check a photo
+          {t('gallery.checkPhoto')}
         </Link>
       </div>
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex min-w-56 flex-1 flex-col gap-1.5">
           <label htmlFor={searchId} className="text-sm font-medium">
-            Search
+            {t('gallery.search')}
           </label>
           <div className="relative">
             <Search
@@ -141,7 +148,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
               id={searchId}
               type="search"
               value={search}
-              placeholder="Photo name"
+              placeholder={t('gallery.searchPlaceholder')}
               className="pl-9"
               onChange={(event) => {
                 setSearch(event.currentTarget.value)
@@ -151,7 +158,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor={presetId} className="text-sm font-medium">
-            Preset
+            {t('gallery.preset')}
           </label>
           <select
             id={presetId}
@@ -161,7 +168,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
             }}
             className={selectClassName}
           >
-            <option value="">All presets</option>
+            <option value="">{t('gallery.allPresets')}</option>
             {(presets.data ?? []).map((preset) => (
               <option key={preset.id} value={preset.id}>
                 {preset.name}
@@ -186,13 +193,13 @@ export function Gallery({ organizationId, role }: GalleryProps) {
               ) : (
                 <Square aria-hidden="true" className="size-4" />
               )}
-              {selected.size === items.length ? 'Clear selection' : 'Select all'}
+              {t(selected.size === items.length ? 'gallery.clearSelection' : 'gallery.selectAll')}
             </Button>
             {canShare ? (
               <ShareDialog
                 organizationId={organizationId}
                 photoIds={[...selected]}
-                defaultTitle={`${String(selected.size)} photo${selected.size === 1 ? '' : 's'}`}
+                defaultTitle={t('gallery.photoCount', { count: selected.size })}
                 trigger={
                   <Button
                     type="button"
@@ -201,7 +208,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                     disabled={selected.size === 0}
                   >
                     <Share2 aria-hidden="true" className="size-4" />
-                    Share {selected.size === 0 ? '' : String(selected.size)}
+                    {t('gallery.share')} {selected.size === 0 ? '' : String(selected.size)}
                   </Button>
                 }
               />
@@ -220,14 +227,14 @@ export function Gallery({ organizationId, role }: GalleryProps) {
       </div>
 
       {remove.isError ? (
-        <Alert tone="error" title="Could not delete">
+        <Alert tone="error" title={t('gallery.deleteErrorTitle')}>
           {describeError(remove.error)}
         </Alert>
       ) : null}
 
-      {photos.isPending ? <Spinner className="size-6" label="Loading photos" /> : null}
+      {photos.isPending ? <Spinner className="size-6" label={t('gallery.loadingPhotos')} /> : null}
       {photos.isError ? (
-        <Alert tone="error" title="Could not load the gallery">
+        <Alert tone="error" title={t('gallery.loadErrorTitle')}>
           {describeError(photos.error)}
         </Alert>
       ) : null}
@@ -235,13 +242,11 @@ export function Gallery({ organizationId, role }: GalleryProps) {
         <Card className="flex flex-col items-start gap-3">
           <Images aria-hidden="true" className="size-8 text-ink-muted" />
           <p className="text-sm text-ink-muted">
-            {isFiltering
-              ? 'No photos match these filters.'
-              : 'No photos yet. Save one from the editor or a whole batch from the bulk tool.'}
+            {t(isFiltering ? 'gallery.emptyFiltered' : 'gallery.empty')}
           </p>
           {isFiltering ? null : (
             <Link to="/app/editor" className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
-              Open the editor
+              {t('gallery.openEditor')}
             </Link>
           )}
         </Card>
@@ -255,7 +260,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
               <li key={photo.id} className="relative">
                 <button
                   type="button"
-                  aria-label={`Open ${photo.name}`}
+                  aria-label={t('gallery.openPhoto', { name: photo.name })}
                   onClick={() => {
                     setOpen(photo)
                   }}
@@ -271,15 +276,20 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                   </span>
                   <span className="truncate px-1 text-xs font-medium">{photo.name}</span>
                   <span className="truncate px-1 text-xs text-ink-muted">
-                    {String(photo.width)} × {String(photo.height)}
-                    {photo.presetName === null ? '' : ` · ${photo.presetName}`}
+                    {photo.presetName === null
+                      ? t('gallery.dimensions', { width: photo.width, height: photo.height })
+                      : t('gallery.dimensionsWithPreset', {
+                          width: photo.width,
+                          height: photo.height,
+                          preset: photo.presetName,
+                        })}
                   </span>
                 </button>
                 {canDelete || canShare ? (
                   <label className="absolute top-2.5 left-2.5 flex size-6 cursor-pointer items-center justify-center rounded-md border border-line bg-surface-raised shadow">
                     <input
                       type="checkbox"
-                      aria-label={`Select ${photo.name}`}
+                      aria-label={t('gallery.selectPhoto', { name: photo.name })}
                       checked={isSelected}
                       onChange={() => {
                         toggle(photo.id)
@@ -304,7 +314,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
             void photos.fetchNextPage()
           }}
         >
-          Load more
+          {t('gallery.loadMore')}
         </Button>
       ) : null}
 
@@ -332,32 +342,33 @@ interface DeleteDialogProps {
 }
 
 function DeleteDialog({ count, isPending, onConfirm }: DeleteDialogProps) {
+  const { t } = useTranslation()
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger asChild>
         <Button type="button" variant="danger" size="sm" disabled={count === 0 || isPending}>
           <Trash2 aria-hidden="true" className="size-4" />
-          Delete {count === 0 ? '' : String(count)}
+          {t('gallery.delete')} {count === 0 ? '' : String(count)}
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
         <AlertDialog.Content className="fixed top-1/2 left-1/2 z-50 w-[min(90vw,24rem)] -translate-x-1/2 -translate-y-1/2 rounded-card border border-line bg-surface-raised p-6 shadow-card">
           <AlertDialog.Title className="text-lg font-semibold">
-            Delete {String(count)} photo{count === 1 ? '' : 's'}?
+            {t('gallery.deleteConfirmTitle', { count })}
           </AlertDialog.Title>
           <AlertDialog.Description className="mt-2 text-sm text-ink-muted">
-            The files and thumbnails are removed from storage. This cannot be undone.
+            {t('gallery.deleteConfirmBody')}
           </AlertDialog.Description>
           <div className="mt-6 flex justify-end gap-2">
             <AlertDialog.Cancel asChild>
               <Button type="button" variant="secondary">
-                Cancel
+                {t('gallery.cancel')}
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action asChild>
               <Button type="button" variant="danger" onClick={onConfirm}>
-                Delete
+                {t('gallery.delete')}
               </Button>
             </AlertDialog.Action>
           </div>
@@ -386,6 +397,7 @@ function Lightbox({
   onClose,
   onDelete,
 }: LightboxProps) {
+  const { t } = useTranslation()
   return (
     <Dialog.Root
       open={photo !== null}
@@ -406,13 +418,24 @@ function Lightbox({
                     {photo.name}
                   </Dialog.Title>
                   <Dialog.Description className="text-xs text-ink-muted">
-                    {String(photo.width)} × {String(photo.height)} · {formatBytes(photo.size)}
-                    {photo.presetName === null ? '' : ` · ${photo.presetName}`} ·{' '}
-                    {dateTimeFormatter.format(new Date(photo.createdAt))}
+                    {photo.presetName === null
+                      ? t('gallery.lightboxMeta', {
+                          width: photo.width,
+                          height: photo.height,
+                          size: formatBytes(photo.size),
+                          date: dateTimeFormatter.format(new Date(photo.createdAt)),
+                        })
+                      : t('gallery.lightboxMetaWithPreset', {
+                          width: photo.width,
+                          height: photo.height,
+                          size: formatBytes(photo.size),
+                          preset: photo.presetName,
+                          date: dateTimeFormatter.format(new Date(photo.createdAt)),
+                        })}
                   </Dialog.Description>
                 </div>
                 <Dialog.Close asChild>
-                  <Button type="button" variant="ghost" size="icon" aria-label="Close">
+                  <Button type="button" variant="ghost" size="icon" aria-label={t('gallery.close')}>
                     <X aria-hidden="true" className="size-4" />
                   </Button>
                 </Dialog.Close>
@@ -425,7 +448,7 @@ function Lightbox({
                   className={buttonVariants({ variant: 'secondary', size: 'sm' })}
                 >
                   <Download aria-hidden="true" className="size-4" />
-                  Download
+                  {t('gallery.download')}
                 </a>
                 {canShare ? (
                   <ShareDialog
@@ -435,7 +458,7 @@ function Lightbox({
                     trigger={
                       <Button type="button" variant="secondary" size="sm">
                         <Share2 aria-hidden="true" className="size-4" />
-                        Share
+                        {t('gallery.share')}
                       </Button>
                     }
                   />
@@ -451,7 +474,7 @@ function Lightbox({
                     }}
                   >
                     <Trash2 aria-hidden="true" className="size-4" />
-                    Delete
+                    {t('gallery.delete')}
                   </Button>
                 ) : null}
               </div>

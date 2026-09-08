@@ -1,4 +1,5 @@
 import { Dialog as Radix } from 'radix-ui'
+import { useTranslation } from 'react-i18next'
 
 import type { EditorDocument } from '../../editor/state'
 import { Editor } from '../editor/editor'
@@ -31,6 +32,7 @@ export function OverrideDialog({
   onRemove,
   onClose,
 }: OverrideDialogProps) {
+  const { t } = useTranslation()
   return (
     <Radix.Root
       open
@@ -46,7 +48,9 @@ export function OverrideDialog({
           aria-describedby={undefined}
           className="fixed inset-2 z-50 flex flex-col gap-4 overflow-y-auto rounded-card border border-line bg-surface p-4 shadow-card outline-none sm:inset-6 lg:inset-12"
         >
-          <Radix.Title className="text-base font-semibold">Adjust {fileName}</Radix.Title>
+          <Radix.Title className="text-base font-semibold">
+            {t('bulk.adjustPhoto', { name: fileName })}
+          </Radix.Title>
           <Editor
             organizationId={organizationId}
             organizationName={organizationName}
