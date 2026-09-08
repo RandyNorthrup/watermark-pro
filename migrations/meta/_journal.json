@@ -29,6 +29,13 @@
       "when": 1788674716288,
       "tag": "0003_shares",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1788850800322,
+      "tag": "0004_shocking_jamie_braddock",
+      "breakpoints": true
     }
   ]
 }

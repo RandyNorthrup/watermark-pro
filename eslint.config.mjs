@@ -28,6 +28,9 @@ export default defineEslintConfig(
       'coverage/**',
       'node_modules/**',
       '.wrangler/**',
+      // Ephemeral agent git worktrees: full repo copies with no node_modules of
+      // their own, so linting them only produces spurious unresolved-import noise.
+      '.claude/**',
       'playwright-report/**',
       'test-results/**',
       'worker-configuration.d.ts',

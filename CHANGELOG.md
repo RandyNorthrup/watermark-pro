@@ -14,6 +14,9 @@ what was planned; superseded entries stay.
   browser → English), a language picker in the app chrome, and a typed English
   catalogue. String extraction across the app and the twelve translated
   catalogues follow; the interface is still English until then.
+- M18 per-account locale: a nullable `locale` column on `user` and a validated
+  `PATCH /api/me` so a signed-in member's language follows them across devices;
+  the picker saves to the account (best-effort) as well as `localStorage`.
 
 ## [1.9.0] - 2026-09-07
 

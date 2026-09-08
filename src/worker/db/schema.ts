@@ -37,6 +37,12 @@ export const user = sqliteTable(
     banned: integer('banned', { mode: 'boolean' }).default(false),
     banReason: text('ban_reason'),
     banExpires: integer('ban_expires', { mode: 'timestamp_ms' }),
+    /**
+     * Saved interface language (M18); null until the user picks one. Registered
+     * as a Better Auth additional field in `auth/options.ts` and validated there
+     * against `SUPPORTED_LOCALES`, so only a shipped locale code is ever stored.
+     */
+    locale: text('locale'),
   },
   (table) => [uniqueIndex('user_email_unique').on(table.email)],
 )

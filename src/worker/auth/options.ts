@@ -13,6 +13,7 @@ import { createAuthMiddleware } from 'better-auth/api'
 import { captcha } from 'better-auth/plugins'
 import { admin } from 'better-auth/plugins/admin'
 import { organization } from 'better-auth/plugins/organization'
+import { z } from 'zod'
 
 import {
   APP_NAME,
@@ -24,6 +25,7 @@ import {
   SESSION_UPDATE_AGE_SECONDS,
   VERIFICATION_TOKEN_TTL_SECONDS,
 } from '../../shared/constants'
+import { LOCALE_CODES } from '../../shared/locales'
 import { accessControl, roles } from '../../shared/permissions'
 import type { AuditStore } from '../audit'
 import type { RateLimitStorage } from './rate-limit'
@@ -35,6 +37,12 @@ export type DatabaseAdapter = ReturnType<typeof drizzleAdapter>
 
 /** Better Auth endpoints that must carry a Turnstile token when captcha is enabled. */
 export const CAPTCHA_PROTECTED_ENDPOINTS = ['/sign-up/email', '/request-password-reset']
+
+/**
+ * The user's saved interface language (M18). Validated against the shipped
+ * locales so `updateUser` (via `PATCH /api/me`) can never persist free text.
+ */
+const localeFieldSchema = z.union(LOCALE_CODES.map((code) => z.literal(code)))
 
 const ADMIN_AUDIT_ACTIONS: Record<string, string> = {
   '/admin/ban-user': 'admin.user_banned',
@@ -68,6 +76,18 @@ export function buildAuthOptions(deps: AuthDependencies) {
     secret: deps.secret,
     trustedOrigins: [appOrigin.origin],
     database: deps.database,
+    user: {
+      additionalFields: {
+        // Nullable until the user picks a language; the validator rejects any
+        // code outside SUPPORTED_LOCALES before it reaches the database.
+        locale: {
+          type: 'string',
+          required: false,
+          input: true,
+          validator: { input: localeFieldSchema },
+        },
+      },
+    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,

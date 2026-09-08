@@ -42,3 +42,5 @@ docs/lighthouse/**/*.html
 
 # Claude Code per-machine permissions; never share
 .claude/settings.local.json
+# Ephemeral agent git worktrees; local only, never committed
+.claude/worktrees/
