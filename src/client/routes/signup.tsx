@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
 import { PASSWORD_MIN_LENGTH } from '../../shared/constants'
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/signup')({
 type SignUpValues = z.infer<typeof signUpSchema>
 
 function SignUpPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [values, setValues] = useState<SignUpValues>({ name: '', email: '', password: '' })
   const [isPending, setIsPending] = useState(false)
@@ -52,13 +54,13 @@ function SignUpPage() {
 
   return (
     <AuthLayout
-      title="Create your account"
-      description="A verification link will be sent to your email."
+      title={t('auth.signup.title')}
+      description={t('auth.signup.description')}
       footer={
         <>
-          Already have an account?{' '}
+          {t('auth.signup.footerPrompt')}{' '}
           <Link to="/login" className="font-medium text-brand-600 dark:text-brand-300">
-            Sign in
+            {t('auth.signup.signIn')}
           </Link>
         </>
       }
@@ -69,7 +71,7 @@ function SignUpPage() {
         className="flex flex-col gap-4"
       >
         {serverError === null ? null : <Alert tone="error">{serverError}</Alert>}
-        <Field label="Name" error={errors.name}>
+        <Field label={t('auth.signup.nameLabel')} error={errors.name}>
           {(control) => (
             <Input
               {...control}
@@ -92,7 +94,7 @@ function SignUpPage() {
           value={values.password}
           error={errors.password}
           autoComplete="new-password"
-          hint={`At least ${String(PASSWORD_MIN_LENGTH)} characters. A few unrelated words work well.`}
+          hint={t('auth.signup.passwordHint', { min: PASSWORD_MIN_LENGTH })}
           onChange={(password) => {
             setValues({ ...values, password })
           }}
@@ -106,7 +108,7 @@ function SignUpPage() {
           disabled={!captcha.isReady}
           className="self-end"
         >
-          Create account
+          {t('auth.signup.submit')}
         </Button>
       </form>
     </AuthLayout>

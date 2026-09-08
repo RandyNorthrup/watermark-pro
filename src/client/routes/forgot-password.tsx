@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { emailSchema } from '../../shared/validation'
@@ -21,6 +22,7 @@ const formSchema = z.object({ email: emailSchema })
 type FormValues = z.infer<typeof formSchema>
 
 function ForgotPasswordPage() {
+  const { t } = useTranslation()
   const [values, setValues] = useState<FormValues>({ email: '' })
   const [isPending, setIsPending] = useState(false)
   const [isSent, setIsSent] = useState(false)
@@ -51,18 +53,17 @@ function ForgotPasswordPage() {
 
   return (
     <AuthLayout
-      title="Reset your password"
-      description="Enter your email and we will send a reset link if an account exists."
+      title={t('auth.forgotPassword.title')}
+      description={t('auth.forgotPassword.description')}
       footer={
         <Link to="/login" className="font-medium text-brand-600 dark:text-brand-300">
-          Back to sign in
+          {t('auth.backToSignIn')}
         </Link>
       }
     >
       {isSent ? (
-        <Alert tone="success" title="Check your inbox">
-          If {values.email} belongs to an account, a reset link is on its way. It expires in one
-          hour.
+        <Alert tone="success" title={t('auth.forgotPassword.sentTitle')}>
+          {t('auth.forgotPassword.sentBody', { email: values.email })}
         </Alert>
       ) : (
         <form
@@ -87,7 +88,7 @@ function ForgotPasswordPage() {
             disabled={!captcha.isReady}
             className="self-end"
           >
-            Send reset link
+            {t('auth.forgotPassword.submit')}
           </Button>
         </form>
       )}

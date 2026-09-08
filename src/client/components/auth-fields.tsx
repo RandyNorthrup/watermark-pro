@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { Field } from './ui/field'
 import { Input } from './ui/input'
 
@@ -8,8 +10,9 @@ interface TextFieldProps {
 }
 
 export function EmailField({ value, onChange, error }: TextFieldProps) {
+  const { t } = useTranslation()
   return (
-    <Field label="Email" error={error}>
+    <Field label={t('auth.fields.emailLabel')} error={error}>
       {(control) => (
         <Input
           {...control}
@@ -37,10 +40,11 @@ export function PasswordField({
   error,
   hint,
   autoComplete,
-  label = 'Password',
+  label,
 }: PasswordFieldProps) {
+  const { t } = useTranslation()
   return (
-    <Field label={label} hint={hint} error={error}>
+    <Field label={label ?? t('auth.fields.passwordLabel')} hint={hint} error={error}>
       {(control) => (
         <Input
           {...control}

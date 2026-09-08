@@ -1,6 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, redirect, useNavigate, useRouter } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  type ErrorComponentProps,
+  redirect,
+  useNavigate,
+  useRouter,
+} from '@tanstack/react-router'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { AuthLayout } from '../components/auth-layout'
 import { Alert } from '../components/ui/alert'
@@ -32,14 +39,20 @@ export const Route = createFileRoute('/accept-invitation/$invitationId')({
     return result.data
   },
   component: AcceptInvitationPage,
-  errorComponent: ({ error }) => (
-    <AuthLayout title="Invitation unavailable">
-      <Alert tone="error">{describeError(error)}</Alert>
-    </AuthLayout>
-  ),
+  errorComponent: InvitationUnavailable,
 })
 
+function InvitationUnavailable({ error }: ErrorComponentProps) {
+  const { t } = useTranslation()
+  return (
+    <AuthLayout title={t('auth.acceptInvitation.unavailableTitle')}>
+      <Alert tone="error">{describeError(error)}</Alert>
+    </AuthLayout>
+  )
+}
+
 function AcceptInvitationPage() {
+  const { t } = useTranslation()
   const invitation = Route.useLoaderData()
   const navigate = useNavigate()
   const router = useRouter()
@@ -70,13 +83,16 @@ function AcceptInvitationPage() {
 
   return (
     <AuthLayout
-      title={`Join ${invitation.organizationName}`}
-      description={`${invitation.inviterEmail} invited you to join as ${invitation.role}.`}
+      title={t('auth.acceptInvitation.title', { organizationName: invitation.organizationName })}
+      description={t('auth.acceptInvitation.description', {
+        inviterEmail: invitation.inviterEmail,
+        role: invitation.role,
+      })}
     >
       <div className="flex flex-col gap-4">
         {serverError === null ? null : <Alert tone="error">{serverError}</Alert>}
         <p className="text-sm">
-          Role: <Badge>{invitation.role}</Badge>
+          {t('auth.acceptInvitation.roleLabel')} <Badge>{invitation.role}</Badge>
         </p>
         <div className="flex justify-end gap-2">
           <Button
@@ -85,14 +101,14 @@ function AcceptInvitationPage() {
             disabled={isPending !== null}
             onClick={() => void respond('reject')}
           >
-            Decline
+            {t('auth.acceptInvitation.decline')}
           </Button>
           <Button
             isPending={isPending === 'accept'}
             disabled={isPending !== null}
             onClick={() => void respond('accept')}
           >
-            Accept invitation
+            {t('auth.acceptInvitation.accept')}
           </Button>
         </div>
       </div>

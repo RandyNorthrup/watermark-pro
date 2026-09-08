@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { MailCheck } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { emailSchema } from '../../shared/validation'
@@ -18,6 +19,7 @@ export const Route = createFileRoute('/check-email')({
 })
 
 function CheckEmailPage() {
+  const { t } = useTranslation()
   const { email } = Route.useSearch()
   const [isPending, setIsPending] = useState(false)
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(null)
@@ -29,18 +31,18 @@ function CheckEmailPage() {
     const failure = describeAuthError(result.error)
     setNotice(
       failure === null
-        ? { tone: 'success', text: 'A new verification link is on its way.' }
+        ? { tone: 'success', text: t('verify.checkEmail.resent') }
         : { tone: 'error', text: failure },
     )
   }
 
   return (
     <AuthLayout
-      title="Check your inbox"
-      description={`We sent a verification link to ${email}. It expires in one hour.`}
+      title={t('verify.checkEmail.title')}
+      description={t('verify.checkEmail.description', { email })}
       footer={
         <Link to="/login" className="font-medium text-brand-600 dark:text-brand-300">
-          Back to sign in
+          {t('auth.backToSignIn')}
         </Link>
       }
     >
@@ -48,7 +50,7 @@ function CheckEmailPage() {
         <MailCheck aria-hidden="true" className="size-10 text-brand-600 dark:text-brand-300" />
         {notice === null ? null : <Alert tone={notice.tone}>{notice.text}</Alert>}
         <Button variant="secondary" isPending={isPending} onClick={() => void resend()}>
-          Resend verification email
+          {t('verify.checkEmail.resend')}
         </Button>
       </div>
     </AuthLayout>

@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { signInSchema } from '../../shared/validation'
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/login')({
 type SignInValues = z.infer<typeof signInSchema>
 
 function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { redirect } = Route.useSearch()
@@ -59,13 +61,13 @@ function LoginPage() {
 
   return (
     <AuthLayout
-      title="Welcome back"
-      description="Sign in to your workspace."
+      title={t('auth.login.title')}
+      description={t('auth.login.description')}
       footer={
         <>
-          New here?{' '}
+          {t('auth.login.footerPrompt')}{' '}
           <Link to="/signup" className="font-medium text-brand-600 dark:text-brand-300">
-            Create an account
+            {t('auth.login.createAccount')}
           </Link>
         </>
       }
@@ -77,14 +79,14 @@ function LoginPage() {
       >
         {serverError === null ? null : <Alert tone="error">{serverError}</Alert>}
         {needsVerification ? (
-          <Alert tone="info" title="Verify your email first">
-            We sent a verification link to {values.email}.{' '}
+          <Alert tone="info" title={t('auth.login.verifyTitle')}>
+            {t('auth.login.verifyBody', { email: values.email })}{' '}
             <Link
               to="/check-email"
               search={{ email: values.email }}
               className="font-medium underline"
             >
-              Resend it
+              {t('auth.login.resendIt')}
             </Link>
           </Alert>
         ) : null}
@@ -105,10 +107,10 @@ function LoginPage() {
         />
         <div className="flex items-center justify-between">
           <Link to="/forgot-password" className="text-sm text-ink-muted hover:text-ink">
-            Forgot password?
+            {t('auth.login.forgotPassword')}
           </Link>
           <Button type="submit" isPending={isPending}>
-            Sign in
+            {t('auth.login.submit')}
           </Button>
         </div>
       </form>

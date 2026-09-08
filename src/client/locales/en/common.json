@@ -38,7 +38,59 @@
     "close": "Close",
     "retry": "Try again"
   },
-  "auth": {},
+  "auth": {
+    "backToSignIn": "Back to sign in",
+    "fields": {
+      "emailLabel": "Email",
+      "passwordLabel": "Password"
+    },
+    "login": {
+      "title": "Welcome back",
+      "description": "Sign in to your workspace.",
+      "footerPrompt": "New here?",
+      "createAccount": "Create an account",
+      "verifyTitle": "Verify your email first",
+      "verifyBody": "We sent a verification link to {{email}}.",
+      "resendIt": "Resend it",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in"
+    },
+    "signup": {
+      "title": "Create your account",
+      "description": "A verification link will be sent to your email.",
+      "footerPrompt": "Already have an account?",
+      "signIn": "Sign in",
+      "nameLabel": "Name",
+      "passwordHint": "At least {{min}} characters. A few unrelated words work well.",
+      "submit": "Create account"
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "description": "Enter your email and we will send a reset link if an account exists.",
+      "sentTitle": "Check your inbox",
+      "sentBody": "If {{email}} belongs to an account, a reset link is on its way. It expires in one hour.",
+      "submit": "Send reset link"
+    },
+    "resetPassword": {
+      "title": "Choose a new password",
+      "invalidTitle": "This reset link is not valid",
+      "invalidBody": "It may have expired or already been used.",
+      "requestNew": "Request a new one",
+      "newPasswordLabel": "New password",
+      "passwordHint": "At least {{min}} characters.",
+      "confirmLabel": "Confirm password",
+      "mismatch": "Passwords do not match",
+      "submit": "Update password"
+    },
+    "acceptInvitation": {
+      "unavailableTitle": "Invitation unavailable",
+      "title": "Join {{organizationName}}",
+      "description": "{{inviterEmail}} invited you to join as {{role}}.",
+      "roleLabel": "Role:",
+      "decline": "Decline",
+      "accept": "Accept invitation"
+    }
+  },
   "library": {},
   "designer": {},
   "editor": {},
@@ -48,7 +100,14 @@
   "admin": {},
   "video": {},
   "documents": {},
-  "verify": {},
+  "verify": {
+    "checkEmail": {
+      "title": "Check your inbox",
+      "description": "We sent a verification link to {{email}}. It expires in one hour.",
+      "resent": "A new verification link is on its way.",
+      "resend": "Resend verification email"
+    }
+  },
   "errors": {
     "fallback": "Something went wrong. Please try again."
   },

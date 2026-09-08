@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { PASSWORD_MIN_LENGTH } from '../../shared/constants'
@@ -24,21 +25,21 @@ export const Route = createFileRoute('/reset-password')({
   component: ResetPasswordPage,
 })
 
-const formSchema = z
-  .object({ password: passwordSchema, confirm: z.string() })
-  .refine((form) => form.password === form.confirm, {
-    message: 'Passwords do not match',
-    path: ['confirm'],
-  })
-type FormValues = z.infer<typeof formSchema>
+const formFields = z.object({ password: passwordSchema, confirm: z.string() })
+type FormValues = z.infer<typeof formFields>
 
 function ResetPasswordPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { token, error: linkError } = Route.useSearch()
   const [values, setValues] = useState<FormValues>({ password: '', confirm: '' })
   const [isPending, setIsPending] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const { errors, validate } = useFormErrors<FormValues>()
+  const formSchema = formFields.refine((form) => form.password === form.confirm, {
+    message: t('auth.resetPassword.mismatch'),
+    path: ['confirm'],
+  })
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -62,18 +63,18 @@ function ResetPasswordPage() {
 
   return (
     <AuthLayout
-      title="Choose a new password"
+      title={t('auth.resetPassword.title')}
       footer={
         <Link to="/login" className="font-medium text-brand-600 dark:text-brand-300">
-          Back to sign in
+          {t('auth.backToSignIn')}
         </Link>
       }
     >
       {isLinkUnusable ? (
-        <Alert tone="error" title="This reset link is not valid">
-          It may have expired or already been used.{' '}
+        <Alert tone="error" title={t('auth.resetPassword.invalidTitle')}>
+          {t('auth.resetPassword.invalidBody')}{' '}
           <Link to="/forgot-password" className="font-medium underline">
-            Request a new one
+            {t('auth.resetPassword.requestNew')}
           </Link>
           .
         </Alert>
@@ -85,8 +86,8 @@ function ResetPasswordPage() {
         >
           {serverError === null ? null : <Alert tone="error">{serverError}</Alert>}
           <Field
-            label="New password"
-            hint={`At least ${String(PASSWORD_MIN_LENGTH)} characters.`}
+            label={t('auth.resetPassword.newPasswordLabel')}
+            hint={t('auth.resetPassword.passwordHint', { min: PASSWORD_MIN_LENGTH })}
             error={errors.password}
           >
             {(control) => (
@@ -101,7 +102,7 @@ function ResetPasswordPage() {
               />
             )}
           </Field>
-          <Field label="Confirm password" error={errors.confirm}>
+          <Field label={t('auth.resetPassword.confirmLabel')} error={errors.confirm}>
             {(control) => (
               <Input
                 {...control}
@@ -115,7 +116,7 @@ function ResetPasswordPage() {
             )}
           </Field>
           <Button type="submit" isPending={isPending} className="self-end">
-            Update password
+            {t('auth.resetPassword.submit')}
           </Button>
         </form>
       )}
