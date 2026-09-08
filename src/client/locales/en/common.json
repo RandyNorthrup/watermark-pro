@@ -26,7 +26,18 @@
     "signOut": "Sign out",
     "switchOrganization": "Switch organization",
     "createOrganization": "Create organization",
-    "accountMenu": "Account menu for {{name}}"
+    "accountMenu": "Account menu for {{name}}",
+    "menuDescription": "Switch organization or go to any part of Watermark Pro.",
+    "switchOrganizationFor": "Organization: {{name}}. Switch organization",
+    "chooseOrganization": "Choose an organization",
+    "chooseOrganizationShort": "Choose organization",
+    "organizations": "Organizations",
+    "newOrganization": "New organization",
+    "theme": {
+      "system": "Theme: follows system. Switch to light",
+      "light": "Theme: light. Switch to dark",
+      "dark": "Theme: dark. Switch to system"
+    }
   },
   "actions": {
     "save": "Save",

@@ -19,6 +19,7 @@ import {
   Users,
 } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { BrandMark } from './brand-mark'
 import { LanguageMenu } from './language-menu'
@@ -38,22 +39,25 @@ import {
 } from './ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 
+// `label` holds the catalogue key, not the visible word; each list translates
+// it at render (`t(item.label)`). NAV_ITEMS is `as const`, so the keys keep
+// their literal types and stay valid arguments to the typed `t`.
 const NAV_ITEMS = [
-  { to: '/app', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { to: '/app/library', label: 'Library', icon: Stamp, exact: false },
-  { to: '/app/editor', label: 'Editor', icon: PencilRuler, exact: false },
-  { to: '/app/bulk', label: 'Bulk', icon: Layers, exact: false },
-  { to: '/app/video', label: 'Video', icon: Film, exact: false },
-  { to: '/app/documents', label: 'Documents', icon: FileText, exact: false },
-  { to: '/app/gallery', label: 'Gallery', icon: Images, exact: false },
-  { to: '/app/shares', label: 'Shares', icon: Share2, exact: false },
-  { to: '/app/members', label: 'Members', icon: Users, exact: false },
-  { to: '/app/audit', label: 'Audit log', icon: ScrollText, exact: false },
+  { to: '/app', label: 'shell.nav.dashboard', icon: LayoutDashboard, exact: true },
+  { to: '/app/library', label: 'shell.nav.library', icon: Stamp, exact: false },
+  { to: '/app/editor', label: 'shell.nav.editor', icon: PencilRuler, exact: false },
+  { to: '/app/bulk', label: 'shell.nav.bulk', icon: Layers, exact: false },
+  { to: '/app/video', label: 'shell.nav.video', icon: Film, exact: false },
+  { to: '/app/documents', label: 'shell.nav.documents', icon: FileText, exact: false },
+  { to: '/app/gallery', label: 'shell.nav.gallery', icon: Images, exact: false },
+  { to: '/app/shares', label: 'shell.nav.shares', icon: Share2, exact: false },
+  { to: '/app/members', label: 'shell.nav.members', icon: Users, exact: false },
+  { to: '/app/audit', label: 'shell.nav.audit', icon: ScrollText, exact: false },
 ] as const
 
 const ADMIN_NAV_ITEM = {
   to: '/app/admin',
-  label: 'Admin',
+  label: 'shell.nav.admin',
   icon: ShieldCheck,
   exact: false,
 } as const
@@ -87,6 +91,7 @@ interface AppShellProps {
  * respect the device's safe areas.
  */
 export function AppShell({ session, organization, organizations, children }: AppShellProps) {
+  const { t } = useTranslation()
   const navItems = navItemsFor(session)
   return (
     <div className="flex min-h-svh">
@@ -94,14 +99,14 @@ export function AppShell({ session, organization, organizations, children }: App
         href="#main"
         className="sr-only z-50 rounded-md bg-brand-600 px-3 py-2 text-white focus:not-sr-only focus:absolute focus:top-2 focus:left-2"
       >
-        Skip to content
+        {t('shell.skipToContent')}
       </a>
       <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface-raised p-4 md:flex">
         <BrandMark to="/app" className="px-2 py-1" />
         <div className="mt-6">
           <OrganizationSwitcher organization={organization} organizations={organizations} />
         </div>
-        <NavList items={navItems} label="Primary" className="mt-6" />
+        <NavList items={navItems} label={t('shell.primaryNav')} className="mt-6" />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface-raised/80 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur md:px-8 md:pt-3">
@@ -140,6 +145,7 @@ interface NavListProps {
 }
 
 function NavList({ items, label, className, onNavigate }: NavListProps) {
+  const { t } = useTranslation()
   return (
     <nav aria-label={label} className={cn('flex flex-col gap-1', className)}>
       {items.map(({ to, label: itemLabel, icon: Icon, exact }) => (
@@ -154,7 +160,7 @@ function NavList({ items, label, className, onNavigate }: NavListProps) {
           }}
         >
           <Icon aria-hidden="true" className="size-4" />
-          {itemLabel}
+          {t(itemLabel)}
         </Link>
       ))}
     </nav>
@@ -163,9 +169,10 @@ function NavList({ items, label, className, onNavigate }: NavListProps) {
 
 /** Phone-only bottom tab bar; sits above the home indicator. */
 function TabBar({ items }: { items: readonly NavItem[] }) {
+  const { t } = useTranslation()
   return (
     <nav
-      aria-label="Tools"
+      aria-label={t('shell.toolsNav')}
       className="fixed inset-x-0 bottom-0 z-10 grid h-(--app-tab-bar-height) border-t border-line bg-surface-raised/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       style={{ gridTemplateColumns: `repeat(${String(items.length)}, minmax(0, 1fr))` }}
     >
@@ -178,7 +185,7 @@ function TabBar({ items }: { items: readonly NavItem[] }) {
           activeProps={{ className: 'text-brand-700 dark:text-brand-200' }}
         >
           <Icon aria-hidden="true" className="size-5" />
-          {label}
+          {t(label)}
         </Link>
       ))}
     </nav>
@@ -190,6 +197,7 @@ function MobileMenu({
   organization,
   organizations,
 }: Pick<AppShellProps, 'organization' | 'organizations'> & { items: readonly NavItem[] }) {
+  const { t } = useTranslation()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   // The sheet is open for the path it was opened on, so any navigation,
   // including the organization switcher's, closes it without an effect.
@@ -203,19 +211,19 @@ function MobileMenu({
       }}
     >
       <SheetTrigger asChild>
-        <Button type="button" variant="ghost" size="icon" aria-label="Menu">
+        <Button type="button" variant="ghost" size="icon" aria-label={t('shell.menu')}>
           <Menu aria-hidden="true" className="size-5" />
         </Button>
       </SheetTrigger>
       <SheetContent
-        title="Menu"
-        description="Switch organization or go to any part of Watermark Pro."
+        title={t('shell.menu')}
+        description={t('shell.menuDescription')}
         isDescriptionHidden
       >
         <OrganizationSwitcher organization={organization} organizations={organizations} />
         <NavList
           items={items}
-          label="Primary (menu)"
+          label={t('shell.primaryMenuNav')}
           onNavigate={() => {
             setOpenPathname(null)
           }}
@@ -229,6 +237,7 @@ function OrganizationSwitcher({
   organization,
   organizations,
 }: Pick<AppShellProps, 'organization' | 'organizations'>) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -248,19 +257,21 @@ function OrganizationSwitcher({
           className="w-full justify-between"
           aria-label={
             organization === null
-              ? 'Choose an organization'
-              : `Organization: ${organization.name}. Switch organization`
+              ? t('shell.chooseOrganization')
+              : t('shell.switchOrganizationFor', { name: organization.name })
           }
         >
           <span className="flex min-w-0 items-center gap-2">
             <Building2 aria-hidden="true" className="size-4 shrink-0" />
-            <span className="truncate">{organization?.name ?? 'Choose organization'}</span>
+            <span className="truncate">
+              {organization?.name ?? t('shell.chooseOrganizationShort')}
+            </span>
           </span>
           <ChevronsUpDown aria-hidden="true" className="size-4 shrink-0 opacity-60" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>Organizations</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('shell.organizations')}</DropdownMenuLabel>
         {organizations.map((candidate) => (
           <DropdownMenuItem
             key={candidate.id}
@@ -273,7 +284,7 @@ function OrganizationSwitcher({
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void navigate({ to: '/app/organizations/new' })}>
           <Plus aria-hidden="true" className="size-4" />
-          New organization
+          {t('shell.newOrganization')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -281,6 +292,7 @@ function OrganizationSwitcher({
 }
 
 function UserMenu({ session }: { session: SessionData }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -296,7 +308,7 @@ function UserMenu({ session }: { session: SessionData }) {
         <button
           type="button"
           className="rounded-full focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
-          aria-label={`Account menu for ${session.user.name}`}
+          aria-label={t('shell.accountMenu', { name: session.user.name })}
         >
           <Avatar name={session.user.name} image={session.user.image} />
         </button>
@@ -309,7 +321,7 @@ function UserMenu({ session }: { session: SessionData }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void signOut()}>
           <LogOut aria-hidden="true" className="size-4" />
-          Sign out
+          {t('shell.signOut')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
