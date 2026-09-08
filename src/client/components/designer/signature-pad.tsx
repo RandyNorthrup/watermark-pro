@@ -149,7 +149,10 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(96vw,44rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-4 shadow-card sm:p-6">
+        <Dialog.Content
+          // physical: geometry: the signature dialog is centred — left-1/2 pairs with -translate-x-1/2
+          className="fixed top-1/2 left-1/2 z-50 flex w-[min(96vw,44rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-4 shadow-card sm:p-6"
+        >
           <div>
             <Dialog.Title className="text-lg font-semibold">
               {t('designer.logo.signature.draw')}
@@ -204,7 +207,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
                 </button>
               ))}
             </div>
-            <div className="ml-auto flex gap-2">
+            <div className="ms-auto flex gap-2">
               <Button
                 type="button"
                 variant="ghost"
@@ -212,7 +215,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
                 disabled={strokes.length === 0}
                 onClick={undo}
               >
-                <Undo2 aria-hidden="true" className="size-4" />
+                <Undo2 aria-hidden="true" className="size-4 rtl:-scale-x-100" />
                 {t('designer.logo.signature.undo')}
               </Button>
               <Button

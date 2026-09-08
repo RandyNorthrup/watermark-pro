@@ -22,6 +22,78 @@ import unicorn from 'eslint-plugin-unicorn'
 import globals from 'globals'
 import { config as defineEslintConfig, configs as tseslintConfigs } from 'typescript-eslint'
 
+// M18 "Right-to-left": physical Tailwind utilities do not mirror under
+// `dir="rtl"`, so the client uses logical ones (`ms`/`me`, `ps`/`pe`,
+// `start`/`end`, `text-start`/`text-end`, `border-s`/`border-e`,
+// `rounded-s`/`rounded-e`). This regex matches the *physical* forms only. Each
+// branch is anchored so it never fires on a logical utility or a substring of an
+// unrelated class:
+//   - `border-line` (colour) is excluded by the `\b` after `[lr]`;
+//   - `rounded-lg`/`rounded-md`/`rounded-none` are excluded by `(?![a-z])`;
+//   - `text-start`/`text-end` and `ms/me/ps/pe/start/end/border-s/border-e` are
+//     simply not in any branch;
+//   - inset `left/right` must carry a value (`left-3`, `right-1/2`, `left-[…]`)
+//     and must not be the tail of `text-left` (the lookbehind rejects a leading
+//     `-`) nor the `right` inside `to_right` in a gradient (rejects a leading
+//     word char).
+const PHYSICAL_TAILWIND_UTILITY =
+  /\b(?:ml|mr|pl|pr)-|\btext-(?:left|right)\b|\bborder-[lr]\b|\brounded-(?:tl|tr|bl|br|[lr])(?![a-z])|(?<![\w-])-?(?:left|right)-(?:[\d.]|\[|auto|full|px)/
+
+// Where a physical utility is genuinely spatial geometry (the editor overlays,
+// and centred modals whose `left-1/2` pairs with a physical `-translate-x-1/2`),
+// the line — or the line just above it — carries this marker and is exempt. The
+// overlay files are additionally turned off wholesale below. See PLAN.md §9.
+const GEOMETRY_MARKER = 'physical: geometry'
+
+/** Flat-config inline plugin: fail on physical Tailwind class utilities in JSX. */
+const rtlPlugin = {
+  rules: {
+    'no-physical-utilities': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Use logical Tailwind utilities so the layout mirrors under dir="rtl" (M18).',
+        },
+        schema: [],
+        messages: {
+          physical:
+            'Physical Tailwind utility "{{match}}" does not mirror in RTL. Use the logical form ' +
+            '(ms/me, ps/pe, start/end, text-start/text-end, border-s/border-e, rounded-s/rounded-e), ' +
+            'or mark a genuine geometry case with a /* physical: geometry */ comment. See PLAN.md §9.',
+        },
+      },
+      create(context) {
+        const { lines } = context.sourceCode
+        const isExempt = (node) => {
+          const line = node.loc.start.line
+          const onLine = lines[line - 1] ?? ''
+          const above = lines[line - 2] ?? ''
+          return onLine.includes(GEOMETRY_MARKER) || above.includes(GEOMETRY_MARKER)
+        }
+        const inspect = (node, value) => {
+          if (typeof value !== 'string') {
+            return
+          }
+          const found = PHYSICAL_TAILWIND_UTILITY.exec(value)
+          if (found === null || isExempt(node)) {
+            return
+          }
+          context.report({ node, messageId: 'physical', data: { match: found[0] } })
+        }
+        return {
+          Literal(node) {
+            inspect(node, node.value)
+          },
+          TemplateElement(node) {
+            inspect(node, node.value.raw)
+          },
+        }
+      },
+    },
+  },
+}
+
 export default defineEslintConfig(
   {
     ignores: [
@@ -244,6 +316,29 @@ export default defineEslintConfig(
   },
 
   {
+    // Right-to-left gate (M18): physical Tailwind utilities in a client component
+    // do not mirror under `dir="rtl"`. `scripts/logical-utilities.mjs` swept the
+    // existing ones to their logical equivalents; this keeps them from creeping
+    // back. Geometry cases carry a `/* physical: geometry */` marker (the overlay
+    // files are exempted wholesale just below). Test files are exempt in the
+    // block that already turns the i18next rule off for them.
+    files: ['src/client/**/*.tsx'],
+    plugins: { 'watermark-rtl': rtlPlugin },
+    rules: { 'watermark-rtl/no-physical-utilities': 'error' },
+  },
+
+  {
+    // The editor overlays position elements by literal pixel geometry, where
+    // left/right/inset are spatial and must stay physical (they track pointer and
+    // keyboard coordinates, which are not mirrored). See PLAN.md §9.
+    files: [
+      'src/client/components/editor/crop-overlay.tsx',
+      'src/client/components/editor/mark-overlay.tsx',
+    ],
+    rules: { 'watermark-rtl/no-physical-utilities': 'off' },
+  },
+
+  {
     // Constants modules are the one place literals belong; the rule would be
     // unsatisfiable there.
     files: ['src/shared/constants.ts', 'src/**/constants.ts'],
@@ -280,6 +375,15 @@ export default defineEslintConfig(
       // Tests assert on literal English; they are not localised (M18).
       'i18next/no-literal-string': 'off',
     },
+  },
+
+  {
+    // Page/component tests assert on the class strings a component renders and on
+    // overlay geometry; the RTL gate is for shipped components, not their
+    // assertions (M18). Scoped to client `.tsx` tests, the only place the rule is
+    // enabled, so the plugin is in scope to switch off.
+    files: ['src/client/**/*.test.tsx'],
+    rules: { 'watermark-rtl/no-physical-utilities': 'off' },
   },
 
   {

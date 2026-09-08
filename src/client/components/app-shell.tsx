@@ -97,11 +97,11 @@ export function AppShell({ session, organization, organizations, children }: App
     <div className="flex min-h-svh">
       <a
         href="#main"
-        className="sr-only z-50 rounded-md bg-brand-600 px-3 py-2 text-white focus:not-sr-only focus:absolute focus:top-2 focus:left-2"
+        className="sr-only z-50 rounded-md bg-brand-600 px-3 py-2 text-white focus:not-sr-only focus:absolute focus:start-2 focus:top-2"
       >
         {t('shell.skipToContent')}
       </a>
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-surface-raised p-4 md:flex">
+      <aside className="hidden w-64 shrink-0 flex-col border-e border-line bg-surface-raised p-4 md:flex">
         <BrandMark to="/app" className="px-2 py-1" />
         <div className="mt-6">
           <OrganizationSwitcher organization={organization} organizations={organizations} />
@@ -118,7 +118,7 @@ export function AppShell({ session, organization, organizations, children }: App
             />
             <BrandMark to="/app" />
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ms-auto flex items-center gap-2">
             <LanguageMenu />
             <ThemeToggle />
             <UserMenu session={session} />

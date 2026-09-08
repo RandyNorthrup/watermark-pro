@@ -34,7 +34,7 @@ export function SheetContent({
       <Radix.Overlay className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in" />
       <Radix.Content
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-[min(20rem,85vw)] flex-col gap-4 overflow-y-auto border-r border-line bg-surface-raised p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-card outline-none data-[state=closed]:animate-sheet-out data-[state=open]:animate-sheet-in',
+          'fixed inset-y-0 start-0 z-50 flex w-[min(20rem,85vw)] flex-col gap-4 overflow-y-auto border-e border-line bg-surface-raised p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-card outline-none data-[state=closed]:animate-sheet-out data-[state=open]:animate-sheet-in',
           className,
         )}
         {...props}

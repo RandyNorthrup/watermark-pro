@@ -111,7 +111,7 @@ function SharePage() {
                     onClick={() => {
                       setOpen(photo)
                     }}
-                    className="flex w-full flex-col gap-1 rounded-lg border border-line bg-surface-raised p-1.5 text-left focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none"
+                    className="flex w-full flex-col gap-1 rounded-lg border border-line bg-surface-raised p-1.5 text-start focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none"
                   >
                     <span className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
                       <img

@@ -130,7 +130,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
                   onClick={() => {
                     onChange(asset.id)
                   }}
-                  className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface-raised p-2 text-left text-xs hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none aria-pressed:border-brand-500 aria-pressed:ring-2 aria-pressed:ring-brand-500/30 dark:hover:bg-brand-900/40"
+                  className="flex w-full flex-col gap-2 rounded-lg border border-line bg-surface-raised p-2 text-start text-xs hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none aria-pressed:border-brand-500 aria-pressed:ring-2 aria-pressed:ring-brand-500/30 dark:hover:bg-brand-900/40"
                 >
                   <span className="flex h-20 items-center justify-center rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
                     <img
@@ -150,7 +150,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
                     variant="ghost"
                     size="icon"
                     aria-label={t('designer.logo.delete', { name: asset.name })}
-                    className="absolute top-1 right-1 size-7 text-ink-muted hover:text-rose-600"
+                    className="absolute end-1 top-1 size-7 text-ink-muted hover:text-rose-600"
                     disabled={remove.isPending}
                     onClick={() => {
                       remove.mutate(asset)

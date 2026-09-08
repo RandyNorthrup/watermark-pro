@@ -32,7 +32,7 @@ export function AuditTable({ caption, entries, detailHeading, renderDetail }: Au
     >
       <table className="w-full text-sm">
         <caption className="sr-only">{caption}</caption>
-        <thead className="text-left text-xs text-ink-muted uppercase">
+        <thead className="text-start text-xs text-ink-muted uppercase">
           <tr>
             <th scope="col" className="px-3 py-3 md:px-4">
               {t('audit.when')}

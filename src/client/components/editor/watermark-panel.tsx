@@ -126,7 +126,7 @@ function PanelBody({
                       onSelectLayer(layer.id)
                     }}
                     className={cn(
-                      'flex min-h-10 min-w-0 flex-1 items-center gap-2 rounded-lg px-3 text-left text-sm transition-colors',
+                      'flex min-h-10 min-w-0 flex-1 items-center gap-2 rounded-lg px-3 text-start text-sm transition-colors',
                       isActive
                         ? 'bg-brand-50 font-medium text-brand-800 dark:bg-brand-900/50 dark:text-brand-100'
                         : 'text-ink hover:bg-brand-50/60 dark:hover:bg-brand-900/20',

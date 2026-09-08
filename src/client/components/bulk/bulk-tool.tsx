@@ -704,7 +704,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                         {job === null ? (
                           <span className="sr-only">{t('bulk.selected')}</span>
                         ) : (
-                          <span className="w-20 text-right text-xs text-ink-muted">
+                          <span className="w-20 text-end text-xs text-ink-muted">
                             {t(STATUS_LABELS[job.status])}
                           </span>
                         )}

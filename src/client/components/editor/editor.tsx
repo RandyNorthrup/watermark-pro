@@ -630,7 +630,7 @@ export function Editor({
               height: sourceSize.height,
             })}
           </span>
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ms-auto flex items-center gap-1">
             {isRendering ? <Spinner className="size-4" label={t('editor.rendering')} /> : null}
             <Button
               type="button"
@@ -643,7 +643,7 @@ export function Editor({
                 dispatch({ type: 'undo' })
               }}
             >
-              <Undo2 aria-hidden="true" className="size-4" />
+              <Undo2 aria-hidden="true" className="size-4 rtl:-scale-x-100" />
             </Button>
             <Button
               type="button"
@@ -656,7 +656,7 @@ export function Editor({
                 dispatch({ type: 'redo' })
               }}
             >
-              <Redo2 aria-hidden="true" className="size-4" />
+              <Redo2 aria-hidden="true" className="size-4 rtl:-scale-x-100" />
             </Button>
           </div>
         </div>

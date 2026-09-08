@@ -142,14 +142,14 @@ export function Gallery({ organizationId, role }: GalleryProps) {
           <div className="relative">
             <Search
               aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted"
+              className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted"
             />
             <Input
               id={searchId}
               type="search"
               value={search}
               placeholder={t('gallery.searchPlaceholder')}
-              className="pl-9"
+              className="ps-9"
               onChange={(event) => {
                 setSearch(event.currentTarget.value)
               }}
@@ -177,7 +177,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
           </select>
         </div>
         {(canDelete || canShare) && items.length > 0 ? (
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ms-auto flex items-center gap-2">
             <Button
               type="button"
               variant="secondary"
@@ -264,7 +264,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                   onClick={() => {
                     setOpen(photo)
                   }}
-                  className="flex w-full flex-col gap-1 rounded-lg border border-line bg-surface-raised p-1.5 text-left focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none"
+                  className="flex w-full flex-col gap-1 rounded-lg border border-line bg-surface-raised p-1.5 text-start focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none"
                 >
                   <span className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
                     <img
@@ -286,7 +286,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                   </span>
                 </button>
                 {canDelete || canShare ? (
-                  <label className="absolute top-2.5 left-2.5 flex size-6 cursor-pointer items-center justify-center rounded-md border border-line bg-surface-raised shadow">
+                  <label className="absolute start-2.5 top-2.5 flex size-6 cursor-pointer items-center justify-center rounded-md border border-line bg-surface-raised shadow">
                     <input
                       type="checkbox"
                       aria-label={t('gallery.selectPhoto', { name: photo.name })}
@@ -353,7 +353,10 @@ function DeleteDialog({ count, isPending, onConfirm }: DeleteDialogProps) {
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <AlertDialog.Content className="fixed top-1/2 left-1/2 z-50 w-[min(90vw,24rem)] -translate-x-1/2 -translate-y-1/2 rounded-card border border-line bg-surface-raised p-6 shadow-card">
+        <AlertDialog.Content
+          // physical: geometry: the delete-confirm dialog is centred — left-1/2 pairs with -translate-x-1/2
+          className="fixed top-1/2 left-1/2 z-50 w-[min(90vw,24rem)] -translate-x-1/2 -translate-y-1/2 rounded-card border border-line bg-surface-raised p-6 shadow-card"
+        >
           <AlertDialog.Title className="text-lg font-semibold">
             {t('gallery.deleteConfirmTitle', { count })}
           </AlertDialog.Title>

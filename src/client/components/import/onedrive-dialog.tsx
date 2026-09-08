@@ -153,7 +153,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
             <li key={item.id}>
               <button
                 type="button"
-                className="hover:bg-surface-sunken flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm"
+                className="hover:bg-surface-sunken flex w-full items-center gap-3 px-4 py-2.5 text-start text-sm"
                 onClick={() => {
                   void loadFolder([...path, item])
                 }}
@@ -163,7 +163,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
                 <span className="truncate">{item.name}</span>
                 <ChevronRight
                   aria-hidden="true"
-                  className="ml-auto size-4 shrink-0 text-ink-muted"
+                  className="ms-auto size-4 shrink-0 text-ink-muted rtl:-scale-x-100"
                 />
               </button>
             </li>
@@ -203,7 +203,10 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card">
+        <Dialog.Content
+          // physical: geometry: the OneDrive dialog is centred — left-1/2 pairs with -translate-x-1/2
+          className="fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card"
+        >
           <div>
             <Dialog.Title className="text-lg font-semibold">
               {t('import.onedrive.title')}
@@ -232,7 +235,10 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
               const isCurrent = index === path.length - 1
               return (
                 <span key={folder.id} className="inline-flex items-center gap-1">
-                  <ChevronRight aria-hidden="true" className="size-3 text-ink-muted" />
+                  <ChevronRight
+                    aria-hidden="true"
+                    className="size-3 text-ink-muted rtl:-scale-x-100"
+                  />
                   <button
                     type="button"
                     className="rounded px-1 text-brand-600 hover:underline disabled:text-ink disabled:no-underline dark:text-brand-300"

@@ -17,6 +17,17 @@ what was planned; superseded entries stay.
 - M18 per-account locale: a nullable `locale` column on `user` and a validated
   `PATCH /api/me` so a signed-in member's language follows them across devices;
   the picker saves to the account (best-effort) as well as `localStorage`.
+- M18 right-to-left: the client layout mirrors under `dir="rtl"` (Arabic). A
+  one-off codemod (`scripts/logical-utilities.mjs`) rewrote physical Tailwind
+  utilities to logical ones across the client (`ml`/`mr`→`ms`/`me`,
+  `pl`/`pr`→`ps`/`pe`, `left`/`right`→`start`/`end`, `text-left`/`text-right`→
+  `text-start`/`text-end`, `border-l`/`border-r`→`border-s`/`border-e`); a new
+  ESLint rule (`watermark-rtl/no-physical-utilities`) keeps them from creeping
+  back; and direction-implying icons (undo/redo, the folder and breadcrumb
+  chevrons) flip with `rtl:-scale-x-100`. The editor overlays and the centred
+  modals keep physical geometry on purpose (marked `physical: geometry`; see
+  PLAN §9), since pointer/keyboard coordinates and `translate` are not mirrored
+  by `dir`.
 
 ## [1.9.0] - 2026-09-07
 

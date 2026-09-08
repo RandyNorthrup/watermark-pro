@@ -274,7 +274,10 @@ function BanDialog({
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <AlertDialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(90vw,26rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card">
+        <AlertDialog.Content
+          // physical: geometry: the ban-confirm dialog is centred — left-1/2 pairs with -translate-x-1/2
+          className="fixed top-1/2 left-1/2 z-50 flex w-[min(90vw,26rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card"
+        >
           <AlertDialog.Title className="text-lg font-semibold">
             {t('admin.banConfirmTitle', { email })}
           </AlertDialog.Title>
@@ -341,7 +344,7 @@ function OrganizationsPanel() {
     >
       <table className="w-full text-sm">
         <caption className="sr-only">{t('admin.organizationsTable')}</caption>
-        <thead className="text-left text-xs text-ink-muted uppercase">
+        <thead className="text-start text-xs text-ink-muted uppercase">
           <tr>
             <th scope="col" className="px-4 py-3">
               {t('admin.th.organization')}
@@ -366,7 +369,7 @@ function OrganizationsPanel() {
               <td className="px-4 py-3">
                 <span className="font-medium">{organization.name}</span>
                 {organization.slug === null ? null : (
-                  <span className="ml-2 text-xs text-ink-muted">{organization.slug}</span>
+                  <span className="ms-2 text-xs text-ink-muted">{organization.slug}</span>
                 )}
               </td>
               <td className="px-4 py-3">{String(organization.memberCount)}</td>

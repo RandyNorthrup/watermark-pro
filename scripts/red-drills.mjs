@@ -618,6 +618,21 @@ export const DRILLS = [
     replace: 'return spec',
     ...unitClient('src/client/pdf/raster-layout.test.ts'),
   },
+  // --- M18: localisation and right-to-left ---------------------------------
+  {
+    name: 'i18n: RTL not applied',
+    file: 'src/shared/locales.ts',
+    find: "localeDirection(locale) === 'rtl'",
+    replace: "localeDirection(locale) === 'ltr'",
+    ...unitClient('src/shared/locales.test.ts'),
+  },
+  {
+    name: 'i18n: physical utility slips in',
+    file: 'src/client/components/app-shell.tsx',
+    find: 'className="ms-auto flex items-center gap-2"',
+    replace: 'className="ms-auto ml-2 flex items-center gap-2"',
+    ...gate('lint', /\d+ problems?/),
+  },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
     name: 'Gate: ESLint rejects `any`',
