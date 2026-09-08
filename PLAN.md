@@ -627,7 +627,10 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
 - **Certification checklist:**
   - [ ] every raised §5.5 budget met on every page (`docs/lighthouse/m19/`); bundle report under `docs/bundle/m19.md`
   - [ ] offline journey green; update flow checked across two deploys (§8)
-  - [ ] competitor re-check done; README status updated
+  - [x] competitor re-check done (2026-09-08; `docs/competitor-research.md`
+        gained a WMP column, a new browser-based `WEB` field, and §5 scoring;
+        matches/exceeds eZy on every axis bar font count + sticker packs);
+        README status updated. Remaining gaps in that doc's §5.3.
   - [ ] full gates, drills, device matrix, screenshots in `en` and `ar`
   - [ ] 2.0.0 tagged, deployed, released
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path

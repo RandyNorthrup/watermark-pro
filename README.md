@@ -6,6 +6,14 @@ editor with crop and resize, storage, sharing, multi-format export, and
 role-based access control. A spiritual competitor to eZy Watermark, MIT
 licensed, hosted on Cloudflare Workers at `watermark.blowmoney.net`.
 
+As of the M19 competitor re-check (2026-09-08) it matches or exceeds eZy
+Watermark on every axis bar font count and sticker packs, and is the only tool
+in the field to combine video **and** PDF watermarking, an invisible mark with a
+read-back verify page, organisation roles with an audit trail, secure signed
+share links, SSRF-guarded URL import and a browser hot-folder, and twelve
+languages (incl. Arabic RTL) — see `docs/competitor-research.md` §5. Remaining
+gaps (fonts, HEIC/RAW input, gradient fill, sticker library) are tracked there.
+
 **Status:** milestones M1 (foundation: accounts, organizations, roles, audit
 trail, design system), M2 (watermark engine: smart placement, auto contrast,
 tiling, PNG/JPEG/WebP output in a Web Worker) M3 (watermark library:
