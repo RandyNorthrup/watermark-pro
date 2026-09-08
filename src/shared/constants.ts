@@ -127,7 +127,7 @@ export const CLEAR_SITE_DATA_ON_SIGN_OUT = '"cache", "storage"'
 
 /** How long client-error and health-check rows are kept before an insert prunes them. */
 export const OBSERVABILITY_RETENTION_DAYS = 7
-const SECONDS_PER_DAY = 86_400
+export const SECONDS_PER_DAY = 86_400
 /** The retention window in milliseconds; an insert prunes rows older than this. */
 export const OBSERVABILITY_RETENTION_MS =
   OBSERVABILITY_RETENTION_DAYS * SECONDS_PER_DAY * MILLISECONDS_PER_SECOND
