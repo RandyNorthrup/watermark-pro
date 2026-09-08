@@ -27,7 +27,6 @@ import {
   type Orientation,
 } from '../../../shared/adjustments'
 import { CLOUD_SAVE_FOLDER, MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
-import type { WatermarkSpec } from '../../../shared/watermark'
 import {
   type BulkFile,
   canPickDirectory,
@@ -73,7 +72,9 @@ import { CloudImportButtons } from '../import/cloud-import-buttons'
 import { CloudSaveButtons } from '../import/cloud-save-buttons'
 import { TakePhotoButton } from '../import/take-photo-button'
 import { UrlImportDialog } from '../import/url-import-dialog'
+import { PresetChecklist } from '../presets/preset-checklist'
 import { PresetGate } from '../presets/preset-gate'
+import { selectedSpecs } from '../presets/selected-specs'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
@@ -199,7 +200,6 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
     useBulkQueue(organizationId)
   const inputRef = useRef<HTMLInputElement>(null)
   const folderInputRef = useRef<HTMLInputElement>(null)
-  const presetsHintId = useId()
   const [files, setFiles] = useState<BulkFile[]>([])
   const [namePattern, setNamePattern] = useState(DEFAULT_NAME_PATTERN)
   const [showAll, setShowAll] = useState(false)
@@ -244,10 +244,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   const queryClient = useQueryClient()
   const [timing, setTiming] = useState<Timing | null>(null)
 
-  const specs: WatermarkSpec[] = presetIds.flatMap((id) => {
-    const preset = presets.data?.find((candidate) => candidate.id === id)
-    return preset === undefined ? [] : [preset.spec]
-  })
+  const specs = selectedSpecs(presetIds, presets.data)
   const hasPresets = specs.length > 0
   /** The gallery records one preset per photo: the first one applied. */
   const presetId = presetIds[0] ?? null
@@ -787,39 +784,13 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
           </Card>
 
           <Card className="flex flex-col gap-5">
-            <fieldset className="flex flex-col gap-2" aria-describedby={presetsHintId}>
-              <legend className="mb-1.5 text-sm font-medium">Presets</legend>
-              <ul className="flex flex-col gap-1">
-                {list.map((candidate) => {
-                  const order = presetIds.indexOf(candidate.id)
-                  return (
-                    <li key={candidate.id}>
-                      <label className="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2 text-sm hover:bg-brand-50/60 dark:hover:bg-brand-900/20">
-                        <input
-                          type="checkbox"
-                          checked={order !== -1}
-                          disabled={snapshot.isRunning}
-                          onChange={(event) => {
-                            togglePreset(candidate.id, event.currentTarget.checked)
-                          }}
-                          className="size-4 accent-brand-600"
-                        />
-                        <span className="min-w-0 flex-1 truncate">{candidate.name}</span>
-                        {order === -1 ? null : (
-                          <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-800 dark:bg-brand-900/50 dark:text-brand-100">
-                            {String(order + 1)}
-                          </span>
-                        )}
-                      </label>
-                    </li>
-                  )
-                })}
-              </ul>
-              <p id={presetsHintId} className="text-xs text-ink-muted">
-                Tick one or more; they are applied in the order ticked, later ones over earlier
-                ones.
-              </p>
-            </fieldset>
+            <PresetChecklist
+              presets={list}
+              selectedIds={presetIds}
+              disabled={snapshot.isRunning}
+              onToggle={togglePreset}
+              hint="Tick one or more; they are applied in the order ticked, later ones over earlier ones."
+            />
             <div className="flex flex-col gap-1.5">
               <span className="text-sm font-medium">Format</span>
               <Select

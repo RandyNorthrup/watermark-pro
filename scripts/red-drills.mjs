@@ -566,6 +566,58 @@ export const DRILLS = [
     replace: 'if (false) {\n      throw apiErrors.unsupportedMedia()',
     ...unitWorker('src/worker/imports.test.ts'),
   },
+  // --- M17: video watermarking ---------------------------------------------
+  {
+    name: 'Video: limits checked after decoding',
+    file: 'src/client/video/probe.ts',
+    find: 'if (limit !== null) {',
+    replace: 'if (limit !== null && false) {',
+    ...browser('src/client/video/probe.browser.test.ts'),
+  },
+  {
+    name: 'Video: frames never closed',
+    file: 'src/client/video/transcode.ts',
+    find: '    sample.draw(ctx, 0, 0, size.width, size.height)\n    sample.close()',
+    replace: '    sample.draw(ctx, 0, 0, size.width, size.height)',
+    ...browser('src/client/video/transcode.browser.test.ts'),
+  },
+  {
+    name: 'Video: mark drawn on the first frame only',
+    file: 'src/client/video/transcode.ts',
+    find: '    for (const mark of marks) {\n      composeMark(ctx, size, map, mark)\n    }',
+    replace:
+      '    if (index === 0) {\n      for (const mark of marks) {\n        composeMark(ctx, size, map, mark)\n      }\n    }',
+    ...browser('src/client/video/transcode.browser.test.ts'),
+  },
+  {
+    name: 'Video: audio dropped',
+    file: 'src/client/video/transcode.ts',
+    find: 'const track = await input.getPrimaryAudioTrack()',
+    replace: 'const track = null',
+    ...browser('src/client/video/transcode.browser.test.ts'),
+  },
+  // --- M17: PDF ("Documents") watermarking ---------------------------------
+  {
+    name: 'PDF: last page unmarked',
+    file: 'src/client/pdf/watermark-pdf.ts',
+    find: 'for (const page of pages) {',
+    replace: 'for (const page of pages.slice(0, -1)) {',
+    ...unitClient('src/client/pdf/watermark-pdf.test.ts'),
+  },
+  {
+    name: 'PDF: page cap ignored',
+    file: 'src/client/pdf/watermark-pdf.ts',
+    find: 'if (pages.length > MAX_PDF_PAGES) {',
+    replace: 'if (false) {',
+    ...unitClient('src/client/pdf/watermark-pdf.test.ts'),
+  },
+  {
+    name: 'PDF: smart placement used on documents',
+    file: 'src/client/pdf/raster-layout.ts',
+    find: "return { ...spec, placement: { mode: 'anchor', anchor: 'bottom-right' } }",
+    replace: 'return spec',
+    ...unitClient('src/client/pdf/raster-layout.test.ts'),
+  },
   // --- Gates: each must refuse the defect it exists for ---------------------
   {
     name: 'Gate: ESLint rejects `any`',

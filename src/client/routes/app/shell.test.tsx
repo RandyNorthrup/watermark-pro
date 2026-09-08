@@ -15,8 +15,8 @@ import { renderApp } from '../../test-support/render-app'
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 
 const client = fakeAuth
-/** Dashboard, Library, Editor, Bulk, Gallery, Shares, Members, Audit log. */
-const NAV_ITEM_COUNT = 8
+/** Dashboard, Library, Editor, Bulk, Video, Documents, Gallery, Shares, Members, Audit log. */
+const NAV_ITEM_COUNT = 10
 
 beforeEach(() => {
   installFakeAuth()

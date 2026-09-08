@@ -7,6 +7,38 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-09-07
+
+M17 (video and PDF): the same presets, placement and contrast now go onto video
+and onto every page of a PDF, both in the browser, from two new tools.
+
+### Added
+
+- **Video** tool (`/app/video`): drop one MP4, WebM or MOV (up to 2 GB, 600 s,
+  3840 px) and watermark every frame with the chosen layers, keeping the audio.
+  Runs entirely in a dedicated Web Worker with WebCodecs and `mediabunny`; picks
+  the best codec the browser can encode and shows the output up front ("Saves as
+  MP4 (H.264)"). Quality is a bitrate ladder (Low/Standard/High) and the output
+  fits Original, 1080p or 720p. Audio is copied when it fits the container, else
+  re-encoded at 128 kbit/s. Progress shows a frame count and ETA, with Cancel.
+  Over-limit files are refused before any frame is decoded. Nothing is uploaded;
+  the gallery does not store videos. Browsers without a WebCodecs `VideoEncoder`
+  see an unsupported message.
+- **Documents** tool (`/app/documents`): watermark every page of up to 50 PDFs
+  (≤ 50 MB, ≤ 200 pages each) with `pdf-lib`. The layers are rasterised once per
+  distinct page size at 150 dpi and drawn on every page; smart placement falls
+  back to a bottom-right anchor on the blank page. Output is
+  `<name>-watermarked.pdf` (a ZIP for several), the Info dictionary kept with
+  `Producer` set to "Watermark Pro". Encrypted PDFs are refused. Runs in the
+  browser; nothing is uploaded.
+
+### Changed
+
+- The bulk and documents tools share one preset checklist (`PresetChecklist` +
+  `selectedSpecs`).
+- `mediabunny` (video) and `pdf-lib` (documents) each load in their own route
+  chunk, so no other page carries them.
+
 ## [1.8.2] - 2026-09-07
 
 M16 (cloud read **and** write): save watermarked photos straight back to Google

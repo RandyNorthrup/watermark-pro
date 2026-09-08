@@ -103,6 +103,23 @@ Only the `main` branch and the latest tagged release receive fixes.
 - QR-code marks (M10) are rendered from the content typed into the preset;
   the content is stored with the preset (limited to 512 characters) and
   rendered as pixels, never interpreted or fetched by the app.
+- Video watermarking (M17) runs entirely in the browser: each file is demuxed,
+  decoded, watermarked frame by frame and re-encoded with WebCodecs and
+  `mediabunny` inside a dedicated Web Worker with no network or storage access,
+  so no bytes leave the device. Size, duration and dimension limits
+  (`MAX_VIDEO_BYTES`, `MAX_VIDEO_SECONDS`, `MAX_VIDEO_SIDE`) are enforced from
+  the file's metadata before any frame is decoded, and the watermarked file is
+  downloaded through a same-origin object URL; the gallery does not store videos.
+- PDF watermarking (M17) runs entirely in the browser: `pdf-lib` parses the
+  chosen documents' untrusted bytes in the page, with no Worker or server
+  exposure and no upload. Encrypted documents are refused rather than
+  processed, and each file is bounded before work begins by a size cap
+  (`MAX_PDF_BYTES`), a page cap (`MAX_PDF_PAGES`, enforced in
+  `watermark-pdf.ts`) and a per-batch file cap (`MAX_PDF_FILES`); the marks are
+  drawn from the same presets as photos and the watermarked file is downloaded
+  through a same-origin object URL. `pdf-lib` is unmaintained (last release
+  2021); its maintained fork `@cantoo/pdf-lib` is the migration target if a fix
+  is ever needed (PLAN.md §3.1).
 
 - Bot protection (M8): when `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
   are configured, sign-up and password-reset requests must carry a Turnstile

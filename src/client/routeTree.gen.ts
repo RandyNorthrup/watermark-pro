@@ -23,11 +23,13 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppAdminRouteImport } from './routes/app/admin'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppBulkRouteImport } from './routes/app/bulk'
+import { Route as AppDocumentsRouteImport } from './routes/app/documents'
 import { Route as AppEditorRouteImport } from './routes/app/editor'
 import { Route as AppGalleryRouteImport } from './routes/app/gallery'
 import { Route as AppMembersRouteImport } from './routes/app/members'
 import { Route as AppSharesRouteImport } from './routes/app/shares'
 import { Route as AppVerifyRouteImport } from './routes/app/verify'
+import { Route as AppVideoRouteImport } from './routes/app/video'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as AppLibraryIndexRouteImport } from './routes/app/library/index'
 import { Route as AppLibraryWatermarkIdRouteImport } from './routes/app/library/$watermarkId'
@@ -105,6 +107,11 @@ const AppBulkRoute = AppBulkRouteImport.update({
   path: '/bulk',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppDocumentsRoute = AppDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppEditorRoute = AppEditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -128,6 +135,11 @@ const AppSharesRoute = AppSharesRouteImport.update({
 const AppVerifyRoute = AppVerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppVideoRoute = AppVideoRouteImport.update({
+  id: '/video',
+  path: '/video',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
@@ -170,11 +182,13 @@ export interface FileRoutesByFullPath {
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/bulk': typeof AppBulkRoute
+  '/app/documents': typeof AppDocumentsRoute
   '/app/editor': typeof AppEditorRoute
   '/app/gallery': typeof AppGalleryRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
+  '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
   '/app/': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
@@ -195,11 +209,13 @@ export interface FileRoutesByTo {
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/bulk': typeof AppBulkRoute
+  '/app/documents': typeof AppDocumentsRoute
   '/app/editor': typeof AppEditorRoute
   '/app/gallery': typeof AppGalleryRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
+  '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
   '/app': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
@@ -222,11 +238,13 @@ export interface FileRoutesById {
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/bulk': typeof AppBulkRoute
+  '/app/documents': typeof AppDocumentsRoute
   '/app/editor': typeof AppEditorRoute
   '/app/gallery': typeof AppGalleryRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
+  '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
   '/app/': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
@@ -250,11 +268,13 @@ export interface FileRouteTypes {
     | '/app/admin'
     | '/app/audit'
     | '/app/bulk'
+    | '/app/documents'
     | '/app/editor'
     | '/app/gallery'
     | '/app/members'
     | '/app/shares'
     | '/app/verify'
+    | '/app/video'
     | '/share/$token'
     | '/app/'
     | '/app/library/$watermarkId'
@@ -275,11 +295,13 @@ export interface FileRouteTypes {
     | '/app/admin'
     | '/app/audit'
     | '/app/bulk'
+    | '/app/documents'
     | '/app/editor'
     | '/app/gallery'
     | '/app/members'
     | '/app/shares'
     | '/app/verify'
+    | '/app/video'
     | '/share/$token'
     | '/app'
     | '/app/library/$watermarkId'
@@ -301,11 +323,13 @@ export interface FileRouteTypes {
     | '/app/admin'
     | '/app/audit'
     | '/app/bulk'
+    | '/app/documents'
     | '/app/editor'
     | '/app/gallery'
     | '/app/members'
     | '/app/shares'
     | '/app/verify'
+    | '/app/video'
     | '/share/$token'
     | '/app/'
     | '/app/library/$watermarkId'
@@ -428,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBulkRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/documents': {
+      id: '/app/documents'
+      path: '/documents'
+      fullPath: '/app/documents'
+      preLoaderRoute: typeof AppDocumentsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/editor': {
       id: '/app/editor'
       path: '/editor'
@@ -461,6 +492,13 @@ declare module '@tanstack/react-router' {
       path: '/verify'
       fullPath: '/app/verify'
       preLoaderRoute: typeof AppVerifyRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/video': {
+      id: '/app/video'
+      path: '/video'
+      fullPath: '/app/video'
+      preLoaderRoute: typeof AppVideoRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/share/$token': {
@@ -505,11 +543,13 @@ interface AppRouteRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppAuditRoute: typeof AppAuditRoute
   AppBulkRoute: typeof AppBulkRoute
+  AppDocumentsRoute: typeof AppDocumentsRoute
   AppEditorRoute: typeof AppEditorRoute
   AppGalleryRoute: typeof AppGalleryRoute
   AppMembersRoute: typeof AppMembersRoute
   AppSharesRoute: typeof AppSharesRoute
   AppVerifyRoute: typeof AppVerifyRoute
+  AppVideoRoute: typeof AppVideoRoute
   AppIndexRoute: typeof AppIndexRoute
   AppLibraryWatermarkIdRoute: typeof AppLibraryWatermarkIdRoute
   AppLibraryNewRoute: typeof AppLibraryNewRoute
@@ -521,11 +561,13 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppAuditRoute: AppAuditRoute,
   AppBulkRoute: AppBulkRoute,
+  AppDocumentsRoute: AppDocumentsRoute,
   AppEditorRoute: AppEditorRoute,
   AppGalleryRoute: AppGalleryRoute,
   AppMembersRoute: AppMembersRoute,
   AppSharesRoute: AppSharesRoute,
   AppVerifyRoute: AppVerifyRoute,
+  AppVideoRoute: AppVideoRoute,
   AppIndexRoute: AppIndexRoute,
   AppLibraryWatermarkIdRoute: AppLibraryWatermarkIdRoute,
   AppLibraryNewRoute: AppLibraryNewRoute,

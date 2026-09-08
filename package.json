@@ -1,6 +1,6 @@
 {
   "name": "watermark-pro",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "private": true,
   "description": "Enterprise-grade photo watermarking on Cloudflare Workers: bulk jobs, watermark library, smart placement, editor, sharing, RBAC.",
   "license": "MIT",
@@ -106,6 +106,8 @@
     "hono": "4.13.7",
     "lucide": "1.37.0",
     "lucide-react": "1.37.0",
+    "mediabunny": "1.55.5",
+    "pdf-lib": "1.17.1",
     "qrcode-generator": "2.0.4",
     "radix-ui": "1.6.7",
     "react": "19.2.8",

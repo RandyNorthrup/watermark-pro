@@ -15,10 +15,26 @@ const UI_CHUNK_GROUP = {
   test: /node_modules[\\/](lucide-react|radix-ui|@radix-ui|class-variance-authority|clsx|tailwind-merge)[\\/]/,
 }
 
+/**
+ * mediabunny (video, M17) and pdf-lib (documents, M17) are large and each is
+ * reached only from its own route, so they ride in their own long-cached chunk
+ * instead of weighing down any page that does not watermark that media type.
+ */
+const VIDEO_CHUNK_GROUP = {
+  name: 'video',
+  test: /node_modules[\\/]mediabunny[\\/]/,
+}
+const PDF_CHUNK_GROUP = {
+  name: 'pdf',
+  test: /node_modules[\\/]pdf-lib[\\/]/,
+}
+
 export default defineConfig({
   build: {
     rolldownOptions: {
-      output: { codeSplitting: { groups: [UI_CHUNK_GROUP] } },
+      output: {
+        codeSplitting: { groups: [UI_CHUNK_GROUP, VIDEO_CHUNK_GROUP, PDF_CHUNK_GROUP] },
+      },
     },
   },
   plugins: [

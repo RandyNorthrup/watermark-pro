@@ -107,6 +107,24 @@ export default defineConfig({
         'src/client/lib/imports/dropbox-save.ts',
         'src/client/lib/imports/onedrive.ts',
         'src/client/components/import/onedrive-dialog.tsx',
+        // Video watermarking (M17): WebCodecs, mediabunny, OffscreenCanvas and a
+        // dedicated Web Worker, none of which coverage can instrument. Exercised
+        // by the `browser` project (capabilities/probe/transcode browser tests)
+        // and the video page test; the pure decisions (codec/container mapping,
+        // bitrate scaling, limits, ETA) live in the fully tested video/plan.ts.
+        // See PLAN.md §9.
+        'src/client/video/frame.ts',
+        'src/client/video/capabilities.ts',
+        'src/client/video/probe.ts',
+        'src/client/video/transcode.ts',
+        'src/client/video/worker.ts',
+        'src/client/video/worker-client.ts',
+        'src/client/components/video/video-tool.tsx',
+        // PDF watermarking (M17): pure OffscreenCanvas drawing of the mark onto a
+        // page-sized canvas; jsdom has no 2D context. Exercised by
+        // pdf/raster.browser.test.ts; the pure decisions live in the tested
+        // pdf/raster-layout.ts. See PLAN.md §9.
+        'src/client/pdf/raster.ts',
         // D1 and binding wiring that only executes inside workerd. Covered
         // functionally by the `workers` project, which cannot report coverage.
         'src/worker/db/**',

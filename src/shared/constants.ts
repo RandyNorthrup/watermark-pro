@@ -235,3 +235,54 @@ export const MICROSOFT_GRAPH_ROOT = 'https://graph.microsoft.com/v1.0'
 export const MICROSOFT_OAUTH_REDIRECT_PATH = '/oauth/microsoft'
 /** Folder each provider saves watermarked photos into (created if missing). */
 export const CLOUD_SAVE_FOLDER = 'Watermark Pro'
+
+/**
+ * Video watermarking (M17). Everything runs in the browser through WebCodecs and
+ * mediabunny; a file larger than any limit is refused before it is decoded.
+ */
+export const MAX_VIDEO_BYTES = 2 * 1024 * BYTES_PER_MEGABYTE
+export const MAX_VIDEO_SECONDS = 600
+export const MAX_VIDEO_SIDE = 3840
+/**
+ * Encoder codec preference, best first (docs/plans/m17 "Codec choice"): H.264 in
+ * MP4, then HEVC in MP4 (Safari), then VP9 and AV1 in WebM. The first the running
+ * browser can encode wins; the container follows the codec (see CODEC_CONTAINER).
+ * These are mediabunny codec ids, kept as strings so this shared module pulls in
+ * no browser-only dependency.
+ */
+export const VIDEO_CODEC_PREFERENCE = ['avc', 'hevc', 'vp9', 'av1'] as const
+/** Audio encoder preference: AAC for MP4, Opus for WebM. */
+export const AUDIO_CODEC_PREFERENCE = ['aac', 'opus'] as const
+/** Which container each video codec is muxed into. */
+export const CODEC_CONTAINER = { avc: 'mp4', hevc: 'mp4', vp9: 'webm', av1: 'webm' } as const
+/**
+ * Target video bitrate for a 1080p frame, in bits per second; the transcoder
+ * scales these by the actual pixel count so smaller frames get proportionally
+ * fewer bits. Low/Standard/High are the user-facing "Quality" choices.
+ */
+export const VIDEO_BITRATE_LADDER = {
+  low: 2_000_000,
+  standard: 6_000_000,
+  high: 12_000_000,
+} as const
+/** Reference frame area the ladder is quoted at (1920×1080). */
+export const VIDEO_BITRATE_REFERENCE_PIXELS = 1920 * 1080
+/** Heights offered by the "Fit" resolution options; "Original" keeps the source. */
+export const VIDEO_FIT_HEIGHTS = { '1080p': 1080, '720p': 720 } as const
+/** Bitrate for re-encoded audio when it cannot be copied through, in bits per second. */
+export const AUDIO_REENCODE_BITRATE = 128_000
+
+/**
+ * PDF watermarking (M17). pdf-lib parses and writes each document in the browser;
+ * the chosen layers are rasterised once per distinct page size and drawn on every
+ * page. Encrypted documents are refused.
+ */
+export const MAX_PDF_BYTES = 50 * BYTES_PER_MEGABYTE
+export const MAX_PDF_PAGES = 200
+export const MAX_PDF_FILES = 50
+/** Resolution the marks are rasterised at before being drawn onto the page. */
+export const PDF_RASTER_DPI = 150
+/** Points per inch in the PDF coordinate system (a PDF user unit is 1/72 inch). */
+export const PDF_POINTS_PER_INCH = 72
+/** Written into the output PDF's Info dictionary. */
+export const PDF_PRODUCER = 'Watermark Pro'

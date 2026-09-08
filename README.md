@@ -325,6 +325,32 @@ input and an output folder and any new photo dropped into the input is
 watermarked with the ticked presets and written to the output while the page
 stays open — a hands-free hot folder no competitor offers.
 
+## Video
+
+Watermark MP4, WebM and MOV in the browser with WebCodecs — the same presets,
+placement and contrast as photos, on every frame, with the audio kept. Files up
+to 2 GB, 600 s and 3840 px are accepted; anything larger is refused before a
+single frame is decoded. "Quality" is a bitrate ladder (Low 2, Standard 6, High
+12 Mbit/s at 1080p, scaled by pixel count) and the output fits Original, 1080p
+or 720p. The container follows whichever codec the browser can encode — MP4
+(H.264/HEVC) or WebM (VP9/AV1) — and is shown before you start ("Saves as MP4
+(H.264)"). Audio is copied without re-encoding when it fits the container
+(AAC→MP4, Opus→WebM), otherwise re-encoded at 128 kbit/s. Everything runs in a
+dedicated Web Worker; nothing is uploaded and the gallery does not store videos.
+Browsers without a WebCodecs `VideoEncoder` (Firefox ≤ 129, older Safari) see an
+unsupported message; Chrome, Edge and Safari 17+ can encode.
+
+## Documents
+
+Watermark every page of a PDF with the same presets as photos. Drop or pick up
+to 50 PDFs (≤ 50 MB, ≤ 200 pages each); the ticked layers are rasterised once
+per distinct page size at 150 dpi and drawn on every page with `pdf-lib`. Smart
+placement reads a photo, so on a blank page it falls back to a bottom-right
+anchor (the tool says so); choose a corner or a custom position instead. Output
+is `<name>-watermarked.pdf`, one per input or a ZIP for several, with the Info
+dictionary kept, `Producer` set to "Watermark Pro" and `ModDate` refreshed.
+Encrypted PDFs are refused. Everything runs in the browser; nothing is uploaded.
+
 ## Exports and metadata
 
 Every export, from the editor or the bulk tool, is re-encoded from pixels by
