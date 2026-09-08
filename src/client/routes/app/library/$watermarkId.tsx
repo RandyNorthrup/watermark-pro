@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi, useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { WatermarkDesigner } from '../../../components/designer/watermark-designer'
 import { Alert } from '../../../components/ui/alert'
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/app/library/$watermarkId')({
 })
 
 function EditPresetPage() {
+  const { t } = useTranslation()
   const organization = appRoute.useLoaderData()
   const membership = Route.useLoaderData()
   const { watermarkId } = Route.useParams()
@@ -28,21 +30,21 @@ function EditPresetPage() {
   })
 
   if (organization === null) {
-    return <Alert tone="info">Create or join an organization first.</Alert>
+    return <Alert tone="info">{t('library.orgRequiredShort')}</Alert>
   }
   if (presets.isPending) {
-    return <Spinner className="size-6" label="Loading preset" />
+    return <Spinner className="size-6" label={t('library.loadingPreset')} />
   }
   if (presets.isError) {
     return (
-      <Alert tone="error" title="Could not load the preset">
+      <Alert tone="error" title={t('library.loadPresetErrorTitle')}>
         {describeError(presets.error)}
       </Alert>
     )
   }
   const preset = presets.data.find((candidate) => candidate.id === watermarkId)
   if (preset === undefined) {
-    return <Alert tone="error">That preset no longer exists.</Alert>
+    return <Alert tone="error">{t('library.presetGone')}</Alert>
   }
   const canManage = canRole(membership?.role, { watermark: ['update'] })
   return (
@@ -50,7 +52,7 @@ function EditPresetPage() {
       <header>
         <h1 className="text-3xl font-semibold tracking-tight">{preset.name}</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          {canManage ? 'Changes apply to everyone who uses this preset.' : 'Read-only view.'}
+          {t(canManage ? 'library.editSubtitleManage' : 'library.editSubtitleReadOnly')}
         </p>
       </header>
       <WatermarkDesigner

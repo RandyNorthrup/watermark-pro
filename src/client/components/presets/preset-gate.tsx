@@ -1,6 +1,7 @@
 import type { UseQueryResult } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { WatermarkDto } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
@@ -19,21 +20,22 @@ interface PresetGateProps {
  * preset; renders the children with the loaded list otherwise.
  */
 export function PresetGate({ query, emptyHint, children }: PresetGateProps) {
+  const { t } = useTranslation()
   if (query.isPending) {
-    return <Spinner className="size-5" label="Loading presets" />
+    return <Spinner className="size-5" label={t('presets.loading')} />
   }
   if (query.isError) {
     return (
-      <Alert tone="error" title="Could not load presets">
+      <Alert tone="error" title={t('presets.loadErrorTitle')}>
         {describeError(query.error)}
       </Alert>
     )
   }
   if (query.data.length === 0) {
     return (
-      <Alert tone="info" title="No presets yet">
+      <Alert tone="info" title={t('presets.emptyTitle')}>
         <Link to="/app/library/new" className="font-medium underline">
-          Create a preset in the library
+          {t('presets.createInLibrary')}
         </Link>{' '}
         {emptyHint}
       </Alert>

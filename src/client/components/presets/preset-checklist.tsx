@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { WatermarkDto } from '../../../shared/api'
 
@@ -25,10 +26,11 @@ export function PresetChecklist({
   onToggle,
   hint,
 }: PresetChecklistProps) {
+  const { t } = useTranslation()
   const hintId = useId()
   return (
     <fieldset className="flex flex-col gap-2" aria-describedby={hintId}>
-      <legend className="mb-1.5 text-sm font-medium">Presets</legend>
+      <legend className="mb-1.5 text-sm font-medium">{t('presets.legend')}</legend>
       <ul className="flex flex-col gap-1">
         {presets.map((candidate) => {
           const order = selectedIds.indexOf(candidate.id)

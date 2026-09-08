@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { Images, Layers, ShieldCheck, Sparkles, Users, Wand2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { APP_TAGLINE } from '../../shared/constants'
 import { BrandMark } from '../components/brand-mark'
@@ -20,98 +21,95 @@ export const Route = createFileRoute('/')({
 const FEATURES = [
   {
     icon: Layers,
-    title: 'Bulk jobs',
-    body: 'Drop hundreds of photos and watermark them all in one pass, in your browser.',
+    titleKey: 'landing.features.bulk.title',
+    bodyKey: 'landing.features.bulk.body',
   },
   {
     icon: Images,
-    title: 'Watermark library',
-    body: 'Save text, symbol and logo marks once; apply them anywhere with a click.',
+    titleKey: 'landing.features.library.title',
+    bodyKey: 'landing.features.library.body',
   },
   {
     icon: Wand2,
-    title: 'Smart placement',
-    body: 'Each photo is analysed so the mark lands where it reads best and stays off the subject.',
+    titleKey: 'landing.features.smart.title',
+    bodyKey: 'landing.features.smart.body',
   },
   {
     icon: Sparkles,
-    title: 'Auto contrast',
-    body: 'Light or dark variant and outline strength chosen per image, adjustable when you disagree.',
+    titleKey: 'landing.features.contrast.title',
+    bodyKey: 'landing.features.contrast.body',
   },
   {
     icon: Users,
-    title: 'Teams and roles',
-    body: 'Organizations with owner, admin, editor and viewer roles, enforced on the server.',
+    titleKey: 'landing.features.teams.title',
+    bodyKey: 'landing.features.teams.body',
   },
   {
     icon: ShieldCheck,
-    title: 'Built to be trusted',
-    body: 'Strict content security policy, audited actions, and photos that never leave your browser unless you save them.',
+    titleKey: 'landing.features.trusted.title',
+    bodyKey: 'landing.features.trusted.body',
   },
 ] as const
 
 function LandingPage() {
+  const { t } = useTranslation()
   return (
     <div className="flex min-h-svh flex-col">
       <header className="flex items-center justify-between gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4 sm:px-6">
         <BrandMark />
-        <nav aria-label="Account" className="flex items-center gap-1 sm:gap-2">
+        <nav aria-label={t('landing.nav')} className="flex items-center gap-1 sm:gap-2">
           <ThemeToggle />
           <Link
             to="/login"
             className="px-3 py-2 text-sm font-medium whitespace-nowrap text-ink-muted hover:text-ink"
           >
-            Sign in
+            {t('landing.signIn')}
           </Link>
           <Link
             to="/signup"
             className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium whitespace-nowrap text-white shadow-sm hover:bg-brand-700"
           >
-            Create account
+            {t('landing.createAccount')}
           </Link>
         </nav>
       </header>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 py-10 sm:px-6 sm:py-16 md:gap-16">
         <section className="flex max-w-3xl flex-col gap-6">
           <p className="text-sm font-semibold tracking-wide text-brand-600 uppercase dark:text-brand-300">
-            Free and open source
+            {t('landing.eyebrow')}
           </p>
           <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
             {APP_TAGLINE}
           </h1>
-          <p className="max-w-prose text-lg text-ink-muted">
-            Protect your photography without losing the picture. Watermark Pro runs the heavy
-            lifting in your browser, keeps your originals private, and gives your team roles that
-            actually mean something.
-          </p>
+          <p className="max-w-prose text-lg text-ink-muted">{t('landing.heroBody')}</p>
           <div className="flex flex-wrap gap-3">
             <Link
               to="/signup"
               className="rounded-lg bg-brand-600 px-5 py-3 text-center text-sm font-medium text-white shadow-sm hover:bg-brand-700 max-sm:w-full"
             >
-              Create your workspace
+              {t('landing.createWorkspace')}
             </Link>
             <Link
               to="/login"
               className="rounded-lg border border-line bg-surface-raised px-5 py-3 text-center text-sm font-medium hover:bg-brand-50 max-sm:w-full"
             >
-              Sign in
+              {t('landing.signIn')}
             </Link>
           </div>
         </section>
         <section aria-labelledby="features-heading" className="flex flex-col gap-6">
           <h2 id="features-heading" className="text-2xl font-semibold tracking-tight">
-            What it does
+            {t('landing.featuresHeading')}
           </h2>
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map(({ icon: Icon, title, body }) => (
-              <li key={title}>
+            {FEATURES.map(({ icon: Icon, titleKey, bodyKey }) => (
+              <li key={titleKey}>
                 <Card className="flex h-full flex-col gap-3">
                   <span className="inline-flex size-9 items-center justify-center rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-200">
                     <Icon aria-hidden="true" className="size-5" />
                   </span>
-                  <h3 className="font-semibold">{title}</h3>
-                  <p className="text-sm text-ink-muted">{body}</p>
+                  <h3 className="font-semibold">{t(titleKey)}</h3>
+                  <p className="text-sm text-ink-muted">{t(bodyKey)}</p>
                 </Card>
               </li>
             ))}
@@ -119,12 +117,12 @@ function LandingPage() {
         </section>
       </main>
       <footer className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-line px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center text-sm text-ink-muted">
-        <span>Watermark Pro is open source under the MIT licence.</span>
+        <span>{t('landing.footer')}</span>
         <Link to="/privacy" className="hover:text-ink hover:underline">
-          Privacy
+          {t('landing.privacy')}
         </Link>
         <Link to="/terms" className="hover:text-ink hover:underline">
-          Terms
+          {t('landing.terms')}
         </Link>
       </footer>
     </div>

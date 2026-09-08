@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { Download, Share2, X } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 import type { PublicShare } from '../../shared/api'
 import { HTTP_STATUS } from '../../shared/constants'
@@ -30,6 +31,7 @@ type SharedPhoto = PublicShare['photos'][number]
 const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'long' })
 
 function SharePage() {
+  const { t } = useTranslation()
   const { token } = Route.useParams()
   const share = useQuery(publicShareQueryOptions(token))
   const [open, setOpen] = useState<SharedPhoto | null>(null)
@@ -55,17 +57,17 @@ function SharePage() {
         id="main"
         className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 md:px-8"
       >
-        {share.isPending ? <Spinner className="size-6" label="Loading photos" /> : null}
+        {share.isPending ? <Spinner className="size-6" label={t('share.loading')} /> : null}
         {share.isError ? (
           <div className="flex flex-col items-start gap-4">
-            <h1 className="text-3xl font-semibold tracking-tight">This link is not available</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">{t('share.unavailableTitle')}</h1>
             <p className="max-w-prose text-ink-muted">
               {share.error instanceof ApiRequestError && share.error.status === HTTP_STATUS.notFound
-                ? 'It may have expired or been revoked, or the address is incomplete. Ask whoever sent it for a new one.'
+                ? t('share.unavailableBody')
                 : describeError(share.error)}
             </p>
             <Link to="/" className={buttonVariants({ variant: 'secondary' })}>
-              About Watermark Pro
+              {t('share.about')}
             </Link>
           </div>
         ) : null}
@@ -75,11 +77,12 @@ function SharePage() {
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight">{share.data.title}</h1>
                 <p className="mt-1 text-sm text-ink-muted">
-                  {String(share.data.photos.length)} photo
-                  {share.data.photos.length === 1 ? '' : 's'}
+                  {t('share.photoCount', { count: share.data.photos.length })}
                   {share.data.expiresAt === null
                     ? ''
-                    : ` · available until ${dateFormatter.format(new Date(share.data.expiresAt))}`}
+                    : t('share.availableUntil', {
+                        date: dateFormatter.format(new Date(share.data.expiresAt)),
+                      })}
                 </p>
               </div>
               <Button
@@ -90,12 +93,12 @@ function SharePage() {
                 }}
               >
                 <Share2 aria-hidden="true" className="size-4" />
-                Share this link
+                {t('share.shareLink')}
               </Button>
             </div>
             {outcome === null ? null : (
               <p className="text-xs text-ink-muted" role="status">
-                {outcome === 'copied' ? 'Link copied to the clipboard.' : 'Link shared.'}
+                {t(outcome === 'copied' ? 'share.linkCopied' : 'share.linkShared')}
               </p>
             )}
             {shareError === null ? null : <Alert tone="error">{shareError}</Alert>}
@@ -104,7 +107,7 @@ function SharePage() {
                 <li key={photo.id}>
                   <button
                     type="button"
-                    aria-label={`Open ${photo.name}`}
+                    aria-label={t('share.openPhoto', { name: photo.name })}
                     onClick={() => {
                       setOpen(photo)
                     }}
@@ -127,11 +130,10 @@ function SharePage() {
         ) : null}
       </main>
       <footer className="border-t border-line px-4 py-4 text-center text-xs text-ink-muted">
-        Shared with{' '}
-        <Link to="/" className="font-medium underline">
-          Watermark Pro
-        </Link>
-        . Photos stay the property of their owner.
+        <Trans
+          i18nKey="share.footer"
+          components={{ home: <Link to="/" className="font-medium underline" /> }}
+        />
       </footer>
       <Dialog.Root
         open={open !== null}
@@ -162,10 +164,15 @@ function SharePage() {
                       className={buttonVariants({ variant: 'secondary', size: 'sm' })}
                     >
                       <Download aria-hidden="true" className="size-4" />
-                      Download
+                      {t('share.download')}
                     </a>
                     <Dialog.Close asChild>
-                      <Button type="button" variant="ghost" size="icon" aria-label="Close">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t('share.close')}
+                      >
                         <X aria-hidden="true" className="size-4" />
                       </Button>
                     </Dialog.Close>

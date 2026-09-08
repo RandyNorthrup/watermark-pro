@@ -1,5 +1,6 @@
 import { type QueryClient, useQuery } from '@tanstack/react-query'
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, type ErrorComponentProps, Outlet, redirect } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { AppShell } from '../../components/app-shell'
 import { Alert } from '../../components/ui/alert'
@@ -60,14 +61,19 @@ export const Route = createFileRoute('/app')({
     return await context.queryClient.query(activeOrganizationQueryOptions)
   },
   component: AppLayout,
-  errorComponent: ({ error }) => (
+  errorComponent: AppErrorBoundary,
+})
+
+function AppErrorBoundary({ error }: ErrorComponentProps) {
+  const { t } = useTranslation()
+  return (
     <main className="mx-auto max-w-xl p-8">
-      <Alert tone="error" title="Something went wrong">
+      <Alert tone="error" title={t('root.somethingWentWrong')}>
         {describeError(error)}
       </Alert>
     </main>
-  ),
-})
+  )
+}
 
 function AppLayout() {
   const { session, organizations } = Route.useRouteContext()

@@ -148,6 +148,14 @@
     "loadErrorTitle": "Could not load the library",
     "empty": "No presets yet. A preset combines a mark (text, symbol or logo) with placement, contrast and style settings.",
     "createFirst": "Create the first preset",
+    "orgRequiredShort": "Create or join an organization first.",
+    "loadingPreset": "Loading preset",
+    "loadPresetErrorTitle": "Could not load the preset",
+    "presetGone": "That preset no longer exists.",
+    "editSubtitleManage": "Changes apply to everyone who uses this preset.",
+    "editSubtitleReadOnly": "Read-only view.",
+    "cannotCreate": "Your role does not allow creating presets.",
+    "newPresetSubtitle": "Design the mark, decide where it goes, then save it to the library.",
     "openInEditor": "Open {{name}} in the editor",
     "deletePreset": "Delete {{name}}",
     "logoBadge": "logo",
@@ -889,6 +897,10 @@
       "description": "We sent a verification link to {{email}}. It expires in one hour.",
       "resent": "A new verification link is on its way.",
       "resend": "Resend verification email"
+    },
+    "tool": {
+      "title": "Verify a photo",
+      "description": "Check whether a PNG carries an invisible Watermark Pro mark and read its hidden message. Nothing leaves your browser."
     }
   },
   "errors": {
@@ -897,7 +909,164 @@
   "tokens": {},
   "filters": {},
   "a11y": {},
+  "presets": {
+    "loading": "Loading presets",
+    "loadErrorTitle": "Could not load presets",
+    "emptyTitle": "No presets yet",
+    "createInLibrary": "Create a preset in the library",
+    "legend": "Presets"
+  },
+  "landing": {
+    "nav": "Account",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "eyebrow": "Free and open source",
+    "heroBody": "Protect your photography without losing the picture. Watermark Pro runs the heavy lifting in your browser, keeps your originals private, and gives your team roles that actually mean something.",
+    "createWorkspace": "Create your workspace",
+    "featuresHeading": "What it does",
+    "features": {
+      "bulk": {
+        "title": "Bulk jobs",
+        "body": "Drop hundreds of photos and watermark them all in one pass, in your browser."
+      },
+      "library": {
+        "title": "Watermark library",
+        "body": "Save text, symbol and logo marks once; apply them anywhere with a click."
+      },
+      "smart": {
+        "title": "Smart placement",
+        "body": "Each photo is analysed so the mark lands where it reads best and stays off the subject."
+      },
+      "contrast": {
+        "title": "Auto contrast",
+        "body": "Light or dark variant and outline strength chosen per image, adjustable when you disagree."
+      },
+      "teams": {
+        "title": "Teams and roles",
+        "body": "Organizations with owner, admin, editor and viewer roles, enforced on the server."
+      },
+      "trusted": {
+        "title": "Built to be trusted",
+        "body": "Strict content security policy, audited actions, and photos that never leave your browser unless you save them."
+      }
+    },
+    "footer": "Watermark Pro is open source under the MIT licence.",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "legal": {
+    "signIn": "Sign in",
+    "lastUpdated": "Last updated {{date}}",
+    "readSibling": "Read the <sibling>{{siblingLabel}}</sibling>, or return to the <home>home page</home>.",
+    "footer": "Watermark Pro is open source under the MIT licence.",
+    "privacy": {
+      "title": "Privacy",
+      "intro": "Watermark Pro is built so your photographs stay yours. This page explains what happens to your images and your account information in plain language, drawn from the controls the project actually enforces.",
+      "siblingLabel": "terms of service",
+      "photos": {
+        "heading": "Your photos stay in your browser",
+        "p1": "Watermarking runs entirely on your device. The editor and the bulk tool decode your photos in the browser, render them in Web Workers, and build the finished files in memory. Previewing a watermark never uploads the photo it is applied to.",
+        "p2": "Exports are assembled locally and handed to you through a same-origin download link that is released the instant the download starts. Your originals are never sent to a server to be previewed or watermarked."
+      },
+      "storage": {
+        "heading": "What we store, and only when you ask",
+        "p1": "Nothing is kept on our servers unless you choose to save it. When you save a photo, a thumbnail, or a logo, it is stored in Cloudflare R2 under keys scoped to your organization, never made public, and served only to signed-in members of that organization with private caching.",
+        "p2": "Each organization has photo, logo, and storage quotas. Every upload and deletion is recorded in the audit trail."
+      },
+      "metadata": {
+        "heading": "Metadata is removed by default",
+        "p1": "Every export is re-encoded from pixels, so no metadata is carried over unless you decide to keep it. The default strips all camera and location data before the file reaches your download, the share sheet, or the gallery.",
+        "p2": "Two opt-in per-export modes let you keep the camera data with the GPS location removed, or keep everything as-is. Metadata is read and written in the browser; nothing is uploaded to do it."
+      },
+      "sharing": {
+        "heading": "Sharing links",
+        "p1": "A share link carries a signed token with a built-in expiry and can be revoked at any time. The public pages a link opens carry no session and are rate limited by address.",
+        "p2": "Expired, revoked, tampered, and unknown links all return the same neutral “not found” response, so a link reveals nothing once it stops working. Creating and revoking links is limited to members with permission and is audited."
+      },
+      "account": {
+        "heading": "Your account",
+        "p1": "An account needs an email address and a password, and the email must be verified before the account is active. Sessions are held in HttpOnly, SameSite=Lax cookies, marked Secure on secure origins.",
+        "p2": "Password-reset links expire after an hour and sign out your other sessions when used."
+      },
+      "analytics": {
+        "heading": "Analytics and cookies",
+        "p1": "We set no third-party analytics or advertising cookies. The only measurement is Cloudflare Web Analytics, which is cookieless and does not track you across sites.",
+        "p2": "The app talks to just two third-party origins, both Cloudflare’s: the Turnstile widget that screens sign-up and password-reset requests for bots, and the cookieless analytics beacon. Fonts, styles, and everything else are served from this site."
+      },
+      "audit": {
+        "heading": "Audit trail",
+        "p1": "Sign-ups and every organization, membership, invitation, library, photo, and share change are written to an append-only audit log. That log is readable only by an organization’s owners and admins."
+      },
+      "reporting": {
+        "heading": "Reporting a problem",
+        "p1": "Security issues can be reported privately through the project’s GitHub repository rather than a public issue. The security policy in the repository describes what to include and how quickly you will hear back."
+      }
+    },
+    "terms": {
+      "title": "Terms of service",
+      "intro": "These terms cover your use of Watermark Pro. They are written to be read, and they describe how the service actually behaves rather than adding claims it does not keep.",
+      "siblingLabel": "privacy policy",
+      "accepting": {
+        "heading": "Accepting these terms",
+        "p1": "Using Watermark Pro means you agree to these terms. If you do not agree, please do not use the service."
+      },
+      "whatItDoes": {
+        "heading": "What the service does",
+        "p1": "Watermark Pro watermarks photographs. The watermarking itself runs in your browser; optional features such as saving photos and logos, working in a team, and sharing use server-side storage on Cloudflare.",
+        "p2": "The software is free and open source under the MIT licence."
+      },
+      "account": {
+        "heading": "Your account",
+        "p1": "Team features need an account with a verified email address. Keep your password to yourself; you are responsible for what happens under your account.",
+        "p2": "You can sign out of your sessions at any time, and using a password-reset link signs out your other sessions."
+      },
+      "content": {
+        "heading": "Your content",
+        "p1": "You keep every right you already hold in the photos and watermarks you upload or create. You are responsible for having the right to use the images you bring to the service.",
+        "p2": "The app processes your content only to provide the features you use, and stores it only when you choose to save it. It is never used to train anything or shared with third parties."
+      },
+      "acceptableUse": {
+        "heading": "Acceptable use",
+        "p1": "Do not use the service to break the law, or to upload or share content you have no right to use. Do not try to bypass security controls or rate limits, or to reach data belonging to organizations you are not a member of.",
+        "p2": "Access within an organization follows your role, and those roles are enforced on the server."
+      },
+      "teams": {
+        "heading": "Teams and roles",
+        "p1": "An organization can have owner, admin, editor, and viewer roles. What each member can see and do is limited to their role, checked on every request rather than only hidden in the interface."
+      },
+      "availability": {
+        "heading": "Availability, warranty, and changes",
+        "p1": "The service is provided “as is”, without warranty of any kind, as set out in the MIT licence. Features may change, and the service may be unavailable at times.",
+        "p2": "These terms may be updated; the date at the top of this page shows when they last changed. Continuing to use the service after a change means you accept the updated terms."
+      },
+      "openSource": {
+        "heading": "Open source",
+        "p1": "Watermark Pro’s source code is available under the MIT licence, which lets you inspect, run, and modify it under that licence’s terms."
+      },
+      "contact": {
+        "heading": "Contact",
+        "p1": "Questions about these terms, and reports of security problems, can be raised through the project’s GitHub repository."
+      }
+    }
+  },
+  "share": {
+    "loading": "Loading photos",
+    "unavailableTitle": "This link is not available",
+    "unavailableBody": "It may have expired or been revoked, or the address is incomplete. Ask whoever sent it for a new one.",
+    "about": "About Watermark Pro",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_other": "{{count}} photos",
+    "availableUntil": " · available until {{date}}",
+    "shareLink": "Share this link",
+    "linkCopied": "Link copied to the clipboard.",
+    "linkShared": "Link shared.",
+    "openPhoto": "Open {{name}}",
+    "footer": "Shared with <home>Watermark Pro</home>. Photos stay the property of their owner.",
+    "download": "Download",
+    "close": "Close"
+  },
   "root": {
+    "somethingWentWrong": "Something went wrong",
     "notFound": {
       "title": "Page not found",
       "body": "The address may be mistyped, or the page may have moved.",
