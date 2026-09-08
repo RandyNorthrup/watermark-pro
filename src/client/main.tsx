@@ -50,6 +50,14 @@ if ('serviceWorker' in navigator) {
   void navigator.serviceWorker.register('/share-target-sw.js', { scope: '/share-target' })
 }
 
+// Offline support (M19): a root-scope worker caches hashed assets and serves
+// navigations network-first, so the installed app works without a network once
+// visited. Production only — in development it would cache dev assets and fight
+// hot-module reloading. It never touches the /share-target scope above.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  void navigator.serviceWorker.register('/sw.js')
+}
+
 // Desktop file handling (installed PWA): the OS opens the app with the files
 // the user chose. One photo goes to the editor, several to the bulk tool.
 interface LaunchParams {

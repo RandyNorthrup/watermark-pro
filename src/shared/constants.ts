@@ -120,6 +120,11 @@ export const CLIENT_ERROR_MAX_BODY_BYTES = 2048
 export const CLIENT_ERROR_MAX_MESSAGE_LENGTH = 1000
 export const CLIENT_ERROR_MAX_SOURCE_LENGTH = 500
 export const CLIENT_ERROR_MAX_ROUTE_LENGTH = 200
+/** Better Auth's sign-out endpoint; the Worker adds Clear-Site-Data to its response. */
+export const AUTH_SIGN_OUT_PATH = '/api/auth/sign-out'
+/** Cleared on sign-out (M19): the offline caches and local storage, for shared devices. */
+export const CLEAR_SITE_DATA_ON_SIGN_OUT = '"cache", "storage"'
+
 /** How long client-error and health-check rows are kept before an insert prunes them. */
 export const OBSERVABILITY_RETENTION_DAYS = 7
 const SECONDS_PER_DAY = 86_400

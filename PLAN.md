@@ -678,6 +678,18 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
     - Still to do: run the prerender in the deploy before upload (orchestrated at
       the 2.0.0 cut); e2e landing coverage; the bundle-budget gate can then be
       wired into `quality` for the `/` surface.
+  - **§4 offline (service worker done; offline-editor journey with §2).** A
+    root-scope `public/sw.js` (registered in production from `main.tsx`) caches
+    hashed `/assets/` cache-first and navigations network-first with a cached
+    fallback; never caches `/api/*`; the M16 share-target worker keeps its narrow
+    scope (a static runtime-caching worker rather than a build-time precache
+    manifest — simpler and lower-risk, same offline outcome once visited). On
+    sign-out the Worker sends `Clear-Site-Data: "cache", "storage"` (tested in
+    `auth-flow.test.ts`), which also makes the §2 persister safe on shared
+    devices. The full offline-**editor** e2e journey needs the §2 persisted
+    session (offline `beforeLoad` cannot reach `/api/auth/get-session`), so it
+    lands with §2. The existing e2e suite runs against the SW-registered preview,
+    so it guards against the worker breaking the app.
   - **§6 observability (done, no dashboard).** Request-id on every API request
     (echoed as `X-Request-Id`, in error logs). Client error reporting:
     `POST /api/client-errors` (rate-limited via the shared limiter, 2 kB cap,

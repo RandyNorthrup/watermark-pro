@@ -25,6 +25,13 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
+- Offline support (PLAN §4): a root-scope service worker (`public/sw.js`,
+  registered in production) caches the hashed build assets forever (immutable by
+  name) and serves navigations network-first with a cached fallback, so repeat
+  loads are instant and the installed app keeps working after a visit. The API is
+  never cached; the M16 share-target worker keeps its own scope. On sign-out the
+  Worker now sends `Clear-Site-Data: "cache", "storage"` so a shared device does
+  not retain the previous user's cached shell or (forthcoming) persisted data.
 - Observability console (PLAN §6, no dashboard): the browser now reports uncaught
   errors and unhandled rejections to a rate-limited, size-capped, low-PII
   `POST /api/client-errors` (message, single top stack frame, route, request id);

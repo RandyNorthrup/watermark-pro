@@ -123,6 +123,15 @@ describe('sign-up and email verification', () => {
     expect(sessionCookie).toMatch(/SameSite=Lax/i)
     expect(sessionCookie).toMatch(/Path=\//)
   })
+
+  it('clears the offline caches and local storage on sign-out', async () => {
+    // ownerClient is signed in (beforeEach). Signing out must instruct the
+    // browser to drop cached shell assets and persisted data (M19, shared
+    // devices); Better Auth clears the cookie on its own.
+    const response = await ownerClient.post('/api/auth/sign-out', {})
+    expect(response.status).toBe(HTTP_STATUS.ok)
+    expect(response.headers.get('clear-site-data')).toBe('"cache", "storage"')
+  })
 })
 
 describe('cross-site request protection', () => {

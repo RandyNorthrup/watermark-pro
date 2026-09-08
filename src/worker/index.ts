@@ -14,7 +14,14 @@ import { secureHeaders } from 'hono/secure-headers'
 import type { AppContext } from './app-context'
 import { EnvValidationError } from './env'
 import type { ApiError, HealthResponse } from '../shared/api'
-import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '../shared/constants'
+import {
+  API_ERROR_CODE,
+  AUTH_SIGN_OUT_PATH,
+  CLEAR_SITE_DATA_ON_SIGN_OUT,
+  HEALTH_PATH,
+  HSTS_MAX_AGE_SECONDS,
+  HTTP_STATUS,
+} from '../shared/constants'
 import { requireSameOrigin } from './middleware/same-origin'
 import { adminRoutes } from './routes/admin'
 import { auditRoutes } from './routes/audit'
@@ -95,7 +102,20 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   })
 
   app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
-    return await c.get('services').auth.handler(c.req.raw)
+    const response = await c.get('services').auth.handler(c.req.raw)
+    // On sign-out, tell the browser to drop the offline caches and local
+    // storage so a shared device does not keep the previous user's cached shell
+    // or persisted query data (M19). Better Auth already clears the cookie.
+    if (c.req.path === AUTH_SIGN_OUT_PATH && response.ok) {
+      const headers = new Headers(response.headers)
+      headers.set('Clear-Site-Data', CLEAR_SITE_DATA_ON_SIGN_OUT)
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      })
+    }
+    return response
   })
 
   app.route('/api', auditRoutes)
