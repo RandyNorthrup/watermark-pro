@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query'
+import { type QueryClient, queryOptions } from '@tanstack/react-query'
 
 import { ApiRequestError, fetchJson } from './api'
 import { authClient } from './auth-client'
@@ -61,6 +61,23 @@ export function auditQueryOptions(organizationId: string) {
 
 /** Query keys to drop after anything that changes membership or the active organization. */
 export const ORGANIZATION_QUERY_KEY = ['organization'] as const
+
+/**
+ * Drops the shell queries the authenticated layout's `beforeLoad` decides from —
+ * the session, the organization list and the active organization — so that after
+ * a mutation that changes them (creating or joining an organization, signing in,
+ * switching the active one) the next boot re-fetches them fresh instead of
+ * reading a stale value from the cache-first path (PLAN §2). Removing (rather
+ * than refetching) is what makes onboarding correct: the active-organization
+ * query is often not in the cache yet, and a `getSession` right after `setActive`
+ * can lag, so the reliable rule is "after a shell mutation, boot fetches fresh".
+ * Ordinary navigation between `/app` pages keeps its cache and stays fast.
+ */
+export function resetShellQueries(queryClient: QueryClient): void {
+  queryClient.removeQueries({ queryKey: sessionQueryOptions.queryKey })
+  queryClient.removeQueries({ queryKey: organizationsQueryOptions.queryKey })
+  queryClient.removeQueries({ queryKey: activeOrganizationQueryOptions.queryKey })
+}
 
 /** Turnstile site key and other pre-sign-in settings; static for the life of a deployment. */
 export const publicConfigQueryOptions = queryOptions({

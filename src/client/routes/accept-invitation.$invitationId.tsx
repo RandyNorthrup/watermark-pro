@@ -16,7 +16,7 @@ import { Button } from '../components/ui/button'
 import { ApiRequestError } from '../lib/api'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError, describeError } from '../lib/errors'
-import { sessionQueryOptions } from '../lib/queries'
+import { resetShellQueries, sessionQueryOptions } from '../lib/queries'
 
 export const Route = createFileRoute('/accept-invitation/$invitationId')({
   beforeLoad: async ({ context, location }) => {
@@ -77,6 +77,7 @@ function AcceptInvitationPage() {
       await authClient.organization.setActive({ organizationId: invitation.organizationId })
     }
     await queryClient.invalidateQueries()
+    resetShellQueries(queryClient)
     await router.invalidate()
     await navigate({ to: decision === 'accept' ? '/app/members' : '/app' })
   }

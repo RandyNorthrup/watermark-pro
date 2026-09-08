@@ -27,6 +27,7 @@ import { ThemeToggle } from './theme-toggle'
 import { isPlatformAdmin } from '../lib/admin'
 import { type ActiveOrganization, authClient, type SessionData } from '../lib/auth-client'
 import { cn } from '../lib/cn'
+import { resetShellQueries } from '../lib/queries'
 import { Avatar } from './ui/avatar'
 import { Button } from './ui/button'
 import {
@@ -245,6 +246,7 @@ function OrganizationSwitcher({
   async function switchTo(organizationId: string) {
     await authClient.organization.setActive({ organizationId })
     await queryClient.invalidateQueries()
+    resetShellQueries(queryClient)
     await router.invalidate()
     await navigate({ to: '/app' })
   }
