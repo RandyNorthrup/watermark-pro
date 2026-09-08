@@ -32,6 +32,13 @@ user (not just the owner). This completes "read and write to cloud storage".
 - CSP `connect-src` gains the write endpoints (`api.dropboxapi.com`,
   `content.dropboxapi.com`, and the OneDrive upload hosts). See `public/_headers`.
 
+### Fixed
+
+- The `adjustPixels` 12-megapixel timing guard flaked on a saturated CI runner
+  (6220 ms against a 6000 ms ceiling; real cost is ~250–450 ms). Its headroom is
+  raised to ~48x the real cost so a genuine large regression still trips it
+  without flaking under gate contention. See PLAN.md §9.
+
 ## [1.8.1] - 2026-09-07
 
 M16 (cloud pickers): import photos straight from Google Drive, Dropbox, and
