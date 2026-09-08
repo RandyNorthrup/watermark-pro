@@ -38,6 +38,26 @@ export function isSupportedLocale(value: string): value is Locale {
   return LOCALE_BY_CODE.has(value as Locale)
 }
 
+/**
+ * First supported locale for a list of BCP-47 tags, matching a bare language to
+ * its regional catalogue (`pt` → `pt-BR`, `zh` → `zh-Hans`). Returns null when
+ * nothing matches. Shared by the client's detection and the Worker's landing
+ * locale negotiation (`Accept-Language`).
+ */
+export function matchLocale(candidates: readonly string[]): Locale | null {
+  for (const candidate of candidates) {
+    if (isSupportedLocale(candidate)) {
+      return candidate
+    }
+    const base = candidate.split('-', 1)[0]
+    const regional = SUPPORTED_LOCALES.find((locale) => locale.code.split('-', 1)[0] === base)
+    if (regional !== undefined) {
+      return regional.code
+    }
+  }
+  return null
+}
+
 /** `'rtl'` for Arabic, `'ltr'` for the rest; drives `<html dir>`. */
 export function localeDirection(locale: Locale): TextDirection {
   return LOCALE_BY_CODE.get(locale)?.dir ?? 'ltr'

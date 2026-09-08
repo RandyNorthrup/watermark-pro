@@ -663,10 +663,18 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
       with a no-JS `<details>` `/?lang=` switcher, writes `dist/client/landing/
 <locale>.html`. Verified: 12 localized static pages, **largest 4.2 kB gzip,
       zero app JS**, correct `lang`/`dir` (incl. `ar` rtl). Done.
-    - Next: the Worker serves `/` from the locale cookie / `Accept-Language`
-      (falling back to the SPA index.html when a landing file is absent, e.g. dev
-      and CI without a prerender), honours `?lang=`, and redirects a signed-in
-      visitor to `/app`; prerender runs in the deploy before upload.
+    - The Worker serves `/` from the locale cookie → `Accept-Language` → English
+      (`src/worker/routes/landing.ts`, `serveLanding`, wrapped into the default
+      export before the Hono app so the locked-down API CSP never touches it),
+      honours `?lang=` (302 + cookie), and redirects a session-cookie visitor to
+      `/app`; it falls back to the SPA `index.html` when a landing file is absent
+      (dev, CI). `wrangler.jsonc` gains the `ASSETS` binding and `/` in
+      `run_worker_first` (both environments). Unit-tested (9 route cases) and
+      verified against a preview: es → Spanish, ar → rtl, none → English, `?lang`
+      cookie, SPA fallback, and `/` never over-captures static assets. Done.
+    - Still to do: run the prerender in the deploy before upload (orchestrated at
+      the 2.0.0 cut); e2e landing coverage; the bundle-budget gate can then be
+      wired into `quality` for the `/` surface.
   - **§1 first-paint skeleton (done).** `index.html` carries a static,
     theme-correct skeleton inside `#root` (header + brand mark, shimmer content
     blocks, phone tab bar) that paints before JavaScript and is replaced by

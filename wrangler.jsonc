@@ -23,8 +23,14 @@
     // Everything that is not an API route is served from the asset store
     // without invoking the Worker; unknown paths fall back to index.html so
     // client-side routing works on a hard refresh.
+    //
+    // The Worker runs first for `/api/*` and for `/`: the root goes through the
+    // Worker so it can serve the prerendered, per-locale static landing
+    // (src/worker/routes/landing.ts). The binding lets that handler read the
+    // prerendered files (dist/client/landing/<locale>.html) and the SPA shell.
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"],
+    "run_worker_first": ["/api/*", "/"],
   },
   "observability": {
     "enabled": true,
@@ -105,6 +111,13 @@
       ],
       "observability": {
         "enabled": true,
+      },
+      // Repeated from the top level so production has the ASSETS binding and the
+      // `/` worker-first route regardless of environment inheritance rules.
+      "assets": {
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        "run_worker_first": ["/api/*", "/"],
       },
       "vars": {
         "APP_ENV": "production",

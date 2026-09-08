@@ -1,13 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import {
-  detectLocale,
-  matchLocale,
-  readLocaleCookie,
-  readStoredLocale,
-  writeLocaleCookie,
-} from './detect'
-import { LOCALE_COOKIE, LOCALE_STORAGE_KEY } from '../../shared/locales'
+import { detectLocale, readLocaleCookie, readStoredLocale, writeLocaleCookie } from './detect'
+import { LOCALE_COOKIE, LOCALE_STORAGE_KEY, matchLocale } from '../../shared/locales'
 
 afterEach(() => {
   localStorage.clear()

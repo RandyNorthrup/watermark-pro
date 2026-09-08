@@ -60,6 +60,7 @@ export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
     AUTH_RATE_LIMITER: notABinding(),
     API_RATE_LIMITER: notABinding(),
     IMPORT_RATE_LIMITER: notABinding(),
+    ASSETS: notABinding(),
     ...overrides,
   }
 }

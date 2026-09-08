@@ -20,6 +20,7 @@ import { adminRoutes } from './routes/admin'
 import { auditRoutes } from './routes/audit'
 import { devRoutes } from './routes/dev'
 import { importRoutes } from './routes/imports'
+import { serveLanding } from './routes/landing'
 import { libraryRoutes } from './routes/library'
 import { meRoutes } from './routes/me'
 import { photoRoutes } from './routes/photos'
@@ -120,4 +121,16 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
 
 const app = createApp()
 
-export default app
+/**
+ * The Worker serves the front door (GET /) as a prerendered, per-locale static
+ * landing before the API app runs (src/worker/routes/landing.ts). Everything
+ * else — the JSON API — is the Hono app. `run_worker_first` in wrangler.jsonc
+ * routes `/api/*` and `/` here; all other paths are served from the asset store
+ * without invoking this Worker.
+ */
+export default {
+  async fetch(request, env, ctx) {
+    const landing = await serveLanding(request, env)
+    return landing ?? (await app.fetch(request, env, ctx))
+  },
+} satisfies ExportedHandler<Env>

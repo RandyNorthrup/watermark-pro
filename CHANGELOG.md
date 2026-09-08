@@ -25,6 +25,17 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
+- The Worker now serves the front door (`GET /`) as a prerendered, per-locale
+  static landing: it picks the language from the `watermark-pro-locale` cookie,
+  then `Accept-Language`, then English, and serves the matching
+  `dist/client/landing/<locale>.html` (which ships no application JavaScript). A
+  `?lang=xx` link persists the choice in the cookie and reloads; a visitor who
+  already has a session is sent to the app. When no prerender is present (local
+  dev, CI) it falls back to the SPA shell, so the app still works without the
+  prerender step. `run_worker_first` in `wrangler.jsonc` routes only `/` and
+  `/api/*` through the Worker; everything else is served straight from the asset
+  store. Verified end to end against a preview (es → Spanish, ar → right-to-left,
+  no header → English, `/` never captures static assets).
 - Landing prerender tooling (`npm run prerender`, `scripts/prerender.mjs`): renders
   the React landing once per shipped language against a preview, strips the
   application bundle, and writes a static `dist/client/landing/<locale>.html` that

@@ -1,9 +1,19 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { createApp } from './index'
+import handler, { createApp } from './index'
 import { apiErrorSchema, healthResponseSchema } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HTTP_STATUS } from '../shared/constants'
 import { createTestEnv, createTestHarness, TEST_APP_URL } from './test-support/test-app'
+
+/** A no-op execution context for calling the default handler's fetch directly. */
+const testExecutionContext = {
+  waitUntil() {
+    // nothing to await in these tests
+  },
+  passThroughOnException() {
+    // never pass through in these tests
+  },
+} as unknown as ExecutionContext
 
 function silenceConsoleError() {
   return vi.spyOn(console, 'error').mockImplementation(() => {
@@ -35,6 +45,40 @@ describe('GET /api/health', () => {
     expect(response.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin')
     expect(response.headers.get('x-content-type-options')).toBe('nosniff')
     expect(response.headers.get('permissions-policy')).toContain('camera=()')
+  })
+})
+
+describe('default worker handler', () => {
+  it('serves the prerendered landing for GET / ahead of the API app', async () => {
+    const env = createTestEnv({
+      // A fake ASSETS binding standing in for the prerendered landing store.
+      ASSETS: {
+        fetch: () =>
+          Promise.resolve(
+            new Response('<!doctype html><html lang="es"></html>', {
+              status: HTTP_STATUS.ok,
+              headers: { 'content-type': 'text/html' },
+            }),
+          ),
+      } as unknown as Env['ASSETS'],
+    })
+    const response = await handler.fetch(new Request(`${TEST_APP_URL}/`), env, testExecutionContext)
+    expect(response.status).toBe(HTTP_STATUS.ok)
+    expect(response.headers.get('content-type')).toContain('text/html')
+    expect(await response.text()).toContain('lang="es"')
+  })
+
+  it('passes non-root requests through to the API app', async () => {
+    const response = await handler.fetch(
+      new Request(`${TEST_APP_URL}${HEALTH_PATH}`),
+      createTestEnv(),
+      testExecutionContext,
+    )
+    expect(response.status).toBe(HTTP_STATUS.ok)
+    expect(healthResponseSchema.parse(await response.json())).toEqual({
+      status: 'ok',
+      environment: 'test',
+    })
   })
 })
 
