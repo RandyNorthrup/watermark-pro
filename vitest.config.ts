@@ -94,6 +94,17 @@ export default defineConfig({
         // and getImageData, both absent in jsdom); its pure decisions live in the
         // fully tested lib/logo-prepare-pipeline.ts. See PLAN.md §9.
         'src/client/components/designer/logo-prepare.tsx',
+        // Cloud import pickers (M16): each loads a third-party SDK (Google
+        // Picker + GIS, the Dropbox Chooser drop-in) or the bundled MSAL client
+        // and drives a vendor popup/iframe that cannot run in jsdom. Their pure
+        // decisions (download-URL builders, response->item mappers, extension
+        // derivation) live in tested helpers within the same modules and in
+        // lib/imports/download.ts + lib/imports/source.ts. The OneDrive browse
+        // dialog is likewise vendor-token/Graph glue. See PLAN.md §9.
+        'src/client/lib/imports/google-picker.ts',
+        'src/client/lib/imports/dropbox-chooser.ts',
+        'src/client/lib/imports/onedrive.ts',
+        'src/client/components/import/onedrive-dialog.tsx',
         // D1 and binding wiring that only executes inside workerd. Covered
         // functionally by the `workers` project, which cannot report coverage.
         'src/worker/db/**',

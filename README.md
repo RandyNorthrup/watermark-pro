@@ -149,20 +149,25 @@ fails the run. Reports are written to `docs/red-drill/`.
 
 ## Environment variables and bindings
 
-| Name                   | Kind       | Where                                | Purpose                                                                |
-| ---------------------- | ---------- | ------------------------------------ | ---------------------------------------------------------------------- |
-| `APP_ENV`              | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `development`, `test`, `staging`, `production`                         |
-| `APP_URL`              | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Public origin; auth links and the same-origin guard                    |
-| `EMAIL_PROVIDER`       | var        | `wrangler.jsonc` `vars`, `.dev.vars` | `console` (dev/test only) or `cloudflare`                              |
-| `EMAIL_FROM`           | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Sender address; must be on a zone in the account                       |
-| `BETTER_AUTH_SECRET`   | secret     | `.dev.vars`, `wrangler secret put`   | Signs sessions and tokens; at least 32 random characters               |
-| `TURNSTILE_SITE_KEY`   | var        | `wrangler.jsonc` `vars`, `.dev.vars` | Optional; Turnstile widget key, served to the client via `/api/config` |
-| `TURNSTILE_SECRET_KEY` | secret     | `.dev.vars`, `wrangler secret put`   | Optional; must be set together with the site key                       |
-| `DB`                   | D1         | `wrangler.jsonc` `d1_databases`      | Users, organizations, members, invitations, audit log, presets         |
-| `BUCKET`               | R2         | `wrangler.jsonc` `r2_buckets`        | Logos, photos and thumbnails; never public, streamed via the API       |
-| `AUTH_RATE_LIMITER`    | ratelimit  | `wrangler.jsonc` `ratelimits`        | 10 requests / 60 s per IP on credential endpoints                      |
-| `API_RATE_LIMITER`     | ratelimit  | `wrangler.jsonc` `ratelimits`        | 120 requests / 60 s per IP on other auth endpoints                     |
-| `SEND_EMAIL`           | send_email | `wrangler.jsonc` `send_email`        | Cloudflare Email Sending; required when provider is `cloudflare`       |
+| Name                     | Kind       | Where                                          | Purpose                                                                        |
+| ------------------------ | ---------- | ---------------------------------------------- | ------------------------------------------------------------------------------ |
+| `APP_ENV`                | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | `development`, `test`, `staging`, `production`                                 |
+| `APP_URL`                | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Public origin; auth links and the same-origin guard                            |
+| `EMAIL_PROVIDER`         | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | `console` (dev/test only) or `cloudflare`                                      |
+| `EMAIL_FROM`             | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Sender address; must be on a zone in the account                               |
+| `BETTER_AUTH_SECRET`     | secret     | `.dev.vars`, `wrangler secret put`             | Signs sessions and tokens; at least 32 random characters                       |
+| `TURNSTILE_SITE_KEY`     | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Optional; Turnstile widget key, served to the client via `/api/config`         |
+| `TURNSTILE_SECRET_KEY`   | secret     | `.dev.vars`, `wrangler secret put`             | Optional; must be set together with the site key                               |
+| `GOOGLE_OAUTH_CLIENT_ID` | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Drive picker. Public client id, served via `/api/config`      |
+| `GOOGLE_PICKER_API_KEY`  | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Picker API key (restrict it to the Picker API + your origins) |
+| `GOOGLE_PICKER_APP_ID`   | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Cloud project number the Picker needs                         |
+| `MICROSOFT_CLIENT_ID`    | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; OneDrive picker. Microsoft Entra SPA app client id                   |
+| `DROPBOX_APP_KEY`        | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Dropbox Chooser app key                                              |
+| `DB`                     | D1         | `wrangler.jsonc` `d1_databases`                | Users, organizations, members, invitations, audit log, presets                 |
+| `BUCKET`                 | R2         | `wrangler.jsonc` `r2_buckets`                  | Logos, photos and thumbnails; never public, streamed via the API               |
+| `AUTH_RATE_LIMITER`      | ratelimit  | `wrangler.jsonc` `ratelimits`                  | 10 requests / 60 s per IP on credential endpoints                              |
+| `API_RATE_LIMITER`       | ratelimit  | `wrangler.jsonc` `ratelimits`                  | 120 requests / 60 s per IP on other auth endpoints                             |
+| `SEND_EMAIL`             | send_email | `wrangler.jsonc` `send_email`                  | Cloudflare Email Sending; required when provider is `cloudflare`               |
 
 Every variable and binding is validated on the first request an isolate
 handles (`src/worker/env.ts`); a misconfigured Worker answers 500 with

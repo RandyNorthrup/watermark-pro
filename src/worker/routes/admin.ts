@@ -21,7 +21,14 @@ export const adminRoutes = new Hono<AppContext>()
   .get('/config', (c) => {
     const { config } = c.get('services')
     return c.json(
-      publicConfigSchema.parse({ turnstileSiteKey: config.TURNSTILE_SITE_KEY ?? null }),
+      publicConfigSchema.parse({
+        turnstileSiteKey: config.TURNSTILE_SITE_KEY ?? null,
+        googleOAuthClientId: config.GOOGLE_OAUTH_CLIENT_ID ?? null,
+        googlePickerApiKey: config.GOOGLE_PICKER_API_KEY ?? null,
+        googlePickerAppId: config.GOOGLE_PICKER_APP_ID ?? null,
+        microsoftClientId: config.MICROSOFT_CLIENT_ID ?? null,
+        dropboxAppKey: config.DROPBOX_APP_KEY ?? null,
+      }),
       HTTP_STATUS.ok,
     )
   })

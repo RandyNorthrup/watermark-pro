@@ -228,7 +228,15 @@ export type PublicShare = z.infer<typeof publicShareSchema>
 export const publicConfigSchema = z.object({
   /** Turnstile site key when bot protection is enabled; null otherwise. */
   turnstileSiteKey: z.string().nullable(),
+  /** Cloud import (M16): each picker is offered only when its keys are configured; null hides it. */
+  googleOAuthClientId: z.string().nullable(),
+  googlePickerApiKey: z.string().nullable(),
+  googlePickerAppId: z.string().nullable(),
+  microsoftClientId: z.string().nullable(),
+  dropboxAppKey: z.string().nullable(),
 })
+
+export type PublicConfig = z.infer<typeof publicConfigSchema>
 
 export const adminOrganizationSchema = z.object({
   id: z.string(),

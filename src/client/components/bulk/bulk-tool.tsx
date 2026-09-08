@@ -59,6 +59,7 @@ import { formatBytes } from '../../lib/format-bytes'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { takeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
+import { publicConfigQueryOptions } from '../../lib/queries'
 import { canShareFiles, shareFile } from '../../lib/share-file'
 import { clearSharedFiles, readSharedFiles } from '../../lib/shared-files'
 import { baseName } from '../../lib/spec-tokens'
@@ -67,6 +68,7 @@ import { FORMAT_OPTIONS } from '../editor/formats'
 import { FrameControls } from '../editor/frame-controls'
 import { MetadataPolicyField } from '../editor/metadata-policy'
 import { OrientationControls } from '../editor/orientation-controls'
+import { CloudImportButtons } from '../import/cloud-import-buttons'
 import { TakePhotoButton } from '../import/take-photo-button'
 import { UrlImportDialog } from '../import/url-import-dialog'
 import { PresetGate } from '../presets/preset-gate'
@@ -190,6 +192,7 @@ const STATUS_LABELS: Record<JobState<BulkJobInput, BulkResult>['status'], string
  */
 export function BulkTool({ organizationId, organizationName, canSave = false }: BulkToolProps) {
   const presets = useQuery(watermarksQueryOptions(organizationId))
+  const publicConfig = useQuery(publicConfigQueryOptions)
   const { snapshot, workers, add, start, setOverride, pause, resume, cancel, retry, clear } =
     useBulkQueue(organizationId)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -199,6 +202,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   const [namePattern, setNamePattern] = useState(DEFAULT_NAME_PATTERN)
   const [showAll, setShowAll] = useState(false)
   const [skippedNote, setSkippedNote] = useState<string | null>(null)
+  const [importError, setImportError] = useState<string | null>(null)
   // The job whose photo is open in the override dialog, or null.
   const [adjusting, setAdjusting] = useState<{ id: string; input: BulkJobInput } | null>(null)
   const canPickFolder = canPickDirectory()
@@ -584,6 +588,19 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     </Button>
                   }
                 />
+                {publicConfig.data === undefined ? null : (
+                  <CloudImportButtons
+                    config={publicConfig.data}
+                    disabled={snapshot.isRunning}
+                    onImport={(cloudFiles) => {
+                      setImportError(null)
+                      addFiles(cloudFiles)
+                    }}
+                    onError={(message) => {
+                      setImportError(message)
+                    }}
+                  />
+                )}
               </p>
               <p className="text-xs text-ink-muted">
                 Up to {String(MAX_BULK_FILES)} photos per batch. Processing happens in your browser
@@ -595,6 +612,11 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               <p className="text-xs text-amber-600" role="status">
                 {skippedNote}
               </p>
+            )}
+            {importError === null ? null : (
+              <Alert tone="error" title="Could not import from the cloud">
+                {importError}
+              </Alert>
             )}
 
             <WatchFolder organizationId={organizationId} specs={specs} settings={settings()} />

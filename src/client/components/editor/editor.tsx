@@ -67,11 +67,13 @@ import { readImageSize } from '../../lib/image-size'
 import { takeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
 import { readPhotoMetadata } from '../../lib/photo-metadata'
+import { publicConfigQueryOptions } from '../../lib/queries'
 import { SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from '../../lib/sample-photo'
 import { shareFile } from '../../lib/share-file'
 import { withPlacement, withStyle } from '../../lib/spec-edit'
 import { baseName, SAMPLE_FILE_NAME } from '../../lib/spec-tokens'
 import { useElementSize } from '../../lib/use-element-size'
+import { CloudImportButtons } from '../import/cloud-import-buttons'
 import { TakePhotoButton } from '../import/take-photo-button'
 import { UrlImportDialog } from '../import/url-import-dialog'
 import { SampleScene } from '../sample-scene'
@@ -245,6 +247,7 @@ export function Editor({
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
   const displaySize = useElementSize(imageElement)
   const presets = useQuery(watermarksQueryOptions(organizationId))
+  const publicConfig = useQuery(publicConfigQueryOptions)
 
   const sourceSize = photo?.size ?? SAMPLE_SIZE
   const isCropping = tool === 'crop'
@@ -566,6 +569,21 @@ export function Editor({
                   </Button>
                 }
               />
+              {publicConfig.data === undefined ? null : (
+                <CloudImportButtons
+                  config={publicConfig.data}
+                  onImport={(files) => {
+                    // The editor works on one photo at a time; take the first.
+                    const first = files[0]
+                    if (first !== undefined) {
+                      void choosePhoto(first)
+                    }
+                  }}
+                  onError={(message) => {
+                    setPhotoError(message)
+                  }}
+                />
+              )}
             </>
           ) : null}
           {photo === null ? null : (

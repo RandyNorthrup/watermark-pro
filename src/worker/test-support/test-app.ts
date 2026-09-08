@@ -37,7 +37,6 @@ function notABinding(): never {
   return {} as never
 }
 
-/** Env plus the optional Turnstile variables, which wrangler.jsonc leaves unset by default. */
 /**
  * The generated `Env` carries only the non-secret vars from wrangler.jsonc
  * (typegen deliberately ignores .dev.vars); tests add the secrets they set.
@@ -81,17 +80,29 @@ export interface TestHarnessOptions {
   importLimiter?: ImportLimiter | undefined
   /** Enables Turnstile with the given secret; verification calls go to `siteVerifyUrl`. */
   captcha?: { secretKey: string; siteVerifyUrl: string; siteKey: string } | undefined
+  /** Sets cloud-import picker vars, for tests that assert /api/config publishes them. */
+  cloudImport?:
+    | Partial<
+        Pick<
+          TestEnv,
+          | 'GOOGLE_OAUTH_CLIENT_ID'
+          | 'GOOGLE_PICKER_API_KEY'
+          | 'GOOGLE_PICKER_APP_ID'
+          | 'MICROSOFT_CLIENT_ID'
+          | 'DROPBOX_APP_KEY'
+        >
+      >
+    | undefined
 }
 
 export function createTestHarness(options: TestHarnessOptions = {}): TestHarness {
-  const env = createTestEnv(
-    options.captcha === undefined
-      ? {}
-      : {
-          TURNSTILE_SITE_KEY: options.captcha.siteKey,
-          TURNSTILE_SECRET_KEY: options.captcha.secretKey,
-        },
-  )
+  const env = createTestEnv({
+    ...(options.captcha !== undefined && {
+      TURNSTILE_SITE_KEY: options.captcha.siteKey,
+      TURNSTILE_SECRET_KEY: options.captcha.secretKey,
+    }),
+    ...options.cloudImport,
+  })
   const config = validateEnv(env)
   const mailbox = createConsoleEmailSender()
   const audit = createMemoryAuditStore()

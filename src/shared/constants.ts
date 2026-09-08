@@ -200,3 +200,24 @@ export const CAMERA_ACCEPT = 'image/*'
 export const SHARED_FILES_DB = 'watermark-pro-shared'
 export const SHARED_FILES_STORE = 'pending'
 export const SHARED_FILES_TTL_MS = 10 * 60 * MILLISECONDS_PER_SECOND
+
+/**
+ * Cloud import pickers (M16). Each provider loads its vendor SDK from these
+ * exact origins on demand and is offered only when its keys (see
+ * src/worker/env.ts, surfaced through GET /api/config) are configured. The
+ * origins are also the CSP allowances in public/_headers, so the two must move
+ * together. Google requests the narrow per-file `drive.file` scope and
+ * downloads through the Drive media endpoint; Dropbox returns short-lived
+ * direct links; OneDrive signs in with MSAL and reads through Microsoft Graph.
+ */
+export const GOOGLE_API_SCRIPT_URL = 'https://apis.google.com/js/api.js'
+export const GOOGLE_IDENTITY_SCRIPT_URL = 'https://accounts.google.com/gsi/client'
+export const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
+export const GOOGLE_DRIVE_FILES_ENDPOINT = 'https://www.googleapis.com/drive/v3/files'
+export const DROPBOX_DROPINS_SCRIPT_URL = 'https://www.dropbox.com/static/api/2/dropins.js'
+/** `common` accepts both Microsoft Entra (work/school) and personal accounts. */
+export const MICROSOFT_AUTHORITY = 'https://login.microsoftonline.com/common'
+export const MICROSOFT_GRAPH_SCOPE = 'Files.Read'
+export const MICROSOFT_GRAPH_ROOT = 'https://graph.microsoft.com/v1.0'
+/** Registered SPA redirect path for the MSAL popup; joined onto the app origin. */
+export const MICROSOFT_OAUTH_REDIRECT_PATH = '/oauth/microsoft'

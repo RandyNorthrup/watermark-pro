@@ -21,3 +21,16 @@ BETTER_AUTH_SECRET=
 # the secret key is a Worker secret.
 # TURNSTILE_SITE_KEY=
 # TURNSTILE_SECRET_KEY=
+
+# Optional cloud import pickers (M16). All public client-side identifiers, not
+# secrets: production sets them as plain vars under env.production in
+# wrangler.jsonc; set them here to enable the pickers on the local origin. Each
+# provider's button appears only when its keys are present. Register the apps in
+# Google Cloud (an OAuth Web client + a Picker API key + the project number),
+# Microsoft Entra (an SPA app with delegated Files.Read), and the Dropbox app
+# console (a scoped app with Chooser domains), authorising http://localhost:5273.
+# GOOGLE_OAUTH_CLIENT_ID=
+# GOOGLE_PICKER_API_KEY=
+# GOOGLE_PICKER_APP_ID=
+# MICROSOFT_CLIENT_ID=
+# DROPBOX_APP_KEY=

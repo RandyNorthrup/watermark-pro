@@ -174,8 +174,20 @@ describe('platform administration', () => {
   })
 
   it('publishes the Turnstile site key only when bot protection is configured', async () => {
+    // Cloud-import pickers are unconfigured in the default harness, so every
+    // picker field is null; only the Turnstile key changes between the cases.
+    const noCloudPickers = {
+      googleOAuthClientId: null,
+      googlePickerApiKey: null,
+      googlePickerAppId: null,
+      microsoftClientId: null,
+      dropboxAppKey: null,
+    }
     const off = await new TestClient(harness.app, harness.env).get('/api/config')
-    expect(publicConfigSchema.parse(await off.json())).toEqual({ turnstileSiteKey: null })
+    expect(publicConfigSchema.parse(await off.json())).toEqual({
+      turnstileSiteKey: null,
+      ...noCloudPickers,
+    })
 
     const protectedHarness = createTestHarness({
       captcha: {
@@ -185,7 +197,31 @@ describe('platform administration', () => {
       },
     })
     const on = await new TestClient(protectedHarness.app, protectedHarness.env).get('/api/config')
-    expect(publicConfigSchema.parse(await on.json())).toEqual({ turnstileSiteKey: 'site-key' })
+    expect(publicConfigSchema.parse(await on.json())).toEqual({
+      turnstileSiteKey: 'site-key',
+      ...noCloudPickers,
+    })
+  })
+
+  it('publishes each cloud-import key that the deployment has configured', async () => {
+    const configured = createTestHarness({
+      cloudImport: {
+        GOOGLE_OAUTH_CLIENT_ID: 'google-client',
+        GOOGLE_PICKER_API_KEY: 'google-key',
+        GOOGLE_PICKER_APP_ID: 'google-app',
+        MICROSOFT_CLIENT_ID: 'ms-client',
+        DROPBOX_APP_KEY: 'dropbox-key',
+      },
+    })
+    const response = await new TestClient(configured.app, configured.env).get('/api/config')
+    expect(publicConfigSchema.parse(await response.json())).toEqual({
+      turnstileSiteKey: null,
+      googleOAuthClientId: 'google-client',
+      googlePickerApiKey: 'google-key',
+      googlePickerAppId: 'google-app',
+      microsoftClientId: 'ms-client',
+      dropboxAppKey: 'dropbox-key',
+    })
   })
 })
 

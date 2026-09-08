@@ -7,6 +7,44 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-09-07
+
+M16 (cloud pickers): import photos straight from Google Drive, Dropbox, and
+OneDrive — the follow-up the 1.8.0 notes held for vendor app registration. The
+three OAuth applications are now registered in the owner's accounts, and each
+button appears only where its keys are configured.
+
+### Added
+
+- **Import from Google Drive**: opens the Google Picker after a one-tap Google
+  sign-in for the narrow, per-file `drive.file` scope; chosen images download
+  through the Drive API and drop into the editor or bulk tool.
+- **Import from Dropbox**: opens the Dropbox Chooser; selected images are
+  fetched from their temporary direct links.
+- **Import from OneDrive**: sign in with Microsoft, then browse your OneDrive
+  in a small in-app dialog (folders navigate with a breadcrumb, images
+  multi-select) and add the ones you pick. Uses Microsoft Graph with a
+  `Files.Read` token; the MSAL sign-in library is bundled, not loaded from a CDN.
+- The cloud buttons show up in both the editor (loads the first photo) and the
+  bulk tool (loads all selected), next to "Take photo" and "From a link", and
+  only for the providers this deployment has configured.
+
+### Changed
+
+- The public config (`GET /api/config`) now also carries the cloud-import
+  picker identifiers (all public, non-secret client keys); the browser uses them
+  to decide which import buttons to show.
+- Content-Security-Policy gains the picker vendor origins (Google, Dropbox,
+  Microsoft) for their SDKs and downloads, and `Cross-Origin-Opener-Policy` is
+  relaxed to `same-origin-allow-popups` so the pickers' sign-in popups can hand
+  their result back. See `public/_headers` and PLAN.md §9.
+
+### Notes
+
+- The Google app is in testing mode, so its Picker is available to the owner and
+  designated test users; general availability needs publishing the app (no
+  Google review is required because `drive.file` is a non-sensitive scope).
+
 ## [1.8.0] - 2026-09-07
 
 M16 (autonomous phase): more ways to get a photo into the app. The cloud

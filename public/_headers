@@ -8,7 +8,27 @@
 # static.cloudflareinsights.com / cloudflareinsights.com is the cookie-less Web
 # Analytics beacon the blowmoney.net zone injects into HTML ("automatic setup").
 # Turn that off in the dashboard (Analytics & Logs -> Web Analytics) and remove
-# the two insights entries to drop it. Every other script stays self-hosted.
+# the two insights entries to drop it.
+#
+# Cloud import pickers (M16, PLAN.md §9). Each is offered only when its keys are
+# configured, but the CSP allowances are static, so they are always present:
+# - Google Drive: script apis.google.com + accounts.google.com (Picker loader +
+#   GIS), frame docs.google.com + accounts.google.com (Picker UI + GIS iframe),
+#   connect www.googleapis.com + accounts.google.com (Drive media download +
+#   token). Picker thumbnails load inside the docs.google.com frame, governed by
+#   Google's CSP, so img-src is unchanged.
+# - Dropbox Chooser: script + frame www.dropbox.com (dropins.js + its relay
+#   iframe), connect *.dropboxusercontent.com (the temporary direct link, and any
+#   redirect hop, which CSP re-checks).
+# - OneDrive: no external script (MSAL is bundled); frame login.microsoftonline.com
+#   (MSAL silent-renew iframe); connect login.microsoftonline.com +
+#   graph.microsoft.com (token + Graph browse) plus the @microsoft.graph.downloadUrl
+#   host, which differs by account type: *.files.1drv.com and
+#   my.microsoftpersonalcontent.com (personal), *.sharepoint.com and
+#   *-my.sharepoint.com (work/school).
+# Every other script stays self-hosted. Cross-Origin-Opener-Policy is relaxed to
+# same-origin-allow-popups because all three pickers hand their result back
+# through a popup's window.opener, which a bare same-origin policy severs.
 # Tracked in PLAN.md §9.
 #
 # No upgrade-insecure-requests: production is HTTPS-only behind HSTS, every
@@ -17,10 +37,10 @@
 # applies the directive to plain-http localhost, which Chromium exempts, so the
 # directive made the local preview unrenderable in the iPhone test projects.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com https://apis.google.com https://accounts.google.com https://www.dropbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://www.googleapis.com https://accounts.google.com https://*.dropboxusercontent.com https://login.microsoftonline.com https://graph.microsoft.com https://*.files.1drv.com https://my.microsoftpersonalcontent.com https://*.sharepoint.com https://*-my.sharepoint.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com https://docs.google.com https://accounts.google.com https://www.dropbox.com https://login.microsoftonline.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Opener-Policy: same-origin-allow-popups

@@ -34,6 +34,12 @@ const envSchema = z
     /** Cloudflare Turnstile: set both keys to protect sign-up and password reset; leave both unset to disable. */
     TURNSTILE_SITE_KEY: z.string().min(1).optional(),
     TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+    /** Cloud import pickers (M16): each provider is offered only when its keys are set; all optional. */
+    GOOGLE_OAUTH_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_PICKER_API_KEY: z.string().min(1).optional(),
+    GOOGLE_PICKER_APP_ID: z.string().min(1).optional(),
+    MICROSOFT_CLIENT_ID: z.string().min(1).optional(),
+    DROPBOX_APP_KEY: z.string().min(1).optional(),
   })
   .refine(
     (env) => (env.TURNSTILE_SITE_KEY === undefined) === (env.TURNSTILE_SECRET_KEY === undefined),

@@ -31,7 +31,20 @@ const client = fakeAuth
 function stubConfig(turnstileSiteKey: string | null) {
   vi.stubGlobal(
     'fetch',
-    vi.fn(() => Promise.resolve(Response.json({ turnstileSiteKey }))),
+    vi.fn(() =>
+      Promise.resolve(
+        // The public config now also carries the cloud-import picker keys; this
+        // suite only cares about Turnstile, so the pickers are all unconfigured.
+        Response.json({
+          turnstileSiteKey,
+          googleOAuthClientId: null,
+          googlePickerApiKey: null,
+          googlePickerAppId: null,
+          microsoftClientId: null,
+          dropboxAppKey: null,
+        }),
+      ),
+    ),
   )
 }
 

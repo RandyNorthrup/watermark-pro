@@ -38,6 +38,13 @@
     "APP_URL": "http://localhost:5273",
     "EMAIL_PROVIDER": "console",
     "EMAIL_FROM": "no-reply@watermark.blowmoney.net",
+    // Cloud import pickers (M16) are configured under env.production below, like
+    // TURNSTILE_SITE_KEY: their public client-side keys are committed there. They
+    // are deliberately absent from this local block so `wrangler types` leaves
+    // them off the generated `Env` (matching how env.ts validates them as
+    // optional); local development enables the pickers by setting the same five
+    // keys in .dev.vars (which typegen and git ignore). See public/_headers and
+    // PLAN.md §9 for the CSP allowances that move with them.
   },
   "d1_databases": [
     {
@@ -107,6 +114,13 @@
         // Turnstile widget "watermark-pro" (managed mode, created 2026-09-06).
         // The site key is public; TURNSTILE_SECRET_KEY is a Worker secret.
         "TURNSTILE_SITE_KEY": "0x4AAAAAAEqUpxeDq6Tcw_bs",
+        // Cloud import pickers (M16); see the top-level vars for why these are
+        // public, non-secret identifiers. Same values as local development.
+        "GOOGLE_OAUTH_CLIENT_ID": "33646039034-62bcsfbjdakffvvdjbr96kv13sl9sc1f.apps.googleusercontent.com",
+        "GOOGLE_PICKER_API_KEY": "AIzaSyDc5o5xSa8OiRz94fQbkQpcf6u-PZkJcfw",
+        "GOOGLE_PICKER_APP_ID": "33646039034",
+        "MICROSOFT_CLIENT_ID": "4e7d0eae-7aba-40ad-ad9f-08414320a608",
+        "DROPBOX_APP_KEY": "s93kl2ruaou8f3p",
       },
       "d1_databases": [
         {
