@@ -43,6 +43,10 @@ user (not just the owner). This completes "read and write to cloud storage".
   router resolves the route on the client — Playwright reported that abort as
   "Frame load interrupted". The rendered-page assertions are unchanged. See
   PLAN.md §9.
+- The D1 rate-limit test no longer pins the throttle to the exact `(max + 1)`th
+  attempt. Cloudflare's Rate Limiting binding is approximate, so the test asserts
+  the 429 engages within a small margin while still proving every pre-throttle
+  attempt is a 401 (never a success). See PLAN.md §9.
 
 ## [1.8.1] - 2026-09-07
 
