@@ -33,7 +33,7 @@ import {
   IDENTITY_ORIENTATION,
   type Orientation,
 } from '../../../shared/adjustments'
-import type { WatermarkDto } from '../../../shared/api'
+import type { WatermarkDto } from '../../../shared/api-watermark'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import {
   ASPECT_PRESETS,

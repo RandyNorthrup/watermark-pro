@@ -11,6 +11,11 @@ M19 (performance and production hardening) is in progress.
 
 ### Changed
 
+- The wire schemas that carry a full `WatermarkSpec` (`saveWatermarkRequestSchema`,
+  `watermarkDtoSchema`, `watermarkListResponseSchema`) moved from `shared/api.ts`
+  to a new `shared/api-watermark.ts`, so importing the boot-path schemas (session,
+  public config, audit) no longer pulls the ~26 kB watermark spec module onto the
+  first paint. Only the lazily-loaded library, designer and editor reach it now.
 - JavaScript diet, first pass (PLAN §5.5): the `ui` chunk group (all of radix-ui
   + lucide bundled together) is gone and the authenticated layout is now
   code-split from the entry, so a first paint no longer downloads every UI

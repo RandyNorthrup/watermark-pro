@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { WatermarkDto } from '../../../shared/api'
+import type { WatermarkDto } from '../../../shared/api-watermark'
 import { describeError } from '../../lib/errors'
 import { Alert } from '../ui/alert'
 import { Spinner } from '../ui/spinner'

@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { WatermarkDto } from '../../../shared/api'
+import type { WatermarkDto } from '../../../shared/api-watermark'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import { type Layer, MAX_LAYERS } from '../../editor/state'
 import { cn } from '../../lib/cn'

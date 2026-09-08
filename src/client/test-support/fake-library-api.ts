@@ -4,12 +4,8 @@ import { NO_CLOUD_CONFIG } from './cloud-config'
 import { type FakeGalleryState, handleGallery } from './fake-gallery-api'
 import { type FakeShareState, handleShares } from './fake-share-api'
 import { requestUrl } from './request-url'
-import {
-  type AssetDto,
-  type PublicConfig,
-  saveWatermarkRequestSchema,
-  type WatermarkDto,
-} from '../../shared/api'
+import type { AssetDto, PublicConfig } from '../../shared/api'
+import { saveWatermarkRequestSchema, type WatermarkDto } from '../../shared/api-watermark'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
 
 /**

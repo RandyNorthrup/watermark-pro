@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { WatermarkDto } from '../../../shared/api'
+import type { WatermarkDto } from '../../../shared/api-watermark'
 
 interface PresetChecklistProps {
   /** The presets to list, already loaded. */

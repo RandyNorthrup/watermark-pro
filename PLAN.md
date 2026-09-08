@@ -636,11 +636,22 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
     of radix + lucide onto the first paint) and code-split the authenticated
     layout from the entry (removed the `splitBehavior` that pinned `/app` in the
     entry). Initial-load JS shared by every page: **234.8 → 188.6 kB gzip**;
-    route chunks unchanged and within budget. Remaining boot fat traced: the
-    landing route's session check pulls `auth-client` + `shared/api` (which pulls
-    the 26 kB `watermark` schema module) onto the public boot — the next lever.
-    The `/` ≤ 90 kB target still needs a minimal public entry (react-dom + router
-    - i18next + query already floor near 130 kB); tracked for the boot-split step.
+    route chunks unchanged and within budget. Then split `shared/api.ts` →
+    `api-watermark.ts` so the boot-path schema imports no longer pull the 26 kB
+    watermark spec module (initial JS 188.6 → 186.8 kB; watermark now off the
+    public boot module graph).
+  - **§5.5 budget conflict found (2026-09-08).** Measuring the floor: even after
+    the full diet, `/` cannot approach 90 kB gzip because the entry chunk is
+    react-dom (~40) + TanStack Router (~30) + query + main glue ≈ 96 kB gzip on
+    its own, plus i18next 13.5 kB and the lucide icon factory 14.5 kB the landing
+    uses. Hitting `/` ≤ 90 kB would require de-hydrating the landing to static
+    HTML — but the landing is interactive and **translated into all 12 languages
+    (M18)**, so a no-JS static landing would lose per-user locale. The literal
+    90 kB byte budget therefore conflicts with the shipped multilingual SPA
+    landing; the real §5.5 target (Lighthouse mobile ≥ 90 with FCP/LCP/CLS/TBT
+    limits) is met by prerender-for-paint + the skeleton while keeping hydration.
+    **Raised with Randy** for a decision (accept score-not-bytes with an honest
+    `/` byte budget, vs. de-hydrate the landing and drop its localisation).
   - **§1 first-paint skeleton (done).** `index.html` carries a static,
     theme-correct skeleton inside `#root` (header + brand mark, shimmer content
     blocks, phone tab bar) that paints before JavaScript and is replaced by

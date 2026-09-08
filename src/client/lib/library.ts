@@ -6,15 +6,13 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import { fetchJson, sendNoContent } from './api'
+import { type AssetDto, assetDtoSchema, assetListResponseSchema } from '../../shared/api'
 import {
-  type AssetDto,
-  assetDtoSchema,
-  assetListResponseSchema,
   type SaveWatermarkRequest,
   type WatermarkDto,
   watermarkDtoSchema,
   watermarkListResponseSchema,
-} from '../../shared/api'
+} from '../../shared/api-watermark'
 
 const JSON_HEADERS = { 'content-type': 'application/json' }
 

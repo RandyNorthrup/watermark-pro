@@ -16,9 +16,8 @@ import {
   photoListResponseSchema,
   publicShareSchema,
   shareDtoSchema,
-  watermarkDtoSchema,
-  watermarkListResponseSchema,
 } from '../shared/api'
+import { watermarkDtoSchema, watermarkListResponseSchema } from '../shared/api-watermark'
 import { HTTP_STATUS, SHARE_PATH_PREFIX } from '../shared/constants'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC } from '../shared/watermark'
 import { TestClient } from './test-support/client'

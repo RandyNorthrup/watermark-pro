@@ -1,4 +1,4 @@
-import type { WatermarkDto } from '../../../shared/api'
+import type { WatermarkDto } from '../../../shared/api-watermark'
 import type { WatermarkSpec } from '../../../shared/watermark'
 
 /** The specs for the ticked presets, in the order ticked; unknown ids are dropped. */

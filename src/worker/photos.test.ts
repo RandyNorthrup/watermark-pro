@@ -7,8 +7,8 @@ import {
   photoDtoSchema,
   photoListResponseSchema,
   storageUsageSchema,
-  watermarkDtoSchema,
 } from '../shared/api'
+import { watermarkDtoSchema } from '../shared/api-watermark'
 import {
   API_ERROR_CODE,
   HTTP_STATUS,

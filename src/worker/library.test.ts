@@ -2,12 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
-import {
-  assetDtoSchema,
-  assetListResponseSchema,
-  watermarkDtoSchema,
-  watermarkListResponseSchema,
-} from '../shared/api'
+import { assetDtoSchema, assetListResponseSchema } from '../shared/api'
+import { watermarkDtoSchema, watermarkListResponseSchema } from '../shared/api-watermark'
 import {
   API_ERROR_CODE,
   HTTP_STATUS,

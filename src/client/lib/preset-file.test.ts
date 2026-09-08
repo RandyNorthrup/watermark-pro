@@ -9,7 +9,8 @@ import {
   parsePresetFile,
   PresetFileError,
 } from './preset-file'
-import type { AssetDto, WatermarkDto } from '../../shared/api'
+import type { AssetDto } from '../../shared/api'
+import type { WatermarkDto } from '../../shared/api-watermark'
 import { MAX_LOGO_BYTES, MAX_PRESET_FILE_BYTES } from '../../shared/constants'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC, type WatermarkSpec } from '../../shared/watermark'
 

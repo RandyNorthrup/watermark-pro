@@ -12,7 +12,8 @@ import { StylePanel } from './style-panel'
 import { SymbolPicker } from './symbol-picker'
 import { TextEffects } from './text-effects'
 import { TokenMenu } from './token-menu'
-import { presetNameSchema, type WatermarkDto } from '../../../shared/api'
+import { presetNameSchema } from '../../../shared/api'
+import type { WatermarkDto } from '../../../shared/api-watermark'
 import {
   MAX_QR_CONTENT_LENGTH,
   MAX_TEXT_LENGTH,

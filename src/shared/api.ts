@@ -17,7 +17,6 @@ import {
   SHARE_EXPIRY_DAYS,
   MAX_PRESET_NAME_LENGTH,
 } from './constants'
-import { watermarkSpecSchema } from './watermark'
 
 export const healthResponseSchema = z.object({
   status: z.literal('ok'),
@@ -86,27 +85,6 @@ export const presetNameSchema = z
   .trim()
   .min(1, 'Give the preset a name')
   .max(MAX_PRESET_NAME_LENGTH)
-
-export const saveWatermarkRequestSchema = z.object({
-  name: presetNameSchema,
-  spec: watermarkSpecSchema,
-})
-
-export type SaveWatermarkRequest = z.infer<typeof saveWatermarkRequestSchema>
-
-export const watermarkDtoSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
-  name: z.string(),
-  spec: watermarkSpecSchema,
-  createdBy: z.string().nullable(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
-})
-
-export type WatermarkDto = z.infer<typeof watermarkDtoSchema>
-
-export const watermarkListResponseSchema = z.object({ watermarks: z.array(watermarkDtoSchema) })
 
 export const assetDtoSchema = z.object({
   id: z.string(),

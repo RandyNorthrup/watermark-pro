@@ -15,7 +15,8 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import type { AssetDto, WatermarkDto } from '../../../../shared/api'
+import type { AssetDto } from '../../../../shared/api'
+import type { WatermarkDto } from '../../../../shared/api-watermark'
 import { LOGO_CONTENT_TYPES } from '../../../../shared/constants'
 import type { Shape, WatermarkSpec } from '../../../../shared/watermark'
 import { ImportDialog } from '../../../components/presets/import-dialog'

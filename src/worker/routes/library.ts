@@ -5,15 +5,13 @@
  */
 import { type Context, Hono } from 'hono'
 
+import { assetDtoSchema, assetListResponseSchema, assetUploadFieldsSchema } from '../../shared/api'
 import {
-  assetDtoSchema,
-  assetListResponseSchema,
-  assetUploadFieldsSchema,
   type SaveWatermarkRequest,
   saveWatermarkRequestSchema,
   watermarkDtoSchema,
   watermarkListResponseSchema,
-} from '../../shared/api'
+} from '../../shared/api-watermark'
 import {
   HTTP_STATUS,
   LOGO_CONTENT_TYPES,

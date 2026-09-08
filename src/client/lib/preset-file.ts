@@ -7,7 +7,7 @@
  * the DOM-facing plumbing (base64, `File`, size gates).
  */
 import { createWatermark, type LogoUpload, uploadLogo } from './library'
-import type { WatermarkDto } from '../../shared/api'
+import type { WatermarkDto } from '../../shared/api-watermark'
 import {
   type LOGO_CONTENT_TYPES,
   MAX_LOGO_BYTES,
