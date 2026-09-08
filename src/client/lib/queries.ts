@@ -1,4 +1,4 @@
-import { type QueryClient, queryOptions } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 import { ApiRequestError, fetchJson } from './api'
 import { authClient } from './auth-client'
@@ -61,23 +61,6 @@ export function auditQueryOptions(organizationId: string) {
 
 /** Query keys to drop after anything that changes membership or the active organization. */
 export const ORGANIZATION_QUERY_KEY = ['organization'] as const
-
-/**
- * Force-refetches the shell queries the authenticated layout's `beforeLoad`
- * decides from — the session, the organization list and the active organization
- * — so that after a mutation that changes them (creating or joining an
- * organization, signing in, switching the active one) the cache is coherent and
- * a cache-first boot cannot read a stale value (PLAN §2). Refetches active and
- * inactive queries alike, and awaits them, so the caller can navigate straight
- * after.
- */
-export async function refetchShellQueries(queryClient: QueryClient): Promise<void> {
-  await Promise.all([
-    queryClient.refetchQueries({ queryKey: sessionQueryOptions.queryKey }),
-    queryClient.refetchQueries({ queryKey: organizationsQueryOptions.queryKey }),
-    queryClient.refetchQueries({ queryKey: activeOrganizationQueryOptions.queryKey }),
-  ])
-}
 
 /** Turnstile site key and other pre-sign-in settings; static for the life of a deployment. */
 export const publicConfigQueryOptions = queryOptions({

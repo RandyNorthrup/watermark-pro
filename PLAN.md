@@ -690,23 +690,7 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
     session (offline `beforeLoad` cannot reach `/api/auth/get-session`), so it
     lands with §2. The existing e2e suite runs against the SW-registered preview,
     so it guards against the worker breaking the app.
-  - **§2 persister + non-blocking boot (done 2026-09-08, redesigned).** Landed
-    correctly after the first attempt hit a stale-after-mutation wall. Three
-    parts: (A) **cache coherence** — `refetchShellQueries` force-refetches the
-    session, organization list and active organization (active and inactive) and
-    is awaited by every mutation that changes them (create/join organization,
-    sign in, switch active) before it navigates, so a cache read at boot is never
-    stale after a mutation; (B) **non-blocking boot** — `/app` `beforeLoad` reads
-    those queries from the cache (`getQueryData`) when present and revalidates in
-    the background (never awaited, paused offline), and `AppLayout` redirects to
-    `/login` if the revalidation finds no session; (C) **persister**
-    (`lib/query-persister.ts`, dehydrate/hydrate filtered to the shell queries,
-    24 h expiry, installed from `main.tsx`) so a return visit and offline boot
-    read the last visit's cache. Persister unit-tested; the boot is covered by the
-    80 `/app` page tests (incl. the create-organization flow that caught the first
-    attempt) and the e2e suite. Together with §4 the installed editor boots
-    offline.
-  - _(Superseded)_ First §2 attempt (persister + non-blocking boot) hit a
+  - **§2 persister + non-blocking boot (attempted 2026-09-08; deferred).** Built a
     `localStorage` query persister (dehydrate/hydrate, filtered to the session/org
     queries) and a non-blocking `/app` `beforeLoad` that reads the cache
     (`getQueryData`) and revalidates in the background, with `AppLayout`

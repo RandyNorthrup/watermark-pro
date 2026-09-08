@@ -25,16 +25,6 @@ M19 (performance and production hardening) is in progress.
 
 ### Added
 
-- Signed-in pages now paint without waiting on the session → organization fetch
-  chain (PLAN §2). The `/app` boot reads the session and organization list from
-  the query cache when present — this session's, or the last visit's, restored by
-  a new `localStorage` persister — and revalidates in the background; only a cold
-  first visit blocks, and the layout redirects to `/login` if the revalidation
-  finds the session gone. Mutations that change those queries (creating or
-  joining an organization, signing in, switching the active one) now refresh the
-  cache before navigating (`refetchShellQueries`), so a cache-first boot can never
-  read a stale value. Combined with the offline service worker, the installed app
-  now boots the editor offline after a visit.
 - Offline support (PLAN §4): a root-scope service worker (`public/sw.js`,
   registered in production) caches the hashed build assets forever (immutable by
   name) and serves navigations network-first with a cached fallback, so repeat

@@ -12,7 +12,6 @@ import { Field } from '../../../components/ui/field'
 import { Input } from '../../../components/ui/input'
 import { authClient } from '../../../lib/auth-client'
 import { describeAuthError } from '../../../lib/errors'
-import { refetchShellQueries } from '../../../lib/queries'
 import { useFormErrors } from '../../../lib/use-form-errors'
 
 export const Route = createFileRoute('/app/organizations/new')({
@@ -50,9 +49,6 @@ function NewOrganizationPage() {
     }
     await authClient.organization.setActive({ organizationId: result.data.id })
     await queryClient.invalidateQueries()
-    // Force the shell queries fresh before leaving, so the /app boot reads the
-    // new organization from cache rather than a stale empty list (PLAN §2).
-    await refetchShellQueries(queryClient)
     await router.invalidate()
     setIsPending(false)
     await navigate({ to: '/app' })

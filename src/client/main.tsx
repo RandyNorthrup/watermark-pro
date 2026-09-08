@@ -8,7 +8,6 @@ import { initI18n } from './i18n'
 import { launchTarget, setLaunchFiles } from './lib/launch-files'
 import { preloadRouteImages } from './lib/preload'
 import { createQueryClient } from './lib/query-client'
-import { installQueryPersister } from './lib/query-persister'
 import { installErrorReporting } from './lib/report-error'
 import { applyTheme, readTheme, watchSystemTheme } from './lib/theme'
 import { createAppRouter } from './router'
@@ -30,9 +29,6 @@ if (import.meta.env.PROD) {
 }
 
 const queryClient = createQueryClient()
-// Restore the shell's session/organization queries from the last visit and keep
-// them persisted, so a return visit renders the frame from cache (PLAN §2).
-installQueryPersister(queryClient)
 const router = createAppRouter(queryClient)
 
 // The routes for this URL need their code as soon as the session check

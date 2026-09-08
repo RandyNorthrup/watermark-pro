@@ -11,7 +11,6 @@ import { Alert } from '../components/ui/alert'
 import { Button } from '../components/ui/button'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError } from '../lib/errors'
-import { refetchShellQueries } from '../lib/queries'
 import { useFormErrors } from '../lib/use-form-errors'
 
 const searchSchema = z.object({
@@ -57,7 +56,6 @@ function LoginPage() {
       return
     }
     await queryClient.invalidateQueries()
-    await refetchShellQueries(queryClient)
     await navigate({ to: redirect ?? '/app' })
   }
 
