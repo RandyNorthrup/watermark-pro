@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
 import {
@@ -48,6 +49,7 @@ const ROLE_OPTIONS: readonly SelectOption<AssignableRole>[] = ASSIGNABLE_ROLES.m
 type InviteValues = z.infer<typeof inviteMemberSchema>
 
 function MembersPage() {
+  const { t } = useTranslation()
   const { session } = Route.useRouteContext()
   const membership = Route.useLoaderData()
   const initialOrganization = appRoute.useLoaderData()
@@ -56,7 +58,7 @@ function MembersPage() {
     initialData: initialOrganization,
   })
   if (organization === null) {
-    return <Alert tone="info">Create or join an organization to manage members.</Alert>
+    return <Alert tone="info">{t('members.orgRequired')}</Alert>
   }
 
   const isManager = canRole(membership?.role, { member: ['update'] })
@@ -67,9 +69,9 @@ function MembersPage() {
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <h1 className="text-3xl font-semibold tracking-tight">Members</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('members.heading')}</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          People in {organization.name} and what they can do.
+          {t('members.description', { name: organization.name })}
         </p>
       </header>
 
@@ -77,7 +79,7 @@ function MembersPage() {
 
       <section aria-labelledby="members-heading" className="flex flex-col gap-3">
         <h2 id="members-heading" className="text-xl font-semibold tracking-tight">
-          {String(organization.members.length)} member{organization.members.length === 1 ? '' : 's'}
+          {t('members.count', { count: organization.members.length })}
         </h2>
         <ul className="flex flex-col gap-2">
           {organization.members.map((member) => (
@@ -95,7 +97,7 @@ function MembersPage() {
       {pendingInvitations.length > 0 ? (
         <section aria-labelledby="invitations-heading" className="flex flex-col gap-3">
           <h2 id="invitations-heading" className="text-xl font-semibold tracking-tight">
-            Pending invitations
+            {t('members.pendingInvitations')}
           </h2>
           <ul className="flex flex-col gap-2">
             {pendingInvitations.map((invitation) => (
@@ -109,6 +111,7 @@ function MembersPage() {
 }
 
 function InviteForm({ organizationId }: { organizationId: string }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [values, setValues] = useState<InviteValues>({ email: '', role: 'editor' })
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(null)
@@ -126,7 +129,7 @@ function InviteForm({ organizationId }: { organizationId: string }) {
       }
     },
     onSuccess: async (_data, input) => {
-      setNotice({ tone: 'success', text: `Invitation sent to ${input.email}.` })
+      setNotice({ tone: 'success', text: t('members.invitationSent', { email: input.email }) })
       setValues({ email: '', role: input.role })
       await queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEY })
     },
@@ -147,10 +150,10 @@ function InviteForm({ organizationId }: { organizationId: string }) {
   return (
     <Card>
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Invite someone</h2>
+        <h2 className="text-lg font-semibold">{t('members.inviteHeading')}</h2>
         {notice === null ? null : <Alert tone={notice.tone}>{notice.text}</Alert>}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          <Field label="Email" error={errors.email} className="flex-1">
+          <Field label={t('members.emailLabel')} error={errors.email} className="flex-1">
             {(control) => (
               <Input
                 {...control}
@@ -163,7 +166,7 @@ function InviteForm({ organizationId }: { organizationId: string }) {
               />
             )}
           </Field>
-          <Field label="Role" error={errors.role}>
+          <Field label={t('members.roleLabel')} error={errors.role}>
             {(control) => (
               <Select
                 id={control.id}
@@ -176,7 +179,7 @@ function InviteForm({ organizationId }: { organizationId: string }) {
             )}
           </Field>
           <Button type="submit" isPending={invite.isPending} className="sm:mt-6">
-            Send invitation
+            {t('members.sendInvitation')}
           </Button>
         </div>
       </form>
@@ -192,6 +195,7 @@ interface MemberRowProps {
 }
 
 function MemberRow({ member, organizationId, isSelf, isManager }: MemberRowProps) {
+  const { t } = useTranslation()
   const currentRole: OrganizationRole = isOrganizationRole(member.role) ? member.role : 'viewer'
   // Owners are not reassignable from this screen; ownership transfer is a separate flow.
   const editableRole: AssignableRole | null =
@@ -211,7 +215,9 @@ function MemberRow({ member, organizationId, isSelf, isManager }: MemberRowProps
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">
             {member.user.name}
-            {isSelf ? <span className="font-normal text-ink-muted"> (you)</span> : null}
+            {isSelf ? (
+              <span className="font-normal text-ink-muted"> {t('members.you')}</span>
+            ) : null}
           </p>
           <p className="truncate text-sm text-ink-muted">{member.user.email}</p>
           <RowError message={error} />
@@ -221,7 +227,7 @@ function MemberRow({ member, organizationId, isSelf, isManager }: MemberRowProps
         ) : (
           <div className="flex items-center gap-2">
             <Select
-              aria-label={`Role for ${member.user.name}`}
+              aria-label={t('members.roleFor', { name: member.user.name })}
               value={editableRole}
               options={ROLE_OPTIONS}
               disabled={changeRole.mutation.isPending}
@@ -236,9 +242,9 @@ function MemberRow({ member, organizationId, isSelf, isManager }: MemberRowProps
               onClick={() => {
                 remove.mutation.mutate(undefined)
               }}
-              aria-label={`Remove ${member.user.name}`}
+              aria-label={t('members.removeMember', { name: member.user.name })}
             >
-              Remove
+              {t('members.remove')}
             </Button>
           </div>
         )}
@@ -254,6 +260,7 @@ function InvitationRow({
   invitation: OrganizationInvitation
   isManager: boolean
 }) {
+  const { t } = useTranslation()
   const cancel = useAuthMutation(() =>
     authClient.organization.cancelInvitation({ invitationId: invitation.id }),
   )
@@ -264,7 +271,7 @@ function InvitationRow({
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">{invitation.email}</p>
           <p className="text-sm text-ink-muted">
-            Invited as <Badge>{invitation.role}</Badge>
+            {t('members.invitedAs')} <Badge>{invitation.role}</Badge>
           </p>
           <RowError message={cancel.error} />
         </div>
@@ -276,9 +283,9 @@ function InvitationRow({
             onClick={() => {
               cancel.mutation.mutate(undefined)
             }}
-            aria-label={`Cancel invitation for ${invitation.email}`}
+            aria-label={t('members.cancelInvitation', { email: invitation.email })}
           >
-            Cancel
+            {t('members.cancel')}
           </Button>
         ) : null}
       </Card>

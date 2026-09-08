@@ -1,4 +1,5 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { BulkTool } from '../../components/bulk/bulk-tool'
 import { Alert } from '../../components/ui/alert'
@@ -13,19 +14,17 @@ export const Route = createFileRoute('/app/bulk')({
 })
 
 function BulkPage() {
+  const { t } = useTranslation()
   const organization = appRoute.useLoaderData()
   const membership = Route.useLoaderData()
   if (organization === null) {
-    return <Alert tone="info">Create or join an organization to watermark in bulk.</Alert>
+    return <Alert tone="info">{t('bulk.orgRequired')}</Alert>
   }
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-semibold tracking-tight">Bulk watermarking</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Apply one preset to a whole shoot. Photos are processed in parallel in your browser and
-          downloaded as a ZIP or one by one.
-        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('bulk.heading')}</h1>
+        <p className="mt-1 text-sm text-ink-muted">{t('bulk.description')}</p>
       </header>
       <BulkTool
         organizationId={organization.id}

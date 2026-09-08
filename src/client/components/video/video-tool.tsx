@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import type { TFunction } from 'i18next'
 import { Download, Film, Loader2, Share2, X } from 'lucide-react'
 import { type DragEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -537,7 +538,7 @@ async function shareOutcome(outcome: Outcome, onError: (message: string) => void
   }
 }
 
-function progressLabel(progress: Progress, t: ReturnType<typeof useTranslation>['t']): string {
+function progressLabel(progress: Progress, t: TFunction): string {
   const elapsed = performance.now() - progress.startedAt
   const remaining = estimateRemainingMs(progress.timestamp, progress.durationSeconds, elapsed)
   const percent = Math.round(

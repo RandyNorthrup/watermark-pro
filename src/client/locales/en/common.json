@@ -102,7 +102,79 @@
       "accept": "Accept invitation"
     }
   },
-  "library": {},
+  "dashboard": {
+    "signedInAs": "Signed in as {{email}}",
+    "yourWorkspace": "Your workspace",
+    "yourRole": "Your role:",
+    "toolsHeading": "Tools",
+    "tools": {
+      "library": {
+        "label": "Library",
+        "body": "Design text, symbol and logo watermarks once and keep them as presets."
+      },
+      "editor": {
+        "label": "Editor",
+        "body": "Watermark one photo by hand: place, crop, resize and export."
+      },
+      "bulk": {
+        "label": "Bulk",
+        "body": "Apply a preset to a whole shoot and download the results as a ZIP."
+      },
+      "gallery": {
+        "label": "Gallery",
+        "body": "Browse what the team has saved, then share albums with a link."
+      }
+    },
+    "overviewHeading": "Overview",
+    "members": "Members",
+    "noPendingInvitations": "No pending invitations.",
+    "pendingInvitations_one": "{{count}} pending invitation.",
+    "pendingInvitations_other": "{{count}} pending invitations.",
+    "manageMembers": "Manage members",
+    "auditLog": "Audit log",
+    "auditDescription": "Every membership and organization change is recorded with who did it and when.",
+    "viewAuditLog": "View audit log"
+  },
+  "library": {
+    "orgRequired": "Create or join an organization to build a watermark library.",
+    "heading": "Watermark library",
+    "description": "Presets shared by everyone in {{name}}. Apply them one at a time or in bulk.",
+    "export": "Export",
+    "exportPreset": "Export {{name}}",
+    "importPresets": "Import presets",
+    "newPreset": "New preset",
+    "exportErrorTitle": "Could not export the presets",
+    "loadingPresets": "Loading presets",
+    "loadErrorTitle": "Could not load the library",
+    "empty": "No presets yet. A preset combines a mark (text, symbol or logo) with placement, contrast and style settings.",
+    "createFirst": "Create the first preset",
+    "openInEditor": "Open {{name}} in the editor",
+    "deletePreset": "Delete {{name}}",
+    "logoBadge": "logo",
+    "autoContrast": "Auto contrast",
+    "manualContrast": "Manual contrast",
+    "updated": "Updated {{date}}",
+    "exportLogoTypeError": "A logo has an image type that cannot be exported.",
+    "exportMissingLogoError": "A preset refers to a logo that is no longer in the library.",
+    "describe": {
+      "text": "“{{text}}” in {{fontFamily}}",
+      "glyph": "Glyph {{glyph}}",
+      "icon": "Icon {{name}}",
+      "logo": "Logo",
+      "qr": "QR code for {{content}}"
+    },
+    "shape": {
+      "rectangle": "Rectangle",
+      "roundedRectangle": "Rounded rectangle",
+      "ellipse": "Ellipse",
+      "line": "Line"
+    },
+    "placement": {
+      "smart": "Smart placement",
+      "custom": "Custom position",
+      "random": "Random placement"
+    }
+  },
   "designer": {
     "presetName": "Preset name",
     "presetNamePlaceholder": "Studio signature",
@@ -304,6 +376,9 @@
     }
   },
   "editor": {
+    "orgRequired": "Create or join an organization to use the editor.",
+    "heading": "Editor",
+    "description": "Watermark one photo: pick a preset, place it by hand if you like, crop, resize and download. Nothing leaves your browser.",
     "tabs": {
       "watermark": "Watermark",
       "crop": "Crop",
@@ -445,6 +520,9 @@
     }
   },
   "bulk": {
+    "orgRequired": "Create or join an organization to watermark in bulk.",
+    "heading": "Bulk watermarking",
+    "description": "Apply one preset to a whole shoot. Photos are processed in parallel in your browser and downloaded as a ZIP or one by one.",
     "emptyHint": "to apply it to a batch.",
     "addPhotos": "Add photos",
     "addFolder": "Add a folder",
@@ -522,6 +600,9 @@
     }
   },
   "gallery": {
+    "orgRequired": "Create or join an organization to keep a gallery.",
+    "heading": "Gallery",
+    "description": "Watermarked photos saved by {{name}}. Search, filter by preset, download or delete.",
     "usage_one": "{{count}} photo · {{used}} of {{max}}",
     "usage_other": "{{count}} photos · {{used}} of {{max}}",
     "maxCount": "Up to {{count}} photos per organization",
@@ -579,8 +660,126 @@
     "linkShared": "Link shared.",
     "copyLink": "Copy link"
   },
-  "shares": {},
-  "admin": {},
+  "shares": {
+    "orgRequired": "Create or join an organization to share photos.",
+    "noPermission": "Your role does not include sharing.",
+    "heading": "Shares",
+    "description": "Links that let people outside {{name}} view and download selected photos. Revoking a link stops it immediately.",
+    "loading": "Loading shares",
+    "loadErrorTitle": "Could not load shares",
+    "empty": "No links yet. Select photos in the gallery and choose Share.",
+    "openGallery": "Open the gallery",
+    "rowCreated_one": "{{count}} photo · created {{created}}",
+    "rowCreated_other": "{{count}} photos · created {{created}}",
+    "neverExpires": " · never expires",
+    "expiresOn": " · expires {{expires}}",
+    "status": {
+      "active": "active",
+      "expired": "expired",
+      "revoked": "revoked"
+    },
+    "copyLink": "Copy link",
+    "shareEllipsis": "Share…",
+    "revoke": "Revoke {{title}}",
+    "revokeButton": "Revoke",
+    "linkCopied": "Link copied to the clipboard.",
+    "linkShared": "Link shared."
+  },
+  "admin": {
+    "heading": "Administration",
+    "description": "Every user and organization on this deployment. Actions here are recorded in the audit trail.",
+    "onlyAdmins": "Only platform administrators can open this page.",
+    "sectionsLabel": "Administration sections",
+    "tabs": {
+      "users": "Users",
+      "organizations": "Organizations",
+      "audit": "Audit trail"
+    },
+    "searchLabel": "Search by email",
+    "searchPlaceholder": "name@example.com",
+    "loadingUsers": "Loading users",
+    "usersErrorTitle": "Could not load users",
+    "userSummary_one": "{{count}} user{{extra}}.",
+    "userSummary_other": "{{count}} users{{extra}}.",
+    "showingNewest": ", showing the newest {{count}}",
+    "you": "(you)",
+    "joined": "Joined {{date}}",
+    "emailNotVerified": " · email not verified",
+    "platformAdmin": "platform admin",
+    "banned": "banned",
+    "bannedReason": "banned: {{reason}}",
+    "unban": "Unban",
+    "unbanUser": "Unban {{email}}",
+    "removeAdmin": "Remove admin",
+    "makeAdminShort": "Make admin",
+    "removeAdminFrom": "Remove admin from {{email}}",
+    "makeAdmin": "Make {{email}} an admin",
+    "signOutEverywhereButton": "Sign out everywhere",
+    "signOutEverywhere": "Sign out {{email}} everywhere",
+    "ban": "Ban",
+    "banUser": "Ban {{email}}",
+    "banConfirmTitle": "Ban {{email}}?",
+    "banConfirmBody": "Their sessions end now and they cannot sign in until unbanned. The reason is shown to them and kept in the audit trail.",
+    "reasonLabel": "Reason",
+    "cancel": "Cancel",
+    "banConfirm": "Ban user",
+    "loadingOrganizations": "Loading organizations",
+    "organizationsErrorTitle": "Could not load organizations",
+    "organizationsTable": "Organizations, newest first",
+    "th": {
+      "organization": "Organization",
+      "members": "Members",
+      "photos": "Photos",
+      "storage": "Storage",
+      "created": "Created"
+    },
+    "loadingAudit": "Loading audit trail",
+    "auditErrorTitle": "Could not load the audit trail",
+    "auditCaption": "Audit entries across all organizations, newest first",
+    "auditDetailHeading": "Organization",
+    "platform": "platform"
+  },
+  "members": {
+    "orgRequired": "Create or join an organization to manage members.",
+    "heading": "Members",
+    "description": "People in {{name}} and what they can do.",
+    "count_one": "{{count}} member",
+    "count_other": "{{count}} members",
+    "pendingInvitations": "Pending invitations",
+    "inviteHeading": "Invite someone",
+    "emailLabel": "Email",
+    "roleLabel": "Role",
+    "sendInvitation": "Send invitation",
+    "invitationSent": "Invitation sent to {{email}}.",
+    "you": "(you)",
+    "roleFor": "Role for {{name}}",
+    "remove": "Remove",
+    "removeMember": "Remove {{name}}",
+    "invitedAs": "Invited as",
+    "cancel": "Cancel",
+    "cancelInvitation": "Cancel invitation for {{email}}"
+  },
+  "audit": {
+    "heading": "Audit log",
+    "description": "The most recent changes in {{name}}. Owners and admins can view this page.",
+    "thisOrganization": "this organization",
+    "loading": "Loading audit log",
+    "loadErrorTitle": "Could not load the audit log",
+    "noAccess": "Your role does not include audit access.",
+    "empty": "Nothing recorded yet.",
+    "tableCaption": "Audit entries, newest first",
+    "detailsHeading": "Details"
+  },
+  "organizations": {
+    "firstTitle": "Create your first organization",
+    "newTitle": "New organization",
+    "description": "Organizations hold your watermarks, photos and team. You will be its owner.",
+    "createFailed": "The organization could not be created.",
+    "nameLabel": "Name",
+    "slugLabel": "URL identifier",
+    "slugHint": "Lowercase letters, numbers and hyphens. Used in links and must be unique.",
+    "submit": "Create organization"
+  },
   "import": {
     "takePhoto": "Take a photo",
     "cancel": "Cancel",
@@ -606,6 +805,9 @@
     }
   },
   "video": {
+    "orgRequired": "Create or join an organization to watermark video.",
+    "heading": "Video watermarking",
+    "description": "Apply a preset to a whole video. Every frame is watermarked in your browser and the audio is kept; nothing is uploaded.",
     "checkingSupport": "Checking video support",
     "unsupportedTitle": "Video is not supported in this browser",
     "unsupportedBody": "Your browser cannot encode video. Chrome, Edge or Safari 17 and later can.",
@@ -655,6 +857,9 @@
     "previewAlt": "The watermark on a frame of the video"
   },
   "documents": {
+    "orgRequired": "Create or join an organization to watermark documents.",
+    "heading": "Documents",
+    "description": "Stamp a preset onto every page of a PDF. Files are processed in your browser and downloaded one by one or as a ZIP.",
     "emptyHint": "to watermark documents with it.",
     "addPdfs": "Add PDFs",
     "dropHint": "Drop PDFs here, or",
@@ -691,5 +896,12 @@
   },
   "tokens": {},
   "filters": {},
-  "a11y": {}
+  "a11y": {},
+  "root": {
+    "notFound": {
+      "title": "Page not found",
+      "body": "The address may be mistyped, or the page may have moved.",
+      "back": "Back to the start"
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
+import type { TFunction } from 'i18next'
 import {
   Download,
   Image,
@@ -12,6 +13,7 @@ import {
   Type,
   Upload,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import type { AssetDto, WatermarkDto } from '../../../../shared/api'
 import { LOGO_CONTENT_TYPES } from '../../../../shared/constants'
@@ -45,12 +47,13 @@ export const Route = createFileRoute('/app/library/')({
 
 const KIND_ICONS = { text: Type, symbol: Stamp, shape: Shapes, image: Image, qr: QrCode } as const
 
-const SHAPE_LABELS: Record<Shape, string> = {
-  rectangle: 'Rectangle',
-  'rounded-rectangle': 'Rounded rectangle',
-  ellipse: 'Ellipse',
-  line: 'Line',
-}
+/** Catalogue keys for each shape; translated where a preset is described. */
+const SHAPE_LABELS = {
+  rectangle: 'library.shape.rectangle',
+  'rounded-rectangle': 'library.shape.roundedRectangle',
+  ellipse: 'library.shape.ellipse',
+  line: 'library.shape.line',
+} as const satisfies Record<Shape, string>
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
 
@@ -59,50 +62,50 @@ const DATE_STAMP_LENGTH = 10
 /** The exported bundle is pretty-printed with this indent for readability. */
 const EXPORT_INDENT = 2
 
-function describeSpec(spec: WatermarkSpec): string {
+function describeSpec(t: TFunction, spec: WatermarkSpec): string {
   switch (spec.kind) {
     case 'text': {
-      return `“${spec.text}” in ${spec.fontFamily}`
+      return t('library.describe.text', { text: spec.text, fontFamily: spec.fontFamily })
     }
     case 'symbol': {
       return spec.symbol.type === 'glyph'
-        ? `Glyph ${spec.symbol.glyph}`
-        : `Icon ${spec.symbol.name}`
+        ? t('library.describe.glyph', { glyph: spec.symbol.glyph })
+        : t('library.describe.icon', { name: spec.symbol.name })
     }
     case 'shape': {
-      return SHAPE_LABELS[spec.shape]
+      return t(SHAPE_LABELS[spec.shape])
     }
     case 'image': {
-      return 'Logo'
+      return t('library.describe.logo')
     }
     case 'qr': {
-      return `QR code for ${spec.content}`
+      return t('library.describe.qr', { content: spec.content })
     }
   }
 }
 
-function describePlacement(spec: WatermarkSpec): string {
+function describePlacement(t: TFunction, spec: WatermarkSpec): string {
   switch (spec.placement.mode) {
     case 'smart': {
-      return 'Smart placement'
+      return t('library.placement.smart')
     }
     case 'anchor': {
       return spec.placement.anchor.replaceAll('-', ' ')
     }
     case 'custom': {
-      return 'Custom position'
+      return t('library.placement.custom')
     }
     case 'random': {
-      return 'Random placement'
+      return t('library.placement.random')
     }
   }
 }
 
 /** Narrows a stored asset content type to the logo types the bundle allows. */
-function toLogoContentType(value: string): (typeof LOGO_CONTENT_TYPES)[number] {
+function toLogoContentType(t: TFunction, value: string): (typeof LOGO_CONTENT_TYPES)[number] {
   const match = LOGO_CONTENT_TYPES.find((type) => type === value)
   if (match === undefined) {
-    throw new Error('A logo has an image type that cannot be exported.')
+    throw new Error(t('library.exportLogoTypeError'))
   }
   return match
 }
@@ -118,6 +121,7 @@ function exportFileName(organization: { slug?: string | null; id: string }): str
  * image preset references so the file is self-contained.
  */
 async function buildExportBlob(
+  t: TFunction,
   organizationId: string,
   presets: readonly WatermarkDto[],
   assets: readonly AssetDto[],
@@ -132,14 +136,14 @@ async function buildExportBlob(
   for (const assetId of assetIds) {
     const asset = assetById.get(assetId)
     if (asset === undefined) {
-      throw new Error('A preset refers to a logo that is no longer in the library.')
+      throw new Error(t('library.exportMissingLogoError'))
     }
     const response = await fetch(assetFileUrl(organizationId, assetId))
     const bytes = new Uint8Array(await response.arrayBuffer())
     logos.push({
       assetId,
       name: asset.name,
-      contentType: toLogoContentType(asset.contentType),
+      contentType: toLogoContentType(t, asset.contentType),
       width: asset.width,
       height: asset.height,
       bytes,
@@ -153,6 +157,7 @@ async function buildExportBlob(
 }
 
 function LibraryPage() {
+  const { t } = useTranslation()
   const organization = appRoute.useLoaderData()
   const membership = Route.useLoaderData()
   const organizationId = organization?.id ?? ''
@@ -170,12 +175,12 @@ function LibraryPage() {
       const assets = hasImagePresets
         ? await queryClient.query(assetsQueryOptions(organizationId))
         : []
-      const blob = await buildExportBlob(organizationId, chosen, assets)
+      const blob = await buildExportBlob(t, organizationId, chosen, assets)
       downloadBlob(blob, exportFileName(organization))
     },
   })
   if (organization === null) {
-    return <Alert tone="info">Create or join an organization to build a watermark library.</Alert>
+    return <Alert tone="info">{t('library.orgRequired')}</Alert>
   }
   const canManage = canRole(membership?.role, { watermark: ['create'] })
   const items = presets.data ?? []
@@ -184,9 +189,9 @@ function LibraryPage() {
     <div className="flex flex-col gap-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Watermark library</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">{t('library.heading')}</h1>
           <p className="mt-1 text-sm text-ink-muted">
-            Presets shared by everyone in {organization.name}. Apply them one at a time or in bulk.
+            {t('library.description', { name: organization.name })}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -200,7 +205,7 @@ function LibraryPage() {
               }}
             >
               {exportPresets.isPending ? null : <Download aria-hidden="true" className="size-4" />}
-              Export
+              {t('library.export')}
             </Button>
           ) : null}
           {canManage ? (
@@ -210,7 +215,7 @@ function LibraryPage() {
               trigger={
                 <Button type="button" variant="secondary">
                   <Upload aria-hidden="true" className="size-4" />
-                  Import presets
+                  {t('library.importPresets')}
                 </Button>
               }
             />
@@ -218,13 +223,13 @@ function LibraryPage() {
           {canManage ? (
             <Link to="/app/library/new" className={buttonVariants({ variant: 'primary' })}>
               <Plus aria-hidden="true" className="size-4" />
-              New preset
+              {t('library.newPreset')}
             </Link>
           ) : null}
         </div>
       </header>
       {exportPresets.isError ? (
-        <Alert tone="error" title="Could not export the presets">
+        <Alert tone="error" title={t('library.exportErrorTitle')}>
           {describeError(exportPresets.error)}
         </Alert>
       ) : null}
@@ -248,12 +253,13 @@ interface PresetListProps {
 }
 
 function PresetList({ query, organizationId, canManage, onExport }: PresetListProps) {
+  const { t } = useTranslation()
   if (query.isPending) {
-    return <Spinner className="size-6" label="Loading presets" />
+    return <Spinner className="size-6" label={t('library.loadingPresets')} />
   }
   if (query.isError) {
     return (
-      <Alert tone="error" title="Could not load the library">
+      <Alert tone="error" title={t('library.loadErrorTitle')}>
         {describeError(query.error)}
       </Alert>
     )
@@ -261,13 +267,10 @@ function PresetList({ query, organizationId, canManage, onExport }: PresetListPr
   if (query.data.length === 0) {
     return (
       <Card className="flex flex-col items-start gap-3">
-        <p className="text-sm text-ink-muted">
-          No presets yet. A preset combines a mark (text, symbol or logo) with placement, contrast
-          and style settings.
-        </p>
+        <p className="text-sm text-ink-muted">{t('library.empty')}</p>
         {canManage ? (
           <Link to="/app/library/new" className={buttonVariants({ variant: 'secondary' })}>
-            Create the first preset
+            {t('library.createFirst')}
           </Link>
         ) : null}
       </Card>
@@ -296,6 +299,7 @@ interface PresetCardProps {
 }
 
 function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardProps) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const remove = useMutation({
     mutationFn: () => deleteWatermark(organizationId, preset.id),
@@ -321,7 +325,7 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
                 {preset.name}
               </Link>
             </h2>
-            <p className="truncate text-sm text-ink-muted">{describeSpec(preset.spec)}</p>
+            <p className="truncate text-sm text-ink-muted">{describeSpec(t, preset.spec)}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -329,7 +333,7 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Export ${preset.name}`}
+            aria-label={t('library.exportPreset', { name: preset.name })}
             className="text-ink-muted"
             onClick={() => {
               onExport(preset)
@@ -340,7 +344,7 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
           <Link
             to="/app/editor"
             search={{ preset: preset.id }}
-            aria-label={`Open ${preset.name} in the editor`}
+            aria-label={t('library.openInEditor', { name: preset.name })}
             className={buttonVariants({ variant: 'ghost', size: 'icon' })}
           >
             <PencilRuler aria-hidden="true" className="size-4" />
@@ -350,7 +354,7 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
               type="button"
               variant="ghost"
               size="icon"
-              aria-label={`Delete ${preset.name}`}
+              aria-label={t('library.deletePreset', { name: preset.name })}
               disabled={remove.isPending}
               onClick={() => {
                 remove.mutate()
@@ -362,13 +366,19 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
           ) : null}
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-          <Badge>{preset.spec.kind === 'image' ? 'logo' : preset.spec.kind}</Badge>
-          <span className="capitalize">{describePlacement(preset.spec)}</span>
+          <Badge>{preset.spec.kind === 'image' ? t('library.logoBadge') : preset.spec.kind}</Badge>
+          <span className="capitalize">{describePlacement(t, preset.spec)}</span>
           <span aria-hidden="true">·</span>
-          <span>{preset.spec.contrast.mode === 'auto' ? 'Auto contrast' : 'Manual contrast'}</span>
+          <span>
+            {t(
+              preset.spec.contrast.mode === 'auto'
+                ? 'library.autoContrast'
+                : 'library.manualContrast',
+            )}
+          </span>
           <span aria-hidden="true">·</span>
           <time dateTime={preset.updatedAt}>
-            Updated {dateFormatter.format(new Date(preset.updatedAt))}
+            {t('library.updated', { date: dateFormatter.format(new Date(preset.updatedAt)) })}
           </time>
         </div>
         {remove.isError ? <Alert tone="error">{describeError(remove.error)}</Alert> : null}

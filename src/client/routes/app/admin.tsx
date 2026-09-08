@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import type { TFunction } from 'i18next'
 import { Ban, ShieldCheck, ShieldOff, UserCheck, UserX } from 'lucide-react'
 import { AlertDialog, Tabs } from 'radix-ui'
 import { useDeferredValue, useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { AuditTable } from '../../components/audit-table'
 import { Alert } from '../../components/ui/alert'
@@ -35,41 +37,40 @@ const tabClassName =
   'rounded-md px-3 py-1.5 text-sm font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white'
 
 function AdminPage() {
+  const { t } = useTranslation()
   const { session } = Route.useRouteContext()
   const isAdmin = isPlatformAdmin(session.user)
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-semibold tracking-tight">Administration</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Every user and organization on this deployment. Actions here are recorded in the audit
-          trail.
-        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('admin.heading')}</h1>
+        <p className="mt-1 text-sm text-ink-muted">{t('admin.description')}</p>
       </header>
       {isAdmin ? (
         <AdminSections selfId={session.user.id} />
       ) : (
-        <Alert tone="error">Only platform administrators can open this page.</Alert>
+        <Alert tone="error">{t('admin.onlyAdmins')}</Alert>
       )}
     </div>
   )
 }
 
 function AdminSections({ selfId }: { selfId: string }) {
+  const { t } = useTranslation()
   return (
     <Tabs.Root defaultValue="users" className="flex flex-col gap-4">
       <Tabs.List
-        aria-label="Administration sections"
+        aria-label={t('admin.sectionsLabel')}
         className="inline-flex self-start rounded-lg border border-line bg-surface-raised p-1"
       >
         <Tabs.Trigger value="users" className={tabClassName}>
-          Users
+          {t('admin.tabs.users')}
         </Tabs.Trigger>
         <Tabs.Trigger value="organizations" className={tabClassName}>
-          Organizations
+          {t('admin.tabs.organizations')}
         </Tabs.Trigger>
         <Tabs.Trigger value="audit" className={tabClassName}>
-          Audit trail
+          {t('admin.tabs.audit')}
         </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content value="users" className="outline-none">
@@ -86,6 +87,7 @@ function AdminSections({ selfId }: { selfId: string }) {
 }
 
 function UsersPanel({ selfId }: { selfId: string }) {
+  const { t } = useTranslation()
   const searchId = useId()
   const [search, setSearch] = useState('')
   const deferredSearch = useDeferredValue(search.trim())
@@ -94,32 +96,34 @@ function UsersPanel({ selfId }: { selfId: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex max-w-md flex-col gap-1.5">
         <label htmlFor={searchId} className="text-sm font-medium">
-          Search by email
+          {t('admin.searchLabel')}
         </label>
         <Input
           id={searchId}
           type="search"
           value={search}
-          placeholder="name@example.com"
+          placeholder={t('admin.searchPlaceholder')}
           onChange={(event) => {
             setSearch(event.currentTarget.value)
           }}
         />
       </div>
-      {users.isPending ? <Spinner className="size-6" label="Loading users" /> : null}
+      {users.isPending ? <Spinner className="size-6" label={t('admin.loadingUsers')} /> : null}
       {users.isError ? (
-        <Alert tone="error" title="Could not load users">
+        <Alert tone="error" title={t('admin.usersErrorTitle')}>
           {describeError(users.error)}
         </Alert>
       ) : null}
       {users.isSuccess ? (
         <>
           <p className="text-sm text-ink-muted">
-            {String(users.data.total)} user{users.data.total === 1 ? '' : 's'}
-            {users.data.total > users.data.users.length
-              ? `, showing the newest ${String(users.data.users.length)}`
-              : ''}
-            .
+            {t('admin.userSummary', {
+              count: users.data.total,
+              extra:
+                users.data.total > users.data.users.length
+                  ? t('admin.showingNewest', { count: users.data.users.length })
+                  : '',
+            })}
           </p>
           <ul className="flex flex-col gap-2">
             {users.data.users.map((user) => (
@@ -132,12 +136,13 @@ function UsersPanel({ selfId }: { selfId: string }) {
   )
 }
 
-function banLabel(user: AdminUser): string {
+function banLabel(t: TFunction, user: AdminUser): string {
   const reason = user.banReason ?? ''
-  return reason === '' ? 'banned' : `banned: ${reason}`
+  return reason === '' ? t('admin.banned') : t('admin.bannedReason', { reason })
 }
 
 function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [error, setError] = useState<string | null>(null)
   const isAdmin = isPlatformAdmin(user)
@@ -159,19 +164,19 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
           <div className="min-w-0">
             <p className="truncate font-medium">
               {user.name}
-              {isSelf ? <span className="text-ink-muted"> (you)</span> : null}
+              {isSelf ? <span className="text-ink-muted"> {t('admin.you')}</span> : null}
             </p>
             <p className="truncate text-sm text-ink-muted">{user.email}</p>
             <p className="text-xs text-ink-muted">
-              Joined {dateTimeFormatter.format(user.createdAt)}
-              {user.emailVerified ? '' : ' · email not verified'}
+              {t('admin.joined', { date: dateTimeFormatter.format(user.createdAt) })}
+              {user.emailVerified ? '' : t('admin.emailNotVerified')}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {isAdmin ? <Badge>platform admin</Badge> : null}
+            {isAdmin ? <Badge>{t('admin.platformAdmin')}</Badge> : null}
             {isBanned ? (
               <Badge className="bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-100">
-                {banLabel(user)}
+                {banLabel(t, user)}
               </Badge>
             ) : null}
           </div>
@@ -184,13 +189,13 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
                 variant="secondary"
                 size="sm"
                 isPending={act.isPending}
-                aria-label={`Unban ${user.email}`}
+                aria-label={t('admin.unbanUser', { email: user.email })}
                 onClick={() => {
                   act.mutate(() => unbanUser(user.id))
                 }}
               >
                 <UserCheck aria-hidden="true" className="size-4" />
-                Unban
+                {t('admin.unban')}
               </Button>
             ) : (
               <BanDialog
@@ -206,9 +211,9 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
               variant="secondary"
               size="sm"
               isPending={act.isPending}
-              aria-label={
-                isAdmin ? `Remove admin from ${user.email}` : `Make ${user.email} an admin`
-              }
+              aria-label={t(isAdmin ? 'admin.removeAdminFrom' : 'admin.makeAdmin', {
+                email: user.email,
+              })}
               onClick={() => {
                 act.mutate(() => setUserRole(user.id, isAdmin ? 'user' : 'admin'))
               }}
@@ -218,20 +223,20 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
               ) : (
                 <ShieldCheck aria-hidden="true" className="size-4" />
               )}
-              {isAdmin ? 'Remove admin' : 'Make admin'}
+              {t(isAdmin ? 'admin.removeAdmin' : 'admin.makeAdminShort')}
             </Button>
             <Button
               type="button"
               variant="secondary"
               size="sm"
               isPending={act.isPending}
-              aria-label={`Sign out ${user.email} everywhere`}
+              aria-label={t('admin.signOutEverywhere', { email: user.email })}
               onClick={() => {
                 act.mutate(() => revokeUserSessions(user.id))
               }}
             >
               <UserX aria-hidden="true" className="size-4" />
-              Sign out everywhere
+              {t('admin.signOutEverywhereButton')}
             </Button>
           </div>
         )}
@@ -250,6 +255,7 @@ function BanDialog({
   isPending: boolean
   onConfirm: (reason: string) => void
 }) {
+  const { t } = useTranslation()
   const reasonId = useId()
   const [reason, setReason] = useState('')
   return (
@@ -260,23 +266,24 @@ function BanDialog({
           variant="danger"
           size="sm"
           isPending={isPending}
-          aria-label={`Ban ${email}`}
+          aria-label={t('admin.banUser', { email })}
         >
           <Ban aria-hidden="true" className="size-4" />
-          Ban
+          {t('admin.ban')}
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
         <AlertDialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(90vw,26rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card">
-          <AlertDialog.Title className="text-lg font-semibold">Ban {email}?</AlertDialog.Title>
+          <AlertDialog.Title className="text-lg font-semibold">
+            {t('admin.banConfirmTitle', { email })}
+          </AlertDialog.Title>
           <AlertDialog.Description className="text-sm text-ink-muted">
-            Their sessions end now and they cannot sign in until unbanned. The reason is shown to
-            them and kept in the audit trail.
+            {t('admin.banConfirmBody')}
           </AlertDialog.Description>
           <div className="flex flex-col gap-1.5">
             <label htmlFor={reasonId} className="text-sm font-medium">
-              Reason
+              {t('admin.reasonLabel')}
             </label>
             <Input
               id={reasonId}
@@ -290,7 +297,7 @@ function BanDialog({
           <div className="flex justify-end gap-2">
             <AlertDialog.Cancel asChild>
               <Button type="button" variant="secondary">
-                Cancel
+                {t('admin.cancel')}
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action asChild>
@@ -302,7 +309,7 @@ function BanDialog({
                   onConfirm(reason.trim())
                 }}
               >
-                Ban user
+                {t('admin.banConfirm')}
               </Button>
             </AlertDialog.Action>
           </div>
@@ -313,13 +320,14 @@ function BanDialog({
 }
 
 function OrganizationsPanel() {
+  const { t } = useTranslation()
   const organizations = useQuery(adminOrganizationsQueryOptions)
   if (organizations.isPending) {
-    return <Spinner className="size-6" label="Loading organizations" />
+    return <Spinner className="size-6" label={t('admin.loadingOrganizations')} />
   }
   if (organizations.isError) {
     return (
-      <Alert tone="error" title="Could not load organizations">
+      <Alert tone="error" title={t('admin.organizationsErrorTitle')}>
         {describeError(organizations.error)}
       </Alert>
     )
@@ -329,26 +337,26 @@ function OrganizationsPanel() {
       className="overflow-x-auto p-0 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
       tabIndex={0}
       role="region"
-      aria-label="Organizations, newest first"
+      aria-label={t('admin.organizationsTable')}
     >
       <table className="w-full text-sm">
-        <caption className="sr-only">Organizations, newest first</caption>
+        <caption className="sr-only">{t('admin.organizationsTable')}</caption>
         <thead className="text-left text-xs text-ink-muted uppercase">
           <tr>
             <th scope="col" className="px-4 py-3">
-              Organization
+              {t('admin.th.organization')}
             </th>
             <th scope="col" className="px-4 py-3">
-              Members
+              {t('admin.th.members')}
             </th>
             <th scope="col" className="px-4 py-3">
-              Photos
+              {t('admin.th.photos')}
             </th>
             <th scope="col" className="px-4 py-3">
-              Storage
+              {t('admin.th.storage')}
             </th>
             <th scope="col" className="px-4 py-3">
-              Created
+              {t('admin.th.created')}
             </th>
           </tr>
         </thead>
@@ -376,25 +384,26 @@ function OrganizationsPanel() {
 }
 
 function AuditPanel() {
+  const { t } = useTranslation()
   const entries = useQuery(adminAuditQueryOptions)
   if (entries.isPending) {
-    return <Spinner className="size-6" label="Loading audit trail" />
+    return <Spinner className="size-6" label={t('admin.loadingAudit')} />
   }
   if (entries.isError) {
     return (
-      <Alert tone="error" title="Could not load the audit trail">
+      <Alert tone="error" title={t('admin.auditErrorTitle')}>
         {describeError(entries.error)}
       </Alert>
     )
   }
   return (
     <AuditTable
-      caption="Audit entries across all organizations, newest first"
+      caption={t('admin.auditCaption')}
       entries={entries.data}
-      detailHeading="Organization"
+      detailHeading={t('admin.auditDetailHeading')}
       renderDetail={(entry) => (
         <td className="px-4 py-3 font-mono text-xs text-ink-muted">
-          {entry.organizationId ?? 'platform'}
+          {entry.organizationId ?? t('admin.platform')}
         </td>
       )}
     />

@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
 import { newOrganizationSchema, slugify } from '../../../../shared/validation'
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/app/organizations/new')({
 type FormValues = z.infer<typeof newOrganizationSchema>
 
 function NewOrganizationPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -42,7 +44,7 @@ function NewOrganizationPage() {
     const failure = describeAuthError(result.error)
     if (failure !== null || result.data === null) {
       setIsPending(false)
-      setServerError(failure ?? 'The organization could not be created.')
+      setServerError(failure ?? t('organizations.createFailed'))
       return
     }
     await authClient.organization.setActive({ organizationId: result.data.id })
@@ -56,11 +58,9 @@ function NewOrganizationPage() {
     <div className="mx-auto flex max-w-lg flex-col gap-6">
       <header>
         <h1 className="text-3xl font-semibold tracking-tight">
-          {organizations.length === 0 ? 'Create your first organization' : 'New organization'}
+          {t(organizations.length === 0 ? 'organizations.firstTitle' : 'organizations.newTitle')}
         </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Organizations hold your watermarks, photos and team. You will be its owner.
-        </p>
+        <p className="mt-1 text-sm text-ink-muted">{t('organizations.description')}</p>
       </header>
       <Card>
         <form
@@ -69,7 +69,7 @@ function NewOrganizationPage() {
           className="flex flex-col gap-4"
         >
           {serverError === null ? null : <Alert tone="error">{serverError}</Alert>}
-          <Field label="Name" error={errors.name}>
+          <Field label={t('organizations.nameLabel')} error={errors.name}>
             {(control) => (
               <Input
                 {...control}
@@ -83,8 +83,8 @@ function NewOrganizationPage() {
             )}
           </Field>
           <Field
-            label="URL identifier"
-            hint="Lowercase letters, numbers and hyphens. Used in links and must be unique."
+            label={t('organizations.slugLabel')}
+            hint={t('organizations.slugHint')}
             error={errors.slug}
           >
             {(control) => (
@@ -100,7 +100,7 @@ function NewOrganizationPage() {
             )}
           </Field>
           <Button type="submit" isPending={isPending} className="self-end">
-            Create organization
+            {t('organizations.submit')}
           </Button>
         </form>
       </Card>

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
 import { Check, Copy, Share2, XCircle } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { ShareDto } from '../../../shared/api'
 import { Alert } from '../../components/ui/alert'
@@ -31,6 +32,13 @@ export const Route = createFileRoute('/app/shares')({
 
 type ShareStatus = 'active' | 'expired' | 'revoked'
 
+/** Catalogue keys for each share status; translated where the badge is drawn. */
+const STATUS_LABELS = {
+  active: 'shares.status.active',
+  expired: 'shares.status.expired',
+  revoked: 'shares.status.revoked',
+} as const satisfies Record<ShareStatus, string>
+
 function statusOf(share: ShareDto, now: number): ShareStatus {
   if (share.revokedAt !== null) {
     return 'revoked'
@@ -42,6 +50,7 @@ function statusOf(share: ShareDto, now: number): ShareStatus {
 }
 
 function SharesPage() {
+  const { t } = useTranslation()
   const organization = appRoute.useLoaderData()
   const membership = Route.useLoaderData()
   const organizationId = organization?.id ?? ''
@@ -49,33 +58,30 @@ function SharesPage() {
   // Captured once per load so the status badges are pure during render.
   const [now] = useState(() => Date.now())
   if (organization === null) {
-    return <Alert tone="info">Create or join an organization to share photos.</Alert>
+    return <Alert tone="info">{t('shares.orgRequired')}</Alert>
   }
   if (!canRole(membership?.role, { share: ['create'] })) {
-    return <Alert tone="error">Your role does not include sharing.</Alert>
+    return <Alert tone="error">{t('shares.noPermission')}</Alert>
   }
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="text-3xl font-semibold tracking-tight">Shares</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('shares.heading')}</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          Links that let people outside {organization.name} view and download selected photos.
-          Revoking a link stops it immediately.
+          {t('shares.description', { name: organization.name })}
         </p>
       </header>
-      {shares.isPending ? <Spinner className="size-6" label="Loading shares" /> : null}
+      {shares.isPending ? <Spinner className="size-6" label={t('shares.loading')} /> : null}
       {shares.isError ? (
-        <Alert tone="error" title="Could not load shares">
+        <Alert tone="error" title={t('shares.loadErrorTitle')}>
           {describeError(shares.error)}
         </Alert>
       ) : null}
       {shares.isSuccess && shares.data.length === 0 ? (
         <Card className="flex flex-col items-start gap-3">
-          <p className="text-sm text-ink-muted">
-            No links yet. Select photos in the gallery and choose Share.
-          </p>
+          <p className="text-sm text-ink-muted">{t('shares.empty')}</p>
           <Link to="/app/gallery" className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
-            Open the gallery
+            {t('shares.openGallery')}
           </Link>
         </Card>
       ) : null}
@@ -105,6 +111,7 @@ function ShareRow({
   organizationId: string
   now: number
 }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [outcome, setOutcome] = useState<'copied' | 'shared' | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -134,14 +141,18 @@ function ShareRow({
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold">{share.title}</h2>
             <p className="text-sm text-ink-muted">
-              {String(share.photoCount)} photo{share.photoCount === 1 ? '' : 's'} · created{' '}
-              {dateTimeFormatter.format(new Date(share.createdAt))}
+              {t('shares.rowCreated', {
+                count: share.photoCount,
+                created: dateTimeFormatter.format(new Date(share.createdAt)),
+              })}
               {share.expiresAt === null
-                ? ' · never expires'
-                : ` · expires ${dateTimeFormatter.format(new Date(share.expiresAt))}`}
+                ? t('shares.neverExpires')
+                : t('shares.expiresOn', {
+                    expires: dateTimeFormatter.format(new Date(share.expiresAt)),
+                  })}
             </p>
           </div>
-          <Badge className={STATUS_STYLES[status]}>{status}</Badge>
+          <Badge className={STATUS_STYLES[status]}>{t(STATUS_LABELS[status])}</Badge>
         </div>
         <p className="truncate font-mono text-xs text-ink-muted">{share.url}</p>
         {status === 'active' ? (
@@ -159,7 +170,7 @@ function ShareRow({
               ) : (
                 <Copy aria-hidden="true" className="size-4" />
               )}
-              Copy link
+              {t('shares.copyLink')}
             </Button>
             <Button
               type="button"
@@ -170,26 +181,26 @@ function ShareRow({
               }}
             >
               <Share2 aria-hidden="true" className="size-4" />
-              Share…
+              {t('shares.shareEllipsis')}
             </Button>
             <Button
               type="button"
               variant="danger"
               size="sm"
               isPending={revoke.isPending}
-              aria-label={`Revoke ${share.title}`}
+              aria-label={t('shares.revoke', { title: share.title })}
               onClick={() => {
                 revoke.mutate()
               }}
             >
               <XCircle aria-hidden="true" className="size-4" />
-              Revoke
+              {t('shares.revokeButton')}
             </Button>
           </div>
         ) : null}
         {outcome === null ? null : (
           <p className="text-xs text-ink-muted" role="status">
-            {outcome === 'copied' ? 'Link copied to the clipboard.' : 'Link shared.'}
+            {t(outcome === 'copied' ? 'shares.linkCopied' : 'shares.linkShared')}
           </p>
         )}
         {revoke.isError ? <Alert tone="error">{describeError(revoke.error)}</Alert> : null}
