@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import type { TFunction } from 'i18next'
-import { Ban, ShieldCheck, ShieldOff, UserCheck, UserX } from 'lucide-react'
+import { Ban, UserCheck, UserX } from 'lucide-react'
 import { AlertDialog, Tabs } from 'radix-ui'
 import { useDeferredValue, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { AccountStatistics } from '../../components/account-statistics'
 import { AuditTable } from '../../components/audit-table'
 import { Alert } from '../../components/ui/alert'
 import { Badge } from '../../components/ui/badge'
@@ -24,7 +25,6 @@ import {
   banUser,
   isPlatformAdmin,
   revokeUserSessions,
-  setUserRole,
   unbanUser,
 } from '../../lib/admin'
 import { describeError } from '../../lib/errors'
@@ -49,7 +49,10 @@ function AdminPage() {
         <p className="mt-1 text-sm text-ink-muted">{t('admin.description')}</p>
       </header>
       {isAdmin ? (
-        <AdminSections selfId={session.user.id} />
+        <>
+          <AccountStatistics />
+          <AdminSections selfId={session.user.id} />
+        </>
       ) : (
         <Alert tone="error">{t('admin.onlyAdmins')}</Alert>
       )}
@@ -220,25 +223,6 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
                 }}
               />
             )}
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              isPending={act.isPending}
-              aria-label={t(isAdmin ? 'admin.removeAdminFrom' : 'admin.makeAdmin', {
-                email: user.email,
-              })}
-              onClick={() => {
-                act.mutate(() => setUserRole(user.id, isAdmin ? 'user' : 'admin'))
-              }}
-            >
-              {isAdmin ? (
-                <ShieldOff aria-hidden="true" className="size-4" />
-              ) : (
-                <ShieldCheck aria-hidden="true" className="size-4" />
-              )}
-              {t(isAdmin ? 'admin.removeAdmin' : 'admin.makeAdminShort')}
-            </Button>
             <Button
               type="button"
               variant="secondary"

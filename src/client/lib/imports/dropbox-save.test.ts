@@ -8,11 +8,7 @@ import {
   escapeNonAscii,
   readAuthorizationCode,
 } from './dropbox-save'
-import {
-  CLOUD_SAVE_FOLDER,
-  DROPBOX_OAUTH_AUTHORIZE_URL,
-  DROPBOX_WRITE_SCOPES,
-} from '../../../shared/constants'
+import { DROPBOX_OAUTH_AUTHORIZE_URL, DROPBOX_WRITE_SCOPES } from '../../../shared/constants'
 
 describe('base64UrlFromBytes', () => {
   it('uses the URL-safe alphabet and strips padding', () => {
@@ -45,6 +41,7 @@ describe('buildAuthorizeUrl', () => {
         appKey: 'app-key-123',
         codeChallenge: 'challenge-xyz',
         redirectUri: 'https://app.example.com/oauth/dropbox',
+        state: 'random-state',
       }),
     )
     expect(`${url.origin}${url.pathname}`).toBe(DROPBOX_OAUTH_AUTHORIZE_URL)
@@ -56,6 +53,7 @@ describe('buildAuthorizeUrl', () => {
       redirect_uri: 'https://app.example.com/oauth/dropbox',
       scope: DROPBOX_WRITE_SCOPES,
       token_access_type: 'online',
+      state: 'random-state',
     })
   })
 })
@@ -85,7 +83,7 @@ describe('dropboxApiArg', () => {
   it('places the file in the save folder with a non-overwriting mode', () => {
     const parsed: unknown = JSON.parse(dropboxApiArg('sunset.jpg'))
     expect(parsed).toEqual({
-      path: `/${CLOUD_SAVE_FOLDER}/sunset.jpg`,
+      path: `/sunset.jpg`,
       mode: 'add',
       autorename: true,
       mute: true,
@@ -97,26 +95,37 @@ describe('dropboxApiArg', () => {
     expect(/^[ -~]*$/.test(header)).toBe(true)
     // The escaped JSON still parses back to the original, accented path.
     const parsed: unknown = JSON.parse(header)
-    expect(parsed).toMatchObject({ path: `/${CLOUD_SAVE_FOLDER}/café.png` })
+    expect(parsed).toMatchObject({ path: `/café.png` })
   })
 })
 
 describe('readAuthorizationCode', () => {
+  it('refuses missing, mismatched, or empty OAuth state even with a valid-looking code', () => {
+    expect(() => readAuthorizationCode('?code=abc&state=other', 'expected')).toThrow(
+      'state did not match',
+    )
+    expect(() => readAuthorizationCode('?code=abc', 'expected')).toThrow('state did not match')
+    expect(() => readAuthorizationCode('?code=abc&state=', '')).toThrow('state did not match')
+  })
   it('returns the code from the redirect query', () => {
-    expect(readAuthorizationCode('?code=abc123&state=x')).toBe('abc123')
+    expect(readAuthorizationCode('?code=abc123&state=x', 'x')).toBe('abc123')
   })
 
   it('throws with the error description when Dropbox denied the request', () => {
     expect(() =>
-      readAuthorizationCode('?error=access_denied&error_description=User+said+no'),
+      readAuthorizationCode('?error=access_denied&error_description=User+said+no&state=x', 'x'),
     ).toThrow('User said no')
   })
 
   it('falls back to the error code when no description is present', () => {
-    expect(() => readAuthorizationCode('?error=access_denied')).toThrow('access_denied')
+    expect(() => readAuthorizationCode('?error=access_denied&state=x', 'x')).toThrow(
+      'access_denied',
+    )
   })
 
   it('throws when neither a code nor an error is present', () => {
-    expect(() => readAuthorizationCode('')).toThrow('did not return an authorization code')
+    expect(() => readAuthorizationCode('?state=x', 'x')).toThrow(
+      'did not return an authorization code',
+    )
   })
 })

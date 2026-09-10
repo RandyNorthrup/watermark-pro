@@ -1,10 +1,11 @@
 import { Download } from 'lucide-react'
 import { Dialog } from 'radix-ui'
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { describeError } from '../../lib/errors'
 import { importFromUrl } from '../../lib/imports/url'
+import { captureOfflineOwner } from '../../lib/offline-context'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Field } from '../ui/field'
@@ -29,18 +30,23 @@ export function UrlImportDialog({ organizationId, onImport, trigger }: UrlImport
   const [url, setUrl] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const requests = useRef(0)
 
   async function fetchPhoto() {
+    const request = ++requests.current
     setIsFetching(true)
     setError(null)
     try {
+      const owner = captureOfflineOwner()
       const file = await importFromUrl(organizationId, url.trim())
+      owner.assertCurrent()
+      if (request !== requests.current) return
       onImport(file)
       setIsOpen(false)
     } catch (error_) {
-      setError(describeError(error_))
+      if (request === requests.current) setError(describeError(error_))
     } finally {
-      setIsFetching(false)
+      if (request === requests.current) setIsFetching(false)
     }
   }
 
@@ -48,6 +54,7 @@ export function UrlImportDialog({ organizationId, onImport, trigger }: UrlImport
     <Dialog.Root
       open={isOpen}
       onOpenChange={(next) => {
+        requests.current += 1
         setIsOpen(next)
         if (next) {
           setUrl('')

@@ -1,13 +1,16 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import type { ReactNode } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
 import { CloudImportButtons } from './cloud-import-buttons'
 import type { PublicConfig } from '../../../shared/api'
 import { pickFromDropbox } from '../../lib/imports/dropbox-chooser'
 import { pickFromGoogleDrive } from '../../lib/imports/google-picker'
+import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG as ALL, NO_CLOUD_CONFIG as NONE } from '../../test-support/cloud-config'
+
+beforeEach(() => setOfflineUser('user-1'))
 
 vi.mock('../../lib/imports/google-picker', () => ({ pickFromGoogleDrive: vi.fn() }))
 vi.mock('../../lib/imports/dropbox-chooser', () => ({ pickFromDropbox: vi.fn() }))

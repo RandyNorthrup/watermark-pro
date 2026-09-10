@@ -1,9 +1,13 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FILTER_BY_ID, IDENTITY_ADJUSTMENTS } from '../../../shared/adjustments'
 import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
+import { takeLaunchFiles } from '../../lib/launch-consumer'
+import { clearLaunchFiles, receiveLaunchFiles } from '../../lib/launch-files'
+import { watermarksQueryOptions } from '../../lib/library'
+import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
@@ -13,6 +17,7 @@ import {
   resetFakeBulkRuntime,
   runs,
 } from '../../test-support/fake-bulk-runtime'
+import { cloudUploadBatches, fakeCloudSaver } from '../../test-support/fake-cloud-save'
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
@@ -37,6 +42,13 @@ const client = fakeAuth
 
 function photo(name: string, size = 2048): File {
   return new File([new Uint8Array(size)], name, { type: 'image/jpeg' })
+}
+
+function openLaunch(names: string[]) {
+  return receiveLaunchFiles(
+    names.map((name) => ({ getFile: () => Promise.resolve(photo(name)) })),
+    vi.fn().mockResolvedValue(undefined),
+  )
 }
 
 type TestUser = ReturnType<typeof userEvent.setup>
@@ -68,6 +80,8 @@ async function runCloudBatch(): Promise<TestUser> {
 }
 
 beforeEach(() => {
+  clearLaunchFiles()
+  setOfflineUser(null)
   installFakeAuth()
   resetFakeBulkRuntime()
   downloads.mockClear()
@@ -76,10 +90,41 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  clearLaunchFiles()
   vi.unstubAllGlobals()
 })
 
 describe('bulk page', () => {
+  it('enables directory selection when the input mounts after the library gate opens', async () => {
+    seedOwnerWorkspace(client())
+    const library = installLibraryApi()
+    const { queryClient } = renderApp('/app/bulk')
+    await screen.findByRole('link', { name: 'Create a preset in the library' })
+    expect(screen.queryByLabelText('Add a folder')).not.toBeInTheDocument()
+    library.watermarks.push(makeWatermark())
+    await act(() =>
+      queryClient.invalidateQueries({ queryKey: watermarksQueryOptions('org-1').queryKey }),
+    )
+    expect(await screen.findByLabelText('Add a folder')).toHaveAttribute('webkitdirectory', '')
+    expect(screen.getByLabelText('Add photos')).not.toHaveAttribute('webkitdirectory')
+  })
+
+  it('adopts startup and later OS batches once while preserving editor-targeted launches', async () => {
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    await openLaunch(['startup-one.jpg', 'startup-two.jpg'])
+    renderApp('/app/bulk')
+    expect(await screen.findByRole('heading', { level: 2, name: '2 photos' })).toBeInTheDocument()
+    await act(() => openLaunch(['later-one.jpg', 'later-two.jpg']))
+    expect(await screen.findByRole('heading', { level: 2, name: '4 photos' })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Remove startup-one.jpg' })).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Remove later-two.jpg' })).toBeInTheDocument()
+    expect(takeLaunchFiles('/app/bulk')).toEqual([])
+    await act(() => openLaunch(['editor-only.jpg']))
+    expect(screen.queryByRole('button', { name: 'Remove editor-only.jpg' })).not.toBeInTheDocument()
+    expect(takeLaunchFiles('/app/editor').map((file) => file.name)).toEqual(['editor-only.jpg'])
+  })
+
   it('runs a batch with progress, isolates failures, retries them, and downloads a ZIP', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
@@ -217,15 +262,13 @@ describe('bulk page', () => {
   })
 
   it('saves a finished batch to a configured cloud provider', async () => {
-    googleSave.mockResolvedValue()
+    googleSave.mockImplementation(fakeCloudSaver('google'))
     const user = await runCloudBatch()
 
     await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
     await waitFor(() => expect(googleSave).toHaveBeenCalledTimes(1))
-    expect(googleSave.mock.calls[0]?.[1]).toHaveLength(2)
-    expect(
-      await screen.findByText(/to your Google Drive .Watermark Pro. folder/),
-    ).toBeInTheDocument()
+    expect(cloudUploadBatches.at(-1)).toHaveLength(2)
+    expect(await screen.findByText(/to your Google Drive .Lumafoil. folder/)).toBeInTheDocument()
   })
 
   it('reports a cloud save failure', async () => {
@@ -305,6 +348,11 @@ describe('bulk page', () => {
     await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg')])
     fireEvent.change(screen.getByLabelText('File names'), { target: { value: ' '.repeat(3) } })
     expect(screen.getByText(/must produce a name/)).toBeInTheDocument()
+    expect(screen.getByLabelText('File names')).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByLabelText('File names')).toHaveAccessibleDescription(/must produce a name/)
+    fireEvent.change(screen.getByLabelText('File names'), { target: { value: '{index}-{name}' } })
+    expect(screen.getByLabelText('File names')).toHaveAttribute('aria-invalid', 'false')
+    expect(screen.getByLabelText('File names')).toHaveAccessibleDescription(/Example: 1-a.jpg/)
   })
 
   it('pauses a running batch and resumes it', async () => {
@@ -341,6 +389,18 @@ describe('bulk page', () => {
     await waitFor(() => expect(runs.length).toBeGreaterThan(runsBefore))
     expect(runs.at(-1)?.override).not.toBeNull()
     expect(screen.getByText('Custom')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: /Download report/ }))
+    const report = downloads.mock.calls.at(-1)
+    if (report === undefined) throw new Error('The report was not downloaded.')
+    expect(report[1]).toBe('report.csv')
+    const text = await report[0].text()
+    const [header, ...rows] = text.split('\n').map((row) => row.split(','))
+    expect(header?.at(-1)).toBe('override')
+    expect(rows.map((row) => [row[0], row.at(-1)])).toEqual([
+      ['one.jpg', 'yes'],
+      ['two.jpg', 'no'],
+    ])
   })
 
   it('pushes one photo’s edits to the whole batch and removes a single override', async () => {

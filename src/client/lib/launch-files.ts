@@ -1,31 +1,41 @@
+/** OS launches wait here until their authenticated destination can consume them once. */
+import {
+  clearLaunchFiles,
+  isCurrentLaunch,
+  setCurrentLaunch,
+  type Launch,
+  type LaunchTarget,
+} from './launch-state'
+import { captureOfflineGeneration, currentOfflineUser } from './offline-context'
+
+export { clearLaunchFiles, retainInitialLaunch } from './launch-state'
+
 /**
- * PWA file handling (M16). When the operating system opens the installed app to
- * handle image files (the manifest's `file_handlers`), the browser delivers them
- * through `window.launchQueue`. The consumer in src/client/main.tsx reads the
- * launch, stashes the files here, and navigates to `launchTarget(files.length)`;
- * the destination route then drains them with `takeLaunchFiles` on mount.
- *
- * The store is a module-level buffer rather than router state because the files
- * arrive before the router has mounted the target route.
+ * Capture ownership before reading handles. A newer OS event supersedes older
+ * reads even when they finish out of order; stale failures cannot affect it.
  */
-
-/** Single image goes straight to the editor; a set goes to the bulk tool. */
-const SINGLE_IMAGE_COUNT = 1
-
-const pendingLaunchFiles: File[] = []
-
-/** Where a launch of `count` files should land. */
-export function launchTarget(count: number): '/app/editor' | '/app/bulk' {
-  return count > SINGLE_IMAGE_COUNT ? '/app/bulk' : '/app/editor'
-}
-
-/** Replaces the pending launch files; the most recent launch wins. */
-export function setLaunchFiles(files: readonly File[]): void {
-  pendingLaunchFiles.length = 0
-  pendingLaunchFiles.push(...files)
-}
-
-/** Returns the pending launch files and empties the buffer; a launch is consumed once. */
-export function takeLaunchFiles(): File[] {
-  return pendingLaunchFiles.splice(0)
+export async function receiveLaunchFiles(
+  handles: readonly Pick<FileSystemFileHandle, 'getFile'>[],
+  navigate: (target: LaunchTarget) => Promise<void>,
+): Promise<void> {
+  if (handles.length === 0) return
+  const launch: Launch = {
+    userId: currentOfflineUser(),
+    ...captureOfflineGeneration(),
+    files: [],
+  }
+  setCurrentLaunch(launch)
+  try {
+    // Start reads immediately and observe failures while delivery code loads.
+    // The lease above must exist before an import can yield to account admission.
+    const [files, { publishLaunchFiles }] = await Promise.all([
+      Promise.all(handles.map((handle) => handle.getFile())),
+      import('./launch-consumer'),
+    ])
+    await publishLaunchFiles(launch, files, navigate)
+  } catch {
+    if (!isCurrentLaunch(launch)) return
+    clearLaunchFiles()
+    throw new Error('The files could not be opened. Open them again to retry.')
+  }
 }

@@ -45,6 +45,8 @@ export function createMemoryWatermarkStore(): WatermarkStore {
       .toArray()
   return {
     listForOrganization: (organizationId) => Promise.resolve(scoped(organizationId)),
+    findMany: (organizationId, ids) =>
+      Promise.resolve(scoped(organizationId).filter((record) => ids.includes(record.id))),
     find: (organizationId, id) =>
       Promise.resolve(scoped(organizationId).find((record) => record.id === id) ?? null),
     create(input) {
@@ -55,10 +57,19 @@ export function createMemoryWatermarkStore(): WatermarkStore {
     },
     update(organizationId, id, patch) {
       const existing = scoped(organizationId).find((record) => record.id === id)
-      if (existing === undefined) {
+      if (
+        existing === undefined ||
+        (patch.expectedUpdatedAt !== undefined &&
+          existing.updatedAt.toISOString() !== patch.expectedUpdatedAt)
+      ) {
         return Promise.resolve(null)
       }
-      const updated: WatermarkRecord = { ...existing, ...patch, updatedAt: new Date() }
+      const updated: WatermarkRecord = {
+        ...existing,
+        name: patch.name,
+        spec: patch.spec,
+        updatedAt: new Date(Math.max(Date.now(), existing.updatedAt.getTime() + 1)),
+      }
       records.set(id, updated)
       return Promise.resolve(updated)
     },
@@ -190,7 +201,7 @@ export function createMemoryPhotoStore(): PhotoStore {
       const rows = scoped(organizationId)
       return Promise.resolve({
         count: rows.length,
-        bytes: rows.reduce((total, record) => total + record.size, 0),
+        bytes: rows.reduce((total, record) => total + record.size + (record.thumbnailSize ?? 0), 0),
       })
     },
     usageByOrganization() {
@@ -199,7 +210,7 @@ export function createMemoryPhotoStore(): PhotoStore {
         const current = usage.get(record.organizationId) ?? { count: 0, bytes: 0 }
         usage.set(record.organizationId, {
           count: current.count + 1,
-          bytes: current.bytes + record.size,
+          bytes: current.bytes + record.size + (record.thumbnailSize ?? 0),
         })
       }
       return Promise.resolve(usage)
@@ -244,6 +255,8 @@ export interface MemoryTenantTables {
 export function createMemoryUserStore(tables: Pick<MemoryTenantTables, 'user'>): UserStore {
   return {
     promoteToPlatformAdmin(email) {
+      const currentAdmin = tables.user.find((candidate) => candidate.role === PLATFORM_ADMIN_ROLE)
+      if (currentAdmin !== undefined && currentAdmin.email !== email) return Promise.resolve(false)
       const row = tables.user.find((candidate) => candidate.email === email)
       if (row === undefined) {
         return Promise.resolve(false)

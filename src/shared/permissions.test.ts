@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { ASSIGNABLE_ROLES, isOrganizationRole, ORGANIZATION_ROLES, roles } from './permissions'
+import { ASSIGNABLE_ROLES } from './constants'
+import { isOrganizationRole, ORGANIZATION_ROLES, roles } from './permissions'
 
 describe('organization roles', () => {
   it('gives owners and admins the audit trail and member management', () => {

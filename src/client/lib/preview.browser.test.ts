@@ -310,7 +310,7 @@ describe('PreviewRenderer', () => {
       expect(seen.at(-1)?.startsWith('logo-photo ')).toBe(true)
       expect(seen.at(-1)).toContain('2026')
       await renderer.render(DEFAULT_TEXT_SPEC)
-      expect(seen.at(-1)).toBe('© Watermark Pro')
+      expect(seen.at(-1)).toBe('© Lumafoil')
     } finally {
       renderer.dispose()
     }

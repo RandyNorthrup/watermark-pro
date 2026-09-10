@@ -1,0 +1,359 @@
+[
+  {
+    "package": "@fontsource-variable/caveat",
+    "version": "5.3.0",
+    "integrity": "sha512-Q3mjghoYIlXgwqBPJKZ4q6f3zu921Gq7UU76r9Z+NAmhapHfX130GIFpOCYf8vt2SIcgCi9RHDT7anfJKg/kiA==",
+    "license": "/fonts/licenses/caveat.txt",
+    "sha256": "163a2b400e16916ad3196296c946c526d0efce6baf22a2164269ffc62fb9f671"
+  },
+  {
+    "package": "@fontsource-variable/cinzel",
+    "version": "5.3.0",
+    "integrity": "sha512-eFcU0TwaAP5QESF2pV8VoOPJJXJ6sSGm/6mXMwqTdMBPAJMaLhfa6oISHuOtFeddsoHP9RYm4Io0j1j3mNEz2Q==",
+    "license": "/fonts/licenses/cinzel.txt",
+    "sha256": "f5a242cf68ad6ebd0603b3359a74c593ca080318a681035be5296ba2c6b04ae6"
+  },
+  {
+    "package": "@fontsource-variable/dancing-script",
+    "version": "5.3.0",
+    "integrity": "sha512-5Z/flvW1UPkznr0hzejY+Wq72GV3hmtJiDGw2hWMu7n6TmCTB6O2jsfySl7+xuMp6R6bWyuNrKjdpT0yt91sfw==",
+    "license": "/fonts/licenses/dancing-script.txt",
+    "sha256": "c02c0002d3bbd41a16933c162888c400469c7029f1362ca9d60d5ed20ea7d157"
+  },
+  {
+    "package": "@fontsource-variable/dm-sans",
+    "version": "5.3.0",
+    "integrity": "sha512-BpUG5bqePiDFMBM4ZtLSlPdAIOM990uB1dlXzIf4aw21yQR7BmykedLXXXMqGWsR18aMLOsbWccwJNh3ztTQaA==",
+    "license": "/fonts/licenses/dm-sans.txt",
+    "sha256": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7"
+  },
+  {
+    "package": "@fontsource-variable/eb-garamond",
+    "version": "5.3.0",
+    "integrity": "sha512-656OJsA9Vv24yhqRZFEzXnzS2AYgKdEILLgHJYLzzXndgcWFKfSXFqzbRI5/6Yk1Yt7UfWrUeppE5nRQPQMwlQ==",
+    "license": "/fonts/licenses/eb-garamond.txt",
+    "sha256": "f03c8eda63076cd52317dcd40aa04db8472d4cb592dfaafa385129dfdafc7f9c"
+  },
+  {
+    "package": "@fontsource-variable/figtree",
+    "version": "5.3.0",
+    "integrity": "sha512-VRVodD7OiG7apQwE8/2fMjaqpY/a0qRJqL5HtYj8CKIVps+9amaFcdfKmDIf7iqYQx6iPLlArVXAfKeIZmVcNQ==",
+    "license": "/fonts/licenses/figtree.txt",
+    "sha256": "ee23e6c84000126692e112ff067b456470493349f993ceaa8b4d3766dd6fad5d"
+  },
+  {
+    "package": "@fontsource-variable/fira-code",
+    "version": "5.3.0",
+    "integrity": "sha512-ZhvHeknlicraKVSJBa1NrJnXDVByUkC407zwgELYfmnx3p9g8vwIPfQCxx8YD3K7dAeCdLuHJOHlpMfRsIcApQ==",
+    "license": "/fonts/licenses/fira-code.txt",
+    "sha256": "126cd7bf732b86f42885f1fbf682e6aeea456672c7fdb99f2d557ec44e468a28"
+  },
+  {
+    "package": "@fontsource-variable/fredoka",
+    "version": "5.3.0",
+    "integrity": "sha512-13w98iw2RcmYfZQRZPLSu+0YJK3HHm5A2XrpU26moFIAePmfiKfvkmEJUgkc8r5GNR+pbDijOueS1KdGAMAWmQ==",
+    "license": "/fonts/licenses/fredoka.txt",
+    "sha256": "9bbd4f5f107895d5a213579b73821fadd05105241cf4360e86050199fcfd6034"
+  },
+  {
+    "package": "@fontsource-variable/inter",
+    "version": "5.3.0",
+    "integrity": "sha512-OupL48va4JNofb97w6NYeF9S7W/kHNKM0Er8Dem5nqi4jeOLrVJDoE8tZEpnMJmtkvNbB1EIPPwHcdkF6b1oUA==",
+    "license": "/fonts/licenses/inter.txt",
+    "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345"
+  },
+  {
+    "package": "@fontsource-variable/jetbrains-mono",
+    "version": "5.3.0",
+    "integrity": "sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==",
+    "license": "/fonts/licenses/jetbrains-mono.txt",
+    "sha256": "403581b69dac5cff4079205e01c6b467e56af449ecbd7247693ddb1baafa005b"
+  },
+  {
+    "package": "@fontsource-variable/josefin-sans",
+    "version": "5.3.0",
+    "integrity": "sha512-duVgkuzE/co4iuIfJ7jM2qX0ED3b6qdY+SlSjNMs6zfhz7EE7kJxV0qF65hQCv1kN0A20j4FwsGAYJvfpU+iSg==",
+    "license": "/fonts/licenses/josefin-sans.txt",
+    "sha256": "56a81de42b758828ed453bf712867221f6d4c05078ed28fba93dc4e06c6fa728"
+  },
+  {
+    "package": "@fontsource-variable/lora",
+    "version": "5.3.0",
+    "integrity": "sha512-2ph8KiZ8Bn141hWuC3ErtpJ+Ui8p2MJQn8TJNRSRmLmnCIOCtHfiBM9R7WLRPeUG/q6hXyHOxWQ8DvRSX+ixvQ==",
+    "license": "/fonts/licenses/lora.txt",
+    "sha256": "948aed765160f7b974105606c21994715a171f89fca48e57bf1e0a23aca0bef1"
+  },
+  {
+    "package": "@fontsource-variable/manrope",
+    "version": "5.3.0",
+    "integrity": "sha512-6D5dgokHsWDDMtmXHznKa0hK229NN+1a4BLPmUCLqcO1Pw5EEhWY5RFt0AcXnVRAljFFPfRtLkJePQj6LSsV6g==",
+    "license": "/fonts/licenses/manrope.txt",
+    "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+  },
+  {
+    "package": "@fontsource-variable/merriweather",
+    "version": "5.3.0",
+    "integrity": "sha512-wK7S4NtPXWUWll/sZCdub93pqSCnFkpKFbnoOE8fh+9Ut6JFjgkc9UlBxHJ0RVMkDpoWwGwMwYYTMvd3G9aAXA==",
+    "license": "/fonts/licenses/merriweather.txt",
+    "sha256": "aa677c3f7682d9c4f7aa48fae3f3b9d0f8d70ac6ab47b9bc20a9cc2879e15af0"
+  },
+  {
+    "package": "@fontsource-variable/montserrat",
+    "version": "5.3.0",
+    "integrity": "sha512-7PaZoxaxrWLAyrhO46v65An9LhUhfkTExWLhfbywYZCnZEgg/W1rEHnlNmZKjNZ3nJTVYyicqxlJt10z/26yTA==",
+    "license": "/fonts/licenses/montserrat.txt",
+    "sha256": "f429f739351287574c0c3175a9222bb3e49c7cad3f568a04f2c08d74c107724e"
+  },
+  {
+    "package": "@fontsource-variable/nunito",
+    "version": "5.3.0",
+    "integrity": "sha512-tw0ch7evIDSwoeUy+0XzocYHfbRWLeCRPJy22KgbrLjDLAbNw/fErBiil10Ssrs3Sjr55zaZrr36a975j8cBkQ==",
+    "license": "/fonts/licenses/nunito.txt",
+    "sha256": "40991bfa02ac620aae16dc527f3c47765a25e43f270d4c301ee6ab663a8d9015"
+  },
+  {
+    "package": "@fontsource-variable/open-sans",
+    "version": "5.3.0",
+    "integrity": "sha512-VOfhZfLIOBVa6K/dTEu7scqQXYdGa4jBX8quFpQ0S6574B+W2EOBJf9PkqyVtMEI7WWIWNEbpvPc3vY1mN2mmQ==",
+    "license": "/fonts/licenses/open-sans.txt",
+    "sha256": "9e7f12fafee50a9b4f7b3004c0fa58990805620d9debb0daf7f75de0d3ad5548"
+  },
+  {
+    "package": "@fontsource-variable/oswald",
+    "version": "5.3.0",
+    "integrity": "sha512-sSZzcTeaQGNyZbTVlS4tNNHElK38UktFLqKd6NQDLFCBV27320rQC3kXSZVytYm1PPjKmPxqVaGwqj7LEKUWQw==",
+    "license": "/fonts/licenses/oswald.txt",
+    "sha256": "23916cdee678823c3c517c699cb2e043088de0d46c959eeaa168b54bb84534df"
+  },
+  {
+    "package": "@fontsource-variable/outfit",
+    "version": "5.3.0",
+    "integrity": "sha512-fPb5XnYK0k7SbR++HEmm4+ZqDszmLKQ+sPRUr8oQ/KNC0vy6r6hazJFe8iYozv4cqlHbvJ/JECkJWrfDodUMVQ==",
+    "license": "/fonts/licenses/outfit.txt",
+    "sha256": "0e5fcef5d93bfcae273c11c00f0bb453d3b5491860e1ac8b658767b7577c938f"
+  },
+  {
+    "package": "@fontsource-variable/playfair-display",
+    "version": "5.3.0",
+    "integrity": "sha512-IHdzTvE8eGIXHteZql7KXoqdc3Gfm+Zs1u4XlSC3MeplkwviT3sx/P6gI0tLwg/xIYLF4ZJYveZ5V+bl9cnDwA==",
+    "license": "/fonts/licenses/playfair-display.txt",
+    "sha256": "c052aafd2a71e90bcee6e69f475029d430a10d548c08ffcae350171f0e9668b1"
+  },
+  {
+    "package": "@fontsource-variable/plus-jakarta-sans",
+    "version": "5.3.0",
+    "integrity": "sha512-/l/4r0yyWK9JzAlmA0LiYgGgmJe/Gswt4jTJEzr5QhJfwMbvJZDmYWyW0M4X7yCK69BajMVlV/Lx8g7WDc1+sw==",
+    "license": "/fonts/licenses/plus-jakarta-sans.txt",
+    "sha256": "e07fd1167c2aaaa6fb965dd66e1e73b13c9c95b76b2d648b6e938780f30b37af"
+  },
+  {
+    "package": "@fontsource-variable/raleway",
+    "version": "5.3.0",
+    "integrity": "sha512-aSV2k+V6Zz+od0dHpBOzkVxEzmgEdiXcxDfant39jLOx+T89dielQRrZylukwK3Fp+FY255gPqz67ruOfs1rqA==",
+    "license": "/fonts/licenses/raleway.txt",
+    "sha256": "7bda8fcb7cfe5a162bb615e16bf4f94c7ef78de6f82ee44d219bf24a013b7ba2"
+  },
+  {
+    "package": "@fontsource-variable/roboto",
+    "version": "5.3.0",
+    "integrity": "sha512-BoaaZiQf8fgtxv07KXkTwx1bKz/EoqIlTXq2OOKKXINxp6qXWdnlChqV+hSaDANS49yyUASFl3OVBMMDTCIHFA==",
+    "license": "/fonts/licenses/roboto.txt",
+    "sha256": "84044c09058803d87a241bd28abb4ce30a433d7db9c27a04da3efad6a0ca539c"
+  },
+  {
+    "package": "@fontsource-variable/source-code-pro",
+    "version": "5.3.0",
+    "integrity": "sha512-CxzAbqtNrQ6EQXTb9ovRZIRiOhFPcBQhNKla58K5UV6IMoL/ROkWxXDSBOa/frIDLuV4B5PLHI4R1e9SWVinYg==",
+    "license": "/fonts/licenses/source-code-pro.txt",
+    "sha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3"
+  },
+  {
+    "package": "@fontsource-variable/work-sans",
+    "version": "5.3.0",
+    "integrity": "sha512-le8h/OIIuhm5Z7TdvuMw0yKg2gaCZUiMec8zaumsVVjzeJRBPEF0bQI/MkaZDHCVzZDvZoP/O2LiGOSfDLSbaw==",
+    "license": "/fonts/licenses/work-sans.txt",
+    "sha256": "e7c426573d51f3d2e5e92254878c862344ffa0b9272f79a880f9f99010f002c7"
+  },
+  {
+    "package": "@fontsource/abril-fatface",
+    "version": "5.3.0",
+    "integrity": "sha512-voKCJEhGGZNdlk+OS3uFRSDV/HWbs6TAy7qKe9wXq96Uzwadfksyk5eyXLa1T5FkEazBgpHRMRSFBKfA3rbKbg==",
+    "license": "/fonts/licenses/abril-fatface.txt",
+    "sha256": "4e65e75d5b12be85144934d41e8a1895c14600ff6f56467d46acf73440adf0e0"
+  },
+  {
+    "package": "@fontsource/alfa-slab-one",
+    "version": "5.3.0",
+    "integrity": "sha512-J/ANFZ7S9CbZClr/QhMjmBtpFmmKipVkEXHj20aurR5uqJPCBChVPJn1/kx6vtrwnfnDY0kQaYSTYasSt4GruA==",
+    "license": "/fonts/licenses/alfa-slab-one.txt",
+    "sha256": "6cb8a5e3f60a5b23d1e5fff9b6fa860f0e5d4055a67bb262497c1e8d8fc13b05"
+  },
+  {
+    "package": "@fontsource/amatic-sc",
+    "version": "5.3.0",
+    "integrity": "sha512-qGAftmq7o21ViixCApztfLOe6TP0VFp3x9ac5KVTwBqW6SU8YJeGWgcLHOfBkooAI+/411R/flMqXos8GseNkA==",
+    "license": "/fonts/licenses/amatic-sc.txt",
+    "sha256": "7ae6d8e98e84ecb99fdec0c36485d1b0c5f61202613f4250b1449c4320bd071c"
+  },
+  {
+    "package": "@fontsource/anton",
+    "version": "5.3.0",
+    "integrity": "sha512-OR1D5n124n2XRs66SbX7IjcOSptljEJE8FcDNnlni2y1/M6KpTx7cU2PIWzTSsBj4WFkHPw24On8qw3qkQZuTw==",
+    "license": "/fonts/licenses/anton.txt",
+    "sha256": "9267baca92b7a7ce9db6dd9e6cc32c9fe3ddf1ac96e421d5f87c5746b9089d6a"
+  },
+  {
+    "package": "@fontsource/archivo-black",
+    "version": "5.3.0",
+    "integrity": "sha512-7EsTIQ+Blf96ktpzTUpI7msi+u9/AJxM/GZxOSkEubVd1jSTrFSTNxMgfpX/8rQsjZ+19a+qvRbtcTEp5J/72g==",
+    "license": "/fonts/licenses/archivo-black.txt",
+    "sha256": "4cafdbbd100af37a23805af09b7068e4daafb4516dc3d6d52436f4a9d7b4c0d3"
+  },
+  {
+    "package": "@fontsource/bangers",
+    "version": "5.3.0",
+    "integrity": "sha512-tSRpmWwkqrO9PCqo9wjA/99/5sLOIWm5cf51G3ooEHd8qZus8sVSSJoWp/7EvM5rIgZMjKRG6XtY9yeisKxE7g==",
+    "license": "/fonts/licenses/bangers.txt",
+    "sha256": "09ef36fcae68a2ba21cc319fd44c09ba40f43163076bcafc14fdfe4cc033e7a2"
+  },
+  {
+    "package": "@fontsource/bebas-neue",
+    "version": "5.3.0",
+    "integrity": "sha512-nCxMEb9Bg9sjNWm9TIOsvHKDMLRUfEZPWpLgYu6m9KavZZVSA/WoHzI5wROwqA+eNwEi/PNBAcB5Co7HA3S0Cw==",
+    "license": "/fonts/licenses/bebas-neue.txt",
+    "sha256": "66c436339f7490c1a99e4f6a7b8aef5c176676edfd071a31638e7d54c1b0aeda"
+  },
+  {
+    "package": "@fontsource/cormorant-garamond",
+    "version": "5.3.0",
+    "integrity": "sha512-weuGsCirGVWBWqpt6YUp0yLThTe4G8YO45noq8wxeJCRvEpq5lFrxNMFSTxcyOyV5k5otzJ8guDzYegdYlcLMQ==",
+    "license": "/fonts/licenses/cormorant-garamond.txt",
+    "sha256": "732f37009943e7f4378cf37113c9bcc4716af002a8583511aa91ed5d37683e73"
+  },
+  {
+    "package": "@fontsource/courgette",
+    "version": "5.3.0",
+    "integrity": "sha512-WIJoNC4W4ur9pvqknO8SJUld0L7U0YDjgv23f8pE+Ec/nMDCVQ6NUNc3xdPSDIKTsXxVJ8lMOkk2UrkIrcc9VQ==",
+    "license": "/fonts/licenses/courgette.txt",
+    "sha256": "36a16817537dc209c0267c4f27473007a0ed48f9e3faefbcaab30968c51e5200"
+  },
+  {
+    "package": "@fontsource/crimson-text",
+    "version": "5.3.0",
+    "integrity": "sha512-W1kLgOlsCD/8DhUNECgYvyx86+t3wAvA0w09juD3XtmwAtV6vuSEwijN4q8fnQ1LgQWV377jQiL8dpSYwLnoAw==",
+    "license": "/fonts/licenses/crimson-text.txt",
+    "sha256": "b00e2c48903dfe35fed22f2049285c36c22cf5e6e8727f17968af3dbb5c4f966"
+  },
+  {
+    "package": "@fontsource/dm-serif-display",
+    "version": "5.3.0",
+    "integrity": "sha512-ecRclUcYeto9fB7ghkB36H4MtUoaUYFjjornWYYeLCMHzaWEDPk2kIWgZOq0mKBNRxclRSieKcFeLonlMYDTKg==",
+    "license": "/fonts/licenses/dm-serif-display.txt",
+    "sha256": "e9d4ced9825bf03a6b634c37fe8ae974f6d1b80fbb0bd3ae9b089987e4dc541b"
+  },
+  {
+    "package": "@fontsource/great-vibes",
+    "version": "5.3.0",
+    "integrity": "sha512-1w60cXzXnC9V4y943po8044O1mqRQBiTTK75h7OpZE+1VQtx+KlAAzoIyEE5KNzu05gUpxaCQg7cbL7ITSwegQ==",
+    "license": "/fonts/licenses/great-vibes.txt",
+    "sha256": "75368fe8ff3eafefaf6d086a8b6c47c5d561bf029c34e2b089607820fc68fead"
+  },
+  {
+    "package": "@fontsource/ibm-plex-mono",
+    "version": "5.3.0",
+    "integrity": "sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==",
+    "license": "/fonts/licenses/ibm-plex-mono.txt",
+    "sha256": "23b0a9d0c6d3f140a0b77e483c5cfa6bba574325ef5cb189ed9f2fec4884533f"
+  },
+  {
+    "package": "@fontsource/indie-flower",
+    "version": "5.3.0",
+    "integrity": "sha512-Wo5eN/ruEQcyC3+ArzhlpqWQgph3VuCNbJlEkVw17LUd0uyTHOb9bTec4g9njQzjiL/ijACF27sSwy90L6kZBg==",
+    "license": "/fonts/licenses/indie-flower.txt",
+    "sha256": "0195774c0deaaf2da57fe0b57444e9f33da639b95610c2fabfe14f721e355613"
+  },
+  {
+    "package": "@fontsource/kaushan-script",
+    "version": "5.3.0",
+    "integrity": "sha512-Kdcvr76wOGp2jgKkkmAOETmPcw/a34RU/qcGW2+gSKzkKyr03vEaLWSbSABoVKWuyuoqWoulcmC4571vq3BYvg==",
+    "license": "/fonts/licenses/kaushan-script.txt",
+    "sha256": "ae018242e581cd9d21e40d19f62642fd15c82dc22ac3f523a6db93590f0e33e7"
+  },
+  {
+    "package": "@fontsource/lato",
+    "version": "5.3.0",
+    "integrity": "sha512-0WhF/4rhrw+ErIyneKvhHn2YAl+xf8GDtllgOgOzDmeaSlLQtjpChXaQOpWhG2BchQW0WJy2zLV12Hdg0ndOMw==",
+    "license": "/fonts/licenses/lato.txt",
+    "sha256": "9648253641ec1d1f8ba2fbe8997909f7bfc48cc38537946f6272321788465b84"
+  },
+  {
+    "package": "@fontsource/libre-baskerville",
+    "version": "5.3.0",
+    "integrity": "sha512-IA6OLq36/JWMX70Fha15sri2qWsijFh7hgdDXCRZHjKUHtWarLQoiGilvm7iMqm7HiYFEv9acF3+IuRHO9kUiA==",
+    "license": "/fonts/licenses/libre-baskerville.txt",
+    "sha256": "8490e863633e537100d6d18755d994ea30b0b44741876a17809d28becf45ce11"
+  },
+  {
+    "package": "@fontsource/lobster",
+    "version": "5.3.0",
+    "integrity": "sha512-jt+RDk/8Sstl1Omhox62gTbvRSLbh06kn5BNfDFgf4rNuDPHF+19eWYFxzq5FsdkalbRJNtc5p5C3qE0+leNVg==",
+    "license": "/fonts/licenses/lobster.txt",
+    "sha256": "73e006e6fc23df5f07e0976d78d49c94aece9ce90cdb2522279a6d79eaa7bbd3"
+  },
+  {
+    "package": "@fontsource/pacifico",
+    "version": "5.3.0",
+    "integrity": "sha512-bWv0fHR1n36p7scRn+maaEaVeQCOq9yvfVfjyAeUzKrK4Y/3qiRAEj4hJgfxj/sjgZZGkeHyKPrbWdDaZtpCVw==",
+    "license": "/fonts/licenses/pacifico.txt",
+    "sha256": "e1b964e3f56697598c46363a8864f0a7b883c86a0c01a9a6a4e90e6949d60ba2"
+  },
+  {
+    "package": "@fontsource/permanent-marker",
+    "version": "5.3.0",
+    "integrity": "sha512-ZO/NtYW4SCc/iY8N3dmjWyDITcXJ/vhWZFgnwRcvzwCKKnScMrM/a2/6VHlsjCVuIgmPzNrCFbedEYhv+/jJBg==",
+    "license": "/fonts/licenses/permanent-marker.txt",
+    "sha256": "044195cfd809d76ea2aaf1c8e3dd80b9fd9447227efc05e51fc906c4a451d451"
+  },
+  {
+    "package": "@fontsource/poppins",
+    "version": "5.3.0",
+    "integrity": "sha512-cms1nM7U6SN8epIV1WMVOV8VsA645aSm3wHfzIQnkk188U341ThbJGSl2Sv54V29gnDbT2arMPfLzvVIIVCceQ==",
+    "license": "/fonts/licenses/poppins.txt",
+    "sha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
+  },
+  {
+    "package": "@fontsource/righteous",
+    "version": "5.3.0",
+    "integrity": "sha512-xr3w0E1jtc7xoXLfgJrcaKqWjvh5XiAAthVLrl9v9HKC7TfwMy3nARytetfi2GIgo51+aWsEJ51Uyd3XEXbj/A==",
+    "license": "/fonts/licenses/righteous.txt",
+    "sha256": "463e9f5e094063efea678dcd70cac0d868a67f52922a71d73706677353d587da"
+  },
+  {
+    "package": "@fontsource/sacramento",
+    "version": "5.3.0",
+    "integrity": "sha512-KkqN52aTsJ0pSBva/NREqFljs0M1TwMIpNcqdSQc2EKR/mVU1CvM2dazf9eG19rHMTIssjbia83nGG705SlD1w==",
+    "license": "/fonts/licenses/sacramento.txt",
+    "sha256": "bdc5980c99813eeb5e0e8188d41b191378dd6fecdd84aeb3a49872ea9f913889"
+  },
+  {
+    "package": "@fontsource/satisfy",
+    "version": "5.3.0",
+    "integrity": "sha512-dQ+Cy85XdwYnwlzWcbkmA2Qkpxam0ZHDaGm/qoGHlyHKRVgM/BJN8RLHpRm31R0REFBQe5Yl8Ke5oTdpcKdPIA==",
+    "license": "/fonts/licenses/satisfy.txt",
+    "sha256": "8c6fc21d7d28d656edfb1051afbd0b5c7577456c8d474d7b1da3233ba3b49fa5"
+  },
+  {
+    "package": "@fontsource/shadows-into-light",
+    "version": "5.3.0",
+    "integrity": "sha512-3dvv0i8/ZwLMY08AAlTLivHUdNQYB6Fxe92d7BZiGbHY2GQnCxEd8JC9CBzxTiP4iyWNa6OZn9LXF+xjc9LaGw==",
+    "license": "/fonts/licenses/shadows-into-light.txt",
+    "sha256": "974d229d083921c6ed420026a45857eb3d2277f2656b156e0d233f175b382d60"
+  },
+  {
+    "package": "@fontsource/space-mono",
+    "version": "5.3.0",
+    "integrity": "sha512-FrpBMOVWn3PRdRHlrZWC55X3kZG/2BTH7SM5ZyS/bky3iKya2BturI5lk+t0RoDQL2JyHzURsVq/EisCsxpI5A==",
+    "license": "/fonts/licenses/space-mono.txt",
+    "sha256": "761663b7fb7667764f42243f9b1b2bcfccf41b158a7ab508bed4961dcf377eab"
+  }
+]

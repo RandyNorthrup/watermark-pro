@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { FontPicker } from './font-picker'
+import { StickerPicker } from './sticker-picker'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import { DEFAULT_FONT_FAMILY } from '../../fonts/catalogue'
 import { cn } from '../../lib/cn'
@@ -38,6 +39,10 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
   const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-5">
+      <StickerPicker
+        selected={symbol.type === 'sticker' ? symbol.id : null}
+        onChange={(id) => onChange({ type: 'sticker', id })}
+      />
       {GLYPH_GROUPS.map((group) => (
         <fieldset key={group.id} className="flex flex-col gap-2">
           <legend className="text-sm font-medium">{group.label}</legend>
@@ -62,6 +67,14 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
       ))}
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">{t('designer.symbol.icons')}</legend>
+        <a
+          href="/stickers/ICON-LICENSE.txt"
+          target="_blank"
+          rel="noreferrer"
+          className="self-start text-xs underline"
+        >
+          {t('designer.symbol.license')}
+        </a>
         <div className="flex flex-wrap gap-1.5">
           {ICON_CATALOGUE.map((icon) => (
             <button

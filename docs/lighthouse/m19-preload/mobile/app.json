@@ -1,0 +1,81 @@
+{
+  "mode": "certification",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.8,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1234.1992,
+        "lcp": 4650.593599999998,
+        "cls": 0.00001509355272086945,
+        "tbt": 217.99999999999955
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.77,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1801.3905,
+        "lcp": 4475.415999999995,
+        "cls": 0,
+        "tbt": 294
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.77,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1801.3366500000002,
+        "lcp": 4475.128799999999,
+        "cls": 0,
+        "tbt": 277
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.77,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1801.7229,
+        "lcp": 4484.188800000005,
+        "cls": 0,
+        "tbt": 290
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.78,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1801.1904,
+        "lcp": 4419.348799999998,
+        "cls": 0.00001509355272086945,
+        "tbt": 267.99999999999864
+      }
+    }
+  ],
+  "scores": {
+    "performance": 0.77,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1801.3366500000002,
+    "lcp": 4475.415999999995,
+    "cls": 0,
+    "tbt": 277
+  }
+}

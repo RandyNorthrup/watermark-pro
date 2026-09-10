@@ -1,9 +1,14 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import handler, { createApp } from './index'
+import handler, { createApp, runHealthCheck } from './index'
+import * as serviceContainer from './services'
 import { apiErrorSchema, healthResponseSchema } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HTTP_STATUS } from '../shared/constants'
 import { createTestEnv, createTestHarness, TEST_APP_URL } from './test-support/test-app'
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
 /** A no-op execution context for calling the default handler's fetch directly. */
 const testExecutionContext = {
@@ -95,8 +100,24 @@ describe('default worker handler', () => {
     })
   })
 
-  it('schedules the health check on the cron trigger', async () => {
-    const consoleError = silenceConsoleError()
+  it('awaits both the health record and durable abandoned-upload cleanup on the cron trigger', async () => {
+    const harness = createTestHarness()
+    vi.spyOn(serviceContainer, 'getServices').mockReturnValue(harness.services)
+    const key = 'org/cron-workspace/abandoned-upload'
+    await harness.objects.put(key, new Uint8Array([1]).buffer, 'image/png')
+    expect(
+      await harness.services.uploads.reserve({
+        id: 'cron-lease',
+        organizationId: 'cron-workspace',
+        uploadId: 'cron-upload',
+        kind: 'logo',
+        userId: 'cron-user',
+        fingerprint: 'cron-fingerprint',
+        keys: [key],
+        bytes: 1,
+        expiresAt: new Date(0),
+      }),
+    ).toBe('reserved')
     const pending: Promise<unknown>[] = []
     const ctx = {
       waitUntil(promise: Promise<unknown>) {
@@ -114,12 +135,38 @@ describe('default worker handler', () => {
         // no-op in tests
       },
     } as unknown as ScheduledController
-    // The test env has no real D1, so the check records a failure and logs it;
-    // this covers the cron wiring and the health-check error path.
-    handler.scheduled(controller, createTestEnv(), ctx)
-    expect(pending).toHaveLength(1)
+    handler.scheduled(controller, harness.env, ctx)
+    expect(pending).toHaveLength(2)
     await Promise.all(pending)
-    consoleError.mockRestore()
+    expect(await harness.services.observability.listHealthChecks()).toMatchObject([
+      { ok: true, detail: null },
+    ])
+    expect(harness.objects.keys()).toEqual([])
+    expect(await harness.services.uploads.cleanupCandidates('cron-workspace')).toEqual([])
+    expect(await harness.services.uploads.usage('cron-workspace')).toEqual({ count: 0, bytes: 0 })
+  })
+
+  it('records a failed health probe and reports a failed health write without leaking the underlying error', async () => {
+    const harness = createTestHarness()
+    vi.spyOn(serviceContainer, 'getServices').mockReturnValue(harness.services)
+    const logger = silenceConsoleError()
+    vi.spyOn(harness.services.observability, 'listHealthChecks').mockRejectedValueOnce(
+      new Error('PRIVATE_DATABASE_CANARY'),
+    )
+    await runHealthCheck(harness.env)
+    const rows = await harness.services.observability.listHealthChecks()
+    expect(rows).toMatchObject([{ ok: false }])
+    expect(rows[0]?.detail).toContain('Database health check failed')
+    expect(rows[0]?.detail).not.toContain('PRIVATE_DATABASE_CANARY')
+    vi.spyOn(harness.services.observability, 'recordHealthCheck').mockRejectedValueOnce(
+      new Error('PRIVATE_WRITE_CANARY'),
+    )
+    await runHealthCheck(harness.env)
+    expect(logger).toHaveBeenCalledWith(
+      'health check: could not record the result',
+      expect.objectContaining({ message: 'Health record failed' }),
+    )
+    expect(JSON.stringify(logger.mock.calls)).not.toContain('PRIVATE_WRITE_CANARY')
   })
 })
 

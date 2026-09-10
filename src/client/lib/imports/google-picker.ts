@@ -19,6 +19,9 @@
  * they unit-test without the SDKs; only the script/token/PickerBuilder
  * orchestration needs a browser.
  */
+import { z } from 'zod'
+
+import { cloudRequest } from './cloud-transfer'
 import { toImageFile } from './download'
 import type { PublicConfig } from '../../../shared/api'
 import {
@@ -27,6 +30,8 @@ import {
   GOOGLE_DRIVE_SCOPE,
   GOOGLE_IDENTITY_SCRIPT_URL,
 } from '../../../shared/constants'
+import { ACCOUNT_CHANGED_EVENT } from '../offline-account'
+import { captureOfflineOwner } from '../offline-context'
 
 /** The `gapi` module name that supplies the Picker UI. */
 const PICKER_MODULE = 'picker'
@@ -56,7 +61,7 @@ interface GoogleTokenClientConfig {
 }
 
 interface GoogleTokenClient {
-  readonly requestAccessToken: () => void
+  readonly requestAccessToken: (options: { prompt: 'select_account' }) => void
 }
 
 interface GoogleAccounts {
@@ -150,16 +155,21 @@ export async function downloadDriveFiles(
 ): Promise<File[]> {
   return await Promise.all(
     picked.map(async (item) => {
-      const response = await fetch(driveMediaUrl(item.id), {
-        headers: { [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${accessToken}` },
-      })
-      if (!response.ok) {
-        throw new Error(
-          `Could not download ${item.name} from Google Drive (HTTP ${String(response.status)}).`,
-        )
-      }
-      const blob = await response.blob()
-      return toImageFile(blob, item.name, item.type)
+      return await cloudRequest(
+        driveMediaUrl(item.id),
+        {
+          headers: { [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${accessToken}` },
+        },
+        async (response) => {
+          if (!response.ok) {
+            throw new Error(
+              `Could not download ${item.name} from Google Drive (HTTP ${String(response.status)}).`,
+            )
+          }
+          const blob = await response.blob()
+          return toImageFile(blob, item.name, item.type)
+        },
+      )
     }),
   )
 }
@@ -186,6 +196,8 @@ function loadScriptOnce(source: string): Promise<void> {
       resolve()
     })
     script.addEventListener('error', () => {
+      loadPromises.delete(source)
+      script.remove()
       reject(new Error(`Could not load the Google SDK from ${source}.`))
     })
     document.head.append(script)
@@ -209,6 +221,7 @@ async function loadPickerModule(): Promise<void> {
           resolve()
         },
         onerror: () => {
+          loadPromises.delete(PICKER_MODULE)
           reject(new Error('Could not load the Google Picker module.'))
         },
       })
@@ -228,7 +241,9 @@ function loadIdentityServices(): Promise<void> {
  * token dance rather than duplicating it.
  */
 export async function acquireGoogleDriveToken(clientId: string): Promise<string> {
+  const owner = captureOfflineOwner()
   await loadIdentityServices()
+  owner.assertCurrent()
   const google = window.google
   if (google === undefined) {
     throw new Error('The Google Identity SDK did not initialise.')
@@ -238,24 +253,40 @@ export async function acquireGoogleDriveToken(clientId: string): Promise<string>
 
 /** Request a `drive.file` access token via the GIS popup flow. */
 function requestAccessToken(accounts: GoogleAccounts, clientId: string): Promise<string> {
+  const owner = captureOfflineOwner()
   return new Promise<string>((resolve, reject) => {
+    const changed = () => reject(new Error('The app account changed during Google sign-in.'))
+    window.addEventListener(ACCOUNT_CHANGED_EVENT, changed, { once: true })
     const client = accounts.oauth2.initTokenClient({
       client_id: clientId,
       scope: GOOGLE_DRIVE_SCOPE,
       callback: (response) => {
+        window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
+        try {
+          owner.assertCurrent()
+        } catch (error) {
+          reject(error instanceof Error ? error : new Error('Google sign-in was interrupted.'))
+          return
+        }
         if (response.error !== undefined) {
           reject(
             new Error(`Google sign-in failed: ${response.error_description ?? response.error}.`),
           )
           return
         }
-        resolve(response.access_token)
+        const token = z.string().min(1).safeParse(response.access_token)
+        if (!token.success) {
+          reject(new Error('Google sign-in did not return a usable token.'))
+          return
+        }
+        resolve(token.data)
       },
       error_callback: (error) => {
+        window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
         reject(new Error(`Google sign-in was cancelled or failed: ${error.message ?? error.type}.`))
       },
     })
-    client.requestAccessToken()
+    client.requestAccessToken({ prompt: 'select_account' })
   })
 }
 
@@ -270,7 +301,12 @@ function showPicker(
   apiKey: string,
   appId: string,
 ): Promise<PickedFile[]> {
-  return new Promise<PickedFile[]>((resolve) => {
+  const owner = captureOfflineOwner()
+  return new Promise<PickedFile[]>((resolve, reject) => {
+    const changed = () => {
+      instance.setVisible(false)
+      reject(new Error('The app account changed while choosing Drive files.'))
+    }
     const instance = new picker.PickerBuilder()
       .addView(new picker.DocsView(picker.ViewId.DOCS_IMAGES))
       .enableFeature(picker.Feature.MULTISELECT_ENABLED)
@@ -279,13 +315,24 @@ function showPicker(
       .setOAuthToken(token)
       .setCallback((data) => {
         if (data.action === picker.Action.PICKED) {
+          window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
+          try {
+            owner.assertCurrent()
+          } catch (error) {
+            reject(
+              error instanceof Error ? error : new Error('Google file selection was interrupted.'),
+            )
+            return
+          }
           resolve(mapPickedDocuments(data))
         } else if (data.action === picker.Action.CANCEL) {
+          window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
           resolve([])
         }
         // Intermediate actions (e.g. the picker finishing loading) are ignored.
       })
       .build()
+    window.addEventListener(ACCOUNT_CHANGED_EVENT, changed, { once: true })
     instance.setVisible(true)
   })
 }
@@ -306,13 +353,17 @@ export async function pickFromGoogleDrive(config: PublicConfig): Promise<File[]>
     throw new Error('Google Drive import is not configured for this deployment.')
   }
 
+  const owner = captureOfflineOwner()
   await Promise.all([loadPickerModule(), loadIdentityServices()])
+  owner.assertCurrent()
   const google = window.google
   if (google === undefined) {
     throw new Error('The Google SDKs did not initialise.')
   }
 
   const token = await requestAccessToken(google.accounts, clientId)
+  owner.assertCurrent()
   const picked = await showPicker(google.picker, token, apiKey, appId)
+  owner.assertCurrent()
   return await downloadDriveFiles(picked, token)
 }

@@ -29,7 +29,9 @@ import {
   storageUsageQueryOptions,
 } from '../../lib/gallery'
 import { watermarksQueryOptions } from '../../lib/library'
+import { noteRecentWork } from '../../lib/recent-work-events'
 import { canRole } from '../../lib/roles'
+import { useWorkspaceMedia } from '../../lib/use-workspace-media'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { buttonVariants } from '../ui/button-variants'
@@ -44,7 +46,7 @@ interface GalleryProps {
 
 const PERCENT = 100
 const selectClassName =
-  'h-10 rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
+  'h-10 w-full min-w-0 rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
 
 /**
  * Stored photos for the organization: thumbnail grid with search and preset
@@ -72,6 +74,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
   const canShare = canRole(role, { share: ['create'] })
 
   const remove = useMutation({
+    networkMode: 'always',
     mutationFn: (ids: readonly string[]) => deletePhotos(organizationId, ids),
     onSuccess: async (_deleted, ids) => {
       setSelected((previous) => new Set([...previous].filter((id) => !ids.includes(id))))
@@ -84,6 +87,11 @@ export function Gallery({ organizationId, role }: GalleryProps) {
 
   const items = photos.data?.pages.flatMap((page) => page.photos) ?? []
   const isFiltering = filters.presetId !== undefined || filters.search !== undefined
+  const hasAllSelected = items.length > 0 && selected.size === items.length
+  let usageCaption: string
+  if (usage.isError) usageCaption = describeError(usage.error)
+  else if (usage.data === undefined) usageCaption = t('gallery.loadingPhotos')
+  else usageCaption = t('gallery.maxCount', { count: usage.data.maxCount })
 
   function toggle(id: string) {
     setSelected((previous) => {
@@ -99,33 +107,38 @@ export function Gallery({ organizationId, role }: GalleryProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      {usage.data === undefined ? null : (
-        <Card className="flex flex-col gap-2 p-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
-            <span data-testid="usage-summary">
-              {t('gallery.usage', {
-                count: usage.data.count,
-                used: formatBytes(usage.data.bytes),
-                max: formatBytes(usage.data.maxBytes),
-              })}
-            </span>
-            <span className="text-xs text-ink-muted">
-              {t('gallery.maxCount', { count: usage.data.maxCount })}
-            </span>
-          </div>
-          <progress
-            aria-label={t('gallery.storageUsed')}
-            max={usage.data.maxBytes}
-            value={usage.data.bytes}
-            className="h-2 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-line [&::-webkit-progress-value]:bg-brand-600"
-          />
+      <Card aria-busy={usage.isPending} className="flex flex-col gap-2 p-4">
+        <div className="grid gap-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
+          <span data-testid="usage-summary" className="min-h-5">
+            {usage.data === undefined
+              ? t('gallery.storageUsed')
+              : t('gallery.usage', {
+                  count: usage.data.count,
+                  used: formatBytes(usage.data.bytes),
+                  max: formatBytes(usage.data.maxBytes),
+                })}
+          </span>
+          <span
+            role={usage.isError ? 'alert' : undefined}
+            className="min-h-4 text-xs text-ink-muted"
+          >
+            {usageCaption}
+          </span>
+        </div>
+        <progress
+          aria-label={t('gallery.storageUsed')}
+          max={usage.data?.maxBytes}
+          value={usage.data?.bytes}
+          className="h-2 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-line [&::-webkit-progress-value]:bg-brand-600"
+        />
+        {usage.data === undefined ? null : (
           <p className="sr-only">
             {t('gallery.storagePercent', {
               percent: Math.round((usage.data.bytes / usage.data.maxBytes) * PERCENT),
             })}
           </p>
-        </Card>
-      )}
+        )}
+      </Card>
 
       <div className="flex justify-end">
         <Link to="/app/verify" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
@@ -135,7 +148,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
       </div>
 
       <div className="flex flex-wrap items-end gap-3">
-        <div className="flex min-w-56 flex-1 flex-col gap-1.5">
+        <div className="flex w-full min-w-0 flex-col gap-1.5 sm:min-w-56 sm:flex-1">
           <label htmlFor={searchId} className="text-sm font-medium">
             {t('gallery.search')}
           </label>
@@ -156,7 +169,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex w-full min-w-0 flex-col gap-1.5 sm:w-56">
           <label htmlFor={presetId} className="text-sm font-medium">
             {t('gallery.preset')}
           </label>
@@ -176,24 +189,23 @@ export function Gallery({ organizationId, role }: GalleryProps) {
             ))}
           </select>
         </div>
-        {(canDelete || canShare) && items.length > 0 ? (
-          <div className="ms-auto flex items-center gap-2">
+        {canDelete || canShare ? (
+          <div className="flex w-full flex-wrap items-center gap-2 sm:ms-auto sm:w-auto">
             <Button
               type="button"
               variant="secondary"
               size="sm"
+              disabled={items.length === 0}
               onClick={() => {
-                setSelected(
-                  selected.size === items.length ? new Set() : new Set(items.map((p) => p.id)),
-                )
+                setSelected(hasAllSelected ? new Set() : new Set(items.map((p) => p.id)))
               }}
             >
-              {selected.size === items.length ? (
+              {hasAllSelected ? (
                 <CheckSquare aria-hidden="true" className="size-4" />
               ) : (
                 <Square aria-hidden="true" className="size-4" />
               )}
-              {t(selected.size === items.length ? 'gallery.clearSelection' : 'gallery.selectAll')}
+              {t(hasAllSelected ? 'gallery.clearSelection' : 'gallery.selectAll')}
             </Button>
             {canShare ? (
               <ShareDialog
@@ -262,13 +274,15 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                   type="button"
                   aria-label={t('gallery.openPhoto', { name: photo.name })}
                   onClick={() => {
+                    noteRecentWork(organizationId, { kind: 'photo', photo })
                     setOpen(photo)
                   }}
                   className="flex w-full flex-col gap-1 rounded-lg border border-line bg-surface-raised p-1.5 text-start focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none"
                 >
                   <span className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
-                    <img
-                      src={photoThumbnailUrl(organizationId, photo.id)}
+                    <GalleryThumbnail
+                      organizationId={organizationId}
+                      photo={photo}
                       alt=""
                       loading="lazy"
                       className="max-h-full max-w-full object-contain"
@@ -318,7 +332,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
         </Button>
       ) : null}
 
-      <Lightbox
+      <GalleryLightbox
         organizationId={organizationId}
         photo={open}
         canDelete={canDelete}
@@ -333,6 +347,21 @@ export function Gallery({ organizationId, role }: GalleryProps) {
       />
     </div>
   )
+}
+
+function GalleryThumbnail({
+  organizationId,
+  photo,
+  ...props
+}: {
+  organizationId: string
+  photo: PhotoDto
+  alt: string
+  className: string
+  loading?: 'lazy' | 'eager'
+}) {
+  const src = useWorkspaceMedia(organizationId, photoThumbnailUrl(organizationId, photo.id))
+  return <img {...props} src={src} />
 }
 
 interface DeleteDialogProps {
@@ -391,7 +420,7 @@ interface LightboxProps {
   onDelete: (photo: PhotoDto) => void
 }
 
-function Lightbox({
+export function GalleryLightbox({
   organizationId,
   photo,
   canDelete,
@@ -401,6 +430,10 @@ function Lightbox({
   onDelete,
 }: LightboxProps) {
   const { t } = useTranslation()
+  const photoUrl = useWorkspaceMedia(
+    organizationId,
+    photo === null ? null : photoFileUrl(organizationId, photo.id),
+  )
   return (
     <Dialog.Root
       open={photo !== null}
@@ -446,7 +479,7 @@ function Lightbox({
               {/* Actions on their own row so a long file name never squeezes them, or vice versa, on a phone. */}
               <div className="flex flex-wrap items-center gap-2">
                 <a
-                  href={photoFileUrl(organizationId, photo.id)}
+                  href={photoUrl}
                   download={photo.name}
                   className={buttonVariants({ variant: 'secondary', size: 'sm' })}
                 >
@@ -483,7 +516,7 @@ function Lightbox({
               </div>
               <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
                 <img
-                  src={photoFileUrl(organizationId, photo.id)}
+                  src={photoUrl}
                   alt={photo.name}
                   className="max-h-full max-w-full object-contain"
                 />

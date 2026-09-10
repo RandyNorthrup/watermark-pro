@@ -118,19 +118,19 @@ describe('sign-up and email verification', () => {
 
     const sessionCookie = response.headers
       .getSetCookie()
-      .find((cookie) => cookie.startsWith('better-auth.session_token='))
+      .find((cookie) => cookie.startsWith('lumafoil.session_token='))
     expect(sessionCookie).toMatch(/HttpOnly/i)
     expect(sessionCookie).toMatch(/SameSite=Lax/i)
     expect(sessionCookie).toMatch(/Path=\//)
   })
 
-  it('clears the offline caches and local storage on sign-out', async () => {
-    // ownerClient is signed in (beforeEach). Signing out must instruct the
-    // browser to drop cached shell assets and persisted data (M19, shared
-    // devices); Better Auth clears the cookie on its own.
+  it('revokes sign-out without a global storage wipe that could erase another account', async () => {
     const response = await ownerClient.post('/api/auth/sign-out', {})
     expect(response.status).toBe(HTTP_STATUS.ok)
-    expect(response.headers.get('clear-site-data')).toBe('"cache", "storage"')
+    expect(response.headers.get('clear-site-data')).toBeNull()
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    const signedOut = await ownerClient.get('/api/auth/get-session')
+    expect(await signedOut.json()).toBeNull()
   })
 })
 

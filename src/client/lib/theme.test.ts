@@ -50,7 +50,7 @@ describe('theme', () => {
       applyTheme('system')
       expect(document.documentElement.dataset['theme']).toBe('dark')
       expect(readTheme()).toBe('system')
-      expect(metas.map((meta) => meta.content)).toEqual(['#26242f', '#26242f'])
+      expect(metas.map((meta) => meta.content)).toEqual(['#211d21', '#211d21'])
 
       applyTheme('light')
       expect(document.documentElement.dataset['theme']).toBe('light')
@@ -78,6 +78,25 @@ describe('theme', () => {
     expect(document.documentElement.dataset['theme']).toBe('light')
     stop()
     expect(stub.listeners.size).toBe(0)
+  })
+
+  it('uses the selected picture theme even when it differs from the operating system', () => {
+    const source = document.createElement('source')
+    source.dataset['themePicture'] = 'dark'
+    source.media = '(prefers-color-scheme: dark)'
+    document.body.append(source)
+    try {
+      stubMatchMedia(true)
+      applyTheme('light')
+      expect(source.media).toBe('not all')
+      applyTheme('dark')
+      expect(source.media).toBe('all')
+      stubMatchMedia(false)
+      applyTheme('system')
+      expect(source.media).toBe('not all')
+    } finally {
+      source.remove()
+    }
   })
 
   it('survives storage being unavailable', () => {

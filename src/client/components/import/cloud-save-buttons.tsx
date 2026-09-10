@@ -1,9 +1,11 @@
 import { UploadCloud } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { CloudSavedDialog } from './cloud-saved-dialog'
 import type { PublicConfig } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
+import { CloudBatchError, type CloudSavedFile } from '../../lib/imports/cloud-transfer'
 import { saveToDropbox } from '../../lib/imports/dropbox-save'
 import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
 import { saveToOneDrive } from '../../lib/imports/onedrive'
@@ -12,13 +14,16 @@ import {
   PROVIDER_LABELS,
   type CloudProviderId,
   type CloudUpload,
+  type CloudUploadSource,
 } from '../../lib/imports/source'
+import { ACCOUNT_CHANGED_EVENT } from '../../lib/offline-account'
+import { captureOfflineOwner } from '../../lib/offline-context'
 import { Button } from '../ui/button'
 
-/** Each provider writes the watermarked photos into its "Watermark Pro" folder. */
+/** Each provider writes the watermarked photos into its "Lumafoil" folder. */
 const SAVERS: Record<
   CloudProviderId,
-  (config: PublicConfig, uploads: readonly CloudUpload[]) => Promise<void>
+  (config: PublicConfig, uploads: CloudUploadSource) => Promise<CloudSavedFile[]>
 > = {
   google: saveToGoogleDrive,
   dropbox: saveToDropbox,
@@ -42,7 +47,7 @@ interface CloudSaveButtonsProps {
 /**
  * One "Save to <provider>" button per configured cloud service (M16). Each opens
  * the provider's sign-in (a popup — Google GIS, a Dropbox PKCE window, or the
- * MSAL popup) then uploads the watermarked photos into a "Watermark Pro" folder.
+ * MSAL popup) then uploads the watermarked photos into a "Lumafoil" folder.
  * A failure is reported through `onError`; the buttons sit in an inline row with
  * no room for an alert of their own.
  */
@@ -55,21 +60,38 @@ export function CloudSaveButtons({
 }: CloudSaveButtonsProps) {
   const { t } = useTranslation()
   const [pending, setPending] = useState<CloudProviderId | null>(null)
+  const [saved, setSaved] = useState<CloudSavedFile[]>([])
+  useEffect(() => {
+    const changed = () => {
+      setSaved([])
+      setPending(null)
+    }
+    window.addEventListener(ACCOUNT_CHANGED_EVENT, changed)
+    return () => window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
+  }, [])
   const providers = configuredProviders(config)
   if (providers.length === 0) {
     return null
   }
 
   async function save(provider: CloudProviderId) {
+    const owner = captureOfflineOwner()
     setPending(provider)
     try {
-      const uploads = await getUploads()
-      if (uploads.length === 0) {
+      const files = await SAVERS[provider](config, getUploads)
+      owner.assertCurrent()
+      setSaved((previous) => [...previous, ...files])
+      if (files.length > 0) onSaved(provider, files.length)
+    } catch (error) {
+      try {
+        owner.assertCurrent()
+      } catch {
         return
       }
-      await SAVERS[provider](config, uploads)
-      onSaved(provider, uploads.length)
-    } catch (error) {
+      if (error instanceof CloudBatchError && error.saved.length > 0) {
+        setSaved((previous) => [...previous, ...error.saved])
+        onSaved(provider, error.saved.length)
+      }
       onError(describeError(error))
     } finally {
       setPending(null)
@@ -84,7 +106,7 @@ export function CloudSaveButtons({
           type="button"
           variant="secondary"
           size="sm"
-          disabled={disabled}
+          disabled={disabled || pending !== null}
           isPending={pending === provider}
           onClick={() => {
             void save(provider)
@@ -94,6 +116,7 @@ export function CloudSaveButtons({
           {t('import.saveToProvider', { provider: PROVIDER_LABELS[provider] })}
         </Button>
       ))}
+      {saved.length === 0 ? null : <CloudSavedDialog config={config} files={saved} />}
     </>
   )
 }

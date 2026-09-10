@@ -23,7 +23,7 @@
     "toolsNav": "Outils",
     "signOut": "Se déconnecter",
     "accountMenu": "Menu du compte de {{name}}",
-    "menuDescription": "Changez d'organisation ou accédez à n'importe quelle partie de Watermark Pro.",
+    "menuDescription": "Changez d'organisation ou accédez à n'importe quelle partie de Lumafoil.",
     "switchOrganizationFor": "Organisation : {{name}}. Changer d'organisation",
     "chooseOrganization": "Choisir une organisation",
     "chooseOrganizationShort": "Choisir l'organisation",
@@ -33,7 +33,8 @@
       "system": "Thème : système. Passer au clair",
       "light": "Thème : clair. Passer au sombre",
       "dark": "Thème : sombre. Passer au système"
-    }
+    },
+    "closeMenu": "Fermer le menu"
   },
   "auth": {
     "backToSignIn": "Retour à la connexion",
@@ -87,12 +88,16 @@
       "roleLabel": "Rôle :",
       "decline": "Refuser",
       "accept": "Accepter l'invitation"
+    },
+    "inviteOnly": {
+      "title": "Invitation requise",
+      "body": "Lumafoil est accessible uniquement sur invitation. Ouvrez le lien reçu par e-mail pour créer votre compte."
     }
   },
   "dashboard": {
     "signedInAs": "Connecté en tant que {{email}}",
     "yourWorkspace": "Votre espace de travail",
-    "yourRole": "Votre rôle :",
+    "yourRole": "Votre rôle dans cet espace :",
     "toolsHeading": "Outils",
     "tools": {
       "library": {
@@ -109,7 +114,7 @@
       },
       "gallery": {
         "label": "Galerie",
-        "body": "Parcourez ce que l'équipe a enregistré, puis partagez des albums via un lien."
+        "body": "Parcourez les photos enregistrées, puis choisissez celles à partager par lien."
       }
     },
     "overviewHeading": "Vue d'ensemble",
@@ -126,7 +131,7 @@
   "library": {
     "orgRequired": "Créez ou rejoignez une organisation pour constituer une bibliothèque de filigranes.",
     "heading": "Bibliothèque de filigranes",
-    "description": "Préréglages partagés par tous les membres de {{name}}. Appliquez-les un par un ou en lot.",
+    "description": "Filigranes enregistrés dans {{name}}. Appliquez-les à un fichier ou à un lot.",
     "export": "Exporter",
     "exportPreset": "Exporter {{name}}",
     "importPresets": "Importer des préréglages",
@@ -140,7 +145,7 @@
     "loadingPreset": "Chargement du préréglage",
     "loadPresetErrorTitle": "Impossible de charger le préréglage",
     "presetGone": "Ce préréglage n'existe plus.",
-    "editSubtitleManage": "Les modifications s'appliquent à tous ceux qui utilisent ce préréglage.",
+    "editSubtitleManage": "Vos modifications mettent à jour ce préréglage enregistré pour les prochaines utilisations.",
     "editSubtitleReadOnly": "Vue en lecture seule.",
     "cannotCreate": "Votre rôle ne permet pas de créer des préréglages.",
     "newPresetSubtitle": "Concevez la marque, choisissez son emplacement, puis enregistrez-la dans la bibliothèque.",
@@ -157,7 +162,8 @@
       "glyph": "Glyphe {{glyph}}",
       "icon": "Icône {{name}}",
       "logo": "Logo",
-      "qr": "Code QR pour {{content}}"
+      "qr": "Code QR pour {{content}}",
+      "sticker": "Autocollant {{name}}"
     },
     "shape": {
       "rectangle": "Rectangle",
@@ -169,7 +175,10 @@
       "smart": "Placement intelligent",
       "custom": "Position personnalisée",
       "random": "Placement aléatoire"
-    }
+    },
+    "newQr": "Nouveau code QR",
+    "qrOnly": "Codes QR uniquement",
+    "noQr": "Aucun code QR enregistré. Créez-en un pour chaque lien utilisé."
   },
   "designer": {
     "presetName": "Nom du préréglage",
@@ -193,7 +202,8 @@
     },
     "qr": {
       "content": "Contenu du code QR",
-      "hint": "Un lien, généralement. Jusqu'à {{max}} caractères ; le code est toujours foncé sur fond clair pour pouvoir être scanné."
+      "hint": "Un lien, généralement. Jusqu'à {{max}} caractères ; le code est toujours foncé sur fond clair pour pouvoir être scanné.",
+      "savedHint": "Nommez et enregistrez chaque code QR séparément. Réutilisez-le depuis la bibliothèque ou gardez-en plusieurs pour différents liens. Testez le résultat à sa taille prévue avant de le partager."
     },
     "tokens": {
       "menu": "Insérer un détail",
@@ -217,12 +227,16 @@
     "font": {
       "family": "Police",
       "weight": "Graisse",
-      "specimen": "Portez ce vieux whisky au juge blond qui fume"
+      "specimen": "Portez ce vieux whisky au juge blond qui fume",
+      "search": "Rechercher des polices",
+      "resultCount": "{{count}} familles de polices",
+      "license": "Licence de la police"
     },
     "symbol": {
       "icons": "Icônes",
       "glyphLabel": "Glyphe {{glyph}}",
-      "iconLabel": "Icône {{label}}"
+      "iconLabel": "Icône {{label}}",
+      "license": "Licences des icônes"
     },
     "shape": {
       "label": "Forme",
@@ -370,12 +384,25 @@
         "cancel": "Annuler",
         "save": "Enregistrer comme logo"
       }
+    },
+    "stickers": {
+      "heading": "Autocollants en couleur",
+      "search": "Rechercher des autocollants",
+      "category": "Catégorie",
+      "all": "Toutes les catégories",
+      "results": "{{total}} autocollants trouvés",
+      "choose": "Choisir {{name}}",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "license": "Fluent Emoji · licence MIT",
+      "usage": "Usage commercial autorisé ; conservez la notice de licence des illustrations lors de leur redistribution.",
+      "guide": "Guide des licences des illustrations"
     }
   },
   "editor": {
     "orgRequired": "Créez ou rejoignez une organisation pour utiliser l'éditeur.",
     "heading": "Éditeur",
-    "description": "Filigranez une photo : choisissez un préréglage, placez-le à la main si vous le souhaitez, recadrez, redimensionnez et téléchargez. Rien ne quitte votre navigateur.",
+    "description": "Choisissez un préréglage, placez le filigrane, recadrez et redimensionnez sur votre appareil. Téléchargez le résultat ou choisissez la galerie ou le cloud.",
     "tabs": {
       "watermark": "Filigrane",
       "crop": "Recadrer",
@@ -425,7 +452,13 @@
       "removeLayer": "Retirer {{name}} de cette photo",
       "adjusted": "Ajusté pour cette photo ; le préréglage de la bibliothèque reste inchangé.",
       "revert": "Réinitialiser",
-      "placement": "Placement"
+      "placement": "Placement",
+      "create": "Créer un filigrane",
+      "createHint": "Créez votre filigrane ici. Enregistrez-le pour cette photo et conservez-le dans votre bibliothèque.",
+      "cancelCreate": "Annuler",
+      "saveAndUse": "Enregistrer et utiliser",
+      "emptyReadOnly": "Aucun filigrane n’est encore disponible dans cette bibliothèque.",
+      "firstUseHint": "Ajoutez un filigrane, puis ouvrez Exporter pour télécharger la photo."
     },
     "crop": {
       "aspectRatio": "Proportions",
@@ -493,7 +526,7 @@
         "label": "Tout conserver",
         "help": "Y compris la position GPS, si la photo en a une."
       },
-      "webpNote": "Les métadonnées sont toujours supprimées des exports WebP."
+      "webpNote": "WebP supprime les métadonnées originales de la photo. Les notices de licence requises pour les illustrations sont conservées."
     },
     "export": {
       "format": "Format",
@@ -605,7 +638,7 @@
   "gallery": {
     "orgRequired": "Créez ou rejoignez une organisation pour tenir une galerie.",
     "heading": "Galerie",
-    "description": "Photos filigranées enregistrées par {{name}}. Recherchez, filtrez par préréglage, téléchargez ou supprimez.",
+    "description": "Photos filigranées enregistrées dans {{name}}. Recherchez, filtrez, téléchargez ou supprimez.",
     "usage_one": "{{count}} photo · {{used}} sur {{max}}",
     "usage_many": "{{count}} photos · {{used}} sur {{max}}",
     "usage_other": "{{count}} photos · {{used}} sur {{max}}",
@@ -696,8 +729,8 @@
   },
   "admin": {
     "heading": "Administration",
-    "description": "Tous les utilisateurs et organisations de ce déploiement. Les actions effectuées ici sont enregistrées dans le journal d'audit.",
-    "onlyAdmins": "Seuls les administrateurs de la plateforme peuvent ouvrir cette page.",
+    "description": "Réservé à l’administrateur du site : gestion des comptes et consultation des totaux. Posséder un espace de travail ne donne pas accès à l’administration du site.",
+    "onlyAdmins": "Seul l’administrateur du site peut ouvrir cette page.",
     "sectionsLabel": "Sections d'administration",
     "tabs": {
       "users": "Utilisateurs",
@@ -715,7 +748,11 @@
       "ok": "OK",
       "failed": "Échec",
       "duration": "{{ms}} ms",
-      "th": { "time": "Heure", "status": "Statut", "duration": "Durée" }
+      "th": {
+        "time": "Heure",
+        "status": "Statut",
+        "duration": "Durée"
+      }
     },
     "clientErrors": {
       "loading": "Chargement des erreurs client",
@@ -737,15 +774,11 @@
     "you": "(vous)",
     "joined": "Inscrit le {{date}}",
     "emailNotVerified": " · e-mail non vérifié",
-    "platformAdmin": "admin plateforme",
+    "platformAdmin": "Administrateur du site",
     "banned": "banni",
     "bannedReason": "banni : {{reason}}",
     "unban": "Débannir",
     "unbanUser": "Débannir {{email}}",
-    "removeAdmin": "Retirer l'admin",
-    "makeAdminShort": "Nommer admin",
-    "removeAdminFrom": "Retirer le rôle d'administrateur à {{email}}",
-    "makeAdmin": "Nommer {{email}} administrateur",
     "signOutEverywhereButton": "Déconnecter partout",
     "signOutEverywhere": "Déconnecter {{email}} partout",
     "ban": "Bannir",
@@ -809,7 +842,7 @@
   "organizations": {
     "firstTitle": "Créez votre première organisation",
     "newTitle": "Nouvelle organisation",
-    "description": "Les organisations regroupent vos filigranes, vos photos et votre équipe. Vous en serez le propriétaire.",
+    "description": "Créez un espace séparé pour vos filigranes et photos. Il reste privé sauf si vous invitez explicitement des membres.",
     "createFailed": "L'organisation n'a pas pu être créée.",
     "nameLabel": "Nom",
     "slugLabel": "Identifiant d'URL",
@@ -839,7 +872,15 @@
       "noneSelected": "Aucune photo sélectionnée",
       "selectedCount": "{{count}} sélectionnée(s)",
       "addSelected": "Ajouter la sélection"
-    }
+    },
+    "cloudSaved": "Fichiers enregistrés dans le cloud ({{total}})",
+    "cloudSavedTitle": "Fichiers enregistrés dans le cloud",
+    "cloudSharingHint": "Enregistrer ne crée pas de lien public. Créez-en un uniquement pour autoriser toute personne disposant du lien à consulter le fichier. Les droits du dossier restent applicables. Gérez les autres accès chez le fournisseur.",
+    "openProvider": "Ouvrir dans {{provider}}",
+    "createPublicLink": "Créer un lien public",
+    "revokePublicLink": "Révoquer le lien public",
+    "linkCopied": "Lien copié",
+    "copyLink": "Copier le lien"
   },
   "video": {
     "orgRequired": "Créez ou rejoignez une organisation pour filigraner des vidéos.",
@@ -932,7 +973,7 @@
     },
     "tool": {
       "title": "Vérifier une photo",
-      "description": "Vérifiez si un PNG porte une marque invisible Watermark Pro et lisez son message caché. Rien ne quitte votre navigateur."
+      "description": "Vérifiez si un PNG porte une marque invisible Lumafoil et lisez son message caché. Rien ne quitte votre navigateur."
     },
     "checkPng": "Vérifier un PNG",
     "checking": "Vérification…",
@@ -949,7 +990,7 @@
     "createInLibrary": "Créer un préréglage dans la bibliothèque",
     "legend": "Préréglages",
     "importTitle": "Importer des préréglages",
-    "importDescription": "Choisissez un fichier de préréglages Watermark Pro. Ses préréglages, ainsi que les logos qu'ils utilisent, sont ajoutés à cette bibliothèque.",
+    "importDescription": "Choisissez un fichier de préréglages Lumafoil. Ses préréglages, ainsi que les logos qu'ils utilisent, sont ajoutés à cette bibliothèque.",
     "presetFileLabel": "Fichier de préréglages",
     "noPresets": "Ce fichier de préréglages ne contient aucun préréglage.",
     "fileCount_one": "{{count}} préréglage dans ce fichier",
@@ -964,111 +1005,174 @@
   "landing": {
     "nav": "Compte",
     "signIn": "Se connecter",
-    "createAccount": "Créer un compte",
-    "eyebrow": "Gratuit et open source",
-    "heroBody": "Protégez vos photographies sans sacrifier l'image. Watermark Pro effectue le gros du travail dans votre navigateur, garde vos originaux privés et donne à votre équipe des rôles qui ont un vrai sens.",
-    "createWorkspace": "Créez votre espace de travail",
-    "featuresHeading": "Ce qu'il fait",
-    "features": {
-      "bulk": {
-        "title": "Traitement par lot",
-        "body": "Déposez des centaines de photos et filigranez-les toutes en une seule passe, dans votre navigateur."
+    "heroBody": "Ajoutez du texte, des logos ou des signatures. Réutilisez vos préréglages sur un fichier ou un lot, travaillez hors ligne et synchronisez à la reconnexion.",
+    "featuresHeading": "Des outils pour chaque étape",
+    "footer": "Lumafoil est un logiciel open source sous licence MIT.",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "heroTitleStart": "Des filigranes pour vos photos,",
+    "heroTitleEnd": "vidéos et PDF.",
+    "heroAlt": "Éditeur photo Lumafoil avec réglages de placement et d’exportation",
+    "previewLabel": "L’éditeur Lumafoil",
+    "privacyNote": "Les fichiers sont traités sur votre appareil. Le stockage cloud est facultatif.",
+    "formatsLabel": "Photos · PDF · Vidéo",
+    "workflowHeading": "Ouvrir. Ajuster. Exporter.",
+    "workflowNote": "Votre espace de travail réunit préréglages et fichiers enregistrés.",
+    "steps": {
+      "openTitle": "Apportez vos photos",
+      "openBody": "Ouvrez une image ou un lot entier. Vos originaux restent intacts.",
+      "markTitle": "Créez votre marque",
+      "markBody": "Choisissez un préréglage enregistré ou créez une signature qui vous ressemble.",
+      "exportTitle": "Exportez, c’est prêt",
+      "exportBody": "Téléchargez les fichiers terminés ou enregistrez-les dans la galerie pour les synchroniser."
+    },
+    "github": "GitHub",
+    "featuresIntro": "Créez un filigrane, appliquez-le à vos fichiers, puis choisissez comment enregistrer ou partager le résultat.",
+    "moreHeading": "D’autres outils pour terminer votre travail",
+    "capabilities": {
+      "marks": {
+        "title": "Texte, logos et votre signature",
+        "body": "Saisissez votre nom ou une mention de copyright, importez un logo ou dessinez une signature. Réglez taille, angle, opacité et couleur, et combinez plusieurs marques."
       },
-      "library": {
-        "title": "Bibliothèque de filigranes",
-        "body": "Enregistrez une fois des marques texte, symbole et logo ; appliquez-les partout d'un clic."
+      "batch": {
+        "title": "Des filigranes par lots",
+        "body": "Appliquez un filigrane enregistré à plusieurs photos. Vérifiez les résultats, ajustez chaque position et téléchargez le lot terminé dans un ZIP."
+      },
+      "fonts": {
+        "title": "551 familles de polices distinctes",
+        "body": "Recherchez des polices avec ou sans empattements, manuscrites, décoratives ou à chasse fixe. Prévisualisez votre texte et enregistrez le style. Les polices sont fournies localement sous licences ouvertes."
+      },
+      "stickers": {
+        "title": "400 stickers vectoriels en couleur",
+        "body": "Parcourez animaux, fleurs, nourriture, voyages, fêtes et objets du quotidien. Recherchez un dessin, ajoutez-le à votre filigrane et redimensionnez-le sans contours flous."
+      },
+      "qr": {
+        "title": "Créez et enregistrez des codes QR",
+        "body": "Transformez une adresse web ou du texte en code QR. Conservez des codes pour votre portfolio, vos coordonnées ou vos projets, puis réutilisez-les."
+      },
+      "templates": {
+        "title": "Enregistrez vos modèles",
+        "body": "Conservez texte, illustrations, style et position. Appliquez les préréglages dans l’éditeur ou par lots, et importez ou exportez vos modèles entre appareils."
+      },
+      "editing": {
+        "title": "Recadrez, redimensionnez et ajustez",
+        "body": "Recadrez une photo, choisissez ses dimensions et réglez luminosité, contraste et saturation avant le filigrane final."
       },
       "smart": {
-        "title": "Placement intelligent",
-        "body": "Chaque photo est analysée pour que la marque se place là où elle se lit le mieux, sans empiéter sur le sujet."
+        "title": "Placement et contraste intelligents",
+        "body": "Lumafoil suggère une position et une marque claire ou sombre selon l’image. Vérifiez le résultat et ajustez-le vous-même."
       },
-      "contrast": {
-        "title": "Contraste automatique",
-        "body": "Variante claire ou foncée et intensité du contour choisies pour chaque image, ajustables si vous n'êtes pas d'accord."
+      "video": {
+        "title": "Filigranes sur vidéos",
+        "body": "Marquez les vidéos compatibles dans votre navigateur. Réglez position et durée d’affichage, puis prévisualisez avant l’exportation."
       },
-      "teams": {
-        "title": "Équipes et rôles",
-        "body": "Des organisations avec les rôles propriétaire, administrateur, éditeur et lecteur, appliqués côté serveur."
+      "pdf": {
+        "title": "Filigranes sur PDF",
+        "body": "Appliquez un filigrane enregistré aux pages PDF choisies. Traitez un document ou un lot et téléchargez les PDF marqués."
       },
-      "trusted": {
-        "title": "Conçu pour inspirer confiance",
-        "body": "Politique de sécurité du contenu stricte, actions auditées et photos qui ne quittent jamais votre navigateur, sauf si vous les enregistrez."
+      "export": {
+        "title": "Choisissez votre format",
+        "body": "Exportez en JPEG, PNG ou WebP. Réglez dimensions et qualité, ou téléchargez un lot traité dans un ZIP."
+      },
+      "gallery": {
+        "title": "Une galerie privée",
+        "body": "Enregistrez vos images terminées dans votre compte. Retrouvez-les, téléchargez-les ou sélectionnez les photos à partager."
+      },
+      "sharing": {
+        "title": "Partagez les photos choisies",
+        "body": "Créez un lien de galerie Lumafoil pour certaines photos. Fixez une expiration ou révoquez le lien quand vous le souhaitez."
+      },
+      "offline": {
+        "title": "Travaillez hors ligne, synchronisez ensuite",
+        "body": "Préparez Lumafoil pour le mode hors ligne, puis modifiez vos modèles et enregistrez vos photos. Les changements se synchronisent au retour de la connexion, avec gestion visible des erreurs et conflits."
+      },
+      "privacy": {
+        "title": "Votre compte, votre espace",
+        "body": "Les nouveaux utilisateurs ont besoin d’une invitation et reçoivent un espace privé. Une invitation ne donne aucun accès à vos photos ou modèles."
+      },
+      "languages": {
+        "title": "Une interface en 12 langues",
+        "body": "Choisissez parmi les 12 langues de Lumafoil, dont l’arabe avec une mise en page de droite à gauche."
+      },
+      "theme": {
+        "title": "Modes clair et sombre",
+        "body": "Choisissez un thème ou suivez celui de votre appareil. L’interface s’adapte aux téléphones, tablettes et grands écrans."
       }
     },
-    "footer": "Watermark Pro est un logiciel open source sous licence MIT.",
-    "privacy": "Confidentialité",
-    "terms": "Conditions"
+    "inviteHosting": "Lumafoil est accessible sur invitation. Vous préférez l’auto-héberger ?",
+    "selfHost": "Obtenez gratuitement le code source sur GitHub.",
+    "featuresNav": "Fonctionnalités"
   },
   "legal": {
     "signIn": "Se connecter",
     "lastUpdated": "Dernière mise à jour le {{date}}",
     "readSibling": "Consultez <sibling>{{siblingLabel}}</sibling>, ou revenez à la <home>page d'accueil</home>.",
-    "footer": "Watermark Pro est un logiciel open source sous licence MIT.",
+    "footer": "Le code de Lumafoil est sous licence MIT. Les polices et illustrations incluses conservent leurs propres licences.",
     "privacy": {
       "title": "Confidentialité",
-      "intro": "Watermark Pro est conçu pour que vos photographies restent les vôtres. Cette page explique en langage clair ce qu'il advient de vos images et des informations de votre compte, à partir des contrôles réellement appliqués par le projet.",
+      "intro": "Lumafoil est conçu pour que vos photographies restent les vôtres. Cette page explique en langage clair ce qu'il advient de vos images et des informations de votre compte, à partir des contrôles réellement appliqués par le projet.",
       "siblingLabel": "les conditions d'utilisation",
       "photos": {
-        "heading": "Vos photos restent dans votre navigateur",
-        "p1": "Le filigranage s'exécute entièrement sur votre appareil. L'éditeur et l'outil En lot décodent vos photos dans le navigateur, les rendent dans des Web Workers et construisent les fichiers finaux en mémoire. Prévisualiser un filigrane n'envoie jamais la photo à laquelle il s'applique.",
-        "p2": "Les exports sont assemblés localement et vous sont fournis via un lien de téléchargement de même origine, libéré dès que le téléchargement commence. Vos originaux ne sont jamais envoyés à un serveur pour être prévisualisés ou filigranés."
+        "heading": "Les photos sont traitées sur votre appareil",
+        "p1": "La retouche et le filigranage se font sur votre appareil. Un aperçu ne téléverse pas vos originaux vers Lumafoil.",
+        "p2": "Vous choisissez de télécharger le résultat, de le sauvegarder dans votre galerie, de le transférer vers un stockage cloud connecté ou de créer un lien de partage."
       },
       "storage": {
-        "heading": "Ce que nous stockons, et uniquement à votre demande",
-        "p1": "Rien n'est conservé sur nos serveurs à moins que vous ne choisissiez de l'enregistrer. Lorsque vous enregistrez une photo, une miniature ou un logo, l'élément est stocké dans Cloudflare R2 sous des clés limitées à votre organisation, jamais rendu public, et servi uniquement aux membres connectés de cette organisation avec une mise en cache privée.",
-        "p2": "Chaque organisation dispose de quotas de photos, de logos et de stockage. Chaque envoi et chaque suppression sont enregistrés dans le journal d'audit."
+        "heading": "Comptes, travail enregistré et copies hors ligne",
+        "p1": "Cloudflare héberge les comptes, préréglages, photos de galerie, miniatures, logos téléversés, données de partage et historique récent. Le contenu appartient à son espace ; les autres utilisateurs ont besoin d’une adhésion explicite ou d’un lien de partage.",
+        "p2": "Cet appareil conserve des copies et modifications en attente propres à chaque compte pour fonctionner hors ligne. La reconnexion au même compte relance la synchronisation. Les modifications en attente bloquent la déconnexion ; une déconnexion réussie efface les données hors ligne de l’app. Une session expirée bloque l’accès sans effacer le travail en attente. Effacer les données du navigateur peut le supprimer."
       },
       "metadata": {
-        "heading": "Les métadonnées sont supprimées par défaut",
-        "p1": "Chaque export est réencodé à partir des pixels, si bien qu'aucune métadonnée n'est conservée à moins que vous ne décidiez de la garder. Le réglage par défaut supprime toutes les données d'appareil et de localisation avant que le fichier n'atteigne votre téléchargement, la feuille de partage ou la galerie.",
-        "p2": "Deux modes facultatifs, choisis à chaque export, vous permettent de conserver les données d'appareil sans la localisation GPS, ou de tout garder tel quel. Les métadonnées sont lues et écrites dans le navigateur ; rien n'est envoyé pour cela."
+        "heading": "Métadonnées personnelles et notices de licence",
+        "p1": "Les images exportées suppriment par défaut les métadonnées de l’appareil photo et de localisation. Les options prises en charge peuvent conserver les données photo sans GPS ou les métadonnées originales compatibles. Le traitement reste dans votre navigateur.",
+        "p2": "Les exports utilisant les illustrations incluses conservent leur notice de licence dans les métadonnées, une pièce jointe au document ou un fichier annexe de l’archive. D’autres logiciels peuvent la supprimer ; conservez la notice applicable lors de la redistribution de ces illustrations."
       },
       "sharing": {
         "heading": "Liens de partage",
-        "p1": "Un lien de partage contient un jeton signé avec une expiration intégrée et peut être révoqué à tout moment. Les pages publiques qu'ouvre un lien ne comportent aucune session et sont limitées en fréquence par adresse.",
-        "p2": "Les liens expirés, révoqués, falsifiés ou inconnus renvoient tous la même réponse neutre « introuvable », de sorte qu'un lien ne révèle rien une fois qu'il cesse de fonctionner. La création et la révocation de liens sont réservées aux membres autorisés et sont auditées."
+        "p1": "Toute personne disposant d’un lien de galerie Lumafoil peut voir les photos enregistrées sélectionnées jusqu’à son expiration ou sa révocation. Une invitation au site ouvre un compte privé distinct ; elle ne partage ni l’espace ni le contenu de l’invitant.",
+        "p2": "Les liens des fournisseurs cloud suivent leurs propres règles d’accès et de révocation. Révoquer un lien ne récupère pas les téléchargements ou copies déjà effectués."
       },
       "account": {
         "heading": "Votre compte",
-        "p1": "Un compte nécessite une adresse e-mail et un mot de passe, et l'e-mail doit être vérifié avant que le compte ne soit actif. Les sessions sont conservées dans des cookies HttpOnly, SameSite=Lax, marqués Secure sur les origines sécurisées.",
-        "p2": "Les liens de réinitialisation de mot de passe expirent après une heure et déconnectent vos autres sessions lorsqu'ils sont utilisés."
+        "p1": "Les nouveaux comptes exigent une invitation et une adresse e-mail vérifiée. Utilisez un mot de passe ou Google/Microsoft si configurés. Un compte existant ne nécessite pas de nouvelle invitation. Ajouter une méthode de connexion exige une association depuis une session authentifiée.",
+        "p2": "Les sessions utilisent des cookies HttpOnly, SameSite=Lax et Secure sous HTTPS. Les liens de réinitialisation expirent après une heure et révoquent les autres sessions serveur lorsqu’ils sont utilisés."
       },
       "analytics": {
-        "heading": "Analyses et cookies",
-        "p1": "Nous ne déposons aucun cookie d'analyse ou de publicité tiers. La seule mesure est Cloudflare Web Analytics, qui fonctionne sans cookie et ne vous suit pas d'un site à l'autre.",
-        "p2": "L'application communique avec seulement deux origines tierces, toutes deux de Cloudflare : le widget Turnstile qui filtre les demandes d'inscription et de réinitialisation de mot de passe contre les bots, et la balise d'analyse sans cookie. Les polices, les styles et tout le reste sont servis depuis ce site."
+        "heading": "Cookies et services externes",
+        "p1": "Lumafoil n’intègre ni balise d’analyse ni cookies publicitaires. Les cookies essentiels maintiennent les sessions ; le stockage local conserve préférences, copies hors ligne et changements en attente.",
+        "p2": "Lorsqu’il est activé, Cloudflare Turnstile filtre les requêtes de compte contre les robots ; consultez sa <turnstile>notice de confidentialité</turnstile>. Google/Microsoft assurent la connexion choisie. Google Drive, Dropbox et OneDrive reçoivent les requêtes des fonctions cloud que vous choisissez ; leurs politiques s’appliquent."
       },
       "audit": {
         "heading": "Journal d'audit",
-        "p1": "Les inscriptions et chaque changement d'organisation, d'adhésion, d'invitation, de bibliothèque, de photo et de partage sont consignés dans un journal d'audit en ajout seul. Ce journal n'est lisible que par les propriétaires et administrateurs d'une organisation."
+        "p1": "Les journaux d’un espace exigent un rôle de propriétaire ou d’administrateur de cet espace. L’unique administrateur du site gère les comptes et consulte totaux, modération, audits et données de santé/erreur. L’historique récent est individuel. Les journaux d’échec de l’app omettent les jetons et corps de requêtes."
       },
       "reporting": {
         "heading": "Signaler un problème",
-        "p1": "Les problèmes de sécurité peuvent être signalés en privé via le dépôt GitHub du projet plutôt que par un ticket public. La politique de sécurité du dépôt décrit ce qu'il faut inclure et dans quels délais vous obtiendrez une réponse."
+        "p1": "Assistance : <support>support@lumafoil.com</support>. Signalez les failles via le <security>formulaire privé de GitHub</security> ou cette adresse. Ne publiez pas de jetons ni de contenu personnel dans les tickets publics."
       }
     },
     "terms": {
       "title": "Conditions d'utilisation",
-      "intro": "Ces conditions couvrent votre utilisation de Watermark Pro. Elles sont rédigées pour être lues et décrivent le comportement réel du service plutôt que d'ajouter des promesses qu'il ne tient pas.",
+      "intro": "Ces conditions couvrent votre utilisation de Lumafoil. Elles sont rédigées pour être lues et décrivent le comportement réel du service plutôt que d'ajouter des promesses qu'il ne tient pas.",
       "siblingLabel": "la politique de confidentialité",
       "accepting": {
         "heading": "Acceptation de ces conditions",
-        "p1": "Utiliser Watermark Pro signifie que vous acceptez ces conditions. Si vous ne les acceptez pas, veuillez ne pas utiliser le service."
+        "p1": "Utiliser Lumafoil signifie que vous acceptez ces conditions. Si vous ne les acceptez pas, veuillez ne pas utiliser le service."
       },
       "whatItDoes": {
         "heading": "Ce que fait le service",
-        "p1": "Watermark Pro filigrane des photographies. Le filigranage lui-même s'exécute dans votre navigateur ; des fonctionnalités facultatives comme l'enregistrement de photos et de logos, le travail en équipe et le partage utilisent un stockage côté serveur sur Cloudflare.",
-        "p2": "Le logiciel est gratuit et open source sous licence MIT."
+        "p1": "Lumafoil applique des filigranes aux photos, documents et vidéos compatibles sur votre appareil. Comptes, galeries et préréglages sauvegardés, historique récent, invitations et partages utilisent le stockage serveur ; les fonctions cloud facultatives contactent le fournisseur choisi.",
+        "p2": "Le code est libre et open source sous MIT. Les polices et illustrations incluses ont leurs propres licences."
       },
       "account": {
         "heading": "Votre compte",
-        "p1": "Les fonctionnalités d'équipe nécessitent un compte avec une adresse e-mail vérifiée. Gardez votre mot de passe pour vous ; vous êtes responsable de ce qui se passe sous votre compte.",
-        "p2": "Vous pouvez vous déconnecter de vos sessions à tout moment, et l'utilisation d'un lien de réinitialisation de mot de passe déconnecte vos autres sessions."
+        "p1": "L’accès se fait actuellement sur invitation et exige une adresse e-mail vérifiée. La connexion par mot de passe ou Google/Microsoft configurés est disponible. Protégez vos identifiants et votre compte fournisseur ; vous êtes responsable de l’utilisation de votre compte.",
+        "p2": "Se déconnecter exige une connexion et la résolution des changements en attente ; cela efface les données hors ligne de l’app dans ce navigateur. Une réinitialisation révoque les autres sessions serveur. Les appareils déconnectés peuvent conserver des copies jusqu’à leur reconnexion ou à l’effacement des données du navigateur."
       },
       "content": {
         "heading": "Votre contenu",
         "p1": "Vous conservez tous les droits que vous détenez déjà sur les photos et les filigranes que vous importez ou créez. Il vous incombe de disposer du droit d'utiliser les images que vous apportez au service.",
-        "p2": "L'application ne traite votre contenu que pour fournir les fonctionnalités que vous utilisez, et ne le stocke que lorsque vous choisissez de l'enregistrer. Il n'est jamais utilisé pour entraîner quoi que ce soit ni partagé avec des tiers."
+        "p2": "Le contenu est traité pour les fonctions que vous choisissez. La galerie utilise Cloudflare ; les transferts cloud et partages choisis transmettent le contenu aux fournisseurs ou destinataires. Lumafoil ne l’utilise pas pour entraîner des modèles. Les illustrations incluses imposent des notices de licence distinctes."
       },
       "acceptableUse": {
         "heading": "Utilisation acceptable",
@@ -1076,8 +1180,8 @@
         "p2": "L'accès au sein d'une organisation dépend de votre rôle, et ces rôles sont appliqués côté serveur."
       },
       "teams": {
-        "heading": "Équipes et rôles",
-        "p1": "Une organisation peut avoir les rôles propriétaire, administrateur, éditeur et lecteur. Ce que chaque membre peut voir et faire est limité à son rôle, vérifié à chaque requête plutôt que simplement masqué dans l'interface."
+        "heading": "Espaces privés et collaboration",
+        "p1": "Chaque compte possède un espace privé. Une invitation au site ne le partage pas. Des espaces de collaboration distincts peuvent ajouter explicitement propriétaires, administrateurs, éditeurs ou lecteurs ; le serveur applique les permissions. Ces rôles ne donnent pas l’administration du site."
       },
       "availability": {
         "heading": "Disponibilité, garantie et modifications",
@@ -1086,11 +1190,11 @@
       },
       "openSource": {
         "heading": "Open source",
-        "p1": "Le code source de Watermark Pro est disponible sous licence MIT, qui vous permet de l'inspecter, de l'exécuter et de le modifier selon les termes de cette licence."
+        "p1": "Le code de Lumafoil peut être consulté, utilisé et modifié selon la licence MIT. Les polices et illustrations incluses conservent leurs licences et notices, accessibles dans leurs sélecteurs et l’index des licences des ressources."
       },
       "contact": {
         "heading": "Contact",
-        "p1": "Les questions relatives à ces conditions, ainsi que les signalements de problèmes de sécurité, peuvent être soumis via le dépôt GitHub du projet."
+        "p1": "Questions : <support>support@lumafoil.com</support>. Sécurité : <security>formulaire privé de GitHub</security> ou cette adresse. Ne placez pas de données sensibles dans les tickets publics."
       }
     }
   },
@@ -1098,7 +1202,7 @@
     "loading": "Chargement des photos",
     "unavailableTitle": "Ce lien n'est pas disponible",
     "unavailableBody": "Il a peut-être expiré ou été révoqué, ou l'adresse est incomplète. Demandez-en un nouveau à la personne qui vous l'a envoyé.",
-    "about": "À propos de Watermark Pro",
+    "about": "À propos de Lumafoil",
     "photoCount_one": "{{count}} photo",
     "photoCount_many": "{{count}} photos",
     "photoCount_other": "{{count}} photos",
@@ -1108,7 +1212,7 @@
     "linkShared": "Lien partagé.",
     "openPhoto": "Ouvrir {{name}}",
     "dimensions": "{{width}} × {{height}}",
-    "footer": "Partagé avec <home>Watermark Pro</home>. Les photos restent la propriété de leur propriétaire.",
+    "footer": "Partagé avec <home>Lumafoil</home>. Les photos restent la propriété de leur propriétaire.",
     "download": "Télécharger",
     "close": "Fermer"
   },
@@ -1118,6 +1222,123 @@
       "title": "Page introuvable",
       "body": "L'adresse est peut-être mal saisie, ou la page a peut-être été déplacée.",
       "back": "Retour à l'accueil"
+    }
+  },
+  "offline": {
+    "label": "Travail hors ligne",
+    "syncing": "Synchronisation du travail enregistré…",
+    "disconnected": "Hors ligne — les modifications restent sur cet appareil.",
+    "pending": "Modifications en attente : {{count}}",
+    "upToDate": "Le travail enregistré est synchronisé.",
+    "syncNow": "Synchroniser",
+    "review": "Vérifier les modifications ({{count}})",
+    "deletion": "Suppression",
+    "conflict": "Ce préréglage a été modifié ailleurs. Conservez les deux versions ou abandonnez la modification locale.",
+    "savedHere": "Enregistré sur cet appareil. La synchronisation se fera lorsque l’application sera ouverte et connectée.",
+    "retry": "Réessayer",
+    "keepBoth": "Conserver les deux versions",
+    "discard": "Abandonner la modification locale",
+    "discardTitle": "Abandonner cette modification locale ?",
+    "discardBody": "Supprime la modification en attente de cet appareil. Les modifications déjà enregistrées sur le serveur ne sont pas annulées.",
+    "cancel": "Annuler",
+    "signOutPending": "Synchronisez ou abandonnez les modifications en attente dans Travail hors ligne avant de vous déconnecter.",
+    "signOutFailed": "Déconnexion impossible. Réessayez.",
+    "connectionRequired": "Connexion requise",
+    "connectOnce": "Connectez-vous et ouvrez cet espace de travail une fois en ligne avant de l’utiliser hors ligne.",
+    "onlineOnly": "La gestion du compte, du partage et des membres nécessite une connexion. Les outils photo et les préréglages enregistrés restent disponibles hors ligne.",
+    "ready": "Les fichiers de l’application sont prêts pour une utilisation hors ligne.",
+    "preparing": "Préparation des fichiers hors ligne. Gardez cet onglet ouvert.",
+    "updateAvailable": "Une mise à jour est prête. Terminez les modifications non enregistrées avant de recharger ; le travail enregistré reste sur cet appareil.",
+    "reload": "Recharger pour mettre à jour"
+  },
+  "siteInvites": {
+    "heading": "Inviter des personnes",
+    "description": "Invitez une personne à créer son propre compte Lumafoil.",
+    "email": "Adresse e-mail",
+    "privacy": "Elle reçoit un espace privé. Cette invitation ne partage aucune photo, aucun préréglage ni donnée de votre compte.",
+    "sent": "Invitation envoyée. Elle expire dans sept jours.",
+    "send": "Envoyer une invitation",
+    "sentHeading": "Vos invitations",
+    "loading": "Chargement des invitations…",
+    "empty": "Vous n’avez envoyé aucune invitation.",
+    "revoke": "Révoquer",
+    "revokeEmail": "Révoquer l’invitation à {{email}}",
+    "invalidEmail": "Saisissez une adresse e-mail valide.",
+    "privateHeading": "Votre espace privé",
+    "privateBody": "Vous seul avez accès. Invitez des personnes à Lumafoil sans partager cet espace, ou créez-en un autre pour collaborer.",
+    "collaborate": "Créer un espace de collaboration",
+    "status": {
+      "pending": "En attente",
+      "accepted": "Acceptée",
+      "revoked": "Révoquée",
+      "expired": "Expirée"
+    },
+    "collaborationNotice": "Une invitation à cet espace donne accès à ses photos et préréglages. Le destinataire doit déjà avoir un compte Lumafoil. Utilisez d’abord Inviter des personnes si nécessaire."
+  },
+  "accountStats": {
+    "users": "Comptes inscrits",
+    "verifiedUsers": "Comptes vérifiés",
+    "pendingInvitations": "Invitations en attente",
+    "acceptedInvitations": "Invitations acceptées"
+  },
+  "accountAuth": {
+    "heading": "Paramètres du compte",
+    "connected": "Méthodes de connexion",
+    "loading": "Chargement des méthodes…",
+    "password": "E-mail et mot de passe",
+    "linkProvider": "Associer {{provider}}",
+    "continueProvider": "Continuer avec {{provider}}",
+    "linkHelp": "Associez un fournisseur une fois connecté, avec la même adresse e-mail.",
+    "identityOnly": "Pour votre compte Lumafoil uniquement. Le stockage cloud se connecte séparément.",
+    "linkError": "Association impossible. Utilisez la même adresse et reconnectez-vous.",
+    "verifyEmail": "Vérifiez votre compte via votre e-mail puis reconnectez-vous.",
+    "signInError": "Connexion incomplète. Si vous avez un mot de passe, connectez-vous ci-dessous puis associez le fournisseur dans les paramètres du compte."
+  },
+  "referral": {
+    "heading": "Votre lien d’invitation",
+    "description": "Toute personne possédant ce lien peut demander son propre compte privé. Partagez-le uniquement avec les personnes à inviter.",
+    "count": "Comptes créés via votre lien : {{count}}",
+    "url": "Lien d’invitation",
+    "copy": "Copier le lien",
+    "copied": "Copié",
+    "copyError": "Copie impossible. Sélectionnez le lien et copiez-le manuellement.",
+    "rotate": "Créer un nouveau lien",
+    "revoke": "Désactiver le lien",
+    "revoked": "Ce lien est désactivé.",
+    "rotateHelp": "Un nouveau lien désactive le précédent. Les comptes existants restent accessibles. Seuls les totaux sont visibles ; les profils et contenus restent privés."
+  },
+  "recent": {
+    "heading": "Travail récent",
+    "description": "Photos ouvertes ou enregistrées et filigranes utilisés dans cet espace.",
+    "viewLabel": "Vue du travail récent",
+    "search": "Rechercher le travail récent",
+    "loading": "Chargement du travail récent",
+    "loadError": "Impossible de charger le travail récent",
+    "retry": "Réessayer",
+    "preferenceError": "Impossible d’enregistrer votre préférence de vue.",
+    "activityPending": "Impossible de mettre à jour les éléments récents. Rouvrez l’élément pour réessayer.",
+    "empty": "Votre travail récent apparaît ici. Enregistrez des photos dans la galerie et ouvrez des filigranes pour les retrouver rapidement.",
+    "noMatches": "Aucun travail récent ne correspond à votre recherche.",
+    "start": "Ouvrir l’éditeur",
+    "detailsLabel": "Détails du travail récent",
+    "itemsLabel": "Éléments récents",
+    "name": "Nom",
+    "type": "Type",
+    "location": "Emplacement",
+    "lastUsed": "Dernière utilisation",
+    "status": "Synchronisation",
+    "photo": "Photo enregistrée",
+    "preset": "Filigrane",
+    "pending": "Activité à synchroniser",
+    "saved": "Enregistré",
+    "gallery": "Galerie",
+    "library": "Bibliothèque de filigranes",
+    "needsAttention": "Attention requise",
+    "workPending": "Travail à synchroniser",
+    "views": {
+      "thumbnails": "Vignettes",
+      "list": "Liste",
+      "details": "Détails"
     }
   }
 }

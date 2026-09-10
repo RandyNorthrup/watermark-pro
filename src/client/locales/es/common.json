@@ -23,7 +23,7 @@
     "toolsNav": "Herramientas",
     "signOut": "Cerrar sesión",
     "accountMenu": "Menú de cuenta de {{name}}",
-    "menuDescription": "Cambia de organización o ve a cualquier parte de Watermark Pro.",
+    "menuDescription": "Cambia de organización o ve a cualquier parte de Lumafoil.",
     "switchOrganizationFor": "Organización: {{name}}. Cambiar de organización",
     "chooseOrganization": "Elige una organización",
     "chooseOrganizationShort": "Elegir organización",
@@ -33,7 +33,8 @@
       "system": "Tema: sigue el sistema. Cambiar a claro",
       "light": "Tema: claro. Cambiar a oscuro",
       "dark": "Tema: oscuro. Cambiar al sistema"
-    }
+    },
+    "closeMenu": "Cerrar menú"
   },
   "auth": {
     "backToSignIn": "Volver a iniciar sesión",
@@ -87,12 +88,16 @@
       "roleLabel": "Rol:",
       "decline": "Rechazar",
       "accept": "Aceptar invitación"
+    },
+    "inviteOnly": {
+      "title": "Se necesita una invitación",
+      "body": "Lumafoil funciona solo con invitación. Abre el enlace de invitación de tu correo para crear tu cuenta."
     }
   },
   "dashboard": {
     "signedInAs": "Sesión iniciada como {{email}}",
     "yourWorkspace": "Tu espacio de trabajo",
-    "yourRole": "Tu rol:",
+    "yourRole": "Tu rol en este espacio:",
     "toolsHeading": "Herramientas",
     "tools": {
       "library": {
@@ -109,7 +114,7 @@
       },
       "gallery": {
         "label": "Galería",
-        "body": "Explora lo que el equipo ha guardado y comparte álbumes con un enlace."
+        "body": "Explora las fotos guardadas y elige cuáles compartir con un enlace."
       }
     },
     "overviewHeading": "Resumen",
@@ -126,7 +131,7 @@
   "library": {
     "orgRequired": "Crea una organización o únete a una para crear una biblioteca de marcas de agua.",
     "heading": "Biblioteca de marcas de agua",
-    "description": "Preajustes compartidos por todos en {{name}}. Aplícalos de uno en uno o por lotes.",
+    "description": "Marcas de agua guardadas en {{name}}. Aplícalas a un archivo o a un lote.",
     "export": "Exportar",
     "exportPreset": "Exportar {{name}}",
     "importPresets": "Importar preajustes",
@@ -140,7 +145,7 @@
     "loadingPreset": "Cargando preajuste",
     "loadPresetErrorTitle": "No se pudo cargar el preajuste",
     "presetGone": "Ese preajuste ya no existe.",
-    "editSubtitleManage": "Los cambios se aplican a todos los que usan este preajuste.",
+    "editSubtitleManage": "Los cambios actualizan este ajuste guardado para su uso futuro.",
     "editSubtitleReadOnly": "Vista de solo lectura.",
     "cannotCreate": "Tu rol no permite crear preajustes.",
     "newPresetSubtitle": "Diseña la marca, decide dónde va y guárdala en la biblioteca.",
@@ -157,7 +162,8 @@
       "glyph": "Glifo {{glyph}}",
       "icon": "Icono {{name}}",
       "logo": "Logotipo",
-      "qr": "Código QR de {{content}}"
+      "qr": "Código QR de {{content}}",
+      "sticker": "Pegatina {{name}}"
     },
     "shape": {
       "rectangle": "Rectángulo",
@@ -169,7 +175,10 @@
       "smart": "Colocación inteligente",
       "custom": "Posición personalizada",
       "random": "Colocación aleatoria"
-    }
+    },
+    "newQr": "Nuevo código QR",
+    "qrOnly": "Solo códigos QR",
+    "noQr": "Aún no hay códigos QR guardados. Crea uno para cada enlace que uses."
   },
   "designer": {
     "presetName": "Nombre del preajuste",
@@ -193,7 +202,8 @@
     },
     "qr": {
       "content": "Contenido del código QR",
-      "hint": "Normalmente un enlace. Hasta {{max}} caracteres; el código siempre es oscuro sobre un fondo claro para que se pueda escanear."
+      "hint": "Normalmente un enlace. Hasta {{max}} caracteres; el código siempre es oscuro sobre un fondo claro para que se pueda escanear.",
+      "savedHint": "Pon un nombre y guarda cada código QR por separado. Reutilízalo desde tu biblioteca o guarda varios para distintos enlaces. Prueba la exportación al tamaño previsto antes de compartirla."
     },
     "tokens": {
       "menu": "Insertar detalle",
@@ -217,12 +227,16 @@
     "font": {
       "family": "Fuente",
       "weight": "Grosor",
-      "specimen": "El veloz murciélago hindú"
+      "specimen": "El veloz murciélago hindú",
+      "search": "Buscar fuentes",
+      "resultCount": "{{count}} familias tipográficas",
+      "license": "Licencia de la fuente"
     },
     "symbol": {
       "icons": "Iconos",
       "glyphLabel": "Glifo {{glyph}}",
-      "iconLabel": "Icono {{label}}"
+      "iconLabel": "Icono {{label}}",
+      "license": "Licencias de iconos"
     },
     "shape": {
       "label": "Forma",
@@ -370,12 +384,25 @@
         "cancel": "Cancelar",
         "save": "Guardar como logotipo"
       }
+    },
+    "stickers": {
+      "heading": "Pegatinas de color",
+      "search": "Buscar pegatinas",
+      "category": "Categoría",
+      "all": "Todas las categorías",
+      "results": "{{total}} pegatinas encontradas",
+      "choose": "Elegir {{name}}",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "license": "Fluent Emoji · licencia MIT",
+      "usage": "Se permite el uso comercial; conserva el aviso de licencia de los gráficos al redistribuirlos.",
+      "guide": "Guía de licencias de gráficos"
     }
   },
   "editor": {
     "orgRequired": "Crea una organización o únete a una para usar el editor.",
     "heading": "Editor",
-    "description": "Aplica una marca de agua a una foto: elige un preajuste, colócalo a mano si quieres, recorta, redimensiona y descarga. Nada sale de tu navegador.",
+    "description": "Elige un ajuste, coloca la marca, recorta y cambia el tamaño en tu dispositivo. Descarga el resultado o elige guardarlo en la galería o la nube.",
     "tabs": {
       "watermark": "Marca de agua",
       "crop": "Recortar",
@@ -425,7 +452,13 @@
       "removeLayer": "Quitar {{name}} de esta foto",
       "adjusted": "Ajustada para esta foto; el preajuste de la biblioteca no cambia.",
       "revert": "Revertir",
-      "placement": "Colocación"
+      "placement": "Colocación",
+      "create": "Crear marca de agua",
+      "createHint": "Diseña aquí tu marca de agua. Guárdala para usarla en esta foto y conservarla en tu biblioteca.",
+      "cancelCreate": "Cancelar",
+      "saveAndUse": "Guardar y usar",
+      "emptyReadOnly": "Aún no hay marcas de agua en esta biblioteca.",
+      "firstUseHint": "Añade una marca de agua y abre Exportar para descargar tu foto."
     },
     "crop": {
       "aspectRatio": "Relación de aspecto",
@@ -493,7 +526,7 @@
         "label": "Conservar todo",
         "help": "Incluida la posición GPS, si la foto la tiene."
       },
-      "webpNote": "Las exportaciones en WebP siempre se limpian de metadatos."
+      "webpNote": "WebP elimina los metadatos originales de la foto. Se conservan los avisos obligatorios de licencia de los gráficos."
     },
     "export": {
       "format": "Formato",
@@ -605,7 +638,7 @@
   "gallery": {
     "orgRequired": "Crea una organización o únete a una para tener una galería.",
     "heading": "Galería",
-    "description": "Fotos con marca de agua guardadas por {{name}}. Busca, filtra por preajuste, descarga o elimina.",
+    "description": "Fotos con marca de agua guardadas en {{name}}. Busca, filtra, descarga o elimina.",
     "usage_one": "{{count}} foto · {{used}} de {{max}}",
     "usage_other": "{{count}} fotos · {{used}} de {{max}}",
     "maxCount": "Hasta {{count}} fotos por organización",
@@ -696,8 +729,8 @@
   },
   "admin": {
     "heading": "Administración",
-    "description": "Todos los usuarios y organizaciones de esta instancia. Las acciones aquí se registran en el historial de auditoría.",
-    "onlyAdmins": "Solo los administradores de la plataforma pueden abrir esta página.",
+    "description": "Solo para el administrador del sitio. Gestiona cuentas y consulta los totales. Ser propietario de un espacio no concede permisos de administración del sitio.",
+    "onlyAdmins": "Solo el administrador del sitio puede abrir esta página.",
     "sectionsLabel": "Secciones de administración",
     "tabs": {
       "users": "Usuarios",
@@ -715,7 +748,11 @@
       "ok": "OK",
       "failed": "Fallida",
       "duration": "{{ms}} ms",
-      "th": { "time": "Hora", "status": "Estado", "duration": "Duración" }
+      "th": {
+        "time": "Hora",
+        "status": "Estado",
+        "duration": "Duración"
+      }
     },
     "clientErrors": {
       "loading": "Cargando errores de cliente",
@@ -736,15 +773,11 @@
     "you": "(tú)",
     "joined": "Se unió el {{date}}",
     "emailNotVerified": " · correo sin verificar",
-    "platformAdmin": "administrador de la plataforma",
+    "platformAdmin": "Administrador del sitio",
     "banned": "bloqueado",
     "bannedReason": "bloqueado: {{reason}}",
     "unban": "Desbloquear",
     "unbanUser": "Desbloquear a {{email}}",
-    "removeAdmin": "Quitar admin",
-    "makeAdminShort": "Hacer admin",
-    "removeAdminFrom": "Quitar admin a {{email}}",
-    "makeAdmin": "Hacer administrador a {{email}}",
     "signOutEverywhereButton": "Cerrar sesión en todas partes",
     "signOutEverywhere": "Cerrar la sesión de {{email}} en todas partes",
     "ban": "Bloquear",
@@ -809,7 +842,7 @@
   "organizations": {
     "firstTitle": "Crea tu primera organización",
     "newTitle": "Nueva organización",
-    "description": "Las organizaciones contienen tus marcas de agua, fotos y equipo. Serás su propietario.",
+    "description": "Crea un espacio separado para tus marcas de agua y fotos. Será privado salvo que invites miembros explícitamente.",
     "createFailed": "No se pudo crear la organización.",
     "nameLabel": "Nombre",
     "slugLabel": "Identificador de URL",
@@ -839,7 +872,15 @@
       "noneSelected": "No hay fotos seleccionadas",
       "selectedCount": "{{count}} seleccionadas",
       "addSelected": "Añadir seleccionadas"
-    }
+    },
+    "cloudSaved": "Archivos guardados en la nube ({{total}})",
+    "cloudSavedTitle": "Archivos guardados en la nube",
+    "cloudSharingHint": "Guardar no crea un enlace público. Créalo solo si quieres que cualquiera con el enlace pueda ver el archivo. Se mantienen los permisos de la carpeta. Gestiona otros accesos en el proveedor.",
+    "openProvider": "Abrir en {{provider}}",
+    "createPublicLink": "Crear enlace público",
+    "revokePublicLink": "Revocar enlace público",
+    "linkCopied": "Enlace copiado",
+    "copyLink": "Copiar enlace"
   },
   "video": {
     "orgRequired": "Crea una organización o únete a una para aplicar marcas de agua a videos.",
@@ -932,7 +973,7 @@
     },
     "tool": {
       "title": "Verificar una foto",
-      "description": "Comprueba si un PNG lleva una marca invisible de Watermark Pro y lee su mensaje oculto. Nada sale de tu navegador."
+      "description": "Comprueba si un PNG lleva una marca invisible de Lumafoil y lee su mensaje oculto. Nada sale de tu navegador."
     },
     "checkPng": "Comprobar un PNG",
     "checking": "Comprobando…",
@@ -949,7 +990,7 @@
     "createInLibrary": "Crea un preajuste en la biblioteca",
     "legend": "Preajustes",
     "importTitle": "Importar preajustes",
-    "importDescription": "Elige un archivo de preajustes de Watermark Pro. Sus preajustes, y los logotipos que usen, se añaden a esta biblioteca.",
+    "importDescription": "Elige un archivo de preajustes de Lumafoil. Sus preajustes, y los logotipos que usen, se añaden a esta biblioteca.",
     "presetFileLabel": "Archivo de preajustes",
     "noPresets": "Este archivo de preajustes no tiene preajustes.",
     "fileCount_one": "{{count}} preajuste en este archivo",
@@ -964,111 +1005,174 @@
   "landing": {
     "nav": "Cuenta",
     "signIn": "Iniciar sesión",
-    "createAccount": "Crear cuenta",
-    "eyebrow": "Gratis y de código abierto",
-    "heroBody": "Protege tu fotografía sin estropear la imagen. Watermark Pro hace el trabajo pesado en tu navegador, mantiene tus originales en privado y le da a tu equipo roles que de verdad significan algo.",
-    "createWorkspace": "Crea tu espacio de trabajo",
-    "featuresHeading": "Qué hace",
-    "features": {
-      "bulk": {
-        "title": "Trabajos por lotes",
-        "body": "Suelta cientos de fotos y aplícales la marca de agua a todas de una vez, en tu navegador."
+    "heroBody": "Añade texto, logotipos o firmas. Reutiliza preajustes en archivos y lotes, edita sin conexión y sincroniza al reconectar.",
+    "featuresHeading": "Funciones para todo el trabajo",
+    "footer": "Lumafoil es de código abierto bajo la licencia MIT.",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "heroTitleStart": "Marcas de agua para fotos,",
+    "heroTitleEnd": "vídeos y PDF.",
+    "heroAlt": "Editor de fotos de Lumafoil con controles de posición y exportación",
+    "previewLabel": "El editor de Lumafoil",
+    "privacyNote": "Los archivos se procesan en tu dispositivo. Guardar en la nube es opcional.",
+    "formatsLabel": "Fotos · PDF · Vídeo",
+    "workflowHeading": "Abre. Ajusta. Exporta.",
+    "workflowNote": "Tu espacio de trabajo mantiene juntos los preajustes y los archivos guardados.",
+    "steps": {
+      "openTitle": "Trae tus fotos",
+      "openBody": "Abre una imagen o un lote completo. Tus originales permanecen intactos.",
+      "markTitle": "Crea tu marca",
+      "markBody": "Elige un ajuste guardado o crea algo inconfundiblemente tuyo.",
+      "exportTitle": "Exporta y listo",
+      "exportBody": "Descarga los archivos terminados o guárdalos en tu galería y sincroniza."
+    },
+    "github": "GitHub",
+    "featuresIntro": "Diseña una marca de agua, aplícala a tus archivos y elige cómo guardar o compartir los resultados.",
+    "moreHeading": "Más formas de terminar tu trabajo",
+    "capabilities": {
+      "marks": {
+        "title": "Texto, logotipos y tu propia firma",
+        "body": "Escribe tu nombre o aviso de copyright, sube un logotipo o dibuja una firma. Ajusta tamaño, ángulo, opacidad y color, y combina varias marcas."
       },
-      "library": {
-        "title": "Biblioteca de marcas de agua",
-        "body": "Guarda marcas de texto, símbolo y logotipo una vez; aplícalas donde quieras con un clic."
+      "batch": {
+        "title": "Marcas de agua por lotes",
+        "body": "Aplica una marca guardada a varias fotos. Revisa los resultados, ajusta la posición en cada imagen y descarga el lote terminado en un ZIP."
+      },
+      "fonts": {
+        "title": "551 familias tipográficas distintas",
+        "body": "Busca fuentes serif, sans serif, manuscritas, decorativas o monoespaciadas. Previsualiza tu texto y guarda el estilo. Las fuentes se incluyen localmente con licencias abiertas."
+      },
+      "stickers": {
+        "title": "400 stickers vectoriales a color",
+        "body": "Explora animales, flores, comida, viajes, celebraciones y objetos cotidianos. Busca un diseño, añádelo a tu marca y cambia su tamaño sin bordes borrosos."
+      },
+      "qr": {
+        "title": "Crea y guarda marcas QR",
+        "body": "Convierte una dirección web o un texto en un código QR. Guarda códigos distintos para tu portafolio, contacto o proyectos y reutilízalos en tus archivos."
+      },
+      "templates": {
+        "title": "Guarda tus marcas como plantillas",
+        "body": "Conserva texto, imágenes, estilo y posición. Aplica los ajustes guardados en el editor o por lotes, e importa o exporta plantillas entre dispositivos."
+      },
+      "editing": {
+        "title": "Recorta, redimensiona y ajusta",
+        "body": "Recorta fotos, elige dimensiones y ajusta brillo, contraste y saturación antes de añadir la marca final."
       },
       "smart": {
-        "title": "Colocación inteligente",
-        "body": "Cada foto se analiza para que la marca quede donde mejor se lee y no tape al sujeto."
+        "title": "Posición y contraste inteligentes",
+        "body": "Lumafoil sugiere una posición y una marca clara u oscura según la imagen. Revisa el resultado y ajusta la posición o el estilo."
       },
-      "contrast": {
-        "title": "Contraste automático",
-        "body": "Se elige la variante clara u oscura y la intensidad del contorno en cada imagen, y puedes ajustarlas si no estás de acuerdo."
+      "video": {
+        "title": "Marcas de agua en vídeos",
+        "body": "Aplica marcas a vídeos compatibles desde el navegador. Ajusta posición y tiempos, y previsualiza antes de exportar."
       },
-      "teams": {
-        "title": "Equipos y roles",
-        "body": "Organizaciones con roles de propietario, administrador, editor y lector, aplicados en el servidor."
+      "pdf": {
+        "title": "Marcas de agua en PDF",
+        "body": "Aplica una marca guardada a las páginas elegidas de un PDF. Procesa uno o varios documentos y descarga los resultados."
       },
-      "trusted": {
-        "title": "Hecho para inspirar confianza",
-        "body": "Política de seguridad de contenido estricta, acciones auditadas y fotos que nunca salen de tu navegador a menos que las guardes."
+      "export": {
+        "title": "Elige el formato de exportación",
+        "body": "Exporta fotos en JPEG, PNG o WebP. Ajusta tamaño y calidad, o descarga un lote procesado como ZIP."
+      },
+      "gallery": {
+        "title": "Tu galería privada",
+        "body": "Guarda imágenes terminadas en tu cuenta para encontrarlas después. Descarga archivos o selecciona fotos para compartir."
+      },
+      "sharing": {
+        "title": "Comparte las fotos que elijas",
+        "body": "Crea un enlace de galería de Lumafoil para fotos seleccionadas. Define una caducidad o revoca el enlace cuando quieras."
+      },
+      "offline": {
+        "title": "Trabaja sin conexión y sincroniza después",
+        "body": "Prepara Lumafoil para usarlo sin conexión. Edita ajustes y guarda fotos; al reconectar, se sincronizan los cambios con errores y conflictos visibles."
+      },
+      "privacy": {
+        "title": "Tu cuenta, tu espacio",
+        "body": "Los nuevos usuarios necesitan una invitación y reciben un espacio privado. Invitarlos no les da acceso a tus fotos ni ajustes."
+      },
+      "languages": {
+        "title": "Interfaz en 12 idiomas",
+        "body": "Elige entre los 12 idiomas de Lumafoil, incluido el árabe con diseño de derecha a izquierda."
+      },
+      "theme": {
+        "title": "Modos claro y oscuro",
+        "body": "Elige un modo o sigue el ajuste del dispositivo. La interfaz se adapta a móviles, tabletas y pantallas grandes."
       }
     },
-    "footer": "Watermark Pro es de código abierto bajo la licencia MIT.",
-    "privacy": "Privacidad",
-    "terms": "Términos"
+    "inviteHosting": "Lumafoil funciona solo por invitación. ¿Prefieres alojarlo tú?",
+    "selfHost": "Consigue el código fuente gratis en GitHub.",
+    "featuresNav": "Funciones"
   },
   "legal": {
     "signIn": "Iniciar sesión",
     "lastUpdated": "Última actualización: {{date}}",
     "readSibling": "Lee <sibling>{{siblingLabel}}</sibling> o vuelve a la <home>página de inicio</home>.",
-    "footer": "Watermark Pro es de código abierto bajo la licencia MIT.",
+    "footer": "El código de Lumafoil usa la licencia MIT. Las fuentes y los gráficos incluidos conservan sus propias licencias.",
     "privacy": {
       "title": "Privacidad",
-      "intro": "Watermark Pro está hecho para que tus fotografías sigan siendo tuyas. Esta página explica en lenguaje sencillo qué ocurre con tus imágenes y con la información de tu cuenta, a partir de los controles que el proyecto realmente aplica.",
+      "intro": "Lumafoil está hecho para que tus fotografías sigan siendo tuyas. Esta página explica en lenguaje sencillo qué ocurre con tus imágenes y con la información de tu cuenta, a partir de los controles que el proyecto realmente aplica.",
       "siblingLabel": "los términos del servicio",
       "photos": {
-        "heading": "Tus fotos se quedan en tu navegador",
-        "p1": "La aplicación de la marca de agua se ejecuta por completo en tu dispositivo. El editor y la herramienta de lotes decodifican tus fotos en el navegador, las procesan en Web Workers y crean los archivos finales en memoria. Ver la vista previa de una marca de agua nunca sube la foto a la que se aplica.",
-        "p2": "Las exportaciones se ensamblan localmente y se te entregan mediante un enlace de descarga del mismo origen que se libera en cuanto comienza la descarga. Tus originales nunca se envían a un servidor para previsualizarlos ni para aplicarles la marca de agua."
+        "heading": "Las fotos se procesan en tu dispositivo",
+        "p1": "La edición y las marcas de agua se procesan en tu dispositivo. La vista previa no sube tus originales a Lumafoil.",
+        "p2": "Tú eliges si descargas el resultado, lo guardas en tu galería, lo transfieres a una nube conectada o creas un enlace para compartir."
       },
       "storage": {
-        "heading": "Qué almacenamos, y solo cuando lo pides",
-        "p1": "No se guarda nada en nuestros servidores a menos que elijas guardarlo. Cuando guardas una foto, una miniatura o un logotipo, se almacena en Cloudflare R2 con claves limitadas a tu organización, nunca se hace público y solo se sirve a los miembros de esa organización que han iniciado sesión, con almacenamiento en caché privado.",
-        "p2": "Cada organización tiene cuotas de fotos, logotipos y almacenamiento. Cada subida y eliminación se registra en el historial de auditoría."
+        "heading": "Cuentas, trabajo guardado y copias sin conexión",
+        "p1": "Cloudflare aloja cuentas, ajustes guardados, fotos de galería, miniaturas, logotipos subidos, registros de enlaces e historial de trabajo reciente. El contenido pertenece a su espacio; otros usuarios necesitan una incorporación explícita o un enlace para compartir.",
+        "p2": "Este dispositivo guarda copias y cambios pendientes separados por cuenta para trabajar sin conexión. Al reconectar con la misma cuenta se reintenta la sincronización. Los cambios pendientes impiden cerrar sesión; al cerrarla se borran los datos sin conexión de la app. Una sesión caducada bloquea el acceso sin borrar cambios pendientes. Borrar los datos del navegador puede eliminarlos."
       },
       "metadata": {
-        "heading": "Los metadatos se eliminan de forma predeterminada",
-        "p1": "Cada exportación se vuelve a codificar a partir de los píxeles, así que no se conserva ningún metadato a menos que decidas conservarlo. La opción predeterminada elimina todos los datos de cámara y ubicación antes de que el archivo llegue a tu descarga, al menú de compartir o a la galería.",
-        "p2": "Dos modos opcionales por exportación te permiten conservar los datos de la cámara sin la ubicación GPS, o conservarlo todo tal cual. Los metadatos se leen y se escriben en el navegador; no se sube nada para hacerlo."
+        "heading": "Metadatos personales y avisos de licencia",
+        "p1": "Las imágenes exportadas eliminan por defecto los metadatos de cámara y ubicación. Las opciones compatibles permiten conservar datos de cámara sin GPS o los metadatos originales compatibles. El proceso se realiza en tu navegador.",
+        "p2": "Los archivos que usan gráficos incluidos conservan su aviso de licencia en metadatos, un adjunto del documento o un archivo adicional del paquete. Otros programas pueden eliminarlo; conserva el aviso aplicable al redistribuir esos gráficos."
       },
       "sharing": {
         "heading": "Enlaces para compartir",
-        "p1": "Un enlace para compartir lleva un token firmado con una caducidad incorporada y se puede revocar en cualquier momento. Las páginas públicas que abre un enlace no tienen sesión y tienen un límite de frecuencia por dirección.",
-        "p2": "Los enlaces caducados, revocados, manipulados y desconocidos devuelven todos la misma respuesta neutra de «no encontrado», de modo que un enlace no revela nada una vez que deja de funcionar. La creación y revocación de enlaces está limitada a los miembros con permiso y queda auditada."
+        "p1": "Cualquiera que tenga un enlace de galería de Lumafoil puede ver las fotos guardadas seleccionadas hasta su caducidad o revocación. Una invitación al sitio da acceso a una cuenta privada independiente; no comparte el espacio ni el contenido de quien invita.",
+        "p2": "Los enlaces de los proveedores de nube siguen sus propias reglas de permisos y revocación. Revocar un enlace no recupera descargas ni copias ya realizadas."
       },
       "account": {
         "heading": "Tu cuenta",
-        "p1": "Una cuenta necesita una dirección de correo electrónico y una contraseña, y el correo debe verificarse antes de que la cuenta esté activa. Las sesiones se guardan en cookies HttpOnly y SameSite=Lax, marcadas como Secure en los orígenes seguros.",
-        "p2": "Los enlaces para restablecer la contraseña caducan al cabo de una hora y cierran tus demás sesiones cuando se usan."
+        "p1": "Las cuentas nuevas requieren invitación y correo verificado. Puedes acceder con contraseña o con Google/Microsoft si están configurados. Las cuentas existentes no necesitan otra invitación. Añadir otro método requiere vincularlo desde una sesión autenticada.",
+        "p2": "Las sesiones usan cookies HttpOnly y SameSite=Lax, con Secure en HTTPS. Los enlaces para restablecer la contraseña caducan en una hora y revocan las demás sesiones del servidor al usarse."
       },
       "analytics": {
-        "heading": "Analítica y cookies",
-        "p1": "No usamos cookies de analítica ni de publicidad de terceros. La única medición es Cloudflare Web Analytics, que no usa cookies y no te rastrea entre sitios.",
-        "p2": "La app se comunica con solo dos orígenes de terceros, ambos de Cloudflare: el widget Turnstile que filtra las solicitudes de registro y de restablecimiento de contraseña en busca de bots, y la baliza de analítica sin cookies. Las fuentes, los estilos y todo lo demás se sirven desde este sitio."
+        "heading": "Cookies y servicios externos",
+        "p1": "Lumafoil no incluye balizas de analítica ni cookies publicitarias. Las cookies esenciales mantienen las sesiones; el almacenamiento del dispositivo guarda preferencias, copias sin conexión y cambios pendientes.",
+        "p2": "Si está activado, Cloudflare Turnstile comprueba solicitudes de cuenta contra bots; consulta su <turnstile>aviso de privacidad</turnstile>. Google/Microsoft gestionan el acceso elegido. Google Drive, Dropbox y OneDrive reciben solicitudes mediante las funciones de nube que eliges; se aplican sus propias políticas."
       },
       "audit": {
         "heading": "Historial de auditoría",
-        "p1": "Los registros de nuevas cuentas y cada cambio de organización, membresía, invitación, biblioteca, foto y elemento compartido se escriben en un registro de auditoría de solo anexión. Ese registro solo pueden leerlo los propietarios y administradores de una organización."
+        "p1": "Los registros de un espacio requieren el rol de propietario o administrador de ese espacio. El único administrador del sitio puede gestionar cuentas y revisar totales, moderación, auditorías y registros de estado/errores. El historial reciente es individual. Los registros de errores de la app omiten tokens y cuerpos de solicitudes."
       },
       "reporting": {
         "heading": "Informar de un problema",
-        "p1": "Los problemas de seguridad se pueden informar de forma privada a través del repositorio del proyecto en GitHub en lugar de en una incidencia pública. La política de seguridad del repositorio describe qué incluir y en cuánto tiempo recibirás respuesta."
+        "p1": "Soporte: <support>support@lumafoil.com</support>. Comunica vulnerabilidades mediante el <security>formulario privado de GitHub</security> o ese correo. No publiques tokens ni contenido personal en incidencias públicas."
       }
     },
     "terms": {
       "title": "Términos del servicio",
-      "intro": "Estos términos cubren tu uso de Watermark Pro. Están escritos para leerse y describen cómo se comporta el servicio en realidad, en lugar de añadir promesas que no cumple.",
+      "intro": "Estos términos cubren tu uso de Lumafoil. Están escritos para leerse y describen cómo se comporta el servicio en realidad, en lugar de añadir promesas que no cumple.",
       "siblingLabel": "la política de privacidad",
       "accepting": {
         "heading": "Aceptación de estos términos",
-        "p1": "Usar Watermark Pro significa que aceptas estos términos. Si no estás de acuerdo, no uses el servicio."
+        "p1": "Usar Lumafoil significa que aceptas estos términos. Si no estás de acuerdo, no uses el servicio."
       },
       "whatItDoes": {
         "heading": "Qué hace el servicio",
-        "p1": "Watermark Pro aplica marcas de agua a fotografías. La aplicación de la marca de agua en sí se ejecuta en tu navegador; las funciones opcionales, como guardar fotos y logotipos, trabajar en equipo y compartir, usan almacenamiento en el servidor de Cloudflare.",
-        "p2": "El software es gratuito y de código abierto bajo la licencia MIT."
+        "p1": "Lumafoil aplica marcas de agua a fotos y a documentos y vídeos compatibles en tu dispositivo. Las cuentas, galerías y ajustes guardados, historial reciente, invitaciones y enlaces usan almacenamiento del servidor; las funciones opcionales de nube contactan con el proveedor elegido.",
+        "p2": "El código es libre y de código abierto bajo MIT. Las fuentes y los gráficos incluidos tienen sus propias licencias."
       },
       "account": {
         "heading": "Tu cuenta",
-        "p1": "Las funciones de equipo necesitan una cuenta con una dirección de correo verificada. No compartas tu contraseña; eres responsable de lo que ocurra en tu cuenta.",
-        "p2": "Puedes cerrar tus sesiones en cualquier momento, y usar un enlace para restablecer la contraseña cierra tus demás sesiones."
+        "p1": "El acceso es actualmente por invitación y requiere correo verificado. Hay acceso con contraseña y Google/Microsoft cuando están configurados. Protege tus credenciales y la cuenta del proveedor; eres responsable del uso de tu cuenta.",
+        "p2": "Cerrar sesión requiere conexión y resolver los cambios pendientes; borra los datos sin conexión de la app en este navegador. Restablecer la contraseña revoca otras sesiones del servidor. Los dispositivos desconectados pueden conservar copias hasta reconectar o borrar sus datos del navegador."
       },
       "content": {
         "heading": "Tu contenido",
         "p1": "Conservas todos los derechos que ya tienes sobre las fotos y las marcas de agua que subes o creas. Eres responsable de tener el derecho de usar las imágenes que traes al servicio.",
-        "p2": "La app procesa tu contenido solo para ofrecer las funciones que usas, y lo almacena solo cuando eliges guardarlo. Nunca se usa para entrenar nada ni se comparte con terceros."
+        "p2": "El contenido se procesa para las funciones que eliges. La galería usa Cloudflare; las transferencias y los enlaces elegidos envían contenido a proveedores o destinatarios. Lumafoil no lo usa para entrenar modelos. Los gráficos incluidos requieren sus avisos de licencia."
       },
       "acceptableUse": {
         "heading": "Uso aceptable",
@@ -1076,8 +1180,8 @@
         "p2": "El acceso dentro de una organización depende de tu rol, y esos roles se aplican en el servidor."
       },
       "teams": {
-        "heading": "Equipos y roles",
-        "p1": "Una organización puede tener roles de propietario, administrador, editor y lector. Lo que cada miembro puede ver y hacer se limita a su rol, que se comprueba en cada solicitud en lugar de solo ocultarse en la interfaz."
+        "heading": "Espacios privados y colaboración",
+        "p1": "Cada cuenta tiene un espacio privado. Invitar al sitio no lo comparte. Los espacios de colaboración independientes pueden incorporar explícitamente propietarios, administradores, editores o lectores; el servidor aplica sus permisos. Estos roles no conceden administración del sitio."
       },
       "availability": {
         "heading": "Disponibilidad, garantía y cambios",
@@ -1086,11 +1190,11 @@
       },
       "openSource": {
         "heading": "Código abierto",
-        "p1": "El código fuente de Watermark Pro está disponible bajo la licencia MIT, que te permite inspeccionarlo, ejecutarlo y modificarlo según los términos de esa licencia."
+        "p1": "El código de Lumafoil se puede examinar, usar y modificar bajo MIT. Las fuentes y los gráficos incluidos conservan sus licencias y avisos, enlazados desde sus selectores y el índice de licencias de recursos."
       },
       "contact": {
         "heading": "Contacto",
-        "p1": "Las preguntas sobre estos términos y los informes de problemas de seguridad se pueden plantear a través del repositorio del proyecto en GitHub."
+        "p1": "Consultas: <support>support@lumafoil.com</support>. Seguridad: <security>formulario privado de GitHub</security> o ese correo. No incluyas datos sensibles en incidencias públicas."
       }
     }
   },
@@ -1098,7 +1202,7 @@
     "loading": "Cargando fotos",
     "unavailableTitle": "Este enlace no está disponible",
     "unavailableBody": "Puede que haya caducado o se haya revocado, o que la dirección esté incompleta. Pídele uno nuevo a quien te lo envió.",
-    "about": "Acerca de Watermark Pro",
+    "about": "Acerca de Lumafoil",
     "photoCount_one": "{{count}} foto",
     "photoCount_other": "{{count}} fotos",
     "availableUntil": " · disponible hasta {{date}}",
@@ -1107,7 +1211,7 @@
     "linkShared": "Enlace compartido.",
     "openPhoto": "Abrir {{name}}",
     "dimensions": "{{width}} × {{height}}",
-    "footer": "Compartido con <home>Watermark Pro</home>. Las fotos siguen siendo propiedad de su dueño.",
+    "footer": "Compartido con <home>Lumafoil</home>. Las fotos siguen siendo propiedad de su dueño.",
     "download": "Descargar",
     "close": "Cerrar",
     "photoCount_many": "{{count}} fotos"
@@ -1118,6 +1222,123 @@
       "title": "Página no encontrada",
       "body": "Puede que la dirección esté mal escrita o que la página se haya movido.",
       "back": "Volver al inicio"
+    }
+  },
+  "offline": {
+    "label": "Trabajo sin conexión",
+    "syncing": "Sincronizando el trabajo guardado…",
+    "disconnected": "Sin conexión: los cambios se guardan en este dispositivo.",
+    "pending": "Cambios pendientes: {{count}}",
+    "upToDate": "El trabajo guardado está sincronizado.",
+    "syncNow": "Sincronizar ahora",
+    "review": "Revisar cambios ({{count}})",
+    "deletion": "Eliminación",
+    "conflict": "Este ajuste cambió en otro dispositivo. Conserva ambas versiones o descarta este cambio local.",
+    "savedHere": "Guardado en este dispositivo. Se sincronizará con la aplicación abierta y conexión.",
+    "retry": "Reintentar",
+    "keepBoth": "Conservar ambas versiones",
+    "discard": "Descartar cambio local",
+    "discardTitle": "¿Descartar este cambio local?",
+    "discardBody": "Elimina el cambio pendiente de este dispositivo. No deshace un cambio ya guardado en el servidor.",
+    "cancel": "Cancelar",
+    "signOutPending": "Sincroniza o descarta los cambios pendientes en Trabajo sin conexión antes de cerrar sesión.",
+    "signOutFailed": "No se pudo cerrar sesión. Inténtalo de nuevo.",
+    "connectionRequired": "Se necesita conexión",
+    "connectOnce": "Inicia sesión y abre este espacio de trabajo con conexión antes de usarlo sin conexión.",
+    "onlineOnly": "La administración de cuentas, enlaces compartidos y miembros requiere conexión. Las herramientas de fotos y los ajustes guardados siguen disponibles sin conexión.",
+    "ready": "Los archivos de la aplicación están listos para usarse sin conexión.",
+    "preparing": "Preparando archivos sin conexión. Mantén esta pestaña abierta.",
+    "updateAvailable": "Hay una actualización lista. Termina los cambios sin guardar antes de recargar; el trabajo guardado permanece en este dispositivo.",
+    "reload": "Recargar para actualizar"
+  },
+  "siteInvites": {
+    "heading": "Invitar personas",
+    "description": "Invita a alguien a crear su propia cuenta de Lumafoil.",
+    "email": "Correo electrónico",
+    "privacy": "Recibirá un espacio privado. Esta invitación no comparte tus fotos, ajustes ni datos de cuenta.",
+    "sent": "Invitación enviada. Caduca en siete días.",
+    "send": "Enviar invitación",
+    "sentHeading": "Tus invitaciones",
+    "loading": "Cargando invitaciones…",
+    "empty": "Aún no has enviado invitaciones.",
+    "revoke": "Revocar",
+    "revokeEmail": "Revocar invitación a {{email}}",
+    "invalidEmail": "Introduce un correo válido.",
+    "privateHeading": "Tu espacio privado",
+    "privateBody": "Solo tú puedes acceder. Invita a personas a Lumafoil sin compartir este espacio o crea uno separado para colaborar.",
+    "collaborate": "Crear un espacio de colaboración",
+    "status": {
+      "pending": "Pendiente",
+      "accepted": "Aceptada",
+      "revoked": "Revocada",
+      "expired": "Caducada"
+    },
+    "collaborationNotice": "La invitación al espacio da acceso a sus fotos y ajustes. El destinatario debe tener una cuenta de Lumafoil. Usa primero Invitar personas si necesita una."
+  },
+  "accountStats": {
+    "users": "Cuentas registradas",
+    "verifiedUsers": "Cuentas verificadas",
+    "pendingInvitations": "Invitaciones pendientes",
+    "acceptedInvitations": "Invitaciones aceptadas"
+  },
+  "accountAuth": {
+    "heading": "Ajustes de cuenta",
+    "connected": "Métodos de acceso",
+    "loading": "Cargando métodos…",
+    "password": "Correo y contraseña",
+    "linkProvider": "Vincular {{provider}}",
+    "continueProvider": "Continuar con {{provider}}",
+    "linkHelp": "Vincula un proveedor con la sesión iniciada y el mismo correo de esta cuenta.",
+    "identityOnly": "Solo para tu cuenta de Lumafoil. La nube se conecta por separado.",
+    "linkError": "No se pudo vincular. Usa el mismo correo e inicia sesión de nuevo.",
+    "verifyEmail": "Verifica la cuenta desde tu correo y vuelve a iniciar sesión.",
+    "signInError": "No se completó el acceso. Si tienes una cuenta con contraseña, entra abajo, abre Ajustes de cuenta y vincula el proveedor."
+  },
+  "referral": {
+    "heading": "Tu enlace de invitación",
+    "description": "Cualquiera con este enlace puede solicitar su propia cuenta privada. Compártelo solo con personas que quieras invitar.",
+    "count": "Cuentas creadas con tu enlace: {{count}}",
+    "url": "Enlace de invitación",
+    "copy": "Copiar enlace",
+    "copied": "Copiado",
+    "copyError": "No se pudo copiar. Selecciona el enlace y cópialo manualmente.",
+    "rotate": "Crear nuevo enlace",
+    "revoke": "Desactivar enlace",
+    "revoked": "Este enlace está desactivado.",
+    "rotateHelp": "El enlace nuevo desactiva el anterior. Las cuentas existentes conservan el acceso. Solo ves recuentos; sus perfiles y contenido siguen siendo privados."
+  },
+  "recent": {
+    "heading": "Trabajo reciente",
+    "description": "Fotos que has abierto o guardado y marcas de agua que has usado en este espacio.",
+    "viewLabel": "Vista del trabajo reciente",
+    "search": "Buscar trabajo reciente",
+    "loading": "Cargando trabajo reciente",
+    "loadError": "No se pudo cargar el trabajo reciente",
+    "retry": "Reintentar",
+    "preferenceError": "No se pudo guardar tu preferencia de vista.",
+    "activityPending": "No se pudo actualizar el trabajo reciente. Vuelve a abrir el elemento para intentarlo de nuevo.",
+    "empty": "Aquí aparece tu trabajo reciente. Guarda fotos en la galería y abre marcas de agua para tenerlas a mano.",
+    "noMatches": "No hay trabajo reciente que coincida con la búsqueda.",
+    "start": "Abrir editor",
+    "detailsLabel": "Detalles del trabajo reciente",
+    "itemsLabel": "Elementos recientes",
+    "name": "Nombre",
+    "type": "Tipo",
+    "location": "Ubicación",
+    "lastUsed": "Último uso",
+    "status": "Sincronización",
+    "photo": "Foto guardada",
+    "preset": "Marca de agua",
+    "pending": "Actividad pendiente de sincronizar",
+    "saved": "Guardado",
+    "gallery": "Galería",
+    "library": "Biblioteca de marcas",
+    "needsAttention": "Requiere atención",
+    "workPending": "Trabajo pendiente de sincronizar",
+    "views": {
+      "thumbnails": "Miniaturas",
+      "list": "Lista",
+      "details": "Detalles"
     }
   }
 }

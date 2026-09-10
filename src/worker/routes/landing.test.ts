@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { type AssetsEnv, serveLanding } from './landing'
 import { HTTP_STATUS } from '../../shared/constants'
 
-const ORIGIN = 'https://watermark.blowmoney.net'
+const ORIGIN = 'https://lumafoil.com'
 
 /**
  * Fake asset store: serves a 200 for the landing files it knows and for the SPA
@@ -32,6 +32,73 @@ function get(path: string, headers: Record<string, string> = {}): Request {
 }
 
 describe('serveLanding', () => {
+  it('overwrites weaker inherited headers without merging duplicate case variants', async () => {
+    const response = await serveLanding(get('/'), {
+      ASSETS: {
+        fetch: () =>
+          Promise.resolve(
+            new Response('page', {
+              headers: {
+                'X-Frame-Options': 'SAMEORIGIN',
+                'Cache-Control': 'public, max-age=3600',
+                'Content-Security-Policy': "default-src 'self'",
+              },
+            }),
+          ),
+      },
+    })
+    expect(response?.headers.get('x-frame-options')).toBe('DENY')
+    expect(response?.headers.get('cache-control')).toBe('no-store')
+    expect(response?.headers.get('content-security-policy')).toBe("default-src 'self'")
+  })
+
+  it('serves localized public policy content even when a session cookie is present', async () => {
+    for (const route of ['privacy', 'terms']) {
+      const env = fakeAssets([`/landing/${route}-es.html`])
+      const response = await serveLanding(
+        get(`/${route}`, { cookie: 'lumafoil.session_token=value', 'accept-language': 'es' }),
+        env,
+      )
+      expect(response?.status).toBe(HTTP_STATUS.ok)
+      expect(response?.headers.get('location')).toBeNull()
+      expect(await response?.text()).toBe(`asset:/landing/${route}-es.html`)
+      expect(response?.headers.get('cache-control')).toBe('no-store')
+    }
+    const choice = await serveLanding(get('/privacy?lang=es'), fakeAssets([]))
+    expect(choice?.headers.get('location')).toBe('/privacy')
+  })
+
+  it('does not treat cookie values, partial names, or an empty session token as a signed-in visitor', async () => {
+    for (const cookie of [
+      'preference=better-auth.session_token',
+      'not-better-auth.session_token=value',
+      'better-auth.session_token=',
+    ]) {
+      const response = await serveLanding(get('/', { cookie }), fakeAssets(['/landing/en.html']))
+      expect(response?.status).toBe(HTTP_STATUS.ok)
+      expect(response?.headers.get('location')).toBeNull()
+    }
+  })
+
+  it('secures cookie-dependent redirects and supports a body-free HEAD response', async () => {
+    const redirect = await serveLanding(get('/?lang=ar'), fakeAssets([]))
+    expect(redirect?.headers.get('cache-control')).toBe('no-store')
+    expect(redirect?.headers.get('vary')).toContain('Cookie')
+    expect(redirect?.headers.get('content-security-policy')).toContain("frame-ancestors 'none'")
+    expect(redirect?.headers.get('strict-transport-security')).toContain('includeSubDomains')
+    const head = await serveLanding(
+      new Request(`${ORIGIN}/`, { method: 'HEAD' }),
+      fakeAssets(['/landing/en.html']),
+    )
+    expect(head?.status).toBe(HTTP_STATUS.ok)
+    expect(await head?.text()).toBe('')
+  })
+
+  it('honors language quality values instead of the textual header order', async () => {
+    const env = fakeAssets(['/landing/es.html'])
+    await serveLanding(get('/', { 'accept-language': 'fr;q=0,en;q=0.1,es;q=0.9' }), env)
+    expect(env.requested).toEqual(['/landing/es.html'])
+  })
   it('defers non-root and non-GET requests to the API app', async () => {
     const env = fakeAssets([])
     expect(await serveLanding(get('/api/health'), env)).toBeNull()
@@ -67,7 +134,7 @@ describe('serveLanding', () => {
   it('sends a signed-in visitor to the app', async () => {
     const env = fakeAssets([])
     const response = await serveLanding(
-      get('/', { cookie: '__Secure-better-auth.session_token=abc.def' }),
+      get('/', { cookie: '__Secure-lumafoil.session_token=abc.def' }),
       env,
     )
     expect(response?.status).toBe(HTTP_STATUS.found)

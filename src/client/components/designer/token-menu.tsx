@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { TEXT_TOKENS, type TextToken } from '../../../shared/watermark'
@@ -36,6 +37,7 @@ const TOKEN_LABELS = {
 /** A menu that inserts a text token (camera field, date, batch position) at the caret. */
 export function TokenMenu({ onInsert }: TokenMenuProps) {
   const { t } = useTranslation()
+  const insertionRef = useRef(false)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -47,12 +49,21 @@ export function TokenMenu({ onInsert }: TokenMenuProps) {
           <ChevronDown aria-hidden="true" className="size-3" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="max-h-72 overflow-y-auto">
+      <DropdownMenuContent
+        className="max-h-72 overflow-y-auto"
+        onCloseAutoFocus={(event) => {
+          // Insertion restores the textarea caret; the menu must not move focus
+          // back to its trigger afterward. Ordinary dismissal retains that default.
+          if (insertionRef.current) event.preventDefault()
+          insertionRef.current = false
+        }}
+      >
         <DropdownMenuLabel>{t('designer.tokens.heading')}</DropdownMenuLabel>
         {TEXT_TOKENS.map((token) => (
           <DropdownMenuItem
             key={token}
             onSelect={() => {
+              insertionRef.current = true
               onInsert(token)
             }}
           >

@@ -1,0 +1,96 @@
+{
+  "mode": "diagnostic",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.96,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1532.3075,
+        "lcp": 2555.3075,
+        "cls": 0.00001760914484101436,
+        "tbt": 84
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 3265.5,
+        "layoutShifts": [
+          {
+            "score": 0.00001760914484101436,
+            "path": "1,HTML,1,BODY,0,DIV,0,DIV,2,DIV,0,HEADER,2,DIV,2,BUTTON,0,SPAN",
+            "nodeId": "page-1-SPAN",
+            "rectangle": {
+              "top": 16,
+              "bottom": 52,
+              "left": 356,
+              "right": 392,
+              "width": 36,
+              "height": 36
+            }
+          }
+        ],
+        "longTasks": [
+          {
+            "source": "asset:watermark-pro-CzeGV6cb.js",
+            "duration": 96,
+            "startTime": 2507.3075
+          },
+          {
+            "source": "unattributable",
+            "duration": 93,
+            "startTime": 1077.3075
+          },
+          {
+            "source": "asset:watermark-pro-CzeGV6cb.js",
+            "duration": 88,
+            "startTime": 1907.3075
+          },
+          {
+            "source": "unattributable",
+            "duration": 70,
+            "startTime": 1170.3075
+          },
+          {
+            "source": "document",
+            "duration": 52,
+            "startTime": 1240.3075
+          }
+        ],
+        "bootup": [
+          {
+            "source": "document",
+            "duration": 363.88399999999973
+          },
+          {
+            "source": "unattributable",
+            "duration": 354.69600000000145
+          },
+          {
+            "source": "asset:watermark-pro-CzeGV6cb.js",
+            "duration": 272.2559999999976
+          },
+          {
+            "source": "asset:offline-database-CTLs5Zcd.js",
+            "duration": 76.85999999999994
+          }
+        ]
+      }
+    }
+  ],
+  "scores": {
+    "performance": 0.96,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1532.3075,
+    "lcp": 2555.3075,
+    "cls": 0.00001760914484101436,
+    "tbt": 84
+  }
+}

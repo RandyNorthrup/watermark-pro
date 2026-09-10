@@ -20,12 +20,14 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AcceptInvitationInvitationIdRouteImport } from './routes/accept-invitation.$invitationId'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppAccountRouteImport } from './routes/app/account'
 import { Route as AppAdminRouteImport } from './routes/app/admin'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppBulkRouteImport } from './routes/app/bulk'
 import { Route as AppDocumentsRouteImport } from './routes/app/documents'
 import { Route as AppEditorRouteImport } from './routes/app/editor'
 import { Route as AppGalleryRouteImport } from './routes/app/gallery'
+import { Route as AppInvitationsRouteImport } from './routes/app/invitations'
 import { Route as AppMembersRouteImport } from './routes/app/members'
 import { Route as AppSharesRouteImport } from './routes/app/shares'
 import { Route as AppVerifyRouteImport } from './routes/app/verify'
@@ -92,6 +94,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppAdminRoute = AppAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -120,6 +127,11 @@ const AppEditorRoute = AppEditorRouteImport.update({
 const AppGalleryRoute = AppGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppInvitationsRoute = AppInvitationsRouteImport.update({
+  id: '/invitations',
+  path: '/invitations',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppMembersRoute = AppMembersRouteImport.update({
@@ -179,12 +191,14 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
+  '/app/account': typeof AppAccountRoute
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/bulk': typeof AppBulkRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/editor': typeof AppEditorRoute
   '/app/gallery': typeof AppGalleryRoute
+  '/app/invitations': typeof AppInvitationsRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
@@ -206,12 +220,14 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
+  '/app/account': typeof AppAccountRoute
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/bulk': typeof AppBulkRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/editor': typeof AppEditorRoute
   '/app/gallery': typeof AppGalleryRoute
+  '/app/invitations': typeof AppInvitationsRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
@@ -235,12 +251,14 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
+  '/app/account': typeof AppAccountRoute
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/bulk': typeof AppBulkRoute
   '/app/documents': typeof AppDocumentsRoute
   '/app/editor': typeof AppEditorRoute
   '/app/gallery': typeof AppGalleryRoute
+  '/app/invitations': typeof AppInvitationsRoute
   '/app/members': typeof AppMembersRoute
   '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
@@ -265,12 +283,14 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/accept-invitation/$invitationId'
+    | '/app/account'
     | '/app/admin'
     | '/app/audit'
     | '/app/bulk'
     | '/app/documents'
     | '/app/editor'
     | '/app/gallery'
+    | '/app/invitations'
     | '/app/members'
     | '/app/shares'
     | '/app/verify'
@@ -292,12 +312,14 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/accept-invitation/$invitationId'
+    | '/app/account'
     | '/app/admin'
     | '/app/audit'
     | '/app/bulk'
     | '/app/documents'
     | '/app/editor'
     | '/app/gallery'
+    | '/app/invitations'
     | '/app/members'
     | '/app/shares'
     | '/app/verify'
@@ -320,12 +342,14 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/accept-invitation/$invitationId'
+    | '/app/account'
     | '/app/admin'
     | '/app/audit'
     | '/app/bulk'
     | '/app/documents'
     | '/app/editor'
     | '/app/gallery'
+    | '/app/invitations'
     | '/app/members'
     | '/app/shares'
     | '/app/verify'
@@ -431,6 +455,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/account': {
+      id: '/app/account'
+      path: '/account'
+      fullPath: '/app/account'
+      preLoaderRoute: typeof AppAccountRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/admin': {
       id: '/app/admin'
       path: '/admin'
@@ -471,6 +502,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/app/gallery'
       preLoaderRoute: typeof AppGalleryRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/invitations': {
+      id: '/app/invitations'
+      path: '/invitations'
+      fullPath: '/app/invitations'
+      preLoaderRoute: typeof AppInvitationsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/members': {
@@ -540,12 +578,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteRouteChildren {
+  AppAccountRoute: typeof AppAccountRoute
   AppAdminRoute: typeof AppAdminRoute
   AppAuditRoute: typeof AppAuditRoute
   AppBulkRoute: typeof AppBulkRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
   AppEditorRoute: typeof AppEditorRoute
   AppGalleryRoute: typeof AppGalleryRoute
+  AppInvitationsRoute: typeof AppInvitationsRoute
   AppMembersRoute: typeof AppMembersRoute
   AppSharesRoute: typeof AppSharesRoute
   AppVerifyRoute: typeof AppVerifyRoute
@@ -558,12 +598,14 @@ interface AppRouteRouteChildren {
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppAccountRoute: AppAccountRoute,
   AppAdminRoute: AppAdminRoute,
   AppAuditRoute: AppAuditRoute,
   AppBulkRoute: AppBulkRoute,
   AppDocumentsRoute: AppDocumentsRoute,
   AppEditorRoute: AppEditorRoute,
   AppGalleryRoute: AppGalleryRoute,
+  AppInvitationsRoute: AppInvitationsRoute,
   AppMembersRoute: AppMembersRoute,
   AppSharesRoute: AppSharesRoute,
   AppVerifyRoute: AppVerifyRoute,

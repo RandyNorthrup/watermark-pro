@@ -1,6 +1,7 @@
 /**
  * Full onboarding journey against the production build in workerd:
- * sign up → verify by email → create an organization → invite a viewer →
+ * sign up → verify by email → private workspace → explicitly create a
+ * collaboration organization → invite a viewer →
  * the viewer signs up, accepts, and is denied management actions.
  *
  * Emails are read from the development mailbox endpoint that exists only
@@ -10,6 +11,7 @@
 import {
   expect,
   expectAccessible,
+  expectActiveWorkspace,
   gotoRetrying,
   latestLinkFor,
   navigateTo,
@@ -33,16 +35,27 @@ const organizationName = `Acme ${runId}`
 
 test.describe.configure({ mode: 'serial' })
 
-test('owner signs up, verifies, and creates an organization', async ({ page, request }) => {
+test('owner starts in a private workspace and explicitly creates a collaboration', async ({
+  page,
+  request,
+}) => {
   await signUpAndVerify(page, request, owner)
-  await expect(page).toHaveURL(/\/app\/organizations\/new/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your first organization')
+  await expect(page).toHaveURL(/\/app\/?$/)
+  const personal = await expectActiveWorkspace(page, owner, 'My workspace')
+  expect(personal.organization.members).toHaveLength(1)
+  expect(personal.member.role).toBe('owner')
   await expectAccessible(page)
 
+  await gotoRetrying(page, '/app/organizations/new')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('New organization')
+  await expectAccessible(page)
   await page.getByLabel('Name').fill(organizationName)
   await page.getByRole('button', { name: 'Create organization' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(organizationName)
-  await expect(page.getByText('owner')).toBeVisible()
+  const collaboration = await expectActiveWorkspace(page, owner, organizationName)
+  expect(collaboration.organization.id).not.toBe(personal.organization.id)
+  expect(collaboration.member.role).toBe('owner')
+  await expect(page.getByText('Your workspace role: owner')).toBeVisible()
   await expectAccessible(page)
 
   await navigateTo(page, 'Audit log')
@@ -76,6 +89,9 @@ test('owner invites a viewer who accepts and is limited to reading', async ({
   const viewerContext = await browser.newContext()
   const viewerPage = await viewerContext.newPage()
   await signUpAndVerify(viewerPage, request, viewer)
+  const personal = await expectActiveWorkspace(viewerPage, viewer, 'My workspace')
+  expect(personal.organization.members).toHaveLength(1)
+  expect(personal.member.role).toBe('owner')
   // WebKit intermittently aborts the client-side load of this route; retry the
   // commit-wait navigation (see gotoRetrying).
   await gotoRetrying(viewerPage, acceptPath)
@@ -85,8 +101,14 @@ test('owner invites a viewer who accepts and is limited to reading', async ({
   await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Members')
   await expect(viewerPage.getByRole('button', { name: 'Send invitation' })).toHaveCount(0)
   await expect(viewerPage.getByText('(you)')).toBeVisible()
+  const joined = await expectActiveWorkspace(viewerPage, viewer, organizationName)
+  expect(joined.organization.id).not.toBe(personal.organization.id)
+  expect(joined.member.role).toBe('viewer')
+  expect(joined.organization.members.map((member) => member.user.email)).toEqual(
+    expect.arrayContaining([owner.email, viewer.email]),
+  )
 
-  const audit = await viewerContext.request.get('/api/orgs/placeholder/audit')
+  const audit = await viewerContext.request.get(`/api/orgs/${joined.organization.id}/audit`)
   expect(audit.status()).toBe(403)
 
   await navigateTo(viewerPage, 'Audit log')

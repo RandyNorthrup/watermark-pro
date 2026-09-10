@@ -12,24 +12,27 @@ import {
   watermarkDtoSchema,
   watermarkListResponseSchema,
 } from '../../shared/api-watermark'
-import {
-  HTTP_STATUS,
-  LOGO_CONTENT_TYPES,
-  MAX_LOGO_BYTES,
-  MAX_LOGOS_PER_ORGANIZATION,
-} from '../../shared/constants'
+import { HTTP_STATUS, LOGO_CONTENT_TYPES, MAX_LOGO_BYTES } from '../../shared/constants'
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { AppContext } from '../app-context'
 import { assetToDto, watermarkToDto } from '../dto'
 import { apiErrors } from '../errors'
 import { requirePermission } from '../middleware/permission'
 import { requireSession } from '../middleware/session'
+import type { AssetRecord, WatermarkRecord } from '../stores'
+import { contentDigest, payloadFingerprint, syncOperationId } from '../sync'
+import { cleanupUploads, persistUpload } from '../upload-lifecycle'
+import { UPLOAD_POLICY } from '../upload-store'
 import { SNIFF_LENGTH, sniffImageType } from '../uploads'
 
-const ASSET_CACHE_CONTROL = 'private, max-age=3600'
+const ASSET_CACHE_CONTROL = 'private, no-store'
 
-function logoKey(organizationId: string, assetId: string): string {
-  return `org/${organizationId}/logos/${assetId}`
+function isMatchingPreset(record: WatermarkRecord, body: SaveWatermarkRequest): boolean {
+  return record.name === body.name && JSON.stringify(record.spec) === JSON.stringify(body.spec)
+}
+
+function logoKey(organizationId: string, assetId: string, digest: string): string {
+  return `org/${organizationId}/logos/${assetId}/${digest}`
 }
 
 async function parseJson(request: Request): Promise<unknown> {
@@ -92,8 +95,17 @@ export const libraryRoutes = new Hono<AppContext>()
       const body = await parseSaveRequest(c, organizationId)
       const { watermarks, audit } = c.get('services')
       const session = c.get('session')
+      const operationId = syncOperationId(c.req.raw)
+      const id = operationId ?? crypto.randomUUID()
+      const existing = operationId === null ? null : await watermarks.find(organizationId, id)
+      if (existing !== null) {
+        if (existing.createdBy !== session.user.id || !isMatchingPreset(existing, body)) {
+          throw apiErrors.conflict()
+        }
+        return c.json(watermarkDtoSchema.parse(watermarkToDto(existing)), HTTP_STATUS.ok)
+      }
       const record = await watermarks.create({
-        id: crypto.randomUUID(),
+        id,
         organizationId,
         name: body.name,
         spec: body.spec,
@@ -119,8 +131,19 @@ export const libraryRoutes = new Hono<AppContext>()
       const organizationId = c.req.param('orgId')
       const body = await parseSaveRequest(c, organizationId)
       const { watermarks, audit } = c.get('services')
+      const existing = await watermarks.find(organizationId, c.req.param('id'))
+      if (
+        existing !== null &&
+        body.expectedUpdatedAt !== undefined &&
+        isMatchingPreset(existing, body)
+      ) {
+        return c.json(watermarkDtoSchema.parse(watermarkToDto(existing)), HTTP_STATUS.ok)
+      }
       const record = await watermarks.update(organizationId, c.req.param('id'), body)
       if (record === null) {
+        if (existing !== null && body.expectedUpdatedAt !== undefined) {
+          throw apiErrors.conflict()
+        }
         throw apiErrors.notFound()
       }
       const session = c.get('session')
@@ -179,16 +202,8 @@ export const libraryRoutes = new Hono<AppContext>()
     requirePermission({ watermark: ['create'] }),
     async (c) => {
       const organizationId = c.req.param('orgId')
-      const { assets, objects, audit } = c.get('services')
-      if (
-        (await assets.countForOrganization(organizationId, 'logo')) >= MAX_LOGOS_PER_ORGANIZATION
-      ) {
-        throw apiErrors.quotaExceeded()
-      }
-      const declaredLength = Number(c.req.header('content-length') ?? '0')
-      if (declaredLength > MAX_LOGO_BYTES) {
-        throw apiErrors.payloadTooLarge()
-      }
+      const services = c.get('services')
+      const { assets } = services
       let form: FormData
       try {
         form = await c.req.raw.formData()
@@ -218,11 +233,30 @@ export const libraryRoutes = new Hono<AppContext>()
       ) {
         throw apiErrors.unsupportedMedia()
       }
-      const id = crypto.randomUUID()
-      const key = logoKey(organizationId, id)
-      await objects.put(key, bytes, contentType)
       const session = c.get('session')
-      const record = await assets.create({
+      const operationId = syncOperationId(c.req.raw)
+      const id = operationId ?? crypto.randomUUID()
+      const digest = await contentDigest(bytes)
+      const leaseId = crypto.randomUUID()
+      const key = logoKey(organizationId, id, `${leaseId}/${digest}`)
+      const uploadFields = fields.data
+      function assertMatching(record: AssetRecord) {
+        if (
+          record.createdBy !== session.user.id ||
+          !record.key.startsWith(`org/${organizationId}/logos/${id}/`) ||
+          !record.key.endsWith(`/${digest}`) ||
+          record.name !== uploadFields.name ||
+          record.width !== uploadFields.width ||
+          record.height !== uploadFields.height
+        )
+          throw apiErrors.conflict()
+      }
+      const existing = operationId === null ? null : await assets.find(organizationId, id)
+      if (existing !== null) {
+        assertMatching(existing)
+        return c.json(assetDtoSchema.parse(assetToDto(existing)), HTTP_STATUS.ok)
+      }
+      const value: Omit<AssetRecord, 'createdAt'> = {
         id,
         organizationId,
         kind: 'logo',
@@ -233,17 +267,40 @@ export const libraryRoutes = new Hono<AppContext>()
         width: fields.data.width,
         height: fields.data.height,
         createdBy: session.user.id,
-      })
-      await audit.append({
-        organizationId,
-        actorUserId: session.user.id,
-        actorName: session.user.name,
-        action: 'asset.uploaded',
-        targetType: 'asset',
-        targetId: id,
-        metadata: { name: record.name, contentType, size: record.size },
-      })
-      return c.json(assetDtoSchema.parse(assetToDto(record)), HTTP_STATUS.created)
+      }
+      const fingerprint = await payloadFingerprint({ digest, ...fields.data })
+      const outcome = await persistUpload(
+        services,
+        {
+          id: leaseId,
+          uploadId: id,
+          organizationId,
+          kind: 'logo',
+          userId: session.user.id,
+          fingerprint,
+          keys: [key],
+          bytes: bytes.byteLength,
+          expiresAt: new Date(Date.now() + UPLOAD_POLICY.leaseMs),
+        },
+        { kind: 'logo', value },
+        {
+          organizationId,
+          actorUserId: session.user.id,
+          actorName: session.user.name,
+          action: 'asset.uploaded',
+          targetType: 'asset',
+          targetId: id,
+          metadata: { name: value.name, contentType, size: value.size },
+        },
+        [{ key, bytes, contentType }],
+      )
+      const record = await assets.find(organizationId, id)
+      if (record === null) throw apiErrors.retryLater()
+      assertMatching(record)
+      return c.json(
+        assetDtoSchema.parse(assetToDto(record)),
+        outcome === 'created' ? HTTP_STATUS.created : HTTP_STATUS.ok,
+      )
     },
   )
   .get(
@@ -278,7 +335,8 @@ export const libraryRoutes = new Hono<AppContext>()
     async (c) => {
       const organizationId = c.req.param('orgId')
       const id = c.req.param('id')
-      const { assets, objects, watermarks, audit } = c.get('services')
+      const services = c.get('services')
+      const { assets, uploads, watermarks } = services
       const record = await assets.find(organizationId, id)
       if (record === null) {
         throw apiErrors.notFound()
@@ -286,10 +344,8 @@ export const libraryRoutes = new Hono<AppContext>()
       if ((await watermarks.countReferencingAsset(organizationId, id)) > 0) {
         throw apiErrors.conflict()
       }
-      await objects.delete(record.key)
-      await assets.delete(organizationId, id)
       const session = c.get('session')
-      await audit.append({
+      const isDeleted = await uploads.deleteLogo(organizationId, id, {
         organizationId,
         actorUserId: session.user.id,
         actorName: session.user.name,
@@ -298,6 +354,8 @@ export const libraryRoutes = new Hono<AppContext>()
         targetId: id,
         metadata: { name: record.name },
       })
+      if (!isDeleted) throw apiErrors.conflict()
+      await cleanupUploads(services, organizationId)
       return c.body(null, HTTP_STATUS.noContent)
     },
   )

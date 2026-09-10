@@ -67,6 +67,20 @@ describe('library over D1 and R2', () => {
 
     const listed = await client.get(`/api/orgs/${organizationId}/watermarks`)
     expect(watermarkListResponseSchema.parse(await listed.json()).watermarks).toHaveLength(1)
+
+    const edit = (name: string) =>
+      client.request(`/api/orgs/${organizationId}/watermarks/${dto.id}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name, spec: DEFAULT_TEXT_SPEC, expectedUpdatedAt: dto.updatedAt }),
+      })
+    const competing = await Promise.all([edit('Concurrent A'), edit('Concurrent B')])
+    expect(
+      competing.map((response) => response.status).toSorted((first, second) => first - second),
+    ).toEqual([HTTP_STATUS.ok, HTTP_STATUS.conflict])
+    const finalRows = await getServices(env).db.query.watermark.findMany()
+    expect(finalRows).toHaveLength(1)
+    expect(['Concurrent A', 'Concurrent B']).toContain(finalRows[0]?.name)
   })
 
   it('stores logo bytes in R2 and blocks deletion while a preset references them', async () => {
@@ -82,7 +96,9 @@ describe('library over D1 and R2', () => {
     expect(uploaded.status).toBe(HTTP_STATUS.created)
     const asset = assetDtoSchema.parse(await uploaded.json())
 
-    const stored = await env.BUCKET.get(`org/${organizationId}/logos/${asset.id}`)
+    const record = await getServices(env).assets.find(organizationId, asset.id)
+    if (record === null) throw new Error('Missing uploaded logo metadata')
+    const stored = await env.BUCKET.get(record.key)
     expect(stored?.httpMetadata?.contentType).toBe('image/png')
     expect(new Uint8Array((await stored?.arrayBuffer()) ?? new ArrayBuffer(0))).toEqual(PNG_BYTES)
 
@@ -114,7 +130,7 @@ describe('library over D1 and R2', () => {
       method: 'DELETE',
     })
     expect(removed.status).toBe(HTTP_STATUS.noContent)
-    expect(await env.BUCKET.get(`org/${organizationId}/logos/${asset.id}`)).toBeNull()
+    expect(await env.BUCKET.get(record.key)).toBeNull()
   })
 
   it('stores photos with thumbnails, pages and searches them, and deletes in bulk', async () => {
@@ -136,8 +152,10 @@ describe('library over D1 and R2', () => {
     const rows = await getServices(env).db.query.photo.findMany()
     expect(rows).toHaveLength(3)
     const first = ids[0] ?? ''
-    expect(await env.BUCKET.get(`org/${organizationId}/photos/${first}`)).not.toBeNull()
-    expect(await env.BUCKET.get(`org/${organizationId}/thumbnails/${first}`)).not.toBeNull()
+    const firstRecord = rows.find((row) => row.id === first)
+    if (firstRecord === undefined) throw new Error('Missing uploaded photo metadata')
+    expect(await env.BUCKET.get(firstRecord.key)).not.toBeNull()
+    expect(await env.BUCKET.get(firstRecord.thumbnailKey)).not.toBeNull()
 
     const listed = await client.get(`/api/orgs/${organizationId}/photos`)
     const page = photoListResponseSchema.parse(await listed.json())
@@ -156,7 +174,8 @@ describe('library over D1 and R2', () => {
       ids: ids.slice(0, 2),
     })
     expect(removed.status).toBe(HTTP_STATUS.ok)
-    expect(await env.BUCKET.get(`org/${organizationId}/photos/${first}`)).toBeNull()
+    expect(await env.BUCKET.get(firstRecord.key)).toBeNull()
+    expect(await env.BUCKET.get(firstRecord.thumbnailKey)).toBeNull()
     expect(await getServices(env).db.query.photo.findMany()).toHaveLength(1)
   })
 

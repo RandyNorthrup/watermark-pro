@@ -26,10 +26,11 @@ import { requirePermission } from '../middleware/permission'
 import { requireSession } from '../middleware/session'
 import { NEVER_EXPIRES, signShareToken, verifyShareToken } from '../share-token'
 import type { PhotoRecord, ShareRecord, StoredObject } from '../stores'
+import { imageContentDisposition } from '../uploads'
 
 const SECONDS_PER_DAY = 86_400
-/** Public responses are cacheable by the visitor's browser for a short while only. */
-const PUBLIC_CACHE_CONTROL = 'private, max-age=300'
+/** Every read rechecks expiry and revocation instead of trusting an old HTTP cache entry. */
+const PUBLIC_CACHE_CONTROL = 'private, no-store'
 
 function shareUrl(appUrl: string, token: string): string {
   return new URL(`${SHARE_PATH_PREFIX}${token}`, appUrl).href
@@ -93,7 +94,7 @@ function streamPublic(stored: StoredObject, record: PhotoRecord, contentType: st
       'content-type': contentType,
       'content-length': String(stored.size),
       'cache-control': PUBLIC_CACHE_CONTROL,
-      'content-disposition': `inline; filename="${record.name.replaceAll('"', '')}"`,
+      'content-disposition': imageContentDisposition(record.name),
     },
   })
 }

@@ -1,13 +1,17 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import i18next from 'i18next'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LanguageMenu } from './language-menu'
+import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
 import { SUPPORTED_LOCALES } from '../../shared/locales'
 import { setLocale } from '../i18n'
+import { currentOfflineUser, setOfflineUser } from '../lib/offline-context'
 import { sessionQueryOptions } from '../lib/queries'
 import { createQueryClient } from '../lib/query-client'
+import french from '../locales/fr/common.json'
 import { OWNER } from '../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../test-support/fake-auth-module'
 
@@ -18,15 +22,23 @@ vi.mock('../lib/auth-client', () => import('../test-support/fake-auth-module'))
  * first paint. `isSignedIn` decides whether the account save runs: a member
  * has a session, the landing/auth pages do not.
  */
-async function mountMenu(isSignedIn: boolean): Promise<void> {
+async function mountMenu(
+  isSignedIn: boolean,
+  { workspace = true }: { workspace?: boolean } = {},
+): Promise<void> {
   const queryClient = createQueryClient()
   if (isSignedIn) {
     fakeAuth().state.user = OWNER
+    if (workspace) setOfflineUser(OWNER.id)
   }
   await queryClient.query(sessionQueryOptions)
   render(
     <QueryClientProvider client={queryClient}>
       <LanguageMenu />
+      <main>
+        <h1>Account settings</h1>
+        <button type="button">Continue editing</button>
+      </main>
     </QueryClientProvider>,
   )
 }
@@ -48,15 +60,112 @@ function requestBody(init: RequestInit | undefined): unknown {
 
 beforeEach(() => {
   installFakeAuth()
+  setOfflineUser(null)
 })
 
 afterEach(async () => {
   vi.restoreAllMocks()
+  i18next.addResourceBundle('fr', 'common', french, true, true)
   // Leave the shared instance back on English for any later test.
   await setLocale('en')
 })
 
 describe('LanguageMenu', () => {
+  it('saves a freshly verified public session without admitting a private workspace', async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(Response.json({ locale: 'es' }))
+    await mountMenu(true, { workspace: false })
+    expect(currentOfflineUser()).toBeNull()
+
+    await pickLanguage('Español')
+
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce())
+    const [url, init] = fetchSpy.mock.calls[0] ?? []
+    expect(url).toBe('/api/me')
+    expect(new Headers(init?.headers).get(ACCOUNT_ID_HEADER)).toBe(OWNER.id)
+    expect(requestBody(init)).toEqual({ locale: 'es' })
+    expect(fakeAuth().getSession).toHaveBeenLastCalledWith({
+      query: { disableCookieCache: true },
+      fetchOptions: { cache: 'no-store' },
+    })
+    expect(currentOfflineUser()).toBeNull()
+  })
+
+  it.each(['signed-out', 'different-account', 'different-session'] as const)(
+    'keeps a stale public session choice local after %s',
+    async (change) => {
+      await mountMenu(true, { workspace: false })
+      if (change === 'signed-out') fakeAuth().state.user = null
+      else if (change === 'different-account')
+        fakeAuth().state.user = { ...OWNER, id: 'another-account' }
+      else
+        fakeAuth().getSession.mockResolvedValue({
+          error: null,
+          data: {
+            user: OWNER,
+            session: { id: 'replacement-session', userId: OWNER.id, activeOrganizationId: null },
+          },
+        })
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+
+      await pickLanguage('Español')
+
+      await waitFor(() => expect(document.documentElement.lang).toBe('es'))
+      expect(fakeAuth().getSession).toHaveBeenCalledTimes(2)
+      expect(fetchSpy).not.toHaveBeenCalled()
+      expect(currentOfflineUser()).toBeNull()
+    },
+  )
+
+  it('keeps the page accessible while choosing a language and restores focus on Escape', async () => {
+    await mountMenu(false)
+    const user = userEvent.setup()
+    const trigger = screen.getByRole('button', { name: 'Change language' })
+    trigger.focus()
+    await user.keyboard('{ArrowDown}')
+    const region = screen.getByRole('region', { name: 'Change language' })
+    expect(within(region).getByRole('menu')).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Account settings' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Continue editing' })).toBeVisible()
+    expect(within(region).getByRole('menuitem', { name: 'English' })).toHaveFocus()
+    await user.keyboard('{End}')
+    expect(within(region).getByRole('menuitem', { name: 'العربية' })).toHaveFocus()
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(trigger).toHaveFocus())
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    expect(document.documentElement.lang).toBe('en')
+  })
+
+  it('allows an outside control to dismiss the chooser without stealing its focus', async () => {
+    await mountMenu(false)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Change language' }))
+    const outside = screen.getByRole('button', { name: 'Continue editing' })
+    await user.click(outside)
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
+    expect(outside).toHaveFocus()
+    expect(document.documentElement.lang).toBe('en')
+  })
+
+  it.each([true, false])(
+    'does not save a stale catalogue choice after relocking (workspace %s)',
+    async (workspace) => {
+      await mountMenu(true, { workspace })
+      i18next.removeResourceBundle('fr', 'common')
+      const download = Promise.withResolvers<Response>()
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => download.promise)
+      await pickLanguage('Français')
+      await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce())
+      setOfflineUser(workspace ? 'different-account' : null)
+      act(() => {
+        download.resolve(Response.json(french))
+      })
+      await waitFor(() => expect(document.documentElement.lang).toBe('fr'))
+      expect(fetchSpy.mock.calls.some(([url]) => url === '/api/me')).toBe(false)
+      expect(fakeAuth().getSession).toHaveBeenCalledOnce()
+    },
+  )
   it('lists every language by its native name and applies the choice', async () => {
     await mountMenu(false)
 

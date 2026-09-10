@@ -12,7 +12,7 @@ BETTER_AUTH_SECRET=
 # APP_ENV=development            # development | test | staging | production
 # APP_URL=http://localhost:5273  # public origin used in auth links
 # EMAIL_PROVIDER=console         # console | cloudflare (console is refused in production)
-# EMAIL_FROM=no-reply@watermark.blowmoney.net
+# EMAIL_FROM=no-reply@lumafoil.com
 
 # Optional Cloudflare Turnstile bot protection for sign-up and password reset.
 # Both must be set together; leave both empty to run without a challenge.
@@ -22,15 +22,28 @@ BETTER_AUTH_SECRET=
 # TURNSTILE_SITE_KEY=
 # TURNSTILE_SECRET_KEY=
 
-# Optional cloud import pickers (M16). All public client-side identifiers, not
-# secrets: production sets them as plain vars under env.production in
-# wrangler.jsonc; set them here to enable the pickers on the local origin. Each
-# provider's button appears only when its keys are present. Register the apps in
-# Google Cloud (an OAuth Web client + a Picker API key + the project number),
-# Microsoft Entra (an SPA app with delegated Files.Read), and the Dropbox app
-# console (a scoped app with Chooser domains), authorising http://localhost:5273.
+# Optional cloud file connections. Public client IDs, project number and Dropbox
+# app key may be plain production vars. GOOGLE_PICKER_API_KEY is visible to the
+# browser at runtime, but is stored as an encrypted Worker secret; never commit
+# its value. Restrict that key to Picker and the required app/Google frame hosts.
+# Set local values here to enable the provider buttons. Register a separate
+# Google cloud Web client, a Microsoft SPA client with delegated Files.ReadWrite
+# and User.Read, and a Dropbox App Folder client with PKCE, file/sharing scopes,
+# Chooser hosts and callbacks. Authorize the production origin and localhost:5273;
+# see docs/verification/m19/domain-migration.md for the exact callback paths.
 # GOOGLE_OAUTH_CLIENT_ID=
 # GOOGLE_PICKER_API_KEY=
 # GOOGLE_PICKER_APP_ID=
 # MICROSOFT_CLIENT_ID=
 # DROPBOX_APP_KEY=
+
+# Optional ACCOUNT identity providers (confidential Web clients; secrets stay server-side).
+# Both fields in each provider pair must be set together.
+# Production callbacks:
+#   https://lumafoil.com/api/auth/callback/google
+#   https://lumafoil.com/api/auth/callback/microsoft
+# GOOGLE_AUTH_CLIENT_ID=
+# GOOGLE_AUTH_CLIENT_SECRET=
+# MICROSOFT_AUTH_CLIENT_ID=
+# MICROSOFT_AUTH_CLIENT_SECRET=
+# MICROSOFT_AUTH_TENANT_ID=common

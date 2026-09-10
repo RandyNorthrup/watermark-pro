@@ -5,6 +5,8 @@ import type { PublicConfig } from '../../../shared/api'
 
 /** A config with every cloud provider disabled; tests turn on one field at a time. */
 const NONE: PublicConfig = {
+  googleAuthEnabled: false,
+  microsoftAuthEnabled: false,
   turnstileSiteKey: null,
   googleOAuthClientId: null,
   googlePickerApiKey: null,

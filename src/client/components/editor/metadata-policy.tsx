@@ -9,7 +9,7 @@ import {
 
 interface MetadataPolicyFieldProps {
   policy: MetadataPolicy
-  /** Keep modes are disabled for formats that cannot carry metadata (WebP). */
+  /** Keep modes are disabled when this exporter does not preserve original photo metadata (WebP). */
   format: OutputFormat
   onChange: (policy: MetadataPolicy) => void
 }

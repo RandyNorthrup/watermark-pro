@@ -85,9 +85,7 @@ export interface GlyphGroup {
   isEmoji?: boolean
 }
 
-/** Platform colour-emoji fonts; a comma-separated stack, drawn without ink fill. */
-export const EMOJI_FONT_STACK =
-  "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif"
+export { EMOJI_FONT_STACK } from './emoji-font'
 
 /** Glyphs are drawn with a bundled font that covers them (Noto-free fallback: system). */
 export const GLYPH_GROUPS: readonly GlyphGroup[] = [

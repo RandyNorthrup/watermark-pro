@@ -9,5 +9,8 @@
     "types": ["@cloudflare/vitest-pool-workers/types"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo"
   },
-  "include": ["src/worker", "src/shared", "worker-configuration.d.ts"]
+  "include": ["src/worker", "src/shared", "worker-configuration.d.ts"],
+  // These harnesses read local configuration or execute shipped JavaScript in
+  // Node's VM. tsconfig.node.json strictly checks their actual runtime APIs.
+  "exclude": ["src/worker/offline-assets.test.ts", "src/worker/observability-config.test.ts"]
 }

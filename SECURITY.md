@@ -1,15 +1,15 @@
 # Security policy
 
-Watermark Pro is built to be operated as an enterprise-grade service. This
-document describes how to report a vulnerability and which controls the
-project commits to. The threat model and accepted residual risks live in
+This document describes vulnerability reporting and Lumafoil's application
+security controls. The threat model, release checks, and residual risks live in
 `PLAN.md` §5.4 and are updated at every milestone.
 
 ## Reporting a vulnerability
 
-Please do not open a public issue for security problems. Email the maintainer
-at the address on the GitHub profile of the repository owner, or use GitHub's
-private vulnerability reporting on the repository once it is enabled. Include
+Please do not open a public issue for security problems. Email
+[support@lumafoil.com](mailto:support@lumafoil.com), or use
+[GitHub's private vulnerability reporting](https://github.com/RandyNorthrup/watermark-pro/security/advisories/new).
+Include
 steps to reproduce, the affected version or commit, and impact. You will get
 an acknowledgement within three business days.
 
@@ -21,25 +21,79 @@ Only the `main` branch and the latest tagged release receive fixes.
 
 - Response headers: CSP, HSTS, `Referrer-Policy`, `Permissions-Policy`,
   `X-Content-Type-Options`, `X-Frame-Options` on both API and static responses.
-  Zero CSP violations on any page (verified in the M1 Lighthouse run).
 - Same-origin guard on every state-changing API request, plus Hono's CSRF
   check for form bodies and Better Auth's own origin checks.
-- Email + password authentication with mandatory email verification, password
-  policy (12 to 128 characters), password reset tokens that expire after one
-  hour and revoke other sessions, and sessions in HttpOnly SameSite=Lax
-  cookies (Secure on https origins).
+- Invitation-only signup with mandatory verified email. Google and Microsoft
+  identity sign-in are separate from cloud-file connections; existing accounts
+  do not need another invitation. Additional sign-in methods require explicit
+  authenticated linking. Passwords use a 12-to-128-character policy; reset tokens
+  expire after one hour and revoke other server sessions. Sessions use HttpOnly,
+  SameSite=Lax cookies, Secure on HTTPS. Signed OAuth state cookies last ten
+  minutes and are always checked. Provider access/refresh tokens are encrypted;
+  identity tokens and provider avatars are not persisted.
+- Site invitations and reusable referral links grant separate private accounts,
+  never membership in the inviter's workspace. Admission rechecks that the
+  inviter exists, has verified email and is not banned, including during OAuth
+  callbacks. Banning through the application revokes outstanding admissions;
+  unbanning does not revive those links. Deleting the inviter cascades their
+  invitation/link rows. Explicit collaboration uses separate workspaces.
+- Exactly one anchored site administrator. Workspace owner/admin roles do not
+  grant site administration. API and D1 guards refuse additional administrators,
+  anchor changes, owner removal/demotion, impersonation, or administrative
+  takeover of another user's email or password.
 - Rate limiting through Workers Rate Limiting bindings: 10 requests per minute
   per address on credential endpoints, 120 on the rest of the auth API.
 - Role-based access control enforced server-side on every custom route;
   non-members and insufficient roles both receive 403 without revealing
   whether the organization exists.
-- Append-only audit trail for sign-ups and every organization, invitation and
-  membership change, readable only by owners and admins.
+- Application audit records cover account, workspace, invitation, library,
+  gallery and sharing changes. Workspace audit routes require an owner/admin
+  role; the site administrator can review global moderation and audit records.
+  Account/invitation totals are site-admin-only; recent-work history is per user.
+- Validated offline display snapshots have no arbitrary age cutoff. Online boot
+  validates the live session before showing private workspace data. A real
+  transport outage may admit only the prepared account and unchanged account
+  generation; server 401/403, sign-out, malformed data, and future timestamps
+  never authorize a cached fallback. Cached display state is not a credential.
+- Private offline copies and queues are scoped by account and workspace. Account
+  changes invalidate in-memory state; unsynchronized changes block sign-out and
+  unsafe account switches. Replay requires a server-checked account binding.
+  Successful sign-out clears local app data. A disconnected device can retain
+  copies until it reconnects or its browser data is cleared.
+  The earlier global `Clear-Site-Data` logout policy is superseded: a delayed
+  old-account response must not erase a newer account's queued work. Cleanup is
+  awaited and scoped to the departing account; public service-worker assets
+  contain no private data and can remain cached.
+- Installed-app file launches capture account ownership before asynchronous file
+  reads. Explicit locks, account changes and newer launches invalidate old work;
+  only trusted initial admission can preserve a new unowned launch. Editor and
+  bulk intake consume only their matching target, and delayed editor metadata
+  cannot replace another account's or a newer selection's photo.
+- Real-stream API limits include Better Auth regardless of declared content
+  type/length. Photo/logo quota admission is atomic in D1 and accounts for
+  thumbnails and pending work. Metadata, audit and receipts commit together;
+  durable cleanup and lease-specific object keys protect failure recovery.
+  Database guards prevent dangling/foreign logo references and workspace
+  deletion while saved content or storage cleanup remains.
+- Auth and Worker diagnostics omit raw tokens, request bodies, state details,
+  provider identity fields and database parameters. Better Call's raw fallback
+  logger is bypassed in favor of the sanitized Worker error handler.
+- Automatic browser reports send only a fixed error classification, code
+  coordinates from the app's own compiled assets and a known route shape.
+  Arbitrary messages, rejected objects, stack text, URL parameters, content IDs
+  and full user-agent strings are not stored. The server normalizes direct
+  submissions too; detailed local browser errors remain on the user's device.
+- Release configuration disables persistent Cloudflare Worker logs and traces:
+  a hosted probe showed that custom-log enrichment otherwise retains bearer
+  request paths despite invocation-log disabling. Application diagnostics and
+  audits remain separate. Private live-tail envelopes still contain request
+  URLs and must not be published. See
+  [the platform privacy evidence](docs/verification/m19/platform-observability-privacy.md).
 - Fail-closed configuration validation; the console email provider is
   refused in production. Two test-only routes exist solely with that
   provider: the development mailbox (`GET /api/dev/mailbox`) and the
-  platform-admin promotion the end-to-end suite uses (`POST /api/dev/promote`,
-  the same change the runbook makes with a D1 update). Both answer 404 in
+  initial singleton administrator bootstrap used by isolated verification
+  (`POST /api/dev/promote`), which refuses a second administrator. Both answer 404 in
   any other configuration, and a Node test proves it.
 - Transport: HSTS (one year, subdomains included) and every CSP source list
   limited to `'self'` or an explicit `https:` origin, so an https page can
@@ -47,18 +101,23 @@ Only the `main` branch and the latest tagged release receive fixes.
   set: it adds nothing on this origin and WebKit applies it to plain-http
   localhost, which made the app unrenderable in Safari-engine tests.
 - HTML email bodies are built with a library escaper; no raw interpolation.
-- Secrets scanning in the pre-commit hook and in CI (gitleaks, full history).
+- Secrets scanning in the pre-commit hook and in CI, including full Git history,
+  current source, index and release archives. The independent publication audit
+  compares configured private values against original bytes and does not trust
+  generic repository ignore files. One revoked historical Picker key has an
+  exact immutable finding/digest exception; current and built copies receive no
+  exception. See [the retirement record](docs/verification/m19/picker-key-rotation.md).
 - Dependency vulnerability audit in CI at the `high` level.
 - Static analysis with semgrep (`p/default`, `p/typescript`, `p/react`,
   `p/secrets`) locally and in CI.
 - Exact dependency pinning, `min-release-age=7` in `.npmrc`, GitHub Actions
   pinned to commit SHAs, semgrep container pinned by digest.
-- Two third-party runtime origins, both Cloudflare's:
-  `https://challenges.cloudflare.com` in `script-src` and `frame-src` for the
-  Turnstile widget, and `https://static.cloudflareinsights.com` /
-  `https://cloudflareinsights.com` for the cookie-less Web Analytics beacon
-  the zone injects (SRI-pinned by Cloudflare; disable "automatic setup" on
-  the zone to drop it). Fonts, styles and everything else are self-hosted.
+- Fonts, stickers, styles and application code are self-hosted. Turnstile uses
+  Cloudflare's challenge origin; explicitly invoked cloud connections also use
+  the Google, Dropbox and Microsoft script, frame and API origins enumerated in
+  `public/_headers`. Microsoft authentication code is bundled. Earlier analytics
+  CSP allowances were removed; final hosted verification must also confirm that
+  the zone does not inject analytics into private or bearer-link routes.
 - Logo uploads (M3): type decided by file signature, never by the declared
   MIME type or extension; size limited before the body is read; per-organization
   quota; objects stored in R2 under organization-scoped keys, never public,

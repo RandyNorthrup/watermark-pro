@@ -50,6 +50,17 @@ export async function loadFont(family: string, weight: number): Promise<FontReso
     throw new Error(`unknown font family: ${family}`)
   }
   const resolvedWeight = nearestWeight(font, weight)
+  if (font.files !== undefined) {
+    const file = font.files.find((candidate) => candidate.weight === resolvedWeight)
+    if (file === undefined) throw new Error(`No font file bundled for ${family}`)
+    if (!loadedStyles.has(file.url)) {
+      const face = new FontFace(family, `url("${file.url}")`, { weight: String(resolvedWeight) })
+      await face.load()
+      document.fonts.add(face)
+      loadedStyles.add(file.url)
+    }
+    return { family, weight: resolvedWeight, url: file.url }
+  }
   const sheet = styleKey(font, resolvedWeight)
   const loadStyles = STYLE_LOADERS[sheet]
   if (loadStyles === undefined) {

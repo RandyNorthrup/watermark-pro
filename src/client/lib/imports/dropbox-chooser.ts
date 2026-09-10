@@ -17,9 +17,11 @@
  * its `window.opener` and can post the selection back — a bare `same-origin`
  * severs that link and the Chooser never resolves.
  */
+import { cloudRequest, trustedCloudUrl } from './cloud-transfer'
 import { toImageFile } from './download'
 import type { PublicConfig } from '../../../shared/api'
 import { DROPBOX_DROPINS_SCRIPT_URL, PHOTO_CONTENT_TYPES } from '../../../shared/constants'
+import { captureOfflineOwner } from '../offline-context'
 
 /** File extensions the Chooser should offer, one entry per accepted photo type. */
 const EXTENSIONS_BY_CONTENT_TYPE: Record<(typeof PHOTO_CONTENT_TYPES)[number], readonly string[]> =
@@ -48,7 +50,10 @@ export interface ChooserFile {
  * preserving order. Pure, so the download loop can stay thin over a tested map.
  */
 export function toChooserSelections(files: readonly ChooserFile[]): ChooserFile[] {
-  return files.map((file) => ({ name: file.name, link: file.link }))
+  return files.map((file) => ({
+    name: file.name,
+    link: trustedCloudUrl(file.link, ['dropboxusercontent.com']),
+  }))
 }
 
 /** Only the slice of the `window.Dropbox` global this module calls. */
@@ -96,12 +101,14 @@ function injectDropins(appKey: string): Promise<DropboxGlobal> {
     script.addEventListener(SCRIPT_LOAD_EVENT, () => {
       const dropbox = window.Dropbox
       if (dropbox === undefined) {
+        script.remove()
         reject(new Error('The Dropbox Chooser script loaded without exposing its API.'))
         return
       }
       resolve(dropbox)
     })
     script.addEventListener(SCRIPT_ERROR_EVENT, () => {
+      script.remove()
       reject(new Error('The Dropbox Chooser script failed to load.'))
     })
     document.head.append(script)
@@ -109,20 +116,35 @@ function injectDropins(appKey: string): Promise<DropboxGlobal> {
 }
 
 /** Inject the drop-in `<script>` once and resolve when `window.Dropbox` is ready. Memoised. */
-function loadDropins(appKey: string): Promise<DropboxGlobal> {
-  dropinsCache.promise ??= injectDropins(appKey)
-  return dropinsCache.promise
+async function loadDropins(appKey: string): Promise<DropboxGlobal> {
+  const pending = dropinsCache.promise ?? injectDropins(appKey)
+  dropinsCache.promise = pending
+  try {
+    return await pending
+  } catch (error) {
+    // Keep simultaneous callers on one attempt; a later user retry can reload it.
+    if (dropinsCache.promise === pending) dropinsCache.promise = null
+    throw error
+  }
 }
 
 /** Open the Chooser and resolve the chosen entries (empty when the user cancels). */
 function chooseFiles(dropbox: DropboxGlobal): Promise<ChooserFile[]> {
-  return new Promise<ChooserFile[]>((resolve) => {
+  const owner = captureOfflineOwner()
+  return new Promise<ChooserFile[]>((resolve, reject) => {
     dropbox.choose({
       linkType: DIRECT_LINK_TYPE,
       multiselect: true,
       extensions: imageExtensions(),
       success: (files) => {
-        resolve(toChooserSelections(files))
+        try {
+          owner.assertCurrent()
+          resolve(toChooserSelections(files))
+        } catch (error) {
+          reject(
+            error instanceof Error ? error : new Error('Dropbox returned an invalid selection.'),
+          )
+        }
       },
       cancel: () => {
         resolve([])
@@ -133,16 +155,26 @@ function chooseFiles(dropbox: DropboxGlobal): Promise<ChooserFile[]> {
 
 /** Download each direct link in order, turning the bytes into an image `File`. */
 async function downloadSelections(selections: readonly ChooserFile[]): Promise<File[]> {
+  const owner = captureOfflineOwner()
   const files: File[] = []
   for (const selection of selections) {
-    const response = await fetch(selection.link)
-    if (!response.ok) {
-      throw new Error(
-        `Could not download ${selection.name} from Dropbox (HTTP ${String(response.status)}).`,
-      )
-    }
-    const blob = await response.blob()
-    files.push(toImageFile(blob, selection.name))
+    owner.assertCurrent()
+    const file = await cloudRequest(
+      trustedCloudUrl(selection.link, ['dropboxusercontent.com']),
+      { credentials: 'omit', referrerPolicy: 'no-referrer' },
+      async (response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Could not download ${selection.name} from Dropbox (HTTP ${String(response.status)}).`,
+          )
+        }
+        const blob = await response.blob()
+        if (response.url !== '') trustedCloudUrl(response.url, ['dropboxusercontent.com'])
+        return toImageFile(blob, selection.name)
+      },
+    )
+    owner.assertCurrent()
+    files.push(file)
   }
   return files
 }
@@ -158,7 +190,10 @@ export async function pickFromDropbox(config: PublicConfig): Promise<File[]> {
   if (appKey === null) {
     throw new Error('Dropbox import is not configured for this deployment.')
   }
+  const owner = captureOfflineOwner()
   const dropbox = await loadDropins(appKey)
+  owner.assertCurrent()
   const selections = await chooseFiles(dropbox)
+  owner.assertCurrent()
   return await downloadSelections(selections)
 }

@@ -10,9 +10,23 @@
  * globals, no imports from either side.
  */
 
-export const APP_NAME = 'Watermark Pro'
-
-export const APP_TAGLINE = 'Watermark photographs at scale, beautifully.'
+export const APP_NAME = 'Lumafoil'
+/** Isolate this application's cookies from other Better Auth applications on localhost. */
+export const AUTH_COOKIE_PREFIX = 'lumafoil'
+/** Must match Better Auth's database OAuth-state lifetime; never bypass the signed cookie check. */
+export const OAUTH_STATE_TTL_SECONDS = 600
+/** A pending upload is transient; clients may replay after this interval. */
+export const UPLOAD_RETRY_AFTER_SECONDS = 30
+/** Canonical source repository; update only after a repository move has completed. */
+export const APP_SOURCE_URL = 'https://github.com/RandyNorthrup/watermark-pro'
+/** Public contact and provider notices used by the localized legal pages. */
+export const LEGAL_LINKS = {
+  support: 'mailto:support@lumafoil.com',
+  security: `${APP_SOURCE_URL}/security/advisories/new`,
+  turnstile: 'https://www.cloudflare.com/turnstile-privacy-policy/',
+} as const
+/** Bound invitation identifiers before database lookups and return-path construction. */
+export const MAX_INVITATION_TOKEN_LENGTH = 200
 
 /** Prefix under which every Worker-handled route lives. Mirrors `run_worker_first` in wrangler.jsonc. */
 export const API_PREFIX = '/api'
@@ -120,10 +134,6 @@ export const CLIENT_ERROR_MAX_BODY_BYTES = 2048
 export const CLIENT_ERROR_MAX_MESSAGE_LENGTH = 1000
 export const CLIENT_ERROR_MAX_SOURCE_LENGTH = 500
 export const CLIENT_ERROR_MAX_ROUTE_LENGTH = 200
-/** Better Auth's sign-out endpoint; the Worker adds Clear-Site-Data to its response. */
-export const AUTH_SIGN_OUT_PATH = '/api/auth/sign-out'
-/** Cleared on sign-out (M19): the offline caches and local storage, for shared devices. */
-export const CLEAR_SITE_DATA_ON_SIGN_OUT = '"cache", "storage"'
 
 /** How long client-error and health-check rows are kept before an insert prunes them. */
 export const OBSERVABILITY_RETENTION_DAYS = 7
@@ -153,6 +163,7 @@ export const HTTP_STATUS = {
   unsupportedMediaType: 415,
   tooManyRequests: 429,
   internalServerError: 500,
+  serviceUnavailable: 503,
 } as const
 
 /** Machine-readable error codes returned in API error bodies. */
@@ -245,7 +256,8 @@ export const DROPBOX_OAUTH_TOKEN_URL = 'https://api.dropboxapi.com/oauth2/token'
 export const DROPBOX_UPLOAD_ENDPOINT = 'https://content.dropboxapi.com/2/files/upload'
 export const DROPBOX_OAUTH_REDIRECT_PATH = '/oauth/dropbox'
 /** Space-separated Dropbox scopes for the save flow (write, plus read for parity). */
-export const DROPBOX_WRITE_SCOPES = 'files.content.write files.content.read files.metadata.read'
+export const DROPBOX_WRITE_SCOPES =
+  'files.content.write files.content.read files.metadata.read sharing.read sharing.write'
 /** `common` accepts both Microsoft Entra (work/school) and personal accounts. */
 export const MICROSOFT_AUTHORITY = 'https://login.microsoftonline.com/common'
 /** `Files.ReadWrite` covers both the OneDrive browse (read) and save (write) flows. */
@@ -254,7 +266,7 @@ export const MICROSOFT_GRAPH_ROOT = 'https://graph.microsoft.com/v1.0'
 /** Registered SPA redirect path for the MSAL popup; joined onto the app origin. */
 export const MICROSOFT_OAUTH_REDIRECT_PATH = '/oauth/microsoft'
 /** Folder each provider saves watermarked photos into (created if missing). */
-export const CLOUD_SAVE_FOLDER = 'Watermark Pro'
+export const CLOUD_SAVE_FOLDER = 'Lumafoil'
 
 /**
  * Video watermarking (M17). Everything runs in the browser through WebCodecs and
@@ -305,4 +317,12 @@ export const PDF_RASTER_DPI = 150
 /** Points per inch in the PDF coordinate system (a PDF user unit is 1/72 inch). */
 export const PDF_POINTS_PER_INCH = 72
 /** Written into the output PDF's Info dictionary. */
-export const PDF_PRODUCER = 'Watermark Pro'
+export const PDF_PRODUCER = 'Lumafoil'
+
+/** Bounds shared by bootstrap URL parsing and account/form validation. */
+export const EMAIL_MAX_LENGTH = 254
+export const MAX_AUTH_ERROR_LENGTH = 200
+export const MAX_ACCOUNT_ID_LENGTH = 128
+
+/** Roles offered when inviting or promoting; owner transfer is separate. */
+export const ASSIGNABLE_ROLES = ['admin', 'editor', 'viewer'] as const

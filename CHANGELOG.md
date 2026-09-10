@@ -7,92 +7,296 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
-M19 (performance and production hardening) is in progress.
+## [2.0.0] - 2026-09-10
 
-### Changed
-
-- The wire schemas that carry a full `WatermarkSpec` (`saveWatermarkRequestSchema`,
-  `watermarkDtoSchema`, `watermarkListResponseSchema`) moved from `shared/api.ts`
-  to a new `shared/api-watermark.ts`, so importing the boot-path schemas (session,
-  public config, audit) no longer pulls the ~26 kB watermark spec module onto the
-  first paint. Only the lazily-loaded library, designer and editor reach it now.
-- JavaScript diet, first pass (PLAN §5.5): the `ui` chunk group (all of radix-ui
-  + lucide bundled together) is gone and the authenticated layout is now
-  code-split from the entry, so a first paint no longer downloads every UI
-  primitive or the app shell. Initial-load JS shared by every page dropped from
-  234.8 kB to 188.6 kB gzip. Route chunks stay small (largest own chunk 10.6 kB
-  gzip, well under the 60 kB budget).
+M19 is the production-readiness release for Lumafoil. Source and local evidence
+live under [docs/verification/m19](docs/verification/m19/); provider and domain
+cutover outcomes are recorded separately because they occur after the tagged
+candidate passes its hosted gates.
 
 ### Added
 
-- Signed-in pages now paint without waiting on the session → organization fetch
-  chain (PLAN §2). The `/app` boot reads the session and organization list from
-  the query cache when present — this session's, or the last visit's, restored by
-  a new `localStorage` persister — and revalidates in the background; only a cold
-  first visit blocks, and the layout redirects to `/login` if the revalidation
-  finds the session gone. Mutations that change those queries (creating or
-  joining an organization, signing in, switching the active one) now refresh the
-  cache before navigating (`refetchShellQueries`), so a cache-first boot can never
-  read a stale value. Combined with the offline service worker, the installed app
-  now boots the editor offline after a visit.
-- Offline support (PLAN §4): a root-scope service worker (`public/sw.js`,
-  registered in production) caches the hashed build assets forever (immutable by
-  name) and serves navigations network-first with a cached fallback, so repeat
-  loads are instant and the installed app keeps working after a visit. The API is
-  never cached; the M16 share-target worker keeps its own scope. On sign-out the
-  Worker now sends `Clear-Site-Data: "cache", "storage"` so a shared device does
-  not retain the previous user's cached shell or (forthcoming) persisted data.
-- Observability console (PLAN §6, no dashboard): the browser now reports uncaught
-  errors and unhandled rejections to a rate-limited, size-capped, low-PII
-  `POST /api/client-errors` (message, single top stack frame, route, request id);
-  a cron trigger runs a `scheduled` health check every five minutes that confirms
-  the database is reachable and records the result; and the admin console gains a
-  **Health** tab (recent checks with status and duration) and a **Client errors**
-  tab (recent reports). Both tables keep seven days of rows, pruned on insert. The
-  new admin strings are translated into all twelve languages.
-- Every API request now carries a correlation id: the Worker takes an inbound
-  `X-Request-Id` or generates one, echoes it on the response, and includes it in
-  the unhandled-error log line, so a client error report can be tied back to a
-  Worker log line (PLAN §6 observability).
-- The Worker now serves the front door (`GET /`) as a prerendered, per-locale
-  static landing: it picks the language from the `watermark-pro-locale` cookie,
-  then `Accept-Language`, then English, and serves the matching
-  `dist/client/landing/<locale>.html` (which ships no application JavaScript). A
-  `?lang=xx` link persists the choice in the cookie and reloads; a visitor who
-  already has a session is sent to the app. When no prerender is present (local
-  dev, CI) it falls back to the SPA shell, so the app still works without the
-  prerender step. `run_worker_first` in `wrangler.jsonc` routes only `/` and
-  `/api/*` through the Worker; everything else is served straight from the asset
-  store. Verified end to end against a preview (es → Spanish, ar → right-to-left,
-  no header → English, `/` never captures static assets).
-- Landing prerender tooling (`npm run prerender`, `scripts/prerender.mjs`): renders
-  the React landing once per shipped language against a preview, strips the
-  application bundle, and writes a static `dist/client/landing/<locale>.html` that
-  paints instantly and ships no application JavaScript (largest is ~4 kB gzip).
-  The theme toggle is replaced with a no-JS `<details>` language switcher whose
-  `/?lang=xx` links the Worker honours; the React landing stays the single source
-  of the markup so the static pages cannot drift. (Serving is wired next.)
-- The chosen interface language is now mirrored to an edge-readable cookie
-  (`watermark-pro-locale`) in addition to `localStorage`, so the Worker can serve
-  the right prerendered landing (per-locale static pages, in progress). Locale
-  detection reads the cookie after `localStorage` and before the browser
-  languages; a shared `localeFromCookieHeader` parser is used by both sides.
-- First-paint skeleton: `index.html` now carries a static, theme-correct
-  skeleton of the app frame (header with the brand mark, shimmering content
-  blocks, and a phone tab bar) that paints before any JavaScript runs and is
-  replaced by React's first render. A tiny inline script resolves the stored
-  theme (mirroring `lib/theme.ts`) before the skeleton paints so it never
-  flashes the wrong colour; a Vite plugin hashes that inline script into the
-  `_headers` `script-src` at build time, keeping the strict CSP (no
-  `'unsafe-inline'` for scripts) intact.
-- Bundle-size measurement and budget tooling (`npm run bundle:report`,
-  `npm run bundle:budget`): the client build now emits a manifest, and
-  `scripts/lib/bundle-sizes.mjs` computes gzip/brotli sizes from the real chunk
-  graph. The report is written to `docs/bundle/m19.md`; the budget gate enforces
-  the PLAN §5.5 gzip limits (`/` ≤ 90 kB, `/app/*` shell ≤ 140 kB, any route
-  chunk ≤ 60 kB excluding the media-engine chunks). Baseline recorded: initial
-  JS shared by every page is 234.8 kB gzip; the budget gate is not yet part of
-  `npm run quality` until the surfaces are split under budget.
+- Private personal workspaces, separate site invitations, each user's unique
+  rotatable invitation link, count-only referral attribution, and
+  administrator-only aggregate account/invitation statistics. Workspace
+  collaboration remains a separate explicit action.
+- A per-user recent-work dashboard with thumbnail, list and details views,
+  account-scoped preferences, real photo/preset previews and offline event replay.
+  Access denial hides previously cached rows immediately.
+- Database-anchored sole site administration, streaming request-size limits and
+  atomic photo/logo/thumbnail storage reservations with durable cleanup recovery.
+- Google and Microsoft account sign-in with invitation-gated new identities,
+  explicit authenticated provider linking, email-ownership checks, encrypted
+  provider tokens and no stored ID-token claims or external avatar URLs.
+- A guarded migration for the original two unused accounts, plus an explicit
+  empty-database owner bootstrap and a self-hosting guide. No public bootstrap
+  endpoint or temporary production-signup bypass is provided.
+- A private SQL replay preparation tool that verifies the recorded backup hash,
+  refuses Git destinations and existing output, and orders table definitions,
+  original data, then indexes/triggers. It executes no backup rows or remote
+  commands. Actual isolated D1 restoration and account/workspace preservation
+  were rehearsed separately before production changes.
+- 500 additional open-licensed font families, bringing the library to **551
+  distinct families**, and **400 Microsoft Fluent vector stickers** with search,
+  categories, provenance, checksums and locally distributed licence notices.
+- A saved-QR creation shortcut and filter. Named codes retain independent
+  destinations; exported QR images have independent decoder regression checks.
+- Durable account-scoped preset/photo/logo saves and an outbox, reconnect
+  replay, visible pending/blocked/conflict states, explicit discard confirmation,
+  and keep-both conflict recovery. Stable server identities make lost-response
+  retries idempotent; preset updates detect concurrent changes.
+- Explicit native cloud-link creation and revocation after Google Drive,
+  Dropbox or OneDrive saves. Saving does not automatically publish files.
+  Confirmed file identities and partial-batch outcomes are preserved.
+- A complete Lumafoil brand kit with outlined wordmarks, approved rounded marks,
+  provider/PWA icons, social assets, colours, typography, email signature and
+  portable guide/archive. Real editor, QR and library captures and bundled-font/
+  sticker specimens support the feature page.
+- Bundled software license notices generated by Vite, plus a deterministic
+  corresponding-source archive and explicit MPL source offer for the pinned
+  Mediabunny video library.
+- Support shared mailbox **support@lumafoil.com**, with direct sign-in blocked
+  and access limited to the existing licensed owner. Inbound and Send As mail
+  were received successfully; recipient checks passed SPF, DKIM and DMARC.
+- Correlation IDs, bounded browser-error reports, scheduled database-health
+  checks and administrator health/error views. Operational records retain the
+  existing seven-day window; sensitive route/query values are redacted.
+
+### Changed
+
+- Private query restoration, account observers and offline admission now load
+  only before an `/app` route is admitted. Public auth pages avoid that private
+  startup work; same-document sign-in still installs it before rendering a
+  workspace. Signed-in public language changes use a fresh exact-session fence
+  and never restore workspace data to save the account preference.
+- Core login, audit and invitation queries now load a four-schema validation
+  leaf instead of initializing unrelated media and administration schemas.
+  Desktop file-launch delivery, the bulk engine pool, mark resource catalogues,
+  photo metadata parsing and PDF processing load only when their actual action
+  needs them; account leases and early error reporting remain synchronous.
+- Updated the exact compatible dependency pins for MSAL Browser, i18next,
+  react-i18next, Lucide, Mediabunny, Testing Library user-event and
+  chrome-launcher. TypeScript 7 and Vitest 5 remain held by the installed
+  typed-ESLint and Cloudflare Workers test peer ranges.
+- Recent work now uses a stable scrollable results panel, with compact horizontal
+  thumbnails on phones and the full card grid on larger screens. This removes
+  the large Tools-section shift without delaying the page or adding an empty
+  placeholder. The first visible thumbnail is eager/high priority; later images
+  remain lazy.
+- Inter remains the interface and watermark font. The application shell keeps
+  its normal stylesheet discovery so the font does not compete with private
+  startup, while prerendered landing/legal documents preload the one built Inter
+  file before their stylesheet. Linux evidence identified the public font swap
+  as the layout-shift source; the targeted preload removes it.
+- Commit hooks invoke the pinned formatter and linters through Node directly.
+  Native Windows argument handling avoids repeated small command batches while
+  retaining staged-only formatting, strict lint and publication checks. Isolated
+  positive/negative proofs preserve partially staged and unstaged changes.
+- Device verification now runs in four separate GitHub jobs with the existing
+  required aggregate check. Release UI audits derive their parallel matrix from
+  the shared page inventory, and tag deployment requires both code/device gates
+  and UI audits. Local browser scheduling uses two workers after paired offline
+  journeys passed under unchanged deadlines; all 104 device cases remain.
+- Authenticated startup now uses one origin-checked `POST /api/me/bootstrap`
+  response to seed the existing session, workspace-list, selected-workspace and
+  role queries. Every account receives its private workspace; a valid selected
+  collaboration remains selected. Revoked selections return to the workspace
+  chooser without rendering stale content or looping through sign-in.
+- Product identity is **Lumafoil**, with **lumafoil.com** as the sole planned
+  production origin and no redirects from retired app domains. Provider
+  registrations and mail settings were moved to the new identity; hosted
+  cutover and provider-flow proof remain tracked release work.
+- Replaced purple with **#C86B82** rose, stronger action contrast and warm neutral
+  surfaces. The first generic serif landing was rejected and replaced with
+  concrete illustrated feature explanations, following the owner's eZy
+  reference. All twelve languages retain equivalent feature/access copy.
+- Applied the supplied MIT-licensed liquid-glass reference to application panels,
+  navigation and controls, with solid reduced-transparency/forced-color fallbacks.
+  The approved landing composition remains; responsive picture variants reduce
+  screenshot transfer and follow manual or system theme selection.
+- The landing explicitly explains invitation-only hosted access and free
+  GitHub source for self-hosting; the footer links to the actual repository.
+  The owner chose the original rounded landing icon over the heavier
+  intermediate OAuth mark; the kit and provider icons now follow that choice.
+- Public landing markup is shared with a build-time renderer for all twelve
+  locales. The earlier preview-dependent prerender procedure is superseded by
+  a build that needs neither a running server nor account credentials.
+- Earlier cache-first online account rendering is superseded by live identity
+  checks and immediate account-boundary clearing. Offline display snapshots
+  exclude session credentials; sign-out does not silently discard pending work.
+- Offline caches use a complete byte-versioned static inventory and independent
+  shell. Private URLs, invitation/share tokens and API responses are not public
+  cache entries. Old static caches remain while another tab may still need them.
+- Creative/media/cloud code loads at its use site. The earlier broad Radix/UI
+  chunk group and eager MSAL import were removed. Bundle tooling measures actual
+  surface dependencies; final budget and Lighthouse evidence remains required.
+
+### Fixed
+
+- Administrator totals and Gallery filters/actions now retain their final
+  geometry while real responses are pending. Loading, empty and failure states
+  remain labelled; actions stay disabled until valid data exists. Held-response
+  checks across desktop, iPhone, iPad and Android report no shift, overflow or
+  axe violations.
+- Library export and invitation referral controls now reserve their final
+  layout while data loads, eliminating the measured desktop and phone shifts
+  without enabling actions before valid data exists. The language chooser is a
+  labelled nonmodal menu, so opening it no longer hides the page landmarks or
+  headings from assistive technology.
+- Filled preset designers now constrain grid tracks, font specimens and hidden
+  radio inputs at phone and tablet widths. English and Arabic production-build
+  checks keep every visible control inside the viewport and preserve keyboard
+  selection with the matching native radio state.
+- Lighthouse content checks wait a bounded interval for the final asynchronous
+  heading and visible-image decode, while still rejecting wrong screens, broken
+  images and decode timeouts. CI report JSON retains only
+  finite benchmark, layout-path, rectangle and task-source diagnostics; page
+  text, selectors and full URLs are omitted.
+- Selecting an Insert detail token could let the closing menu return focus to
+  its trigger after the designer restored the text caret. Selection now retains
+  the insertion field; Escape dismissal still returns focus to the trigger.
+- Bulk filename validation now exposes its composite token/example feedback
+  through `aria-describedby` and reports the real invalid state. Device tests
+  assert both the blank-pattern failure and valid-pattern negative control.
+- Lighthouse previously closed its internally created tab before the rendered
+  content assertion ran. The runner now supplies and owns the exact measured
+  browser target until route, seeded-state and image decoding checks finish.
+- WebKit's automation-level offline switch disabled service-worker cache delivery
+  even when the complete cache was active. Offline browser journeys now sever a
+  per-test loopback proxy, prove uncached traffic is blocked and cached assets
+  remain readable, then reconnect the same origin. A one-operation transport
+  fault drops only a real successful photo acknowledgement so replay and
+  idempotency remain end-to-end checks. Production offline code is unchanged.
+- GitHub's Ubuntu runner could not start the pinned audit browser under its
+  namespace sandbox. The ephemeral runner now verifies the exact publisher
+  sandbox helper by browser version and SHA-256 before installing that same file
+  root-owned with its required mode. No sandbox is disabled and no developer
+  machine is changed.
+- Completed bulk and video results could expand the iPhone document by six and
+  eight pixels. Their grids now use a zero-minimum flexible column and
+  shrinkable cards. Replay of the captured pages shows no overflow or axe
+  violations, with every control remaining within the viewport.
+- Linux audit startup now retains the pinned Chromium build while allowing a
+  verified existing root-owned sandbox helper. Startup failures are classified
+  before profile cleanup; no operating-system permissions or global browser
+  settings are changed.
+- Folder import could mount after preset loading, after its mount-only setup
+  effect had already run. The directory attribute is now attached when the
+  actual input mounts. A loading-to-ready regression reproduced the missing
+  attribute; normal photo input remains a separate control.
+- The first populated Lighthouse run misclassified browser-local blob images as
+  HTTP requests because they share the page's origin. Protocol checks now apply
+  only to HTTP(S) traffic, while visible in-viewport images must already be
+  complete and decode successfully. Audits use the real sample photograph and
+  a normal thumbnail instead of a one-pixel photo fixture.
+- PDF export assumed `OffscreenCanvas` existed and failed on the WebKit device
+  profile. Rasterization now uses the existing canvas backend, including its DOM
+  fallback. A real pixel test first reproduced the missing-capability failure
+  and then passed without changing PDF page/content assertions.
+- Empty or loading Recent work views constructed a date formatter before any
+  dates were needed. Formatting now initializes on first use and reuses the
+  locale's formatter across view changes; populated and locale-change tests
+  preserve the actual displayed dates.
+- Bulk CSV reports incorrectly marked every result as having no per-photo
+  override. Reports now distinguish customized and ordinary rows; a regression
+  test demonstrated the wrong output before the correction.
+- Visual certification could overwrite distinct designer, crop, menu and
+  administration captures. New and saved designers now have separate names,
+  duplicate capture names fail, and a shared inventory covers every leaf route.
+  Reset-password forms, matching-recipient collaboration invitations, language
+  menus and bilingual share dialogs are included in the pending visual run.
+- Lighthouse reports now use fixed surface names rather than fixture-token URLs.
+  Real local accounts, invitations, presets, photos and view preferences prepare
+  the audited states; rendered-content checks reject a successful HTTP response
+  that displays the wrong page or missing fixture content.
+- The browser gate now uses the supported Workers test harness with native
+  service/asset dispatch and isolated D1/R2. Routing parity and cancellation
+  checks precede adoption. Offline conflict verification now waits for the real
+  service-worker lifecycle before asserting readiness, without increasing its
+  timeout. The PDF test reader also handles pdf-lib's legitimate normalized
+  content streams while retaining original-content and watermark-pixel checks.
+- Delayed operating-system file reads could repopulate the launch buffer after
+  an account change. Launch ownership is now captured before reading; explicit
+  locks and newer launches invalidate older work. Trusted initial admission can
+  preserve a new unowned launch, while mounted editor/bulk views receive later
+  same-route launches. Editor metadata completion also checks account, request
+  and mount lifetime before adopting a file.
+- Automatic browser diagnostics could transmit private data embedded in raw
+  error messages, rejection values or stack URLs. Reports now retain only fixed
+  error classifications, own-asset code coordinates and known redacted route
+  shapes. Direct API submissions are normalized again; full user-agent strings
+  are no longer stored. Negative canary tests cover both transport and storage.
+- A hosted Cloudflare probe disproved the assumption that disabling invocation
+  logs removes sensitive request context from custom logs. Persistent Worker
+  logs and traces are now disabled in the release configuration, with source
+  and generated-output checks; sanitized application diagnostics remain.
+  Query redaction alone does not remove bearer tokens embedded in paths.
+- Better Auth per-request callbacks could consume an old account's response
+  before the SDK's global response hooks ran. The shared account boundary now
+  checks request callbacks, retry callbacks and session updates before adoption.
+  Mismatched custom-API account headers receive a neutral denial rather than an
+  internal authentication exception becoming a server error.
+- Cancelling or unmounting video export while preparing a watermark could start
+  a worker afterward. Cancellation now covers preparation and worker startup;
+  synchronous worker-message failures clear pending work, and disposed clients
+  reject new requests instead of hanging.
+- A rejected Dropbox loader remained cached and prevented recovery after a
+  network failure. Failed loader state and script elements are cleared so a
+  later attempt can retry while concurrent requests still share one load.
+- Retired the previously published Google Picker key, installed its restricted
+  replacement as an encrypted Worker binding, and resolved the GitHub alert as
+  revoked. Account OAuth credentials are also installed as encrypted bindings.
+  Publication checks permit only the exact revoked historical finding and keep
+  current source, index, build and private-value checks strict. Repository-local
+  Gitleaks ignores cannot silently bypass the independent publication audit.
+- A cached null or different active organization could leave onboarding stuck
+  at “Your workspace”. Account/workspace refresh now rejects that stale state.
+- Private media cache fallback could bypass a live authorization denial;
+  in-flight responses and shared-file inboxes could survive account changes.
+  Owner-generation checks, account-bound requests, scoped inboxes and explicit
+  local-store cleanup close those paths.
+- Native IndexedDB Blob persistence failed on the WebKit test host. Versioned
+  byte buffers retain exact content and MIME type, reconstruct Blob values when
+  read, and remain compatible with existing locally stored Blob entries.
+- Button color interpolation briefly failed rendered contrast checks. Foreground
+  and background now change together while shadow transitions remain.
+- Delayed sign-out responses could redirect a new login or erase a newer
+  account's local saves. Global `Clear-Site-Data` was replaced by serialized,
+  account-scoped cleanup that rechecks the outbox transactionally; newly queued
+  work survives for its original owner. HTTP session revocation and no-store
+  responses remain enforced.
+- Cached offline boot now distinguishes a real transport failure from a live
+  authorization refusal even when the browser still reports being online.
+  Structurally valid display snapshots remain available across long outages;
+  online identity validation still precedes private rendering.
+- The dependency-cycle gate found a lazy recent-work notification back edge;
+  notification state now has an independent shared module. Generated temporary
+  repo mirrors are excluded from lint and forbidden by publication checks.
+- Earlier coverage exclusions incorrectly assumed browser code could not be
+  instrumented. Actual V8 counters disproved that; canvas, cloud, PDF, locale
+  and main-thread video modules are now included under unchanged coverage floors.
+- Delayed URL-import bodies and cancelled dialogs could still deliver a file.
+  Owner checks cover body completion and editor adoption; cancelled requests
+  cannot populate a reopened dialog.
+- Private photo/logo/shared-file HTTP responses now use **private, no-store**.
+  Public analytics allowances inherited from the old host were removed.
+- Fractional QR modules created seams that prevented an actual scan. Four-module
+  quiet zones and integer-aligned module edges now pass independent decoding.
+- Unsupported font weights persisted after a family change; selection now
+  chooses a shipped weight atomically. Narrow editor/designer tabs now wrap
+  instead of clipping labels.
+- Dropbox PKCE now validates state, cancels on account change and times out.
+  App-folder saves avoid an unnecessary nested folder. OneDrive creates its
+  destination explicitly and uses conflict-safe uploads instead of silently
+  overwriting same-named files.
+- Manual themes now change semantic surfaces as well as component variants.
+  Unavailable localStorage no longer prevents the system theme from applying.
+- The invalid wildcard SharePoint CSP origin was removed; the valid existing
+  subdomain source covers the required hosts.
+- Pinned sharp **0.35.4** and the legacy esbuild-kit loader's esbuild **0.25.12**
+  to remove the observed audit advisories, preserving release-age checks.
+  Sharp raster tooling and jsQR decoder tests are direct development dependencies.
+  Semgrep's launcher now resolves Windows Python user installs outside PATH.
 
 ## [1.10.0] - 2026-09-08
 
@@ -104,8 +308,8 @@ including one right-to-left script, and follows the user's preference.
 - **Twelve languages**: English, Spanish, German, French, Italian, Brazilian
   Portuguese, Dutch, Japanese, Korean, Simplified Chinese, Russian, and Arabic
   (right-to-left). A language picker in the header and on the signed-out pages
-  applies a choice immediately, remembers it in the browser, and — when signed
-  in — saves it to the account (a new `user.locale` column via a validated
+  applies a choice immediately, remembers it in the browser, and â€” when signed
+  in â€” saves it to the account (a new `user.locale` column via a validated
   `PATCH /api/me`) so it follows the member across devices. Before a choice is
   made the app picks from the saved preference, then the browser's languages,
   then English; `<html lang>`/`dir` follow the locale.
@@ -116,14 +320,14 @@ including one right-to-left script, and follows the user's preference.
   are code-split and loaded on demand.
 - Right-to-left support: the client layout mirrors under `dir="rtl"` (Arabic). A
   one-off codemod (`scripts/logical-utilities.mjs`) rewrote physical Tailwind
-  utilities to logical ones across the client (`ml`/`mr`→`ms`/`me`,
-  `pl`/`pr`→`ps`/`pe`, `left`/`right`→`start`/`end`, `text-left`/`text-right`→
-  `text-start`/`text-end`, `border-l`/`border-r`→`border-s`/`border-e`); a new
+  utilities to logical ones across the client (`ml`/`mr`â†’`ms`/`me`,
+  `pl`/`pr`â†’`ps`/`pe`, `left`/`right`â†’`start`/`end`, `text-left`/`text-right`â†’
+  `text-start`/`text-end`, `border-l`/`border-r`â†’`border-s`/`border-e`); a new
   ESLint rule (`watermark-rtl/no-physical-utilities`) keeps them from creeping
   back; and direction-implying icons (undo/redo, the folder and breadcrumb
   chevrons) flip with `rtl:-scale-x-100`. The editor overlays and the centred
   modals keep physical geometry on purpose (marked `physical: geometry`; see
-  PLAN §9), since pointer/keyboard coordinates and `translate` are not mirrored
+  PLAN Â§9), since pointer/keyboard coordinates and `translate` are not mirrored
   by `dir`.
 
 ### Gates
@@ -131,13 +335,13 @@ including one right-to-left script, and follows the user's preference.
 - New: the `no-literal-string` ESLint gate (a hard-coded string in a component
   fails lint), a catalogue completeness test (every locale has English's keys,
   no empty values, placeholder and plural parity), and `i18n:check` (no dead or
-  missing keys) — all part of `npm run quality`.
+  missing keys) â€” all part of `npm run quality`.
 
 ### Notes
 
 - Date, number and file-size formatting still follow the browser default rather
-  than the active locale, and error-message and email text stay English — a
-  localisation follow-up (PLAN §4).
+  than the active locale, and error-message and email text stay English â€” a
+  localisation follow-up (PLAN Â§4).
 
 ## [1.9.0] - 2026-09-07
 
@@ -157,7 +361,7 @@ and onto every page of a PDF, both in the browser, from two new tools.
   the gallery does not store videos. Browsers without a WebCodecs `VideoEncoder`
   see an unsupported message.
 - **Documents** tool (`/app/documents`): watermark every page of up to 50 PDFs
-  (≤ 50 MB, ≤ 200 pages each) with `pdf-lib`. The layers are rasterised once per
+  (â‰¤ 50 MB, â‰¤ 200 pages each) with `pdf-lib`. The layers are rasterised once per
   distinct page size at 150 dpi and drawn on every page; smart placement falls
   back to a bottom-right anchor on the blank page. Output is
   `<name>-watermarked.pdf` (a ZIP for several), the Info dictionary kept with
@@ -189,7 +393,7 @@ user (not just the owner). This completes "read and write to cloud storage".
 ### Changed
 
 - The Google OAuth app is **published to production**, so any Google account can
-  use Drive import and save (no verification — `drive.file` is non-sensitive).
+  use Drive import and save (no verification â€” `drive.file` is non-sensitive).
 - The OneDrive app was **re-registered on the correct Microsoft account** and now
   requests `Files.ReadWrite` (read for the picker, write for save).
 - Dropbox gained `files.content.write` and a PKCE redirect for the save flow.
@@ -199,23 +403,23 @@ user (not just the owner). This completes "read and write to cloud storage".
 ### Fixed
 
 - The `adjustPixels` 12-megapixel timing guard flaked on a saturated CI runner
-  (6220 ms against a 6000 ms ceiling; real cost is ~250–450 ms). Its headroom is
+  (6220 ms against a 6000 ms ceiling; real cost is ~250â€“450 ms). Its headroom is
   raised to ~48x the real cost so a genuine large regression still trips it
-  without flaking under gate contention. See PLAN.md §9.
+  without flaking under gate contention. See PLAN.md Â§9.
 - The accept-invitation end-to-end navigations wait for the navigation to commit
   rather than the full `load` event, which WebKit (iPhone/iPad) aborts while the
-  router resolves the route on the client — Playwright reported that abort as
+  router resolves the route on the client â€” Playwright reported that abort as
   "Frame load interrupted". The rendered-page assertions are unchanged. See
-  PLAN.md §9.
+  PLAN.md Â§9.
 - The D1 rate-limit test no longer pins the throttle to the exact `(max + 1)`th
   attempt. Cloudflare's Rate Limiting binding is approximate, so the test asserts
   the 429 engages within a small margin while still proving every pre-throttle
-  attempt is a 401 (never a success). See PLAN.md §9.
+  attempt is a 401 (never a success). See PLAN.md Â§9.
 
 ## [1.8.1] - 2026-09-07
 
 M16 (cloud pickers): import photos straight from Google Drive, Dropbox, and
-OneDrive — the follow-up the 1.8.0 notes held for vendor app registration. The
+OneDrive â€” the follow-up the 1.8.0 notes held for vendor app registration. The
 three OAuth applications are now registered in the owner's accounts, and each
 button appears only where its keys are configured.
 
@@ -242,7 +446,7 @@ button appears only where its keys are configured.
 - Content-Security-Policy gains the picker vendor origins (Google, Dropbox,
   Microsoft) for their SDKs and downloads, and `Cross-Origin-Opener-Policy` is
   relaxed to `same-origin-allow-popups` so the pickers' sign-in popups can hand
-  their result back. See `public/_headers` and PLAN.md §9.
+  their result back. See `public/_headers` and PLAN.md Â§9.
 
 ### Notes
 
@@ -259,14 +463,14 @@ need vendor app registrations in the owner's accounts.
 ### Added
 
 - **Import from a URL**: paste a link in the editor or bulk tool and the Worker
-  fetches the image on your behalf, under an SSRF policy — https only, no
+  fetches the image on your behalf, under an SSRF policy â€” https only, no
   credentials in the link, no IP-literal or internal hosts, every redirect hop
   re-checked, a size cap enforced by both the declared length and the streamed
   bytes, the type sniffed from the bytes, a 15 s timeout and a dedicated
   per-address rate limit. Gated by the upload permission and audited by host.
 - **Camera capture** on phones: a "Take photo" button (shown only on
   coarse-pointer devices) opens the OS camera through the file input's
-  `capture` attribute — no `getUserMedia`, no camera permission prompt.
+  `capture` attribute â€” no `getUserMedia`, no camera permission prompt.
 - **Web Share Target** (Android): share photos from any app into Watermark Pro;
   a single-purpose service worker (scoped to `/share-target`) stashes them and
   the bulk tool picks them up.
@@ -301,7 +505,7 @@ M15: preset files, logo tools and an invisible mark.
   one-pixel feather) and trim transparent margins, then uploads a clean PNG.
 - **Invisible mark**: the editor and the bulk tool can hide a short message in
   the pixels of a PNG export (LSB steganography along a seeded walk, protected
-  by a CRC). It is PNG-only — a lossy re-encode is refused — and defaults to the
+  by a CRC). It is PNG-only â€” a lossy re-encode is refused â€” and defaults to the
   workspace name. A new **/app/verify** page and a gallery "Check a photo"
   entry read the message back (or report that a photo carries no mark).
 
@@ -310,7 +514,7 @@ M15: preset files, logo tools and an invisible mark.
 - The steganography, background-removal, preset-file and read-back logic are
   pure modules unit-tested in jsdom; the canvas decode/encode wrappers
   (`read-invisible.ts`, the logo-prepare panel) are browser-only and covered by
-  their callers, excluded from coverage like `engine/render.ts` (PLAN.md §9).
+  their callers, excluded from coverage like `engine/render.ts` (PLAN.md Â§9).
 - New red drills: an invisible mark written into a lossy JPEG, a corrupted
   payload read as valid, a preset spec imported without validation, and a
   background removal that ignores its tolerance.
@@ -347,7 +551,7 @@ M14 (completion): the two carried-forward bulk features now ship.
 
 ## [1.6.0] - 2026-09-07
 
-M14: bulk power — folders, output-name patterns, pause/resume, and a batch report.
+M14: bulk power â€” folders, output-name patterns, pause/resume, and a batch report.
 
 ### Added
 
@@ -361,8 +565,8 @@ M14: bulk power — folders, output-name patterns, pause/resume, and a batch rep
   an empty result is refused. Duplicate names still get ` (2)` in the ZIP.
 - **Pause and resume** a running batch: pausing lets the jobs already running
   finish and stops starting new ones.
-- A **batch report** (CSV, "Download report") with one row per job — source,
-  path, output, status, size, duration, error and presets — with proper CSV
+- A **batch report** (CSV, "Download report") with one row per job â€” source,
+  path, output, status, size, duration, error and presets â€” with proper CSV
   escaping.
 - The photo list is capped at 60 rows with a "Show all" control, so a
   500-photo batch stays responsive.
@@ -385,7 +589,7 @@ M14: bulk power — folders, output-name patterns, pause/resume, and a batch rep
 
 ## [1.5.0] - 2026-09-07
 
-M13: photo metadata — EXIF tokens, a keep/strip export policy, and preserved DPI.
+M13: photo metadata â€” EXIF tokens, a keep/strip export policy, and preserved DPI.
 
 ### Added
 
@@ -395,16 +599,16 @@ M13: photo metadata — EXIF tokens, a keep/strip export policy, and preserved D
   `{date}` and `{time}` now prefer the capture date when the photo has one.
   An "Insert detail" menu in the designer inserts a token at the caret. When a
   token has no value it is removed and any separator it left behind is tidied
-  (`{camera} · {lens}` with no lens becomes `Canon EOS R6`).
+  (`{camera} Â· {lens}` with no lens becomes `Canon EOS R6`).
 - An export **Metadata** policy in the editor's Export tab and the bulk output
-  settings: **Strip** (default — no camera data, no location), **Keep except
+  settings: **Strip** (default â€” no camera data, no location), **Keep except
   location** (camera, lens and capture time stay; GPS removed) and **Keep
   everything**. WebP is always stripped (its keep modes are disabled with a
   note). In both keep modes the Orientation tag is reset to 1 (the pixels are
   already upright) and the pixel-dimension tags are rewritten to the output
   size; GPS is emptied for keep-except-location.
 - Print density (DPI) is preserved on JPEG (JFIF APP0) and PNG (`pHYs`)
-  regardless of policy — it is not personal.
+  regardless of policy â€” it is not personal.
 - Metadata is read in the browser with `exifr` (never uploaded); the raw
   Exif/XMP/density bytes are written back by our own byte code
   (`src/client/engine/metadata/`). Untrusted input never throws: a fuzz test
@@ -426,13 +630,13 @@ M13: photo metadata — EXIF tokens, a keep/strip export policy, and preserved D
 
 ## [1.4.0] - 2026-09-07
 
-M12: richer marks — text effects, shapes, frames and random placement.
+M12: richer marks â€” text effects, shapes, frames and random placement.
 
 ### Added
 
-- Text marks gain a Text tab with **letter spacing** (−10% to +100% of the
-  font size), a **curve** slider (−100% to +100%) that bends the line into an
-  arc, and four **paint effects** — Solid, Outline, Emboss and Engrave.
+- Text marks gain a Text tab with **letter spacing** (âˆ’10% to +100% of the
+  font size), a **curve** slider (âˆ’100% to +100%) that bends the line into an
+  arc, and four **paint effects** â€” Solid, Outline, Emboss and Engrave.
   Spacing is measured per grapheme cluster (`Intl.Segmenter`), so emoji and
   combining marks space correctly.
 - A new **Shape** mark kind: rectangle, rounded rectangle, ellipse or line,
@@ -459,7 +663,7 @@ M12: richer marks — text effects, shapes, frames and random placement.
 
 ### Notes
 
-- Per-milestone certification for M12–M18 runs `npm run quality`, semgrep and
+- Per-milestone certification for M12â€“M18 runs `npm run quality`, semgrep and
   the red-drill suite; e2e, Lighthouse and screenshots are deferred to M19.
 
 ## [1.3.0] - 2026-09-07
@@ -469,12 +673,12 @@ M11: photo adjustments and orientation.
 ### Added
 
 - Orientation in the editor's Crop tab: rotate left and right in quarter
-  turns, flip horizontally and vertically, and a straighten slider (−45° to
-  +45°) that auto-crops the tilt to the largest rectangle of the original
+  turns, flip horizontally and vertically, and a straighten slider (âˆ’45Â° to
+  +45Â°) that auto-crops the tilt to the largest rectangle of the original
   aspect, so an export never has empty corners.
 - An Adjust tab with brightness, contrast, saturation, warmth, sepia and
-  vignette sliders (each with a reset) and eight one-tap filters — Original,
-  Mono, Sepia, Vivid, Warm, Cool, Fade and Noir — previewed as thumbnails of
+  vignette sliders (each with a reset) and eight one-tap filters â€” Original,
+  Mono, Sepia, Vivid, Warm, Cool, Fade and Noir â€” previewed as thumbnails of
   the current photo. A mark's auto contrast is computed from the adjusted
   pixels, so ink stays legible after a darkening filter.
 - The bulk tool gains a "Photo adjustments" section: one rotation, flip and
@@ -489,7 +693,7 @@ M11: photo adjustments and orientation.
 
 ### Documentation
 
-- Specifications for milestones M11–M19 under `docs/plans/` (photo
+- Specifications for milestones M11â€“M19 under `docs/plans/` (photo
   adjustments, mark engine extensions, metadata, bulk power, preset files
   and logo tools, import surfaces, video and PDF, localisation,
   performance), with an agent runbook, and their entries and open questions
@@ -620,11 +824,11 @@ M9: mobile and Safari certification, red drill.
   viewers updating presets, JSON requests from a foreign origin, and the
   photo count quota had no failing test; all three now have one.
 - `scripts/lighthouse.mjs <milestone> mobile`: Lighthouse's phone emulation
-  with its own budgets (PLAN.md §5.5), audited through a brotli proxy
+  with its own budgets (PLAN.md Â§5.5), audited through a brotli proxy
   (`scripts/lib/compressing-proxy.mjs`) because the preview serves
   uncompressed bytes and production does not; median of three runs per page.
 - `scripts/screenshots.mjs <milestone> [desktop|phone|tablet|all]`: the
-  visual record at 1440×900, on an iPhone 14 and on an iPad Mini (WebKit).
+  visual record at 1440Ã—900, on an iPhone 14 and on an iPad Mini (WebKit).
 - Dashboard tool cards; a sample-scene placeholder so the editor and
   designer paint the photo with the page instead of a spinner; a
   metric-matched fallback face for Inter so the font swap moves nothing.
@@ -684,7 +888,7 @@ M9: mobile and Safari certification, red drill.
 - CSP allows Cloudflare's Web Analytics beacon (`static.cloudflareinsights.com`,
   `cloudflareinsights.com`), which the `blowmoney.net` zone injects into every
   HTML response and the policy had been blocking with a console error on
-  every page. Documented as a zone-level choice in PLAN.md §9.
+  every page. Documented as a zone-level choice in PLAN.md Â§9.
 
 ## [1.0.0] - 2026-09-06
 
@@ -753,7 +957,7 @@ Milestone M7: sharing.
   under `/api/share/:token` that carry no session, are rate limited per
   address, serve only the photos in the link, and refuse expired, revoked
   and tampered tokens with one neutral 404.
-- Share dialog with Copy link and Share… (the platform share sheet through
+- Share dialog with Copy link and Shareâ€¦ (the platform share sheet through
   the Web Share API, clipboard fallback); `/app/shares` to review, copy,
   share and revoke links; the public `/share/:token` album page with a
   lightbox, downloads and a "Share this link" button.
@@ -893,7 +1097,6 @@ Milestone M2: watermark engine.
   tests, included in coverage; `npm run test:browser`.
 - `docs/benchmarks.md` with the M2 throughput measurement.
 
-
 ### Added
 
 - `production` wrangler environment (`APP_ENV=production`,
@@ -961,7 +1164,7 @@ the design system. No watermarking yet; that begins in M2.
 - Node test harness running the real Hono app and real Better Auth on the
   in-memory adapter; Workers test project applying D1 migrations per file and
   exercising real D1 and rate-limit bindings; Playwright onboarding journey
-  (sign-up → verify → organization → invite → accept → viewer denied) with axe
+  (sign-up â†’ verify â†’ organization â†’ invite â†’ accept â†’ viewer denied) with axe
   on every page; Lighthouse and screenshot audit scripts.
 - npm scripts `db:generate`, `db:migrate:local`, `db:migrate:remote`,
   `audit:lighthouse`, `audit:screenshots`; `deploy` now applies remote

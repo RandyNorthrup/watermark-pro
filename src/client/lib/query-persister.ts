@@ -1,85 +1,106 @@
-/**
- * Persists the shell's session and organization queries to localStorage (M19,
- * PLAN §2), so a return visit renders the app frame from the last visit's data
- * immediately while the real requests revalidate, instead of waiting on the
- * session → organization fetch chain. The data is small and non-secret (ids,
- * names, roles) and is cleared on sign-out by the Worker's Clear-Site-Data
- * header, so a shared device keeps nothing.
- */
-import { dehydrate, type DehydratedState, hydrate, type QueryClient } from '@tanstack/react-query'
+/** Validated display snapshots accelerate repeat visits; session credentials are never persisted. */
+import type { QueryClient } from '@tanstack/react-query'
 
-import { MILLISECONDS_PER_SECOND, SECONDS_PER_DAY } from '../../shared/constants'
+import { setOfflineUser } from './offline-context'
+import { clearPersistedQueries, SHELL_STORAGE_KEY } from './persisted-shell-storage'
+import { MILLISECONDS_PER_SECOND } from '../../shared/constants'
+import { shellCacheSchema } from '../../shared/shell-cache'
 
-const STORAGE_KEY = 'watermark-pro:query-cache'
-/** Persisted data older than this is discarded on load. */
-const MAX_AGE_MS = SECONDS_PER_DAY * MILLISECONDS_PER_SECOND
-/** Coalesce bursts of cache updates into one write. */
 const PERSIST_DEBOUNCE_MS = MILLISECONDS_PER_SECOND
+const SESSION_KEY = ['session'] as const
+const ORGANIZATIONS_KEY = ['organizations'] as const
+const ORGANIZATION_KEY = ['organization', 'active'] as const
+const ROLE_KEY = ['organization', 'active', 'role'] as const
+const PERSISTED_KEYS = [SESSION_KEY, ORGANIZATIONS_KEY, ORGANIZATION_KEY, ROLE_KEY]
 
-/** Query-key prefixes that carry shell state worth persisting (not per-org data). */
-const PERSISTED_PREFIXES: readonly (readonly string[])[] = [
-  ['session'],
-  ['organizations'],
-  ['organization', 'active'],
-]
-
-/** Whether a query key is one of the shell queries above (prefix match). */
+/** Only four defined display queries may be persisted; arbitrary suffixes are rejected. */
 export function isPersistedQuery(queryKey: readonly unknown[]): boolean {
-  return PERSISTED_PREFIXES.some((prefix) =>
-    prefix.every((part, index) => queryKey[index] === part),
+  return PERSISTED_KEYS.some(
+    (key) => key.length === queryKey.length && key.every((part, index) => queryKey[index] === part),
   )
 }
 
-interface PersistedCache {
-  at: number
-  state: DehydratedState
-}
-
-/** Hydrates the query cache from the last visit when the snapshot is fresh. */
+/** Validated display data remains available during sustained outages; live identity gates all online admission. */
 export function loadPersistedQueries(queryClient: QueryClient, storage: Storage): void {
   try {
-    const raw = storage.getItem(STORAGE_KEY)
+    const raw = storage.getItem(SHELL_STORAGE_KEY)
     if (raw === null) {
       return
     }
-    const parsed = JSON.parse(raw) as PersistedCache
-    if (Date.now() - parsed.at > MAX_AGE_MS) {
-      storage.removeItem(STORAGE_KEY)
+    const parsed = shellCacheSchema.safeParse(JSON.parse(raw))
+    if (!parsed.success || parsed.data.at > Date.now()) {
+      clearPersistedQueries(storage)
       return
     }
-    hydrate(queryClient, parsed.state)
+    const saved = parsed.data
+    queryClient.setQueryData(SESSION_KEY, saved.session, { updatedAt: 0 })
+    setOfflineUser(saved.session.user.id)
+    if (saved.organizations !== undefined) {
+      queryClient.setQueryData(ORGANIZATIONS_KEY, saved.organizations, { updatedAt: 0 })
+    }
+    if (saved.organization !== undefined) {
+      queryClient.setQueryData(ORGANIZATION_KEY, saved.organization, { updatedAt: 0 })
+    }
+    if (saved.role !== undefined) {
+      queryClient.setQueryData(ROLE_KEY, saved.role, { updatedAt: 0 })
+    }
   } catch {
-    // Corrupt, expired-shaped or unavailable storage; start with an empty cache.
+    clearPersistedQueries(storage)
   }
 }
 
-/** Writes the current shell queries to storage. */
+/** The allowlist removes tokens, addresses, user-agents and unknown fields before serialization. */
 export function persistQueries(queryClient: QueryClient, storage: Storage): void {
   try {
-    const state = dehydrate(queryClient, {
-      shouldDehydrateQuery: (query) =>
-        query.state.status === 'success' && isPersistedQuery(query.queryKey),
+    const parsed = shellCacheSchema.safeParse({
+      version: 2,
+      at: Date.now(),
+      session: queryClient.getQueryData(SESSION_KEY),
+      organizations: queryClient.getQueryData(ORGANIZATIONS_KEY),
+      organization: queryClient.getQueryData(ORGANIZATION_KEY),
+      role: queryClient.getQueryData(ROLE_KEY),
     })
-    const snapshot: PersistedCache = { at: Date.now(), state }
-    storage.setItem(STORAGE_KEY, JSON.stringify(snapshot))
+    if (!parsed.success) {
+      clearPersistedQueries(storage)
+      return
+    }
+    storage.setItem(SHELL_STORAGE_KEY, JSON.stringify(parsed.data))
   } catch {
-    // Private mode or quota; persistence is a convenience, not a requirement.
+    /* Shell persistence is optional; durable saves report storage failures separately. */
   }
 }
 
-/** Loads the last visit's shell queries, then persists updates (debounced). */
+/** Restore once and persist updates. Removing the session clears the snapshot synchronously. */
 export function installQueryPersister(
   queryClient: QueryClient,
-  storage: Storage = localStorage,
-): void {
-  loadPersistedQueries(queryClient, storage)
+  storage?: Storage,
+): (() => void) | undefined {
+  let target: Storage
+  try {
+    target = storage ?? localStorage
+  } catch {
+    return
+  }
+  loadPersistedQueries(queryClient, target)
   let timer: ReturnType<typeof setTimeout> | null = null
-  queryClient.getQueryCache().subscribe(() => {
+  const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+    const key: unknown = event.query.queryKey
+    if (!Array.isArray(key) || !isPersistedQuery(key)) {
+      return
+    }
     if (timer !== null) {
       clearTimeout(timer)
     }
+    if (queryClient.getQueryData(SESSION_KEY) == null) {
+      clearPersistedQueries(target)
+      return
+    }
     timer = setTimeout(() => {
-      persistQueries(queryClient, storage)
+      persistQueries(queryClient, target)
     }, PERSIST_DEBOUNCE_MS)
   })
+  return () => {
+    if (timer !== null) clearTimeout(timer)
+    unsubscribe()
+  }
 }

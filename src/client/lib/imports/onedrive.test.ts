@@ -1,15 +1,16 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
+import { setOfflineUser } from '../offline-context'
 import {
   downloadOneDriveImage,
   listOneDriveImages,
   mapGraphChildren,
   oneDriveChildrenUrl,
-  oneDriveUploadUrl,
-  uploadOneDriveImage,
   type OneDriveImage,
 } from './onedrive'
-import { CLOUD_SAVE_FOLDER, MICROSOFT_GRAPH_ROOT } from '../../../shared/constants'
+import { MICROSOFT_GRAPH_ROOT } from '../../../shared/constants'
+
+beforeEach(() => setOfflineUser('user-1'))
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -23,7 +24,7 @@ const graphChildren = {
       id: 'img-1',
       name: 'beach.jpg',
       file: { mimeType: 'image/jpeg' },
-      '@microsoft.graph.downloadUrl': 'https://dl.example.com/beach.jpg',
+      '@microsoft.graph.downloadUrl': 'https://public.dm.files.1drv.com/beach.jpg',
     },
     { id: 'doc-1', name: 'notes.pdf', file: { mimeType: 'application/pdf' } },
     {
@@ -56,7 +57,7 @@ describe('mapGraphChildren', () => {
         id: 'img-1',
         name: 'beach.jpg',
         mimeType: 'image/jpeg',
-        downloadUrl: 'https://dl.example.com/beach.jpg',
+        downloadUrl: 'https://public.dm.files.1drv.com/beach.jpg',
       },
     ])
   })
@@ -76,6 +77,23 @@ describe('mapGraphChildren', () => {
 })
 
 describe('listOneDriveImages', () => {
+  it('follows same-folder pages and never follows an attacker next link with the bearer token', async () => {
+    const next = `${MICROSOFT_GRAPH_ROOT}/me/drive/root/children?$skiptoken=next`
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(Response.json({ ...graphChildren, '@odata.nextLink': next }))
+      .mockResolvedValueOnce(
+        Response.json({ value: [{ id: 'last', name: 'Last folder', folder: {} }] }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ value: [], '@odata.nextLink': 'https://attacker.example/collect' }),
+      )
+    vi.stubGlobal('fetch', fetcher)
+    expect(await listOneDriveImages('token')).toHaveLength(3)
+    expect(fetcher.mock.calls[1]?.[0]).toBe(next)
+    await expect(listOneDriveImages('token')).rejects.toThrow('unexpected URL')
+    expect(fetcher).toHaveBeenCalledTimes(3)
+  })
   it('sends the bearer token and maps the response', async () => {
     const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json(graphChildren)))
     vi.stubGlobal('fetch', fetchMock)
@@ -98,53 +116,13 @@ describe('listOneDriveImages', () => {
   })
 })
 
-describe('oneDriveUploadUrl', () => {
-  it('addresses the save folder at the root and percent-encodes both segments', () => {
-    expect(oneDriveUploadUrl('a b&c.png')).toBe(
-      `${MICROSOFT_GRAPH_ROOT}/me/drive/root:/${encodeURIComponent(CLOUD_SAVE_FOLDER)}/a%20b%26c.png:/content`,
-    )
-  })
-})
-
-describe('uploadOneDriveImage', () => {
-  it('PUTs the blob with the bearer token to the upload URL', async () => {
-    const fetchMock = vi.fn<typeof fetch>(() =>
-      Promise.resolve(new Response(null, { status: 201 })),
-    )
-    vi.stubGlobal('fetch', fetchMock)
-
-    await uploadOneDriveImage('token-xyz', {
-      name: 'mark.png',
-      blob: new Blob([new Uint8Array([1])], { type: 'image/png' }),
-    })
-
-    const call = fetchMock.mock.calls[0]
-    expect(call?.[0]).toBe(oneDriveUploadUrl('mark.png'))
-    expect(call?.[1]).toMatchObject({
-      method: 'PUT',
-      headers: { Authorization: 'Bearer token-xyz', 'Content-Type': 'image/png' },
-    })
-  })
-
-  it('throws when the upload responds with a non-OK status', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() => Promise.resolve(new Response(null, { status: 507 }))),
-    )
-
-    await expect(
-      uploadOneDriveImage('token-xyz', { name: 'mark.png', blob: new Blob([]) }),
-    ).rejects.toThrow(/mark\.png/)
-  })
-})
-
 describe('downloadOneDriveImage', () => {
   const image: OneDriveImage = {
     kind: 'image',
     id: 'img-1',
     name: 'beach.jpg',
     mimeType: 'image/jpeg',
-    downloadUrl: 'https://dl.example.com/beach.jpg',
+    downloadUrl: 'https://public.dm.files.1drv.com/beach.jpg',
   }
 
   it('fetches the download URL and returns a typed File', async () => {
@@ -160,7 +138,7 @@ describe('downloadOneDriveImage', () => {
     expect(file).toBeInstanceOf(File)
     expect(file.name).toBe('beach.jpg')
     expect(file.type).toBe('image/jpeg')
-    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://dl.example.com/beach.jpg')
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://public.dm.files.1drv.com/beach.jpg')
   })
 
   it('throws when the download URL responds with a non-OK status', async () => {

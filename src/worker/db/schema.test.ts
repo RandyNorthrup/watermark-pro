@@ -13,11 +13,14 @@ import * as schema from './schema'
 import { buildAuthOptions } from '../auth/options'
 import { unlimitedRateLimitStorage } from '../auth/rate-limit'
 import { createConsoleEmailSender } from '../email/console'
+import { createMemoryAccountStore } from '../test-support/memory-account-store'
 import { createMemoryAuditStore } from '../test-support/memory-audit-store'
 import { TEST_SECRET } from '../test-support/test-app'
 
 const options = buildAuthOptions({
   database: memoryAdapter({}),
+  accounts: createMemoryAccountStore({ user: [], organization: [], member: [] }),
+  hasWorkspaceContent: () => Promise.resolve(false),
   secret: TEST_SECRET,
   appUrl: 'http://localhost:5273',
   email: createConsoleEmailSender(),

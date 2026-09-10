@@ -1,0 +1,54 @@
+{
+  "mode": "diagnostic",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 1,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 943.457,
+        "lcp": 1393.4569999999999,
+        "cls": 0,
+        "tbt": 0
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 3048,
+        "layoutShifts": [],
+        "longTasks": [
+          {
+            "source": "document",
+            "duration": 56,
+            "startTime": 830.457
+          }
+        ],
+        "bootup": [
+          {
+            "source": "document",
+            "duration": 204.98799999999997
+          },
+          {
+            "source": "unattributable",
+            "duration": 83.14400000000018
+          }
+        ]
+      }
+    }
+  ],
+  "scores": {
+    "performance": 1,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 943.457,
+    "lcp": 1393.4569999999999,
+    "cls": 0,
+    "tbt": 0
+  }
+}

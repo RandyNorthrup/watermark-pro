@@ -7,6 +7,7 @@
  * network to test.
  */
 import { apiRequest } from '../api'
+import { captureOfflineOwner } from '../offline-context'
 
 const JSON_HEADERS = { 'content-type': 'application/json' }
 const CONTENT_DISPOSITION_HEADER = 'content-disposition'
@@ -85,12 +86,14 @@ export function deriveFileName(input: {
  * `apiRequest`) carrying the mapped, user-facing message.
  */
 export async function importFromUrl(organizationId: string, url: string): Promise<File> {
+  const owner = captureOfflineOwner()
   const response = await apiRequest(`/api/orgs/${organizationId}/imports/url`, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: JSON.stringify({ url }),
   })
   const blob = await response.blob()
+  owner.assertCurrent()
   const fileName = deriveFileName({
     contentDisposition: response.headers.get(CONTENT_DISPOSITION_HEADER),
     url,

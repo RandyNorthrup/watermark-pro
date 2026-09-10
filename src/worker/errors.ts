@@ -1,7 +1,7 @@
 import { HTTPException } from 'hono/http-exception'
 
 import type { ApiError } from '../shared/api'
-import { API_ERROR_CODE, HTTP_STATUS } from '../shared/constants'
+import { API_ERROR_CODE, HTTP_STATUS, UPLOAD_RETRY_AFTER_SECONDS } from '../shared/constants'
 
 function jsonError(status: number, error: ApiError['error'], details?: unknown): Response {
   const body: ApiError = details === undefined ? { error } : { error, details }
@@ -10,6 +10,16 @@ function jsonError(status: number, error: ApiError['error'], details?: unknown):
 
 /** Typed HTTP errors so handlers never build ad-hoc error responses. */
 export const apiErrors = {
+  retryLater: () =>
+    new HTTPException(HTTP_STATUS.serviceUnavailable, {
+      res: Response.json(
+        { error: API_ERROR_CODE.internalError },
+        {
+          status: HTTP_STATUS.serviceUnavailable,
+          headers: { 'retry-after': String(UPLOAD_RETRY_AFTER_SECONDS) },
+        },
+      ),
+    }),
   unauthenticated: () =>
     new HTTPException(HTTP_STATUS.unauthorized, {
       res: jsonError(HTTP_STATUS.unauthorized, API_ERROR_CODE.unauthenticated),

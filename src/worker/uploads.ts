@@ -31,6 +31,16 @@ const BRAND_OFFSET = 8
 const BRAND_LENGTH = 4
 /** Longest prefix any signature needs. */
 export const SNIFF_LENGTH = 12
+const HEX_RADIX = 16
+
+/** RFC 5987 encoding preserves Unicode names without letting header delimiters enter a response. */
+export function imageContentDisposition(fileName: string): string {
+  const encoded = encodeURIComponent(fileName).replaceAll(
+    /[!'()*]/g,
+    (character) => `%${(character.codePointAt(0) ?? 0).toString(HEX_RADIX).toUpperCase()}`,
+  )
+  return `inline; filename*=UTF-8''${encoded}`
+}
 
 function hasSignature(bytes: Uint8Array, expected: readonly number[], offset = 0): boolean {
   return expected.every((byte, index) => bytes[offset + index] === byte)

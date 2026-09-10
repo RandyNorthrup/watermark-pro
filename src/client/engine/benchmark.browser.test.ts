@@ -17,7 +17,7 @@ const MILLISECONDS = 1000
 
 const spec: WatermarkSpec = {
   kind: 'text',
-  text: '© Watermark Pro benchmark',
+  text: '© Lumafoil benchmark',
   fontFamily: 'sans-serif',
   fontWeight: 600,
   letterSpacing: 0,

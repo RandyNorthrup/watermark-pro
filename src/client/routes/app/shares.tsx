@@ -13,7 +13,7 @@ import { Card } from '../../components/ui/card'
 import { Spinner } from '../../components/ui/spinner'
 import { describeError } from '../../lib/errors'
 import { dateTimeFormatter } from '../../lib/format-date'
-import { activeMemberRoleQueryOptions } from '../../lib/queries'
+import { readActiveMemberRole } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
 import {
   copyLink,
@@ -26,7 +26,7 @@ import {
 const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/shares')({
-  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: SharesPage,
 })
 

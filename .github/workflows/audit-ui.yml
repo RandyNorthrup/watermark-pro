@@ -1,0 +1,109 @@
+name: UI release audits
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  matrix:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'release-audit')
+    runs-on: ubuntu-latest
+    outputs:
+      entries: ${{ steps.matrix.outputs.entries }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - id: matrix
+        name: Derive the complete audit matrix from the shared page inventory
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
+          import { AUDIT_SURFACES } from './scripts/lib/audit-surfaces.mjs'
+          const include = ['desktop', 'mobile'].flatMap(factor => AUDIT_SURFACES.map(surface => ({
+            kind: 'lighthouse', label: `${factor}-${surface.id}`, factor, surface: surface.id, profile: '',
+          })))
+          for (const profile of ['desktop', 'phone', 'tablet', 'android'])
+            include.push({ kind: 'screenshots', label: profile, profile, factor: '', surface: '' })
+          process.stdout.write(`entries=${JSON.stringify({ include })}\n`)
+          NODE
+
+  audit:
+    name: Audit (${{ matrix.label }})
+    needs: matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.matrix.outputs.entries) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node-gitleaks
+      - name: Run the complete assigned audit on its own machine
+        shell: bash
+        env:
+          AUDIT_KIND: ${{ matrix.kind }}
+          AUDIT_FACTOR: ${{ matrix.factor }}
+          AUDIT_SURFACE: ${{ matrix.surface }}
+          AUDIT_PROFILE: ${{ matrix.profile }}
+        run: |
+          set -euo pipefail
+          mkdir -p temp
+          node scripts/gate-server.mjs > temp/ui-gate.log 2>&1 &
+          gate_pid=$!
+          trap 'kill "$gate_pid" 2>/dev/null || true; wait "$gate_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for attempt in {1..120}; do
+            kill -0 "$gate_pid" || { printf 'Isolated UI gate exited before readiness.\n'; exit 1; }
+            if curl --fail --silent --max-time 2 http://localhost:5273/api/health > /dev/null; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+          "$ready" || { printf 'Isolated UI gate did not become ready.\n'; exit 1; }
+          case "$AUDIT_KIND" in
+            lighthouse)
+              LIGHTHOUSE_PAGES="$AUDIT_SURFACE" node scripts/lighthouse.mjs m19-ci "$AUDIT_FACTOR"
+              ;;
+            screenshots)
+              node scripts/screenshots.mjs m19-ci "$AUDIT_PROFILE"
+              ;;
+            *) printf 'Unknown audit kind.\n'; exit 1 ;;
+          esac
+      - name: Retain measured results and visual proof
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ui-${{ matrix.label }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            docs/lighthouse/m19-ci/**/*.json
+            docs/lighthouse/m19-ci/**/summary.md
+            docs/screenshots/m19-ci/**/*.png
+            docs/screenshots/m19-ci/inventory.json
+
+  complete:
+    name: UI release audits complete
+    if: always() && (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'release-audit'))
+    needs: [matrix, audit]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every audit job to succeed
+        env:
+          MATRIX_RESULT: ${{ needs.matrix.result }}
+          AUDIT_RESULT: ${{ needs.audit.result }}
+        run: test "$MATRIX_RESULT" = success && test "$AUDIT_RESULT" = success

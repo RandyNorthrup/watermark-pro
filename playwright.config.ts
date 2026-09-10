@@ -4,16 +4,16 @@ import { PREVIEW_ORIGIN } from './e2e/preview'
 
 const BASE_URL = PREVIEW_ORIGIN
 const CI_RETRIES = 2
-const SERVER_START_TIMEOUT_MS = 180_000
+const SERVER_START_TIMEOUT_MS = 240_000
 /**
- * Four device projects share one machine. Each test gets a minute (journeys
- * that need more declare `test.slow()`), assertions ten seconds, and no more
- * than four browsers run at once so WebKit is not starved of CPU.
+ * Every device project runs. Two simultaneous browsers keep complete 37 MiB
+ * offline installs from contending with foreground WebKit journeys. The paired
+ * offline proof passes existing deadlines at this concurrency; four cold
+ * installs exceeded them. Longer journeys explicitly use `test.slow()`.
  */
 const TEST_TIMEOUT_MS = 60_000
 const EXPECT_TIMEOUT_MS = 10_000
-const MAX_WORKERS = 4
-const CI_WORKERS = 2
+const MAX_WORKERS = 2
 
 /**
  * The share flows write links to the clipboard; headless Chromium denies that
@@ -22,8 +22,8 @@ const CI_WORKERS = 2
 const CHROMIUM_PERMISSIONS = ['clipboard-read', 'clipboard-write']
 
 /**
- * End-to-end tests run against the production build served by `vite preview`,
- * which executes the Worker in workerd exactly as production does. Every
+ * End-to-end tests run against the production build in the supported isolated
+ * Workers SDK gate with native service/asset routing. Every
  * journey runs on four devices: a desktop, an iPhone and an iPad in WebKit
  * (the engine Safari uses), and an Android phone in Chromium.
  */
@@ -32,8 +32,7 @@ export default defineConfig({
   fullyParallel: true,
   timeout: TEST_TIMEOUT_MS,
   expect: { timeout: EXPECT_TIMEOUT_MS },
-  // GitHub's hosted runner has two cores; four browsers on it time out.
-  workers: process.env['CI'] === undefined ? MAX_WORKERS : CI_WORKERS,
+  workers: MAX_WORKERS,
   forbidOnly: process.env['CI'] !== undefined,
   retries: process.env['CI'] === undefined ? 0 : CI_RETRIES,
   reporter: process.env['CI'] === undefined ? 'list' : 'github',
@@ -54,7 +53,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run build && npm run db:migrate:local && npm run preview',
+    command: 'node scripts/gate-server.mjs',
     url: BASE_URL,
     // Always build fresh: a running dev server on this port would serve
     // unbuilt code and the test would no longer be about the production build.

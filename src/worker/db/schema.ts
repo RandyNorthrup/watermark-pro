@@ -6,8 +6,10 @@
  *
  * Column naming is snake_case in the database and camelCase in code.
  */
-import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import { sql } from 'drizzle-orm'
+import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
+import type { RecentActivity, RecentView } from '../../shared/recent-work'
 import type { WatermarkSpec } from '../../shared/watermark'
 
 const now = () => new Date()
@@ -44,7 +46,12 @@ export const user = sqliteTable(
      */
     locale: text('locale'),
   },
-  (table) => [uniqueIndex('user_email_unique').on(table.email)],
+  (table) => [
+    uniqueIndex('user_email_unique').on(table.email),
+    uniqueIndex('user_single_site_admin')
+      .on(sql`(1)`)
+      .where(sql`instr(',' || coalesce(${table.role}, '') || ',', ',admin,') > 0`),
+  ],
 )
 
 export const session = sqliteTable(
@@ -242,6 +249,7 @@ export const photo = sqliteTable(
     name: text('name').notNull(),
     key: text('key').notNull(),
     thumbnailKey: text('thumbnail_key').notNull(),
+    thumbnailSize: integer('thumbnail_size').notNull().default(0),
     contentType: text('content_type').notNull(),
     size: integer('size').notNull(),
     /** Pixel dimensions as reported by the uploading client (display only). */
@@ -324,4 +332,137 @@ export const healthCheck = sqliteTable(
     createdAt: createdAtColumn(),
   },
   (table) => [index('health_check_created_at_idx').on(table.createdAt)],
+)
+
+/** Site admission never creates a membership in the inviter's workspace. */
+export const siteInvitation = sqliteTable(
+  'site_invitation',
+  {
+    id: text('id').primaryKey(),
+    inviterId: text('inviter_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    email: text('email').notNull(),
+    tokenHash: text('token_hash').notNull(),
+    referralId: text('referral_id').references(() => referralLink.id, { onDelete: 'set null' }),
+    createdAt: createdAtColumn(),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+    acceptedAt: integer('accepted_at', { mode: 'timestamp_ms' }),
+    acceptedUserId: text('accepted_user_id').references(() => user.id, { onDelete: 'set null' }),
+    revokedAt: integer('revoked_at', { mode: 'timestamp_ms' }),
+  },
+  (table) => [
+    uniqueIndex('site_invitation_token_unique').on(table.tokenHash),
+    index('site_invitation_inviter_idx').on(table.inviterId),
+  ],
+)
+
+/** One default personal workspace per account; no collaboration is allowed here. */
+export const privateWorkspace = sqliteTable(
+  'private_workspace',
+  {
+    userId: text('user_id')
+      .primaryKey()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+  },
+  (table) => [uniqueIndex('private_workspace_organization_unique').on(table.organizationId)],
+)
+
+/** Rotatable reusable site-admission link. No recipient identity is exposed to its owner. */
+export const referralLink = sqliteTable(
+  'referral_link',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    nonce: text('nonce').notNull(),
+    tokenHash: text('token_hash').notNull(),
+    createdAt: createdAtColumn(),
+    revokedAt: integer('revoked_at', { mode: 'timestamp_ms' }),
+  },
+  (table) => [
+    uniqueIndex('referral_link_user_unique').on(table.userId),
+    uniqueIndex('referral_link_token_unique').on(table.tokenHash),
+  ],
+)
+
+/** Pending rows reserve quota; cleanup rows retain the charge until R2 deletion succeeds. */
+export const uploadReservation = sqliteTable(
+  'upload_reservation',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    uploadId: text('upload_id').notNull(),
+    kind: text('kind').notNull(),
+    userId: text('user_id').notNull(),
+    fingerprint: text('fingerprint').notNull(),
+    keys: text('keys', { mode: 'json' }).$type<string[]>().notNull(),
+    bytes: integer('bytes').notNull(),
+    status: text('status').notNull().default('pending'),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [
+    index('upload_reservation_org_idx').on(table.organizationId),
+    index('upload_reservation_expiry_idx').on(table.status, table.expiresAt),
+    uniqueIndex('upload_reservation_pending_unique')
+      .on(table.organizationId, table.kind, table.uploadId)
+      .where(sql`${table.status} = 'pending'`),
+  ],
+)
+
+/** The site's single administrator is an anchored account, not a workspace role. */
+export const siteOwner = sqliteTable(
+  'site_owner',
+  {
+    id: integer('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'restrict' }),
+  },
+  (table) => [check('site_owner_singleton', sql`${table.id} = 1`)],
+)
+
+/** Resource IDs are polymorphic; the route rechecks current access before returning metadata. */
+export const recentActivity = sqliteTable(
+  'recent_activity',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    kind: text('kind').$type<RecentActivity['kind']>().notNull(),
+    resourceId: text('resource_id').notNull(),
+    usedAt: integer('used_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [
+    index('recent_activity_owner_org_time').on(table.userId, table.organizationId, table.usedAt),
+    uniqueIndex('recent_activity_resource_unique').on(
+      table.userId,
+      table.organizationId,
+      table.kind,
+      table.resourceId,
+    ),
+    check('recent_activity_kind', sql`${table.kind} in ('photo', 'preset')`),
+  ],
+)
+
+/** Interface preference follows the account; another account never inherits it. */
+export const recentViewPreference = sqliteTable(
+  'recent_view_preference',
+  {
+    userId: text('user_id')
+      .primaryKey()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    view: text('view').$type<RecentView>().notNull(),
+  },
+  (table) => [check('recent_view_valid', sql`${table.view} in ('thumbnails', 'list', 'details')`)],
 )

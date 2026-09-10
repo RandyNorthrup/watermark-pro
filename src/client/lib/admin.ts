@@ -115,10 +115,6 @@ export async function unbanUser(userId: string): Promise<void> {
   unwrap('/api/auth/admin/unban-user', await authClient.admin.unbanUser({ userId }))
 }
 
-export async function setUserRole(userId: string, role: 'admin' | 'user'): Promise<void> {
-  unwrap('/api/auth/admin/set-role', await authClient.admin.setRole({ userId, role }))
-}
-
 export async function revokeUserSessions(userId: string): Promise<void> {
   unwrap(
     '/api/auth/admin/revoke-user-sessions',

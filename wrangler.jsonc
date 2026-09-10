@@ -7,7 +7,7 @@
   // `watermark-pro-dev`, has no routes and no workers.dev subdomain, so an
   // accidental `wrangler deploy` without an environment cannot overwrite
   // production. Production lives under `env.production` and is served at
-  // watermark.blowmoney.net (PLAN.md R15); deploy it with `npm run deploy`.
+  // lumafoil.com (PLAN.md R15); deploy it with `npm run deploy`.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "watermark-pro-dev",
   "main": "src/worker/index.ts",
@@ -30,10 +30,22 @@
     // prerendered files (dist/client/landing/<locale>.html) and the SPA shell.
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/"],
+    "run_worker_first": ["/api/*", "/", "/privacy", "/terms"],
   },
   "observability": {
-    "enabled": true,
+    // Custom console logs retain bearer paths in platform metadata even when
+    // invocation logs are disabled. Application diagnostics remain in D1.
+    "enabled": false,
+    "redact_query_string": true,
+    "logs": {
+      "enabled": false,
+      "invocation_logs": false,
+      "persist": false,
+    },
+    "traces": {
+      "enabled": false,
+      "persist": false,
+    },
   },
   // Scheduled health check (M19): the `scheduled` handler in src/worker/index.ts
   // confirms the database is reachable every five minutes and records the result
@@ -49,7 +61,7 @@
     "APP_ENV": "development",
     "APP_URL": "http://localhost:5273",
     "EMAIL_PROVIDER": "console",
-    "EMAIL_FROM": "no-reply@watermark.blowmoney.net",
+    "EMAIL_FROM": "no-reply@lumafoil.com",
     // Cloud import pickers (M16) are configured under env.production below, like
     // TURNSTILE_SITE_KEY: their public client-side keys are committed there. They
     // are deliberately absent from this local block so `wrangler types` leaves
@@ -111,12 +123,23 @@
         {
           // Custom Domain: wrangler creates the DNS record and certificate on
           // deploy. The zone must live in the same Cloudflare account.
-          "pattern": "watermark.blowmoney.net",
+          "pattern": "lumafoil.com",
           "custom_domain": true,
         },
       ],
       "observability": {
-        "enabled": true,
+        // Preserve the same privacy boundary in the resolved production build.
+        "enabled": false,
+        "redact_query_string": true,
+        "logs": {
+          "enabled": false,
+          "invocation_logs": false,
+          "persist": false,
+        },
+        "traces": {
+          "enabled": false,
+          "persist": false,
+        },
       },
       "triggers": {
         "crons": ["*/5 * * * *"],
@@ -126,23 +149,22 @@
       "assets": {
         "binding": "ASSETS",
         "not_found_handling": "single-page-application",
-        "run_worker_first": ["/api/*", "/"],
+        "run_worker_first": ["/api/*", "/", "/privacy", "/terms"],
       },
       "vars": {
         "APP_ENV": "production",
-        "APP_URL": "https://watermark.blowmoney.net",
+        "APP_URL": "https://lumafoil.com",
         "EMAIL_PROVIDER": "cloudflare",
-        "EMAIL_FROM": "no-reply@watermark.blowmoney.net",
+        "EMAIL_FROM": "no-reply@lumafoil.com",
         // Turnstile widget "watermark-pro" (managed mode, created 2026-09-06).
         // The site key is public; TURNSTILE_SECRET_KEY is a Worker secret.
         "TURNSTILE_SITE_KEY": "0x4AAAAAAEqUpxeDq6Tcw_bs",
         // Cloud import pickers (M16); see the top-level vars for why these are
         // public, non-secret identifiers. Same values as local development.
         "GOOGLE_OAUTH_CLIENT_ID": "33646039034-62bcsfbjdakffvvdjbr96kv13sl9sc1f.apps.googleusercontent.com",
-        "GOOGLE_PICKER_API_KEY": "AIzaSyDc5o5xSa8OiRz94fQbkQpcf6u-PZkJcfw",
         "GOOGLE_PICKER_APP_ID": "33646039034",
         "MICROSOFT_CLIENT_ID": "1165fcc2-276c-4dde-b83b-394d32441fad",
-        "DROPBOX_APP_KEY": "s93kl2ruaou8f3p",
+        "DROPBOX_APP_KEY": "n4p4sfvxnat9ccd",
       },
       "d1_databases": [
         {

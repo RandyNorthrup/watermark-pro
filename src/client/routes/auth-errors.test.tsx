@@ -1,8 +1,10 @@
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HTTP_STATUS } from '../../shared/constants'
+import { ACCOUNT_CHANGED_EVENT } from '../lib/offline-account'
+import { currentOfflineUser, setOfflineUser } from '../lib/offline-context'
 import {
   makeMember,
   makeOrganization,
@@ -84,6 +86,40 @@ describe('error paths on public pages', () => {
 })
 
 describe('error paths on invitations', () => {
+  it('binds a fresh invite page before its first private read and hides it after an account change', async () => {
+    seedInvitationFor(VIEWER)
+    setOfflineUser(null)
+    const original = client().organization.getInvitation.getMockImplementation()
+    if (original === undefined) throw new Error('Missing invitation fixture implementation')
+    client().organization.getInvitation.mockImplementationOnce((...args) => {
+      expect(currentOfflineUser()).toBe(VIEWER.id)
+      return original(...args)
+    })
+    renderApp('/accept-invitation/inv-9')
+    await screen.findByRole('button', { name: 'Accept invitation' })
+    act(() => {
+      setOfflineUser(OWNER.id)
+      window.dispatchEvent(new Event(ACCOUNT_CHANGED_EVENT))
+    })
+    expect(screen.queryByRole('button', { name: 'Accept invitation' })).not.toBeInTheDocument()
+    expect(client().organization.acceptInvitation).not.toHaveBeenCalled()
+  })
+  it('does not activate another account workspace when the account changes during invitation acceptance', async () => {
+    const ui = userEvent.setup()
+    seedInvitationFor(VIEWER)
+    const original = client().organization.acceptInvitation.getMockImplementation()
+    if (original === undefined) throw new Error('Missing acceptance fixture implementation')
+    client().organization.acceptInvitation.mockImplementationOnce(async (...args) => {
+      const result = await original(...args)
+      setOfflineUser(OWNER.id)
+      window.dispatchEvent(new Event(ACCOUNT_CHANGED_EVENT))
+      return result
+    })
+    renderApp('/accept-invitation/inv-9')
+    await ui.click(await screen.findByRole('button', { name: 'Accept invitation' }))
+    expect(client().organization.setActive).not.toHaveBeenCalled()
+    expect(screen.queryByRole('button', { name: 'Accept invitation' })).not.toBeInTheDocument()
+  })
   it('lets the invitee decline', async () => {
     const user = userEvent.setup()
     seedInvitationFor(VIEWER)

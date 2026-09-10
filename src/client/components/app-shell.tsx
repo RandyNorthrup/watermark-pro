@@ -17,8 +17,9 @@ import {
   ShieldCheck,
   Stamp,
   Users,
+  UserPlus,
 } from 'lucide-react'
-import { type ReactNode, useState } from 'react'
+import { lazy, type ReactNode, Suspense, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BrandMark } from './brand-mark'
@@ -27,6 +28,9 @@ import { ThemeToggle } from './theme-toggle'
 import { isPlatformAdmin } from '../lib/admin'
 import { type ActiveOrganization, authClient, type SessionData } from '../lib/auth-client'
 import { cn } from '../lib/cn'
+import { clearOfflineAccount } from '../lib/offline-account'
+import { currentOfflineUser, hasOfflineDatabase } from '../lib/offline-context'
+import { offlineStatus, subscribeOfflineStatus } from '../lib/offline-status'
 import { resetShellQueries } from '../lib/queries'
 import { Avatar } from './ui/avatar'
 import { Button } from './ui/button'
@@ -40,6 +44,11 @@ import {
 } from './ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 
+const OfflinePanel = lazy(async () => {
+  const module = await import('./offline-panel')
+  return { default: module.OfflinePanel }
+})
+
 // `label` holds the catalogue key, not the visible word; each list translates
 // it at render (`t(item.label)`). NAV_ITEMS is `as const`, so the keys keep
 // their literal types and stay valid arguments to the typed `t`.
@@ -52,6 +61,8 @@ const NAV_ITEMS = [
   { to: '/app/documents', label: 'shell.nav.documents', icon: FileText, exact: false },
   { to: '/app/gallery', label: 'shell.nav.gallery', icon: Images, exact: false },
   { to: '/app/shares', label: 'shell.nav.shares', icon: Share2, exact: false },
+  { to: '/app/account', label: 'accountAuth.heading', icon: Users, exact: false },
+  { to: '/app/invitations', label: 'siteInvites.heading', icon: UserPlus, exact: false },
   { to: '/app/members', label: 'shell.nav.members', icon: Users, exact: false },
   { to: '/app/audit', label: 'shell.nav.audit', icon: ScrollText, exact: false },
 ] as const
@@ -94,23 +105,27 @@ interface AppShellProps {
 export function AppShell({ session, organization, organizations, children }: AppShellProps) {
   const { t } = useTranslation()
   const navItems = navItemsFor(session)
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const currentItem = navItems.find((item) =>
+    item.exact ? pathname === item.to : pathname.startsWith(item.to),
+  )
   return (
-    <div className="flex min-h-svh">
+    <div className="workspace-scene flex min-h-svh">
       <a
         href="#main"
         className="sr-only z-50 rounded-md bg-brand-600 px-3 py-2 text-white focus:not-sr-only focus:absolute focus:start-2 focus:top-2"
       >
         {t('shell.skipToContent')}
       </a>
-      <aside className="hidden w-64 shrink-0 flex-col border-e border-line bg-surface-raised p-4 md:flex">
+      <aside className="glass-chrome sticky top-0 hidden h-svh w-60 shrink-0 flex-col overflow-y-auto border-e border-line bg-surface-muted px-4 py-6 md:flex">
         <BrandMark to="/app" className="px-2 py-1" />
         <div className="mt-6">
           <OrganizationSwitcher organization={organization} organizations={organizations} />
         </div>
-        <NavList items={navItems} label={t('shell.primaryNav')} className="mt-6" />
+        <NavList items={navItems} label={t('shell.primaryNav')} className="mt-7" />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface-raised/80 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur md:px-8 md:pt-3">
+        <header className="glass-chrome sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur md:px-8 md:pt-3">
           <div className="flex min-w-0 items-center gap-1 md:hidden">
             <MobileMenu
               items={navItems}
@@ -118,6 +133,13 @@ export function AppShell({ session, organization, organizations, children }: App
               organizations={organizations}
             />
             <BrandMark to="/app" />
+          </div>
+          <div className="hidden min-w-0 items-center gap-3 text-sm md:flex">
+            <span className="truncate text-ink-muted">{organization?.name}</span>
+            <span aria-hidden="true" className="h-3.5 w-px rotate-[18deg] bg-control-line/65" />
+            <span className="font-medium">
+              {currentItem === undefined ? null : t(currentItem.label)}
+            </span>
           </div>
           <div className="ms-auto flex items-center gap-2">
             <LanguageMenu />
@@ -130,7 +152,16 @@ export function AppShell({ session, organization, organizations, children }: App
           tabIndex={-1}
           className="flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:py-8 md:pb-8"
         >
-          <div className="mx-auto w-full max-w-5xl">{children}</div>
+          <div className="mx-auto w-full max-w-7xl">
+            {hasOfflineDatabase() ? (
+              <div className="mb-5 min-h-18">
+                <Suspense fallback={null}>
+                  <OfflinePanel userId={session.user.id} organizationId={organization?.id} />
+                </Suspense>
+              </div>
+            ) : null}
+            {children}
+          </div>
         </main>
         <TabBar items={TAB_BAR_ITEMS} />
       </div>
@@ -155,9 +186,10 @@ function NavList({ items, label, className, onNavigate }: NavListProps) {
           to={to}
           activeOptions={{ exact }}
           onClick={onNavigate}
-          className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-brand-50 hover:text-ink dark:hover:bg-brand-900/40"
+          className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition-shadow hover:bg-surface-raised hover:text-ink"
           activeProps={{
-            className: 'bg-brand-50 text-brand-800 dark:bg-brand-900/50 dark:text-brand-100',
+            className:
+              'glass-nav-active bg-surface-raised text-brand-700 shadow-sm dark:text-brand-200',
           }}
         >
           <Icon aria-hidden="true" className="size-4" />
@@ -174,7 +206,7 @@ function TabBar({ items }: { items: readonly NavItem[] }) {
   return (
     <nav
       aria-label={t('shell.toolsNav')}
-      className="fixed inset-x-0 bottom-0 z-10 grid h-(--app-tab-bar-height) border-t border-line bg-surface-raised/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      className="glass-chrome fixed inset-x-0 bottom-0 z-10 grid h-(--app-tab-bar-height) border-t border-line bg-surface-raised/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       style={{ gridTemplateColumns: `repeat(${String(items.length)}, minmax(0, 1fr))` }}
     >
       {items.map(({ to, label, icon: Icon, exact }) => (
@@ -242,9 +274,16 @@ function OrganizationSwitcher({
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { isOnline } = useSyncExternalStore(subscribeOfflineStatus, offlineStatus)
+  const [switchError, setSwitchError] = useState<string | null>(null)
 
   async function switchTo(organizationId: string) {
-    await authClient.organization.setActive({ organizationId })
+    setSwitchError(null)
+    const result = await authClient.organization.setActive({ organizationId })
+    if (result.error !== null) {
+      setSwitchError(result.error.message ?? t('offline.connectionRequired'))
+      return
+    }
     await queryClient.invalidateQueries()
     resetShellQueries(queryClient)
     await router.invalidate()
@@ -252,56 +291,88 @@ function OrganizationSwitcher({
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="secondary"
-          className="w-full justify-between"
-          aria-label={
-            organization === null
-              ? t('shell.chooseOrganization')
-              : t('shell.switchOrganizationFor', { name: organization.name })
-          }
-        >
-          <span className="flex min-w-0 items-center gap-2">
-            <Building2 aria-hidden="true" className="size-4 shrink-0" />
-            <span className="truncate">
-              {organization?.name ?? t('shell.chooseOrganizationShort')}
-            </span>
-          </span>
-          <ChevronsUpDown aria-hidden="true" className="size-4 shrink-0 opacity-60" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>{t('shell.organizations')}</DropdownMenuLabel>
-        {organizations.map((candidate) => (
-          <DropdownMenuItem
-            key={candidate.id}
-            className={cn(candidate.id === organization?.id && 'font-semibold')}
-            onSelect={() => void switchTo(candidate.id)}
+    <div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="secondary"
+            className="w-full justify-between"
+            disabled={!isOnline}
+            aria-label={
+              organization === null
+                ? t('shell.chooseOrganization')
+                : t('shell.switchOrganizationFor', { name: organization.name })
+            }
           >
-            {candidate.name}
+            <span className="flex min-w-0 items-center gap-2">
+              <Building2 aria-hidden="true" className="size-4 shrink-0" />
+              <span className="truncate">
+                {organization?.name ?? t('shell.chooseOrganizationShort')}
+              </span>
+            </span>
+            <ChevronsUpDown aria-hidden="true" className="size-4 shrink-0 opacity-60" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuLabel>{t('shell.organizations')}</DropdownMenuLabel>
+          {organizations.map((candidate) => (
+            <DropdownMenuItem
+              key={candidate.id}
+              className={cn(candidate.id === organization?.id && 'font-semibold')}
+              onSelect={() => void switchTo(candidate.id)}
+            >
+              {candidate.name}
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => void navigate({ to: '/app/organizations/new' })}>
+            <Plus aria-hidden="true" className="size-4" />
+            {t('shell.newOrganization')}
           </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/organizations/new' })}>
-          <Plus aria-hidden="true" className="size-4" />
-          {t('shell.newOrganization')}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {isOnline ? null : (
+        <p className="mt-2 text-xs text-ink-muted">{t('offline.connectionRequired')}</p>
+      )}
+      {switchError === null ? null : (
+        <p role="alert" className="text-danger mt-2 text-xs">
+          {switchError}
+        </p>
+      )}
+    </div>
   )
 }
 
 function UserMenu({ session }: { session: SessionData }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const router = useRouter()
   const queryClient = useQueryClient()
+  const [signOutError, setSignOutError] = useState<string | null>(null)
 
   async function signOut() {
-    await authClient.signOut()
-    queryClient.clear()
-    await navigate({ to: '/login' })
+    const exitingUserId = session.user.id
+    setSignOutError(null)
+    if (hasOfflineDatabase()) {
+      const { pendingOperations } = await import('../lib/offline-database')
+      const pending = await pendingOperations(exitingUserId)
+      if (pending.length > 0) {
+        setSignOutError(t('offline.signOutPending'))
+        return
+      }
+    }
+    const result = await authClient.signOut()
+    if (result.error !== null) {
+      setSignOutError(result.error.message ?? t('offline.signOutFailed'))
+      return
+    }
+    await clearOfflineAccount(queryClient, exitingUserId)
+    // The session observer may already have left the app while device cleanup
+    // awaited IndexedDB. Do not interrupt a new login/signup from that old task.
+    const path = router.state.location.pathname
+    if (currentOfflineUser() === null && (path === '/app' || path.startsWith('/app/'))) {
+      await navigate({ to: '/login' })
+    }
   }
 
   return (
@@ -321,7 +392,20 @@ function UserMenu({ session }: { session: SessionData }) {
           <span className="block truncate">{session.user.email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => void signOut()}>
+        {signOutError === null ? null : (
+          <p
+            role="alert"
+            className="max-w-xs px-2 py-2 text-sm whitespace-normal text-rose-700 dark:text-rose-300"
+          >
+            {signOutError}
+          </p>
+        )}
+        <DropdownMenuItem
+          onSelect={(event) => {
+            event.preventDefault()
+            void signOut()
+          }}
+        >
           <LogOut aria-hidden="true" className="size-4" />
           {t('shell.signOut')}
         </DropdownMenuItem>

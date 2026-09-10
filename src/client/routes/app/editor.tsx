@@ -1,24 +1,19 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { z } from 'zod'
 
+import { editorSearchSchema } from '../../../shared/client-search'
 import { SAMPLE_SCENE_PATH } from '../../../shared/constants'
 import { Editor } from '../../components/editor/editor'
 import { Alert } from '../../components/ui/alert'
-import { activeMemberRoleQueryOptions } from '../../lib/queries'
+import { readActiveMemberRole } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
 
 const appRoute = getRouteApi('/app')
 
-const editorSearchSchema = z.object({
-  /** Library preset to load on open. */
-  preset: z.string().min(1).optional(),
-})
-
 export const Route = createFileRoute('/app/editor')({
   validateSearch: editorSearchSchema,
   staticData: { preloadImages: [SAMPLE_SCENE_PATH] },
-  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: EditorPage,
 })
 
@@ -41,6 +36,7 @@ function EditorPage() {
         organizationName={organization.name}
         initialPresetId={preset ?? null}
         canSave={canRole(membership?.role, { photo: ['upload'] })}
+        canCreatePresets={canRole(membership?.role, { watermark: ['create'] })}
       />
     </div>
   )

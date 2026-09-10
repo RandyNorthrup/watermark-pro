@@ -5,7 +5,7 @@
 import type { Canvas2D } from './canvas'
 import { INK, type ResolvedContrast } from './contrast'
 import type { MarkGeometry } from './layout'
-import { qrMatrix } from './qr'
+import { type QrMatrix, qrMatrix } from './qr'
 import { arcBounds, measureRun } from './text-layout'
 import type { Shape, TextEffect, WatermarkSpec } from '../../shared/watermark'
 
@@ -33,8 +33,8 @@ const SHADOW_RATIO = 0.18
 /** Padding and corner radius of the backdrop box relative to the mark height. */
 const BACKDROP_PADDING_RATIO = 0.2
 const BACKDROP_RADIUS_RATIO = 0.12
-/** Quiet zone around a QR code, in modules; the standard asks for four, two scans reliably at these sizes. */
-const QR_QUIET_MODULES = 2
+/** DENSO WAVE specifies at least four clear modules around a standard QR symbol. */
+const QR_QUIET_MODULES = 4
 /** QR codes are always dark on light: readers expect it and the field guarantees contrast. */
 const QR_INK = INK.dark
 const HALF_TURN_DEGREES = 180
@@ -105,7 +105,7 @@ function probeRunWidth(ctx: Canvas2D, mark: RenderableMark, spacing: number): nu
  */
 export function measureAspect(ctx: Canvas2D, mark: RenderableMark): number {
   const { spec } = mark
-  if (spec.kind === 'image') {
+  if (spec.kind === 'image' || (spec.kind === 'symbol' && spec.symbol.type === 'sticker')) {
     if (mark.image === undefined) {
       throw new TypeError('image marks need a resolved bitmap')
     }
@@ -355,16 +355,19 @@ function drawQr(ctx: Canvas2D, content: string, size: number): void {
   ctx.fillRect(-size / 2, -size / 2, size, size)
   ctx.fillStyle = QR_INK.fill
   for (let row = 0; row < matrix.size; row += 1) {
-    for (let column = 0; column < matrix.size; column += 1) {
-      if (matrix.isDark(row, column)) {
-        ctx.fillRect(
-          -size / 2 + (column + QR_QUIET_MODULES) * cell,
-          -size / 2 + (row + QR_QUIET_MODULES) * cell,
-          cell,
-          cell,
-        )
-      }
-    }
+    drawQrRow(ctx, matrix, row, size, cell)
+  }
+}
+
+/** Integer module edges keep adjacent dark cells connected for QR readers. */
+function drawQrRow(ctx: Canvas2D, matrix: QrMatrix, row: number, size: number, cell: number): void {
+  const top = Math.round(-size / 2 + (row + QR_QUIET_MODULES) * cell)
+  const bottom = Math.round(-size / 2 + (row + QR_QUIET_MODULES + 1) * cell)
+  for (let column = 0; column < matrix.size; column += 1) {
+    if (!matrix.isDark(row, column)) continue
+    const left = Math.round(-size / 2 + (column + QR_QUIET_MODULES) * cell)
+    const right = Math.round(-size / 2 + (column + QR_QUIET_MODULES + 1) * cell)
+    ctx.fillRect(left, top, right - left, bottom - top)
   }
 }
 
@@ -410,7 +413,16 @@ export function drawMark(
       if (spec.style.backdrop.enabled) {
         drawBackdrop(ctx, geometry, spec.style.backdrop.opacity, contrast)
       }
-      if (spec.kind === 'symbol' && spec.symbol.type === 'icon') {
+      if (spec.kind === 'symbol' && spec.symbol.type === 'sticker') {
+        if (mark.image === undefined) throw new TypeError('sticker marks need a resolved bitmap')
+        ctx.drawImage(
+          mark.image,
+          -geometry.width / 2,
+          -geometry.height / 2,
+          geometry.width,
+          geometry.height,
+        )
+      } else if (spec.kind === 'symbol' && spec.symbol.type === 'icon') {
         drawIcon(ctx, mark, geometry.width, contrast)
       } else {
         drawGlyphs(ctx, mark, geometry.width, contrast)

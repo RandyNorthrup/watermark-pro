@@ -10,6 +10,7 @@ import {
   type BulkResult,
   type BulkSettings,
 } from './processor'
+import { CancelledError } from './queue'
 import { defaultPoolSize, WorkerPool } from './worker-pool'
 import type { WatermarkSpec } from '../../shared/watermark'
 import { hasOffscreenCanvas } from '../lib/canvas-backend'
@@ -34,15 +35,31 @@ export function runtimePoolSize(): number {
 }
 
 export function createBulkRuntime(loadLogo: LogoLoader, workers = runtimePoolSize()): BulkRuntime {
-  const pool = new WorkerPool(workers)
+  if (!Number.isSafeInteger(workers) || workers < 1) {
+    throw new RangeError('pool size must be a positive integer')
+  }
+  let pool: WorkerPool | null = null
   const resources = new MarkResources(loadLogo)
-  const processor = new BulkProcessor(pool, resources)
+  let processor: BulkProcessor | null = null
+  let isDisposed = false
   return {
     workers,
-    run: (input, specs, settings, position, signal) =>
-      processor.process(input, specs, settings, position, signal),
+    run: async (input, specs, settings, position, signal) => {
+      if (isDisposed) throw new Error('bulk runtime disposed')
+      if (signal.aborted) throw new CancelledError()
+      // Browsing the empty tool needs its queue, but no rendering engines.
+      // The first job creates the shared pool synchronously before yielding.
+      if (processor === null) {
+        pool = new WorkerPool(workers)
+        processor = new BulkProcessor(pool, resources)
+      }
+      return await processor.process(input, specs, settings, position, signal)
+    },
     dispose: () => {
-      pool.terminate()
+      isDisposed = true
+      pool?.terminate()
+      pool = null
+      processor = null
       resources.clear()
     },
   }

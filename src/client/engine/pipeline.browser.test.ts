@@ -295,7 +295,7 @@ describe('applyWatermark', () => {
             spec: {
               ...textSpec,
               kind: 'qr',
-              content: 'https://watermark.blowmoney.net',
+              content: 'https://lumafoil.com',
               placement: { mode: 'anchor', anchor: 'center' },
               style: { ...textSpec.style, scale: 0.5, opacity: 1 },
             },

@@ -18,7 +18,7 @@ const bindingSchema = <T>(name: string) =>
 const envSchema = z
   .object({
     APP_ENV: z.enum(APP_ENVIRONMENTS),
-    /** Public origin of the app, e.g. https://watermark.blowmoney.net. Used for auth links and origin checks. */
+    /** Public origin of the app, e.g. https://lumafoil.com. Used for auth links and origin checks. */
     APP_URL: z.url({ protocol: /^https?$/ }),
     /** At least 32 characters; signs session cookies and tokens. Set with `wrangler secret put`. */
     BETTER_AUTH_SECRET: z.string().min(AUTH_SECRET_MIN_LENGTH),
@@ -34,6 +34,12 @@ const envSchema = z
     /** Cloudflare Turnstile: set both keys to protect sign-up and password reset; leave both unset to disable. */
     TURNSTILE_SITE_KEY: z.string().min(1).optional(),
     TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+    /** Dedicated confidential OAuth clients for account identity, independent from file providers. */
+    GOOGLE_AUTH_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_AUTH_CLIENT_SECRET: z.string().min(1).optional(),
+    MICROSOFT_AUTH_CLIENT_ID: z.string().min(1).optional(),
+    MICROSOFT_AUTH_CLIENT_SECRET: z.string().min(1).optional(),
+    MICROSOFT_AUTH_TENANT_ID: z.string().min(1).optional(),
     /** Cloud import pickers (M16): each provider is offered only when its keys are set; all optional. */
     GOOGLE_OAUTH_CLIENT_ID: z.string().min(1).optional(),
     GOOGLE_PICKER_API_KEY: z.string().min(1).optional(),
@@ -46,6 +52,23 @@ const envSchema = z
     {
       message: 'TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY must be set together',
       path: ['TURNSTILE_SECRET_KEY'],
+    },
+  )
+  .refine(
+    (env) =>
+      (env.GOOGLE_AUTH_CLIENT_ID === undefined) === (env.GOOGLE_AUTH_CLIENT_SECRET === undefined),
+    {
+      message: 'GOOGLE_AUTH_CLIENT_ID and GOOGLE_AUTH_CLIENT_SECRET must be set together',
+      path: ['GOOGLE_AUTH_CLIENT_SECRET'],
+    },
+  )
+  .refine(
+    (env) =>
+      (env.MICROSOFT_AUTH_CLIENT_ID === undefined) ===
+      (env.MICROSOFT_AUTH_CLIENT_SECRET === undefined),
+    {
+      message: 'MICROSOFT_AUTH_CLIENT_ID and MICROSOFT_AUTH_CLIENT_SECRET must be set together',
+      path: ['MICROSOFT_AUTH_CLIENT_SECRET'],
     },
   )
   .refine((env) => env.APP_ENV !== 'production' || env.EMAIL_PROVIDER !== 'console', {

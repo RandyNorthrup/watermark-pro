@@ -4,8 +4,9 @@
  * personal). In keep modes the source Exif is copied, its Orientation reset to
  * 1 (the pixels are already upright) and its pixel-dimension tags rewritten to
  * the output size, GPS removed for keep-except-location; nothing is added to
- * the block. WebP cannot carry metadata, so its keep modes throw (the UI never
- * offers them). Runs in the worker: Blob → bytes → patch → Blob.
+ * the block. Keeping source metadata in WebP is unsupported here, so its keep
+ * modes throw (the UI never offers them). Required artwork notices are added
+ * separately after this personal-metadata policy. Runs in the worker.
  */
 import { setOrientation, setPixelDimensions, removeLocation } from './exif-edit'
 import {
@@ -93,7 +94,7 @@ export async function withMetadata(
 ): Promise<Blob> {
   if (format === 'image/webp') {
     if (policy !== 'strip') {
-      throw new RangeError('WebP exports cannot carry metadata')
+      throw new RangeError('WebP exports cannot keep source photo metadata')
     }
     return blob
   }

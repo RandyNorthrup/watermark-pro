@@ -1,0 +1,9 @@
+name: Verify generated Worker types
+description: Regenerate public Worker binding types and reject drift from the committed file.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        npm run cf-typegen
+        git diff --exit-code -- worker-configuration.d.ts

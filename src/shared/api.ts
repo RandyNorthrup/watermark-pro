@@ -7,7 +7,6 @@
 import { z } from 'zod'
 
 import {
-  API_ERROR_CODE,
   APP_ENVIRONMENTS,
   CLIENT_ERROR_MAX_MESSAGE_LENGTH,
   CLIENT_ERROR_MAX_ROUTE_LENGTH,
@@ -20,6 +19,17 @@ import {
   SHARE_EXPIRY_DAYS,
   MAX_PRESET_NAME_LENGTH,
 } from './constants'
+import { classifyClientError, redactRoutePath, sanitizeErrorSource } from './observability'
+
+export {
+  apiErrorSchema,
+  auditEntrySchema,
+  auditListResponseSchema,
+  publicConfigSchema,
+  type ApiError,
+  type AuditListResponse,
+  type PublicConfig,
+} from './api-core'
 
 export const healthResponseSchema = z.object({
   status: z.literal('ok'),
@@ -27,44 +37,6 @@ export const healthResponseSchema = z.object({
 })
 
 export type HealthResponse = z.infer<typeof healthResponseSchema>
-
-export const apiErrorSchema = z.object({
-  error: z.enum([
-    API_ERROR_CODE.notFound,
-    API_ERROR_CODE.internalError,
-    API_ERROR_CODE.invalidConfiguration,
-    API_ERROR_CODE.unauthenticated,
-    API_ERROR_CODE.forbidden,
-    API_ERROR_CODE.validation,
-    API_ERROR_CODE.rateLimited,
-    API_ERROR_CODE.conflict,
-    API_ERROR_CODE.payloadTooLarge,
-    API_ERROR_CODE.unsupportedMedia,
-    API_ERROR_CODE.quotaExceeded,
-    API_ERROR_CODE.unsupportedUrl,
-  ]),
-  details: z.unknown().optional(),
-})
-
-export type ApiError = z.infer<typeof apiErrorSchema>
-
-export const auditEntrySchema = z.object({
-  id: z.string(),
-  organizationId: z.string().nullable(),
-  actorUserId: z.string().nullable(),
-  actorName: z.string().nullable(),
-  action: z.string(),
-  targetType: z.string(),
-  targetId: z.string().nullable(),
-  metadata: z.record(z.string(), z.unknown()).nullable(),
-  createdAt: z.iso.datetime(),
-})
-
-export const auditListResponseSchema = z.object({
-  entries: z.array(auditEntrySchema),
-})
-
-export type AuditListResponse = z.infer<typeof auditListResponseSchema>
 
 const devMailboxMessageSchema = z.object({
   to: z.string(),
@@ -205,20 +177,6 @@ export const publicShareSchema = z.object({
 
 export type PublicShare = z.infer<typeof publicShareSchema>
 
-/** Configuration the browser may know before signing in. */
-export const publicConfigSchema = z.object({
-  /** Turnstile site key when bot protection is enabled; null otherwise. */
-  turnstileSiteKey: z.string().nullable(),
-  /** Cloud import (M16): each picker is offered only when its keys are configured; null hides it. */
-  googleOAuthClientId: z.string().nullable(),
-  googlePickerApiKey: z.string().nullable(),
-  googlePickerAppId: z.string().nullable(),
-  microsoftClientId: z.string().nullable(),
-  dropboxAppKey: z.string().nullable(),
-})
-
-export type PublicConfig = z.infer<typeof publicConfigSchema>
-
 export const adminOrganizationSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -233,12 +191,27 @@ export const adminOrganizationListSchema = z.object({
   organizations: z.array(adminOrganizationSchema),
 })
 
-/** Body of `POST /api/client-errors`: bounded, low-PII (M19 observability). */
+/** Normalize again at the server boundary; direct callers cannot store raw diagnostic text. */
 export const clientErrorReportSchema = z.object({
-  message: z.string().trim().min(1).max(CLIENT_ERROR_MAX_MESSAGE_LENGTH),
-  /** The single top stack frame; the client never sends the whole stack. */
-  source: z.string().trim().max(CLIENT_ERROR_MAX_SOURCE_LENGTH).optional(),
-  route: z.string().trim().max(CLIENT_ERROR_MAX_ROUTE_LENGTH).optional(),
+  message: z
+    .string()
+    .trim()
+    .min(1)
+    .max(CLIENT_ERROR_MAX_MESSAGE_LENGTH)
+    .transform(classifyClientError),
+  source: z
+    .string()
+    .trim()
+    .max(CLIENT_ERROR_MAX_SOURCE_LENGTH)
+    .transform(sanitizeErrorSource)
+    .optional(),
+  route: z
+    .string()
+    .trim()
+    .startsWith('/')
+    .max(CLIENT_ERROR_MAX_ROUTE_LENGTH)
+    .transform(redactRoutePath)
+    .optional(),
 })
 
 export type ClientErrorReport = z.infer<typeof clientErrorReportSchema>

@@ -59,7 +59,7 @@ beforeEach(async () => {
 })
 
 describe('dev promotion route', () => {
-  it('promotes an existing account only while the console provider is configured', async () => {
+  it('keeps the initial administrator and refuses a second promotion', async () => {
     const otherClient = new TestClient(harness.app, harness.env)
     await otherClient.signUpAndVerify(harness.mailbox, other)
     expect(await statusOf(otherClient.get('/api/admin/audit'))).toBe(HTTP_STATUS.forbidden)
@@ -71,9 +71,12 @@ describe('dev promotion route', () => {
       await statusOf(otherClient.post('/api/dev/promote', { email: 'nobody@example.test' })),
     ).toBe(HTTP_STATUS.notFound)
     expect(await statusOf(otherClient.post('/api/dev/promote', { email: other.email }))).toBe(
+      HTTP_STATUS.notFound,
+    )
+    expect(await statusOf(otherClient.get('/api/admin/audit'))).toBe(HTTP_STATUS.forbidden)
+    expect(await statusOf(adminClient.post('/api/dev/promote', { email: owner.email }))).toBe(
       HTTP_STATUS.ok,
     )
-    expect(await statusOf(otherClient.get('/api/admin/audit'))).toBe(HTTP_STATUS.ok)
 
     // Without the console provider (production) the route does not exist.
     harness.services.devMailbox = undefined
@@ -140,7 +143,7 @@ describe('platform administration', () => {
       userId: otherId,
       role: 'admin',
     })
-    expect(promoted.status).toBe(HTTP_STATUS.ok)
+    expect(promoted.status).toBe(HTTP_STATUS.forbidden)
     const unbanned = await adminClient.post('/api/auth/admin/unban-user', { userId: otherId })
     expect(unbanned.status).toBe(HTTP_STATUS.ok)
 
@@ -149,19 +152,10 @@ describe('platform administration', () => {
     const { entries } = auditListResponseSchema.parse(await trail.json())
     const actions = entries.map((entry) => entry.action)
     expect(actions).toEqual(
-      expect.arrayContaining([
-        'admin.user_banned',
-        'admin.role_set',
-        'admin.user_unbanned',
-        'organization.created',
-      ]),
+      expect.arrayContaining(['admin.user_banned', 'admin.user_unbanned', 'organization.created']),
     )
     const roleEntry = entries.find((entry) => entry.action === 'admin.role_set')
-    expect(roleEntry).toMatchObject({
-      organizationId: null,
-      targetId: otherId,
-      metadata: { role: 'admin' },
-    })
+    expect(roleEntry).toBeUndefined()
 
     const users = await adminClient.get(
       '/api/auth/admin/list-users?searchValue=otto&searchField=email',
@@ -171,8 +165,7 @@ describe('platform administration', () => {
       other.email,
     ])
     const denied = await otherClient.get('/api/admin/audit')
-    // Otto is an admin now but his session was revoked by the ban; a fresh sign-in works.
-    expect([HTTP_STATUS.unauthorized, HTTP_STATUS.ok]).toContain(denied.status)
+    expect(denied.status).toBe(HTTP_STATUS.unauthorized)
   })
 
   it('exposes client errors and health checks to platform admins only', async () => {
@@ -215,6 +208,8 @@ describe('platform administration', () => {
     // Cloud-import pickers are unconfigured in the default harness, so every
     // picker field is null; only the Turnstile key changes between the cases.
     const noCloudPickers = {
+      googleAuthEnabled: false,
+      microsoftAuthEnabled: false,
       googleOAuthClientId: null,
       googlePickerApiKey: null,
       googlePickerAppId: null,
@@ -255,6 +250,8 @@ describe('platform administration', () => {
     expect(publicConfigSchema.parse(await response.json())).toEqual({
       turnstileSiteKey: null,
       googleOAuthClientId: 'google-client',
+      googleAuthEnabled: false,
+      microsoftAuthEnabled: false,
       googlePickerApiKey: 'google-key',
       googlePickerAppId: 'google-app',
       microsoftClientId: 'ms-client',

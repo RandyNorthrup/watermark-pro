@@ -1,6 +1,6 @@
 # Translation quality record (M18)
 
-Watermark Pro ships in twelve languages. English (`src/client/locales/en/common.json`)
+Lumafoil ships in twelve languages. English (`src/client/locales/en/common.json`)
 is the source of truth; the other eleven are translated from it. There is no
 human reviewer (Randy, 2026-09-06): translations are produced and checked by the
 agent, and a language that does not pass is cut rather than shipped half-right.

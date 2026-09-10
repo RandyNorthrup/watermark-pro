@@ -7,7 +7,7 @@ catalogue, and reuse it. When a term is an established loanword in the target
 language (many of these are, in software), the loanword is usually the right
 choice — consistency matters more than novelty.
 
-Do not translate the **brand name** "Watermark Pro"; leave it verbatim in every
+Do not translate the **brand name** "Lumafoil"; leave it verbatim in every
 language. Do not translate the placeholder tokens shown in braces (`{{name}}`,
 `{{count}}`, …) — keep them exactly, only moving them within the sentence as the
 grammar requires.

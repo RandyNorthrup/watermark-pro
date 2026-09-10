@@ -10,7 +10,7 @@ import { embedInvisibleMark, readInvisibleMark } from './invisible'
 import { pixelsOf } from './test-support/fixtures'
 
 const OPAQUE = 255
-const MESSAGE = '© 2026 Randy — Watermark Pro'
+const MESSAGE = '© 2026 Randy — Lumafoil'
 
 /** An opaque canvas carrying a gradient with the mark embedded in its pixels. */
 function markedCanvas(width: number, height: number, message: string): OffscreenCanvas {

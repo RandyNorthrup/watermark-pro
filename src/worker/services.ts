@@ -5,9 +5,11 @@
  */
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 
+import type { AccountStore } from './account-store'
 import type { AuditStore } from './audit'
 import { type Auth, createAuth } from './auth/auth'
 import { createBindingRateLimitStorage, type RateLimitStorage } from './auth/rate-limit'
+import { createDrizzleAccountStore } from './db/account-store'
 import { createDrizzleAuditStore } from './db/audit-store'
 import { createDatabase, type Database } from './db/client'
 import {
@@ -19,12 +21,15 @@ import {
 } from './db/library-stores'
 import { createDrizzleObservabilityStore } from './db/observability-store'
 import { createDrizzleOrganizationStore } from './db/organization-store'
+import { createDrizzleRecentStore } from './db/recent-store'
 import * as schema from './db/schema'
+import { createDrizzleUploadStore } from './db/upload-store'
 import { createDrizzleUserStore } from './db/user-store'
 import { createCloudflareEmailSender } from './email/cloudflare'
 import { createConsoleEmailSender, type DevMailbox } from './email/console'
 import type { EmailSender } from './email/sender'
 import { validateEnv, type ValidatedEnv } from './env'
+import type { RecentStore } from './recent-store'
 import type {
   AssetStore,
   ObjectStore,
@@ -35,11 +40,15 @@ import type {
   UserStore,
   WatermarkStore,
 } from './stores'
+import type { UploadStore } from './upload-store'
 
 export interface Services {
+  uploads: UploadStore
   config: ValidatedEnv
   db: Database
   auth: Auth
+  accounts: AccountStore
+  recents: RecentStore
   email: EmailSender
   audit: AuditStore
   watermarks: WatermarkStore
@@ -88,6 +97,8 @@ function createEmailSender(config: ValidatedEnv): {
 export function buildServices(config: ValidatedEnv): Services {
   const db = createDatabase(config.DB)
   const audit = createDrizzleAuditStore(db)
+  const accounts = createDrizzleAccountStore(db)
+  const uploads = createDrizzleUploadStore(db)
   const { email, devMailbox } = createEmailSender(config)
   const rateLimit = createBindingRateLimitStorage(config.AUTH_RATE_LIMITER, config.API_RATE_LIMITER)
   const auth = createAuth({
@@ -95,9 +106,31 @@ export function buildServices(config: ValidatedEnv): Services {
     secret: config.BETTER_AUTH_SECRET,
     appUrl: config.APP_URL,
     email,
+    accounts,
+    hasWorkspaceContent: async (organizationId) => await uploads.hasContent(organizationId),
+    accountOAuth: {
+      ...(config.GOOGLE_AUTH_CLIENT_ID !== undefined &&
+        config.GOOGLE_AUTH_CLIENT_SECRET !== undefined && {
+          google: {
+            clientId: config.GOOGLE_AUTH_CLIENT_ID,
+            clientSecret: config.GOOGLE_AUTH_CLIENT_SECRET,
+          },
+        }),
+      ...(config.MICROSOFT_AUTH_CLIENT_ID !== undefined &&
+        config.MICROSOFT_AUTH_CLIENT_SECRET !== undefined && {
+          microsoft: {
+            clientId: config.MICROSOFT_AUTH_CLIENT_ID,
+            clientSecret: config.MICROSOFT_AUTH_CLIENT_SECRET,
+            tenantId: config.MICROSOFT_AUTH_TENANT_ID,
+          },
+        }),
+    },
     audit,
     rateLimit,
     rateLimitEnabled: true,
+    // The console mailbox cannot be enabled in production (env.ts). This keeps
+    // disposable local test users possible without opening production admission.
+    canSignUpWithoutInvitation: config.APP_ENV !== 'production' && devMailbox !== undefined,
     ...(config.TURNSTILE_SECRET_KEY !== undefined && {
       captcha: { secretKey: config.TURNSTILE_SECRET_KEY },
     }),
@@ -107,6 +140,9 @@ export function buildServices(config: ValidatedEnv): Services {
     db,
     auth,
     email,
+    accounts,
+    recents: createDrizzleRecentStore(db),
+    uploads,
     audit,
     watermarks: createDrizzleWatermarkStore(db),
     assets: createDrizzleAssetStore(db),

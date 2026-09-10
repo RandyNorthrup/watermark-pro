@@ -1,7 +1,7 @@
 /**
  * Client error reporting (M19 observability). The browser posts an uncaught
- * error or unhandled rejection here; the Worker stores a bounded, low-PII record
- * (message, single top stack frame, route, request id) for the admin console.
+ * error or unhandled rejection here; the Worker stores only a fixed error class,
+ * own-asset coordinates, a known route shape and request id for the admin console.
  * Rate limited per client so a render loop cannot flood the table, and capped in
  * size. No authentication: errors happen on public pages too.
  */
@@ -15,6 +15,7 @@ import {
   HTTP_STATUS,
 } from '../../shared/constants'
 import type { AppContext } from '../app-context'
+import { readJsonBody } from '../request-body'
 
 export const clientErrorRoutes = new Hono<AppContext>().post('/client-errors', async (c) => {
   const services = c.get('services')
@@ -28,18 +29,7 @@ export const clientErrorRoutes = new Hono<AppContext>().post('/client-errors', a
     return c.json(body, HTTP_STATUS.tooManyRequests)
   }
 
-  const declaredSize = Number(c.req.header('content-length') ?? '0')
-  if (Number.isFinite(declaredSize) && declaredSize > CLIENT_ERROR_MAX_BODY_BYTES) {
-    const body: ApiError = { error: API_ERROR_CODE.payloadTooLarge }
-    return c.json(body, HTTP_STATUS.payloadTooLarge)
-  }
-
-  let payload: unknown
-  try {
-    payload = await c.req.json()
-  } catch {
-    payload = null
-  }
+  const payload = await readJsonBody(c.req.raw, CLIENT_ERROR_MAX_BODY_BYTES)
   const parsed = clientErrorReportSchema.safeParse(payload)
   if (!parsed.success) {
     const body: ApiError = { error: API_ERROR_CODE.validation }
@@ -50,9 +40,9 @@ export const clientErrorRoutes = new Hono<AppContext>().post('/client-errors', a
     message: parsed.data.message,
     source: parsed.data.source ?? null,
     route: parsed.data.route ?? null,
-    userAgent: c.req.header('user-agent') ?? null,
+    userAgent: null,
     requestId: c.get('requestId'),
-    // No user id: reports carry no PII beyond the message, top frame and route.
+    // Diagnostics are not a second account/profile inventory.
     userId: null,
   })
   return c.body(null, HTTP_STATUS.noContent)

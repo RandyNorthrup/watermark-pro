@@ -49,6 +49,7 @@ export default defineConfig({
       {
         // Canvas rendering, encoding and the Web Worker run in a real
         // Chromium; jsdom has no 2D context worth testing against.
+        optimizeDeps: { include: ['zod/mini'] },
         test: {
           name: 'browser',
           include: ['src/client/**/*.browser.test.ts'],
@@ -65,13 +66,13 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
-      include: ['src/**'],
+      // Runtime TypeScript/TSX is executable coverage. JSON catalogues and CSS
+      // are data/assets, verified by catalogue tests and rendered UI checks;
+      // treating Vite's raw JSON ?import URL as JavaScript cannot be parsed.
+      include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'src/**/*.test.{ts,tsx}',
         'src/**/test-support/**',
-        // Non-code assets under src/ (the translator glossary); coverage's
-        // instrumenter would try to parse them and warn.
-        'src/**/*.md',
         'src/client/test-setup.ts',
         // Bootstraps the DOM; exercised by the Playwright smoke test instead.
         'src/client/main.tsx',
@@ -81,58 +82,12 @@ export default defineConfig({
         'src/client/lib/auth-client.ts',
         // One-line side-effect import of main.tsx; covered by Playwright.
         'src/client/lib/zod-config.ts',
-        // i18next runtime glue (M18): instance init, code-split catalogue loads
-        // and `<html lang/dir>` mutation. The locale-selection logic it depends
-        // on lives in the fully tested i18n/detect.ts; the instance is set up
-        // for every page test by test-setup.ts. See PLAN.md §9.
-        'src/client/i18n/index.ts',
-        // Runs inside a Web Worker thread, which coverage cannot instrument;
-        // exercised end to end through worker-client tests in Chromium.
+        // Dedicated Web Worker entries remain outside the page's V8 profiler.
+        // Main-thread canvas, provider, media and locale modules are included;
+        // the M19 counter audit disproved their earlier blanket exclusions.
+        // Both worker entries have real browser message/output tests instead.
         'src/client/engine/worker.ts',
-        // Pure canvas drawing: every branch is a 2D-context call that jsdom
-        // cannot run (getContext is null there). Exercised by the `browser`
-        // project (pipeline/text-layout browser tests), which cannot report
-        // coverage. See PLAN.md §9.
-        'src/client/engine/render.ts',
-        // Decodes an image file to pixels on a canvas to read an invisible
-        // mark; getContext is null in jsdom, so the Verify page test replaces
-        // this module with a fake. See PLAN.md §9.
-        'src/client/lib/read-invisible.ts',
-        // The logo-prepare panel decodes/encodes on a 2D canvas (createImageBitmap
-        // and getImageData, both absent in jsdom); its pure decisions live in the
-        // fully tested lib/logo-prepare-pipeline.ts. See PLAN.md §9.
-        'src/client/components/designer/logo-prepare.tsx',
-        // Cloud import pickers (M16): each loads a third-party SDK (Google
-        // Picker + GIS, the Dropbox Chooser drop-in) or the bundled MSAL client
-        // and drives a vendor popup/iframe that cannot run in jsdom. Their pure
-        // decisions (download-URL builders, response->item mappers, extension
-        // derivation) live in tested helpers within the same modules and in
-        // lib/imports/download.ts + lib/imports/source.ts. The OneDrive browse
-        // dialog is likewise vendor-token/Graph glue. See PLAN.md §9.
-        'src/client/lib/imports/google-picker.ts',
-        'src/client/lib/imports/google-drive-save.ts',
-        'src/client/lib/imports/dropbox-chooser.ts',
-        'src/client/lib/imports/dropbox-save.ts',
-        'src/client/lib/imports/onedrive.ts',
-        'src/client/components/import/onedrive-dialog.tsx',
-        // Video watermarking (M17): WebCodecs, mediabunny, OffscreenCanvas and a
-        // dedicated Web Worker, none of which coverage can instrument. Exercised
-        // by the `browser` project (capabilities/probe/transcode browser tests)
-        // and the video page test; the pure decisions (codec/container mapping,
-        // bitrate scaling, limits, ETA) live in the fully tested video/plan.ts.
-        // See PLAN.md §9.
-        'src/client/video/frame.ts',
-        'src/client/video/capabilities.ts',
-        'src/client/video/probe.ts',
-        'src/client/video/transcode.ts',
         'src/client/video/worker.ts',
-        'src/client/video/worker-client.ts',
-        'src/client/components/video/video-tool.tsx',
-        // PDF watermarking (M17): pure OffscreenCanvas drawing of the mark onto a
-        // page-sized canvas; jsdom has no 2D context. Exercised by
-        // pdf/raster.browser.test.ts; the pure decisions live in the tested
-        // pdf/raster-layout.ts. See PLAN.md §9.
-        'src/client/pdf/raster.ts',
         // D1 and binding wiring that only executes inside workerd. Covered
         // functionally by the `workers` project, which cannot report coverage.
         'src/worker/db/**',

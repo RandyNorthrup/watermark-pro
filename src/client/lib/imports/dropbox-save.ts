@@ -28,16 +28,24 @@
  */
 import { z } from 'zod'
 
-import type { CloudUpload } from './source'
+import {
+  cloudFileIdSchema,
+  cloudFileName,
+  cloudRequest,
+  uploadCloudBatch,
+  type CloudSavedFile,
+} from './cloud-transfer'
+import type { CloudUpload, CloudUploadSource } from './source'
 import type { PublicConfig } from '../../../shared/api'
 import {
-  CLOUD_SAVE_FOLDER,
   DROPBOX_OAUTH_AUTHORIZE_URL,
   DROPBOX_OAUTH_REDIRECT_PATH,
   DROPBOX_OAUTH_TOKEN_URL,
   DROPBOX_UPLOAD_ENDPOINT,
   DROPBOX_WRITE_SCOPES,
 } from '../../../shared/constants'
+import { ACCOUNT_CHANGED_EVENT } from '../offline-account'
+import { captureOfflineOwner } from '../offline-context'
 
 /** Digest algorithm for the PKCE challenge. */
 const SHA_256 = 'SHA-256'
@@ -69,10 +77,11 @@ const HEX_RADIX = 16
 const UNICODE_ESCAPE_HEX_LENGTH = 4
 
 /** Pop-up window name and size; a real window (not a frame) on www.dropbox.com. */
-const POPUP_TARGET = 'watermark-pro-dropbox-oauth'
+const POPUP_TARGET = 'lumafoil-dropbox-oauth'
 const POPUP_FEATURES = 'popup,width=600,height=720'
 /** How often to check whether the pop-up has landed back on our redirect path. */
 const POPUP_POLL_INTERVAL_MS = 400
+const POPUP_TIMEOUT_MS = 120_000
 
 /** base64url (RFC 4648 §5, unpadded) of raw bytes; the encoding PKCE and JWT-style values use. */
 export function base64UrlFromBytes(bytes: Uint8Array): string {
@@ -104,6 +113,7 @@ export interface AuthorizeUrlInput {
   readonly appKey: string
   readonly codeChallenge: string
   readonly redirectUri: string
+  readonly state: string
 }
 
 /**
@@ -121,6 +131,7 @@ export function buildAuthorizeUrl(input: AuthorizeUrlInput): string {
     redirect_uri: input.redirectUri,
     scope: DROPBOX_WRITE_SCOPES,
     token_access_type: TOKEN_ACCESS_TYPE_ONLINE,
+    state: input.state,
   }).toString()
   return url.href
 }
@@ -157,7 +168,7 @@ export function escapeNonAscii(text: string): string {
  */
 export function dropboxApiArg(name: string): string {
   const arg = {
-    path: `/${CLOUD_SAVE_FOLDER}/${name}`,
+    path: `/${cloudFileName(name)}`,
     mode: UPLOAD_MODE_ADD,
     autorename: true,
     mute: true,
@@ -170,8 +181,10 @@ export function dropboxApiArg(name: string): string {
  * readable error when Dropbox returned `?error=…` or no code. Pure, so the
  * redirect handling is unit-tested without a pop-up.
  */
-export function readAuthorizationCode(search: string): string {
+export function readAuthorizationCode(search: string, expectedState: string): string {
   const params = new URLSearchParams(search)
+  if (expectedState.length === 0 || params.get('state') !== expectedState)
+    throw new Error('Dropbox sign-in state did not match. Start sign-in again.')
   const error = params.get('error')
   if (error !== null) {
     const description = params.get('error_description')
@@ -203,19 +216,23 @@ function assertBrowserWithCrypto(): void {
  * `/oauth/dropbox`; polling swallows the cross-origin read until then. Rejects
  * when the user closes the window or Dropbox returns an error.
  */
-function runAuthorizePopup(authorizeUrl: string): Promise<string> {
+function runAuthorizePopup(popup: Window, state: string): Promise<string> {
+  const owner = captureOfflineOwner()
   return new Promise<string>((resolve, reject) => {
-    const popup = window.open(authorizeUrl, POPUP_TARGET, POPUP_FEATURES)
-    if (popup === null) {
-      reject(
-        new Error('Could not open the Dropbox sign-in window. Please allow pop-ups and retry.'),
-      )
-      return
+    const started = Date.now()
+    const cleanup = () => {
+      window.clearInterval(timer)
+      window.removeEventListener(ACCOUNT_CHANGED_EVENT, cancelled)
+      popup.close()
+    }
+    const cancelled = () => {
+      cleanup()
+      reject(new Error('Dropbox sign-in cancelled because the app account changed.'))
     }
     const timer = window.setInterval(() => {
-      if (popup.closed) {
-        window.clearInterval(timer)
-        reject(new Error('Dropbox sign-in was cancelled.'))
+      if (popup.closed || Date.now() - started >= POPUP_TIMEOUT_MS) {
+        cleanup()
+        reject(new Error('Dropbox sign-in was cancelled or timed out.'))
         return
       }
       let search: string
@@ -229,14 +246,15 @@ function runAuthorizePopup(authorizeUrl: string): Promise<string> {
         // Still cross-origin on www.dropbox.com; the read throws until it lands.
         return
       }
-      window.clearInterval(timer)
-      popup.close()
+      cleanup()
       try {
-        resolve(readAuthorizationCode(search))
+        owner.assertCurrent()
+        resolve(readAuthorizationCode(search, state))
       } catch (error) {
         reject(error instanceof Error ? error : new Error('Dropbox sign-in failed.'))
       }
     }, POPUP_POLL_INTERVAL_MS)
+    window.addEventListener(ACCOUNT_CHANGED_EVENT, cancelled, { once: true })
   })
 }
 
@@ -247,48 +265,84 @@ async function exchangeCodeForToken(input: {
   codeVerifier: string
   redirectUri: string
 }): Promise<string> {
-  const response = await fetch(DROPBOX_OAUTH_TOKEN_URL, {
-    method: POST_METHOD,
-    headers: { [CONTENT_TYPE_HEADER]: FORM_CONTENT_TYPE },
-    body: new URLSearchParams({
-      code: input.code,
-      grant_type: GRANT_TYPE_AUTH_CODE,
-      client_id: input.appKey,
-      code_verifier: input.codeVerifier,
-      redirect_uri: input.redirectUri,
-    }),
-  })
-  if (!response.ok) {
-    throw new Error(`Dropbox token exchange failed (HTTP ${String(response.status)}).`)
-  }
-  const payload: unknown = await response.json()
-  return tokenResponseSchema.parse(payload).access_token
+  return await cloudRequest(
+    DROPBOX_OAUTH_TOKEN_URL,
+    {
+      method: POST_METHOD,
+      headers: { [CONTENT_TYPE_HEADER]: FORM_CONTENT_TYPE },
+      body: new URLSearchParams({
+        code: input.code,
+        grant_type: GRANT_TYPE_AUTH_CODE,
+        client_id: input.appKey,
+        code_verifier: input.codeVerifier,
+        redirect_uri: input.redirectUri,
+      }),
+    },
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(`Dropbox token exchange failed (HTTP ${String(response.status)}).`)
+      }
+      const payload: unknown = await response.json()
+      return tokenResponseSchema.parse(payload).access_token
+    },
+  )
 }
 
 /** Run the full PKCE sign-in and resolve an access token with the write scopes. */
-async function authorize(appKey: string): Promise<string> {
-  const codeVerifier = generateCodeVerifier()
-  const codeChallenge = await deriveCodeChallenge(codeVerifier)
-  const redirectUri = `${window.location.origin}${DROPBOX_OAUTH_REDIRECT_PATH}`
-  const authorizeUrl = buildAuthorizeUrl({ appKey, codeChallenge, redirectUri })
-  const code = await runAuthorizePopup(authorizeUrl)
-  return await exchangeCodeForToken({ appKey, code, codeVerifier, redirectUri })
+export async function acquireDropboxToken(appKey: string): Promise<string> {
+  const owner = captureOfflineOwner()
+  assertBrowserWithCrypto()
+  // Reserve synchronously while the browser still has the click's user activation.
+  const popup = window.open('about:blank', POPUP_TARGET, POPUP_FEATURES)
+  if (popup === null)
+    throw new Error('Could not open the Dropbox sign-in window. Please allow pop-ups and retry.')
+  try {
+    const codeVerifier = generateCodeVerifier()
+    const state = generateCodeVerifier()
+    const codeChallenge = await deriveCodeChallenge(codeVerifier)
+    owner.assertCurrent()
+    const redirectUri = `${window.location.origin}${DROPBOX_OAUTH_REDIRECT_PATH}`
+    const authorizeUrl = buildAuthorizeUrl({ appKey, codeChallenge, redirectUri, state })
+    popup.location.href = authorizeUrl
+    const code = await runAuthorizePopup(popup, state)
+    owner.assertCurrent()
+    return await exchangeCodeForToken({ appKey, code, codeVerifier, redirectUri })
+  } finally {
+    popup.close()
+  }
 }
 
 /** Upload one photo's bytes to the save folder, naming the file in any failure. */
-async function uploadOne(token: string, upload: CloudUpload): Promise<void> {
-  const response = await fetch(DROPBOX_UPLOAD_ENDPOINT, {
-    method: POST_METHOD,
-    headers: {
-      [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${token}`,
-      [CONTENT_TYPE_HEADER]: OCTET_STREAM_CONTENT_TYPE,
-      [DROPBOX_API_ARG_HEADER]: dropboxApiArg(upload.name),
+async function uploadOne(token: string, upload: CloudUpload): Promise<CloudSavedFile> {
+  const owner = captureOfflineOwner()
+  return await cloudRequest(
+    DROPBOX_UPLOAD_ENDPOINT,
+    {
+      method: POST_METHOD,
+      headers: {
+        [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${token}`,
+        [CONTENT_TYPE_HEADER]: OCTET_STREAM_CONTENT_TYPE,
+        [DROPBOX_API_ARG_HEADER]: dropboxApiArg(upload.name),
+      },
+      body: upload.blob,
     },
-    body: upload.blob,
-  })
-  if (!response.ok) {
-    throw new Error(`Could not save "${upload.name}" to Dropbox (HTTP ${String(response.status)}).`)
-  }
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Could not save "${upload.name}" to Dropbox (HTTP ${String(response.status)}).`,
+        )
+      }
+      const payload: unknown = await response.json()
+      const file = z.object({ id: cloudFileIdSchema, name: z.string().min(1) }).parse(payload)
+      return {
+        provider: 'dropbox',
+        id: file.id,
+        name: file.name,
+        manageUrl: 'https://www.dropbox.com/home/Apps/Lumafoil',
+        userId: owner.userId,
+      }
+    },
+  )
 }
 
 /**
@@ -301,15 +355,16 @@ async function uploadOne(token: string, upload: CloudUpload): Promise<void> {
  */
 export async function saveToDropbox(
   config: PublicConfig,
-  uploads: readonly CloudUpload[],
-): Promise<void> {
+  uploads: CloudUploadSource,
+): Promise<CloudSavedFile[]> {
   const appKey = config.dropboxAppKey
   if (appKey === null) {
     throw new Error('Dropbox save is not configured for this deployment.')
   }
-  assertBrowserWithCrypto()
-  const token = await authorize(appKey)
-  for (const upload of uploads) {
-    await uploadOne(token, upload)
-  }
+  const owner = captureOfflineOwner()
+  const token = await acquireDropboxToken(appKey)
+  owner.assertCurrent()
+  const files = typeof uploads === 'function' ? await uploads() : uploads
+  owner.assertCurrent()
+  return await uploadCloudBatch(files, (upload) => uploadOne(token, upload))
 }

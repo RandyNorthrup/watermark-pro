@@ -1,11 +1,10 @@
 /**
  * Reads a video's metadata and refuses an over-limit file *before* a single
- * frame is decoded, plus samples one frame for the preview. Browser-bound
- * (mediabunny + OffscreenCanvas), so coverage-excluded; the limit arithmetic it
- * calls lives in `plan.ts` and is tested there.
+ * frame is decoded, plus samples one frame for the preview. Native browser
+ * tests exercise mediabunny and OffscreenCanvas with V8 coverage; the limit
+ * arithmetic lives in `plan.ts` and has independent unit tests.
  */
-import { ALL_FORMATS, BlobSource, Input, VideoSampleSink } from 'mediabunny'
-import type { AudioCodec, VideoCodec } from 'mediabunny'
+import type { AudioCodec, Input, VideoCodec } from 'mediabunny'
 
 import { context2d } from './frame'
 import { checkVideoLimits, DEFAULT_VIDEO_LIMITS, type VideoLimit, type VideoLimits } from './plan'
@@ -32,7 +31,8 @@ export interface VideoProbe {
   audioCodec: AudioCodec | null
 }
 
-function inputFor(file: Blob): Input {
+async function inputFor(file: Blob): Promise<Input> {
+  const { ALL_FORMATS, BlobSource, Input } = await import('mediabunny')
   return new Input({ source: new BlobSource(file), formats: ALL_FORMATS })
 }
 
@@ -45,7 +45,7 @@ export async function probeVideo(
   file: File,
   limits: VideoLimits = DEFAULT_VIDEO_LIMITS,
 ): Promise<VideoProbe> {
-  const input = inputFor(file)
+  const input = await inputFor(file)
   const videoTrack = await input.getPrimaryVideoTrack()
   if (videoTrack === null) {
     throw new Error('This file has no video track.')
@@ -76,7 +76,8 @@ export async function probeVideo(
  * for the still preview the editor path renders the chosen layers onto.
  */
 export async function sampleFrame(file: File, timestampSeconds: number): Promise<Blob> {
-  const input = inputFor(file)
+  const { VideoSampleSink } = await import('mediabunny')
+  const input = await inputFor(file)
   const videoTrack = await input.getPrimaryVideoTrack()
   if (videoTrack === null) {
     throw new Error('This file has no video track.')

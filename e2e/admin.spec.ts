@@ -1,21 +1,22 @@
 /**
  * Platform administration journey against the production build in workerd:
- * an ordinary owner cannot reach the console, a promoted administrator can
+ * an ordinary owner cannot reach the console, the single test administrator can
  * search users, ban one (whose session ends and whose sign-in is refused),
  * unban them, see every organization, and find the ban in the global audit
- * trail. Promotion happens the way the runbook does it: a direct D1 update.
+ * trail. Every device signs into the same administrator in isolated gate state.
  */
 
+import { PREVIEW_ORIGIN } from './preview'
 import {
   createWorkspace,
   expect,
   expectAccessible,
   expectNoNavLink,
   navigateTo,
-  promoteToPlatformAdmin,
   signIn,
   test,
 } from './support'
+import { ensureTestSiteOwner, TEST_SITE_OWNER } from '../scripts/lib/test-site-owner'
 
 const runId = Date.now().toString(36)
 const admin = {
@@ -31,7 +32,7 @@ const member = {
 const adminOrganization = `Admin Org ${runId}`
 const memberOrganization = `Member Org ${runId}`
 
-test('promoted administrator manages users and sees every organization', async ({
+test('the sole administrator manages users and sees account totals', async ({
   browser,
   page,
   request,
@@ -43,7 +44,7 @@ test('promoted administrator manages users and sees every organization', async (
   // Before promotion the console is a dead end and the nav does not offer it.
   await expectNoNavLink(page, 'Admin')
   await page.goto('/app/admin')
-  await expect(page.getByRole('alert')).toContainText('Only platform administrators')
+  await expect(page.getByRole('alert')).toContainText('Only the site administrator')
   await expectAccessible(page)
 
   // A second, unrelated account with its own organization and live session.
@@ -51,11 +52,14 @@ test('promoted administrator manages users and sees every organization', async (
   const memberPage = await memberContext.newPage()
   await createWorkspace(memberPage, memberContext.request, member, memberOrganization)
 
-  await promoteToPlatformAdmin(request, admin.email)
-  await page.reload()
+  await ensureTestSiteOwner(PREVIEW_ORIGIN)
+  await page.request.post('/api/auth/sign-out', { data: {}, headers: { origin: PREVIEW_ORIGIN } })
+  await signIn(page, TEST_SITE_OWNER, 'My workspace')
   await navigateTo(page, 'Admin')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Administration')
   await expect(page.getByText(/\d+ users?[,.]/)).toBeVisible()
+  await expect(page.getByText('Registered accounts', { exact: true })).toBeVisible()
+  await expect(page.getByText('Verified accounts', { exact: true })).toBeVisible()
   await expectAccessible(page)
 
   await page.getByLabel('Search by email').fill(member.email)

@@ -1,19 +1,18 @@
 /**
  * Rasterises the chosen layers onto a transparent, page-sized canvas so they
  * can be stamped onto a PDF page. Browser-only: it draws on an
- * `OffscreenCanvas` through the engine's `composeMark`, exactly as the photo
- * and video paths do, and jsdom has no 2D context. Its pure decisions (pixel
- * sizing, the smart-placement fallback) live in `raster-layout.ts`, which is
- * tested for coverage; this module is coverage-excluded (see PLAN.md §9), and
- * its drawing is proven by `raster.browser.test.ts`.
+ * capability-selected canvas through the engine's `composeMark`, sharing the
+ * photo tool's DOM fallback when OffscreenCanvas is unavailable. Its pure decisions (pixel
+ * sizing, the smart-placement fallback) live in `raster-layout.ts`. Native
+ * `raster.browser.test.ts` tests exercise this drawing code with V8 coverage.
  */
 import { documentSpec, type PageSize, pixelDimensions } from './raster-layout'
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { LuminanceMap } from '../engine/analysis'
-import { contextOf } from '../engine/canvas'
 import { FontLoader } from '../engine/fonts'
 import { composeMark } from '../engine/pipeline'
 import type { MarkInput } from '../engine/protocol'
+import { mainThreadBackend } from '../lib/canvas-backend'
 import { type LogoLoader, MarkResources } from '../lib/mark-resources'
 
 /**
@@ -48,12 +47,14 @@ export class DocumentRasteriser {
   /** Transparent PNG bytes of the prepared marks drawn at `page`'s size. */
   async rasterise(page: PageSize): Promise<Uint8Array> {
     const pixels = pixelDimensions(page)
-    const canvas = new OffscreenCanvas(pixels.width, pixels.height)
-    const ctx = contextOf(canvas)
+    const canvas = mainThreadBackend().createCanvas(pixels.width, pixels.height)
     for (const mark of this.#marks) {
-      composeMark(ctx, pixels, WHITE_PAGE_MAP, { ...mark, spec: documentSpec(mark.spec) })
+      composeMark(canvas.context, pixels, WHITE_PAGE_MAP, {
+        ...mark,
+        spec: documentSpec(mark.spec),
+      })
     }
-    const blob = await canvas.convertToBlob({ type: 'image/png' })
+    const blob = await canvas.encode({ format: 'image/png', quality: 1, metadata: 'strip' })
     return new Uint8Array(await blob.arrayBuffer())
   }
 

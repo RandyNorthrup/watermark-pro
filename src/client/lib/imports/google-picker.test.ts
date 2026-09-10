@@ -1,7 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
+import { setOfflineUser } from '../offline-context'
 import { downloadDriveFiles, driveMediaUrl, mapPickedDocuments } from './google-picker'
 import { GOOGLE_DRIVE_FILES_ENDPOINT, HTTP_STATUS } from '../../../shared/constants'
+
+beforeEach(() => setOfflineUser('user-1'))
 
 afterEach(() => {
   vi.unstubAllGlobals()

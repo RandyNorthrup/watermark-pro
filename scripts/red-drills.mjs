@@ -59,6 +59,20 @@ const e2e = (project, file) => ({
 const gate = (script, failure) => ({ command: [...NPM, script], failure })
 
 export const DRILLS = [
+  {
+    name: 'Bootstrap: nullable account generation is ignored',
+    file: 'src/client/lib/bootstrap-request.ts',
+    find: 'const generation = captureOfflineGeneration()',
+    replace: 'const generation = { assertCurrent() {} }',
+    ...unitClient('src/client/lib/bootstrap-request.test.ts'),
+  },
+  {
+    name: 'Bootstrap: mismatched membership role is accepted',
+    file: 'src/shared/bootstrap.ts',
+    find: 'member?.role === role.role &&',
+    replace: 'true &&',
+    ...unitClient('src/shared/bootstrap.test.ts'),
+  },
   // --- Worker: authorization, origin, secrets, limits -----------------------
   {
     name: 'RBAC: viewers may edit presets',
@@ -77,8 +91,8 @@ export const DRILLS = [
   {
     name: 'Platform admin: any signed-in user reaches the admin API',
     file: 'src/worker/middleware/platform-admin.ts',
-    find: 'if (user.role !== PLATFORM_ADMIN_ROLE) {',
-    replace: 'if (user.role === PLATFORM_ADMIN_ROLE) {',
+    find: 'if (user.role !== PLATFORM_ADMIN_ROLE || user.id !== ownerId) {',
+    replace: 'if (user.role === PLATFORM_ADMIN_ROLE && user.id === ownerId) {',
     ...unitWorker('src/worker/admin.test.ts'),
   },
   {
@@ -118,17 +132,19 @@ export const DRILLS = [
   },
   {
     name: 'Uploads: declared size limit not enforced',
-    file: 'src/worker/routes/photos.ts',
-    find: 'if (declaredLength > MAX_PHOTO_BYTES + MAX_THUMBNAIL_BYTES) {',
-    replace: 'if (declaredLength < 0) {',
-    ...unitWorker('src/worker/photos.test.ts'),
+    file: 'src/worker/middleware/body-limit.ts',
+    find: "if (Number(request.headers.get('content-length')) > maxBytes) throw apiErrors.payloadTooLarge()",
+    replace:
+      "if (Number(request.headers.get('content-length')) > maxBytes * 2) throw apiErrors.payloadTooLarge()",
+    ...unitWorker('src/worker/middleware/body-limit.test.ts'),
   },
   {
     name: 'Uploads: photo count quota not enforced',
-    file: 'src/worker/routes/photos.ts',
-    find: 'if (usage.count >= MAX_PHOTOS_PER_ORGANIZATION) {',
-    replace: 'if (usage.count > MAX_PHOTOS_PER_ORGANIZATION * 2) {',
-    ...unitWorker('src/worker/photos.test.ts'),
+    file: 'src/worker/db/upload-store.ts',
+    find: "input.kind === 'photo' ? MAX_PHOTOS_PER_ORGANIZATION : MAX_LOGOS_PER_ORGANIZATION",
+    replace:
+      "input.kind === 'photo' ? MAX_PHOTOS_PER_ORGANIZATION + 1 : MAX_LOGOS_PER_ORGANIZATION",
+    ...workers('src/worker/uploads.workers.test.ts'),
   },
   {
     name: 'Uploads: declared type trusted instead of the bytes',
@@ -701,8 +717,9 @@ export const DRILLS = [
   {
     name: 'E2E (iPhone): phone menu button missing',
     file: 'src/client/components/app-shell.tsx',
-    find: '<Button type="button" variant="ghost" size="icon" aria-label="Menu">',
-    replace: '<Button type="button" variant="ghost" size="icon" aria-label="Navigation">',
+    find: '<Button type="button" variant="ghost" size="icon" aria-label={t(\'shell.menu\')}>',
+    replace:
+      '<Button type="button" variant="ghost" size="icon" aria-label={t(\'shell.menuDescription\')}>',
     ...e2e('iphone', 'e2e/library.spec.ts'),
   },
   {

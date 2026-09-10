@@ -5,7 +5,7 @@
  * (pixels) at the raster dpi. The smart-placement fallback is unit-tested in
  * `raster-layout.test.ts`; here it is exercised end to end.
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { DocumentRasteriser } from './raster'
 import { type PageSize, pixelDimensions } from './raster-layout'
@@ -50,7 +50,11 @@ interface Rect {
 async function decode(bytes: Uint8Array): Promise<ImageData> {
   // The cast bridges TS 6's narrower lib.dom BlobPart; a Uint8Array is one at runtime.
   const bitmap = await createImageBitmap(new Blob([bytes] as BlobPart[], { type: 'image/png' }))
-  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+  // Decode independently with DOM canvas so this oracle also works while the
+  // capability test removes OffscreenCanvas from the browser under test.
+  const canvas = document.createElement('canvas')
+  canvas.width = bitmap.width
+  canvas.height = bitmap.height
   const ctx = canvas.getContext('2d')
   if (ctx === null) {
     throw new Error('no 2d context')
@@ -75,26 +79,33 @@ function opaqueCount(image: ImageData, rect: Rect): number {
 }
 
 describe('DocumentRasteriser', () => {
-  it('paints a mark on a transparent, correctly scaled page canvas', async () => {
-    const rasteriser = new DocumentRasteriser(NO_LOGOS)
-    await rasteriser.prepare([FILLED_SQUARE])
-    const png = await rasteriser.rasterise(LETTER)
-    rasteriser.close()
-
-    const image = await decode(png)
-    // 612 × 792 pt at 150 dpi is 1275 × 1650 px.
-    const expected = pixelDimensions(LETTER)
-    expect({ width: image.width, height: image.height }).toEqual(expected)
-    expect(expected).toEqual({ width: 1275, height: 1650 })
-
-    const whole = { x: 0, y: 0, width: image.width, height: image.height }
-    const painted = opaqueCount(image, whole)
-    expect(painted).toBeGreaterThan(0)
-    // The page is not filled edge to edge: a transparent margin remains.
-    expect(painted).toBeLessThan(image.width * image.height)
-    // A corner well outside a centred half-width square is untouched.
-    expect(opaqueCount(image, { x: 0, y: 0, width: 100, height: 100 })).toBe(0)
-  })
+  it.each(['offscreen', 'DOM'] as const)(
+    'paints a real transparent mark at the correct scale with the %s canvas backend',
+    async (backend) => {
+      if (backend === 'DOM') vi.stubGlobal('OffscreenCanvas', undefined)
+      const rasteriser = new DocumentRasteriser(NO_LOGOS)
+      try {
+        await rasteriser.prepare([FILLED_SQUARE])
+        const png = await rasteriser.rasterise(LETTER)
+        const image = await decode(png)
+        // 612 × 792 pt at 150 dpi is 1275 × 1650 px.
+        const expected = pixelDimensions(LETTER)
+        expect({ width: image.width, height: image.height }).toEqual(expected)
+        expect(expected).toEqual({ width: 1275, height: 1650 })
+        const painted = opaqueCount(image, { x: 0, y: 0, width: image.width, height: image.height })
+        expect(painted).toBeGreaterThan(0)
+        // Empty output and opaque page fills fail different controls.
+        expect(painted).toBeLessThan(image.width * image.height)
+        expect(opaqueCount(image, { x: 0, y: 0, width: 100, height: 100 })).toBe(0)
+        const centre =
+          (Math.floor(image.height / 2) * image.width + Math.floor(image.width / 2)) * 4
+        expect([...image.data.slice(centre, centre + 4)]).toEqual([109, 77, 230, 255])
+      } finally {
+        rasteriser.close()
+        vi.unstubAllGlobals()
+      }
+    },
+  )
 
   it('falls a smart mark back to the bottom-right corner', async () => {
     const rasteriser = new DocumentRasteriser(NO_LOGOS)

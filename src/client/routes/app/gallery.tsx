@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 
 import { Gallery } from '../../components/gallery/gallery'
 import { Alert } from '../../components/ui/alert'
-import { activeMemberRoleQueryOptions } from '../../lib/queries'
+import { readActiveMemberRole } from '../../lib/queries'
 
 const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/gallery')({
-  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: GalleryPage,
 })
 

@@ -34,7 +34,12 @@ export function ChoiceGroup<T extends string>({
           onChange(match.value)
         }
       }}
-      className={cn('inline-flex rounded-lg border border-line bg-surface-raised p-1', className)}
+      // Radix's off-screen form inputs otherwise extend the RTL scroll area.
+      // The visible radio buttons keep their focus and keyboard semantics.
+      className={cn(
+        'inline-flex flex-wrap rounded-lg border border-line bg-surface-raised p-1 [&>input[type=radio][aria-hidden=true]]:hidden',
+        className,
+      )}
     >
       {choices.map((choice) => (
         <RadioGroup.Item

@@ -1,8 +1,17 @@
 import { type QueryClient, queryOptions } from '@tanstack/react-query'
 
-import { ApiRequestError, fetchJson } from './api'
+import { ApiRequestError, fetchJson, isTransportFailure } from './api'
 import { authClient } from './auth-client'
-import { auditListResponseSchema, publicConfigSchema } from '../../shared/api'
+import { captureOfflineGeneration, captureOfflineOwner } from './offline-context'
+import { auditListResponseSchema, publicConfigSchema } from '../../shared/api-core'
+import type { BootstrapSnapshot } from '../../shared/bootstrap'
+import { HTTP_STATUS } from '../../shared/constants'
+import {
+  shellOrganizationSchema,
+  shellOrganizationsSchema,
+  shellRoleSchema,
+  shellSessionSchema,
+} from '../../shared/shell-cache'
 
 /**
  * Query definitions shared by route loaders and components. Better Auth
@@ -25,32 +34,91 @@ function unwrap<T>(path: string, result: AuthResult<T>): T | null {
 
 export const sessionQueryOptions = queryOptions({
   queryKey: ['session'],
-  queryFn: async () => unwrap('/api/auth/get-session', await authClient.getSession()),
+  queryFn: async () => {
+    const generation = captureOfflineGeneration()
+    try {
+      const result = await authClient.getSession()
+      generation.assertCurrent()
+      const response = unwrap('/api/auth/get-session', result)
+      return response === null ? null : shellSessionSchema.parse(response)
+    } catch (error) {
+      generation.assertCurrent()
+      throw error
+    }
+  },
 })
 
 export const organizationsQueryOptions = queryOptions({
   queryKey: ['organizations'],
   queryFn: async () =>
-    unwrap('/api/auth/organization/list', await authClient.organization.list()) ?? [],
+    shellOrganizationsSchema.parse(
+      unwrap('/api/auth/organization/list', await authClient.organization.list()) ?? [],
+    ),
 })
 
 export const activeOrganizationQueryOptions = queryOptions({
   queryKey: ['organization', 'active'],
-  queryFn: async () =>
-    unwrap(
+  queryFn: async () => {
+    const result = unwrap(
       '/api/auth/organization/get-full-organization',
       await authClient.organization.getFullOrganization(),
-    ),
+    )
+    return result === null ? null : shellOrganizationSchema.parse(result)
+  },
 })
 
 export const activeMemberRoleQueryOptions = queryOptions({
   queryKey: ['organization', 'active', 'role'],
-  queryFn: async () =>
-    unwrap(
+  queryFn: async () => {
+    const result = unwrap(
       '/api/auth/organization/get-active-member-role',
       await authClient.organization.getActiveMemberRole(),
-    ),
+    )
+    return result === null ? null : shellRoleSchema.parse(result)
+  },
 })
+
+/** Seed the existing shell query keys only after the snapshot's account has been admitted. */
+export function seedBootstrapQueries(queryClient: QueryClient, snapshot: BootstrapSnapshot): void {
+  const owner = captureOfflineOwner()
+  if (snapshot.session.user.id !== owner.userId)
+    throw new Error('The signed-in account changed before loading its workspace.')
+  owner.assertCurrent()
+  queryClient.setQueryData(sessionQueryOptions.queryKey, snapshot.session)
+  queryClient.setQueryData(organizationsQueryOptions.queryKey, snapshot.organizations)
+  queryClient.setQueryData(activeOrganizationQueryOptions.queryKey, snapshot.organization)
+  queryClient.setQueryData(activeMemberRoleQueryOptions.queryKey, snapshot.role)
+}
+
+/** Offline tools use the last displayed role; the server rechecks authorization for every replay. */
+export async function readActiveMemberRole(queryClient: QueryClient) {
+  const owner = captureOfflineOwner()
+  const session = queryClient.getQueryData(sessionQueryOptions.queryKey)
+  const cached = queryClient.getQueryData(activeMemberRoleQueryOptions.queryKey)
+  function offlineRole() {
+    owner.assertCurrent()
+    if (cached === undefined || session?.user.id !== owner.userId) {
+      throw new Error('Connect once before using this workspace offline.')
+    }
+    return cached
+  }
+  if (!navigator.onLine) return offlineRole()
+  try {
+    const role = await queryClient.query({ ...activeMemberRoleQueryOptions, retry: false })
+    owner.assertCurrent()
+    return role
+  } catch (error) {
+    if (!isTransportFailure(error)) {
+      if (
+        error instanceof ApiRequestError &&
+        (error.status === HTTP_STATUS.unauthorized || error.status === HTTP_STATUS.forbidden)
+      )
+        queryClient.removeQueries({ queryKey: activeMemberRoleQueryOptions.queryKey })
+      throw error
+    }
+    return offlineRole()
+  }
+}
 
 export function auditQueryOptions(organizationId: string) {
   return queryOptions({

@@ -81,14 +81,15 @@ starting the next. Where a spec says "ask Randy", stop and ask in one line;
 everything else is yours to decide within the spec.
 
 Vendor accounts: Randy has accounts with Google, Microsoft and Dropbox and
-expects the OAuth applications to be registered by you (M16). Use a
-vendor CLI where one exists (Azure CLI 2.83 is installed) and the
-`chrome-control` MCP server (his own Chrome, signed in; 43 `browser_*`
-tools, catalogue in `C:/Users/Randy/Coding/chrome-control-mcp/docs/TOOLS.md`)
-where the vendor only offers a web console. Client ids and API keys are
-public configuration; never paste a client _secret_ into the repository
-or the chat, and prefer flows that need none (PKCE, implicit token
-clients, pickers).
+expects the OAuth applications to be registered by you (M16). Use an available
+vendor CLI or the configured browser tools for providers that require a web
+console. Client identifiers are public identifiers, but credentials and API-key
+values stay out of repository source and chat. Store local values in ignored
+configuration and deployed credentials in encrypted Worker bindings. A browser
+Picker key is restricted by API and referrer and delivered to the browser at
+runtime; its visibility there does not justify committing it. Prefer the
+provider's supported browser flow, including PKCE and official pickers, without
+introducing a browser-held client secret.
 
 ## The loop for one milestone
 

@@ -1,10 +1,13 @@
 /**
  * Reads a hidden mark out of an image file (M15): decode the file to pixels on
- * a canvas, then hand them to the pure `readInvisibleMark`. The decode is a 2D
- * canvas operation jsdom cannot run, so page tests replace this module with a
- * fake and it is excluded from coverage (see vitest.config.ts / PLAN.md §9).
+ * a canvas, then hand them to the pure `readInvisibleMark`. Real browser tests
+ * cover decoding and distinguish an absent mark from an unavailable reader.
  */
 import { readInvisibleMark } from '../engine/invisible'
+
+export class InvisibleReadError extends Error {
+  override readonly name = 'InvisibleReadError'
+}
 
 export async function readInvisibleFromFile(file: Blob): Promise<string | null> {
   const bitmap = await createImageBitmap(file)
@@ -14,7 +17,9 @@ export async function readInvisibleFromFile(file: Blob): Promise<string | null> 
     canvas.height = bitmap.height
     const context = canvas.getContext('2d')
     if (context === null) {
-      return null
+      throw new InvisibleReadError(
+        'This browser could not open a canvas to check the image. Try again in a supported browser.',
+      )
     }
     context.drawImage(bitmap, 0, 0)
     const image = context.getImageData(0, 0, bitmap.width, bitmap.height)

@@ -1,15 +1,26 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ExportPanel } from './export-panel'
 import type { Size } from '../../engine/layout'
 import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
-import type { CloudUpload } from '../../lib/imports/source'
+import type { CloudUpload, CloudUploadSource } from '../../lib/imports/source'
+import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
+import { fakeCloudSaver } from '../../test-support/fake-cloud-save'
+
+beforeEach(() => {
+  setOfflineUser('user-1')
+})
 
 vi.mock('../../lib/imports/google-drive-save', () => ({ saveToGoogleDrive: vi.fn() }))
-vi.mock('../../lib/imports/dropbox-save', () => ({ saveToDropbox: vi.fn() }))
+vi.mock('../../lib/imports/dropbox-save', () => ({
+  saveToDropbox: vi.fn(async (_config: unknown, source: CloudUploadSource) => {
+    if (typeof source === 'function') await source()
+    return []
+  }),
+}))
 vi.mock('../../lib/imports/onedrive', () => ({ saveToOneDrive: vi.fn() }))
 
 const googleSaveMock = vi.mocked(saveToGoogleDrive)
@@ -51,18 +62,18 @@ describe('ExportPanel cloud save', () => {
   })
 
   it('renders the current photo and confirms a successful save', async () => {
-    googleSaveMock.mockResolvedValue()
+    googleSaveMock.mockImplementation(fakeCloudSaver('google'))
     const onExportBlob = vi.fn(() => Promise.resolve(UPLOAD))
     const { user, onCloudSaved, onCloudError } = renderPanel(onExportBlob)
 
     await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
 
-    await waitFor(() => expect(googleSaveMock).toHaveBeenCalledWith(ALL_CLOUD_CONFIG, [UPLOAD]))
+    await waitFor(() =>
+      expect(googleSaveMock).toHaveBeenCalledWith(ALL_CLOUD_CONFIG, expect.any(Function)),
+    )
     expect(onExportBlob).toHaveBeenCalledTimes(1)
     await waitFor(() =>
-      expect(onCloudSaved).toHaveBeenCalledWith(
-        'Saved to your Google Drive “Watermark Pro” folder.',
-      ),
+      expect(onCloudSaved).toHaveBeenCalledWith('Saved to your Google Drive “Lumafoil” folder.'),
     )
     expect(onCloudError).not.toHaveBeenCalled()
   })

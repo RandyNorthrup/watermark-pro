@@ -1,12 +1,12 @@
 {
-  "name": "Watermark Pro",
-  "short_name": "Watermark",
-  "description": "Bulk photo watermarking with smart placement, a watermark library, an editor, and secure sharing.",
+  "name": "Lumafoil",
+  "short_name": "Lumafoil",
+  "description": "Watermark photos, videos, and PDFs. Reusable presets, offline editing, and optional workspace sync.",
   "start_url": "/app",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#fbfbfc",
-  "theme_color": "#6d4de6",
+  "background_color": "#fbf9f7",
+  "theme_color": "#c86b82",
   "icons": [
     {
       "src": "/favicon.svg",
@@ -22,6 +22,12 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "share_target": {
@@ -29,13 +35,22 @@
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
-      "files": [{ "name": "photos", "accept": ["image/png", "image/jpeg", "image/webp"] }]
+      "files": [
+        {
+          "name": "photos",
+          "accept": ["image/png", "image/jpeg", "image/webp"]
+        }
+      ]
     }
   },
   "file_handlers": [
     {
       "action": "/app",
-      "accept": { "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"], "image/webp": [".webp"] }
+      "accept": {
+        "image/png": [".png"],
+        "image/jpeg": [".jpg", ".jpeg"],
+        "image/webp": [".webp"]
+      }
     }
   ]
 }

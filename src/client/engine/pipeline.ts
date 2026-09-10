@@ -20,6 +20,7 @@ import { resolveContrast, type ResolvedContrast } from './contrast'
 import { DEFAULT_METADATA_POLICY, encodeCanvas, type EncodeOptions } from './encode'
 import { embedInvisibleMark } from './invisible'
 import { markSize, resolvePlacement, type Size, tileCentres } from './layout'
+import { withAssetNotice } from './metadata/asset-notice'
 import type { RawMetadata } from './metadata/segments'
 import { withMetadata } from './metadata/write'
 import {
@@ -37,6 +38,7 @@ import {
   isIdentityAdjustments,
   type Orientation,
 } from '../../shared/adjustments'
+import { artworkLicenseNotice } from '../../shared/asset-licenses'
 import type { Anchor } from '../../shared/watermark'
 
 /** Longest side of the analysis map; small enough to be instant, large enough to see composition. */
@@ -270,11 +272,17 @@ export async function applyWatermark(
   const framed = await frameCanvas(canvas, request.transform?.border, backend)
   embedInvisible(framed.canvas, request.output.invisible)
   const encoded = await encodeCanvas(framed.canvas, request.output)
-  const blob = await withMetadata(
+  const metadataBlob = await withMetadata(
     encoded,
     request.output.format,
     request.metadata ?? null,
     request.output.metadata ?? DEFAULT_METADATA_POLICY,
+    { width: framed.canvas.width, height: framed.canvas.height },
+  )
+  const blob = await withAssetNotice(
+    metadataBlob,
+    request.output.format,
+    artworkLicenseNotice(request.marks.map((mark) => mark.spec)),
     { width: framed.canvas.width, height: framed.canvas.height },
   )
   const offsetMarks = marks.map((mark) => ({

@@ -12,9 +12,9 @@ import {
   sweepFolder,
   WATCH_INTERVAL_MS,
 } from '../../bulk/watch'
-import { apiRequest } from '../../lib/api'
 import { describeError } from '../../lib/errors'
 import { assetFileUrl } from '../../lib/library'
+import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { readPhotoMetadata } from '../../lib/photo-metadata'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -129,8 +129,7 @@ export function WatchFolder({ organizationId, specs, settings }: WatchFolderProp
       outputRef.current = output
       seenRef.current = []
       runtimeRef.current = createBulkRuntime(async (assetId) => {
-        const response = await apiRequest(assetFileUrl(organizationId, assetId))
-        return await response.blob()
+        return await loadWorkspaceMedia(organizationId, assetFileUrl(organizationId, assetId))
       })
       setLog([])
       setIsWatching(true)

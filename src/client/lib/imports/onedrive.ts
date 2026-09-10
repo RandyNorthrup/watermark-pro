@@ -12,24 +12,32 @@
  * auth header. The URL builders and the mapper are pure and unit-tested; the
  * MSAL and network glue is exercised by the browser, not here.
  *
- * Saving back (M16 save-to-cloud) uses the same `Files.ReadWrite` token: each
- * watermarked photo is PUT to `.../root:/<CLOUD_SAVE_FOLDER>/<name>:/content`,
- * which creates the folder path if missing and supports the photo sizes this
- * app produces (Graph's simple upload accepts up to 250 MB).
+ * Saving uses a separately verified folder and rename-on-conflict upload
+ * sessions in `onedrive-upload`. Tokens and temporary URLs remain in memory;
+ * app-account transitions invalidate pending work and the cached MSAL instance.
  */
-import { InteractionRequiredAuthError, PublicClientApplication } from '@azure/msal-browser'
+import type { PublicClientApplication } from '@azure/msal-browser'
 import { z } from 'zod'
 
+import {
+  cloudFileIdSchema,
+  cloudRequest,
+  trustedCloudUrl,
+  uploadCloudBatch,
+  type CloudSavedFile,
+} from './cloud-transfer'
 import { toImageFile } from './download'
-import type { CloudUpload } from './source'
+import { ensureOneDriveFolder, uploadOneDriveImage } from './onedrive-upload'
+import type { CloudUploadSource } from './source'
 import type { PublicConfig } from '../../../shared/api'
 import {
-  CLOUD_SAVE_FOLDER,
   MICROSOFT_AUTHORITY,
   MICROSOFT_GRAPH_ROOT,
   MICROSOFT_GRAPH_SCOPE,
   MICROSOFT_OAUTH_REDIRECT_PATH,
 } from '../../../shared/constants'
+import { ACCOUNT_CHANGED_EVENT } from '../offline-account'
+import { captureOfflineOwner } from '../offline-context'
 
 /** Graph marks image files with a MIME type under this family. */
 const IMAGE_MIME_PREFIX = 'image/'
@@ -37,6 +45,13 @@ const IMAGE_MIME_PREFIX = 'image/'
 const DOWNLOAD_URL_KEY = '@microsoft.graph.downloadUrl'
 const AUTHORIZATION_HEADER = 'Authorization'
 const BEARER_PREFIX = 'Bearer '
+const FILE_HOSTS = [
+  'files.1drv.com',
+  'up.1drv.com',
+  'my.microsoftpersonalcontent.com',
+  'sharepoint.com',
+]
+const GRAPH_PAGE_LIMIT = 100
 
 /** A folder in the drive; kept only so the picker can navigate into it. */
 export interface OneDriveFolder {
@@ -59,8 +74,8 @@ export type OneDriveItem = OneDriveFolder | OneDriveImage
 
 /** Only the Graph `driveItem` fields the picker reads; extra keys are stripped. */
 const graphDriveItemSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+  id: cloudFileIdSchema,
+  name: z.string().min(1),
   /** Present (as a facet object) when the item is a folder. */
   folder: z.unknown().optional(),
   /** Present when the item is a file; carries its MIME type. */
@@ -70,6 +85,7 @@ const graphDriveItemSchema = z.object({
 
 const graphChildrenSchema = z.object({
   value: z.array(graphDriveItemSchema),
+  '@odata.nextLink': z.string().optional(),
 })
 
 /**
@@ -80,7 +96,7 @@ const graphChildrenSchema = z.object({
 export function oneDriveChildrenUrl(folderId?: string): string {
   return folderId === undefined
     ? `${MICROSOFT_GRAPH_ROOT}/me/drive/root/children`
-    : `${MICROSOFT_GRAPH_ROOT}/me/drive/items/${folderId}/children`
+    : `${MICROSOFT_GRAPH_ROOT}/me/drive/items/${encodeURIComponent(folderId)}/children`
 }
 
 /**
@@ -98,7 +114,13 @@ export function mapGraphChildren(payload: unknown): OneDriveItem[] {
     if (mimeType?.startsWith(IMAGE_MIME_PREFIX) === true) {
       const downloadUrl = entry[DOWNLOAD_URL_KEY]
       if (downloadUrl !== undefined) {
-        items.push({ kind: 'image', id: entry.id, name: entry.name, mimeType, downloadUrl })
+        items.push({
+          kind: 'image',
+          id: entry.id,
+          name: entry.name,
+          mimeType,
+          downloadUrl: trustedCloudUrl(downloadUrl, FILE_HOSTS),
+        })
       }
       continue
     }
@@ -114,24 +136,56 @@ export function mapGraphChildren(payload: unknown): OneDriveItem[] {
  * object (rather than a reassigned module variable) keeps the memoisation
  * lint-clean while still caching across calls.
  */
-const instanceCache: { promise: Promise<PublicClientApplication> | null } = { promise: null }
+const instanceCache: {
+  promise: Promise<PublicClientApplication> | null
+  owner: string | null
+  clientId: string | null
+  listening: boolean
+} = { promise: null, owner: null, clientId: null, listening: false }
 
 async function initInstance(clientId: string): Promise<PublicClientApplication> {
-  const instance = new PublicClientApplication({
+  const msal = await import('@azure/msal-browser')
+  const instance = new msal.PublicClientApplication({
     auth: {
       clientId,
       authority: MICROSOFT_AUTHORITY,
       redirectUri: `${window.location.origin}${MICROSOFT_OAUTH_REDIRECT_PATH}`,
     },
+    cache: { cacheLocation: 'memoryStorage' },
   })
   await instance.initialize()
   return instance
 }
 
 /** The shared MSAL instance, created and initialized once per page. */
-function getInstance(clientId: string): Promise<PublicClientApplication> {
+async function getInstance(clientId: string): Promise<PublicClientApplication> {
+  const owner = captureOfflineOwner()
+  if (!instanceCache.listening) {
+    instanceCache.listening = true
+    window.addEventListener(
+      ACCOUNT_CHANGED_EVENT,
+      () => {
+        instanceCache.promise = null
+        instanceCache.owner = null
+        instanceCache.clientId = null
+        instanceCache.listening = false
+      },
+      { once: true },
+    )
+  }
+  if (instanceCache.owner !== owner.userId || instanceCache.clientId !== clientId) {
+    instanceCache.promise = null
+    instanceCache.owner = owner.userId
+    instanceCache.clientId = clientId
+  }
   instanceCache.promise ??= initInstance(clientId)
-  return instanceCache.promise
+  const pending = instanceCache.promise
+  try {
+    return await pending
+  } catch (error) {
+    if (instanceCache.promise === pending) instanceCache.promise = null
+    throw error
+  }
 }
 
 /**
@@ -141,21 +195,28 @@ function getInstance(clientId: string): Promise<PublicClientApplication> {
  * interaction is required (a lapsed session or ungranted consent).
  */
 export async function acquireGraphToken(clientId: string): Promise<string> {
+  const owner = captureOfflineOwner()
+  const { InteractionRequiredAuthError } = await import('@azure/msal-browser')
+  owner.assertCurrent()
   const instance = await getInstance(clientId)
+  owner.assertCurrent()
   const scopes = [MICROSOFT_GRAPH_SCOPE]
   const account = instance.getAllAccounts()[0]
   if (account !== undefined) {
     try {
       const silent = await instance.acquireTokenSilent({ scopes, account })
-      return silent.accessToken
+      owner.assertCurrent()
+      return z.string().min(1).parse(silent.accessToken)
     } catch (error) {
       if (!(error instanceof InteractionRequiredAuthError)) {
         throw error
       }
     }
   }
-  const popup = await instance.acquireTokenPopup({ scopes })
-  return popup.accessToken
+  owner.assertCurrent()
+  const popup = await instance.acquireTokenPopup({ scopes, prompt: 'select_account' })
+  owner.assertCurrent()
+  return z.string().min(1).parse(popup.accessToken)
 }
 
 /**
@@ -167,14 +228,33 @@ export async function listOneDriveImages(
   token: string,
   folderId?: string,
 ): Promise<OneDriveItem[]> {
-  const response = await fetch(oneDriveChildrenUrl(folderId), {
-    headers: { [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${token}` },
-  })
-  if (!response.ok) {
-    throw new Error(`Could not list OneDrive contents (HTTP ${String(response.status)}).`)
+  const owner = captureOfflineOwner()
+  const first = oneDriveChildrenUrl(folderId)
+  let next: string | undefined = first
+  const seen = new Set<string>()
+  const items: OneDriveItem[] = []
+  while (next !== undefined) {
+    owner.assertCurrent()
+    if (seen.has(next) || seen.size >= GRAPH_PAGE_LIMIT)
+      throw new Error('OneDrive returned an invalid or oversized folder listing.')
+    const url = new URL(trustedCloudUrl(next, ['graph.microsoft.com']))
+    if (url.origin !== new URL(first).origin || url.pathname !== new URL(first).pathname)
+      throw new Error('OneDrive returned an unexpected page link.')
+    seen.add(next)
+    const page: z.infer<typeof graphChildrenSchema> = await cloudRequest(
+      next,
+      { headers: { [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${token}` } },
+      async (response) => {
+        if (!response.ok)
+          throw new Error(`Could not list OneDrive contents (HTTP ${String(response.status)}).`)
+        return graphChildrenSchema.parse(await response.json())
+      },
+    )
+    owner.assertCurrent()
+    items.push(...mapGraphChildren(page))
+    next = page['@odata.nextLink']
   }
-  const payload: unknown = await response.json()
-  return mapGraphChildren(payload)
+  return items
 }
 
 /**
@@ -183,49 +263,19 @@ export async function listOneDriveImages(
  * pick.
  */
 export async function downloadOneDriveImage(item: OneDriveImage): Promise<File> {
-  const response = await fetch(item.downloadUrl)
-  if (!response.ok) {
-    throw new Error(`Could not download "${item.name}" (HTTP ${String(response.status)}).`)
-  }
-  const blob = await response.blob()
-  return toImageFile(blob, item.name, item.mimeType)
-}
-
-/**
- * Graph simple-upload URL for a watermarked photo, addressed by path under the
- * save folder at the drive root. Both path segments are percent-encoded so a
- * name with spaces or reserved characters cannot break out of the path. Pure,
- * so it is unit-tested without a network.
- */
-export function oneDriveUploadUrl(name: string): string {
-  const folder = encodeURIComponent(CLOUD_SAVE_FOLDER)
-  const file = encodeURIComponent(name)
-  return `${MICROSOFT_GRAPH_ROOT}/me/drive/root:/${folder}/${file}:/content`
-}
-
-/** Content type sent with an upload when the blob does not carry one. */
-const DEFAULT_UPLOAD_CONTENT_TYPE = 'application/octet-stream'
-
-/**
- * Writes one watermarked photo to the save folder via Graph's simple upload,
- * creating the folder path if it does not exist. A non-OK response throws with
- * the status so `describeError` can surface it.
- */
-export async function uploadOneDriveImage(token: string, upload: CloudUpload): Promise<void> {
-  const contentType = upload.blob.type.length > 0 ? upload.blob.type : DEFAULT_UPLOAD_CONTENT_TYPE
-  const response = await fetch(oneDriveUploadUrl(upload.name), {
-    method: 'PUT',
-    headers: {
-      [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${token}`,
-      'Content-Type': contentType,
+  const url = trustedCloudUrl(item.downloadUrl, FILE_HOSTS)
+  return await cloudRequest(
+    url,
+    { credentials: 'omit', referrerPolicy: 'no-referrer' },
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(`Could not download "${item.name}" (HTTP ${String(response.status)}).`)
+      }
+      const blob = await response.blob()
+      if (response.url !== '') trustedCloudUrl(response.url, FILE_HOSTS)
+      return toImageFile(blob, item.name, item.mimeType)
     },
-    body: upload.blob,
-  })
-  if (!response.ok) {
-    throw new Error(
-      `Could not save "${upload.name}" to OneDrive (HTTP ${String(response.status)}).`,
-    )
-  }
+  )
 }
 
 /**
@@ -236,14 +286,19 @@ export async function uploadOneDriveImage(token: string, upload: CloudUpload): P
  */
 export async function saveToOneDrive(
   config: PublicConfig,
-  uploads: readonly CloudUpload[],
-): Promise<void> {
+  uploads: CloudUploadSource,
+): Promise<CloudSavedFile[]> {
   const clientId = config.microsoftClientId
   if (clientId === null) {
     throw new Error('OneDrive is not configured for this deployment.')
   }
+  const owner = captureOfflineOwner()
   const token = await acquireGraphToken(clientId)
-  for (const upload of uploads) {
-    await uploadOneDriveImage(token, upload)
-  }
+  owner.assertCurrent()
+  const files = typeof uploads === 'function' ? await uploads() : uploads
+  owner.assertCurrent()
+  if (files.length === 0) return []
+  const folder = await ensureOneDriveFolder(token)
+  owner.assertCurrent()
+  return await uploadCloudBatch(files, (upload) => uploadOneDriveImage(token, upload, folder))
 }

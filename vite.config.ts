@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { cloudflare } from '@cloudflare/vite-plugin'
@@ -7,6 +7,10 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
+
+import { bundleInventoryPlugin } from './scripts/lib/bundle-inventory'
+import { routePreloadPlugin } from './scripts/lib/route-preloads'
+import { completeSoftwareNotices } from './scripts/lib/software-notices'
 
 /**
  * index.html carries one inline `<script>` (the pre-paint theme resolver) so
@@ -19,6 +23,76 @@ import { defineConfig, type Plugin } from 'vite'
  */
 const SCRIPT_SRC_MARKER = "script-src 'self'"
 const INLINE_SCRIPT_PATTERN = /<script(?![^>]*\ssrc=)[^>]*>([\S\s]*?)<\/script>/g
+
+/** Each build gets a complete offline asset inventory and a changed service-worker version. */
+function offlineAssetsPlugin(): Plugin {
+  return {
+    name: 'offline-assets',
+    apply: 'build',
+    writeBundle(options, bundle) {
+      if (bundle['index.html']?.type !== 'asset') {
+        return
+      }
+      const outDir = options.dir ?? path.join('dist', 'client')
+      completeSoftwareNotices(outDir)
+      const assets = [
+        '/offline-shell',
+        '/sample-scene.jpg',
+        '/manifest.webmanifest',
+        '/favicon.svg',
+        '/apple-touch-icon.png',
+        '/icon-192.png',
+        '/icon-512.png',
+        '/icon-maskable-512.png',
+        '/third-party-licenses.md',
+        '/open-source.md',
+        ...['fonts', 'stickers', 'product']
+          .flatMap((directory) =>
+            existsSync(path.join('public', directory))
+              ? readdirSync(path.join('public', directory), {
+                  recursive: true,
+                  withFileTypes: true,
+                })
+              : [],
+          )
+          .filter((entry) => entry.isFile())
+          .map(
+            (entry) =>
+              `/${path.relative('public', path.join(entry.parentPath, entry.name)).replaceAll('\\', '/')}`,
+          ),
+        ...Object.keys(bundle)
+          .filter((name) => name.startsWith('assets/'))
+          .map((name) => `/${name}`),
+      ].toSorted((first, second) => first.localeCompare(second))
+      const html = bundle['index.html']
+      const source =
+        typeof html.source === 'string' ? html.source : Buffer.from(html.source).toString('utf8')
+      const worker = readFileSync(path.join('public', 'sw.js'), 'utf8')
+      const hash = createHash('sha256').update(JSON.stringify(assets)).update(source).update(worker)
+      // Unhashed public assets can change without changing their URL. Cache
+      // identity must include their bytes as well as Vite's hashed chunk names.
+      for (const asset of assets) {
+        if (asset === '/offline-shell') {
+          continue
+        }
+        const assetPath = path.join(outDir, asset.slice(1))
+        hash.update(readFileSync(assetPath))
+      }
+      const digest = hash.digest('hex')
+      const document = source.replace(
+        '<head>',
+        () => `<head><meta name="offline-build" content="watermark-pro-offline-${digest}">`,
+      )
+      writeFileSync(path.join(outDir, 'index.html'), document)
+      writeFileSync(path.join(outDir, 'offline-shell.html'), document)
+      writeFileSync(path.join(outDir, 'offline-manifest.json'), JSON.stringify(assets))
+      writeFileSync(
+        path.join(outDir, 'sw.js'),
+        worker.replace('watermark-pro-offline-v2', () => `watermark-pro-offline-${digest}`),
+      )
+    },
+  }
+}
 
 function inlineScriptCspHashPlugin(): Plugin {
   return {
@@ -61,27 +135,7 @@ function inlineScriptCspHashPlugin(): Plugin {
   }
 }
 
-/**
- * mediabunny (video, M17) and pdf-lib (documents, M17) are large and each is
- * reached only from its own route, so they ride in their own long-cached chunk
- * instead of weighing down any page that does not watermark that media type.
- *
- * The UI primitives (radix-ui, lucide-react) are deliberately NOT grouped
- * (M19): grouping every primitive into one `ui` chunk pulled all of radix onto
- * the first paint even though the shell needs only a handful, costing ~40 kB
- * gzip. Cloudflare serves HTTP/2, so the many-small-files round-trip cost the
- * grouping avoided no longer applies; letting rolldown split them per route
- * keeps the public boot lean (PLAN.md §5.5).
- */
-const VIDEO_CHUNK_GROUP = {
-  name: 'video',
-  test: /node_modules[\\/]mediabunny[\\/]/,
-}
-const PDF_CHUNK_GROUP = {
-  name: 'pdf',
-  test: /node_modules[\\/]pdf-lib[\\/]/,
-}
-
+/** Libraries split at their actual feature boundaries; eager grouping would load unused tools at boot. */
 export default defineConfig({
   build: {
     // The client build emits `.vite/manifest.json` so the bundle report and the
@@ -89,9 +143,46 @@ export default defineConfig({
     // can trace the initial-load set per route from the real chunk graph
     // instead of scraping the built HTML. The Worker build ignores this.
     manifest: true,
+    license: { fileName: 'third-party-licenses.md' },
     rolldownOptions: {
       output: {
-        codeSplitting: { groups: [VIDEO_CHUNK_GROUP, PDF_CHUNK_GROUP] },
+        postBanner: '/*! /third-party-licenses.md /open-source.md */',
+      },
+      treeshake: {
+        // This module only constructs validators. The router leaves side-effect
+        // imports after splitting forms; they must not load unused form schemas
+        // into every route. Used validators remain in their actual form chunks.
+        moduleSideEffects: (id) => !id.replaceAll('\\', '/').endsWith('/src/shared/validation.ts'),
+      },
+    },
+  },
+  environments: {
+    client: {
+      build: {
+        rolldownOptions: {
+          preserveEntrySignatures: 'allow-extension',
+          output: {
+            // Zod barrels and split form declarations expose pre-treeshake
+            // imports to $initial. Preserve their existing chunk boundaries.
+            strictExecutionOrder: true,
+            codeSplitting: {
+              groups: [
+                {
+                  name: 'app-boot',
+                  tags: ['$initial'],
+                  includeDependenciesRecursively: false,
+                  test: (id) => {
+                    const normalized = id.replaceAll('\\', '/')
+                    return (
+                      !normalized.includes('/node_modules/zod/') &&
+                      !normalized.endsWith('/src/shared/validation.ts')
+                    )
+                  },
+                },
+              ],
+            },
+          },
+        },
       },
     },
   },
@@ -100,6 +191,15 @@ export default defineConfig({
     tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
+      codeSplittingOptions: {
+        defaultBehavior: [
+          ['loader'],
+          ['component'],
+          ['pendingComponent'],
+          ['errorComponent'],
+          ['notFoundComponent'],
+        ],
+      },
       routesDirectory: './src/client/routes',
       generatedRouteTree: './src/client/routeTree.gen.ts',
       // Co-located tests live beside routes but are not routes.
@@ -112,6 +212,9 @@ export default defineConfig({
     cloudflare(),
     // After the client build writes index.html and _headers, allow-list the
     // inline theme script's hash in the CSP.
+    routePreloadPlugin(),
     inlineScriptCspHashPlugin(),
+    offlineAssetsPlugin(),
+    bundleInventoryPlugin(),
   ],
 })

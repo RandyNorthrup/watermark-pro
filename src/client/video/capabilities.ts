@@ -1,10 +1,8 @@
 /**
  * Up-front detection of what this browser can produce, shown to the user before
- * they start ("Saves as MP4 (H.264)"). Browser-bound (WebCodecs + mediabunny),
- * so coverage-excluded; the pure selection logic it drives lives in `plan.ts`
- * and is tested there against a fake `canEncode`.
+ * they start ("Saves as MP4 (H.264)"). Native browser tests exercise WebCodecs
+ * and mediabunny with V8 coverage. The pure selection logic lives in `plan.ts`.
  */
-import { canEncodeAudio, canEncodeVideo } from 'mediabunny'
 import type { AudioCodec, VideoCodec } from 'mediabunny'
 import { useEffect, useState } from 'react'
 
@@ -45,6 +43,7 @@ export async function detectVideoCapability(): Promise<VideoCapability> {
   if (!hasVideoEncoder()) {
     return { supported: false }
   }
+  const { canEncodeAudio, canEncodeVideo } = await import('mediabunny')
   const videoCodec = await chooseVideoCodec((codec) => canEncodeVideo(codec))
   if (videoCodec === null) {
     return { supported: false }
@@ -64,17 +63,26 @@ export async function detectVideoCapability(): Promise<VideoCapability> {
 
 /** The detected capability, or null while detection is still running. */
 export function useVideoCapability(): VideoCapability | null {
+  const [error, setError] = useState<Error | null>(null)
   const [capability, setCapability] = useState<VideoCapability | null>(null)
   useEffect(() => {
     let isLive = true
-    void detectVideoCapability().then((result) => {
-      if (isLive) {
-        setCapability(result)
-      }
-    })
+    void detectVideoCapability()
+      .then((result) => {
+        if (isLive) setCapability(result)
+      })
+      .catch((error_: unknown) => {
+        if (isLive)
+          setError(
+            error_ instanceof Error
+              ? error_
+              : new Error('Video support detection failed.', { cause: error_ }),
+          )
+      })
     return () => {
       isLive = false
     }
   }, [])
+  if (error !== null) throw error
   return capability
 }

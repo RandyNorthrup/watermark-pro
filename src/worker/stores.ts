@@ -18,11 +18,12 @@ export interface WatermarkRecord {
 export interface WatermarkStore {
   listForOrganization(organizationId: string): Promise<WatermarkRecord[]>
   find(organizationId: string, id: string): Promise<WatermarkRecord | null>
+  findMany(organizationId: string, ids: readonly string[]): Promise<WatermarkRecord[]>
   create(input: Omit<WatermarkRecord, 'createdAt' | 'updatedAt'>): Promise<WatermarkRecord>
   update(
     organizationId: string,
     id: string,
-    patch: { name: string; spec: WatermarkSpec },
+    patch: { name: string; spec: WatermarkSpec; expectedUpdatedAt?: string | undefined },
   ): Promise<WatermarkRecord | null>
   delete(organizationId: string, id: string): Promise<boolean>
   /** Presets whose image mark references the asset. */
@@ -73,6 +74,8 @@ export interface PhotoRecord {
   name: string
   key: string
   thumbnailKey: string
+  /** Actual thumbnail bytes; legacy internal fixtures can omit a thumbnail. */
+  thumbnailSize?: number | undefined
   contentType: string
   size: number
   width: number

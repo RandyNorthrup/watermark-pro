@@ -5,6 +5,12 @@ description: >-
   dependencies and the Chromium build the browser tests use. Shared by the
   CI and Deploy workflows so the two never drift.
 
+inputs:
+  install-browsers:
+    description: Install pinned Chromium and WebKit for test jobs.
+    required: false
+    default: 'true'
+
 runs:
   using: composite
   steps:
@@ -17,9 +23,15 @@ runs:
       shell: bash
       env:
         GITLEAKS_VERSION: 8.30.1
+        # Official release checksums verified against downloaded bytes on 2026-09-09.
+        GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
       run: |
-        curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
-          | tar -xz -C /usr/local/bin gitleaks
+        archive="$RUNNER_TEMP/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+        curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
+          "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+          --output "$archive"
+        printf '%s  %s\n' "$GITLEAKS_SHA256" "$archive" | sha256sum --check --strict
+        tar -xzf "$archive" -C /usr/local/bin gitleaks
         gitleaks version
 
     - shell: bash
@@ -28,4 +40,45 @@ runs:
     # The Vitest `browser` project and the Playwright suite both run in
     # Chromium; installing it here keeps every job that runs tests identical.
     - shell: bash
+      if: inputs.install-browsers == 'true'
       run: npx playwright install --with-deps chromium webkit
+
+    - name: Install the pinned Chromium sandbox on the ephemeral Linux runner
+      if: inputs.install-browsers == 'true' && runner.os == 'Linux' && runner.environment == 'github-hosted'
+      shell: bash
+      env:
+        AUDIT_CHROMIUM_VERSION: 153.0.8010.12
+        # Verified from the exact publisher ZIP on 2026-09-10; no independently downloaded helper.
+        AUDIT_SANDBOX_SHA256: c100b678a8c171ad0733e51b6f18d98d936d38ab945681c41da00f2ee22e7571
+      run: |
+        set -euo pipefail
+        sandbox_source="$(node --input-type=module <<'NODE'
+        import { execFileSync } from 'node:child_process'
+        import { lstatSync, readFileSync } from 'node:fs'
+        import { createRequire } from 'node:module'
+        import path from 'node:path'
+        import { chromium } from '@playwright/test'
+        const require = createRequire(import.meta.url)
+        const registry = JSON.parse(readFileSync(path.join(path.dirname(require.resolve('playwright-core/package.json')), 'browsers.json'), 'utf8'))
+        const expected = process.env.AUDIT_CHROMIUM_VERSION
+        if (registry.browsers.find(browser => browser.name === 'chromium')?.browserVersion !== expected)
+          throw new Error('Review the sandbox pin when changing the Playwright browser version')
+        const executable = chromium.executablePath()
+        if (execFileSync(executable, ['--version'], { encoding: 'utf8' }).trim().split(/\s+/).at(-1) !== expected)
+          throw new Error('Installed Chromium does not match its reviewed browser pin')
+        // Chromium honors CHROME_DEVEL_SANDBOX for this user-managed executable.
+        if (lstatSync(executable).uid !== process.getuid())
+          throw new Error('The pinned Chromium executable must remain owned by the runner')
+        const source = path.join(path.dirname(executable), 'chrome_sandbox')
+        if (!lstatSync(source).isFile()) throw new Error('Pinned publisher sandbox is not a regular file')
+        process.stdout.write(source)
+        NODE
+        )"
+        printf '%s  %s\n' "$AUDIT_SANDBOX_SHA256" "$sandbox_source" | sha256sum --check --strict
+        sudo install -d -o root -g root -m 0755 /usr/local/lib/lumafoil
+        sudo install -o root -g root -m 4755 -- "$sandbox_source" /usr/local/lib/lumafoil/chrome-sandbox
+        cmp -- "$sandbox_source" /usr/local/lib/lumafoil/chrome-sandbox
+        test "$(stat -c '%u:%g:%a' /usr/local/lib/lumafoil/chrome-sandbox)" = '0:0:4755'
+        printf 'Pinned Chromium sandbox installed and verified.\n'
+        # Prove this runner can launch the sandboxed browser before expensive application checks.
+        node --test scripts/audit-certificate.browser.test.mjs

@@ -23,7 +23,7 @@
     "toolsNav": "工具",
     "signOut": "退出登录",
     "accountMenu": "{{name}} 的账户菜单",
-    "menuDescription": "切换组织，或前往 Watermark Pro 的任意部分。",
+    "menuDescription": "切换组织，或前往 Lumafoil 的任意部分。",
     "switchOrganizationFor": "组织：{{name}}。切换组织",
     "chooseOrganization": "选择一个组织",
     "chooseOrganizationShort": "选择组织",
@@ -33,7 +33,8 @@
       "system": "主题：跟随系统。切换为浅色",
       "light": "主题：浅色。切换为深色",
       "dark": "主题：深色。切换为跟随系统"
-    }
+    },
+    "closeMenu": "关闭菜单"
   },
   "auth": {
     "backToSignIn": "返回登录",
@@ -87,12 +88,16 @@
       "roleLabel": "角色：",
       "decline": "拒绝",
       "accept": "接受邀请"
+    },
+    "inviteOnly": {
+      "title": "需要邀请",
+      "body": "Lumafoil目前仅限受邀用户使用。请打开邮件中的邀请链接创建账户。"
     }
   },
   "dashboard": {
     "signedInAs": "已以 {{email}} 登录",
     "yourWorkspace": "您的工作区",
-    "yourRole": "您的角色：",
+    "yourRole": "你在此工作区的角色：",
     "toolsHeading": "工具",
     "tools": {
       "library": {
@@ -109,7 +114,7 @@
       },
       "gallery": {
         "label": "图库",
-        "body": "浏览团队已保存的内容，然后通过链接分享相册。"
+        "body": "浏览已保存的照片，再选择要通过链接分享的照片。"
       }
     },
     "overviewHeading": "概览",
@@ -124,7 +129,7 @@
   "library": {
     "orgRequired": "创建或加入一个组织，以构建水印库。",
     "heading": "水印库",
-    "description": "由 {{name}} 中所有成员共享的预设。可逐个应用，也可批量应用。",
+    "description": "{{name}} 中保存的水印。可应用于单个文件或整个批次。",
     "export": "导出",
     "exportPreset": "导出 {{name}}",
     "importPresets": "导入预设",
@@ -138,7 +143,7 @@
     "loadingPreset": "正在加载预设",
     "loadPresetErrorTitle": "无法加载该预设",
     "presetGone": "该预设已不存在。",
-    "editSubtitleManage": "更改将应用于使用此预设的所有人。",
+    "editSubtitleManage": "更改将更新此预设，供之后使用。",
     "editSubtitleReadOnly": "只读视图。",
     "cannotCreate": "您的角色不允许创建预设。",
     "newPresetSubtitle": "设计标记，决定它的位置，然后将其保存到水印库。",
@@ -155,7 +160,8 @@
       "glyph": "字形 {{glyph}}",
       "icon": "图标 {{name}}",
       "logo": "Logo",
-      "qr": "{{content}} 的二维码"
+      "qr": "{{content}} 的二维码",
+      "sticker": "贴纸 {{name}}"
     },
     "shape": {
       "rectangle": "矩形",
@@ -167,7 +173,10 @@
       "smart": "智能放置",
       "custom": "自定义位置",
       "random": "随机放置"
-    }
+    },
+    "newQr": "新建二维码",
+    "qrOnly": "仅显示二维码",
+    "noQr": "尚无已保存的二维码。可以为每个常用链接创建一个。"
   },
   "designer": {
     "presetName": "预设名称",
@@ -191,7 +200,8 @@
     },
     "qr": {
       "content": "二维码内容",
-      "hint": "通常是一个链接。最多 {{max}} 个字符；二维码始终为浅底深色，以便扫描。"
+      "hint": "通常是一个链接。最多 {{max}} 个字符；二维码始终为浅底深色，以便扫描。",
+      "savedHint": "为每个二维码命名并单独保存。可从素材库重复使用，也可为不同链接保存多个二维码。分享前，请按实际使用尺寸测试导出的图片。"
     },
     "tokens": {
       "menu": "插入详情",
@@ -215,12 +225,16 @@
     "font": {
       "family": "字体",
       "weight": "字重",
-      "specimen": "敏捷的棕色狐狸跃过懒狗"
+      "specimen": "敏捷的棕色狐狸跃过懒狗",
+      "search": "搜索字体",
+      "resultCount": "{{count}} 个字体家族",
+      "license": "字体许可证"
     },
     "symbol": {
       "icons": "图标",
       "glyphLabel": "字形 {{glyph}}",
-      "iconLabel": "图标 {{label}}"
+      "iconLabel": "图标 {{label}}",
+      "license": "图标许可证"
     },
     "shape": {
       "label": "形状",
@@ -368,12 +382,25 @@
         "cancel": "取消",
         "save": "保存为 Logo"
       }
+    },
+    "stickers": {
+      "heading": "彩色贴纸",
+      "search": "搜索贴纸",
+      "category": "分类",
+      "all": "所有分类",
+      "results": "找到 {{total}} 个贴纸",
+      "choose": "选择 {{name}}",
+      "previous": "上一页",
+      "next": "下一页",
+      "license": "Fluent Emoji · MIT 许可证",
+      "usage": "允许商业使用；再次分发时请保留附带的图形许可声明。",
+      "guide": "图形许可指南"
     }
   },
   "editor": {
     "orgRequired": "创建或加入一个组织，以使用编辑器。",
     "heading": "编辑器",
-    "description": "为一张照片添加水印：选择一个预设，可手动放置，裁剪、调整大小并下载。任何内容都不会离开您的浏览器。",
+    "description": "在设备上选择预设、调整位置、裁剪和缩放。可下载结果，也可自主选择保存到图库或云端。",
     "tabs": {
       "watermark": "水印",
       "crop": "裁剪",
@@ -423,7 +450,13 @@
       "removeLayer": "从这张照片中移除 {{name}}",
       "adjusted": "已针对这张照片调整；水印库中的预设保持不变。",
       "revert": "还原",
-      "placement": "放置"
+      "placement": "放置",
+      "create": "创建水印",
+      "createHint": "在这里设计水印。保存后即可用于当前照片，并保留在素材库中以便重复使用。",
+      "cancelCreate": "取消",
+      "saveAndUse": "保存并使用",
+      "emptyReadOnly": "此素材库中尚无水印。",
+      "firstUseHint": "添加水印后，打开“导出”即可下载照片。"
     },
     "crop": {
       "aspectRatio": "宽高比",
@@ -491,7 +524,7 @@
         "label": "全部保留",
         "help": "包括 GPS 位置（如果照片有的话）。"
       },
-      "webpNote": "WebP 导出始终会去除元数据。"
+      "webpNote": "WebP 会移除照片的原始元数据，但会保留必要的图形许可声明。"
     },
     "export": {
       "format": "格式",
@@ -595,7 +628,7 @@
   "gallery": {
     "orgRequired": "创建或加入一个组织，以保存图库。",
     "heading": "图库",
-    "description": "由 {{name}} 保存的已加水印照片。可搜索、按预设筛选、下载或删除。",
+    "description": "保存在 {{name}} 中的水印照片。可搜索、筛选、下载或删除。",
     "usage_other": "{{count}} 张照片 · {{used}}/{{max}}",
     "maxCount": "每个组织最多 {{count}} 张照片",
     "storageUsed": "已用存储",
@@ -674,8 +707,8 @@
   },
   "admin": {
     "heading": "管理",
-    "description": "此部署上的所有用户和组织。此处的操作会记录在审计追踪中。",
-    "onlyAdmins": "只有平台管理员才能打开此页面。",
+    "description": "仅供网站管理员管理账号和查看汇总数据。拥有工作区并不授予网站管理权限。",
+    "onlyAdmins": "只有网站管理员可以打开此页面。",
     "sectionsLabel": "管理分区",
     "tabs": {
       "users": "用户",
@@ -693,7 +726,11 @@
       "ok": "OK",
       "failed": "失败",
       "duration": "{{ms}} ms",
-      "th": { "time": "时间", "status": "状态", "duration": "时长" }
+      "th": {
+        "time": "时间",
+        "status": "状态",
+        "duration": "时长"
+      }
     },
     "clientErrors": {
       "loading": "正在加载客户端错误",
@@ -713,15 +750,11 @@
     "you": "（您）",
     "joined": "加入于 {{date}}",
     "emailNotVerified": " · 邮箱未验证",
-    "platformAdmin": "平台管理员",
+    "platformAdmin": "网站管理员",
     "banned": "已封禁",
     "bannedReason": "已封禁：{{reason}}",
     "unban": "解除封禁",
     "unbanUser": "解除封禁 {{email}}",
-    "removeAdmin": "移除管理员",
-    "makeAdminShort": "设为管理员",
-    "removeAdminFrom": "移除 {{email}} 的管理员权限",
-    "makeAdmin": "将 {{email}} 设为管理员",
     "signOutEverywhereButton": "在所有设备上退出登录",
     "signOutEverywhere": "让 {{email}} 在所有设备上退出登录",
     "ban": "封禁",
@@ -783,7 +816,7 @@
   "organizations": {
     "firstTitle": "创建您的第一个组织",
     "newTitle": "新建组织",
-    "description": "组织包含您的水印、照片和团队。您将成为它的所有者。",
+    "description": "为水印和照片创建独立工作区。除非你明确邀请成员，否则它保持私密。",
     "createFailed": "无法创建该组织。",
     "nameLabel": "名称",
     "slugLabel": "URL 标识符",
@@ -813,7 +846,15 @@
       "noneSelected": "未选择照片",
       "selectedCount": "已选择 {{count}} 张",
       "addSelected": "添加所选"
-    }
+    },
+    "cloudSaved": "已保存的云端文件（{{total}}）",
+    "cloudSavedTitle": "已保存的云端文件",
+    "cloudSharingHint": "保存不会创建公开链接。只有希望任何持有链接的人都能查看文件时才创建。现有文件夹权限仍然适用。其他访问权限请在云服务中管理。",
+    "openProvider": "在 {{provider}} 中打开",
+    "createPublicLink": "创建公开链接",
+    "revokePublicLink": "撤销公开链接",
+    "linkCopied": "链接已复制",
+    "copyLink": "复制链接"
   },
   "video": {
     "orgRequired": "创建或加入一个组织，以为视频添加水印。",
@@ -902,7 +943,7 @@
     },
     "tool": {
       "title": "验证照片",
-      "description": "检查 PNG 是否带有隐形的 Watermark Pro 标记，并读取其隐藏信息。任何内容都不会离开您的浏览器。"
+      "description": "检查 PNG 是否带有隐形的 Lumafoil 标记，并读取其隐藏信息。任何内容都不会离开您的浏览器。"
     },
     "checkPng": "检查 PNG",
     "checking": "正在检查…",
@@ -919,7 +960,7 @@
     "createInLibrary": "在水印库中创建预设",
     "legend": "预设",
     "importTitle": "导入预设",
-    "importDescription": "选择一个 Watermark Pro 预设文件。其中的预设及其使用的所有 Logo 都会添加到此水印库。",
+    "importDescription": "选择一个 Lumafoil 预设文件。其中的预设及其使用的所有 Logo 都会添加到此水印库。",
     "presetFileLabel": "预设文件",
     "noPresets": "此预设文件不含任何预设。",
     "fileCount_other": "此文件中有 {{count}} 个预设",
@@ -930,111 +971,174 @@
   "landing": {
     "nav": "账户",
     "signIn": "登录",
-    "createAccount": "创建账户",
-    "eyebrow": "免费且开源",
-    "heroBody": "保护您的摄影作品，同时不损失画面本身。Watermark Pro 在您的浏览器中完成繁重的处理，让您的原图保持私密，并为您的团队提供真正有意义的角色。",
-    "createWorkspace": "创建您的工作区",
-    "featuresHeading": "功能介绍",
-    "features": {
-      "bulk": {
-        "title": "批量任务",
-        "body": "拖入数百张照片，在您的浏览器中一次性为它们全部添加水印。"
+    "heroBody": "添加文字、标志或签名。在单个文件或批量任务中复用预设，离线编辑，并在恢复连接后同步。",
+    "featuresHeading": "覆盖完整流程的功能",
+    "footer": "Lumafoil 是基于 MIT 许可证的开源软件。",
+    "privacy": "隐私",
+    "terms": "条款",
+    "heroTitleStart": "为照片、视频和PDF",
+    "heroTitleEnd": "添加水印。",
+    "heroAlt": "带水印位置和导出设置的Lumafoil照片编辑器",
+    "previewLabel": "Lumafoil编辑器",
+    "privacyNote": "文件在您的设备上处理。云端保存是可选的。",
+    "formatsLabel": "照片 · PDF · 视频",
+    "workflowHeading": "打开。调整。导出。",
+    "workflowNote": "工作区集中管理预设和已保存的文件。",
+    "steps": {
+      "openTitle": "导入照片",
+      "openBody": "打开单张图片或整批照片，原始文件保持不变。",
+      "markTitle": "制作你的水印",
+      "markBody": "选择已保存的预设，或创作属于你的独特印记。",
+      "exportTitle": "导出即可",
+      "exportBody": "下载完成的文件，或保存到图库并同步。"
+    },
+    "github": "GitHub",
+    "featuresIntro": "设计水印，应用到文件，再选择保存或分享结果的方式。",
+    "moreHeading": "更多实用工具",
+    "capabilities": {
+      "marks": {
+        "title": "文字、标志和亲笔签名",
+        "body": "输入姓名或版权声明，上传标志，或绘制签名。调整大小、角度、不透明度和颜色，还能组合多个水印。"
       },
-      "library": {
-        "title": "水印库",
-        "body": "一次性保存文字、符号和 Logo 标记；随处一键应用。"
+      "batch": {
+        "title": "批量添加水印",
+        "body": "将保存的水印应用到多张照片。检查结果，单独调整每张图片的位置，再将成品打包为 ZIP 下载。"
+      },
+      "fonts": {
+        "title": "551 个不同的字体家族",
+        "body": "搜索衬线、无衬线、手写、装饰和等宽字体。预览文字并保存样式。字体以开放许可证在本地提供，无需外部字体请求。"
+      },
+      "stickers": {
+        "title": "400 款彩色矢量贴纸",
+        "body": "浏览动物、花卉、食物、旅行、庆典和日常物品。搜索图案，添加到水印中，缩放时保持边缘清晰。"
+      },
+      "qr": {
+        "title": "创建并保存二维码水印",
+        "body": "将网址或文字转换成二维码。为作品集、联系页面或不同项目分别保存代码，再应用到文件中。"
+      },
+      "templates": {
+        "title": "将水印保存为模板",
+        "body": "保存文字、图案、样式和位置。在编辑器或批量工具中使用预设，并通过导入和导出在设备之间转移。"
+      },
+      "editing": {
+        "title": "裁剪、缩放和调整",
+        "body": "裁剪照片，选择输出尺寸，并在完成水印前调整亮度、对比度和饱和度。"
       },
       "smart": {
-        "title": "智能放置",
-        "body": "系统会分析每张照片，使标记落在最易辨识且不遮挡主体的位置。"
+        "title": "智能位置和对比度",
+        "body": "Lumafoil 根据图片推荐位置及浅色或深色水印。检查结果后，可自行移动或调整样式。"
       },
-      "contrast": {
-        "title": "自动对比度",
-        "body": "为每张图片选择浅色或深色版本以及轮廓强度，若您有不同意见可自行调整。"
+      "video": {
+        "title": "视频水印",
+        "body": "在浏览器中为支持的视频添加水印。设置位置和显示时间，导出前预览效果。"
       },
-      "teams": {
-        "title": "团队与角色",
-        "body": "组织具备所有者、管理员、编辑者和查看者角色，并在服务器端强制执行。"
+      "pdf": {
+        "title": "PDF 文档水印",
+        "body": "将保存的水印应用到选定的 PDF 页面。处理单个或多个文档，再下载带水印的 PDF。"
       },
-      "trusted": {
-        "title": "值得信赖",
-        "body": "严格的内容安全策略、经过审计的操作，以及除非您主动保存、否则永不离开浏览器的照片。"
+      "export": {
+        "title": "选择导出格式",
+        "body": "将照片导出为 JPEG、PNG 或 WebP。设置尺寸和质量，或将处理好的照片打包为 ZIP 下载。"
+      },
+      "gallery": {
+        "title": "私人图库",
+        "body": "将完成的图片保存在账户中，方便以后查找。下载文件或选择要分享的照片。"
+      },
+      "sharing": {
+        "title": "分享选定的照片",
+        "body": "为选定的照片创建 Lumafoil 图库链接。设置到期时间，或随时撤销链接。"
+      },
+      "offline": {
+        "title": "离线工作，稍后同步",
+        "body": "完成离线准备后，无需连接即可编辑预设和保存照片。重新连接时同步更改，并显示错误及冲突恢复选项。"
+      },
+      "privacy": {
+        "title": "你的账户，你的工作空间",
+        "body": "新用户需要邀请，并各自获得私人的工作空间。邀请他人不会授予其访问你的照片或预设的权限。"
+      },
+      "languages": {
+        "title": "12 种界面语言",
+        "body": "可选择 12 种语言，包括采用从右到左布局的阿拉伯语。"
+      },
+      "theme": {
+        "title": "浅色和深色模式",
+        "body": "选择主题或跟随设备设置。界面适应手机、平板电脑和更大的屏幕。"
       }
     },
-    "footer": "Watermark Pro 是基于 MIT 许可证的开源软件。",
-    "privacy": "隐私",
-    "terms": "条款"
+    "inviteHosting": "Lumafoil 仅限受邀用户使用。想自行托管？",
+    "selfHost": "在 GitHub 免费获取源代码。",
+    "featuresNav": "功能"
   },
   "legal": {
     "signIn": "登录",
     "lastUpdated": "最后更新于 {{date}}",
     "readSibling": "阅读<sibling>{{siblingLabel}}</sibling>，或返回<home>主页</home>。",
-    "footer": "Watermark Pro 是基于 MIT 许可证的开源软件。",
+    "footer": "Lumafoil 源代码采用 MIT 许可。内置字体和美术素材保留各自的许可证。",
     "privacy": {
       "title": "隐私",
-      "intro": "Watermark Pro 的设计宗旨是让您的照片始终属于您。本页面以通俗的语言说明您的图片和账户信息会经历什么，内容源自本项目实际执行的各项控制措施。",
+      "intro": "Lumafoil 的设计宗旨是让您的照片始终属于您。本页面以通俗的语言说明您的图片和账户信息会经历什么，内容源自本项目实际执行的各项控制措施。",
       "siblingLabel": "服务条款",
       "photos": {
-        "heading": "您的照片保留在您的浏览器中",
-        "p1": "添加水印完全在您的设备上运行。编辑器和批量工具会在浏览器中解码您的照片，在 Web Workers 中渲染它们，并在内存中构建最终文件。预览水印绝不会上传所应用的照片。",
-        "p2": "导出文件在本地组装，并通过同源下载链接交给您，该链接在下载开始的瞬间即被释放。您的原图绝不会被发送到服务器进行预览或添加水印。"
+        "heading": "照片在你的设备上处理",
+        "p1": "编辑和添加水印在本机执行。预览不会将原始照片上传到 Lumafoil。",
+        "p2": "你可以选择下载结果、保存到图库、传输到已连接的云存储，或创建分享链接。"
       },
       "storage": {
-        "heading": "我们存储什么，且仅在您要求时",
-        "p1": "除非您选择保存，否则我们的服务器上不会保留任何内容。当您保存照片、缩略图或 Logo 时，它会存储在 Cloudflare R2 中，使用限定于您组织的键，绝不公开，并仅通过私有缓存提供给该组织中已登录的成员。",
-        "p2": "每个组织都有照片、Logo 和存储配额。每一次上传和删除都会记录在审计追踪中。"
+        "heading": "账号、已保存的工作和离线副本",
+        "p1": "Cloudflare 托管账号、预设、图库照片、缩略图、上传的标志、分享记录和最近工作历史。已保存内容归属于其工作区；其他用户需要明确的成员资格或分享链接才能访问。",
+        "p2": "设备按账号保存离线副本和待同步修改。使用同一账号重新连接后会重试同步。有待处理修改时不能退出；退出成功会清除本浏览器的应用离线数据。会话过期会锁定访问，但不会删除待同步工作。清除浏览器数据可能丢失未同步修改。"
       },
       "metadata": {
-        "heading": "默认移除元数据",
-        "p1": "每次导出都会从像素重新编码，因此除非您决定保留，否则不会带过任何元数据。默认设置会在文件到达您的下载、分享面板或图库之前，去除所有相机和位置数据。",
-        "p2": "两种可选的按导出模式允许您在移除 GPS 位置的同时保留相机数据，或原样保留全部内容。元数据在浏览器中读取和写入；为此不会上传任何内容。"
+        "heading": "个人元数据与许可声明",
+        "p1": "导出图片默认删除相机和位置元数据。受支持的选项可保留不含 GPS 的相机字段，或保留支持的原始元数据。处理在浏览器中完成。",
+        "p2": "使用内置美术素材的导出文件会在元数据、文档附件或压缩包的附加文件中保留许可声明。其他软件可能删除声明；再次分发这些素材时，请保留适用的许可声明。"
       },
       "sharing": {
         "heading": "分享链接",
-        "p1": "分享链接携带一个带内置有效期的签名令牌，可随时撤销。链接打开的公开页面不携带任何会话，并按地址进行速率限制。",
-        "p2": "已过期、已撤销、被篡改和未知的链接都会返回相同的中性“未找到”响应，因此链接一旦失效便不会泄露任何信息。创建和撤销链接仅限于具有权限的成员，并会被审计。"
+        "p1": "任何持有 Lumafoil 图库链接的人都能查看选中的已保存照片，直到链接过期或被撤销。网站邀请用于创建独立的私人账号，不会分享邀请人的工作区或内容。",
+        "p2": "云服务商的原生链接遵循其权限和撤销规则。撤销链接无法收回已经下载或复制的内容。"
       },
       "account": {
         "heading": "您的账户",
-        "p1": "账户需要电子邮箱和密码，且在账户激活之前必须验证电子邮箱。会话保存在 HttpOnly、SameSite=Lax 的 Cookie 中，并在安全来源上标记为 Secure。",
-        "p2": "密码重置链接在一小时后失效，使用时会让您的其他会话退出登录。"
+        "p1": "新账号需要邀请和已验证的邮箱。可以使用密码或已配置的 Google/Microsoft 登录。已有账号不需要新的邀请。添加其他登录方式须在已认证账号中进行关联。",
+        "p2": "会话使用 HttpOnly、SameSite=Lax Cookie，并在 HTTPS 下设置 Secure。密码重置链接一小时后失效，使用后会撤销其他服务器会话。"
       },
       "analytics": {
-        "heading": "分析与 Cookie",
-        "p1": "我们不设置任何第三方分析或广告 Cookie。唯一的测量工具是 Cloudflare Web Analytics，它不使用 Cookie，也不会跨站点跟踪您。",
-        "p2": "本应用仅与两个第三方来源通信，二者均属于 Cloudflare：用于筛查注册和密码重置请求中机器人的 Turnstile 组件，以及无 Cookie 的分析信标。字体、样式及其他一切均由本站点提供。"
+        "heading": "Cookie 与外部服务",
+        "p1": "Lumafoil 不包含分析信标或广告 Cookie。必要 Cookie 用于维持会话；设备存储保存设置、离线副本和待处理修改。",
+        "p2": "启用时，Cloudflare Turnstile 会检查账号请求以防机器人；请查看其<turnstile>隐私说明</turnstile>。Google/Microsoft 处理你选择的登录方式。你选择的云功能会向 Google Drive、Dropbox 和 OneDrive 发送请求，并适用各自的隐私政策。"
       },
       "audit": {
         "heading": "审计追踪",
-        "p1": "注册以及每一次组织、成员、邀请、水印库、照片和分享的变更都会写入仅可追加的审计日志。该日志仅可由组织的所有者和管理员读取。"
+        "p1": "工作区审计日志仅对该工作区的所有者和管理员开放。唯一的网站管理员可以管理账号并查看汇总、管理操作、审计以及健康/错误记录。最近工作历史按用户隔离。应用故障日志不包含令牌和请求正文。"
       },
       "reporting": {
         "heading": "报告问题",
-        "p1": "安全问题可以通过本项目的 GitHub 仓库私下报告，而不是发布公开 issue。仓库中的安全策略说明了应包含哪些内容以及您将多快收到回复。"
+        "p1": "支持：<support>support@lumafoil.com</support>。请通过 <security>GitHub 私密报告表单</security>或该邮箱报告漏洞。不要在公开问题中发布令牌或个人内容。"
       }
     },
     "terms": {
       "title": "服务条款",
-      "intro": "本条款涵盖您对 Watermark Pro 的使用。它们旨在便于阅读，并描述本服务的实际行为，而非添加它无法兑现的声明。",
+      "intro": "本条款涵盖您对 Lumafoil 的使用。它们旨在便于阅读，并描述本服务的实际行为，而非添加它无法兑现的声明。",
       "siblingLabel": "隐私政策",
       "accepting": {
         "heading": "接受本条款",
-        "p1": "使用 Watermark Pro 即表示您同意本条款。如果您不同意，请勿使用本服务。"
+        "p1": "使用 Lumafoil 即表示您同意本条款。如果您不同意，请勿使用本服务。"
       },
       "whatItDoes": {
         "heading": "本服务的功能",
-        "p1": "Watermark Pro 为照片添加水印。添加水印本身在您的浏览器中运行；诸如保存照片和 Logo、团队协作以及分享等可选功能会使用 Cloudflare 上的服务器端存储。",
-        "p2": "本软件是基于 MIT 许可证的免费开源软件。"
+        "p1": "Lumafoil 在你的设备上为照片及受支持的文档、视频添加水印。账号、已保存的图库和预设、最近历史、邀请与分享使用服务器存储；可选云功能会连接所选服务商。",
+        "p2": "源代码免费开源并采用 MIT 许可。内置字体和美术素材使用各自的许可证。"
       },
       "account": {
         "heading": "您的账户",
-        "p1": "团队功能需要一个已验证电子邮箱的账户。请妥善保管您的密码；您需对您账户下发生的一切负责。",
-        "p2": "您可以随时退出您的会话，使用密码重置链接会让您的其他会话退出登录。"
+        "p1": "目前仅受邀用户可使用，且需要已验证邮箱。可使用密码及已配置的 Google/Microsoft 登录。请保护登录凭据和服务商账号；你对自己账号的使用负责。",
+        "p2": "退出需要联网并解决待处理修改，之后会清除本浏览器的应用离线数据。密码重置会撤销其他服务器会话。离线设备可能保留本地副本，直到重新连接或清除浏览器数据。"
       },
       "content": {
         "heading": "您的内容",
         "p1": "您对上传或创建的照片和水印所拥有的一切权利仍归您所有。您需负责确保您有权使用带入本服务的图片。",
-        "p2": "本应用仅为提供您使用的功能而处理您的内容，并仅在您选择保存时才存储它。它绝不会被用于训练任何模型，也不会与第三方共享。"
+        "p2": "内容仅用于你选择的功能。图库保存使用 Cloudflare；你选择的云传输和分享会将内容发送给服务商或接收者。Lumafoil 不会用其训练模型。内置美术素材有单独的许可声明要求。"
       },
       "acceptableUse": {
         "heading": "可接受的使用",
@@ -1042,8 +1146,8 @@
         "p2": "组织内的访问权限遵循您的角色，且这些角色会在服务器端强制执行。"
       },
       "teams": {
-        "heading": "团队与角色",
-        "p1": "组织可以拥有所有者、管理员、编辑者和查看者角色。每位成员能看到和执行的内容都受其角色限制，并在每次请求时进行检查，而不仅仅是在界面中隐藏。"
+        "heading": "私人工作区与协作",
+        "p1": "每个账号都有私人工作区。网站邀请不会共享该空间。独立的协作空间可以明确添加所有者、管理员、编辑者或查看者，服务器会强制执行权限。这些角色并不授予网站管理权。"
       },
       "availability": {
         "heading": "可用性、担保与变更",
@@ -1052,11 +1156,11 @@
       },
       "openSource": {
         "heading": "开源",
-        "p1": "Watermark Pro 的源代码基于 MIT 许可证提供，您可以在该许可证的条款下检查、运行和修改它。"
+        "p1": "Lumafoil 源代码可按 MIT 条款查看、使用和修改。内置字体和美术素材保留其许可证与声明，可从选择器和资源许可证索引访问。"
       },
       "contact": {
         "heading": "联系方式",
-        "p1": "有关本条款的问题以及安全问题的报告，均可通过本项目的 GitHub 仓库提出。"
+        "p1": "问题咨询：<support>support@lumafoil.com</support>。安全报告：<security>GitHub 私密表单</security>或该邮箱。请勿在公开问题中包含敏感信息。"
       }
     }
   },
@@ -1064,7 +1168,7 @@
     "loading": "正在加载照片",
     "unavailableTitle": "此链接不可用",
     "unavailableBody": "它可能已过期或被撤销，或者地址不完整。请向发送者索取新的链接。",
-    "about": "关于 Watermark Pro",
+    "about": "关于 Lumafoil",
     "photoCount_other": "{{count}} 张照片",
     "availableUntil": " · 有效期至 {{date}}",
     "shareLink": "分享此链接",
@@ -1072,7 +1176,7 @@
     "linkShared": "链接已分享。",
     "openPhoto": "打开 {{name}}",
     "dimensions": "{{width}} × {{height}}",
-    "footer": "通过<home>Watermark Pro</home>分享。照片仍归其所有者所有。",
+    "footer": "通过<home>Lumafoil</home>分享。照片仍归其所有者所有。",
     "download": "下载",
     "close": "关闭"
   },
@@ -1082,6 +1186,123 @@
       "title": "页面未找到",
       "body": "地址可能输入有误，或页面可能已移动。",
       "back": "返回首页"
+    }
+  },
+  "offline": {
+    "label": "离线工作",
+    "syncing": "正在同步已保存的工作…",
+    "disconnected": "离线 — 更改保存在此设备上。",
+    "pending": "待同步更改：{{count}}",
+    "upToDate": "已保存的工作已同步。",
+    "syncNow": "立即同步",
+    "review": "查看已保存的更改（{{count}}）",
+    "deletion": "删除",
+    "conflict": "此预设已在其他地方更改。请保留两个版本或放弃本地更改。",
+    "savedHere": "已保存在此设备上。应用打开并联网时会进行同步。",
+    "retry": "重试",
+    "keepBoth": "保留两个版本",
+    "discard": "放弃本地更改",
+    "discardTitle": "放弃此本地更改？",
+    "discardBody": "这会移除此设备上的待同步更改，不会撤销已保存到服务器的更改。",
+    "cancel": "取消",
+    "signOutPending": "退出登录前，请在离线工作中同步或放弃待同步的更改。",
+    "signOutFailed": "无法退出登录，请重试。",
+    "connectionRequired": "需要连接网络",
+    "connectOnce": "离线使用前，请先联网登录并打开此工作区一次。",
+    "onlineOnly": "账号、分享和成员管理需要联网。照片工具和已保存的预设仍可离线使用。",
+    "ready": "应用文件已准备好，可供离线使用。",
+    "preparing": "正在准备离线应用文件，请保持此标签页打开。",
+    "updateAvailable": "更新已准备好。重新加载前请完成未保存的编辑；已保存的工作会保留在此设备上。",
+    "reload": "重新加载以更新"
+  },
+  "siteInvites": {
+    "heading": "邀请用户",
+    "description": "邀请他人创建自己的 Lumafoil 账号。",
+    "email": "电子邮箱",
+    "privacy": "对方将拥有独立的私人工作区。此邀请不会共享你的照片、预设或账号信息。",
+    "sent": "邀请已发送，七天后过期。",
+    "send": "发送邀请",
+    "sentHeading": "我发出的邀请",
+    "loading": "正在加载邀请…",
+    "empty": "你尚未发送邀请。",
+    "revoke": "撤销",
+    "revokeEmail": "撤销发送给 {{email}} 的邀请",
+    "invalidEmail": "请输入有效的邮箱地址。",
+    "privateHeading": "你的私人工作区",
+    "privateBody": "只有你可以访问。你可以邀请他人使用 Lumafoil 而不共享此空间，或另建工作区进行协作。",
+    "collaborate": "创建协作工作区",
+    "status": {
+      "pending": "待接受",
+      "accepted": "已接受",
+      "revoked": "已撤销",
+      "expired": "已过期"
+    },
+    "collaborationNotice": "工作区邀请会授予其中照片和预设的访问权限。收件人必须已有 Lumafoil 账号；如未注册，请先使用邀请用户功能。"
+  },
+  "accountStats": {
+    "users": "注册账号",
+    "verifiedUsers": "已验证账号",
+    "pendingInvitations": "待接受邀请",
+    "acceptedInvitations": "已接受邀请"
+  },
+  "accountAuth": {
+    "heading": "账号设置",
+    "connected": "登录方式",
+    "loading": "正在加载登录方式…",
+    "password": "邮箱和密码",
+    "linkProvider": "关联 {{provider}}",
+    "continueProvider": "使用 {{provider}} 继续",
+    "linkHelp": "请在登录后关联使用相同邮箱的账号。",
+    "identityOnly": "仅用于 Lumafoil 账号。云存储需要单独连接。",
+    "linkError": "无法关联。请使用相同的邮箱重新登录。",
+    "verifyEmail": "请通过邮件验证账号，然后重新登录。",
+    "signInError": "无法完成登录。如果已有密码账号，请在下方登录，然后在账号设置中关联提供商。"
+  },
+  "referral": {
+    "heading": "你的邀请链接",
+    "description": "持有此链接的人可以申请独立的私人账号。请只分享给你想邀请的人。",
+    "count": "通过你的链接创建的账号：{{count}}",
+    "url": "邀请链接",
+    "copy": "复制链接",
+    "copied": "已复制",
+    "copyError": "无法复制。请选择链接并手动复制。",
+    "rotate": "创建新链接",
+    "revoke": "停用链接",
+    "revoked": "此链接已停用。",
+    "rotateHelp": "新链接会使旧链接失效。已有账号仍可使用。你只能看到人数，其他人的资料和内容保持私密。"
+  },
+  "recent": {
+    "heading": "最近的工作",
+    "description": "你在此工作区打开或保存的照片以及使用过的水印。",
+    "viewLabel": "最近工作视图",
+    "search": "搜索最近的工作",
+    "loading": "正在加载最近的工作",
+    "loadError": "无法加载最近的工作",
+    "retry": "重试",
+    "preferenceError": "无法保存视图偏好设置。",
+    "activityPending": "无法更新最近的工作。请重新打开该项目以重试。",
+    "empty": "最近的工作将显示在这里。将照片保存到图库并打开水印，以便快速再次使用。",
+    "noMatches": "没有匹配搜索的最近工作。",
+    "start": "打开编辑器",
+    "detailsLabel": "最近工作详情",
+    "itemsLabel": "最近的项目",
+    "name": "名称",
+    "type": "类型",
+    "location": "位置",
+    "lastUsed": "上次使用",
+    "status": "同步状态",
+    "photo": "已保存的照片",
+    "preset": "水印",
+    "pending": "活动等待同步",
+    "saved": "已保存",
+    "gallery": "图库",
+    "library": "水印素材库",
+    "needsAttention": "需要处理",
+    "workPending": "工作等待同步",
+    "views": {
+      "thumbnails": "缩略图",
+      "list": "列表",
+      "details": "详细信息"
     }
   }
 }

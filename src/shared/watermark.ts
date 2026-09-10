@@ -8,6 +8,7 @@ import { z } from 'zod'
 
 import { COMMON_SHUTTER_DENOMINATORS, FONT_WEIGHTS } from './constants'
 import { EMPTY_PHOTO_METADATA, type GeoLocation, type PhotoMetadata } from './metadata'
+import stickerIds from './sticker-ids.json' with { type: 'json' }
 
 export const ANCHORS = [
   'top-left',
@@ -299,6 +300,8 @@ export const symbolSourceSchema = z.discriminatedUnion('type', [
   }),
   /** A named icon from the bundled icon catalogue. */
   z.object({ type: z.literal('icon'), name: z.string().min(1).max(MAX_ICON_NAME_LENGTH) }),
+  /** A bundled, licensed sticker. Only known IDs can cross the storage boundary. */
+  z.object({ type: z.literal('sticker'), id: z.enum(stickerIds) }),
 ])
 
 export const watermarkSpecSchema = z.discriminatedUnion('kind', [
@@ -351,7 +354,7 @@ export const DEFAULT_STYLE: WatermarkStyle = {
 
 export const DEFAULT_TEXT_SPEC: TextSpec = {
   kind: 'text',
-  text: '© Watermark Pro',
+  text: '© Lumafoil',
   fontFamily: 'Inter Variable',
   fontWeight: 600,
   letterSpacing: 0,
@@ -367,7 +370,7 @@ export const DEFAULT_SHAPE_SPEC: ShapeSpec = {
   kind: 'shape',
   shape: 'rectangle',
   aspect: DEFAULT_SHAPE_ASPECT,
-  fill: { enabled: false, colour: '#6d4de6', opacity: 0.5 },
+  fill: { enabled: false, colour: '#c86b82', opacity: 0.5 },
   stroke: { width: DEFAULT_STROKE_RATIO, colour: null },
   placement: { mode: 'smart' },
   contrast: { mode: 'auto' },

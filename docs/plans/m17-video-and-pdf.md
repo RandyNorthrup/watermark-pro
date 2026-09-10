@@ -59,7 +59,7 @@ MP4, Opus for WebM); if neither the copy nor the encoder is available
 the output is silent and the UI says so before starting. Every branch
 has a browser test with a fake `isConfigSupported`.
 
-Dependency: `mediabunny` 1.55.7 (MPL-2.0, allowed by the dependency-review
+Dependency: `mediabunny` 1.55.6 (MPL-2.0, allowed by the dependency-review
 list; peer: none; declares WebCodecs types). Verify the version, pin, §3.1
 row. Do not add `mp4-muxer`/`webm-muxer` (superseded by mediabunny).
 

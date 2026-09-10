@@ -9,20 +9,17 @@
 import { Hono } from 'hono'
 import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
+import { routePath } from 'hono/route'
 import { secureHeaders } from 'hono/secure-headers'
 
 import type { AppContext } from './app-context'
 import { EnvValidationError } from './env'
 import type { ApiError, HealthResponse } from '../shared/api'
-import {
-  API_ERROR_CODE,
-  AUTH_SIGN_OUT_PATH,
-  CLEAR_SITE_DATA_ON_SIGN_OUT,
-  HEALTH_PATH,
-  HSTS_MAX_AGE_SECONDS,
-  HTTP_STATUS,
-} from '../shared/constants'
+import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '../shared/constants'
+import { authenticationDiagnostic } from './auth/logger'
+import { limitApiRequestBody } from './middleware/body-limit'
 import { requireSameOrigin } from './middleware/same-origin'
+import { accountRoutes } from './routes/accounts'
 import { adminRoutes } from './routes/admin'
 import { auditRoutes } from './routes/audit'
 import { clientErrorRoutes } from './routes/client-errors'
@@ -32,8 +29,11 @@ import { serveLanding } from './routes/landing'
 import { libraryRoutes } from './routes/library'
 import { meRoutes } from './routes/me'
 import { photoRoutes } from './routes/photos'
+import { recentWorkRoutes } from './routes/recent-work'
+import { referralRoutes } from './routes/referrals'
 import { shareRoutes } from './routes/shares'
 import { getServices, type Services } from './services'
+import { cleanupUploads } from './upload-lifecycle'
 
 export interface CreateAppOptions {
   /** Resolves the service container for a request env. Tests inject fakes here. */
@@ -92,6 +92,14 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   })
 
   app.use(requireSameOrigin)
+  app.use('/api/*', async (c, next) => {
+    await next()
+    // Set this after external auth Responses are returned; a pre-set context
+    // header can be replaced by Better Auth's response headers.
+    const hasPrivatePolicy = c.res.headers.get('Cache-Control')?.includes('private') === true
+    c.header('Cache-Control', hasPrivatePolicy ? 'private, no-store' : 'no-store')
+  })
+  app.use('/api/*', limitApiRequestBody)
 
   app.get(HEALTH_PATH, (c) => {
     const body: HealthResponse = {
@@ -102,22 +110,14 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   })
 
   app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
-    const response = await c.get('services').auth.handler(c.req.raw)
-    // On sign-out, tell the browser to drop the offline caches and local
-    // storage so a shared device does not keep the previous user's cached shell
-    // or persisted query data (M19). Better Auth already clears the cookie.
-    if (c.req.path === AUTH_SIGN_OUT_PATH && response.ok) {
-      const headers = new Headers(response.headers)
-      headers.set('Clear-Site-Data', CLEAR_SITE_DATA_ON_SIGN_OUT)
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers,
-      })
-    }
-    return response
+    // Global Clear-Site-Data could erase a newer account's queued edits when
+    // an older logout response arrives late. Client cleanup is account-scoped.
+    return await c.get('services').auth.handler(c.req.raw)
   })
 
+  app.route('/api', referralRoutes)
+  app.route('/api', recentWorkRoutes)
+  app.route('/api', accountRoutes)
   app.route('/api', auditRoutes)
   app.route('/api', clientErrorRoutes)
   app.route('/api', libraryRoutes)
@@ -148,8 +148,8 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
       'Unhandled error while serving',
       c.get('requestId'),
       c.req.method,
-      c.req.path,
-      error,
+      routePath(c),
+      authenticationDiagnostic('Request failed', [error]),
     )
     const body: ApiError = { error: API_ERROR_CODE.internalError }
     return c.json(body, HTTP_STATUS.internalServerError)
@@ -176,13 +176,16 @@ export async function runHealthCheck(env: Env): Promise<void> {
     await services.observability.listHealthChecks()
   } catch (error) {
     isHealthy = false
-    detail = error instanceof Error ? error.message : String(error)
+    detail = JSON.stringify(authenticationDiagnostic('Database health check failed', [error]))
   }
   const durationMs = Date.now() - started
   try {
     await services.observability.recordHealthCheck({ ok: isHealthy, detail, durationMs })
   } catch (error) {
-    console.error('health check: could not record the result', error)
+    console.error(
+      'health check: could not record the result',
+      authenticationDiagnostic('Health record failed', [error]),
+    )
   }
   if (!isHealthy) {
     console.error('health check failed', detail)
@@ -203,5 +206,6 @@ export default {
   },
   scheduled(_event, env, ctx) {
     ctx.waitUntil(runHealthCheck(env))
+    ctx.waitUntil(cleanupUploads(getServices(env)))
   },
 } satisfies ExportedHandler<Env>

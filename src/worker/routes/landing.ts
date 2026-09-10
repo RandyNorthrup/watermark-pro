@@ -15,7 +15,7 @@
  * Runs before the Hono API app (src/worker/index.ts) and its locked-down API
  * CSP, so the landing keeps the SPA response headers from public/_headers.
  */
-import { HTTP_STATUS } from '../../shared/constants'
+import { AUTH_COOKIE_PREFIX, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '../../shared/constants'
 import {
   DEFAULT_LOCALE,
   isSupportedLocale,
@@ -32,22 +32,34 @@ export interface AssetsEnv {
 
 const LOCALE_COOKIE_MAX_AGE_SECONDS = 31_536_000
 /** Better Auth's session cookie, with or without the production `__Secure-` prefix. */
-const SESSION_COOKIE_NAME = 'better-auth.session_token'
+const SESSION_COOKIE_NAME = `${AUTH_COOKIE_PREFIX}.session_token`
 
 function localeCookie(locale: Locale, isSecure: boolean): string {
   const attributes = `Path=/; Max-Age=${String(LOCALE_COOKIE_MAX_AGE_SECONDS)}; SameSite=Lax`
   return `${LOCALE_COOKIE}=${locale}; ${attributes}${isSecure ? '; Secure' : ''}`
 }
 
-/** Ordered language tags from an `Accept-Language` header (q-values dropped). */
+/** Honor weighted preferences; a q=0 language is explicitly unacceptable. */
 function acceptLanguageTags(header: string | null): string[] {
   if (header === null) {
     return []
   }
   return header
     .split(',')
-    .map((part) => (part.split(';', 1)[0] ?? '').trim())
-    .filter((tag) => tag.length > 0 && tag !== '*')
+    .map((part) => {
+      const [tag, ...parameters] = part.trim().split(';')
+      const quality = parameters.find((parameter) => parameter.trimStart().startsWith('q='))
+      return {
+        tag: tag?.trim() ?? '',
+        weight: quality === undefined ? 1 : Number(quality.trim().slice(2)),
+      }
+    })
+    .filter(
+      ({ tag, weight }) =>
+        tag.length > 0 && tag !== '*' && Number.isFinite(weight) && weight > 0 && weight <= 1,
+    )
+    .toSorted((first, second) => second.weight - first.weight)
+    .map(({ tag }) => tag)
 }
 
 /** Cookie → `Accept-Language` → English. */
@@ -60,7 +72,40 @@ function negotiateLocale(request: Request): Locale {
 }
 
 function hasSessionCookie(request: Request): boolean {
-  return (request.headers.get('cookie') ?? '').includes(SESSION_COOKIE_NAME)
+  return (request.headers.get('cookie') ?? '').split(';').some((part) => {
+    const [name, ...value] = part.trim().split('=')
+    return (
+      (name === SESSION_COOKIE_NAME || name === `__Secure-${SESSION_COOKIE_NAME}`) &&
+      value.join('=').trim().length > 0
+    )
+  })
+}
+
+/** Dynamic locale/cookie decisions cannot be reused for another visitor by an HTTP cache. */
+function landingResponse(response: Response, isHead = false): Response {
+  // Headers iteration normalizes names to lowercase. Apply all security
+  // overrides after the copied asset headers, so duplicate casing cannot
+  // merge a weaker inherited value into the final policy.
+  const headers = new Headers({
+    ...Object.fromEntries(response.headers),
+    'cache-control': 'no-store',
+    vary: 'Cookie, Accept-Language',
+    'strict-transport-security': `max-age=${String(HSTS_MAX_AGE_SECONDS)}; includeSubDomains`,
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'DENY',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'permissions-policy': 'camera=(), microphone=(), geolocation=()',
+    'cross-origin-opener-policy': 'same-origin-allow-popups',
+    ...(response.status === HTTP_STATUS.found && {
+      'content-security-policy':
+        "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+    }),
+  })
+  return new Response(isHead ? null : response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
 }
 
 /**
@@ -69,11 +114,11 @@ function hasSessionCookie(request: Request): boolean {
  * the SPA shell.
  */
 export async function serveLanding(request: Request, env: AssetsEnv): Promise<Response | null> {
-  if (request.method !== 'GET') {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
     return null
   }
   const url = new URL(request.url)
-  if (url.pathname !== '/') {
+  if (!['/', '/privacy', '/terms'].includes(url.pathname)) {
     return null
   }
   const isSecure = url.protocol === 'https:'
@@ -81,22 +126,29 @@ export async function serveLanding(request: Request, env: AssetsEnv): Promise<Re
   const requestedLang = url.searchParams.get('lang')
   if (requestedLang !== null) {
     const locale = isSupportedLocale(requestedLang) ? requestedLang : DEFAULT_LOCALE
-    return new Response(null, {
-      status: HTTP_STATUS.found,
-      headers: { location: '/', 'set-cookie': localeCookie(locale, isSecure) },
-    })
+    return landingResponse(
+      new Response(null, {
+        status: HTTP_STATUS.found,
+        headers: { location: url.pathname, 'set-cookie': localeCookie(locale, isSecure) },
+      }),
+    )
   }
 
-  if (hasSessionCookie(request)) {
-    return new Response(null, { status: HTTP_STATUS.found, headers: { location: '/app' } })
+  if (url.pathname === '/' && hasSessionCookie(request)) {
+    return landingResponse(
+      new Response(null, { status: HTTP_STATUS.found, headers: { location: '/app' } }),
+    )
   }
 
   const locale = negotiateLocale(request)
+  const prefix = url.pathname === '/' ? '' : `${url.pathname.slice(1)}-`
   const landing = await env.ASSETS.fetch(
-    new Request(new URL(`/landing/${locale}.html`, url.origin)),
+    new Request(new URL(`/landing/${prefix}${locale}.html`, url.origin)),
   )
   if (landing.status === HTTP_STATUS.notFound) {
-    return await env.ASSETS.fetch(new Request(new URL('/index.html', url.origin)))
+    const shellRequest = new Request(new URL('/index.html', url.origin))
+    const shell = await env.ASSETS.fetch(shellRequest)
+    return landingResponse(shell, request.method === 'HEAD')
   }
-  return landing
+  return landingResponse(landing, request.method === 'HEAD')
 }

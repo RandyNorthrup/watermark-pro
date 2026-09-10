@@ -1,0 +1,82 @@
+{
+  "mode": "diagnostic",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.95,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.4391,
+        "lcp": 2276.4391,
+        "cls": 0,
+        "tbt": 163.5
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 2659,
+        "layoutShifts": [],
+        "longTasks": [
+          {
+            "source": "unattributable",
+            "duration": 484,
+            "startTime": 750.4391
+          },
+          {
+            "source": "asset:watermark-pro-CzeGV6cb.js",
+            "duration": 176,
+            "startTime": 2457.4391
+          },
+          {
+            "source": "asset:watermark-pro-CzeGV6cb.js",
+            "duration": 125,
+            "startTime": 1857.4391
+          },
+          {
+            "source": "unattributable",
+            "duration": 69,
+            "startTime": 1364.4391
+          },
+          {
+            "source": "unattributable",
+            "duration": 60,
+            "startTime": 1433.4391
+          }
+        ],
+        "bootup": [
+          {
+            "source": "unattributable",
+            "duration": 1050.1879999999653
+          },
+          {
+            "source": "asset:watermark-pro-CzeGV6cb.js",
+            "duration": 449.5240000000036
+          },
+          {
+            "source": "document",
+            "duration": 324.32000000000005
+          },
+          {
+            "source": "asset:offline-database-CTLs5Zcd.js",
+            "duration": 73.872
+          }
+        ]
+      }
+    }
+  ],
+  "scores": {
+    "performance": 0.95,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1875.4391,
+    "lcp": 2276.4391,
+    "cls": 0,
+    "tbt": 163.5
+  }
+}

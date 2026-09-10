@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { CreateWatermarkDialog } from './create-watermark-dialog'
 import type { WatermarkDto } from '../../../shared/api-watermark'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import { type Layer, MAX_LAYERS } from '../../editor/state'
@@ -16,6 +17,8 @@ import { Button } from '../ui/button'
 
 interface WatermarkPanelProps {
   organizationId: string
+  canCreate: boolean
+  photo?: File | undefined
   /** Marks on the photo in drawing order. */
   layers: readonly Layer[]
   activeLayerId: string | null
@@ -38,19 +41,45 @@ function isSameSpec(a: WatermarkSpec, b: WatermarkSpec): boolean {
  * adjust its placement and style for this photo only, remove the ones you
  * no longer want.
  */
-export function WatermarkPanel({ organizationId, ...props }: WatermarkPanelProps) {
+export function WatermarkPanel({
+  organizationId,
+  canCreate,
+  photo,
+  ...props
+}: WatermarkPanelProps) {
   const { t } = useTranslation()
   const selectId = useId()
   const presets = useQuery(watermarksQueryOptions(organizationId))
 
   return (
-    <PresetGate query={presets} emptyHint={t('editor.watermark.emptyHint')}>
-      {(list) => <PanelBody list={list} selectId={selectId} {...props} />}
-    </PresetGate>
+    <div className="flex flex-col gap-4">
+      {canCreate ? (
+        <CreateWatermarkDialog
+          organizationId={organizationId}
+          photo={photo}
+          disabled={props.layers.length >= MAX_LAYERS}
+          onCreated={props.onAddPreset}
+        />
+      ) : null}
+      <PresetGate
+        query={presets}
+        emptyHint={t('editor.watermark.emptyHint')}
+        emptyContent={
+          <p className="text-sm text-ink-muted">
+            {t(canCreate ? 'editor.watermark.createHint' : 'editor.watermark.emptyReadOnly')}
+          </p>
+        }
+      >
+        {(list) => <PanelBody list={list} selectId={selectId} {...props} />}
+      </PresetGate>
+    </div>
   )
 }
 
-interface PanelBodyProps extends Omit<WatermarkPanelProps, 'organizationId'> {
+interface PanelBodyProps extends Omit<
+  WatermarkPanelProps,
+  'organizationId' | 'canCreate' | 'photo'
+> {
   list: WatermarkDto[]
   selectId: string
 }

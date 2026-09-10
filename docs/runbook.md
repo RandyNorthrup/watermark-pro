@@ -1,201 +1,308 @@
 # Operations runbook
 
-How to deploy, roll back, rotate secrets, inspect and recover the production
-deployment at `https://watermark.blowmoney.net`. Every command assumes an
-authenticated `wrangler` (`npx wrangler whoami`) on an account that owns the
-`blowmoney.net` zone, the `watermark-pro` D1 database and the `watermark-pro`
-R2 bucket.
+This runbook covers release and recovery for `https://lumafoil.com`. Select the
+production environment explicitly. Keep account/database/user identifiers,
+exports, bookmarks, credentials, cookies and raw provider responses in private
+operator records, outside version control. The ignored `temp/` directory is for
+temporary local evidence, not durable backups.
 
-## Topology
+## Identify the deployment
 
-| Piece          | Name                                                         | Notes                                                       |
-| -------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
-| Worker         | `watermark-pro`                                              | `env.production` in `wrangler.jsonc`; serves SPA and `/api` |
-| Custom domain  | `watermark.blowmoney.net`                                    | Managed by wrangler on deploy                               |
-| D1 database    | `watermark-pro`                                              | id `e142b088-c663-4276-bd39-5ded21775fb1`                   |
-| R2 bucket      | `watermark-pro`                                              | Private; objects under `org/<organizationId>/…`             |
-| Rate limiters  | `AUTH_RATE_LIMITER`, `API_RATE_LIMITER`                      | 10/min and 120/min per address                              |
-| Email          | Cloudflare Email Sending, `no-reply@watermark.blowmoney.net` |                                                             |
-| Bot protection | Turnstile (optional)                                         | Enabled when both Turnstile variables are present           |
+Read the current production configuration in `wrangler.jsonc`, then verify the
+Cloudflare identity and target bindings:
 
-## Deploy
-
-### From CI (preferred)
-
-Pushing a tag that starts with `v` runs `.github/workflows/deploy.yml`: the
-full quality chain and the Playwright suite on the tagged commit, then
-`npm run deploy` inside the `production` GitHub environment.
-
-```bash
-git tag v1.0.0 && git push origin v1.0.0
+```powershell
+npx wrangler whoami
+npx wrangler d1 info DB --env production
+npx wrangler d1 execute DB --remote --env production --command "SELECT id, name, applied_at FROM d1_migrations ORDER BY id"
 ```
 
-Required GitHub repository secrets:
+Use the explicit `SELECT` for a read-only preflight. The installed Wrangler
+`d1 migrations list` implementation initializes its bookkeeping table with
+`CREATE TABLE IF NOT EXISTS`; it is therefore excluded from observation-only
+checks. Applying migrations remains a deliberate release step below.
 
-- `CLOUDFLARE_API_TOKEN`: an account token with Workers Scripts: Edit, D1:
-  Edit, Workers R2 Storage: Edit, Email Sending: Edit and Zone DNS: Edit for
-  `blowmoney.net` (custom-domain provisioning).
-- `CLOUDFLARE_ACCOUNT_ID`: from the Workers overview page.
+`DB` and `BUCKET` bind D1 and private R2 storage. Objects use workspace-scoped
+keys. `AUTH_RATE_LIMITER`, `API_RATE_LIMITER` and `IMPORT_RATE_LIMITER` enforce
+configured request limits. Production email uses the Cloudflare sending binding;
+`support@lumafoil.com` is the public support contact. The canonical origin is
+`https://lumafoil.com`; migration does not require legacy-domain redirects.
+Target lookups may print identifiers: keep their output private.
 
-### From a workstation
+## Release preparation
 
-```bash
+Reconcile `PLAN.md` and run the required quality, E2E/axe, SAST, screenshot,
+Lighthouse and hosted checks. Focused results are not full release certification.
+Automated browser gates use isolated storage and generated test secrets, separate
+from manual QA and production. E2E, screenshots and Lighthouse share the one
+synthetic owner in `scripts/lib/test-site-owner.ts`, with independent sessions.
+
+Before schema or identity changes:
+
+1. Capture a private D1 export and current Time Travel bookmark. Verify a
+   recoverable copy of required R2 objects separately.
+2. Record aggregate preservation counts and verify the intended site owner
+   privately. Pause writers and cleanup when restoring or splitting existing
+   data; restoring a database does not merge concurrent changes.
+3. Review pending migrations and Worker compatibility. Complete explicit
+   operator steps before opening access.
+4. Stage complete matching settings and secrets. `env.ts` rejects incomplete
+   provider/Turnstile pairs; half-configured running versions can return errors.
+
+### Private admission and the initial owner
+
+Site invitations create separate private accounts, never membership in the
+inviter's workspace. Collaboration is a separate explicit operation. Exactly
+one anchored site administrator exists; workspace ownership does not grant it.
+
+For a new database, follow [self-hosting](self-hosting.md). The first-owner tool
+creates an unverified owner without generating a password; mailbox verification
+and normal recovery finish setup. Inspect the syntax without changing data:
+
+```powershell
+node scripts/bootstrap-owner.mjs --help
+node scripts/split-empty-workspace.mjs --help
+```
+
+Migration 0010 accepts an empty database or exactly one existing administrator.
+An occupied database with zero or multiple administrators fails closed. Before
+that migration, the bootstrap tool's `--existing-user-id` selects an explicitly
+named verified owner, preserving accounts/content while normalizing site roles.
+After anchoring, an ownership transfer requires a separately reviewed operator
+migration. Normal APIs cannot add another administrator or demote/delete the
+owner, change the anchor, impersonate users, or replace another user's email or
+password.
+
+Migration 0008 is a no-op marker. For an old deployment containing only one
+confirmed-empty shared workspace, `split-empty-workspace.mjs` takes exact private
+target identifiers and the expected membership count. It refuses changed,
+populated or active deployments and applies a temporary transactional migration.
+Never weaken its guard to move populated content. See
+[private accounts](private-accounts.md) for preconditions and ownership checks.
+
+For that legacy transition, apply the remote schema migrations separately,
+perform and verify the guarded private-workspace split, and only then run the
+deployment command. Do not let its automatic migration-and-publish sequence
+expose the new application before the required data split is complete.
+
+### Deploy
+
+Version tags matching `v*` trigger `.github/workflows/deploy.yml`. Deployment
+requires its quality/generated-source/E2E gates and the shared pinned Semgrep
+workflow to succeed on that tag. Branch/PR CI calls the same SAST workflow and
+generated-Worker-types action. Review the tagged commit, workflow
+origin, GitHub environment and remaining release gates before publishing a tag.
+A workstation release uses:
+
+```powershell
 npm run deploy
 ```
 
-`scripts/deploy.mjs` builds with `CLOUDFLARE_ENV=production`, applies pending
-D1 migrations with `CI=true` (so wrangler never waits for a confirmation
-prompt), refuses to continue if any migration is still unapplied, then runs
-`wrangler deploy --env production`. Verify:
+`scripts/deploy.mjs` builds for production, applies remote migrations with
+noninteractive confirmation, refuses pending migrations, then deploys the
+resolved build configuration. These steps are not a transaction across Worker
+code, D1, R2, DNS and secrets. If a later step fails, inspect which earlier steps
+completed before retrying.
 
-```bash
-curl -s https://watermark.blowmoney.net/api/health
-curl -s https://watermark.blowmoney.net/api/config
-```
+CI requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in GitHub secrets.
+Scope credentials to the account, zone and Worker/D1/R2/email/DNS actions actually
+needed. Never publish their values or raw configuration output.
 
-## Roll back
+After deployment, verify health/config, invite-only admission, returning
+Google/Microsoft login, verification/reset delivery, cross-account gallery and
+preset denial, administrator totals, cloud read/write/native sharing, offline
+edits/reconnect, and expired/revoked gallery links. Check the canonical origin,
+legal pages, provider callbacks/branding and absence of legacy redirects or
+injected analytics. A health response alone does not prove these flows.
 
-Workers keep the last ten uploads. List and roll back without rebuilding:
+## Secrets and provider configuration
 
-```bash
-npx wrangler deployments list --env production
-npx wrangler rollback --env production            # previous version
-npx wrangler rollback <version-id> --env production
-```
+Local secrets belong in ignored `.dev.vars`; `.dev.vars.example` lists names
+without values. Production credentials use Worker secrets. Use interactive
+input, never literal credentials in command lines or printed generated values:
 
-Rollback does not undo D1 migrations. Migrations here are additive (new
-tables and columns only), so an older Worker keeps working against a newer
-schema. If a future migration is destructive, restore the database first (see
-Time Travel below) and then roll the Worker back.
-
-## Secrets and variables
-
-Secrets are stored on the Worker, never in the repository or CI logs.
-
-```bash
+```powershell
 npx wrangler secret put BETTER_AUTH_SECRET --env production
+npx wrangler secret put GOOGLE_AUTH_CLIENT_SECRET --env production
+npx wrangler secret put MICROSOFT_AUTH_CLIENT_SECRET --env production
 npx wrangler secret put TURNSTILE_SECRET_KEY --env production
 npx wrangler secret list --env production
 ```
 
-Non-secret variables live in `wrangler.jsonc` under `env.production.vars` and
-ship with the next deploy. The Turnstile site key is public and belongs there:
+These are syntax examples, not instructions to rotate every secret each release.
+Pair Google account credentials with `GOOGLE_AUTH_CLIENT_ID`; Microsoft with
+`MICROSOFT_AUTH_CLIENT_ID` and the configured tenant; Turnstile with
+`TURNSTILE_SITE_KEY`. Stage matching changes through a tested version workflow
+or planned maintenance window. The deploy script does not make them atomic.
 
-```jsonc
-"vars": { "TURNSTILE_SITE_KEY": "0x4AAAAAAA…" }
-```
+Account callbacks are:
 
-The Worker validates its environment on the first request an isolate handles
-(`src/worker/env.ts`). Setting only one of the two Turnstile variables makes
-every request fail with a configuration error, so set both or neither. That
-also means enabling Turnstile has a short window: `wrangler secret put` takes
-effect on running isolates at once, while the site key only arrives with the
-next deploy, so run the two commands back to back (the 2026-09-06 rollout
-answered `500 invalid_configuration` for about a minute in between). To
-disable, remove the var from `wrangler.jsonc`, deploy, then
-`wrangler secret delete TURNSTILE_SECRET_KEY --env production`.
+- `https://lumafoil.com/api/auth/callback/google`
+- `https://lumafoil.com/api/auth/callback/microsoft`
 
-### Rotating `BETTER_AUTH_SECRET`
+Account login requests identity scopes only. Cloud storage uses separate client
+settings (`GOOGLE_OAUTH_CLIENT_ID`, Picker configuration, `MICROSOFT_CLIENT_ID`,
+`DROPBOX_APP_KEY`) and explicit authorization. Do not substitute a cloud client
+for an account client or grant file permissions to make login work. Password
+users link providers from their authenticated Account page. Microsoft identities
+without verified email must complete Lumafoil mailbox verification. Track
+credential expiry/renewal in a private operator calendar.
 
-Rotation signs everybody out and invalidates every share link, because share
-tokens are keyed from the same secret. Announce it, then:
+### Rotating the authentication secret
 
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))" \
-  | npx wrangler secret put BETTER_AUTH_SECRET --env production
-```
+`BETTER_AUTH_SECRET` protects sessions, gallery links, reusable invitations and
+stored account-provider token encryption. Replacement invalidates sessions and
+outstanding signed flows/links. Existing provider ciphertext is not automatically
+re-encrypted. The app currently configures one secret, not a multi-key rotation
+mechanism.
 
-Existing share rows stay in D1; owners can re-create links from the gallery.
+Plan rotation with a private backup of the prior configuration, account
+recovery/reauthorization, replacement gallery links and rotated reusable
+invitation links. Verification/reset flows need fresh messages. A blind rotation
+does more than sign users out. Prove recovery on isolated state before changing
+production, and never put either secret value in logs.
 
-## Observability
+## Observability and privacy
 
-```bash
+```powershell
 npx wrangler tail --env production --format pretty
 npx wrangler tail --env production --status error
 ```
 
-Workers Logs (observability is enabled in `wrangler.jsonc`) keep structured
-logs in the dashboard under Workers & Pages → watermark-pro → Logs. The
-application logs one line per unexpected error with the method, path and
-stack; it never logs request bodies, tokens or addresses.
+Application request logs use route patterns and correlation IDs rather than raw
+query strings or parameter values. Unexpected-error diagnostics retain safe
+classifications and omit raw stacks, database parameters, OAuth state/tokens,
+request bodies and arbitrary provider/account objects. Better Call's raw error
+fallback is routed through the sanitized Worker handler. The development mailbox
+contains verification links and is forbidden in production.
 
-## Database
+Browser reports carry finite error classifications, bounded same-origin
+compiled-JavaScript coordinates and known route shapes with content identifiers
+redacted. Arbitrary exception/rejection messages and stack text are not sent.
+The API normalizes direct callers again, and raw user-agent strings are not
+stored. These application controls remain necessary even with platform
+observability disabled.
 
-### Inspect
+Persistent Cloudflare Worker logs and traces are disabled in both Wrangler
+environments. A hosted probe showed that even sanitized custom console records
+retain request paths in platform enrichment when invocation logs are disabled;
+query-string redaction cannot remove bearer credentials embedded in paths.
+Query redaction remains configured as a defense, but it is not permission to
+enable persistent request-context logs. See the
+[hosted privacy evidence](verification/m19/platform-observability-privacy.md).
 
-```bash
-npx wrangler d1 execute watermark-pro --remote --env production \
-  --command "select count(*) as users from user"
-npx wrangler d1 migrations list watermark-pro --remote --env production
+Live `wrangler tail` remains available with platform persistence disabled. Its
+envelope still contains URLs, including path and query values, so use it only
+for an authorized investigation and keep captured output in private operator
+storage. Do not publish raw tails, provider events, identifiers or screenshots.
+Application D1 diagnostics, scheduled health checks and audit records remain
+independent of platform-log persistence. The site administrator can inspect
+totals, moderation, audits, health and errors; workspace audit routes require
+that workspace's owner/admin role. Recent-work history is user-specific.
+
+After deploying this configuration, confirm **Workers Logs Disabled** and
+**Workers Traces Disabled** on the exact production Worker, verify the generated
+deployment configuration and check administrator diagnostics. This local change
+does not erase previously stored provider events; review their retention and
+access separately. Re-enabling persistence requires a reviewed design and new
+hosted proof that bearer paths cannot reach stored metadata. The temporary
+probe's passing checks are not production deployment evidence.
+
+## Database backup and restore
+
+Use the binding and an explicitly private output location:
+
+```powershell
+npx wrangler d1 export DB --remote --env production --output <private-backup.sql>
+npx wrangler d1 time-travel info DB --env production
 ```
 
-### Backups and point-in-time restore
+Replace angle-bracket parameters before running commands. Keep exports and
+bookmarks in access-controlled storage outside the repository. Time Travel
+currently retains seven days on Free and thirty on Paid; verify the plan and
+available bookmark. Restoring overwrites D1 and cancels in-flight queries.
+Capture a current recovery bookmark first.
+[Cloudflare Time Travel documentation](https://developers.cloudflare.com/d1/reference/time-travel/).
 
-D1 Time Travel keeps thirty days of history on the paid plan.
+For SQL-export recovery, use [the private replay preparation guide](recovery-sql.md)
+before executing the export. The verified legacy export failed direct D1 replay
+because data preceded a referenced table. The preparation helper verifies the
+recorded hash and produces tables, data, then indexes/triggers in a new private
+directory outside Git. It executes no backup rows and contacts no database.
+Keep a replay target unserved until all phases and independent integrity,
+account-preservation and access checks pass. See
+[the isolated D1 rehearsal](verification/m19/d1-restore-rehearsal.md) for the
+actual missing-table failure, successful replay and guarded workspace split.
 
-```bash
-npx wrangler d1 time-travel info watermark-pro --env production
-npx wrangler d1 time-travel restore watermark-pro --env production \
-  --timestamp 2026-09-06T12:00:00Z
+```powershell
+npx wrangler d1 time-travel restore DB --env production --bookmark <private-bookmark>
 ```
 
-Restore is a full-database operation; take a bookmark first
-(`time-travel info` prints the current one) so the restore itself can be
-undone. R2 has no time travel: photo deletions remove the object at once.
+D1 recovery does not restore R2 objects. An older snapshot can reference deleted
+objects or roll back upload receipts and admission state. Pause writers and
+scheduled cleanup, restore coordinated state, reconcile D1 references with R2,
+and verify private access before resuming. This repository does not provide an
+automatic coordinated D1-plus-R2 disaster restore.
 
-### Migrations
+## Storage and failed uploads
 
-Generated by `npm run db:generate` from `src/worker/db/schema.ts`, applied by
-the deploy script. To apply by hand:
+Gallery/logo APIs verify session, supplied account binding, workspace membership
+and role. Offline replay requires the expected account binding. Stream caps
+precede parsing; individual file sizes and signatures are also checked. D1
+atomically reserves count and the shared photo/logo byte budget, including
+thumbnails, before R2 writes.
 
-```bash
-npm run db:migrate:remote
+Metadata, audit and committed receipt form one D1 batch. A lost database reply
+cannot delete a committed file. Deletion first removes accessible metadata and
+persists cleanup. Failed R2 deletion keeps its quota charge and retries on later
+uploads and scheduled maintenance. Do not delete receipts/reservations to clear
+a quota warning.
+
+Inspect private `upload_reservation` status counts and scoped usage when
+troubleshooting. Restore D1/R2 availability so recovery can retry. Committed and
+deleted receipts prevent duplicate or resurrected offline uploads. Migration
+0009 charges old thumbnails the former 1 MiB maximum because their actual size
+was not recorded; new uploads record exact sizes. Database guards prevent
+referenced-logo deletion and workspace deletion with content/pending cleanup.
+
+Installed Wrangler `r2 object` supports `get`, `put` and `delete`; it has no
+`r2 object list`. Use the dashboard or authenticated R2 API for scoped inventory.
+Normal deletion must use the app to coordinate metadata, audit and cleanup.
+Manual object operations require a private inventory and a matching database
+reconciliation plan.
+
+## Worker rollback
+
+```powershell
+npx wrangler deployments list --env production
+npx wrangler rollback <compatible-version-id> --env production
 ```
 
-## Storage
+Choose a known compatible version from available history. Worker rollback
+changes code and associated configuration, not D1/R2 data.
+[Cloudflare rollback documentation](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/).
 
-```bash
-npx wrangler r2 object list watermark-pro --prefix org/<organizationId>/
-npx wrangler r2 object delete watermark-pro <key>
-```
+The migrations are not all behaviorally additive. Singleton-admin constraints,
+private admission, operator workspace splitting and upload reservations change
+required invariants. Older code may omit controls or disagree with the schema.
+Do not cross those boundaries without a reviewed compatible release and an
+explicit data/secret recovery plan. Prefer a tested forward fix when rollback
+would reopen admission or bypass storage recovery.
 
-Per-organization usage is visible in the admin console (Organizations tab)
-and comes from D1, not from listing the bucket.
+## Incident actions
 
-## Platform administration
+| Situation                 | Action                                                                                                                                                |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exposed gallery link      | Revoke it in the authorized workspace. New requests fail; prior downloads cannot be recalled.                                                         |
+| Exposed native cloud link | Revoke/change permissions with that provider; gallery-link revocation does not revoke provider links.                                                 |
+| Abusive account           | The site administrator bans it; server sessions and pending targeted/reusable invitations are revoked. Existing invitees remain independent accounts. |
+| Credential exposure       | Identify the affected credential privately and plan its full rotation/recovery impact without publishing secret material.                             |
+| Bad release               | Check code, schema, configuration and secret compatibility before choosing rollback or a forward fix.                                                 |
+| Corruption/deletion       | Pause writers/cleanup, capture recovery points, restore coordinated D1/R2 state and verify isolation.                                                 |
+| Reserved storage          | Inspect durable cleanup/status counts and service failures; restore connectivity rather than deleting receipts.                                       |
+| Missing email             | Check provider settings, verified sender/domain and delivery errors without logging verification links.                                               |
+| Revoked offline session   | Server access fails at the next identity check/reconnect; revocation cannot remotely erase disconnected copies.                                       |
 
-The first platform administrator is promoted directly in D1; after that the
-admin console can promote others.
-
-```bash
-npx wrangler d1 execute watermark-pro --remote --env production \
-  --command "update user set role = 'admin' where email = 'randy.northrup@gmail.com'"
-```
-
-The console at `/app/admin` can search users, ban and unban them with a
-reason, grant or remove the platform role, sign a user out everywhere, list
-organizations with member and storage counts, and browse the global audit
-trail. Every one of those actions is itself audited.
-
-## Incident playbook
-
-| Situation                 | Action                                                                                                                         |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Leaked share link         | Owner or admin revokes it from Gallery → Shares; the token 404s immediately                                                    |
-| Abusive account           | Admin console → Users → Ban with reason; sessions are revoked and sign-in is refused                                           |
-| Credential stuffing       | Rate limiter already returns 429; lower `AUTH_RATE_LIMITER.limit` in `wrangler.jsonc` and redeploy if needed; enable Turnstile |
-| Suspected secret exposure | Rotate `BETTER_AUTH_SECRET` (above); rotate the Turnstile secret in the dashboard and `secret put`                             |
-| Bad deploy                | `wrangler rollback`; open an issue with the version id                                                                         |
-| Data corruption           | D1 Time Travel restore to a timestamp before the incident                                                                      |
-| Runaway storage           | Admin console shows per-organization bytes; quotas are constants in `src/shared/constants.ts`                                  |
-| Email not arriving        | `wrangler tail --status error` for Email Sending failures; check the sender address is verified in the dashboard               |
-
-## Rate limits
-
-| Limiter             | Applies to                                | Limit           |
-| ------------------- | ----------------------------------------- | --------------- |
-| `AUTH_RATE_LIMITER` | sign-in, sign-up, reset, verification     | 10 / 60 s / IP  |
-| `API_RATE_LIMITER`  | other auth endpoints, public share routes | 120 / 60 s / IP |
-
-`src/shared/constants.ts` mirrors these values so the client and the
-`Retry-After` header stay accurate. Change both places together.
+Rate-limit values live in `src/shared/constants.ts` and Wrangler bindings; change
+them together. Invitation/referral limits live in `src/shared/api-accounts.ts`.
+Re-run boundary and concurrency tests when changing those policies.

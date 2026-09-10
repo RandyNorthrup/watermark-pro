@@ -2,11 +2,9 @@
  * Reads a photo's metadata in the browser, once, when it is opened or added to
  * a batch. Camera fields come from `exifr`; the raw Exif/XMP/density bytes come
  * from our own segment scanner (`engine/metadata/segments.ts`) because exifr
- * does not return them. Nothing is ever uploaded for this, and the function
- * never throws: a file with no EXIF or a corrupt block yields all-null fields.
+ * does not return them. Nothing is uploaded. Missing or malformed camera
+ * fields yield nulls; an unreadable file or unavailable parser rejects.
  */
-import { parse as parseExif } from 'exifr'
-
 import { EMPTY_PHOTO_METADATA, type PhotoMetadata } from '../../shared/metadata'
 import { extractJpegMetadata, extractPngMetadata } from '../engine/metadata/segments'
 
@@ -64,6 +62,8 @@ function locationOf(fields: Record<string, unknown>): PhotoMetadata['location'] 
 export async function readPhotoMetadata(file: File): Promise<PhotoMetadata> {
   const bytes = new Uint8Array(await file.arrayBuffer())
   const raw = file.type === 'image/png' ? extractPngMetadata(bytes) : extractJpegMetadata(bytes)
+  // Keep parser download failures distinct from malformed camera metadata.
+  const { parse: parseExif } = await import('exifr')
 
   let parsed: unknown
   try {

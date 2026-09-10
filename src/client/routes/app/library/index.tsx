@@ -13,6 +13,7 @@ import {
   Type,
   Upload,
 } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { AssetDto } from '../../../../shared/api'
@@ -35,14 +36,15 @@ import {
   libraryQueryKey,
   watermarksQueryOptions,
 } from '../../../lib/library'
+import { loadWorkspaceMedia } from '../../../lib/offline-media'
 import { buildPresetFile, type ExportLogo } from '../../../lib/preset-file'
-import { activeMemberRoleQueryOptions } from '../../../lib/queries'
+import { readActiveMemberRole } from '../../../lib/queries'
 import { canRole } from '../../../lib/roles'
 
 const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/library/')({
-  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: LibraryPage,
 })
 
@@ -69,6 +71,8 @@ function describeSpec(t: TFunction, spec: WatermarkSpec): string {
       return t('library.describe.text', { text: spec.text, fontFamily: spec.fontFamily })
     }
     case 'symbol': {
+      if (spec.symbol.type === 'sticker')
+        return t('library.describe.sticker', { name: spec.symbol.id })
       return spec.symbol.type === 'glyph'
         ? t('library.describe.glyph', { glyph: spec.symbol.glyph })
         : t('library.describe.icon', { name: spec.symbol.name })
@@ -139,8 +143,8 @@ async function buildExportBlob(
     if (asset === undefined) {
       throw new Error(t('library.exportMissingLogoError'))
     }
-    const response = await fetch(assetFileUrl(organizationId, assetId))
-    const bytes = new Uint8Array(await response.arrayBuffer())
+    const blob = await loadWorkspaceMedia(organizationId, assetFileUrl(organizationId, assetId))
+    const bytes = new Uint8Array(await blob.arrayBuffer())
     logos.push({
       assetId,
       name: asset.name,
@@ -196,18 +200,27 @@ function LibraryPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {items.length > 0 ? (
-            <Button
-              type="button"
-              variant="secondary"
-              isPending={exportPresets.isPending}
-              onClick={() => {
-                exportPresets.mutate(items)
-              }}
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={items.length === 0}
+            isPending={exportPresets.isPending}
+            onClick={() => {
+              exportPresets.mutate(items)
+            }}
+          >
+            {exportPresets.isPending ? null : <Download aria-hidden="true" className="size-4" />}
+            {t('library.export')}
+          </Button>
+          {canManage ? (
+            <Link
+              to="/app/library/new"
+              search={{ kind: 'qr' }}
+              className={buttonVariants({ variant: 'secondary' })}
             >
-              {exportPresets.isPending ? null : <Download aria-hidden="true" className="size-4" />}
-              {t('library.export')}
-            </Button>
+              <QrCode aria-hidden="true" className="size-4" />
+              {t('library.newQr')}
+            </Link>
           ) : null}
           {canManage ? (
             <ImportDialog
@@ -255,6 +268,7 @@ interface PresetListProps {
 
 function PresetList({ query, organizationId, canManage, onExport }: PresetListProps) {
   const { t } = useTranslation()
+  const [qrOnly, setQrOnly] = useState(false)
   if (query.isPending) {
     return <Spinner className="size-6" label={t('library.loadingPresets')} />
   }
@@ -278,17 +292,33 @@ function PresetList({ query, organizationId, canManage, onExport }: PresetListPr
     )
   }
   return (
-    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {query.data.map((preset) => (
-        <PresetCard
-          key={preset.id}
-          preset={preset}
-          organizationId={organizationId}
-          canManage={canManage}
-          onExport={onExport}
+    <div className="flex flex-col gap-4">
+      <label className="flex min-h-11 items-center gap-2 self-start text-sm">
+        <input
+          type="checkbox"
+          checked={qrOnly}
+          onChange={(event) => setQrOnly(event.currentTarget.checked)}
+          className="size-4 accent-brand-600"
         />
-      ))}
-    </ul>
+        {t('library.qrOnly')}
+      </label>
+      {qrOnly && query.data.every((preset) => preset.spec.kind !== 'qr') ? (
+        <p className="text-sm text-ink-muted">{t('library.noQr')}</p>
+      ) : null}
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {query.data
+          .filter((preset) => !qrOnly || preset.spec.kind === 'qr')
+          .map((preset) => (
+            <PresetCard
+              key={preset.id}
+              preset={preset}
+              organizationId={organizationId}
+              canManage={canManage}
+              onExport={onExport}
+            />
+          ))}
+      </ul>
+    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-# Agent instructions — Watermark Pro
+# Agent instructions — Lumafoil
 
 These rules apply to every AI coding agent and every human contributor. They
 are project-local; never modify global agent memory, IDE settings, or

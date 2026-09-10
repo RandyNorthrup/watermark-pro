@@ -1,0 +1,101 @@
+{
+  "mode": "provisional",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.94,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1298.629,
+        "lcp": 2798.629,
+        "cls": 0.00001509355272086945,
+        "tbt": 151
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.94,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1951.1152000000002,
+        "lcp": 2617.1152,
+        "cls": 0,
+        "tbt": 128.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.86,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1801.1889,
+        "lcp": 2657.1889,
+        "cls": 0,
+        "tbt": 390
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.9,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1877.1009,
+        "lcp": 2552.1009,
+        "cls": 0,
+        "tbt": 282.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.84,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1727.1444000000001,
+        "lcp": 2627.1444,
+        "cls": 0,
+        "tbt": 487
+      },
+      "protocols": [
+        "h2"
+      ]
+    }
+  ],
+  "scores": {
+    "performance": 0.9,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1801.1889,
+    "lcp": 2627.1444,
+    "cls": 0,
+    "tbt": 282.5
+  },
+  "validity": {
+    "status": "provisional-concurrent-load",
+    "reason": "SAST started2026-09-10T04:55:16Z and overlapped the final seven seconds; preceding small tests also overlapped. This aggregate cannot certify performance."
+  }
+}

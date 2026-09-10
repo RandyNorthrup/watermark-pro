@@ -1,8 +1,17 @@
-import { PDFDocument } from 'pdf-lib'
+import {
+  decodePDFRawStream,
+  PDFArray,
+  PDFDict,
+  PDFDocument,
+  PDFName,
+  PDFRawStream,
+  PDFString,
+} from 'pdf-lib'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { PageSize } from './raster-layout'
 import { EncryptedPdfError, PdfPageLimitError, watermarkPdf } from './watermark-pdf'
+import { ARTWORK_NOTICE_FILE, FLUENT_STICKER_NOTICE } from '../../shared/asset-licenses'
 import { MAX_PDF_PAGES, PDF_PRODUCER } from '../../shared/constants'
 import { markPng } from '../test-support/pdf-fixtures'
 
@@ -24,6 +33,30 @@ async function buildPdf(pageSizes: readonly PageSize[], title?: string): Promise
 }
 
 describe('watermarkPdf', () => {
+  it('attaches the complete artwork licence without changing the document author or title', async () => {
+    const original = await PDFDocument.create()
+    original.addPage([300, 400])
+    original.setAuthor('Original photographer')
+    original.setTitle('Original document')
+    const output = await watermarkPdf(
+      await original.save(),
+      fakeRasteriser(),
+      FLUENT_STICKER_NOTICE,
+    )
+    const document = await PDFDocument.load(output, { updateMetadata: false })
+    expect(document.getAuthor()).toBe('Original photographer')
+    expect(document.getTitle()).toBe('Original document')
+    const names = document.catalog.lookup(PDFName.of('Names'), PDFDict)
+    const embedded = names.lookup(PDFName.of('EmbeddedFiles'), PDFDict)
+    const files = embedded.lookup(PDFName.of('Names'), PDFArray)
+    const spec = files.lookup(1, PDFDict)
+    expect(spec.lookup(PDFName.of('F'), PDFString).decodeText()).toBe(ARTWORK_NOTICE_FILE)
+    const stream = spec.lookup(PDFName.of('EF'), PDFDict).lookup(PDFName.of('F'))
+    if (!(stream instanceof PDFRawStream)) throw new Error('Missing embedded licence bytes')
+    expect(new TextDecoder().decode(decodePDFRawStream(stream).decode())).toBe(
+      FLUENT_STICKER_NOTICE,
+    )
+  })
   it('draws the mark on every page and keeps the rest of the Info dictionary', async () => {
     const rasterise = fakeRasteriser()
     const input = await buildPdf(

@@ -7,12 +7,12 @@ import { useTranslation } from 'react-i18next'
 import { MILLISECONDS_PER_SECOND } from '../../../shared/constants'
 import type { Anchor, WatermarkSpec } from '../../../shared/watermark'
 import { seedFor } from '../../engine/random'
-import { apiRequest } from '../../lib/api'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { assetFileUrl, watermarksQueryOptions } from '../../lib/library'
 import { MarkResources } from '../../lib/mark-resources'
+import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { canShareFiles, shareFile } from '../../lib/share-file'
 import { withPlacement } from '../../lib/spec-edit'
 import { baseName, specForPhoto } from '../../lib/spec-tokens'
@@ -156,6 +156,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const transcoderRef = useRef<VideoTranscoder | null>(null)
   const resourcesRef = useRef<MarkResources | null>(null)
+  const runRef = useRef<AbortController | null>(null)
 
   const [video, setVideo] = useState<LoadedVideo | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -170,6 +171,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
 
   useEffect(
     () => () => {
+      runRef.current?.abort()
       transcoderRef.current?.terminate()
       resourcesRef.current?.clear()
     },
@@ -205,8 +207,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
 
   function resources(): MarkResources {
     resourcesRef.current ??= new MarkResources(async (assetId) => {
-      const response = await apiRequest(assetFileUrl(organizationId, assetId))
-      return await response.blob()
+      return await loadWorkspaceMedia(organizationId, assetFileUrl(organizationId, assetId))
     })
     return resourcesRef.current
   }
@@ -224,6 +225,8 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
     setOutcome(null)
     setRunError(null)
     setWasCancelled(false)
+    const controller = new AbortController()
+    runRef.current = controller
     const plan: TranscodePlan = {
       videoCodec: capability.videoCodec,
       container: capability.container,
@@ -240,6 +243,11 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
     })
     try {
       const marks = await resources().resolve(resolvedSpecs, seedFor(video.file))
+      if (controller.signal.aborted) {
+        // Preparation created these bitmaps, but no worker owns them yet.
+        for (const mark of marks.marks) mark.image?.close()
+        throw new CancelledError()
+      }
       transcoderRef.current ??= new VideoTranscoder()
       const blob = await transcoderRef.current.transcode(
         { source: video.file, marks: marks.marks, fonts: marks.fonts, plan },
@@ -249,14 +257,16 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
           },
         },
       )
+      controller.signal.throwIfAborted()
       setOutcome({ blob, fileName: outputFileName() })
     } catch (error) {
-      if (error instanceof CancelledError) {
+      if (controller.signal.aborted || error instanceof CancelledError) {
         setWasCancelled(true)
       } else {
         setRunError(describeError(error))
       }
     } finally {
+      runRef.current = null
       setProgress(null)
     }
   }
@@ -294,8 +304,8 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
   return (
     <PresetGate query={presets} emptyHint={t('video.emptyHint')}>
       {(list) => (
-        <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-          <Card className="flex flex-col gap-4 p-4">
+        <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <Card className="flex min-w-0 flex-col gap-4 p-4">
             <div
               onDragOver={allowDrop}
               onDrop={onDrop}
@@ -392,6 +402,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                   variant="danger"
                   className="self-start"
                   onClick={() => {
+                    runRef.current?.abort()
                     transcoderRef.current?.cancel()
                   }}
                 >
@@ -435,7 +446,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
             )}
           </Card>
 
-          <Card className="flex flex-col gap-5">
+          <Card className="flex min-w-0 flex-col gap-5">
             <fieldset className="flex flex-col gap-2">
               <legend className="mb-1.5 text-sm font-medium">{t('video.presets')}</legend>
               <ul className="flex flex-col gap-1">

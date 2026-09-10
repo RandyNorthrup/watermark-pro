@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
+import { setOfflineUser } from '../offline-context'
 import {
   buildFolderQuery,
   buildMultipartBody,
@@ -14,6 +15,8 @@ import {
   GOOGLE_DRIVE_UPLOAD_ENDPOINT,
   HTTP_STATUS,
 } from '../../../shared/constants'
+
+beforeEach(() => setOfflineUser('user-1'))
 
 const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
 const MULTIPART_UPLOAD_URL = `${GOOGLE_DRIVE_UPLOAD_ENDPOINT}?uploadType=multipart`
@@ -143,14 +146,14 @@ describe('createFolder', () => {
 describe('uploadFile', () => {
   it('uploads to the multipart endpoint with the bearer token and multipart content type', async () => {
     const fetchMock = vi.fn<typeof fetch>(() =>
-      Promise.resolve(new Response(null, { status: HTTP_STATUS.ok })),
+      Promise.resolve(Response.json({ id: 'created-file' }, { status: HTTP_STATUS.ok })),
     )
     vi.stubGlobal('fetch', fetchMock)
 
     const blob = new Blob([new Uint8Array([9])], { type: 'image/jpeg' })
     await expect(
       uploadFile('token-3', 'folder-9', { name: 'sunset.jpg', blob }),
-    ).resolves.toBeUndefined()
+    ).resolves.toMatchObject({ id: 'created-file', name: 'sunset.jpg' })
 
     const call = fetchMock.mock.calls[0]
     expect(call?.[0]).toBe(MULTIPART_UPLOAD_URL)

@@ -2,35 +2,33 @@ import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { z } from 'zod'
+import type { z } from 'zod'
 
+import { loginSearchSchema } from '../../shared/client-search'
 import { signInSchema } from '../../shared/validation'
 import { EmailField, PasswordField } from '../components/auth-fields'
 import { AuthLayout } from '../components/auth-layout'
+import { SocialAuth } from '../components/social-auth'
 import { Alert } from '../components/ui/alert'
 import { Button } from '../components/ui/button'
 import { authClient } from '../lib/auth-client'
-import { describeAuthError } from '../lib/errors'
-import { resetShellQueries } from '../lib/queries'
+import { describeAuthError, describeError } from '../lib/errors'
+import { activateOfflineAccount } from '../lib/offline-account'
+import { clearPendingInvitation, pendingInvitation } from '../lib/pending-invitation'
 import { useFormErrors } from '../lib/use-form-errors'
 
-const searchSchema = z.object({
-  /** Path to return to after signing in; only same-app paths are honoured. */
-  redirect: z.string().startsWith('/').optional(),
-})
-
 export const Route = createFileRoute('/login')({
-  validateSearch: (search) => searchSchema.parse(search),
+  validateSearch: (search) => loginSearchSchema.parse(search),
   component: LoginPage,
 })
 
-type SignInValues = z.infer<typeof signInSchema>
-
 function LoginPage() {
+  type SignInValues = z.infer<typeof signInSchema>
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { redirect } = Route.useSearch()
+  const { redirect, invitation: linkedInvitation, error: oauthError } = Route.useSearch()
+  const invitation = linkedInvitation ?? pendingInvitation()
   const [values, setValues] = useState<SignInValues>({ email: '', password: '' })
   const [isPending, setIsPending] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
@@ -56,8 +54,16 @@ function LoginPage() {
       }
       return
     }
-    await queryClient.invalidateQueries()
-    resetShellQueries(queryClient)
+    // Query keys are organization-scoped. A different account must never inherit
+    // the previous account's in-memory local overlays, even in a shared workspace.
+    try {
+      await activateOfflineAccount(queryClient, result.data.user.id)
+    } catch (error) {
+      setServerError(describeError(error))
+      return
+    }
+    clearPendingInvitation()
+    queryClient.clear()
     await navigate({ to: redirect ?? '/app' })
   }
 
@@ -67,13 +73,29 @@ function LoginPage() {
       description={t('auth.login.description')}
       footer={
         <>
-          {t('auth.login.footerPrompt')}{' '}
-          <Link to="/signup" className="font-medium text-brand-600 dark:text-brand-300">
-            {t('auth.login.createAccount')}
-          </Link>
+          {t(invitation === undefined ? 'auth.inviteOnly.body' : 'auth.login.footerPrompt')}{' '}
+          {invitation === undefined ? null : (
+            <Link
+              to="/signup"
+              search={{ invitation }}
+              className="font-medium text-brand-600 dark:text-brand-300"
+            >
+              {t('auth.login.createAccount')}
+            </Link>
+          )}
         </>
       }
     >
+      {oauthError === undefined ? null : (
+        <Alert tone="error">
+          {t(
+            oauthError === 'email_not_verified'
+              ? 'accountAuth.verifyEmail'
+              : 'accountAuth.signInError',
+          )}
+        </Alert>
+      )}
+      <SocialAuth invitation={invitation} />
       <form
         onSubmit={(event) => void handleSubmit(event)}
         noValidate

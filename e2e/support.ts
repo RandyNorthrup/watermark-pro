@@ -15,6 +15,7 @@ import {
 } from '@playwright/test'
 
 import { PREVIEW_ORIGIN } from './preview'
+import { shellOrganizationSchema, shellSessionSchema } from '../src/shared/shell-cache'
 
 export { expect } from '@playwright/test'
 
@@ -151,18 +152,6 @@ export async function expectNoNavLink(page: Page, label: string) {
 }
 
 /**
- * Grants the platform admin role through the console-provider-only dev
- * route, the same change the runbook makes with a D1 update in production.
- */
-export async function promoteToPlatformAdmin(request: APIRequestContext, email: string) {
-  const response = await request.post('/api/dev/promote', {
-    data: { email },
-    headers: { origin: PREVIEW_ORIGIN },
-  })
-  expect(response.status()).toBe(200)
-}
-
-/**
  * axe with zero violations, and no sideways scrolling (WCAG 1.4.10 reflow):
  * a page wider than its viewport puts tap targets off-screen on a phone,
  * which is how a long nowrap preset description broke the Android tab bar.
@@ -177,30 +166,95 @@ export async function expectAccessible(page: Page) {
 }
 
 export async function signUpAndVerify(page: Page, request: APIRequestContext, person: Person) {
-  await page.goto('/signup')
-  // Route chunks load after the document; axe must see the rendered page.
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account')
-  await expectAccessible(page)
-  await page.getByLabel('Name').fill(person.name)
-  await page.getByLabel('Email').fill(person.email)
-  await page.getByLabel('Password').fill(person.password)
-  await page.getByRole('button', { name: 'Create account' }).click()
+  // Only the local console-mailbox environment permits fixture bootstrapping.
+  // Production admission and the actual invitation UI have dedicated journeys.
+  const signup = await page.request.post('/api/auth/sign-up/email', {
+    headers: { origin: PREVIEW_ORIGIN },
+    data: { ...person, callbackURL: '/app' },
+  })
+  expect(signup.status()).toBe(200)
+  await page.goto(`/check-email?email=${encodeURIComponent(person.email)}`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Check your inbox')
   await expectAccessible(page)
 
   const verifyPath = await latestLinkFor(request, person.email, '/api/auth/verify-email')
   await page.goto(verifyPath)
-  // The verification link lands in the app, which redirects a member of no
-  // organization to the creation page; wait for that before navigating on.
-  await expect(page).toHaveURL(/\/app\/organizations\/new/)
+  // Every verified account starts in a separate personal workspace.
+  await expect(page).toHaveURL(/\/app\/?$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('My workspace')
 }
 
-export async function signIn(page: Page, person: Person, expectedHeading: string | RegExp) {
+async function organizationSwitcher(page: Page) {
+  const switcher = page.getByRole('button', { name: /^Organization: .+\. Switch organization$/ })
+  if (!(await switcher.isVisible())) {
+    await page.getByRole('button', { name: 'Menu', exact: true }).click()
+  }
+  await expect(switcher).toBeVisible()
+  return switcher
+}
+
+async function closeMobileMenu(page: Page): Promise<void> {
+  const close = page.getByRole('button', { name: 'Close menu', exact: true })
+  if (await close.isVisible()) {
+    await close.click()
+    await expect(page.getByRole('dialog', { name: 'Menu', exact: true })).toHaveCount(0)
+  }
+}
+
+/** Verify visible selection against the server session, account and actual membership. */
+export async function expectActiveWorkspace(page: Page, person: Person, expectedWorkspace: string) {
+  await expect(
+    page.getByRole('button', { name: `Account menu for ${person.name}`, exact: true }),
+  ).toBeVisible()
+  const switcher = await organizationSwitcher(page)
+  await expect(switcher).toHaveText(expectedWorkspace)
+  await closeMobileMenu(page)
+  const sessionResponse = await page.request.get('/api/auth/get-session')
+  expect(sessionResponse.status()).toBe(200)
+  const session = shellSessionSchema.parse(await sessionResponse.json())
+  expect(session.user).toMatchObject({
+    name: person.name,
+    email: person.email,
+    emailVerified: true,
+  })
+  const organizationResponse = await page.request.get(
+    '/api/auth/organization/get-full-organization',
+  )
+  expect(organizationResponse.status()).toBe(200)
+  const organization = shellOrganizationSchema.parse(await organizationResponse.json())
+  expect(organization.name).toBe(expectedWorkspace)
+  expect(organization.id).toBe(session.session.activeOrganizationId)
+  const member = organization.members.find((candidate) => candidate.userId === session.user.id)
+  if (member === undefined)
+    throw new Error('The signed-in account has no active workspace membership.')
+  expect(member).toMatchObject({
+    organizationId: organization.id,
+    userId: session.user.id,
+    user: { id: session.user.id, name: person.name, email: person.email },
+  })
+  return { session, organization, member }
+}
+
+/** Fresh login starts privately; collaboration is selected explicitly through the rendered switcher. */
+export async function signIn(page: Page, person: Person, expectedWorkspace: string) {
   await page.goto('/login')
   await page.getByLabel('Email').fill(person.email)
   await page.getByLabel('Password').fill(person.password)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(expectedHeading)
+  await expect(page).toHaveURL(/\/app\/?$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('My workspace')
+  const personal = await expectActiveWorkspace(page, person, 'My workspace')
+  expect(personal.organization.members).toHaveLength(1)
+  expect(personal.member.role).toBe('owner')
+  if (expectedWorkspace === 'My workspace') return
+  const switcher = await organizationSwitcher(page)
+  await switcher.click()
+  await page.getByRole('menuitem', { name: expectedWorkspace, exact: true }).click()
+  await expect(switcher).toHaveText(expectedWorkspace)
+  await closeMobileMenu(page)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(expectedWorkspace)
+  const selected = await expectActiveWorkspace(page, person, expectedWorkspace)
+  expect(selected.organization.id).not.toBe(personal.organization.id)
 }
 
 /** Sign up, verify, and create an organization; lands on the dashboard. */
@@ -211,11 +265,13 @@ export async function createWorkspace(
   organizationName: string,
 ) {
   await signUpAndVerify(page, request, person)
-  await expect(page).toHaveURL(/\/app\/organizations\/new/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your first organization')
+  await gotoRetrying(page, '/app/organizations/new')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('New organization')
   await page.getByLabel('Name').fill(organizationName)
   await page.getByRole('button', { name: 'Create organization' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(organizationName)
+  const workspace = await expectActiveWorkspace(page, person, organizationName)
+  expect(workspace.member.role).toBe('owner')
 }
 
 function crc32(bytes: Uint8Array): number {

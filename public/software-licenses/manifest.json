@@ -1,0 +1,22 @@
+[
+  {
+    "name": "qrcode-generator",
+    "version": "2.0.4",
+    "repository": "kazuhikoarase/qrcode-generator",
+    "packageCommit": "83b7e8fe3fddd3b0368dbafd6ce56995bd25e3c8",
+    "licenseCommit": "83b7e8fe3fddd3b0368dbafd6ce56995bd25e3c8",
+    "source": "https://raw.githubusercontent.com/kazuhikoarase/qrcode-generator/83b7e8fe3fddd3b0368dbafd6ce56995bd25e3c8/LICENSE",
+    "file": "qrcode-generator-2.0.4-LICENSE.txt",
+    "sha256": "3a850fa5f08101db6f40676c2786e10bd2cd5fff7b12ffdf1e0c434d4e49d90c"
+  },
+  {
+    "name": "react-remove-scroll-bar",
+    "version": "2.3.8",
+    "repository": "theKashey/react-remove-scroll-bar",
+    "licenseCommit": "7301c160fda44cb8cf2b9fdfde61efad35736196",
+    "packageCommit": "b3b1287aad81def2e2ae707274b74531b61ddbaf",
+    "source": "https://raw.githubusercontent.com/theKashey/react-remove-scroll-bar/7301c160fda44cb8cf2b9fdfde61efad35736196/LICENSE",
+    "file": "react-remove-scroll-bar-2.3.8-LICENSE.txt",
+    "sha256": "a79aae0c0f21990d9d963bb3c5a79cdcea9a46f8523ba55c58d7fe776b6ebc84"
+  }
+]

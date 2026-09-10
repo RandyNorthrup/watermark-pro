@@ -17,6 +17,7 @@ import { encoded, resetFakeCanvasBackend } from '../../test-support/fake-canvas-
 import { installLibraryApi, makeAsset, makeWatermark } from '../../test-support/fake-library-api'
 import { renderedSpecs, resetFakePreview } from '../../test-support/fake-preview'
 import { renderApp } from '../../test-support/render-app'
+import { requestUrl } from '../../test-support/request-url'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
@@ -40,6 +41,25 @@ afterEach(() => {
 })
 
 describe('library page', () => {
+  it('keeps Export in the toolbar while presets load and enables it only for real records', async () => {
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    const fetcher = globalThis.fetch
+    const pending = Promise.withResolvers<Response>()
+    vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+      requestUrl(input).endsWith('/watermarks') ? pending.promise : fetcher(input, init),
+    )
+    renderApp('/app/library')
+    await screen.findByRole('heading', { name: 'Watermark library' })
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    expect(exportButton).toBeDisabled()
+    expect(screen.queryByText('Studio signature')).not.toBeInTheDocument()
+    pending.resolve(Response.json({ watermarks: [makeWatermark()] }))
+    await screen.findByText('Studio signature')
+    expect(exportButton).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Export' })).toBe(exportButton)
+  })
+
   it('lists presets with their kind and placement and lets an owner delete one', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
@@ -101,6 +121,7 @@ describe('library page', () => {
     installLibraryApi()
     renderApp('/app/library')
     expect(await screen.findByText(/No presets yet/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
     expect(screen.queryByRole('link', { name: 'New preset' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Create the first preset' })).not.toBeInTheDocument()
   })
@@ -110,6 +131,7 @@ describe('library page', () => {
     installLibraryApi({ failWith: 'forbidden' })
     renderApp('/app/library')
     expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
+    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
   })
 
   it('exports every preset as a parseable preset file', async () => {
@@ -184,6 +206,40 @@ describe('library page', () => {
 })
 
 describe('preset designer', () => {
+  it('saves separate QR destinations and filters the library without mixing their contents', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ watermarks: [makeWatermark()] })
+    const { router } = renderApp('/app/library/new?kind=qr')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('New QR code')
+    await user.type(screen.getByLabelText('Preset name'), 'Portfolio QR')
+    await user.clear(screen.getByLabelText('QR code content'))
+    await user.type(screen.getByLabelText('QR code content'), 'https://example.com/portfolio')
+    await user.click(screen.getByRole('button', { name: 'Save preset' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
+    await user.click(await screen.findByRole('link', { name: 'New QR code' }))
+    await screen.findByLabelText('QR code content')
+    await user.type(screen.getByLabelText('Preset name'), 'Contact QR')
+    await user.clear(screen.getByLabelText('QR code content'))
+    await user.type(screen.getByLabelText('QR code content'), 'https://example.com/contact')
+    await user.click(screen.getByRole('button', { name: 'Save preset' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
+    await user.click(await screen.findByRole('checkbox', { name: 'QR codes only' }))
+    expect(screen.getByRole('link', { name: 'Portfolio QR' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Contact QR' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Studio signature' })).not.toBeInTheDocument()
+    expect(
+      api.watermarks
+        .filter((preset) => preset.spec.kind === 'qr')
+        .map((preset) => (preset.spec.kind === 'qr' ? preset.spec.content : '')),
+    ).toEqual(['https://example.com/portfolio', 'https://example.com/contact'])
+    await user.click(screen.getByRole('link', { name: 'Portfolio QR' }))
+    expect(await screen.findByLabelText('QR code content')).toHaveValue(
+      'https://example.com/portfolio',
+    )
+    expect(screen.getByLabelText('QR code content')).not.toHaveValue('https://example.com/contact')
+  })
+
   it('creates a text preset, previewing each change through the engine', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())

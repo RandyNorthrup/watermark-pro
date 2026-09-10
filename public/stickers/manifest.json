@@ -1,0 +1,4082 @@
+{
+  "source": "https://github.com/microsoft/fluentui-emoji",
+  "commit": "1ffb34c752ecf5d402f04cfb4b392c77f57c54bc",
+  "license": "MIT",
+  "licenseGitBlob": "9e841e7a26e4eb057b24511e7b92d42b257a80e5",
+  "stickers": [
+    {
+      "id": "1st-place-medal",
+      "name": "1st place medal",
+      "category": "Activities",
+      "keywords": ["1st place medal", "first", "gold", "medal"],
+      "url": "/stickers/1st-place-medal-0b791d107a3b.svg",
+      "sourcePath": "assets/1st place medal/Color/1st_place_medal_color.svg",
+      "gitBlob": "3103bc584e794cec059565dcecf9fa12719d19fa",
+      "sha256": "0b791d107a3bdabee90e6b10edaac4a4753e85ba4e941d8c578979ba877d9909"
+    },
+    {
+      "id": "2nd-place-medal",
+      "name": "2nd place medal",
+      "category": "Activities",
+      "keywords": ["2nd place medal", "medal", "second", "silver"],
+      "url": "/stickers/2nd-place-medal-d8ce18dfba9c.svg",
+      "sourcePath": "assets/2nd place medal/Color/2nd_place_medal_color.svg",
+      "gitBlob": "e613c39d1959efe8186e090147bf0aa04a952582",
+      "sha256": "d8ce18dfba9c10221e311d156cbad0872721b1103d53efd8620905397d7467f7"
+    },
+    {
+      "id": "a-button-blood-type",
+      "name": "A button blood type",
+      "category": "Symbols",
+      "keywords": ["a", "A button (blood type)", "blood type"],
+      "url": "/stickers/a-button-blood-type-3a857de92bc4.svg",
+      "sourcePath": "assets/A button blood type/Color/a_button_blood_type_color.svg",
+      "gitBlob": "f87214727397d5190ab5c70e971a5fbb1d4a206e",
+      "sha256": "3a857de92bc40d987acacd29325df45eb005fef740eb1e49397bc59137248d81"
+    },
+    {
+      "id": "admission-tickets",
+      "name": "Admission tickets",
+      "category": "Activities",
+      "keywords": ["admission", "admission tickets", "ticket"],
+      "url": "/stickers/admission-tickets-45be54d5c91a.svg",
+      "sourcePath": "assets/Admission tickets/Color/admission_tickets_color.svg",
+      "gitBlob": "ad232c7f2bc3322147805e62fb870355eb9e6a61",
+      "sha256": "45be54d5c91a5ef63b6bdcfcd6981229da9243d4ffbaccf7239b38daa52d8137"
+    },
+    {
+      "id": "alarm-clock",
+      "name": "Alarm clock",
+      "category": "Travel & Places",
+      "keywords": ["alarm", "clock"],
+      "url": "/stickers/alarm-clock-838484b485d0.svg",
+      "sourcePath": "assets/Alarm clock/Color/alarm_clock_color.svg",
+      "gitBlob": "44066e7f230cd29f5f673fa1cac108f829ea5254",
+      "sha256": "838484b485d036524c79101a83ecfc1a0a55faa7162d7eec9ed1d50816b5f5ce"
+    },
+    {
+      "id": "american-football",
+      "name": "American football",
+      "category": "Activities",
+      "keywords": ["american", "ball", "football"],
+      "url": "/stickers/american-football-6881109a0f1d.svg",
+      "sourcePath": "assets/American football/Color/american_football_color.svg",
+      "gitBlob": "f98a26f88255a61b3c969592424f5f1663c4ff37",
+      "sha256": "6881109a0f1dc866ce7fd09f86f62138b386399b70c9c7e1ee1ea3838a713b55"
+    },
+    {
+      "id": "angry-face-with-horns",
+      "name": "Angry face with horns",
+      "category": "Smileys & Emotion",
+      "keywords": ["angry face with horns", "demon", "devil", "face", "fantasy", "imp"],
+      "url": "/stickers/angry-face-with-horns-d9e04f7b963c.svg",
+      "sourcePath": "assets/Angry face with horns/Color/angry_face_with_horns_color.svg",
+      "gitBlob": "d9cddcfc41b7531199e14e5932f5545e557a6daf",
+      "sha256": "d9e04f7b963c0eac9838bc04bd808a7d3e7c1b369d56d1a601285351adc8f295"
+    },
+    {
+      "id": "aquarius",
+      "name": "Aquarius",
+      "category": "Symbols",
+      "keywords": ["Aquarius", "bearer", "water", "zodiac"],
+      "url": "/stickers/aquarius-f4c225742a61.svg",
+      "sourcePath": "assets/Aquarius/Color/aquarius_color.svg",
+      "gitBlob": "dd7cec0261e87bf7b61c13a0e0d30b423f809db4",
+      "sha256": "f4c225742a617068ade43f61c762a794ec8701f4935072bd0356a5d0508b19c2"
+    },
+    {
+      "id": "artist-palette",
+      "name": "Artist palette",
+      "category": "Activities",
+      "keywords": ["art", "artist palette", "museum", "painting", "palette"],
+      "url": "/stickers/artist-palette-078b2287b45e.svg",
+      "sourcePath": "assets/Artist palette/Color/artist_palette_color.svg",
+      "gitBlob": "1cde8eccb3f027ce3ee6453959fa0002cf03e2e1",
+      "sha256": "078b2287b45eb8f36fbc39c0caec6afd173922cfd16759d9d25638a938a67088"
+    },
+    {
+      "id": "astonished-face",
+      "name": "Astonished face",
+      "category": "Smileys & Emotion",
+      "keywords": ["astonished", "face", "shocked", "totally"],
+      "url": "/stickers/astonished-face-865d82d803b5.svg",
+      "sourcePath": "assets/Astonished face/Color/astonished_face_color.svg",
+      "gitBlob": "0ae6239cf197e035a2a44009791afeff928af363",
+      "sha256": "865d82d803b5c585408c83b90b30e6c87af738c44a67dc0041b6b91ed709510d"
+    },
+    {
+      "id": "atm-sign",
+      "name": "Atm sign",
+      "category": "Symbols",
+      "keywords": ["atm", "ATM sign", "automated", "bank", "teller"],
+      "url": "/stickers/atm-sign-4ea57198ad43.svg",
+      "sourcePath": "assets/Atm sign/Color/atm_sign_color.svg",
+      "gitBlob": "972a2e64ee1d8098d16401e3d6063592c95101e8",
+      "sha256": "4ea57198ad434f5e61a1dc7b055c8fabe6eb799dddcd65027a50959c757d0c96"
+    },
+    {
+      "id": "auto-rickshaw",
+      "name": "Auto rickshaw",
+      "category": "Travel & Places",
+      "keywords": ["auto rickshaw", "tuk tuk"],
+      "url": "/stickers/auto-rickshaw-c3707c1af3ba.svg",
+      "sourcePath": "assets/Auto rickshaw/Color/auto_rickshaw_color.svg",
+      "gitBlob": "0e6887e58311c4e765bedfd61f41bd6810b0d04d",
+      "sha256": "c3707c1af3ba01f90ac7f4558060dc961fb60916c4dcc4567f6cdd66b935eedc"
+    },
+    {
+      "id": "automobile",
+      "name": "Automobile",
+      "category": "Travel & Places",
+      "keywords": ["automobile", "car"],
+      "url": "/stickers/automobile-4cb6ea51b7cc.svg",
+      "sourcePath": "assets/Automobile/Color/automobile_color.svg",
+      "gitBlob": "bd8df8e3c9e5b84647563e251fc6ed314cb124b9",
+      "sha256": "4cb6ea51b7cc1dd81d68995a327cbf507e025364bf031072d5173c4905442555"
+    },
+    {
+      "id": "baby-symbol",
+      "name": "Baby symbol",
+      "category": "Symbols",
+      "keywords": ["baby", "baby symbol", "changing"],
+      "url": "/stickers/baby-symbol-dbbff1803726.svg",
+      "sourcePath": "assets/Baby symbol/Color/baby_symbol_color.svg",
+      "gitBlob": "8ce96817f5e27e9731d2144371c9f2a16bd85474",
+      "sha256": "dbbff1803726a506dd709d46845c003be31e17bcaea1d2e4b5464d6e72a5755a"
+    },
+    {
+      "id": "badger",
+      "name": "Badger",
+      "category": "Animals & Nature",
+      "keywords": ["badger", "honey badger", "pester"],
+      "url": "/stickers/badger-1214a0c963eb.svg",
+      "sourcePath": "assets/Badger/Color/badger_color.svg",
+      "gitBlob": "eafc9e0bba1d26dcf65f240d016f35a36c6e448a",
+      "sha256": "1214a0c963ebd768d248b42dfbcbbc35cde242b7ae48c3764e2ffd4d56a2f898"
+    },
+    {
+      "id": "balloon",
+      "name": "Balloon",
+      "category": "Activities",
+      "keywords": ["balloon", "celebration"],
+      "url": "/stickers/balloon-3dbba8b304d9.svg",
+      "sourcePath": "assets/Balloon/Color/balloon_color.svg",
+      "gitBlob": "ce5732da83a25d137695224b7176c054058ffe28",
+      "sha256": "3dbba8b304d9976151ed64889809833b9731be5dcccec643cdcfd3cd69813afc"
+    },
+    {
+      "id": "banjo",
+      "name": "Banjo",
+      "category": "Objects",
+      "keywords": ["banjo", "music", "stringed"],
+      "url": "/stickers/banjo-f0a620457122.svg",
+      "sourcePath": "assets/Banjo/Color/banjo_color.svg",
+      "gitBlob": "2de98f45db0a4771f9dcf48d809e610c800538f0",
+      "sha256": "f0a6204571223f629b2185b5f96241ed8c9fb5cfc521baff5b2a33791e8cd5cb"
+    },
+    {
+      "id": "basketball",
+      "name": "Basketball",
+      "category": "Activities",
+      "keywords": ["ball", "basketball", "hoop"],
+      "url": "/stickers/basketball-19c0515831ce.svg",
+      "sourcePath": "assets/Basketball/Color/basketball_color.svg",
+      "gitBlob": "9c68cff447a955868bc5d06b8b1a9e1795b1a851",
+      "sha256": "19c0515831ce87c0d33d3c98eef109abb7f482b1d9bea07a831dc7acfd35837a"
+    },
+    {
+      "id": "beans",
+      "name": "Beans",
+      "category": "Food & Drink",
+      "keywords": ["beans", "food", "kidney", "legume"],
+      "url": "/stickers/beans-11348933f86f.svg",
+      "sourcePath": "assets/Beans/Color/beans_color.svg",
+      "gitBlob": "2475e56bbd6855737c413199f053f72eda2cd867",
+      "sha256": "11348933f86f2695bb3057a7ca805d8c0f6ded9d0d6a38641ae5be1fb4c86c8d"
+    },
+    {
+      "id": "bell-pepper",
+      "name": "Bell pepper",
+      "category": "Food & Drink",
+      "keywords": ["bell pepper", "capsicum", "pepper", "vegetable"],
+      "url": "/stickers/bell-pepper-1a697b5cc626.svg",
+      "sourcePath": "assets/Bell pepper/Color/bell_pepper_color.svg",
+      "gitBlob": "ac04bba18de62205a5aeb0381b77169e857738d8",
+      "sha256": "1a697b5cc626c189fb123d4a606070d031886082568d040c8acb216dc5ed8184"
+    },
+    {
+      "id": "bento-box",
+      "name": "Bento box",
+      "category": "Food & Drink",
+      "keywords": ["bento", "box"],
+      "url": "/stickers/bento-box-c447223612e9.svg",
+      "sourcePath": "assets/Bento box/Color/bento_box_color.svg",
+      "gitBlob": "ad6d839a1343d0cc089b955754df1c34e7c2d2ef",
+      "sha256": "c447223612e9f00b7dd938abe212b790a1b68af6676e03a4de26e9d6b111c607"
+    },
+    {
+      "id": "bicycle",
+      "name": "Bicycle",
+      "category": "Travel & Places",
+      "keywords": ["bicycle", "bike"],
+      "url": "/stickers/bicycle-f2698cbea24b.svg",
+      "sourcePath": "assets/Bicycle/Color/bicycle_color.svg",
+      "gitBlob": "52ff540ddfe5fa2ab8a69e3d3f37e1a260f49a36",
+      "sha256": "f2698cbea24be8a3679e31097907990ba6583c8b270853e1f44d37d5a58bb491"
+    },
+    {
+      "id": "biting-lip",
+      "name": "Biting lip",
+      "category": "People & Body",
+      "keywords": [
+        "anxious",
+        "biting lip",
+        "fear",
+        "flirting",
+        "nervous",
+        "uncomfortable",
+        "worried"
+      ],
+      "url": "/stickers/biting-lip-8b6a390d3608.svg",
+      "sourcePath": "assets/Biting lip/Color/biting_lip_color.svg",
+      "gitBlob": "57f155921fde80a14cf5861d5b508fffe9bf96fd",
+      "sha256": "8b6a390d3608e0961477246701b427652acfa1827f983223ed88cd9783a98a44"
+    },
+    {
+      "id": "black-heart",
+      "name": "Black heart",
+      "category": "Smileys & Emotion",
+      "keywords": ["black", "black heart", "evil", "wicked"],
+      "url": "/stickers/black-heart-eacf6e2dc0d8.svg",
+      "sourcePath": "assets/Black heart/Color/black_heart_color.svg",
+      "gitBlob": "34a291f0921bbf376299ef232a775a73561cbac8",
+      "sha256": "eacf6e2dc0d8423bb140448540cdfa51e43dcc4d40a8c63b982d11e86a1106c2"
+    },
+    {
+      "id": "black-nib",
+      "name": "Black nib",
+      "category": "Objects",
+      "keywords": ["black nib", "nib", "pen"],
+      "url": "/stickers/black-nib-08941784bb96.svg",
+      "sourcePath": "assets/Black nib/Color/black_nib_color.svg",
+      "gitBlob": "dd99a8ccf488da2974d73380fdfcfcc0845d28d1",
+      "sha256": "08941784bb960f5b4081c59d9572d94a121d4ec561c65efea398f26b22aeddfa"
+    },
+    {
+      "id": "blowfish",
+      "name": "Blowfish",
+      "category": "Animals & Nature",
+      "keywords": ["blowfish", "fish"],
+      "url": "/stickers/blowfish-91b5b77d7d95.svg",
+      "sourcePath": "assets/Blowfish/Color/blowfish_color.svg",
+      "gitBlob": "4053386b7965732bfab581cd6209bb882ef7ae17",
+      "sha256": "91b5b77d7d955bc2faa1ac0f57aeb6fcfd8c87eaa2c0259241135bafa6459f31"
+    },
+    {
+      "id": "blue-square",
+      "name": "Blue square",
+      "category": "Symbols",
+      "keywords": ["blue", "square"],
+      "url": "/stickers/blue-square-d5150bdaa26e.svg",
+      "sourcePath": "assets/Blue square/Color/blue_square_color.svg",
+      "gitBlob": "8c13b28c7d1063df04d60f73b200f6391d7c8107",
+      "sha256": "d5150bdaa26e95c301cf78d463f70774a8ab72f0b0320bb1f4cfbf4ffd473550"
+    },
+    {
+      "id": "bomb",
+      "name": "Bomb",
+      "category": "Smileys & Emotion",
+      "keywords": ["bomb", "comic"],
+      "url": "/stickers/bomb-50aa46b120b8.svg",
+      "sourcePath": "assets/Bomb/Color/bomb_color.svg",
+      "gitBlob": "a60f959a58ff26c690988398104ebac6d605bf7d",
+      "sha256": "50aa46b120b8cb3de6afab6c4d935c9e61a86031325cfd854453fc3c9d4b89d2"
+    },
+    {
+      "id": "bookmark",
+      "name": "Bookmark",
+      "category": "Objects",
+      "keywords": ["bookmark", "mark"],
+      "url": "/stickers/bookmark-5e7c9d6f4f07.svg",
+      "sourcePath": "assets/Bookmark/Color/bookmark_color.svg",
+      "gitBlob": "d31bbce57b23ceb4564dcd80662ff771f384d6bc",
+      "sha256": "5e7c9d6f4f079196fc58fc61a77e97dd0fb01784d2dc7cbe9a7dc536c08a5464"
+    },
+    {
+      "id": "bouquet",
+      "name": "Bouquet",
+      "category": "Animals & Nature",
+      "keywords": ["bouquet", "flower"],
+      "url": "/stickers/bouquet-fc04e8752687.svg",
+      "sourcePath": "assets/Bouquet/Color/bouquet_color.svg",
+      "gitBlob": "927f393f4483bf7d7bc93fa915fd5a669b9b3f1e",
+      "sha256": "fc04e875268725df05e7176af2922a6efcf243fa2a7fbd0f1f4353aa5a4d100f"
+    },
+    {
+      "id": "bowling",
+      "name": "Bowling",
+      "category": "Activities",
+      "keywords": ["ball", "bowling", "game"],
+      "url": "/stickers/bowling-e3ffeb826a2a.svg",
+      "sourcePath": "assets/Bowling/Color/bowling_color.svg",
+      "gitBlob": "d4ece78692a6009528bcc56d806fe8a17831f077",
+      "sha256": "e3ffeb826a2a352ef56f7d6dbba36ec93d0ec4758a2e4572118b88e357754fea"
+    },
+    {
+      "id": "bridge-at-night",
+      "name": "Bridge at night",
+      "category": "Travel & Places",
+      "keywords": ["bridge", "bridge at night", "night"],
+      "url": "/stickers/bridge-at-night-263808305f84.svg",
+      "sourcePath": "assets/Bridge at night/Color/bridge_at_night_color.svg",
+      "gitBlob": "40d7feea6b3cea8cf15d36069ea5a200eae15e6e",
+      "sha256": "263808305f84717021cbb8085270a3646702f2dc1159de19d43b7b27a817e05a"
+    },
+    {
+      "id": "broccoli",
+      "name": "Broccoli",
+      "category": "Food & Drink",
+      "keywords": ["broccoli", "wild cabbage"],
+      "url": "/stickers/broccoli-254a9064a61e.svg",
+      "sourcePath": "assets/Broccoli/Color/broccoli_color.svg",
+      "gitBlob": "fa605c9c67942e6fab9fe5266871bebadb1af5bc",
+      "sha256": "254a9064a61e960158ebc17312295e1df59434a58d7006b3519b4025550fe10f"
+    },
+    {
+      "id": "brown-circle",
+      "name": "Brown circle",
+      "category": "Symbols",
+      "keywords": ["brown", "circle"],
+      "url": "/stickers/brown-circle-a5ddb67d201b.svg",
+      "sourcePath": "assets/Brown circle/Color/brown_circle_color.svg",
+      "gitBlob": "1674a99191f980eb5a60f53cdbe8362928b68d31",
+      "sha256": "a5ddb67d201bceea055a8fd03be900cb28fb0a0464ba294f991a493ab36a5c41"
+    },
+    {
+      "id": "brown-square",
+      "name": "Brown square",
+      "category": "Symbols",
+      "keywords": ["brown", "square"],
+      "url": "/stickers/brown-square-eb2baee73e7a.svg",
+      "sourcePath": "assets/Brown square/Color/brown_square_color.svg",
+      "gitBlob": "9abe09fd9a0c53f8ecd1f271c7049d648de54dfa",
+      "sha256": "eb2baee73e7a0871675a4486f6289c96563baea6634f269c5b54d2af5f415da1"
+    },
+    {
+      "id": "bullseye",
+      "name": "Bullseye",
+      "category": "Activities",
+      "keywords": ["bullseye", "dart", "direct hit", "game", "hit", "target"],
+      "url": "/stickers/bullseye-253cc7fdb362.svg",
+      "sourcePath": "assets/Bullseye/Color/bullseye_color.svg",
+      "gitBlob": "39ce795cd671a5ef9775eb7d79044521a9741cf0",
+      "sha256": "253cc7fdb3625d98a104f6b9d7bddd02b2de829bf3e0df4143b9644d93ee3d2b"
+    },
+    {
+      "id": "bus-stop",
+      "name": "Bus stop",
+      "category": "Travel & Places",
+      "keywords": ["bus", "stop"],
+      "url": "/stickers/bus-stop-8898dd7fb973.svg",
+      "sourcePath": "assets/Bus stop/Color/bus_stop_color.svg",
+      "gitBlob": "490341c586920b79c0b3bb8325c990433c655431",
+      "sha256": "8898dd7fb9739ca26d7a549422118ec2fa9194a3b31f3fbd54e5ecd700545091"
+    },
+    {
+      "id": "butter",
+      "name": "Butter",
+      "category": "Food & Drink",
+      "keywords": ["butter", "dairy"],
+      "url": "/stickers/butter-b6c38bbb9926.svg",
+      "sourcePath": "assets/Butter/Color/butter_color.svg",
+      "gitBlob": "a73483926b7e902e7914a79808579db12d9c4490",
+      "sha256": "b6c38bbb9926ec39b9fdbef8b0bc0efa8f7c9c7c5bee76cbe80efb67ffd1f75c"
+    },
+    {
+      "id": "camel",
+      "name": "Camel",
+      "category": "Animals & Nature",
+      "keywords": ["camel", "dromedary", "hump"],
+      "url": "/stickers/camel-6e8680611bda.svg",
+      "sourcePath": "assets/Camel/Color/camel_color.svg",
+      "gitBlob": "4d1936c9e4b59a46fdf49ad889148b6c8af4946f",
+      "sha256": "6e8680611bda3fbc630cea1367e806099a453a0dfed9d30e21f34c7245568bb6"
+    },
+    {
+      "id": "camera",
+      "name": "Camera",
+      "category": "Objects",
+      "keywords": ["camera", "video"],
+      "url": "/stickers/camera-7481daf70e78.svg",
+      "sourcePath": "assets/Camera/Color/camera_color.svg",
+      "gitBlob": "ca43c4fa60ae0f48a768ce4f6824ea52c5f1b135",
+      "sha256": "7481daf70e78b80196d6443e8a825543ad5e8b0b859bbff52c80f24c1c10536f"
+    },
+    {
+      "id": "card-index-dividers",
+      "name": "Card index dividers",
+      "category": "Objects",
+      "keywords": ["card", "dividers", "index"],
+      "url": "/stickers/card-index-dividers-b3fdfffa268c.svg",
+      "sourcePath": "assets/Card index dividers/Color/card_index_dividers_color.svg",
+      "gitBlob": "e1eb7890465a8baf8d150d188a580dd43439b726",
+      "sha256": "b3fdfffa268cb9386a91461d83133176b75c3de3745b9dd8624e7756a771d6ee"
+    },
+    {
+      "id": "carp-streamer",
+      "name": "Carp streamer",
+      "category": "Activities",
+      "keywords": ["carp", "celebration", "streamer"],
+      "url": "/stickers/carp-streamer-86074ca5513b.svg",
+      "sourcePath": "assets/Carp streamer/Color/carp_streamer_color.svg",
+      "gitBlob": "dbb921971ba30a3f9dbbe1916606b9dc5110ebc7",
+      "sha256": "86074ca5513b163d2fc77af06265c58a22354cc78344098626c019f2fb6e072a"
+    },
+    {
+      "id": "cat",
+      "name": "Cat",
+      "category": "Animals & Nature",
+      "keywords": ["cat", "pet"],
+      "url": "/stickers/cat-302446b5011b.svg",
+      "sourcePath": "assets/Cat/Color/cat_color.svg",
+      "gitBlob": "b424735a31abe7b48272041c593ccbf67e20802b",
+      "sha256": "302446b5011b874cfed0a5ad9c570fb839976dda201c6618af57a16a110fb8c1"
+    },
+    {
+      "id": "cat-with-tears-of-joy",
+      "name": "Cat with tears of joy",
+      "category": "Smileys & Emotion",
+      "keywords": ["cat", "cat with tears of joy", "face", "joy", "tear"],
+      "url": "/stickers/cat-with-tears-of-joy-d9d2bbdb90cf.svg",
+      "sourcePath": "assets/Cat with tears of joy/Color/cat_with_tears_of_joy_color.svg",
+      "gitBlob": "7f6c314e81445585455c0223ef4246a151d985de",
+      "sha256": "d9d2bbdb90cf9bb0fa17f98620d030c405b71d667b0f13280c1c03bc840d7a1e"
+    },
+    {
+      "id": "cherries",
+      "name": "Cherries",
+      "category": "Food & Drink",
+      "keywords": ["berries", "cherries", "cherry", "fruit", "red"],
+      "url": "/stickers/cherries-4d4185addb93.svg",
+      "sourcePath": "assets/Cherries/Color/cherries_color.svg",
+      "gitBlob": "80071f8b1e15e4369e6dc8c42ac7a9e998cc466e",
+      "sha256": "4d4185addb937a58cc9b890ea7d14d350fa36ba679547abb0836b0bb473f9abe"
+    },
+    {
+      "id": "chess-pawn",
+      "name": "Chess pawn",
+      "category": "Activities",
+      "keywords": ["chess", "chess pawn", "dupe", "expendable"],
+      "url": "/stickers/chess-pawn-5cbf7ab9328f.svg",
+      "sourcePath": "assets/Chess pawn/Color/chess_pawn_color.svg",
+      "gitBlob": "9aeb931f211c8cf00bf039a621c34b20a2770974",
+      "sha256": "5cbf7ab9328facd1e0e1a29cb0c755aa8d73baad44b73144dbcf17000c7ff145"
+    },
+    {
+      "id": "chipmunk",
+      "name": "Chipmunk",
+      "category": "Animals & Nature",
+      "keywords": ["chipmunk", "squirrel"],
+      "url": "/stickers/chipmunk-8c3fdff7645e.svg",
+      "sourcePath": "assets/Chipmunk/Color/chipmunk_color.svg",
+      "gitBlob": "00bd01c36b761a94518b8c5cd684c3372902d642",
+      "sha256": "8c3fdff7645e9e823d137cddb2e47c8795710b29cc224cf54806aae6589916a1"
+    },
+    {
+      "id": "chocolate-bar",
+      "name": "Chocolate bar",
+      "category": "Food & Drink",
+      "keywords": ["bar", "chocolate", "dessert", "sweet"],
+      "url": "/stickers/chocolate-bar-1bd7f854f027.svg",
+      "sourcePath": "assets/Chocolate bar/Color/chocolate_bar_color.svg",
+      "gitBlob": "eea5fec1861194539939508f97ef13b09b027174",
+      "sha256": "1bd7f854f027328f123490d92ac9441c29dfccb0d5c4dd9b0827573b532088b5"
+    },
+    {
+      "id": "cityscape",
+      "name": "Cityscape",
+      "category": "Travel & Places",
+      "keywords": ["city", "cityscape"],
+      "url": "/stickers/cityscape-fa7f7873b6fb.svg",
+      "sourcePath": "assets/Cityscape/Color/cityscape_color.svg",
+      "gitBlob": "4626432777d221bf7566e925c57cdd17c682cab5",
+      "sha256": "fa7f7873b6fb1bc9a70fe19fbef48fc7877e9cd8e5d19d32ca4d0ab39939362e"
+    },
+    {
+      "id": "clockwise-vertical-arrows",
+      "name": "Clockwise vertical arrows",
+      "category": "Symbols",
+      "keywords": ["arrow", "clockwise", "clockwise vertical arrows", "reload"],
+      "url": "/stickers/clockwise-vertical-arrows-904df35ecad9.svg",
+      "sourcePath": "assets/Clockwise vertical arrows/Color/clockwise_vertical_arrows_color.svg",
+      "gitBlob": "4af5885ac9bc0879357d35f1033e80d3ae0c72f3",
+      "sha256": "904df35ecad92e0f38f69e5b58ee2750da8c57af0b983ea24e699006154c3a27"
+    },
+    {
+      "id": "closed-umbrella",
+      "name": "Closed umbrella",
+      "category": "Travel & Places",
+      "keywords": ["closed umbrella", "clothing", "rain", "umbrella"],
+      "url": "/stickers/closed-umbrella-ecc3028c4540.svg",
+      "sourcePath": "assets/Closed umbrella/Color/closed_umbrella_color.svg",
+      "gitBlob": "0d755f6b9dd9d8ec69e683e7eb7709a439738615",
+      "sha256": "ecc3028c4540d4fb4dee6965b93344a8453b018cd327c1d94dd8c460cf3a19b1"
+    },
+    {
+      "id": "clown-face",
+      "name": "Clown face",
+      "category": "Smileys & Emotion",
+      "keywords": ["clown", "face"],
+      "url": "/stickers/clown-face-6f8b071782ed.svg",
+      "sourcePath": "assets/Clown face/Color/clown_face_color.svg",
+      "gitBlob": "59dc597045d035d4992cd2952b27c6f5cf780be6",
+      "sha256": "6f8b071782ed0c06bc1d1cc2f897bf59cffbd242a9a385c26da7eeafe6dd726f"
+    },
+    {
+      "id": "club-suit",
+      "name": "Club suit",
+      "category": "Activities",
+      "keywords": ["card", "club suit", "game"],
+      "url": "/stickers/club-suit-3efe148ac595.svg",
+      "sourcePath": "assets/Club suit/Color/club_suit_color.svg",
+      "gitBlob": "03c37f86f0d1fd1d14a8bee96e362f87231bc956",
+      "sha256": "3efe148ac595443e2e176c6bacda3ba6e1cb1fcbee8edfeac14bc8e3f2160e79"
+    },
+    {
+      "id": "coat",
+      "name": "Coat",
+      "category": "Objects",
+      "keywords": ["coat", "jacket"],
+      "url": "/stickers/coat-3c4336049f6c.svg",
+      "sourcePath": "assets/Coat/Color/coat_color.svg",
+      "gitBlob": "84722d810d4a4e220ff92651bcdfe220d351ac64",
+      "sha256": "3c4336049f6c477ae81040d69d4c68f1ec9eaee072ec215801ba10a95e288a05"
+    },
+    {
+      "id": "coconut",
+      "name": "Coconut",
+      "category": "Food & Drink",
+      "keywords": ["coconut", "palm", "pi\u00f1a colada"],
+      "url": "/stickers/coconut-7eed2dbde32c.svg",
+      "sourcePath": "assets/Coconut/Color/coconut_color.svg",
+      "gitBlob": "94a5eb856d670d2842a99f1ed7cfe5de9dec06be",
+      "sha256": "7eed2dbde32c40204029785548aeb54ef2676feac820e962ae185d94d1a557cf"
+    },
+    {
+      "id": "coffin",
+      "name": "Coffin",
+      "category": "Objects",
+      "keywords": ["coffin", "death"],
+      "url": "/stickers/coffin-7b157aaa70b7.svg",
+      "sourcePath": "assets/Coffin/Color/coffin_color.svg",
+      "gitBlob": "bed3f9b13a5028d2d1b88477599203786652f998",
+      "sha256": "7b157aaa70b7c5720f00c745b54a9336b45e80b58b5c7ecf2588b7a323e43a49"
+    },
+    {
+      "id": "coin",
+      "name": "Coin",
+      "category": "Objects",
+      "keywords": ["coin", "gold", "metal", "money", "silver", "treasure"],
+      "url": "/stickers/coin-9bf65f4cbc4a.svg",
+      "sourcePath": "assets/Coin/Color/coin_color.svg",
+      "gitBlob": "862c184edefb763ca046ac5b56e559271b79c3f5",
+      "sha256": "9bf65f4cbc4aec092ce5b213063ddd0d21190dabd13850227cacdec14dc5acbc"
+    },
+    {
+      "id": "computer-mouse",
+      "name": "Computer mouse",
+      "category": "Objects",
+      "keywords": ["computer", "computer mouse"],
+      "url": "/stickers/computer-mouse-d0ffa7e4c0d7.svg",
+      "sourcePath": "assets/Computer mouse/Color/computer_mouse_color.svg",
+      "gitBlob": "1ee99389656de0f1e0826203cf8236d54bc7f569",
+      "sha256": "d0ffa7e4c0d757c0c778f1208d8a96374dbfe171c909e84fd2af00e6bcb2177b"
+    },
+    {
+      "id": "construction-worker",
+      "name": "Construction worker",
+      "category": "People & Body",
+      "keywords": ["construction", "hat", "worker"],
+      "url": "/stickers/construction-worker-1f00fa036497.svg",
+      "sourcePath": "assets/Construction worker/Default/Color/construction_worker_color_default.svg",
+      "gitBlob": "1898c002d3270081292356ffb23e482bed523475",
+      "sha256": "1f00fa036497b8d706972429a589624367b6a3cd094b61f4172544b4f953734f"
+    },
+    {
+      "id": "cookie",
+      "name": "Cookie",
+      "category": "Food & Drink",
+      "keywords": ["cookie", "dessert", "sweet"],
+      "url": "/stickers/cookie-15d534892f08.svg",
+      "sourcePath": "assets/Cookie/Color/cookie_color.svg",
+      "gitBlob": "42b628cca13536d363969cbe8d0b7c3f782d32a6",
+      "sha256": "15d534892f081d0187e49923a190a918cbb29811e03595c7489058e5ba6884d7"
+    },
+    {
+      "id": "cow-face",
+      "name": "Cow face",
+      "category": "Animals & Nature",
+      "keywords": ["cow", "face"],
+      "url": "/stickers/cow-face-a1e1ee4130c3.svg",
+      "sourcePath": "assets/Cow face/Color/cow_face_color.svg",
+      "gitBlob": "f159c037aae798b00ef3a12444784a38059ae0a0",
+      "sha256": "a1e1ee4130c338b7bc8224d69fca2f523adddc322bf299130c0dcafd2d995809"
+    },
+    {
+      "id": "cowboy-hat-face",
+      "name": "Cowboy hat face",
+      "category": "Smileys & Emotion",
+      "keywords": ["cowboy", "cowgirl", "face", "hat"],
+      "url": "/stickers/cowboy-hat-face-63ede7f39340.svg",
+      "sourcePath": "assets/Cowboy hat face/Color/cowboy_hat_face_color.svg",
+      "gitBlob": "eb200cf44d69122a2a771029a445d96810f46a62",
+      "sha256": "63ede7f39340f0e3e233089f88688d4bdea142432f65c7fbfbe01f2766a803ee"
+    },
+    {
+      "id": "crab",
+      "name": "Crab",
+      "category": "Food & Drink",
+      "keywords": ["Cancer", "crab", "zodiac"],
+      "url": "/stickers/crab-86deb790f5d5.svg",
+      "sourcePath": "assets/Crab/Color/crab_color.svg",
+      "gitBlob": "400d57d49a47ac0c10ea365b52de22d775d48acd",
+      "sha256": "86deb790f5d5b43f9103ea2f9c4d5b61f1854518b30f563076d79456fbed3097"
+    },
+    {
+      "id": "crescent-moon",
+      "name": "Crescent moon",
+      "category": "Travel & Places",
+      "keywords": ["crescent", "moon"],
+      "url": "/stickers/crescent-moon-76c8d9977454.svg",
+      "sourcePath": "assets/Crescent moon/Color/crescent_moon_color.svg",
+      "gitBlob": "78fee27b6d1df8f0c402748d3764b01682a22c79",
+      "sha256": "76c8d99774542de9814d6b191cdf6a046b0db6c867cd2988e77a8c8fdd13149f"
+    },
+    {
+      "id": "crocodile",
+      "name": "Crocodile",
+      "category": "Animals & Nature",
+      "keywords": ["crocodile"],
+      "url": "/stickers/crocodile-1b33b35e5336.svg",
+      "sourcePath": "assets/Crocodile/Color/crocodile_color.svg",
+      "gitBlob": "457e4487d681245d9635da1647c03fb5e758c2cd",
+      "sha256": "1b33b35e533689cca48cd0f80e7f74fe574a574442c4f17eb67d85332eee69b7"
+    },
+    {
+      "id": "crossed-swords",
+      "name": "Crossed swords",
+      "category": "Objects",
+      "keywords": ["crossed", "swords", "weapon"],
+      "url": "/stickers/crossed-swords-56798109a6c4.svg",
+      "sourcePath": "assets/Crossed swords/Color/crossed_swords_color.svg",
+      "gitBlob": "33f3b94e598789c1bee7624c501c02d4480c7f98",
+      "sha256": "56798109a6c4261626762e0a0546297b5e90d400e8683697b9e55c100e5cb80a"
+    },
+    {
+      "id": "crutch",
+      "name": "Crutch",
+      "category": "Objects",
+      "keywords": ["cane", "crutch", "disability", "hurt", "mobility aid", "stick"],
+      "url": "/stickers/crutch-e92f8ede89b2.svg",
+      "sourcePath": "assets/Crutch/Color/crutch_color.svg",
+      "gitBlob": "4c064d7916c767136be19fb4120cc01bb15ad32f",
+      "sha256": "e92f8ede89b20bfcf768f09fb99de5a09fbb186acdd138bffdab9ab5c3b4e7ae"
+    },
+    {
+      "id": "crystal-ball",
+      "name": "Crystal ball",
+      "category": "Activities",
+      "keywords": ["ball", "crystal", "fairy tale", "fantasy", "fortune", "tool"],
+      "url": "/stickers/crystal-ball-131f0b1b639e.svg",
+      "sourcePath": "assets/Crystal ball/Color/crystal_ball_color.svg",
+      "gitBlob": "e6f743b0a7d51c840085047e835711c665a352e6",
+      "sha256": "131f0b1b639eea0f6a4badf394fd001dfa54ade0904216dd5a966378c017ad47"
+    },
+    {
+      "id": "curly-loop",
+      "name": "Curly loop",
+      "category": "Symbols",
+      "keywords": ["curl", "curly loop", "loop"],
+      "url": "/stickers/curly-loop-54633f23f39b.svg",
+      "sourcePath": "assets/Curly loop/Color/curly_loop_color.svg",
+      "gitBlob": "46d1c4137520698c74a8569fc77dc22458822507",
+      "sha256": "54633f23f39b32ffffb758fb54ab3b75edd079990c0fdf346bfef95752d5d0bc"
+    },
+    {
+      "id": "custard",
+      "name": "Custard",
+      "category": "Food & Drink",
+      "keywords": ["custard", "dessert", "pudding", "sweet"],
+      "url": "/stickers/custard-f73542fc2f99.svg",
+      "sourcePath": "assets/Custard/Color/custard_color.svg",
+      "gitBlob": "c76b3335e599f34d9e58263741d668f0bc67758d",
+      "sha256": "f73542fc2f9998c5270e17e217c0e14a4b9de88c0014a47b945d0f9b139d6949"
+    },
+    {
+      "id": "dango",
+      "name": "Dango",
+      "category": "Food & Drink",
+      "keywords": ["dango", "dessert", "Japanese", "skewer", "stick", "sweet"],
+      "url": "/stickers/dango-b179ebc9c3c8.svg",
+      "sourcePath": "assets/Dango/Color/dango_color.svg",
+      "gitBlob": "b8199beb35e9dfa0f25972bc64cb107da85b42bc",
+      "sha256": "b179ebc9c3c8457e7ba612d6da2529bb5a4b91afb8e149a7a61161a2b6304bcb"
+    },
+    {
+      "id": "deciduous-tree",
+      "name": "Deciduous tree",
+      "category": "Animals & Nature",
+      "keywords": ["deciduous", "shedding", "tree"],
+      "url": "/stickers/deciduous-tree-7c5e9e2f8286.svg",
+      "sourcePath": "assets/Deciduous tree/Color/deciduous_tree_color.svg",
+      "gitBlob": "43f416e0da31599eb6ec7c441503950c7191ff84",
+      "sha256": "7c5e9e2f82863914061116fdd2b36e33299057155f8e90f1bd03b8b58836e4be"
+    },
+    {
+      "id": "delivery-truck",
+      "name": "Delivery truck",
+      "category": "Travel & Places",
+      "keywords": ["delivery", "truck"],
+      "url": "/stickers/delivery-truck-2371feb44b72.svg",
+      "sourcePath": "assets/Delivery truck/Color/delivery_truck_color.svg",
+      "gitBlob": "3f8607b434a96cac62307493b35b28b8ca0d20ed",
+      "sha256": "2371feb44b72066b5f01927ae8619467bb75ee83758aa8486142f7eaffbd8c57"
+    },
+    {
+      "id": "derelict-house",
+      "name": "Derelict house",
+      "category": "Travel & Places",
+      "keywords": ["derelict", "house"],
+      "url": "/stickers/derelict-house-a991dc0318fc.svg",
+      "sourcePath": "assets/Derelict house/Color/derelict_house_color.svg",
+      "gitBlob": "39ed399245ffb4428cb9ce30073ec21f7f05e194",
+      "sha256": "a991dc0318fc24e63138fbf06760bdcda34e9554fc6277ecd0737590b9c6c6e8"
+    },
+    {
+      "id": "desert",
+      "name": "Desert",
+      "category": "Travel & Places",
+      "keywords": ["desert"],
+      "url": "/stickers/desert-00167acc42f8.svg",
+      "sourcePath": "assets/Desert/Color/desert_color.svg",
+      "gitBlob": "0cc83bfc51883cfc9ba4599c31c31426034d10c2",
+      "sha256": "00167acc42f8436264392589f8e36972dda7c176c915a75fe41d281c029e799d"
+    },
+    {
+      "id": "diamond-suit",
+      "name": "Diamond suit",
+      "category": "Activities",
+      "keywords": ["card", "diamond suit", "game"],
+      "url": "/stickers/diamond-suit-e91c88d7378b.svg",
+      "sourcePath": "assets/Diamond suit/Color/diamond_suit_color.svg",
+      "gitBlob": "4880334724675a69c05361e6451a13d380480cdb",
+      "sha256": "e91c88d7378b62205e084fb2d8e0b0b956bb3195b11a6a3a8c86153d1dbf6ab6"
+    },
+    {
+      "id": "divide",
+      "name": "Divide",
+      "category": "Symbols",
+      "keywords": ["\u00f7", "divide", "division", "math", "sign"],
+      "url": "/stickers/divide-5afc387fc685.svg",
+      "sourcePath": "assets/Divide/Color/divide_color.svg",
+      "gitBlob": "defcead149bf8de9958cc64d7c799ca2d534cb2e",
+      "sha256": "5afc387fc685fc050007b321ea9b10523c2b618fda9109efce0fcbacbbf7c700"
+    },
+    {
+      "id": "dizzy",
+      "name": "Dizzy",
+      "category": "Smileys & Emotion",
+      "keywords": ["comic", "dizzy", "star"],
+      "url": "/stickers/dizzy-9bfc7719fbe9.svg",
+      "sourcePath": "assets/Dizzy/Color/dizzy_color.svg",
+      "gitBlob": "e11b31b9a986cd56bdbbf99d7968d73c472b33bc",
+      "sha256": "9bfc7719fbe9d9f6da8cd99f2e7a69ce335e3233c2de458f20da597ef1dac8c4"
+    },
+    {
+      "id": "dog",
+      "name": "Dog",
+      "category": "Animals & Nature",
+      "keywords": ["dog", "pet"],
+      "url": "/stickers/dog-26e7f98e9167.svg",
+      "sourcePath": "assets/Dog/Color/dog_color.svg",
+      "gitBlob": "a8e95a0b20d526699fc767309c88fc66a54dc784",
+      "sha256": "26e7f98e91676f9ad6cb3f72f564fb64ff9c1451ec54336bb682dafdedf78121"
+    },
+    {
+      "id": "dolphin",
+      "name": "Dolphin",
+      "category": "Animals & Nature",
+      "keywords": ["dolphin", "flipper"],
+      "url": "/stickers/dolphin-0597c035fc58.svg",
+      "sourcePath": "assets/Dolphin/Color/dolphin_color.svg",
+      "gitBlob": "f558e5bb6abcda9815b44c32011099b03ef972fa",
+      "sha256": "0597c035fc58a36d38cdde90715f7e22f1d95b06663b78583f37be7d433da5d8"
+    },
+    {
+      "id": "donkey",
+      "name": "Donkey",
+      "category": "Animals & Nature",
+      "keywords": ["animal", "ass", "burro", "donkey", "mammal", "mule", "stubborn"],
+      "url": "/stickers/donkey-4d11c8a8cbd6.svg",
+      "sourcePath": "assets/Donkey/Color/donkey_color.svg",
+      "gitBlob": "9734dd135fbf7dab177d9751800dead7d404e918",
+      "sha256": "4d11c8a8cbd67372fd5323552cddcbbb0326ca9d42cdc94188119206ab8d2e64"
+    },
+    {
+      "id": "doughnut",
+      "name": "Doughnut",
+      "category": "Food & Drink",
+      "keywords": ["breakfast", "dessert", "donut", "doughnut", "sweet"],
+      "url": "/stickers/doughnut-7d1cda787ce1.svg",
+      "sourcePath": "assets/Doughnut/Color/doughnut_color.svg",
+      "gitBlob": "e8e225bc0a9fdef290f3dedfb02e54ec722be572",
+      "sha256": "7d1cda787ce1fa50ab8a8dad25b608c17c7e7c39dfdff19d3308c645e00094b7"
+    },
+    {
+      "id": "dove",
+      "name": "Dove",
+      "category": "Animals & Nature",
+      "keywords": ["bird", "dove", "fly", "peace"],
+      "url": "/stickers/dove-5b7acf8c8c4f.svg",
+      "sourcePath": "assets/Dove/Color/dove_color.svg",
+      "gitBlob": "75afdc5dc261e38b6ba83499ee9f6853246bd163",
+      "sha256": "5b7acf8c8c4fa5aca078b4660ce5c9f9bd26f6591d36385bf02d25d6048421c6"
+    },
+    {
+      "id": "down-arrow",
+      "name": "Down arrow",
+      "category": "Symbols",
+      "keywords": ["arrow", "cardinal", "direction", "down", "south"],
+      "url": "/stickers/down-arrow-280df86ba746.svg",
+      "sourcePath": "assets/Down arrow/Color/down_arrow_color.svg",
+      "gitBlob": "ca6048324941e77cae18c724ce74ee434f181bdf",
+      "sha256": "280df86ba746ee10a6b2aff29913d922445a2bd86bbd49a3830d16f24c10bfcd"
+    },
+    {
+      "id": "downwards-button",
+      "name": "Downwards button",
+      "category": "Symbols",
+      "keywords": ["arrow", "button", "down", "downwards button", "red"],
+      "url": "/stickers/downwards-button-4a8ddd63e6db.svg",
+      "sourcePath": "assets/Downwards button/Color/downwards_button_color.svg",
+      "gitBlob": "e6881508dcd804db0b12cd828e8273cc97d7f8ce",
+      "sha256": "4a8ddd63e6db12a85298b626dbac06bf9c8bae5cb152691027168cdf2e5dbd61"
+    },
+    {
+      "id": "dragon-face",
+      "name": "Dragon face",
+      "category": "Animals & Nature",
+      "keywords": ["dragon", "face", "fairy tale"],
+      "url": "/stickers/dragon-face-ea0696346c22.svg",
+      "sourcePath": "assets/Dragon face/Color/dragon_face_color.svg",
+      "gitBlob": "40f8ebae97e0a1c9e23efaec2c919d6d18f4c27e",
+      "sha256": "ea0696346c22df3b1c70e1723fda7f2f8df30f0c79ba2eeeaea9662c82a44d2a"
+    },
+    {
+      "id": "drum",
+      "name": "Drum",
+      "category": "Objects",
+      "keywords": ["drum", "drumsticks", "music"],
+      "url": "/stickers/drum-d46aee793e42.svg",
+      "sourcePath": "assets/Drum/Color/drum_color.svg",
+      "gitBlob": "ea922838f55528e700e6003e64adecf3ecce449a",
+      "sha256": "d46aee793e4265906005f89935b43131de963b2bd5dba8e108ab6667666c556e"
+    },
+    {
+      "id": "duck",
+      "name": "Duck",
+      "category": "Animals & Nature",
+      "keywords": ["bird", "duck"],
+      "url": "/stickers/duck-768adcc30c10.svg",
+      "sourcePath": "assets/Duck/Color/duck_color.svg",
+      "gitBlob": "2305db7f433d7dee55a3b0dfc49a52da41dbf8bd",
+      "sha256": "768adcc30c10f4aa8fcfe174996185dba5c4e5ae9058307810719149fc3b5647"
+    },
+    {
+      "id": "e-mail",
+      "name": "E-mail",
+      "category": "Objects",
+      "keywords": ["e-mail", "email", "letter", "mail"],
+      "url": "/stickers/e-mail-6e5e75f48510.svg",
+      "sourcePath": "assets/E-mail/Color/e-mail_color.svg",
+      "gitBlob": "23b465cf66bebf00b18c8bd681bc5ce6bc770d19",
+      "sha256": "6e5e75f48510d662f84d57435ea3603cc15b3c8960849c6edf438bcee763485e"
+    },
+    {
+      "id": "egg",
+      "name": "Egg",
+      "category": "Food & Drink",
+      "keywords": ["breakfast", "egg", "food"],
+      "url": "/stickers/egg-33a0ee52e572.svg",
+      "sourcePath": "assets/Egg/Color/egg_color.svg",
+      "gitBlob": "c9b41e72f42815378b3f25a86a83b4ac2f0b1061",
+      "sha256": "33a0ee52e57249fdc246548b099153b1dba2d361e8b2d8d02d495463e7fb473f"
+    },
+    {
+      "id": "empty-nest",
+      "name": "Empty nest",
+      "category": "Animals & Nature",
+      "keywords": ["empty nest", "nesting"],
+      "url": "/stickers/empty-nest-8621617f7418.svg",
+      "sourcePath": "assets/Empty nest/Color/empty_nest_color.svg",
+      "gitBlob": "6ef888799e6842c6931c8faf414597c183b8be1b",
+      "sha256": "8621617f7418dfafd25e45e00482bc310fd3638427d2d4c845de404f74b37815"
+    },
+    {
+      "id": "euro-banknote",
+      "name": "Euro banknote",
+      "category": "Objects",
+      "keywords": ["banknote", "bill", "currency", "euro", "money", "note"],
+      "url": "/stickers/euro-banknote-6bfb8e66a982.svg",
+      "sourcePath": "assets/Euro banknote/Color/euro_banknote_color.svg",
+      "gitBlob": "7c7c55f8be363198ea95846acb919ea5a09794fa",
+      "sha256": "6bfb8e66a98211d442557eb350971f9067a0b332fd9138bf7ce3770aedc93479"
+    },
+    {
+      "id": "exclamation-question-mark",
+      "name": "Exclamation question mark",
+      "category": "Symbols",
+      "keywords": ["!", "!?", "?", "exclamation", "interrobang", "mark", "punctuation", "question"],
+      "url": "/stickers/exclamation-question-mark-3cef696ebb76.svg",
+      "sourcePath": "assets/Exclamation question mark/Color/exclamation_question_mark_color.svg",
+      "gitBlob": "360d92900745c2683f1fa125b48d1230b60fb6fc",
+      "sha256": "3cef696ebb76f70905fcef2c83d79375fd65b7bfc22edff13f34d4dc54f1cf7a"
+    },
+    {
+      "id": "exploding-head",
+      "name": "Exploding head",
+      "category": "Smileys & Emotion",
+      "keywords": ["exploding head", "mind blown", "shocked"],
+      "url": "/stickers/exploding-head-69106c58db90.svg",
+      "sourcePath": "assets/Exploding head/Color/exploding_head_color.svg",
+      "gitBlob": "f29d19876d7c6880c961484742992ee7d6a047f6",
+      "sha256": "69106c58db90902a16137de17c70dd23293a47f8e1d531adf03303de262bb682"
+    },
+    {
+      "id": "face-exhaling",
+      "name": "Face exhaling",
+      "category": "Smileys & Emotion",
+      "keywords": ["exhale", "face exhaling", "gasp", "groan", "relief", "whisper", "whistle"],
+      "url": "/stickers/face-exhaling-f681a71f5cb9.svg",
+      "sourcePath": "assets/Face exhaling/Color/face_exhaling_color.svg",
+      "gitBlob": "55699700e6d7f72bfa999698c689fd9c5fa84855",
+      "sha256": "f681a71f5cb923ef12ffe4a1fb168ab5e12effce8032476014d878aa136cfc81"
+    },
+    {
+      "id": "face-savoring-food",
+      "name": "Face savoring food",
+      "category": "Smileys & Emotion",
+      "keywords": ["delicious", "face", "face savoring food", "savouring", "smile", "yum"],
+      "url": "/stickers/face-savoring-food-5b660af1e5ef.svg",
+      "sourcePath": "assets/Face savoring food/Color/face_savoring_food_color.svg",
+      "gitBlob": "de0384c9a730fd1eb8dd9cfbc6a8696ea659336e",
+      "sha256": "5b660af1e5ef5b6dde8c10c971be294f4e224dae69ca6ec8b726d47e086e74d0"
+    },
+    {
+      "id": "face-with-hand-over-mouth",
+      "name": "Face with hand over mouth",
+      "category": "Smileys & Emotion",
+      "keywords": ["face with hand over mouth", "whoops"],
+      "url": "/stickers/face-with-hand-over-mouth-e76106439b58.svg",
+      "sourcePath": "assets/Face with hand over mouth/Color/face_with_hand_over_mouth_color.svg",
+      "gitBlob": "b70ed7945941852a19b92f8ddc4ff47a519476c1",
+      "sha256": "e76106439b58c7bc4d93c3ba802329b62724c70c164eabcba4545a186b55ec4a"
+    },
+    {
+      "id": "face-with-monocle",
+      "name": "Face with monocle",
+      "category": "Smileys & Emotion",
+      "keywords": ["face with monocle", "stuffy"],
+      "url": "/stickers/face-with-monocle-ed9ceb028278.svg",
+      "sourcePath": "assets/Face with monocle/Color/face_with_monocle_color.svg",
+      "gitBlob": "20c89e043409066ee4ce9ef2e7f414c2d3953b8c",
+      "sha256": "ed9ceb028278ffa19f40747200075eef76bf8a54b58b80100e39d1f8384b7d2f"
+    },
+    {
+      "id": "face-with-peeking-eye",
+      "name": "Face with peeking eye",
+      "category": "Smileys & Emotion",
+      "keywords": ["captivated", "face with peeking eye", "peep", "stare"],
+      "url": "/stickers/face-with-peeking-eye-dc9513d0f5fd.svg",
+      "sourcePath": "assets/Face with peeking eye/Color/face_with_peeking_eye_color.svg",
+      "gitBlob": "55b338bcba95e73184b1cce75e47152135bc581c",
+      "sha256": "dc9513d0f5fd065896f2edb21fb4168e186a23eed9de05ea51e20ffb0c1b0bac"
+    },
+    {
+      "id": "fast-up-button",
+      "name": "Fast up button",
+      "category": "Symbols",
+      "keywords": ["arrow", "double", "fast up button"],
+      "url": "/stickers/fast-up-button-a26f6d2da958.svg",
+      "sourcePath": "assets/Fast up button/Color/fast_up_button_color.svg",
+      "gitBlob": "1cb17c86d64eebe4a4707f3e08359066eb30c19c",
+      "sha256": "a26f6d2da9584799467e61a72419c7aa859733d2268b2bca81ead859d73a739f"
+    },
+    {
+      "id": "female-sign",
+      "name": "Female sign",
+      "category": "Symbols",
+      "keywords": ["female sign", "woman"],
+      "url": "/stickers/female-sign-f22acaa521fe.svg",
+      "sourcePath": "assets/Female sign/Color/female_sign_color.svg",
+      "gitBlob": "2da4b967125f59ab4877b68c8a87c220cf53b0d2",
+      "sha256": "f22acaa521fea214a6f148d11345bfbb704461fa92042d43a2926596524f5623"
+    },
+    {
+      "id": "ferris-wheel",
+      "name": "Ferris wheel",
+      "category": "Travel & Places",
+      "keywords": ["amusement park", "ferris", "wheel"],
+      "url": "/stickers/ferris-wheel-b43d3f15d789.svg",
+      "sourcePath": "assets/Ferris wheel/Color/ferris_wheel_color.svg",
+      "gitBlob": "223b2d6bd86f342bf633b2c905eeb5ec4df1bf10",
+      "sha256": "b43d3f15d789ea8ed1d14deb5dfdd6752e953a6b268507fa4b6365a8ce8b69d8"
+    },
+    {
+      "id": "field-hockey",
+      "name": "Field hockey",
+      "category": "Activities",
+      "keywords": ["ball", "field", "game", "hockey", "stick"],
+      "url": "/stickers/field-hockey-35344ad238e2.svg",
+      "sourcePath": "assets/Field hockey/Color/field_hockey_color.svg",
+      "gitBlob": "4dd6707cd57b83ad6746809c1b4abbbea39951df",
+      "sha256": "35344ad238e27a8f42e196dd81efe71889e21f5c4e61934f531f3af22e6e8bab"
+    },
+    {
+      "id": "film-frames",
+      "name": "Film frames",
+      "category": "Objects",
+      "keywords": ["cinema", "film", "frames", "movie"],
+      "url": "/stickers/film-frames-156e33bada5b.svg",
+      "sourcePath": "assets/Film frames/Color/film_frames_color.svg",
+      "gitBlob": "c8e26df832a0099c10aeecf3c6a350d732b76648",
+      "sha256": "156e33bada5b2b17a16f5140aca84af3ccea90d677d4816aea4652cd4c809511"
+    },
+    {
+      "id": "film-projector",
+      "name": "Film projector",
+      "category": "Objects",
+      "keywords": ["cinema", "film", "movie", "projector", "video"],
+      "url": "/stickers/film-projector-065b0393f548.svg",
+      "sourcePath": "assets/Film projector/Color/film_projector_color.svg",
+      "gitBlob": "9644788dbf00e8c61029b3bdb70dd8b2b890ef1e",
+      "sha256": "065b0393f548b9a95ff68ce2b875da96a41bb4ea6ef0c668e892e89a00880582"
+    },
+    {
+      "id": "firecracker",
+      "name": "Firecracker",
+      "category": "Activities",
+      "keywords": ["dynamite", "explosive", "firecracker", "fireworks"],
+      "url": "/stickers/firecracker-5c13596c11db.svg",
+      "sourcePath": "assets/Firecracker/Color/firecracker_color.svg",
+      "gitBlob": "c7dad175dc24bb70bc7241f838078f964e1b9fe7",
+      "sha256": "5c13596c11db2ac2085fffbf2f019614b3d47d1b2c1f1f5f485a56f172819af7"
+    },
+    {
+      "id": "fish",
+      "name": "Fish",
+      "category": "Animals & Nature",
+      "keywords": ["fish", "Pisces", "zodiac"],
+      "url": "/stickers/fish-e1bfd0beb123.svg",
+      "sourcePath": "assets/Fish/Color/fish_color.svg",
+      "gitBlob": "6ca65ba9ab0c16d9f2f08263d7943d2dede245ff",
+      "sha256": "e1bfd0beb123366e4e83b7b5a7b571a810c875661f3edd31d33c3511e9888eb6"
+    },
+    {
+      "id": "fish-cake-with-swirl",
+      "name": "Fish cake with swirl",
+      "category": "Food & Drink",
+      "keywords": ["cake", "fish", "fish cake with swirl", "pastry", "swirl"],
+      "url": "/stickers/fish-cake-with-swirl-0c89265ff24b.svg",
+      "sourcePath": "assets/Fish cake with swirl/Color/fish_cake_with_swirl_color.svg",
+      "gitBlob": "8928279df2cc2d2f2be6d9ba755ff37ef376886e",
+      "sha256": "0c89265ff24b83835732e199d1e23b1d4b4dcf64ef7d9b4792a9bb46b070ee3e"
+    },
+    {
+      "id": "flamingo",
+      "name": "Flamingo",
+      "category": "Animals & Nature",
+      "keywords": ["flamboyant", "flamingo", "tropical"],
+      "url": "/stickers/flamingo-52f1e812a84b.svg",
+      "sourcePath": "assets/Flamingo/Color/flamingo_color.svg",
+      "gitBlob": "f3999aa5a67e1c00e4273764f94c91eb824a5895",
+      "sha256": "52f1e812a84bbb98982f15243def0a0e644d96ac9a789fece9ede6382930a861"
+    },
+    {
+      "id": "flower-playing-cards",
+      "name": "Flower playing cards",
+      "category": "Activities",
+      "keywords": ["card", "flower", "flower playing cards", "game", "Japanese", "playing"],
+      "url": "/stickers/flower-playing-cards-979b9620abcf.svg",
+      "sourcePath": "assets/Flower playing cards/Color/flower_playing_cards_color.svg",
+      "gitBlob": "bae4a790a78a8e9cb6a2649a155da624144b27e1",
+      "sha256": "979b9620abcf0818fde9538771114afcd1b399deebc569b0feee7bb5ebd09157"
+    },
+    {
+      "id": "fly",
+      "name": "Fly",
+      "category": "Animals & Nature",
+      "keywords": ["disease", "fly", "maggot", "pest", "rotting"],
+      "url": "/stickers/fly-e937ab001d42.svg",
+      "sourcePath": "assets/Fly/Color/fly_color.svg",
+      "gitBlob": "4426d76bb4f7e24cc9ce77026368a5e1882422ba",
+      "sha256": "e937ab001d4243a25147a8d63359d5c70fcf73b5fda988d1a1becb2ae9f7d9d2"
+    },
+    {
+      "id": "flying-disc",
+      "name": "Flying disc",
+      "category": "Activities",
+      "keywords": ["flying disc", "ultimate"],
+      "url": "/stickers/flying-disc-3e894a0f52e6.svg",
+      "sourcePath": "assets/Flying disc/Color/flying_disc_color.svg",
+      "gitBlob": "4eddc1f73d1750bbccf13fb9965a617a4d737f00",
+      "sha256": "3e894a0f52e65aafa73dd77b5eee751df190a11de277c86d8af7ae00475c67e7"
+    },
+    {
+      "id": "fog",
+      "name": "Fog",
+      "category": "Travel & Places",
+      "keywords": ["cloud", "fog"],
+      "url": "/stickers/fog-d09190ffa9d1.svg",
+      "sourcePath": "assets/Fog/Color/fog_color.svg",
+      "gitBlob": "fc74c85d2f88a37e162cff368ccb42229775d057",
+      "sha256": "d09190ffa9d1df647f15a29c7bacc7fab1c6245e44f29f8330c904912f8d5577"
+    },
+    {
+      "id": "folding-hand-fan",
+      "name": "Folding hand fan",
+      "category": "Objects",
+      "keywords": ["cooling", "dance", "fan", "flutter", "folding hand fan", "hot", "shy"],
+      "url": "/stickers/folding-hand-fan-2200dd195408.svg",
+      "sourcePath": "assets/Folding hand fan/Color/folding_hand_fan_color.svg",
+      "gitBlob": "9ed22f883fefc7fd47821c09a87ac3d7769035a0",
+      "sha256": "2200dd195408e6957380a40e7cd008c935546858386f6520c8a715b70a022033"
+    },
+    {
+      "id": "fountain-pen",
+      "name": "Fountain pen",
+      "category": "Objects",
+      "keywords": ["fountain", "pen"],
+      "url": "/stickers/fountain-pen-b7485a20ea68.svg",
+      "sourcePath": "assets/Fountain pen/Color/fountain_pen_color.svg",
+      "gitBlob": "e98c21499f6bcd57df1f3bcb5120a1167924d757",
+      "sha256": "b7485a20ea68ab93fb53bbe03f5a004e85f1d65183ca5faa3f36c9dfd14f6e68"
+    },
+    {
+      "id": "four-oclock",
+      "name": "Four oclock",
+      "category": "Travel & Places",
+      "keywords": ["00", "4", "4:00", "clock", "four", "o\u2019clock"],
+      "url": "/stickers/four-oclock-e7b333deb8a2.svg",
+      "sourcePath": "assets/Four oclock/Color/four_oclock_color.svg",
+      "gitBlob": "47cc338ecc856de8c5ffed22def179dd257de47f",
+      "sha256": "e7b333deb8a21ac8f9cb7b2035b945015f84a417719a416b323fad9aaa1251a2"
+    },
+    {
+      "id": "framed-picture",
+      "name": "Framed picture",
+      "category": "Activities",
+      "keywords": ["art", "frame", "framed picture", "museum", "painting", "picture"],
+      "url": "/stickers/framed-picture-3d18642efdaa.svg",
+      "sourcePath": "assets/Framed picture/Color/framed_picture_color.svg",
+      "gitBlob": "8528864f0ef1c3e5a6aeff0b23be6d97054cbde0",
+      "sha256": "3d18642efdaa3e1d385869a6b9458f9b1afeb7de9f6ea378195ad93c082fc394"
+    },
+    {
+      "id": "front-facing-baby-chick",
+      "name": "Front-facing baby chick",
+      "category": "Animals & Nature",
+      "keywords": ["baby", "bird", "chick", "front-facing baby chick"],
+      "url": "/stickers/front-facing-baby-chick-6d995f1c4c5a.svg",
+      "sourcePath": "assets/Front-facing baby chick/Color/front-facing_baby_chick_color.svg",
+      "gitBlob": "952737910bafe270b1375fc118d473796ab3f8f3",
+      "sha256": "6d995f1c4c5a1a6d055502e59440e838ab11768c67c61d99e38ab49e37a932d8"
+    },
+    {
+      "id": "frowning-face-with-open-mouth",
+      "name": "Frowning face with open mouth",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "frown", "frowning face with open mouth", "mouth", "open"],
+      "url": "/stickers/frowning-face-with-open-mouth-4f726518d763.svg",
+      "sourcePath": "assets/Frowning face with open mouth/Color/frowning_face_with_open_mouth_color.svg",
+      "gitBlob": "2007f42ee8bff2ee08937e92a295a882969be907",
+      "sha256": "4f726518d7636146c90e1d62433e7d3971d82a8ca1841dd743fe2fe0a48768e6"
+    },
+    {
+      "id": "full-moon",
+      "name": "Full moon",
+      "category": "Travel & Places",
+      "keywords": ["full", "moon"],
+      "url": "/stickers/full-moon-979f2a378fc0.svg",
+      "sourcePath": "assets/Full moon/Color/full_moon_color.svg",
+      "gitBlob": "39b1dda02cf05daf45371d7c3fb9a55423b9db8e",
+      "sha256": "979f2a378fc09368efe9bb6a5e6a12b386cabb61d022efa50390455b4026347a"
+    },
+    {
+      "id": "funeral-urn",
+      "name": "Funeral urn",
+      "category": "Objects",
+      "keywords": ["ashes", "death", "funeral", "urn"],
+      "url": "/stickers/funeral-urn-a668dc6afd8e.svg",
+      "sourcePath": "assets/Funeral urn/Color/funeral_urn_color.svg",
+      "gitBlob": "a4d8633074bc986c0dc68bb20ebbed8c163ee3fa",
+      "sha256": "a668dc6afd8e9fe21c634d14d138a698e06080e2dd0df547eb8c58b834bdabda"
+    },
+    {
+      "id": "garlic",
+      "name": "Garlic",
+      "category": "Food & Drink",
+      "keywords": ["flavoring", "garlic"],
+      "url": "/stickers/garlic-83d222e8af56.svg",
+      "sourcePath": "assets/Garlic/Color/garlic_color.svg",
+      "gitBlob": "be54ddb5012a699374b5f7cbbb206c2dd2e4abe6",
+      "sha256": "83d222e8af56baf7f7be6199c9e27bde80416b72e16aac546d0ce9039c08da11"
+    },
+    {
+      "id": "gem-stone",
+      "name": "Gem stone",
+      "category": "Objects",
+      "keywords": ["diamond", "gem", "gem stone", "jewel"],
+      "url": "/stickers/gem-stone-f9a62aea55fc.svg",
+      "sourcePath": "assets/Gem stone/Color/gem_stone_color.svg",
+      "gitBlob": "9ce2434652af9cfe67367d98b1a1d2614fcb2726",
+      "sha256": "f9a62aea55fc1a75879093d693b064c2c212e1abda8070863e6e751b8fcf5243"
+    },
+    {
+      "id": "ginger-root",
+      "name": "Ginger root",
+      "category": "Food & Drink",
+      "keywords": ["beer", "ginger root", "root", "spice"],
+      "url": "/stickers/ginger-root-2aad774070e2.svg",
+      "sourcePath": "assets/Ginger root/Color/ginger_root_color.svg",
+      "gitBlob": "87a51d7e486014a54db8b54ccad10d7614d5510d",
+      "sha256": "2aad774070e2c75f1cd29d20498b2ae57eb957f9fd56b4638e798a4cb6d830f4"
+    },
+    {
+      "id": "girl",
+      "name": "Girl",
+      "category": "People & Body",
+      "keywords": ["girl", "Virgo", "young", "zodiac"],
+      "url": "/stickers/girl-defaeb4e7e3b.svg",
+      "sourcePath": "assets/Girl/Default/Color/girl_color_default.svg",
+      "gitBlob": "f4296965a0e509fadbea347d16427d26d111f061",
+      "sha256": "defaeb4e7e3b212877e81fbaf2704f15e251e9991b2be23b09472da8fbc7606e"
+    },
+    {
+      "id": "glass-of-milk",
+      "name": "Glass of milk",
+      "category": "Food & Drink",
+      "keywords": ["drink", "glass", "glass of milk", "milk"],
+      "url": "/stickers/glass-of-milk-9f37c211585b.svg",
+      "sourcePath": "assets/Glass of milk/Color/glass_of_milk_color.svg",
+      "gitBlob": "bc500718fbba58d0d0edb1264b3e460a34267a72",
+      "sha256": "9f37c211585b2e5b744a9f76b5d1aaf51907a7d73f5ff325cd127617ccb207b5"
+    },
+    {
+      "id": "globe-showing-europe-africa",
+      "name": "Globe showing europe-africa",
+      "category": "Travel & Places",
+      "keywords": ["Africa", "earth", "Europe", "globe", "globe showing Europe-Africa", "world"],
+      "url": "/stickers/globe-showing-europe-africa-3520f53c7342.svg",
+      "sourcePath": "assets/Globe showing europe-africa/Color/globe_showing_europe-africa_color.svg",
+      "gitBlob": "3dcf22ac32534159cf6382e34efa54a79e2e8ac6",
+      "sha256": "3520f53c7342b3af0227b08abd5de334ea49890f20b1ed5cc6a7accfbacf0cad"
+    },
+    {
+      "id": "glowing-star",
+      "name": "Glowing star",
+      "category": "Travel & Places",
+      "keywords": ["glittery", "glow", "glowing star", "shining", "sparkle", "star"],
+      "url": "/stickers/glowing-star-c68e1bc09c12.svg",
+      "sourcePath": "assets/Glowing star/Color/glowing_star_color.svg",
+      "gitBlob": "87dc273c45b3343178a8d9c64f73ecdb1df1c6ef",
+      "sha256": "c68e1bc09c12d10ed6b2cf4565b58b73ad7dcb876be3e06b679862c363f7094d"
+    },
+    {
+      "id": "goal-net",
+      "name": "Goal net",
+      "category": "Activities",
+      "keywords": ["goal", "net"],
+      "url": "/stickers/goal-net-4762147dc36c.svg",
+      "sourcePath": "assets/Goal net/Color/goal_net_color.svg",
+      "gitBlob": "30b82feb9ec3252b275be98fba4b7a4ef447618f",
+      "sha256": "4762147dc36c4360947adb97b35c484d9730dee3483d47c54b7d45f4570f916b"
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "category": "Smileys & Emotion",
+      "keywords": ["creature", "face", "fairy tale", "fantasy", "goblin", "monster"],
+      "url": "/stickers/goblin-f2df118b959b.svg",
+      "sourcePath": "assets/Goblin/Color/goblin_color.svg",
+      "gitBlob": "3f90da96d8ecfa0d1731a178cd6f2df047adfa5e",
+      "sha256": "f2df118b959bc7472b6880ab2dbde6a23635fe5b9331126424f9d965ee112a12"
+    },
+    {
+      "id": "green-apple",
+      "name": "Green apple",
+      "category": "Food & Drink",
+      "keywords": ["apple", "fruit", "green"],
+      "url": "/stickers/green-apple-e0c4c4c5107f.svg",
+      "sourcePath": "assets/Green apple/Color/green_apple_color.svg",
+      "gitBlob": "7c7ee3436095651fd2b6c0628fde3d5234035563",
+      "sha256": "e0c4c4c5107f0e3e963ca71f26cda70318191af0d5b1c1263129d3c9c7682c32"
+    },
+    {
+      "id": "grinning-cat-with-smiling-eyes",
+      "name": "Grinning cat with smiling eyes",
+      "category": "Smileys & Emotion",
+      "keywords": ["cat", "eye", "face", "grin", "grinning cat with smiling eyes", "smile"],
+      "url": "/stickers/grinning-cat-with-smiling-eyes-07f7fc7ce04c.svg",
+      "sourcePath": "assets/Grinning cat with smiling eyes/Color/grinning_cat_with_smiling_eyes_color.svg",
+      "gitBlob": "b8cec8325cb31ad3bedcfb9be513ffb1fac1a997",
+      "sha256": "07f7fc7ce04cc8b255d8adcdd74793d61b56f8e3e4601fd9651be572f513a834"
+    },
+    {
+      "id": "grinning-face-with-big-eyes",
+      "name": "Grinning face with big eyes",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "grinning face with big eyes", "mouth", "open", "smile"],
+      "url": "/stickers/grinning-face-with-big-eyes-d2d6b1a1caa9.svg",
+      "sourcePath": "assets/Grinning face with big eyes/Color/grinning_face_with_big_eyes_color.svg",
+      "gitBlob": "524c89f175140406b989f6be6c1b917f2c1c4f54",
+      "sha256": "d2d6b1a1caa92df531d6a8cbac55ac285663e42226e51f0be58d4ea22227940f"
+    },
+    {
+      "id": "grinning-squinting-face",
+      "name": "Grinning squinting face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "grinning squinting face", "laugh", "mouth", "satisfied", "smile"],
+      "url": "/stickers/grinning-squinting-face-f34e292553db.svg",
+      "sourcePath": "assets/Grinning squinting face/Color/grinning_squinting_face_color.svg",
+      "gitBlob": "bbb7e4693e8f77d0fb01f687744623620fd9ea88",
+      "sha256": "f34e292553db9b7fbc7b2c698f6471184f60b448517e1b9da0b84f951be48751"
+    },
+    {
+      "id": "growing-heart",
+      "name": "Growing heart",
+      "category": "Smileys & Emotion",
+      "keywords": ["excited", "growing", "growing heart", "nervous", "pulse"],
+      "url": "/stickers/growing-heart-74b4451413a2.svg",
+      "sourcePath": "assets/Growing heart/Color/growing_heart_color.svg",
+      "gitBlob": "d5f261029a84b89e543d2cce6bba57750c917a3f",
+      "sha256": "74b4451413a2178864f9c7374bc82fa97bc44f59afe0586f39988afb413dfbbc"
+    },
+    {
+      "id": "hamsa",
+      "name": "Hamsa",
+      "category": "Activities",
+      "keywords": ["amulet", "Fatima", "hamsa", "hand", "Mary", "Miriam", "protection"],
+      "url": "/stickers/hamsa-42e1f9c2cb56.svg",
+      "sourcePath": "assets/Hamsa/Color/hamsa_color.svg",
+      "gitBlob": "cb1dc71700ec4f574bbf4f71aa3d4647a1feb74f",
+      "sha256": "42e1f9c2cb56184014cede95415ad85185c8bddff429e03f0ce160fccf61b0e7"
+    },
+    {
+      "id": "hamster",
+      "name": "Hamster",
+      "category": "Animals & Nature",
+      "keywords": ["face", "hamster", "pet"],
+      "url": "/stickers/hamster-70a5458fe0bf.svg",
+      "sourcePath": "assets/Hamster/Color/hamster_color.svg",
+      "gitBlob": "9c98580b15327eabf545a1d32a78baaae77b6b38",
+      "sha256": "70a5458fe0bf2c4ddda00d602196917c0290eff9a24ea4a5835dafca8892d73f"
+    },
+    {
+      "id": "hatching-chick",
+      "name": "Hatching chick",
+      "category": "Animals & Nature",
+      "keywords": ["baby", "bird", "chick", "hatching"],
+      "url": "/stickers/hatching-chick-634a3a8e90e6.svg",
+      "sourcePath": "assets/Hatching chick/Color/hatching_chick_color.svg",
+      "gitBlob": "db8b45755d0414d84cecfa23ef490dd9eafbdeb2",
+      "sha256": "634a3a8e90e6eefd67336f958e7a8979c5e034a6180613a27c4467579a9337e9"
+    },
+    {
+      "id": "head-shaking-horizontally",
+      "name": "Head shaking horizontally",
+      "category": "Smileys & Emotion",
+      "keywords": ["head shaking horizontally", "no", "shake"],
+      "url": "/stickers/head-shaking-horizontally-52567e486d85.svg",
+      "sourcePath": "assets/Head shaking horizontally/Color/head_shaking_horizontally_color.svg",
+      "gitBlob": "003536ebc18a330c78ef4c9519dc879e7bc70926",
+      "sha256": "52567e486d85cdefac115e20fb80f104f030fc91725012b0547102afa76bdc54"
+    },
+    {
+      "id": "heart-exclamation",
+      "name": "Heart exclamation",
+      "category": "Smileys & Emotion",
+      "keywords": ["exclamation", "heart exclamation", "mark", "punctuation"],
+      "url": "/stickers/heart-exclamation-6f64b6648c3b.svg",
+      "sourcePath": "assets/Heart exclamation/Color/heart_exclamation_color.svg",
+      "gitBlob": "4707173cb71734016c05b14b9acb005edb454abb",
+      "sha256": "6f64b6648c3ba1e788ab3ae943e5b655d585335b35f0724e3694e8ef7b6a03d1"
+    },
+    {
+      "id": "heart-on-fire",
+      "name": "Heart on fire",
+      "category": "Smileys & Emotion",
+      "keywords": ["burn", "heart", "heart on fire", "love", "lust", "sacred heart"],
+      "url": "/stickers/heart-on-fire-24a55118b33e.svg",
+      "sourcePath": "assets/Heart on fire/Color/heart_on_fire_color.svg",
+      "gitBlob": "062b24a9593e5ab9d08c9a60d1e630b4486609f3",
+      "sha256": "24a55118b33e8d1a7a9dd78d7e3c3c39476fc7594e6ba2e318347c9848e1d469"
+    },
+    {
+      "id": "heart-suit",
+      "name": "Heart suit",
+      "category": "Activities",
+      "keywords": ["card", "game", "heart suit"],
+      "url": "/stickers/heart-suit-43ed0eed26e8.svg",
+      "sourcePath": "assets/Heart suit/Color/heart_suit_color.svg",
+      "gitBlob": "b679389891eb7ea8e4f9f352bae94fea7a6c4661",
+      "sha256": "43ed0eed26e8a7d8fee45ae032608a3a05e475419c2fca422d99ef1de9f8231e"
+    },
+    {
+      "id": "heavy-dollar-sign",
+      "name": "Heavy dollar sign",
+      "category": "Symbols",
+      "keywords": ["currency", "dollar", "heavy dollar sign", "money"],
+      "url": "/stickers/heavy-dollar-sign-e04bdc4fe588.svg",
+      "sourcePath": "assets/Heavy dollar sign/Color/heavy_dollar_sign_color.svg",
+      "gitBlob": "80da310e0998f329575bd0457245cd075187a318",
+      "sha256": "e04bdc4fe588f570750994cccc1cec37b414aebb122ceed1cbd8fbf7ba4d8836"
+    },
+    {
+      "id": "helicopter",
+      "name": "Helicopter",
+      "category": "Travel & Places",
+      "keywords": ["helicopter", "vehicle"],
+      "url": "/stickers/helicopter-273dae6ad491.svg",
+      "sourcePath": "assets/Helicopter/Color/helicopter_color.svg",
+      "gitBlob": "d00c4aed8834135a404ef9ee9fbf930c3c247e7e",
+      "sha256": "273dae6ad491ebeb43f6b51a016784e57b07e56c0788dfadbd73a64746f1d460"
+    },
+    {
+      "id": "horizontal-traffic-light",
+      "name": "Horizontal traffic light",
+      "category": "Travel & Places",
+      "keywords": ["horizontal traffic light", "light", "signal", "traffic"],
+      "url": "/stickers/horizontal-traffic-light-c6fd7e44e3c5.svg",
+      "sourcePath": "assets/Horizontal traffic light/Color/horizontal_traffic_light_color.svg",
+      "gitBlob": "7d4a16379e9fb410d0cbc6b411efea7ce0d29268",
+      "sha256": "c6fd7e44e3c5881697c6159b2be5e794c1bdfbcdff01d7c1acd65b18a0dba12f"
+    },
+    {
+      "id": "hot-face",
+      "name": "Hot face",
+      "category": "Smileys & Emotion",
+      "keywords": ["feverish", "heat stroke", "hot", "hot face", "red-faced", "sweating"],
+      "url": "/stickers/hot-face-bfe40c4e6522.svg",
+      "sourcePath": "assets/Hot face/Color/hot_face_color.svg",
+      "gitBlob": "1540e06850ed7dc6461721fe41ba665b20de82cd",
+      "sha256": "bfe40c4e6522402a0a1140ece4e04a76739623cb5c590bdc3335319326ec49e0"
+    },
+    {
+      "id": "hot-pepper",
+      "name": "Hot pepper",
+      "category": "Food & Drink",
+      "keywords": ["hot", "pepper"],
+      "url": "/stickers/hot-pepper-0a258a2d86e9.svg",
+      "sourcePath": "assets/Hot pepper/Color/hot_pepper_color.svg",
+      "gitBlob": "22913399c51deff73bc6deb44b41cfe4c5ecee18",
+      "sha256": "0a258a2d86e9b93ccedf4e25508207a6484e8654c9bb3db8f7dcb58724c2c96d"
+    },
+    {
+      "id": "hot-springs",
+      "name": "Hot springs",
+      "category": "Travel & Places",
+      "keywords": ["hot", "hotsprings", "springs", "steaming"],
+      "url": "/stickers/hot-springs-fcef6b6db8b4.svg",
+      "sourcePath": "assets/Hot springs/Color/hot_springs_color.svg",
+      "gitBlob": "be2c453bd794af867470c3c325dc77a7489e906c",
+      "sha256": "fcef6b6db8b47ec533946415475478e1c16226a4b25281fc0dceac457758795d"
+    },
+    {
+      "id": "house",
+      "name": "House",
+      "category": "Travel & Places",
+      "keywords": ["home", "house"],
+      "url": "/stickers/house-19a59311287d.svg",
+      "sourcePath": "assets/House/Color/house_color.svg",
+      "gitBlob": "0b74bb03b9bc80e8eb5bd36b7df9ce8d06992689",
+      "sha256": "19a59311287d1664c05f8a1a5e4c51674cdde8c4f4cb8fd696df9e3acb7fff38"
+    },
+    {
+      "id": "hushed-face",
+      "name": "Hushed face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "hushed", "stunned", "surprised"],
+      "url": "/stickers/hushed-face-2f6495f51a09.svg",
+      "sourcePath": "assets/Hushed face/Color/hushed_face_color.svg",
+      "gitBlob": "f07fbfde792d8ed50ad4d77b41068d5b863eb00b",
+      "sha256": "2f6495f51a09fda59228d8a46f3e7b15b2db8ff2abb820c0128be32463fc9368"
+    },
+    {
+      "id": "ice",
+      "name": "Ice",
+      "category": "Food & Drink",
+      "keywords": ["cold", "ice", "ice cube", "iceberg"],
+      "url": "/stickers/ice-3f874fee98df.svg",
+      "sourcePath": "assets/Ice/Color/ice_color.svg",
+      "gitBlob": "5edee16517e92cf20a3d45096622e0d9ac01a518",
+      "sha256": "3f874fee98df58cc30f446cc2a8da1bebf8939cdfeffb82607ce1906e0ec7de3"
+    },
+    {
+      "id": "ice-hockey",
+      "name": "Ice hockey",
+      "category": "Activities",
+      "keywords": ["game", "hockey", "ice", "puck", "stick"],
+      "url": "/stickers/ice-hockey-2787075469d9.svg",
+      "sourcePath": "assets/Ice hockey/Color/ice_hockey_color.svg",
+      "gitBlob": "9dcdc92033fc91bf74057cafc719466e1ed7e2a1",
+      "sha256": "2787075469d9e1cd809ef52c5439a84c991903a81574e9a17957b5992b2904e4"
+    },
+    {
+      "id": "inbox-tray",
+      "name": "Inbox tray",
+      "category": "Objects",
+      "keywords": ["box", "inbox", "letter", "mail", "receive", "tray"],
+      "url": "/stickers/inbox-tray-10be50623bc7.svg",
+      "sourcePath": "assets/Inbox tray/Color/inbox_tray_color.svg",
+      "gitBlob": "063e03d0e7f53eb9292dbcc1608c085a7a0041aa",
+      "sha256": "10be50623bc7d1dee6be4fc89361a39e25f0c567e477941004ba10f5b044f2fb"
+    },
+    {
+      "id": "information",
+      "name": "Information",
+      "category": "Symbols",
+      "keywords": ["i", "information"],
+      "url": "/stickers/information-688b32a60051.svg",
+      "sourcePath": "assets/Information/Color/information_color.svg",
+      "gitBlob": "ea8da5e03c79e823e70499aa432253cda508ec4c",
+      "sha256": "688b32a60051dc1f52c7ab1143533d6d3a5c9bbf71cf6de0281906c0000439a1"
+    },
+    {
+      "id": "japanese-castle",
+      "name": "Japanese castle",
+      "category": "Travel & Places",
+      "keywords": ["castle", "Japanese"],
+      "url": "/stickers/japanese-castle-0188e5a169cc.svg",
+      "sourcePath": "assets/Japanese castle/Color/japanese_castle_color.svg",
+      "gitBlob": "e9bf898e0433e3ba3c40b4b42f79d54064e20886",
+      "sha256": "0188e5a169cc0538b03ae6346edab84161276202827d8890d82462f0f2e0d056"
+    },
+    {
+      "id": "japanese-discount-button",
+      "name": "Japanese discount button",
+      "category": "Symbols",
+      "keywords": [
+        "\u201cdiscount\u201d",
+        "ideograph",
+        "Japanese",
+        "Japanese \u201cdiscount\u201d button",
+        "\u5272"
+      ],
+      "url": "/stickers/japanese-discount-button-e1d099ea05ea.svg",
+      "sourcePath": "assets/Japanese discount button/Color/japanese_discount_button_color.svg",
+      "gitBlob": "bab2901aa976895f1328b456e937e9618c6ab20e",
+      "sha256": "e1d099ea05eaa59f4972d9b66677ddb9061b008aaef7f579d76021e9dc8d33c4"
+    },
+    {
+      "id": "japanese-dolls",
+      "name": "Japanese dolls",
+      "category": "Activities",
+      "keywords": ["celebration", "doll", "festival", "Japanese", "Japanese dolls"],
+      "url": "/stickers/japanese-dolls-9dc03afab33c.svg",
+      "sourcePath": "assets/Japanese dolls/Color/japanese_dolls_color.svg",
+      "gitBlob": "a5cd4c57ee49445abdc9453a897b1a5199cddbb5",
+      "sha256": "9dc03afab33c042c10e788d760b530e7d982d5c978111171c037c9c70fa1eddf"
+    },
+    {
+      "id": "japanese-free-of-charge-button",
+      "name": "Japanese free of charge button",
+      "category": "Symbols",
+      "keywords": [
+        "\u201cfree of charge\u201d",
+        "ideograph",
+        "Japanese",
+        "Japanese \u201cfree of charge\u201d button",
+        "\u7121"
+      ],
+      "url": "/stickers/japanese-free-of-charge-button-dcda61958078.svg",
+      "sourcePath": "assets/Japanese free of charge button/Color/japanese_free_of_charge_button_color.svg",
+      "gitBlob": "d234e9a3b49ef3200d373f933be9f712922d2e5c",
+      "sha256": "dcda61958078517b77f89890009bce357986ac2a22004597a12e06412dc7b7b5"
+    },
+    {
+      "id": "japanese-here-button",
+      "name": "Japanese here button",
+      "category": "Symbols",
+      "keywords": [
+        "\u201chere\u201d",
+        "Japanese",
+        "Japanese \u201chere\u201d button",
+        "katakana",
+        "\u30b3\u30b3"
+      ],
+      "url": "/stickers/japanese-here-button-4daa88ca5722.svg",
+      "sourcePath": "assets/Japanese here button/Color/japanese_here_button_color.svg",
+      "gitBlob": "a91f635f31fd8af48371617fa4b56c2a0de2e839",
+      "sha256": "4daa88ca57227b89e52e444baee7919ba4437a890ff285194f2204417825b9fb"
+    },
+    {
+      "id": "japanese-passing-grade-button",
+      "name": "Japanese passing grade button",
+      "category": "Symbols",
+      "keywords": [
+        "\u201cpassing grade\u201d",
+        "ideograph",
+        "Japanese",
+        "Japanese \u201cpassing grade\u201d button",
+        "\u5408"
+      ],
+      "url": "/stickers/japanese-passing-grade-button-b644ec68b2e2.svg",
+      "sourcePath": "assets/Japanese passing grade button/Color/japanese_passing_grade_button_color.svg",
+      "gitBlob": "2267d18ede7f277ba4e927de97bc26924bdc9db3",
+      "sha256": "b644ec68b2e2de4651654c5fddad07bb6230897df187965a03f3f997cf71f6b9"
+    },
+    {
+      "id": "japanese-reserved-button",
+      "name": "Japanese reserved button",
+      "category": "Symbols",
+      "keywords": [
+        "\u201creserved\u201d",
+        "ideograph",
+        "Japanese",
+        "Japanese \u201creserved\u201d button",
+        "\u6307"
+      ],
+      "url": "/stickers/japanese-reserved-button-6c464860490a.svg",
+      "sourcePath": "assets/Japanese reserved button/Color/japanese_reserved_button_color.svg",
+      "gitBlob": "d2db448de956e64cd2f934ba2ae74541a8cf9197",
+      "sha256": "6c464860490a995bfb144a51ac9cd05bffb5180a80c23baa146094f81a1be161"
+    },
+    {
+      "id": "japanese-secret-button",
+      "name": "Japanese secret button",
+      "category": "Symbols",
+      "keywords": [
+        "\u201csecret\u201d",
+        "ideograph",
+        "Japanese",
+        "Japanese \u201csecret\u201d button",
+        "\u79d8"
+      ],
+      "url": "/stickers/japanese-secret-button-6b06777e8f1b.svg",
+      "sourcePath": "assets/Japanese secret button/Color/japanese_secret_button_color.svg",
+      "gitBlob": "92aeafc7c82c133fbe653d5de6dce4659d9e128d",
+      "sha256": "6b06777e8f1b2d0b28893665397cd7df44da9c1fb67ea9dd6b6caebeebadca9f"
+    },
+    {
+      "id": "japanese-symbol-for-beginner",
+      "name": "Japanese symbol for beginner",
+      "category": "Symbols",
+      "keywords": ["beginner", "chevron", "Japanese", "Japanese symbol for beginner", "leaf"],
+      "url": "/stickers/japanese-symbol-for-beginner-d3eccf54c30d.svg",
+      "sourcePath": "assets/Japanese symbol for beginner/Color/japanese_symbol_for_beginner_color.svg",
+      "gitBlob": "cd95cf9925bde01d3abdab6b3aa71c4500c449de",
+      "sha256": "d3eccf54c30def0465f93e92e8eae33027b3d949b4849e641f074378dec92dc9"
+    },
+    {
+      "id": "jar",
+      "name": "Jar",
+      "category": "Food & Drink",
+      "keywords": ["condiment", "container", "empty", "jar", "sauce", "store"],
+      "url": "/stickers/jar-45dfe525dcb6.svg",
+      "sourcePath": "assets/Jar/Color/jar_color.svg",
+      "gitBlob": "ae2c962afa30797e480dab7bd9674201e349d499",
+      "sha256": "45dfe525dcb679c967fb4bf1bcdcef05f2e3fe7e9b785bd3d65ea13007776e21"
+    },
+    {
+      "id": "jellyfish",
+      "name": "Jellyfish",
+      "category": "Animals & Nature",
+      "keywords": ["burn", "invertebrate", "jelly", "jellyfish", "marine", "ouch", "stinger"],
+      "url": "/stickers/jellyfish-b11fa8ea429d.svg",
+      "sourcePath": "assets/Jellyfish/Color/jellyfish_color.svg",
+      "gitBlob": "10162dce63221501ccc76a9d6392e57b3e8c5a37",
+      "sha256": "b11fa8ea429dc9014f6e0799575c0ff075c19cfca49a0591c1e52953acf808ed"
+    },
+    {
+      "id": "keyboard",
+      "name": "Keyboard",
+      "category": "Objects",
+      "keywords": ["computer", "keyboard"],
+      "url": "/stickers/keyboard-d483bfb37cfe.svg",
+      "sourcePath": "assets/Keyboard/Color/keyboard_color.svg",
+      "gitBlob": "fceba874fa8d29f082976d00f16b80625cb20885",
+      "sha256": "d483bfb37cfe43b5a7c670fe84338b9b2c2382577c36a485775bd431791b64e8"
+    },
+    {
+      "id": "keycap-9",
+      "name": "Keycap 9",
+      "category": "Symbols",
+      "keywords": ["keycap", "nine"],
+      "url": "/stickers/keycap-9-ad4848d1e499.svg",
+      "sourcePath": "assets/Keycap 9/Color/keycap_9_color.svg",
+      "gitBlob": "126399b1b44cd826aa68247f16df17afa7299291",
+      "sha256": "ad4848d1e49980e01e74c51c862fdcbb632d299295983c38d9f0d77b57d51f7a"
+    },
+    {
+      "id": "kick-scooter",
+      "name": "Kick scooter",
+      "category": "Travel & Places",
+      "keywords": ["kick", "scooter"],
+      "url": "/stickers/kick-scooter-b3ccf09ccd8a.svg",
+      "sourcePath": "assets/Kick scooter/Color/kick_scooter_color.svg",
+      "gitBlob": "4fa1db57013348a1c61a4a8f1f042988b27a05bc",
+      "sha256": "b3ccf09ccd8a6a0f7422229642805795dbc4b9c79c858beda9feca909548134c"
+    },
+    {
+      "id": "kissing-face",
+      "name": "Kissing face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "kiss", "kissing face"],
+      "url": "/stickers/kissing-face-9dad3dbc3c1b.svg",
+      "sourcePath": "assets/Kissing face/Color/kissing_face_color.svg",
+      "gitBlob": "0a9587b5e02aafcd372446e92ef982c8a2778a01",
+      "sha256": "9dad3dbc3c1bc7cf105688559c7d58ee532e9067c62e86ec34555b8ec8c7b707"
+    },
+    {
+      "id": "kite",
+      "name": "Kite",
+      "category": "Activities",
+      "keywords": ["fly", "kite", "soar"],
+      "url": "/stickers/kite-2cdb60dd45f9.svg",
+      "sourcePath": "assets/Kite/Color/kite_color.svg",
+      "gitBlob": "06a229e7e0a0c5b43ea8f92c0141cf125681ddcb",
+      "sha256": "2cdb60dd45f9ea1d8cce6d51cfc7971886899b5a061829452cad024cb4811a92"
+    },
+    {
+      "id": "knocked-out-face",
+      "name": "Knocked-out face",
+      "category": "Smileys & Emotion",
+      "keywords": ["crossed-out eyes", "dead", "face", "face with crossed-out eyes", "knocked out"],
+      "url": "/stickers/knocked-out-face-1c857d91df03.svg",
+      "sourcePath": "assets/Knocked-out face/Color/knocked-out_face_color.svg",
+      "gitBlob": "282017dbd051f998d747e17aa4479e49d73553ce",
+      "sha256": "1c857d91df034688399b229ce2c21037b8e1ea8c01c522ba60e338824f4379ec"
+    },
+    {
+      "id": "knot",
+      "name": "Knot",
+      "category": "Activities",
+      "keywords": ["knot", "rope", "tangled", "tie", "twine", "twist"],
+      "url": "/stickers/knot-3ced2d1a4123.svg",
+      "sourcePath": "assets/Knot/Color/knot_color.svg",
+      "gitBlob": "dc0e7d29a994c45f403cb90ae351b2db9be051f9",
+      "sha256": "3ced2d1a41234a048ac487811522fe82328f947db2ac94a2a8b6d56a283908d5"
+    },
+    {
+      "id": "label",
+      "name": "Label",
+      "category": "Objects",
+      "keywords": ["label"],
+      "url": "/stickers/label-dc4e95bb6bd0.svg",
+      "sourcePath": "assets/Label/Color/label_color.svg",
+      "gitBlob": "2445ebda08c738bb54411ec5d5205c70c5a5079c",
+      "sha256": "dc4e95bb6bd0e69a66b89872a06e7b6e36ab316e9f99cba53372a237311b21c5"
+    },
+    {
+      "id": "lacrosse",
+      "name": "Lacrosse",
+      "category": "Activities",
+      "keywords": ["ball", "goal", "lacrosse", "stick"],
+      "url": "/stickers/lacrosse-1dd111cb66b0.svg",
+      "sourcePath": "assets/Lacrosse/Color/lacrosse_color.svg",
+      "gitBlob": "1d410fb9248d23912710ca1af81406d59894cbbc",
+      "sha256": "1dd111cb66b0bebd4333ee9bef9c3ee905aabca9ada9eec9888ce3cb3b295de2"
+    },
+    {
+      "id": "lady-beetle",
+      "name": "Lady beetle",
+      "category": "Animals & Nature",
+      "keywords": ["beetle", "insect", "lady beetle", "ladybird", "ladybug"],
+      "url": "/stickers/lady-beetle-7d526e1e3672.svg",
+      "sourcePath": "assets/Lady beetle/Color/lady_beetle_color.svg",
+      "gitBlob": "1bc7761227df9ea10f1a0fc052665c8d98836a8d",
+      "sha256": "7d526e1e36720a65d8d4a457e0e91641df0a9b32ad143047e5023bda54ecabd5"
+    },
+    {
+      "id": "laptop",
+      "name": "Laptop",
+      "category": "Objects",
+      "keywords": ["computer", "laptop", "pc", "personal"],
+      "url": "/stickers/laptop-b1e1413ef52c.svg",
+      "sourcePath": "assets/Laptop/Color/laptop_color.svg",
+      "gitBlob": "cc2f295e965234def6378f2b739037bc617524a1",
+      "sha256": "b1e1413ef52cc1d8c5883b619d5b724ff3f325baa4539634a75b3d57597cf562"
+    },
+    {
+      "id": "large-blue-diamond",
+      "name": "Large blue diamond",
+      "category": "Symbols",
+      "keywords": ["blue", "diamond", "geometric", "large blue diamond"],
+      "url": "/stickers/large-blue-diamond-9d4e9331c5e0.svg",
+      "sourcePath": "assets/Large blue diamond/Color/large_blue_diamond_color.svg",
+      "gitBlob": "724cea9920af9caace88f9e7b3c54cf299b4aaf7",
+      "sha256": "9d4e9331c5e030a3cd5e5774bcbf1347de55f76d8de1be3b21db73b6da3521e3"
+    },
+    {
+      "id": "leaf-fluttering-in-wind",
+      "name": "Leaf fluttering in wind",
+      "category": "Animals & Nature",
+      "keywords": ["blow", "flutter", "leaf", "leaf fluttering in wind", "wind"],
+      "url": "/stickers/leaf-fluttering-in-wind-38884c450832.svg",
+      "sourcePath": "assets/Leaf fluttering in wind/Color/leaf_fluttering_in_wind_color.svg",
+      "gitBlob": "c44facc75f12a48a87c9809e74db96ffafd6bd7e",
+      "sha256": "38884c450832805abe919f3b8ba2f1fdf9a1bc9df8799b37fcdf000478ec1d91"
+    },
+    {
+      "id": "left-speech-bubble",
+      "name": "Left speech bubble",
+      "category": "Smileys & Emotion",
+      "keywords": ["dialog", "left speech bubble", "speech"],
+      "url": "/stickers/left-speech-bubble-8f8b2f8d5561.svg",
+      "sourcePath": "assets/Left speech bubble/Color/left_speech_bubble_color.svg",
+      "gitBlob": "7bf45c09c52f660f2ca158c825e4d0e674b903a6",
+      "sha256": "8f8b2f8d5561e58ed5fa4229b9b784cacf8c9c1e11ca18987c504012930e14cb"
+    },
+    {
+      "id": "leftwards-pushing-hand",
+      "name": "Leftwards pushing hand",
+      "category": "People & Body",
+      "keywords": [
+        "high five",
+        "leftward",
+        "leftwards pushing hand",
+        "push",
+        "refuse",
+        "stop",
+        "wait"
+      ],
+      "url": "/stickers/leftwards-pushing-hand-ad010ff62fc1.svg",
+      "sourcePath": "assets/Leftwards pushing hand/Default/Color/leftwards_pushing_hand_color_default.svg",
+      "gitBlob": "ac9ad2727df9ce4c43a3c8d4b397facb32b527fa",
+      "sha256": "ad010ff62fc12e245eb91c2ceb224a8ec36fc7f03a8a51196f97b140c1033d53"
+    },
+    {
+      "id": "libra",
+      "name": "Libra",
+      "category": "Symbols",
+      "keywords": ["balance", "justice", "Libra", "scales", "zodiac"],
+      "url": "/stickers/libra-df2b38d2e158.svg",
+      "sourcePath": "assets/Libra/Color/libra_color.svg",
+      "gitBlob": "116213b5bbbc4628c670394234d3106ac7c25c2f",
+      "sha256": "df2b38d2e15816245e28eb1ab93a5c6ad58a836e9f8a3e380e3374fe674e126f"
+    },
+    {
+      "id": "light-blue-heart",
+      "name": "Light blue heart",
+      "category": "Smileys & Emotion",
+      "keywords": ["cyan", "heart", "light blue", "light blue heart", "teal"],
+      "url": "/stickers/light-blue-heart-292ba8f4ae39.svg",
+      "sourcePath": "assets/Light blue heart/Color/light_blue_heart_color.svg",
+      "gitBlob": "0d132a02414cedc6033ee06f665b639bcf0f420a",
+      "sha256": "292ba8f4ae39d7912529d9a2ce0b992242833a4641bd083b9a6a10a3fc9c776a"
+    },
+    {
+      "id": "light-rail",
+      "name": "Light rail",
+      "category": "Travel & Places",
+      "keywords": ["light rail", "railway"],
+      "url": "/stickers/light-rail-987ee3147418.svg",
+      "sourcePath": "assets/Light rail/Color/light_rail_color.svg",
+      "gitBlob": "452bea3617e51b10efe4efd277bd4d44fe1a940b",
+      "sha256": "987ee3147418b2d7c6b2c5c38f0e51a5ae5bf1e254253b65f53ddf322063e803"
+    },
+    {
+      "id": "litter-in-bin-sign",
+      "name": "Litter in bin sign",
+      "category": "Symbols",
+      "keywords": ["litter", "litter bin", "litter in bin sign"],
+      "url": "/stickers/litter-in-bin-sign-ac3afaee14ad.svg",
+      "sourcePath": "assets/Litter in bin sign/Color/litter_in_bin_sign_color.svg",
+      "gitBlob": "7b1abbaa66e1d2822843232f3426cccbfe76eeba",
+      "sha256": "ac3afaee14ad5789daa89965aa7b8a3390022d5f6bb24badaef69ecbd1b39075"
+    },
+    {
+      "id": "lobster",
+      "name": "Lobster",
+      "category": "Food & Drink",
+      "keywords": ["bisque", "claws", "lobster", "seafood"],
+      "url": "/stickers/lobster-ef7ebf2cd724.svg",
+      "sourcePath": "assets/Lobster/Color/lobster_color.svg",
+      "gitBlob": "01b673ce16f7b97273d8a015964854546cdabd16",
+      "sha256": "ef7ebf2cd72437c14bc1c0b489eab2967cc6cb756d6a6f29760dbd9bff2c9ac0"
+    },
+    {
+      "id": "lollipop",
+      "name": "Lollipop",
+      "category": "Food & Drink",
+      "keywords": ["candy", "dessert", "lollipop", "sweet"],
+      "url": "/stickers/lollipop-940496b90b95.svg",
+      "sourcePath": "assets/Lollipop/Color/lollipop_color.svg",
+      "gitBlob": "ad90ac6f528e588e818d39f89cf3c46b2cfb202a",
+      "sha256": "940496b90b95243504721c18136549c04112217058f393f9a0358a5cee528ced"
+    },
+    {
+      "id": "love-you-gesture",
+      "name": "Love-you gesture",
+      "category": "People & Body",
+      "keywords": ["hand", "ILY", "love-you gesture"],
+      "url": "/stickers/love-you-gesture-fc9df6425ae6.svg",
+      "sourcePath": "assets/Love-you gesture/Default/Color/love-you_gesture_color_default.svg",
+      "gitBlob": "81626ecc67dbb823c29870849bceeee10c69942c",
+      "sha256": "fc9df6425ae6243a28828552029ecc66eb55f6172f3785a092ada8c258f54340"
+    },
+    {
+      "id": "lying-face",
+      "name": "Lying face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "lie", "lying face", "pinocchio"],
+      "url": "/stickers/lying-face-e8d3ff42d081.svg",
+      "sourcePath": "assets/Lying face/Color/lying_face_color.svg",
+      "gitBlob": "dae8fb779c2e01c30f6a00956e2db9f42645331a",
+      "sha256": "e8d3ff42d081c569d93ef6a43fdad79fa08cc572af6cf72012de9b41e3c5134e"
+    },
+    {
+      "id": "magic-wand",
+      "name": "Magic wand",
+      "category": "Activities",
+      "keywords": ["magic", "magic wand", "witch", "wizard"],
+      "url": "/stickers/magic-wand-de38ff4cb325.svg",
+      "sourcePath": "assets/Magic wand/Color/magic_wand_color.svg",
+      "gitBlob": "821e2e30d01b3df13b34425a35cbbf33eaf6c904",
+      "sha256": "de38ff4cb325bec441ec023fdc81f29655c3fac93f20bb6f21610c2deed6f784"
+    },
+    {
+      "id": "magnet",
+      "name": "Magnet",
+      "category": "Objects",
+      "keywords": ["attraction", "horseshoe", "magnet", "magnetic"],
+      "url": "/stickers/magnet-579890d943cf.svg",
+      "sourcePath": "assets/Magnet/Color/magnet_color.svg",
+      "gitBlob": "4a15f1addc18397df0e2dc7230704fae4dabc9b5",
+      "sha256": "579890d943cf3bf1ee816029ca4a3928436b9081b9666ab2e3f62674e340d842"
+    },
+    {
+      "id": "mahjong-red-dragon",
+      "name": "Mahjong red dragon",
+      "category": "Activities",
+      "keywords": ["game", "mahjong", "mahjong red dragon", "red"],
+      "url": "/stickers/mahjong-red-dragon-f5d618d3ef88.svg",
+      "sourcePath": "assets/Mahjong red dragon/Color/mahjong_red_dragon_color.svg",
+      "gitBlob": "307865b1d64902ad4f6fa9eced7402792ee7b14f",
+      "sha256": "f5d618d3ef88cc53184a5e730da0718aed2d90c8df21d4879741ba6be33b9450"
+    },
+    {
+      "id": "man-astronaut",
+      "name": "Man astronaut",
+      "category": "People & Body",
+      "keywords": ["astronaut", "man", "rocket"],
+      "url": "/stickers/man-astronaut-fef022c05854.svg",
+      "sourcePath": "assets/Man astronaut/Default/Color/man_astronaut_color_default.svg",
+      "gitBlob": "208a6a093be549f92a8ed5c2f49d162a23cd522c",
+      "sha256": "fef022c0585488ca7b204d12280309d5bb6298c720ec034fba36b391b5590895"
+    },
+    {
+      "id": "man-biking",
+      "name": "Man biking",
+      "category": "People & Body",
+      "keywords": ["bicycle", "biking", "cyclist", "man"],
+      "url": "/stickers/man-biking-e26a9365eba9.svg",
+      "sourcePath": "assets/Man biking/Default/Color/man_biking_color_default.svg",
+      "gitBlob": "4a44d89cf5eecf8c57b123eddc0bfe7b89066279",
+      "sha256": "e26a9365eba9ef33baa35b02dbf0c2400a923d9888b78939c60f6b636aa86ac9"
+    },
+    {
+      "id": "man-bouncing-ball",
+      "name": "Man bouncing ball",
+      "category": "People & Body",
+      "keywords": ["ball", "man", "man bouncing ball"],
+      "url": "/stickers/man-bouncing-ball-12101f675717.svg",
+      "sourcePath": "assets/Man bouncing ball/Default/Color/man_bouncing_ball_color_default.svg",
+      "gitBlob": "a7c08a5b4351a3e6904378fdc08ea3f948476746",
+      "sha256": "12101f675717b6230a0a0b34b10fd179312c042c88143e9958ff3af2c81e1750"
+    },
+    {
+      "id": "man-in-lotus-position",
+      "name": "Man in lotus position",
+      "category": "People & Body",
+      "keywords": ["man in lotus position", "meditation", "yoga"],
+      "url": "/stickers/man-in-lotus-position-26df5dd9d43a.svg",
+      "sourcePath": "assets/Man in lotus position/Default/Color/man_in_lotus_position_color_default.svg",
+      "gitBlob": "c27a4ef3a044b375ccfb057d5dc9a22668e1fef6",
+      "sha256": "26df5dd9d43a8df8a46719a72599e7de013c19a16934d9bfec54557739c88f66"
+    },
+    {
+      "id": "man-lifting-weights",
+      "name": "Man lifting weights",
+      "category": "People & Body",
+      "keywords": ["man", "man lifting weights", "weight lifter"],
+      "url": "/stickers/man-lifting-weights-3d882bbb8bd6.svg",
+      "sourcePath": "assets/Man lifting weights/Default/Color/man_lifting_weights_color_default.svg",
+      "gitBlob": "b2219e893e2e7fd15ffcb82c71eb18edfcc4e94e",
+      "sha256": "3d882bbb8bd616c1fdbce697143ef99b8e66fdaae3f56b46d4ddd9512eb03b06"
+    },
+    {
+      "id": "man-office-worker",
+      "name": "Man office worker",
+      "category": "People & Body",
+      "keywords": ["architect", "business", "man", "man office worker", "manager", "white-collar"],
+      "url": "/stickers/man-office-worker-189a1d536093.svg",
+      "sourcePath": "assets/Man office worker/Default/Color/man_office_worker_color_default.svg",
+      "gitBlob": "3f1421ddd92cd6ae2515352c36f612d9ceda06bf",
+      "sha256": "189a1d536093b24b4a129122c06dc4e2112c6e41362999739161d1304ad0f22a"
+    },
+    {
+      "id": "man-pouting",
+      "name": "Man pouting",
+      "category": "People & Body",
+      "keywords": ["gesture", "man", "pouting"],
+      "url": "/stickers/man-pouting-189b4b5e9629.svg",
+      "sourcePath": "assets/Man pouting/Default/Color/man_pouting_color_default.svg",
+      "gitBlob": "abf108e4877c48b96738c6285e49f4b551c78eb0",
+      "sha256": "189b4b5e9629f5369e51a8f51f38c7045ac0ee8e2a8c549b6fef6f36a49dc5e3"
+    },
+    {
+      "id": "man-shrugging",
+      "name": "Man shrugging",
+      "category": "People & Body",
+      "keywords": ["doubt", "ignorance", "indifference", "man", "man shrugging", "shrug"],
+      "url": "/stickers/man-shrugging-49e0dadbf936.svg",
+      "sourcePath": "assets/Man shrugging/Default/Color/man_shrugging_color_default.svg",
+      "gitBlob": "73b7d02ca01ecc81fa129b82fc4030fa94df3cb8",
+      "sha256": "49e0dadbf93698587ea5289626b805c43647bc1d6e6c7233913519b0cf7b9027"
+    },
+    {
+      "id": "man-singer",
+      "name": "Man singer",
+      "category": "People & Body",
+      "keywords": ["actor", "entertainer", "man", "rock", "singer", "star"],
+      "url": "/stickers/man-singer-89e2bf6c4401.svg",
+      "sourcePath": "assets/Man singer/Default/Color/man_singer_color_default.svg",
+      "gitBlob": "328659187ebe1e8f73c367917ed62de90be4a3e7",
+      "sha256": "89e2bf6c4401f213a90e84dc58b357be132981c5fef08c0dda53d14aa4eb4bd3"
+    },
+    {
+      "id": "man-white-hair",
+      "name": "Man white hair",
+      "category": "People & Body",
+      "keywords": ["adult", "man", "white hair"],
+      "url": "/stickers/man-white-hair-6b6d340740e3.svg",
+      "sourcePath": "assets/Man white hair/Default/Color/man_white_hair_color_default.svg",
+      "gitBlob": "319d5aec55142451dfc6955e5ab8eb5c1e06fcbb",
+      "sha256": "6b6d340740e325bb965c31864464d79fa38a388a8cdb7a5339cc327645b31854"
+    },
+    {
+      "id": "man-wrestling",
+      "name": "Man wrestling",
+      "category": "People & Body",
+      "keywords": ["men", "men wrestling", "wrestle"],
+      "url": "/stickers/man-wrestling-1449107099cf.svg",
+      "sourcePath": "assets/Man wrestling/Color/man_wrestling_color.svg",
+      "gitBlob": "5bf45f22f21d168a0c365fb1a2bc350ea0e9f50a",
+      "sha256": "1449107099cfb63b54fb0de56d248868b48364ecba0a69a13e34e0bb6d2ef4b6"
+    },
+    {
+      "id": "mango",
+      "name": "Mango",
+      "category": "Food & Drink",
+      "keywords": ["fruit", "mango", "tropical"],
+      "url": "/stickers/mango-eacf368ac0d7.svg",
+      "sourcePath": "assets/Mango/Color/mango_color.svg",
+      "gitBlob": "c5d93bb80c938e91cd5fc597522e3a57745d3134",
+      "sha256": "eacf368ac0d767b21225ea4209eead9b96758e51be7cc12fee9981d35d8f8793"
+    },
+    {
+      "id": "maple-leaf",
+      "name": "Maple leaf",
+      "category": "Animals & Nature",
+      "keywords": ["falling", "leaf", "maple"],
+      "url": "/stickers/maple-leaf-d62ded703fe8.svg",
+      "sourcePath": "assets/Maple leaf/Color/maple_leaf_color.svg",
+      "gitBlob": "dda148a0119ec2c5a775d92482c2370e8f2013dc",
+      "sha256": "d62ded703fe883cc95733d6c72783713e897f157ad2a6aa1baf40abd65c4ca34"
+    },
+    {
+      "id": "maracas",
+      "name": "Maracas",
+      "category": "Objects",
+      "keywords": ["instrument", "maracas", "music", "percussion", "rattle", "shake"],
+      "url": "/stickers/maracas-b9501768e412.svg",
+      "sourcePath": "assets/Maracas/Color/maracas_color.svg",
+      "gitBlob": "c139d2a309052086c91c559f820f683010e60727",
+      "sha256": "b9501768e4124012b44c9ba52a5f112ecbf20f4b5a5224f570f1114bf85a6bb2"
+    },
+    {
+      "id": "mate",
+      "name": "Mate",
+      "category": "Food & Drink",
+      "keywords": ["drink", "mate"],
+      "url": "/stickers/mate-daa5774a84c3.svg",
+      "sourcePath": "assets/Mate/Color/mate_color.svg",
+      "gitBlob": "724faceb777204117717fa045e6b04f205e36215",
+      "sha256": "daa5774a84c3ef6f09a1a0e5102bff3732c85d7ce7082844d0e8f84fb4196d36"
+    },
+    {
+      "id": "microphone",
+      "name": "Microphone",
+      "category": "Objects",
+      "keywords": ["karaoke", "mic", "microphone"],
+      "url": "/stickers/microphone-c2226e4dfcfd.svg",
+      "sourcePath": "assets/Microphone/Color/microphone_color.svg",
+      "gitBlob": "ea7c19310ce830be4f3016edc1bf796dad661d76",
+      "sha256": "c2226e4dfcfd720afe892c5d7d0d0d7c2004835a2dd095b11e77732bfc19a553"
+    },
+    {
+      "id": "military-medal",
+      "name": "Military medal",
+      "category": "Activities",
+      "keywords": ["celebration", "medal", "military"],
+      "url": "/stickers/military-medal-89a3cddee11c.svg",
+      "sourcePath": "assets/Military medal/Color/military_medal_color.svg",
+      "gitBlob": "30c4abd5c416a92cdd48d4d072c3426999bf24a5",
+      "sha256": "89a3cddee11c39cd3f88b0b7ef3812cb1c41130c063b3d94d382a658a2aa17fa"
+    },
+    {
+      "id": "milky-way",
+      "name": "Milky way",
+      "category": "Travel & Places",
+      "keywords": ["milky way", "space"],
+      "url": "/stickers/milky-way-4197fa42c5ef.svg",
+      "sourcePath": "assets/Milky way/Color/milky_way_color.svg",
+      "gitBlob": "acdca1e0b1d077ce964dc923362e767bc79dbb88",
+      "sha256": "4197fa42c5efde71960bc718da15f2bbefe6383d26a6c008727248833312361a"
+    },
+    {
+      "id": "mirror-ball",
+      "name": "Mirror ball",
+      "category": "Activities",
+      "keywords": ["dance", "disco", "glitter", "mirror ball", "party"],
+      "url": "/stickers/mirror-ball-abced5f4bc83.svg",
+      "sourcePath": "assets/Mirror ball/Color/mirror_ball_color.svg",
+      "gitBlob": "e1d3181dce55c866d43b9272d81ab8fbc6054df6",
+      "sha256": "abced5f4bc83ffc5eb245ac72e2854794153f9e04dd23d8b39a7c3d3d940610f"
+    },
+    {
+      "id": "moai",
+      "name": "Moai",
+      "category": "Objects",
+      "keywords": ["face", "moai", "moyai", "statue"],
+      "url": "/stickers/moai-36800ba3d942.svg",
+      "sourcePath": "assets/Moai/Color/moai_color.svg",
+      "gitBlob": "1f1e398ebafe5d38ad0360d107e3df520a52d7b3",
+      "sha256": "36800ba3d942eba65ebd0b03b8cbbc9c1ca9f25ebcb4a75777b1de6ce0ed192b"
+    },
+    {
+      "id": "mobile-phone",
+      "name": "Mobile phone",
+      "category": "Objects",
+      "keywords": ["cell", "mobile", "phone", "telephone"],
+      "url": "/stickers/mobile-phone-0109d1473297.svg",
+      "sourcePath": "assets/Mobile phone/Color/mobile_phone_color.svg",
+      "gitBlob": "95973a9da6b91f3cb4ffeb204adef679dcd93a84",
+      "sha256": "0109d1473297bf47a35ea6d411187825b5b5f6f51416c28400a65c7f4f095514"
+    },
+    {
+      "id": "moon-viewing-ceremony",
+      "name": "Moon viewing ceremony",
+      "category": "Activities",
+      "keywords": ["celebration", "ceremony", "moon", "moon viewing ceremony"],
+      "url": "/stickers/moon-viewing-ceremony-62e547da2469.svg",
+      "sourcePath": "assets/Moon viewing ceremony/Color/moon_viewing_ceremony_color.svg",
+      "gitBlob": "7ed04714b14bdd18ebd5b2bc78b69255abb6524b",
+      "sha256": "62e547da2469ec9cca62afea8d46b55cf9a23dd2b612f5181ba8f1e57d604646"
+    },
+    {
+      "id": "motor-boat",
+      "name": "Motor boat",
+      "category": "Travel & Places",
+      "keywords": ["boat", "motor boat", "motorboat"],
+      "url": "/stickers/motor-boat-2eee36a7ad66.svg",
+      "sourcePath": "assets/Motor boat/Color/motor_boat_color.svg",
+      "gitBlob": "8a56df2d573546e64c44de0cb6f00a31800cce8f",
+      "sha256": "2eee36a7ad6689159f657304b09cf5596464c792fa0b1f321e7b4421979ecb6c"
+    },
+    {
+      "id": "motorway",
+      "name": "Motorway",
+      "category": "Travel & Places",
+      "keywords": ["highway", "motorway", "road"],
+      "url": "/stickers/motorway-70860c87ddd8.svg",
+      "sourcePath": "assets/Motorway/Color/motorway_color.svg",
+      "gitBlob": "e181084a4b5e6ed758ad2f5d2960f1026bff872b",
+      "sha256": "70860c87ddd82f7a1b45b8960f14c6f5461793d8c1b83a591075785649054d17"
+    },
+    {
+      "id": "mount-fuji",
+      "name": "Mount fuji",
+      "category": "Travel & Places",
+      "keywords": ["fuji", "mount fuji", "mountain"],
+      "url": "/stickers/mount-fuji-f0a6eb8776b6.svg",
+      "sourcePath": "assets/Mount fuji/Color/mount_fuji_color.svg",
+      "gitBlob": "6ec447264e907d0fb62bae9d2335211a8244706f",
+      "sha256": "f0a6eb8776b69f58e5d32b2b358901c3d53adf4562b329ef5ef29b78825f6f53"
+    },
+    {
+      "id": "mountain",
+      "name": "Mountain",
+      "category": "Travel & Places",
+      "keywords": ["mountain"],
+      "url": "/stickers/mountain-c02ea32f4c1e.svg",
+      "sourcePath": "assets/Mountain/Color/mountain_color.svg",
+      "gitBlob": "dc4b3b2dbfca122b3caeb215ba35e4991e36884b",
+      "sha256": "c02ea32f4c1e756eca0b9dc77b1aebd2e48e81f368c68bf45165c3fc1723b936"
+    },
+    {
+      "id": "mountain-cableway",
+      "name": "Mountain cableway",
+      "category": "Travel & Places",
+      "keywords": ["cable", "gondola", "mountain", "mountain cableway"],
+      "url": "/stickers/mountain-cableway-cb1125c32c85.svg",
+      "sourcePath": "assets/Mountain cableway/Color/mountain_cableway_color.svg",
+      "gitBlob": "59fc65de7e2ba961caac89ba166218f1389e307c",
+      "sha256": "cb1125c32c8595ef7f59209fb910f606173379b548191e8c68cf44f1b90672b0"
+    },
+    {
+      "id": "mouse-face",
+      "name": "Mouse face",
+      "category": "Animals & Nature",
+      "keywords": ["face", "mouse"],
+      "url": "/stickers/mouse-face-9e89ce37cd21.svg",
+      "sourcePath": "assets/Mouse face/Color/mouse_face_color.svg",
+      "gitBlob": "551ba1cc7af3e5bca8f4d08e62aa3a985f8a8e26",
+      "sha256": "9e89ce37cd21c21f5c5a8afec9310884947efc0db9e89724a2f2d45ec80e2d9b"
+    },
+    {
+      "id": "mouth",
+      "name": "Mouth",
+      "category": "People & Body",
+      "keywords": ["lips", "mouth"],
+      "url": "/stickers/mouth-55ab5de933be.svg",
+      "sourcePath": "assets/Mouth/Color/mouth_color.svg",
+      "gitBlob": "86b001227b59268ba0acd80ecf62becd820483b4",
+      "sha256": "55ab5de933be7020aea07a074df52885b04989537bbc834a2480f505d3e1c142"
+    },
+    {
+      "id": "multiply",
+      "name": "Multiply",
+      "category": "Symbols",
+      "keywords": ["\u00d7", "cancel", "multiplication", "multiply", "sign", "x"],
+      "url": "/stickers/multiply-17ae9717f3c1.svg",
+      "sourcePath": "assets/Multiply/Color/multiply_color.svg",
+      "gitBlob": "fc5e53a98503b4afdd5f86f7d1f17fbed2a0bb1e",
+      "sha256": "17ae9717f3c1fc3da971e3e5e777da5bc208a765b6dd05cea9a233e43b33466f"
+    },
+    {
+      "id": "musical-notes",
+      "name": "Musical notes",
+      "category": "Objects",
+      "keywords": ["music", "musical notes", "note", "notes"],
+      "url": "/stickers/musical-notes-6dab1458f674.svg",
+      "sourcePath": "assets/Musical notes/Color/musical_notes_color.svg",
+      "gitBlob": "f14761b06c368ecea9d629e3b5843b9469708862",
+      "sha256": "6dab1458f67497c3922fc31e3403c995c0c928c51109151db084c82d3767c4c7"
+    },
+    {
+      "id": "nazar-amulet",
+      "name": "Nazar amulet",
+      "category": "Activities",
+      "keywords": ["bead", "charm", "evil-eye", "nazar", "nazar amulet", "talisman"],
+      "url": "/stickers/nazar-amulet-1c3016cc4100.svg",
+      "sourcePath": "assets/Nazar amulet/Color/nazar_amulet_color.svg",
+      "gitBlob": "28e62c136b5bd71256d465e902ea3e2f9b0be214",
+      "sha256": "1c3016cc41006dbd2ca5348c69b937aee1e1f5b6275c5f61a5876564c262bfa4"
+    },
+    {
+      "id": "nerd-face",
+      "name": "Nerd face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "geek", "nerd"],
+      "url": "/stickers/nerd-face-3dac43eaccc4.svg",
+      "sourcePath": "assets/Nerd face/Color/nerd_face_color.svg",
+      "gitBlob": "1294f41d42af1a21fa7e6eabd49fc4b76448d044",
+      "sha256": "3dac43eaccc4e4c59ee5d8373e5f8aaeb5c8ca415eb1d78091a200569ac0229d"
+    },
+    {
+      "id": "nest-with-eggs",
+      "name": "Nest with eggs",
+      "category": "Animals & Nature",
+      "keywords": ["nest with eggs", "nesting"],
+      "url": "/stickers/nest-with-eggs-b18ddf36c23e.svg",
+      "sourcePath": "assets/Nest with eggs/Color/nest_with_eggs_color.svg",
+      "gitBlob": "aace813f8468dfd40178c43d02678e49c51c3012",
+      "sha256": "b18ddf36c23e0aa7d1328be040413ea6adb004de8df4d015f5a2edda629d6926"
+    },
+    {
+      "id": "nesting-dolls",
+      "name": "Nesting dolls",
+      "category": "Activities",
+      "keywords": ["doll", "nesting", "nesting dolls", "russia"],
+      "url": "/stickers/nesting-dolls-49b25d79331a.svg",
+      "sourcePath": "assets/Nesting dolls/Color/nesting_dolls_color.svg",
+      "gitBlob": "49144fbeece4319193d3649a531bcf902d68c56e",
+      "sha256": "49b25d79331a881c0359c7d50f20e433c7ac6fe355e0cbea55729a7c5c038278"
+    },
+    {
+      "id": "new-moon-face",
+      "name": "New moon face",
+      "category": "Travel & Places",
+      "keywords": ["face", "moon", "new moon face"],
+      "url": "/stickers/new-moon-face-9a97afe75ca4.svg",
+      "sourcePath": "assets/New moon face/Color/new_moon_face_color.svg",
+      "gitBlob": "132da272bf923abe23d9e80cac208bc8d62d01b4",
+      "sha256": "9a97afe75ca4ba4ef61c0838b06fabc28e28737e353a0c35a8f03a150662889f"
+    },
+    {
+      "id": "newspaper",
+      "name": "Newspaper",
+      "category": "Objects",
+      "keywords": ["news", "newspaper", "paper"],
+      "url": "/stickers/newspaper-f43efc2afc9c.svg",
+      "sourcePath": "assets/Newspaper/Color/newspaper_color.svg",
+      "gitBlob": "eab22d06a990f61c14f4c21e31965ece46856c8b",
+      "sha256": "f43efc2afc9c9b8d10781f31349afe1b570e9996487aa018a2e2186c8a2237d5"
+    },
+    {
+      "id": "no-bicycles",
+      "name": "No bicycles",
+      "category": "Symbols",
+      "keywords": ["bicycle", "bike", "forbidden", "no", "no bicycles", "prohibited"],
+      "url": "/stickers/no-bicycles-b046636548c5.svg",
+      "sourcePath": "assets/No bicycles/Color/no_bicycles_color.svg",
+      "gitBlob": "8082592bf439aafe0e2697de73c56c6237db311e",
+      "sha256": "b046636548c5b2d95a3fb3186ce4a6407a9f1b872586391d9d2fa9543af89592"
+    },
+    {
+      "id": "no-one-under-eighteen",
+      "name": "No one under eighteen",
+      "category": "Symbols",
+      "keywords": [
+        "18",
+        "age restriction",
+        "eighteen",
+        "no one under eighteen",
+        "prohibited",
+        "underage"
+      ],
+      "url": "/stickers/no-one-under-eighteen-5fa03a285557.svg",
+      "sourcePath": "assets/No one under eighteen/Color/no_one_under_eighteen_color.svg",
+      "gitBlob": "e687404b12565cff1964193e0bc504400a781737",
+      "sha256": "5fa03a285557f5042c56916bbb093f3c65bac92b7d43680cde085278a4830d5f"
+    },
+    {
+      "id": "non-potable-water",
+      "name": "Non-potable water",
+      "category": "Symbols",
+      "keywords": ["non-drinking", "non-potable", "water"],
+      "url": "/stickers/non-potable-water-75846fe21c80.svg",
+      "sourcePath": "assets/Non-potable water/Color/non-potable_water_color.svg",
+      "gitBlob": "4de8ad7149ecb889cc61ac253ea7aa1fa0046311",
+      "sha256": "75846fe21c80f1336d3d37c52647858b1b92b4f684a86dc427ccb0ddf607a632"
+    },
+    {
+      "id": "nose",
+      "name": "Nose",
+      "category": "People & Body",
+      "keywords": ["body", "nose"],
+      "url": "/stickers/nose-c84f1e662e6a.svg",
+      "sourcePath": "assets/Nose/Default/Color/nose_color_default.svg",
+      "gitBlob": "66e8312588c6b09febc99112381e954f57c01b2c",
+      "sha256": "c84f1e662e6a4027c90cd1a0dcb503032460b2d8f83cfee374c6bb5911ea82e6"
+    },
+    {
+      "id": "notebook",
+      "name": "Notebook",
+      "category": "Objects",
+      "keywords": ["notebook"],
+      "url": "/stickers/notebook-f56d3ca31e21.svg",
+      "sourcePath": "assets/Notebook/Color/notebook_color.svg",
+      "gitBlob": "540c2bc6aa48b1adb8af7832ce2553b00c04d3e8",
+      "sha256": "f56d3ca31e21980139f5f7fbed96b2f8506147f84a8b8fedb8501afe47161bd1"
+    },
+    {
+      "id": "ok-button",
+      "name": "Ok button",
+      "category": "Symbols",
+      "keywords": ["OK", "OK button"],
+      "url": "/stickers/ok-button-7c76ed78c745.svg",
+      "sourcePath": "assets/Ok button/Color/ok_button_color.svg",
+      "gitBlob": "834cd4f4746e5d1322952c798f1e1b38af0377ae",
+      "sha256": "7c76ed78c7452e1c6e754220eb1b0a45a78cde7fc066c499913edfb8fb22d56d"
+    },
+    {
+      "id": "old-woman",
+      "name": "Old woman",
+      "category": "People & Body",
+      "keywords": ["adult", "old", "woman"],
+      "url": "/stickers/old-woman-b5cd8bcfea1d.svg",
+      "sourcePath": "assets/Old woman/Default/Color/old_woman_color_default.svg",
+      "gitBlob": "9be0f4083d75501f13c020c841de0de8c40f9ec8",
+      "sha256": "b5cd8bcfea1d962fafe4d3e0b568728c0e9d2d9db4d834ac60bf26f90a931ca6"
+    },
+    {
+      "id": "olive",
+      "name": "Olive",
+      "category": "Food & Drink",
+      "keywords": ["food", "olive"],
+      "url": "/stickers/olive-c4368029af09.svg",
+      "sourcePath": "assets/Olive/Color/olive_color.svg",
+      "gitBlob": "4ea2d73cb904eb0e5dd9eff4e557e0ca5dcc3f50",
+      "sha256": "c4368029af09261e259ea1a515310af8bf96f6b6807ceeac945847c57d4c5e56"
+    },
+    {
+      "id": "oncoming-automobile",
+      "name": "Oncoming automobile",
+      "category": "Travel & Places",
+      "keywords": ["automobile", "car", "oncoming"],
+      "url": "/stickers/oncoming-automobile-0e191b1bfcd9.svg",
+      "sourcePath": "assets/Oncoming automobile/Color/oncoming_automobile_color.svg",
+      "gitBlob": "94133aa6bb27ca7bad60068757cb8b39630f4076",
+      "sha256": "0e191b1bfcd92b064c588b1b146cc9c38ff54bdf6155252e092a601cfac52330"
+    },
+    {
+      "id": "oncoming-police-car",
+      "name": "Oncoming police car",
+      "category": "Travel & Places",
+      "keywords": ["car", "oncoming", "police"],
+      "url": "/stickers/oncoming-police-car-a00204916808.svg",
+      "sourcePath": "assets/Oncoming police car/Color/oncoming_police_car_color.svg",
+      "gitBlob": "e50f075b8dba1883c048190b5415c0514cffac65",
+      "sha256": "a002049168089853c2a687c0693c7615050ab353257b11e0e011f547427026b4"
+    },
+    {
+      "id": "one-oclock",
+      "name": "One oclock",
+      "category": "Travel & Places",
+      "keywords": ["00", "1", "1:00", "clock", "o\u2019clock", "one"],
+      "url": "/stickers/one-oclock-7b829ac90bac.svg",
+      "sourcePath": "assets/One oclock/Color/one_oclock_color.svg",
+      "gitBlob": "179df57a00547a0ede97bba1641b20caefb70226",
+      "sha256": "7b829ac90bac53a959f00d3310c1e7cbcd584033f59ea315e1f32e192f9f5ae8"
+    },
+    {
+      "id": "open-book",
+      "name": "Open book",
+      "category": "Objects",
+      "keywords": ["book", "open"],
+      "url": "/stickers/open-book-ddd214b2383b.svg",
+      "sourcePath": "assets/Open book/Color/open_book_color.svg",
+      "gitBlob": "94772bced66b212beab78be5e2f2b549078603ed",
+      "sha256": "ddd214b2383ba8206a8519003fbb8b345eb2a1a77ae860e732b11daa76776582"
+    },
+    {
+      "id": "open-mailbox-with-raised-flag",
+      "name": "Open mailbox with raised flag",
+      "category": "Objects",
+      "keywords": ["mail", "mailbox", "open", "open mailbox with raised flag", "postbox"],
+      "url": "/stickers/open-mailbox-with-raised-flag-b4acd57d3af6.svg",
+      "sourcePath": "assets/Open mailbox with raised flag/Color/open_mailbox_with_raised_flag_color.svg",
+      "gitBlob": "14293ef377a3cf5340a31f630ae2f151c8e8dc72",
+      "sha256": "b4acd57d3af6437c7cea39c2c28cfd64b9a8cde85fbdc4d0137faf522855ff6f"
+    },
+    {
+      "id": "orange-circle",
+      "name": "Orange circle",
+      "category": "Symbols",
+      "keywords": ["circle", "orange"],
+      "url": "/stickers/orange-circle-8623bf6fbd72.svg",
+      "sourcePath": "assets/Orange circle/Color/orange_circle_color.svg",
+      "gitBlob": "5b8a11a3a42589aea24639691350a6d7336a71b7",
+      "sha256": "8623bf6fbd728ec9d5d25df1f8dbaf63f13693fb9127a2b72cf5790fdb21560a"
+    },
+    {
+      "id": "orange-square",
+      "name": "Orange square",
+      "category": "Symbols",
+      "keywords": ["orange", "square"],
+      "url": "/stickers/orange-square-78fd9cc2824e.svg",
+      "sourcePath": "assets/Orange square/Color/orange_square_color.svg",
+      "gitBlob": "8d871c9f524bb768a8b48903d162da130b1d36a4",
+      "sha256": "78fd9cc2824ec8021823640d3e39a7713467068f1a159e3f3bebeadd04ca024b"
+    },
+    {
+      "id": "orangutan",
+      "name": "Orangutan",
+      "category": "Animals & Nature",
+      "keywords": ["ape", "orangutan"],
+      "url": "/stickers/orangutan-9bd291ebd818.svg",
+      "sourcePath": "assets/Orangutan/Color/orangutan_color.svg",
+      "gitBlob": "db64a0853ec783302d576f44f96d49f2be605253",
+      "sha256": "9bd291ebd81882cf5c15849c7fcfd610970eab4beb04ab4574b3a4410785bc8c"
+    },
+    {
+      "id": "ox",
+      "name": "Ox",
+      "category": "Animals & Nature",
+      "keywords": ["bull", "ox", "Taurus", "zodiac"],
+      "url": "/stickers/ox-01848a2cc586.svg",
+      "sourcePath": "assets/Ox/Color/ox_color.svg",
+      "gitBlob": "18eec7cf4dd0d711090f5754f1eb9b188cfba7c3",
+      "sha256": "01848a2cc5865eb03a2737c1289a2cffc944a3144278a9ed2adc0a9004243137"
+    },
+    {
+      "id": "page-with-curl",
+      "name": "Page with curl",
+      "category": "Objects",
+      "keywords": ["curl", "document", "page", "page with curl"],
+      "url": "/stickers/page-with-curl-8b503012610b.svg",
+      "sourcePath": "assets/Page with curl/Color/page_with_curl_color.svg",
+      "gitBlob": "d7824367470ed85c97bf819cdd1569b883b20574",
+      "sha256": "8b503012610b9510f8c6e4f416acb26d25b2b8b45345e2137546ce54716468e2"
+    },
+    {
+      "id": "pager",
+      "name": "Pager",
+      "category": "Objects",
+      "keywords": ["pager"],
+      "url": "/stickers/pager-a5f602c4a733.svg",
+      "sourcePath": "assets/Pager/Color/pager_color.svg",
+      "gitBlob": "8afd1fc5b6d60e1ef87817a00abb8c229d66b3b7",
+      "sha256": "a5f602c4a7337406058f1ece0c97f654c4de0dcafe15bfb3014e21d57ad1f08d"
+    },
+    {
+      "id": "paintbrush",
+      "name": "Paintbrush",
+      "category": "Objects",
+      "keywords": ["paintbrush", "painting"],
+      "url": "/stickers/paintbrush-38c45f9c859b.svg",
+      "sourcePath": "assets/Paintbrush/Color/paintbrush_color.svg",
+      "gitBlob": "1af9537a15b475874ef644f9efa623f8bdb93c23",
+      "sha256": "38c45f9c859ba89ceb840fc759180c2287d6874daea98858f12200981b660ec2"
+    },
+    {
+      "id": "parrot",
+      "name": "Parrot",
+      "category": "Animals & Nature",
+      "keywords": ["bird", "parrot", "pirate", "talk"],
+      "url": "/stickers/parrot-b2bf0a205842.svg",
+      "sourcePath": "assets/Parrot/Color/parrot_color.svg",
+      "gitBlob": "5fc4da265c9a887bd3b7f08ab763532ccc6a4ecd",
+      "sha256": "b2bf0a205842bd582b8d0556ac8fcddb75c9cdd820544dad24972478a4ee5f7e"
+    },
+    {
+      "id": "peach",
+      "name": "Peach",
+      "category": "Food & Drink",
+      "keywords": ["fruit", "peach"],
+      "url": "/stickers/peach-f1610c2f7d78.svg",
+      "sourcePath": "assets/Peach/Color/peach_color.svg",
+      "gitBlob": "b3976bfee78940ef83c20a24988eaad95438fe8d",
+      "sha256": "f1610c2f7d785cbf83a3d6f20aba1f60f7ec73c094fed478b71cad27ba74ef8b"
+    },
+    {
+      "id": "performing-arts",
+      "name": "Performing arts",
+      "category": "Activities",
+      "keywords": ["art", "mask", "performing", "performing arts", "theater", "theatre"],
+      "url": "/stickers/performing-arts-c260d0da4c28.svg",
+      "sourcePath": "assets/Performing arts/Color/performing_arts_color.svg",
+      "gitBlob": "1486b04f5563bae2941a1f8204a5254f28641315",
+      "sha256": "c260d0da4c28d7e04522a34815b54f934fd63371ecc60dd2f6760cb9980011b6"
+    },
+    {
+      "id": "person-blonde-hair",
+      "name": "Person blonde hair",
+      "category": "People & Body",
+      "keywords": ["blond", "blond-haired person", "hair", "person: blond hair"],
+      "url": "/stickers/person-blonde-hair-7bbb914cf250.svg",
+      "sourcePath": "assets/Person blonde hair/Default/Color/person_blonde_hair_color_default.svg",
+      "gitBlob": "302da5f9e0dbb5487afdefbb267804c325b2863f",
+      "sha256": "7bbb914cf250adb801e51f961b19ec5847c91540baf82c320beaf8af178e2f2d"
+    },
+    {
+      "id": "person-raising-hand",
+      "name": "Person raising hand",
+      "category": "People & Body",
+      "keywords": ["gesture", "hand", "happy", "person raising hand", "raised"],
+      "url": "/stickers/person-raising-hand-c8726c368dab.svg",
+      "sourcePath": "assets/Person raising hand/Default/Color/person_raising_hand_color_default.svg",
+      "gitBlob": "30b7e08ef1eb1bf79f8add0099d7162883a14544",
+      "sha256": "c8726c368dab6e4aaef9e2996cb05cb967fd9f1e8a0a08d9794db6825c914f12"
+    },
+    {
+      "id": "person-shrugging",
+      "name": "Person shrugging",
+      "category": "People & Body",
+      "keywords": ["doubt", "ignorance", "indifference", "person shrugging", "shrug"],
+      "url": "/stickers/person-shrugging-9fafae790ba5.svg",
+      "sourcePath": "assets/Person shrugging/Default/Color/person_shrugging_color_default.svg",
+      "gitBlob": "c45949124a9f3d22ad30b198e0bbdb3992f67a84",
+      "sha256": "9fafae790ba530d270955ce714b5ab531262b7356c27a2033e40de674fca9379"
+    },
+    {
+      "id": "person-standing",
+      "name": "Person standing",
+      "category": "People & Body",
+      "keywords": ["person standing", "stand", "standing"],
+      "url": "/stickers/person-standing-de84fb7826ed.svg",
+      "sourcePath": "assets/Person standing/Default/Color/person_standing_color_default.svg",
+      "gitBlob": "facf995956d132b55bded179117abb6ce891b827",
+      "sha256": "de84fb7826ed858b5b54d475646ad549a0307b6773faf9e80ac8dbb3c97ad131"
+    },
+    {
+      "id": "person-superhero",
+      "name": "Person superhero",
+      "category": "People & Body",
+      "keywords": ["good", "hero", "heroine", "superhero", "superpower"],
+      "url": "/stickers/person-superhero-38769a74136b.svg",
+      "sourcePath": "assets/Person superhero/Default/Color/person_superhero_color_default.svg",
+      "gitBlob": "2a60c505788206d4e4d959b33f87e228124cb53a",
+      "sha256": "38769a74136ba28853e3ab3e8ddb623ebeffb6771081ab86c2beded1ccd29c67"
+    },
+    {
+      "id": "person-tipping-hand",
+      "name": "Person tipping hand",
+      "category": "People & Body",
+      "keywords": ["hand", "help", "information", "person tipping hand", "sassy", "tipping"],
+      "url": "/stickers/person-tipping-hand-5be1df336f7b.svg",
+      "sourcePath": "assets/Person tipping hand/Default/Color/person_tipping_hand_color_default.svg",
+      "gitBlob": "5d1006f46767f39772d494d54d299a8e8496cbc9",
+      "sha256": "5be1df336f7b3ca4ccd1ee9419331bc22aecd383e346b0022b82a96b95dd5fc7"
+    },
+    {
+      "id": "person-white-hair",
+      "name": "Person white hair",
+      "category": "People & Body",
+      "keywords": ["adult", "gender-neutral", "person", "unspecified gender", "white hair"],
+      "url": "/stickers/person-white-hair-d1c787891159.svg",
+      "sourcePath": "assets/Person white hair/Default/Color/person_white_hair_color_default.svg",
+      "gitBlob": "ae2c7c573f8d6c4434c21187ec68c1ba680e34b5",
+      "sha256": "d1c78789115953b6f15d2488777fdda74a591b976a3e02def7953d042e01c28a"
+    },
+    {
+      "id": "person-with-skullcap",
+      "name": "Person with skullcap",
+      "category": "People & Body",
+      "keywords": ["cap", "gua pi mao", "hat", "person", "person with skullcap", "skullcap"],
+      "url": "/stickers/person-with-skullcap-f0f608de5d14.svg",
+      "sourcePath": "assets/Person with skullcap/Default/Color/person_with_skullcap_color_default.svg",
+      "gitBlob": "dc85b9208a06905cd991bae8861569dea6920071",
+      "sha256": "f0f608de5d14bafbb9b57dedc6eb7a1639a2c50434906fc2aeefb9d58805ed05"
+    },
+    {
+      "id": "person-with-white-cane",
+      "name": "Person with white cane",
+      "category": "People & Body",
+      "keywords": ["accessibility", "blind", "person with white cane"],
+      "url": "/stickers/person-with-white-cane-ca23e6093b56.svg",
+      "sourcePath": "assets/Person with white cane/Default/Color/person_with_white_cane_color_default.svg",
+      "gitBlob": "2b71685f55396081cc32204021933f290a7d46ed",
+      "sha256": "ca23e6093b56b305ab7d32717cf3742d217d50f77f61eac720bed1f46f085064"
+    },
+    {
+      "id": "person-zombie",
+      "name": "Person zombie",
+      "category": "People & Body",
+      "keywords": ["undead", "walking dead", "zombie"],
+      "url": "/stickers/person-zombie-046091fbaf06.svg",
+      "sourcePath": "assets/Person zombie/Color/person_zombie_color.svg",
+      "gitBlob": "a1c7672de9584e8fc8189d81257222b88a80f4f6",
+      "sha256": "046091fbaf060f3487570886189cd14117abf8931635c2dcc79eaf3fc8290fba"
+    },
+    {
+      "id": "pie",
+      "name": "Pie",
+      "category": "Food & Drink",
+      "keywords": ["filling", "pastry", "pie"],
+      "url": "/stickers/pie-e98a491f50ea.svg",
+      "sourcePath": "assets/Pie/Color/pie_color.svg",
+      "gitBlob": "de08cf95e0adb753c9f7e622ef38884d3ba26c1e",
+      "sha256": "e98a491f50eadfce582a94c9d0e9522f2aba2b8538d33e8cdaa390981326e4a4"
+    },
+    {
+      "id": "pig-face",
+      "name": "Pig face",
+      "category": "Animals & Nature",
+      "keywords": ["face", "pig"],
+      "url": "/stickers/pig-face-0950c0b5323c.svg",
+      "sourcePath": "assets/Pig face/Color/pig_face_color.svg",
+      "gitBlob": "daab14874feb4183b69c1d4310a678c416b6b692",
+      "sha256": "0950c0b5323c00a848f2047c086aa4fed960367d8e1205fd6ec23e7797f609ff"
+    },
+    {
+      "id": "pile-of-poo",
+      "name": "Pile of poo",
+      "category": "Smileys & Emotion",
+      "keywords": ["dung", "face", "monster", "pile of poo", "poo", "poop"],
+      "url": "/stickers/pile-of-poo-fe0d4e5c2bd0.svg",
+      "sourcePath": "assets/Pile of poo/Color/pile_of_poo_color.svg",
+      "gitBlob": "f0370bbe983bbe347d12f512cb6d93c72aae7c70",
+      "sha256": "fe0d4e5c2bd08ad9eb2ff734fb70973d5d2db5ac25b0fd61bd2c3f2cbe53ed84"
+    },
+    {
+      "id": "pisces",
+      "name": "Pisces",
+      "category": "Symbols",
+      "keywords": ["fish", "Pisces", "zodiac"],
+      "url": "/stickers/pisces-4b0db583fb23.svg",
+      "sourcePath": "assets/Pisces/Color/pisces_color.svg",
+      "gitBlob": "11d237602464f399547f46447d479f7cd79019a5",
+      "sha256": "4b0db583fb23530282f93a48f4469046028bf4f38e04e232a9a844dd83422ca2"
+    },
+    {
+      "id": "pi-ata",
+      "name": "Pi\u00f1ata",
+      "category": "Activities",
+      "keywords": ["celebration", "party", "pi\u00f1ata"],
+      "url": "/stickers/pi-ata-9bf878ff180e.svg",
+      "sourcePath": "assets/Pi\u00f1ata/Color/pi\u00f1ata_color.svg",
+      "gitBlob": "34ccb6651cc67b823a0130805010d33334a73277",
+      "sha256": "9bf878ff180e456c2027e1fc35bc62902df0f98fb865564da58b3b5b09035155"
+    },
+    {
+      "id": "polar-bear",
+      "name": "Polar bear",
+      "category": "Animals & Nature",
+      "keywords": ["arctic", "bear", "polar bear", "white"],
+      "url": "/stickers/polar-bear-7caa582d079b.svg",
+      "sourcePath": "assets/Polar bear/Color/polar_bear_color.svg",
+      "gitBlob": "d3d4990aefaa8aa0fd178f9ca8183f0264a8a7a8",
+      "sha256": "7caa582d079bde505c72ecca0c7066fa99eac7450c3512e7d25c03d4ca8d8ed5"
+    },
+    {
+      "id": "police-car-light",
+      "name": "Police car light",
+      "category": "Travel & Places",
+      "keywords": ["beacon", "car", "light", "police", "revolving"],
+      "url": "/stickers/police-car-light-48c8ea0c1ab5.svg",
+      "sourcePath": "assets/Police car light/Color/police_car_light_color.svg",
+      "gitBlob": "5f2404e31b1ba2f1517f69a6934342354db18c08",
+      "sha256": "48c8ea0c1ab58c0851c09dedaa02f6670184d30c10ab705bc3672733794f0d36"
+    },
+    {
+      "id": "poodle",
+      "name": "Poodle",
+      "category": "Animals & Nature",
+      "keywords": ["dog", "poodle"],
+      "url": "/stickers/poodle-047b077c45ab.svg",
+      "sourcePath": "assets/Poodle/Color/poodle_color.svg",
+      "gitBlob": "15513161a2c6db38bcd358c0ad4326ecb4e382fe",
+      "sha256": "047b077c45abc8cb5de53cc82267de88dbc9300a72de2d66d3d392ebaf692833"
+    },
+    {
+      "id": "pool-8-ball",
+      "name": "Pool 8 ball",
+      "category": "Activities",
+      "keywords": ["8", "ball", "billiard", "eight", "game", "pool 8 ball"],
+      "url": "/stickers/pool-8-ball-5ed979b0cb29.svg",
+      "sourcePath": "assets/Pool 8 ball/Color/pool_8_ball_color.svg",
+      "gitBlob": "d495f7b2f0093d91356f6698207ff0f95150b897",
+      "sha256": "5ed979b0cb291d07528b123b972b43b70f98948490fcc243c555102536cd7c15"
+    },
+    {
+      "id": "pot-of-food",
+      "name": "Pot of food",
+      "category": "Food & Drink",
+      "keywords": ["pot", "pot of food", "stew"],
+      "url": "/stickers/pot-of-food-1cd6fc7c0615.svg",
+      "sourcePath": "assets/Pot of food/Color/pot_of_food_color.svg",
+      "gitBlob": "592121d5835017cba5129ccc0375f102baccbb78",
+      "sha256": "1cd6fc7c0615a1afd93d821a700730071a561420b24640691450217be8bb81c2"
+    },
+    {
+      "id": "potted-plant",
+      "name": "Potted plant",
+      "category": "Animals & Nature",
+      "keywords": ["boring", "grow", "house", "nurturing", "plant", "potted plant", "useless"],
+      "url": "/stickers/potted-plant-7c70a7674ebb.svg",
+      "sourcePath": "assets/Potted plant/Color/potted_plant_color.svg",
+      "gitBlob": "bfafaf27db93044d0125717d76cdb93889552786",
+      "sha256": "7c70a7674ebb2a47f7ab0b29be8e2669fcdfaca07576dbc3bddd07c501e055ce"
+    },
+    {
+      "id": "poultry-leg",
+      "name": "Poultry leg",
+      "category": "Food & Drink",
+      "keywords": ["bone", "chicken", "drumstick", "leg", "poultry"],
+      "url": "/stickers/poultry-leg-9d1f1c5da29d.svg",
+      "sourcePath": "assets/Poultry leg/Color/poultry_leg_color.svg",
+      "gitBlob": "10f12eed6d7eb889c65f721937b65a4a1c191591",
+      "sha256": "9d1f1c5da29d546b20cd7438f547ce0a4909d91e24766f9ebbdd022e27298c19"
+    },
+    {
+      "id": "pretzel",
+      "name": "Pretzel",
+      "category": "Food & Drink",
+      "keywords": ["pretzel", "twisted"],
+      "url": "/stickers/pretzel-6789b30566ca.svg",
+      "sourcePath": "assets/Pretzel/Color/pretzel_color.svg",
+      "gitBlob": "c796f026e9cb7319e22ee9941fbee5734e08cc8d",
+      "sha256": "6789b30566cad931e8b1aebfaf658a6e02597d3b22e7ec248b7a7431b61082f0"
+    },
+    {
+      "id": "prince",
+      "name": "Prince",
+      "category": "People & Body",
+      "keywords": ["prince"],
+      "url": "/stickers/prince-156fbee9f8a0.svg",
+      "sourcePath": "assets/Prince/Default/Color/prince_color_default.svg",
+      "gitBlob": "167910caa5df1e7de98535dec48fdd66dc2064f1",
+      "sha256": "156fbee9f8a081d0dcd47ae8f6cfa526a13e45a6d85481b383904152d0ded245"
+    },
+    {
+      "id": "printer",
+      "name": "Printer",
+      "category": "Objects",
+      "keywords": ["computer", "printer"],
+      "url": "/stickers/printer-ab61f8b20711.svg",
+      "sourcePath": "assets/Printer/Color/printer_color.svg",
+      "gitBlob": "3c588fd7a0df0d2b7397cea3d76f7d232b1a33c3",
+      "sha256": "ab61f8b207112bded1105095e0083db771596ec1f2fab92289b8adb91500e0eb"
+    },
+    {
+      "id": "purple-circle",
+      "name": "Purple circle",
+      "category": "Symbols",
+      "keywords": ["circle", "purple"],
+      "url": "/stickers/purple-circle-9b2fa8e53fb2.svg",
+      "sourcePath": "assets/Purple circle/Color/purple_circle_color.svg",
+      "gitBlob": "80588abad76e680e59126d2c8db3e19b472a9202",
+      "sha256": "9b2fa8e53fb2e16aaf1a08e45cefcca5c09e41c6818a0de73b60c71dd8bf10a4"
+    },
+    {
+      "id": "purse",
+      "name": "Purse",
+      "category": "Objects",
+      "keywords": ["clothing", "coin", "purse"],
+      "url": "/stickers/purse-6d48356b9f07.svg",
+      "sourcePath": "assets/Purse/Color/purse_color.svg",
+      "gitBlob": "88c9d82c7d0448bcd6f673af3e29c4e8d92d9d1f",
+      "sha256": "6d48356b9f07bf756d90c7459d260f1bb9c5a187c53501891d39edeb1b5b9989"
+    },
+    {
+      "id": "rabbit",
+      "name": "Rabbit",
+      "category": "Animals & Nature",
+      "keywords": ["bunny", "pet", "rabbit"],
+      "url": "/stickers/rabbit-1042369009c0.svg",
+      "sourcePath": "assets/Rabbit/Color/rabbit_color.svg",
+      "gitBlob": "f6aab5b711942da623e3e4c628986df9d597d9f9",
+      "sha256": "1042369009c0720d236b6f056478661cb47ca5aa17444c093e974b266eca9ff2"
+    },
+    {
+      "id": "raccoon",
+      "name": "Raccoon",
+      "category": "Animals & Nature",
+      "keywords": ["curious", "raccoon", "sly"],
+      "url": "/stickers/raccoon-2fa0886f1737.svg",
+      "sourcePath": "assets/Raccoon/Color/raccoon_color.svg",
+      "gitBlob": "a6264f56549e162968616129406bd3346ad0ea9c",
+      "sha256": "2fa0886f1737ba6b3841ebee5440dc4955485b1012e33207ed1709bbfe1e4a75"
+    },
+    {
+      "id": "racing-car",
+      "name": "Racing car",
+      "category": "Travel & Places",
+      "keywords": ["car", "racing"],
+      "url": "/stickers/racing-car-7fbb8637f70c.svg",
+      "sourcePath": "assets/Racing car/Color/racing_car_color.svg",
+      "gitBlob": "9b82c062d05b239ef77783925424fcc8bea391be",
+      "sha256": "7fbb8637f70c1e15bec15f389ed61df51b3bd0a0a593d534b75d00c5158c7fbf"
+    },
+    {
+      "id": "radio-button",
+      "name": "Radio button",
+      "category": "Symbols",
+      "keywords": ["button", "geometric", "radio"],
+      "url": "/stickers/radio-button-de3c13f7afda.svg",
+      "sourcePath": "assets/Radio button/Color/radio_button_color.svg",
+      "gitBlob": "d73e8da61e1f1233181b22a6f3bad303b3e2987d",
+      "sha256": "de3c13f7afda4361639833b004b450e926032cfe15fe52d1274b2f4d837efe2e"
+    },
+    {
+      "id": "red-apple",
+      "name": "Red apple",
+      "category": "Food & Drink",
+      "keywords": ["apple", "fruit", "red"],
+      "url": "/stickers/red-apple-af1f7c903040.svg",
+      "sourcePath": "assets/Red apple/Color/red_apple_color.svg",
+      "gitBlob": "9039c7b244ecb5f69f04d8147fbb5a3a593d0e96",
+      "sha256": "af1f7c90304096dfc6a05c1e2f25f6e3924ecba50f174c5537a42b4d45e47589"
+    },
+    {
+      "id": "red-exclamation-mark",
+      "name": "Red exclamation mark",
+      "category": "Symbols",
+      "keywords": ["!", "exclamation", "mark", "punctuation", "red exclamation mark"],
+      "url": "/stickers/red-exclamation-mark-e03690091cec.svg",
+      "sourcePath": "assets/Red exclamation mark/Color/red_exclamation_mark_color.svg",
+      "gitBlob": "ecaefd7cf30f762d31c74af80ee1899eaef3edac",
+      "sha256": "e03690091cec7679a54e01b55feada25f9f908e409e45b1cb25c8d5779b9083a"
+    },
+    {
+      "id": "red-paper-lantern",
+      "name": "Red paper lantern",
+      "category": "Objects",
+      "keywords": ["bar", "lantern", "light", "red", "red paper lantern"],
+      "url": "/stickers/red-paper-lantern-eff9f0bed276.svg",
+      "sourcePath": "assets/Red paper lantern/Color/red_paper_lantern_color.svg",
+      "gitBlob": "bf841175e6b17fee2cf35b7047064b535ae84d61",
+      "sha256": "eff9f0bed276d36d2dd223fd09f95b061bae22899237d488154a0aaeda22e01e"
+    },
+    {
+      "id": "red-question-mark",
+      "name": "Red question mark",
+      "category": "Symbols",
+      "keywords": ["?", "mark", "punctuation", "question", "red question mark"],
+      "url": "/stickers/red-question-mark-aa59f7cfe293.svg",
+      "sourcePath": "assets/Red question mark/Color/red_question_mark_color.svg",
+      "gitBlob": "ee1391c421b1b303ec006e604f0c31b872173a2f",
+      "sha256": "aa59f7cfe293f597d87046d97709d5554c66a0f8314b14222143b16d20ad8264"
+    },
+    {
+      "id": "registered",
+      "name": "Registered",
+      "category": "Symbols",
+      "keywords": ["r", "registered"],
+      "url": "/stickers/registered-33ccc7f6fdc3.svg",
+      "sourcePath": "assets/Registered/Color/registered_color.svg",
+      "gitBlob": "fab72525c0c7a2667c8ebc4791ccde7696991c3a",
+      "sha256": "33ccc7f6fdc33b40bbf1824061cf8907258f1fb031e0e45209c7c87055f3c22d"
+    },
+    {
+      "id": "rhinoceros",
+      "name": "Rhinoceros",
+      "category": "Animals & Nature",
+      "keywords": ["rhinoceros"],
+      "url": "/stickers/rhinoceros-9ad272daa997.svg",
+      "sourcePath": "assets/Rhinoceros/Color/rhinoceros_color.svg",
+      "gitBlob": "de48f1420d006644caa20596a54a69aa3c6fb263",
+      "sha256": "9ad272daa9973b559001817ea62d912e2045a6531f06dc56ad603b10d25f6d25"
+    },
+    {
+      "id": "rice-cracker",
+      "name": "Rice cracker",
+      "category": "Food & Drink",
+      "keywords": ["cracker", "rice"],
+      "url": "/stickers/rice-cracker-b4ec31fee2a0.svg",
+      "sourcePath": "assets/Rice cracker/Color/rice_cracker_color.svg",
+      "gitBlob": "287984e356c46670fbe5dc20764c9d2b1b079977",
+      "sha256": "b4ec31fee2a0ae10fa2e3e2c50f2ed4693926329e9e6b0d87a484d5ff153df44"
+    },
+    {
+      "id": "right-anger-bubble",
+      "name": "Right anger bubble",
+      "category": "Smileys & Emotion",
+      "keywords": ["angry", "balloon", "bubble", "mad", "right anger bubble"],
+      "url": "/stickers/right-anger-bubble-1d5441c02554.svg",
+      "sourcePath": "assets/Right anger bubble/Color/right_anger_bubble_color.svg",
+      "gitBlob": "41497a255ab44eb67e154046efea41a09f9c285e",
+      "sha256": "1d5441c0255482d643253daf688f877058616dc54d06e862d0ffd2cfc29f6c1e"
+    },
+    {
+      "id": "right-arrow",
+      "name": "Right arrow",
+      "category": "Symbols",
+      "keywords": ["arrow", "cardinal", "direction", "east", "right arrow"],
+      "url": "/stickers/right-arrow-9c9cb1ea4979.svg",
+      "sourcePath": "assets/Right arrow/Color/right_arrow_color.svg",
+      "gitBlob": "e8bc5eb220cbc54909e0f606a174e200486fd40f",
+      "sha256": "9c9cb1ea4979a1187245be8a6fa3184a2865918aacbb01cc69cf9dc32a75a9cf"
+    },
+    {
+      "id": "roasted-sweet-potato",
+      "name": "Roasted sweet potato",
+      "category": "Food & Drink",
+      "keywords": ["potato", "roasted", "sweet"],
+      "url": "/stickers/roasted-sweet-potato-49cd6056fdff.svg",
+      "sourcePath": "assets/Roasted sweet potato/Color/roasted_sweet_potato_color.svg",
+      "gitBlob": "a49a658331c095b59f8d4ae7852922ea409ac6f7",
+      "sha256": "49cd6056fdff6e85375281f0dceb1c8c3ebd540a40c2d4b582b7347110e1b093"
+    },
+    {
+      "id": "robot",
+      "name": "Robot",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "monster", "robot"],
+      "url": "/stickers/robot-cf39296b50cd.svg",
+      "sourcePath": "assets/Robot/Color/robot_color.svg",
+      "gitBlob": "4dc0fc72e84eb1ac6ff4df905b85a317e1bf5f4d",
+      "sha256": "cf39296b50cd9acee64e1c415dc0a0f6552818e00ff65a316b64c66f8aab0027"
+    },
+    {
+      "id": "safety-pin",
+      "name": "Safety pin",
+      "category": "Objects",
+      "keywords": ["diaper", "punk rock", "safety pin"],
+      "url": "/stickers/safety-pin-ce8654ee5632.svg",
+      "sourcePath": "assets/Safety pin/Color/safety_pin_color.svg",
+      "gitBlob": "a0f86a12e75f9d4e525e69c74c748f5e0c130b19",
+      "sha256": "ce8654ee5632b8515a5a46221299ad74df09c48fea246665e1ad6ed5ae4b24b4"
+    },
+    {
+      "id": "salt",
+      "name": "Salt",
+      "category": "Food & Drink",
+      "keywords": ["condiment", "salt", "shaker"],
+      "url": "/stickers/salt-b0fbe0c05a07.svg",
+      "sourcePath": "assets/Salt/Color/salt_color.svg",
+      "gitBlob": "09a8a33f0719d9ffab2713146e73012537ff1132",
+      "sha256": "b0fbe0c05a07bf19c7e7e3827a056a3d930df0cb5bc6a0ebd54ce89e469b843c"
+    },
+    {
+      "id": "saluting-face",
+      "name": "Saluting face",
+      "category": "Smileys & Emotion",
+      "keywords": ["OK", "salute", "saluting face", "sunny", "troops", "yes"],
+      "url": "/stickers/saluting-face-1bd18b19535c.svg",
+      "sourcePath": "assets/Saluting face/Color/saluting_face_color.svg",
+      "gitBlob": "092f593ef0ba578bbd356ff6d3bcc965a3501372",
+      "sha256": "1bd18b19535c8dbabf6f9a437c275f938803ea020430c237ca16a1ae86f98e13"
+    },
+    {
+      "id": "sauropod",
+      "name": "Sauropod",
+      "category": "Animals & Nature",
+      "keywords": ["brachiosaurus", "brontosaurus", "diplodocus", "sauropod"],
+      "url": "/stickers/sauropod-d9a629e68a49.svg",
+      "sourcePath": "assets/Sauropod/Color/sauropod_color.svg",
+      "gitBlob": "a122bcbced6c31cf3e5a3ce96af2f0f34aeca654",
+      "sha256": "d9a629e68a49c2e5cc280137d7bcaf40e75887feceec73b6ce23354d70ef4f17"
+    },
+    {
+      "id": "scientist",
+      "name": "Scientist",
+      "category": "People & Body",
+      "keywords": ["biologist", "chemist", "engineer", "physicist", "scientist"],
+      "url": "/stickers/scientist-b150b07e31a0.svg",
+      "sourcePath": "assets/Scientist/Default/Color/scientist_color_default.svg",
+      "gitBlob": "be7eef9c79ad25e349b5172121cfea1feb2cde75",
+      "sha256": "b150b07e31a031b690b8be4dd29996f99d973d373d7424f5618bcaee25fae74b"
+    },
+    {
+      "id": "scissors",
+      "name": "Scissors",
+      "category": "Objects",
+      "keywords": ["cutting", "scissors", "tool"],
+      "url": "/stickers/scissors-7decedf83bc5.svg",
+      "sourcePath": "assets/Scissors/Color/scissors_color.svg",
+      "gitBlob": "80f32d5deae68c38c02265068cec9e81cf17f9d3",
+      "sha256": "7decedf83bc50348beeb9e177ca490199000c9b093dff0d131341ec07ca7c683"
+    },
+    {
+      "id": "scorpio",
+      "name": "Scorpio",
+      "category": "Symbols",
+      "keywords": ["Scorpio", "scorpion", "scorpius", "zodiac"],
+      "url": "/stickers/scorpio-f332980d8481.svg",
+      "sourcePath": "assets/Scorpio/Color/scorpio_color.svg",
+      "gitBlob": "440b9a71319a705fef4d38cff4aa03db4ca6549a",
+      "sha256": "f332980d8481f1570aec16a4bcaff15de716bf06169880de3f7d5c74410be435"
+    },
+    {
+      "id": "seedling",
+      "name": "Seedling",
+      "category": "Animals & Nature",
+      "keywords": ["seedling", "young"],
+      "url": "/stickers/seedling-0d45f7f42154.svg",
+      "sourcePath": "assets/Seedling/Color/seedling_color.svg",
+      "gitBlob": "a959b7408631165443736a9f1f2b9f30b44371b4",
+      "sha256": "0d45f7f42154c900500579fe1816dfd35776b7b5e843b15476c0b3f2dd7353ac"
+    },
+    {
+      "id": "service-dog",
+      "name": "Service dog",
+      "category": "Animals & Nature",
+      "keywords": ["accessibility", "assistance", "dog", "service"],
+      "url": "/stickers/service-dog-a8cf61596180.svg",
+      "sourcePath": "assets/Service dog/Color/service_dog_color.svg",
+      "gitBlob": "aa17fe7f1990258ccfd8fd5299018b35ff282bb0",
+      "sha256": "a8cf61596180f70130975ca9fd3607471c0d0877a0ecc38b04071e9136281942"
+    },
+    {
+      "id": "seven-oclock",
+      "name": "Seven oclock",
+      "category": "Travel & Places",
+      "keywords": ["00", "7", "7:00", "clock", "o\u2019clock", "seven"],
+      "url": "/stickers/seven-oclock-8bfbc31c311d.svg",
+      "sourcePath": "assets/Seven oclock/Color/seven_oclock_color.svg",
+      "gitBlob": "e2540a1c7df82f24c430f3b95bba56728c6376cd",
+      "sha256": "8bfbc31c311d2ec1744b1000d04037314411a78188b441c20d2dd4f604e674d2"
+    },
+    {
+      "id": "sewing-needle",
+      "name": "Sewing needle",
+      "category": "Activities",
+      "keywords": ["embroidery", "needle", "sewing", "stitches", "sutures", "tailoring"],
+      "url": "/stickers/sewing-needle-993d3c000f74.svg",
+      "sourcePath": "assets/Sewing needle/Color/sewing_needle_color.svg",
+      "gitBlob": "aab3db3beddbb733cff759d506beea30c003da1d",
+      "sha256": "993d3c000f745285f448fec2d68b1a1083d00ba0ffd78334543221ca73c2112f"
+    },
+    {
+      "id": "shallow-pan-of-food",
+      "name": "Shallow pan of food",
+      "category": "Food & Drink",
+      "keywords": ["casserole", "food", "paella", "pan", "shallow", "shallow pan of food"],
+      "url": "/stickers/shallow-pan-of-food-a5865ab7522d.svg",
+      "sourcePath": "assets/Shallow pan of food/Color/shallow_pan_of_food_color.svg",
+      "gitBlob": "e04d6c4a0e45d226618e9cc9772c9d53c02f042c",
+      "sha256": "a5865ab7522d0fafb8ea599436bec7c48b101be50125ebf4323c08c775a88cc2"
+    },
+    {
+      "id": "shark",
+      "name": "Shark",
+      "category": "Animals & Nature",
+      "keywords": ["fish", "shark"],
+      "url": "/stickers/shark-206007b60207.svg",
+      "sourcePath": "assets/Shark/Color/shark_color.svg",
+      "gitBlob": "494d3d40cb16a8d640c4a3e9f997b69beaf41534",
+      "sha256": "206007b6020764de2117fcd6c2c8186a518af31fc6d1a1c306f02eacba985b79"
+    },
+    {
+      "id": "shaved-ice",
+      "name": "Shaved ice",
+      "category": "Food & Drink",
+      "keywords": ["dessert", "ice", "shaved", "sweet"],
+      "url": "/stickers/shaved-ice-0c569ad16da6.svg",
+      "sourcePath": "assets/Shaved ice/Color/shaved_ice_color.svg",
+      "gitBlob": "64dfef8e05cf5bf113809a51c23f45781aaccc0f",
+      "sha256": "0c569ad16da6da67a4bcb3bada4e0a9d454cd0843df48a8d6ef047e855df01a2"
+    },
+    {
+      "id": "shower",
+      "name": "Shower",
+      "category": "Objects",
+      "keywords": ["shower", "water"],
+      "url": "/stickers/shower-5feb7baab432.svg",
+      "sourcePath": "assets/Shower/Color/shower_color.svg",
+      "gitBlob": "e2c1d5016e560df191a91b718dec14fb98ec7ced",
+      "sha256": "5feb7baab4328be4c5895fbf73e9be7049f41fa78ff5a761c1ba2793eaeefd99"
+    },
+    {
+      "id": "sign-of-the-horns",
+      "name": "Sign of the horns",
+      "category": "People & Body",
+      "keywords": ["finger", "hand", "horns", "rock-on", "sign of the horns"],
+      "url": "/stickers/sign-of-the-horns-52bac6fa04ac.svg",
+      "sourcePath": "assets/Sign of the horns/Default/Color/sign_of_the_horns_color_default.svg",
+      "gitBlob": "0c81b4f53fbdbac2cb35ece21fe889e1705b50fe",
+      "sha256": "52bac6fa04ac085602d79ff7a3512e8d5409ad1c3b1acbd515850f3a44b57528"
+    },
+    {
+      "id": "skis",
+      "name": "Skis",
+      "category": "Activities",
+      "keywords": ["ski", "skis", "snow"],
+      "url": "/stickers/skis-0355b0e00933.svg",
+      "sourcePath": "assets/Skis/Color/skis_color.svg",
+      "gitBlob": "f57a304446453fc02c2ea8cd95ede33cace18d17",
+      "sha256": "0355b0e00933ddcafe2e01c651c208b2f787c68a42539127df0ebd587abb179a"
+    },
+    {
+      "id": "skull",
+      "name": "Skull",
+      "category": "Smileys & Emotion",
+      "keywords": ["death", "face", "fairy tale", "monster", "skull"],
+      "url": "/stickers/skull-d6f300a6c94e.svg",
+      "sourcePath": "assets/Skull/Color/skull_color.svg",
+      "gitBlob": "e4c4d89d05d51be9fe43fac70a7eae7873e37d08",
+      "sha256": "d6f300a6c94e2d2e28d5c2a646743eb489b6ca5acd2e4ae633bacbd1ae3a7099"
+    },
+    {
+      "id": "sleepy-face",
+      "name": "Sleepy face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "sleep", "sleepy face"],
+      "url": "/stickers/sleepy-face-eebe37016275.svg",
+      "sourcePath": "assets/Sleepy face/Color/sleepy_face_color.svg",
+      "gitBlob": "b7ffb97c4215d7f9014568d66aa38577469973d5",
+      "sha256": "eebe37016275c70360d4058c37f2b4c36849b7eae8f2bf6800fb5ea1b5bed84f"
+    },
+    {
+      "id": "slightly-smiling-face",
+      "name": "Slightly smiling face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "slightly smiling face", "smile"],
+      "url": "/stickers/slightly-smiling-face-84a2e5f44fbc.svg",
+      "sourcePath": "assets/Slightly smiling face/Color/slightly_smiling_face_color.svg",
+      "gitBlob": "a946f059357e04f0877607c6ff6d5d8737e14c14",
+      "sha256": "84a2e5f44fbc57024a9ad98bc95324e930341cdad0f0538f9d4f1d2deb5be687"
+    },
+    {
+      "id": "slot-machine",
+      "name": "Slot machine",
+      "category": "Activities",
+      "keywords": ["game", "slot", "slot machine"],
+      "url": "/stickers/slot-machine-f9ec4145feda.svg",
+      "sourcePath": "assets/Slot machine/Color/slot_machine_color.svg",
+      "gitBlob": "d0035ed46348464638acff211782912609165054",
+      "sha256": "f9ec4145feda6af39f2e7c2167224e9f95a8bdfb392e08213c61e08f691e4f22"
+    },
+    {
+      "id": "sloth",
+      "name": "Sloth",
+      "category": "Animals & Nature",
+      "keywords": ["lazy", "sloth", "slow"],
+      "url": "/stickers/sloth-39f2a7687b86.svg",
+      "sourcePath": "assets/Sloth/Color/sloth_color.svg",
+      "gitBlob": "b1b3b544401698c8ad593ce19bf3ce0ec0218566",
+      "sha256": "39f2a7687b8612bc0407f6c1561106a6ea4a2613c8cf87a7544a8307f3fc46e5"
+    },
+    {
+      "id": "smiling-face",
+      "name": "Smiling face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "outlined", "relaxed", "smile", "smiling face"],
+      "url": "/stickers/smiling-face-63401b900ba2.svg",
+      "sourcePath": "assets/Smiling face/Color/smiling_face_color.svg",
+      "gitBlob": "f0e1bc79888ac1e05ce880e3696526edc63a127a",
+      "sha256": "63401b900ba20e29106c6862a0eb6185361d05d95dcfd0cf14b2ae9f6ad2b9c2"
+    },
+    {
+      "id": "smiling-face-with-hearts",
+      "name": "Smiling face with hearts",
+      "category": "Smileys & Emotion",
+      "keywords": ["adore", "crush", "hearts", "in love", "smiling face with hearts"],
+      "url": "/stickers/smiling-face-with-hearts-49dc70c6d0a1.svg",
+      "sourcePath": "assets/Smiling face with hearts/Color/smiling_face_with_hearts_color.svg",
+      "gitBlob": "d93e38a95c3e878cf77207e00263887fa18629eb",
+      "sha256": "49dc70c6d0a191e2fb4f6004c133924a1c98ec0c8e76fd569addd0e9b2f119d4"
+    },
+    {
+      "id": "smiling-face-with-tear",
+      "name": "Smiling face with tear",
+      "category": "Smileys & Emotion",
+      "keywords": [
+        "grateful",
+        "proud",
+        "relieved",
+        "smiling",
+        "smiling face with tear",
+        "tear",
+        "touched"
+      ],
+      "url": "/stickers/smiling-face-with-tear-ddc6917a2991.svg",
+      "sourcePath": "assets/Smiling face with tear/Color/smiling_face_with_tear_color.svg",
+      "gitBlob": "f4e46ee2e4a039fc619338e3c56a24832358d9cb",
+      "sha256": "ddc6917a299156fe6c3c81c192db43cfd03dae03d2d73c9cba564fbe4b75c8ed"
+    },
+    {
+      "id": "smirking-face",
+      "name": "Smirking face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "smirk", "smirking face"],
+      "url": "/stickers/smirking-face-27538b71daa2.svg",
+      "sourcePath": "assets/Smirking face/Color/smirking_face_color.svg",
+      "gitBlob": "691ad75d7069620c8a6414aeb745d16fa4948c4f",
+      "sha256": "27538b71daa2bb7f2d9d7af2cf1c651b3d09ea6d2e49e677942961b479e71b19"
+    },
+    {
+      "id": "snail",
+      "name": "Snail",
+      "category": "Animals & Nature",
+      "keywords": ["snail"],
+      "url": "/stickers/snail-f5abc8a8a9ea.svg",
+      "sourcePath": "assets/Snail/Color/snail_color.svg",
+      "gitBlob": "f9e79ae56cd5115aafdfc7608025d1010566b5df",
+      "sha256": "f5abc8a8a9ea3358bed1db7ac923568771a9c39e8aed75836761a53ec0fab383"
+    },
+    {
+      "id": "snowflake",
+      "name": "Snowflake",
+      "category": "Travel & Places",
+      "keywords": ["cold", "snow", "snowflake"],
+      "url": "/stickers/snowflake-b86eb1a6cdb7.svg",
+      "sourcePath": "assets/Snowflake/Color/snowflake_color.svg",
+      "gitBlob": "0ef50386a50073d62c0d8834b7e23fc0c315018c",
+      "sha256": "b86eb1a6cdb7e990a796402f67b784c11b4672662483d0b974f3f8284872faa2"
+    },
+    {
+      "id": "snowman-without-snow",
+      "name": "Snowman without snow",
+      "category": "Travel & Places",
+      "keywords": ["cold", "snow", "snowman", "snowman without snow"],
+      "url": "/stickers/snowman-without-snow-9c01159f9890.svg",
+      "sourcePath": "assets/Snowman without snow/Color/snowman_without_snow_color.svg",
+      "gitBlob": "c72d036341195ff98f54a78d220c59eb196fb6d2",
+      "sha256": "9c01159f98907333780838485554fe3ead739992dc138b656b9b3dd199d737c9"
+    },
+    {
+      "id": "soccer-ball",
+      "name": "Soccer ball",
+      "category": "Activities",
+      "keywords": ["ball", "football", "soccer"],
+      "url": "/stickers/soccer-ball-dfdf5a655881.svg",
+      "sourcePath": "assets/Soccer ball/Color/soccer_ball_color.svg",
+      "gitBlob": "b4b93b1a0650498ba586251da4d9b677dce592be",
+      "sha256": "dfdf5a6558816958563b6e47120beaf51d86b1ab580e41a68676febec4aca7c1"
+    },
+    {
+      "id": "softball",
+      "name": "Softball",
+      "category": "Activities",
+      "keywords": ["ball", "glove", "softball", "underarm"],
+      "url": "/stickers/softball-4bc6cef05025.svg",
+      "sourcePath": "assets/Softball/Color/softball_color.svg",
+      "gitBlob": "e7bab964c08f9eb95757621ba3f0fd5ffbe61d09",
+      "sha256": "4bc6cef050252bb653958bc3b3dabf39f6726c906c75f7945c7c6d0e5e499407"
+    },
+    {
+      "id": "sparkler",
+      "name": "Sparkler",
+      "category": "Activities",
+      "keywords": ["celebration", "fireworks", "sparkle", "sparkler"],
+      "url": "/stickers/sparkler-dfa28a7726d1.svg",
+      "sourcePath": "assets/Sparkler/Color/sparkler_color.svg",
+      "gitBlob": "21052f8193eb3c467fb3334f7fd6f6a0b5ca3eb6",
+      "sha256": "dfa28a7726d17cb171631e753f2a2392dbc404c21774d89904d5a9762773eca2"
+    },
+    {
+      "id": "sparkling-heart",
+      "name": "Sparkling heart",
+      "category": "Smileys & Emotion",
+      "keywords": ["excited", "sparkle", "sparkling heart"],
+      "url": "/stickers/sparkling-heart-2ba4932cecce.svg",
+      "sourcePath": "assets/Sparkling heart/Color/sparkling_heart_color.svg",
+      "gitBlob": "497bfaf457c811ab9d8eda480338a2bb3913fafa",
+      "sha256": "2ba4932cecce232393d566238d36171180c973f5088c3163d39185509e9a9eaa"
+    },
+    {
+      "id": "speak-no-evil-monkey",
+      "name": "Speak-no-evil monkey",
+      "category": "Smileys & Emotion",
+      "keywords": ["evil", "face", "forbidden", "monkey", "speak", "speak-no-evil monkey"],
+      "url": "/stickers/speak-no-evil-monkey-583dd07b0d72.svg",
+      "sourcePath": "assets/Speak-no-evil monkey/Color/speak-no-evil_monkey_color.svg",
+      "gitBlob": "7ff0d567d6e784752ed5c021efbe9bbea2a57480",
+      "sha256": "583dd07b0d72e4ac42b14162ff74acf3a3ace175e7bfa9320f7605886480e8aa"
+    },
+    {
+      "id": "speaker-low-volume",
+      "name": "Speaker low volume",
+      "category": "Objects",
+      "keywords": ["soft", "speaker low volume"],
+      "url": "/stickers/speaker-low-volume-79dc0e949886.svg",
+      "sourcePath": "assets/Speaker low volume/Color/speaker_low_volume_color.svg",
+      "gitBlob": "9fa52521c73963c2be4f5d487d39e20e334a5d48",
+      "sha256": "79dc0e949886e2739d61b559dc397c376a17ea7095fc81a3bc98f8688137c3b1"
+    },
+    {
+      "id": "speaker-medium-volume",
+      "name": "Speaker medium volume",
+      "category": "Objects",
+      "keywords": ["medium", "speaker medium volume"],
+      "url": "/stickers/speaker-medium-volume-d36c2e556153.svg",
+      "sourcePath": "assets/Speaker medium volume/Color/speaker_medium_volume_color.svg",
+      "gitBlob": "a2e745288fa43ef1b096c739379265a9ee90d525",
+      "sha256": "d36c2e55615396ee624676c1deaa9358da86fd2a7ef204e1737f165e5532e6ef"
+    },
+    {
+      "id": "speech-balloon",
+      "name": "Speech balloon",
+      "category": "Smileys & Emotion",
+      "keywords": ["balloon", "bubble", "comic", "dialog", "speech"],
+      "url": "/stickers/speech-balloon-3166b258bd24.svg",
+      "sourcePath": "assets/Speech balloon/Color/speech_balloon_color.svg",
+      "gitBlob": "947871ce56513df16f82f5ab7349aa9681a86758",
+      "sha256": "3166b258bd24468e8fff08c2bc8215d11f2b819f8ff6b2349b3ffddc9e6935e9"
+    },
+    {
+      "id": "speedboat",
+      "name": "Speedboat",
+      "category": "Travel & Places",
+      "keywords": ["boat", "speedboat"],
+      "url": "/stickers/speedboat-576b69f88682.svg",
+      "sourcePath": "assets/Speedboat/Color/speedboat_color.svg",
+      "gitBlob": "2aabb604d6846e38508b864f5a600191642aba78",
+      "sha256": "576b69f88682f4a3b6b4f5e89d5c19d1efbf951d28c3ab5e7c523314d91891a5"
+    },
+    {
+      "id": "spider",
+      "name": "Spider",
+      "category": "Animals & Nature",
+      "keywords": ["insect", "spider"],
+      "url": "/stickers/spider-bd9bd2f06fcb.svg",
+      "sourcePath": "assets/Spider/Color/spider_color.svg",
+      "gitBlob": "9a50d0813428f297501455fc9ee4852c764d8f57",
+      "sha256": "bd9bd2f06fcb57bc443674064b63e9394db32c07526fd25100336882c9daf379"
+    },
+    {
+      "id": "star-and-crescent",
+      "name": "Star and crescent",
+      "category": "Symbols",
+      "keywords": ["islam", "Muslim", "religion", "star and crescent"],
+      "url": "/stickers/star-and-crescent-4305a36057b2.svg",
+      "sourcePath": "assets/Star and crescent/Color/star_and_crescent_color.svg",
+      "gitBlob": "1bf8878ed3f219bde2edd4a5ca756746c72ab901",
+      "sha256": "4305a36057b29f7872bdeeafd2b21f57fbe0b9a36735cbdeda2ba0a4f7dd7c98"
+    },
+    {
+      "id": "star-struck",
+      "name": "Star-struck",
+      "category": "Smileys & Emotion",
+      "keywords": ["eyes", "face", "grinning", "star", "star-struck"],
+      "url": "/stickers/star-struck-5411bd832303.svg",
+      "sourcePath": "assets/Star-struck/Color/star-struck_color.svg",
+      "gitBlob": "18bc8524bda711eb86c32de539d507d44870229a",
+      "sha256": "5411bd832303ed89db09c98768b65b306c4c62469ef43491b78690bcf3d75165"
+    },
+    {
+      "id": "station",
+      "name": "Station",
+      "category": "Travel & Places",
+      "keywords": ["railway", "station", "train"],
+      "url": "/stickers/station-c95de9c3dc16.svg",
+      "sourcePath": "assets/Station/Color/station_color.svg",
+      "gitBlob": "0463acbc9913c51d70ec9f0e91481e3437f9838a",
+      "sha256": "c95de9c3dc16adfc57655270608cbe6e2a68451c340bed169fc553e37a171940"
+    },
+    {
+      "id": "steaming-bowl",
+      "name": "Steaming bowl",
+      "category": "Food & Drink",
+      "keywords": ["bowl", "noodle", "ramen", "steaming"],
+      "url": "/stickers/steaming-bowl-b05fa1d50360.svg",
+      "sourcePath": "assets/Steaming bowl/Color/steaming_bowl_color.svg",
+      "gitBlob": "7efeb34a52a6040577ae9c4a495b288a5891cabc",
+      "sha256": "b05fa1d5036069b01a13b463cbbcf720b66e3fca238e369777a818cdd44fe1b1"
+    },
+    {
+      "id": "stop-button",
+      "name": "Stop button",
+      "category": "Symbols",
+      "keywords": ["square", "stop", "stop button"],
+      "url": "/stickers/stop-button-53b7656270bd.svg",
+      "sourcePath": "assets/Stop button/Color/stop_button_color.svg",
+      "gitBlob": "e4ead98d46584aecb8411d8b1db8f2804429a37e",
+      "sha256": "53b7656270bd962eb7444c08adec24c7aabe7963cdb4e2cdc6a1472b54b80b95"
+    },
+    {
+      "id": "sunset",
+      "name": "Sunset",
+      "category": "Travel & Places",
+      "keywords": ["dusk", "sun", "sunset"],
+      "url": "/stickers/sunset-bfd3e004ba51.svg",
+      "sourcePath": "assets/Sunset/Color/sunset_color.svg",
+      "gitBlob": "b58bb4de2e6940a4aa829cd89c56f56ff66607f7",
+      "sha256": "bfd3e004ba51f897814d1b9a94cc6a160b0044747f076f305ac815438ae16970"
+    },
+    {
+      "id": "sushi",
+      "name": "Sushi",
+      "category": "Food & Drink",
+      "keywords": ["sushi"],
+      "url": "/stickers/sushi-12efccd87185.svg",
+      "sourcePath": "assets/Sushi/Color/sushi_color.svg",
+      "gitBlob": "953640788c8c556bfd3d5c3817c48dfe27559d6b",
+      "sha256": "12efccd871859550d2450bdebdc3d672c1e097b6597782beca42f0015ffbbdd5"
+    },
+    {
+      "id": "suspension-railway",
+      "name": "Suspension railway",
+      "category": "Travel & Places",
+      "keywords": ["railway", "suspension"],
+      "url": "/stickers/suspension-railway-fa5ddbffc239.svg",
+      "sourcePath": "assets/Suspension railway/Color/suspension_railway_color.svg",
+      "gitBlob": "cc9b42daeb0647993790e9ad130250b9801a4e1d",
+      "sha256": "fa5ddbffc2395666f82afd04e6c1323ad501b5fa30566c31beb631c4360554b4"
+    },
+    {
+      "id": "sweat-droplets",
+      "name": "Sweat droplets",
+      "category": "Smileys & Emotion",
+      "keywords": ["comic", "splashing", "sweat", "sweat droplets"],
+      "url": "/stickers/sweat-droplets-c631e123249e.svg",
+      "sourcePath": "assets/Sweat droplets/Color/sweat_droplets_color.svg",
+      "gitBlob": "95136b54583505f90c6846cdab10792a4f144235",
+      "sha256": "c631e123249e6054d41ee2c233c009863bfe0afba80b4d843e3d4d17f3cc6705"
+    },
+    {
+      "id": "t-rex",
+      "name": "T-rex",
+      "category": "Animals & Nature",
+      "keywords": ["T-Rex", "Tyrannosaurus Rex"],
+      "url": "/stickers/t-rex-8eb276a9c284.svg",
+      "sourcePath": "assets/T-rex/Color/t-rex_color.svg",
+      "gitBlob": "78efa15af51b6c69024ff88e38679b2958798ff4",
+      "sha256": "8eb276a9c2843b1c23715a1cf5b2b44929f8b5e680a95b889b51d882af1cc0bc"
+    },
+    {
+      "id": "taco",
+      "name": "Taco",
+      "category": "Food & Drink",
+      "keywords": ["mexican", "taco"],
+      "url": "/stickers/taco-cebb047ee3c2.svg",
+      "sourcePath": "assets/Taco/Color/taco_color.svg",
+      "gitBlob": "a8a9af8b6f6d328c797ebd737601d01ea76a3a05",
+      "sha256": "cebb047ee3c2fedc00d0594517979dfd6d07ceaad3bb7148ee73dec4890554fb"
+    },
+    {
+      "id": "takeout-box",
+      "name": "Takeout box",
+      "category": "Food & Drink",
+      "keywords": ["oyster pail", "takeout box"],
+      "url": "/stickers/takeout-box-b156d289343f.svg",
+      "sourcePath": "assets/Takeout box/Color/takeout_box_color.svg",
+      "gitBlob": "012d6cb39b74d635ae22c72cd4ed1f30a4327f43",
+      "sha256": "b156d289343fde3d36e79d5f38597a7ec04ca3b190691258c2a94f7bfc2701cf"
+    },
+    {
+      "id": "tamale",
+      "name": "Tamale",
+      "category": "Food & Drink",
+      "keywords": ["mexican", "tamale", "wrapped"],
+      "url": "/stickers/tamale-3d93a187afb6.svg",
+      "sourcePath": "assets/Tamale/Color/tamale_color.svg",
+      "gitBlob": "1ef6552912a2bdc4c04decca2b5c34ccb14bae16",
+      "sha256": "3d93a187afb6c7d637758ab0695559268dc18e5eb39954ebf1aece62c80b4b24"
+    },
+    {
+      "id": "tanabata-tree",
+      "name": "Tanabata tree",
+      "category": "Activities",
+      "keywords": ["banner", "celebration", "Japanese", "tanabata tree", "tree"],
+      "url": "/stickers/tanabata-tree-03ee6c872e77.svg",
+      "sourcePath": "assets/Tanabata tree/Color/tanabata_tree_color.svg",
+      "gitBlob": "8e98e45b91b97c9b5f860d48242d53ab0910609d",
+      "sha256": "03ee6c872e77071681639cd792e7454ecb0c21a48fef082154823372218a9073"
+    },
+    {
+      "id": "tangerine",
+      "name": "Tangerine",
+      "category": "Food & Drink",
+      "keywords": ["fruit", "orange", "tangerine"],
+      "url": "/stickers/tangerine-93a761b3dc9c.svg",
+      "sourcePath": "assets/Tangerine/Color/tangerine_color.svg",
+      "gitBlob": "837bf69fd0f76abef7f0a9cde79489cc7baab17c",
+      "sha256": "93a761b3dc9cda1fb5d753e0034aae06ae8650176d3c4c335f7ff1c7a0c6b65c"
+    },
+    {
+      "id": "teacup-without-handle",
+      "name": "Teacup without handle",
+      "category": "Food & Drink",
+      "keywords": ["beverage", "cup", "drink", "tea", "teacup", "teacup without handle"],
+      "url": "/stickers/teacup-without-handle-8c75de67a826.svg",
+      "sourcePath": "assets/Teacup without handle/Color/teacup_without_handle_color.svg",
+      "gitBlob": "ca1f0e1af7050a90f1d3b2d9b99d8f29e9f7515a",
+      "sha256": "8c75de67a826965a6baea82b1a1ad14fd31a5521ec9dec4869d14907c1fd929b"
+    },
+    {
+      "id": "teapot",
+      "name": "Teapot",
+      "category": "Food & Drink",
+      "keywords": ["drink", "pot", "tea", "teapot"],
+      "url": "/stickers/teapot-7bb8cc0b41e3.svg",
+      "sourcePath": "assets/Teapot/Color/teapot_color.svg",
+      "gitBlob": "c952ac1784aa15406ed0165b584d21655f46b6b6",
+      "sha256": "7bb8cc0b41e30a0120d5544a1a800e2a73f83693441f3b25292bc945f2cc3792"
+    },
+    {
+      "id": "teddy-bear",
+      "name": "Teddy bear",
+      "category": "Activities",
+      "keywords": ["plaything", "plush", "stuffed", "teddy bear", "toy"],
+      "url": "/stickers/teddy-bear-69a583e2339b.svg",
+      "sourcePath": "assets/Teddy bear/Color/teddy_bear_color.svg",
+      "gitBlob": "d90e5ab41c2fe53b4b9797e32eac58f52e3f035f",
+      "sha256": "69a583e2339bdc76119be9c46acf274e30b80356371f7a27bb77254b70c26b0b"
+    },
+    {
+      "id": "ten-oclock",
+      "name": "Ten oclock",
+      "category": "Travel & Places",
+      "keywords": ["00", "10", "10:00", "clock", "o\u2019clock", "ten"],
+      "url": "/stickers/ten-oclock-997e55988b31.svg",
+      "sourcePath": "assets/Ten oclock/Color/ten_oclock_color.svg",
+      "gitBlob": "8823ecb69278df3cb60129bb26d69f0170341055",
+      "sha256": "997e55988b31ebfd7fcc7dde62d161e48fd6d1eedec5febbbec433ad653e3ea0"
+    },
+    {
+      "id": "tent",
+      "name": "Tent",
+      "category": "Travel & Places",
+      "keywords": ["camping", "tent"],
+      "url": "/stickers/tent-5cc15fec2700.svg",
+      "sourcePath": "assets/Tent/Color/tent_color.svg",
+      "gitBlob": "28131c83ef9155e08bd1e4c1b37ac2d664d10e1c",
+      "sha256": "5cc15fec2700d4a5694509e110be087455e0c16cff8a2cf75b507cdee523f534"
+    },
+    {
+      "id": "test-tube",
+      "name": "Test tube",
+      "category": "Objects",
+      "keywords": ["chemist", "chemistry", "experiment", "lab", "science", "test tube"],
+      "url": "/stickers/test-tube-86b501a2f436.svg",
+      "sourcePath": "assets/Test tube/Color/test_tube_color.svg",
+      "gitBlob": "348a5ae4b50f7584da101804f49f68de119cf00a",
+      "sha256": "86b501a2f436022a6ef78b9369c3f4f59074a7069199597b2e64aa2623e311ba"
+    },
+    {
+      "id": "thinking-face",
+      "name": "Thinking face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "thinking"],
+      "url": "/stickers/thinking-face-5f8c875da4fc.svg",
+      "sourcePath": "assets/Thinking face/Color/thinking_face_color.svg",
+      "gitBlob": "1f78eb23257c1283e66c8725a2f12261d8d9f653",
+      "sha256": "5f8c875da4fc81d2a5c98d7fea5e356c29388ecfcae06027af2e4a92abe07b2d"
+    },
+    {
+      "id": "thread",
+      "name": "Thread",
+      "category": "Activities",
+      "keywords": ["needle", "sewing", "spool", "string", "thread"],
+      "url": "/stickers/thread-64dc05c5e12b.svg",
+      "sourcePath": "assets/Thread/Color/thread_color.svg",
+      "gitBlob": "83cb74e1bd18520484ea94c4c42a4a0879d4205f",
+      "sha256": "64dc05c5e12b550428e73cbe6e9e8c8a3fb456cbdc1a5cf8afee29ae3249c447"
+    },
+    {
+      "id": "thumbs-down",
+      "name": "Thumbs down",
+      "category": "People & Body",
+      "keywords": ["-1", "down", "hand", "thumb", "thumbs down"],
+      "url": "/stickers/thumbs-down-4bb1a3fbc502.svg",
+      "sourcePath": "assets/Thumbs down/Default/Color/thumbs_down_color_default.svg",
+      "gitBlob": "a87a1b4db11def1b6443647f6d5908b6a293f411",
+      "sha256": "4bb1a3fbc502b40e0332c6697ec9695fb93a926297693605d42e3da1d131aa16"
+    },
+    {
+      "id": "ticket",
+      "name": "Ticket",
+      "category": "Activities",
+      "keywords": ["admission", "ticket"],
+      "url": "/stickers/ticket-a3541f7d1b99.svg",
+      "sourcePath": "assets/Ticket/Color/ticket_color.svg",
+      "gitBlob": "a322fa2b519900869c0122d47a76dc2b772e64e5",
+      "sha256": "a3541f7d1b997ca1b70fc88dd83284dca01e584e2e4c1c95d021b79766028e66"
+    },
+    {
+      "id": "tiger",
+      "name": "Tiger",
+      "category": "Animals & Nature",
+      "keywords": ["tiger"],
+      "url": "/stickers/tiger-cf8ac4d80cb0.svg",
+      "sourcePath": "assets/Tiger/Color/tiger_color.svg",
+      "gitBlob": "4f2c6520e6e2a6a4c93152d569a4275f4b52a157",
+      "sha256": "cf8ac4d80cb0fbb444ecd0e08feac9fb1cace4355c4708581bb52dabbde290ec"
+    },
+    {
+      "id": "tokyo-tower",
+      "name": "Tokyo tower",
+      "category": "Travel & Places",
+      "keywords": ["Tokyo", "tower"],
+      "url": "/stickers/tokyo-tower-b88816c3dfd2.svg",
+      "sourcePath": "assets/Tokyo tower/Color/tokyo_tower_color.svg",
+      "gitBlob": "c6868b0b9056c06321b1aa568522bc64ad1f9923",
+      "sha256": "b88816c3dfd25a12aa88983a6169c6807aea8ba2ce38a06e03418744606260ba"
+    },
+    {
+      "id": "tooth",
+      "name": "Tooth",
+      "category": "People & Body",
+      "keywords": ["dentist", "tooth"],
+      "url": "/stickers/tooth-7d88a93258ea.svg",
+      "sourcePath": "assets/Tooth/Color/tooth_color.svg",
+      "gitBlob": "9829bcd62635d629937f2c964a937c4e241e829f",
+      "sha256": "7d88a93258eab4ac8c790637475d4d7cbb19a23f4eab0e8fc4370cee732197d8"
+    },
+    {
+      "id": "tornado",
+      "name": "Tornado",
+      "category": "Travel & Places",
+      "keywords": ["cloud", "tornado", "whirlwind"],
+      "url": "/stickers/tornado-f31a2bbf0b5e.svg",
+      "sourcePath": "assets/Tornado/Color/tornado_color.svg",
+      "gitBlob": "90503faeff0c1b0a0106e4285ec228fd84bd83ec",
+      "sha256": "f31a2bbf0b5ec9e93efafc579206b1d58cd1eeffd497b6718f6dd6c3dffc3592"
+    },
+    {
+      "id": "transgender-symbol",
+      "name": "Transgender symbol",
+      "category": "Symbols",
+      "keywords": ["transgender", "transgender symbol"],
+      "url": "/stickers/transgender-symbol-9bb6e1e82792.svg",
+      "sourcePath": "assets/Transgender symbol/Color/transgender_symbol_color.svg",
+      "gitBlob": "226b7b891ccaa0ec06dec601571e830ce04c08b9",
+      "sha256": "9bb6e1e82792ad75622947c39d0496b7e2b8ba6bf258df85d8b51dba44ad0296"
+    },
+    {
+      "id": "triangular-ruler",
+      "name": "Triangular ruler",
+      "category": "Objects",
+      "keywords": ["ruler", "set", "triangle", "triangular ruler"],
+      "url": "/stickers/triangular-ruler-2a3a2eb2eae9.svg",
+      "sourcePath": "assets/Triangular ruler/Color/triangular_ruler_color.svg",
+      "gitBlob": "ee81e91af470215a614636d83b29615b473428a2",
+      "sha256": "2a3a2eb2eae9c18259cbd353a7d73df121cfccd241778b9f0f89dcc468158a63"
+    },
+    {
+      "id": "tropical-drink",
+      "name": "Tropical drink",
+      "category": "Food & Drink",
+      "keywords": ["bar", "drink", "tropical"],
+      "url": "/stickers/tropical-drink-b0de1f0e6bb7.svg",
+      "sourcePath": "assets/Tropical drink/Color/tropical_drink_color.svg",
+      "gitBlob": "493eb073e8f9f88a0db56cdfe267f065988a479f",
+      "sha256": "b0de1f0e6bb7abb2b1bc488cc9118269e9c0ea56bc876ad21efaf406ae096f84"
+    },
+    {
+      "id": "trumpet",
+      "name": "Trumpet",
+      "category": "Objects",
+      "keywords": ["instrument", "music", "trumpet"],
+      "url": "/stickers/trumpet-43133d6c229f.svg",
+      "sourcePath": "assets/Trumpet/Color/trumpet_color.svg",
+      "gitBlob": "446a7b343a0ff74d50225712a05595b8e95b0fc0",
+      "sha256": "43133d6c229f1112516edc19f72c844c42b6b3ae82a4ebd94158df9086527631"
+    },
+    {
+      "id": "tulip",
+      "name": "Tulip",
+      "category": "Animals & Nature",
+      "keywords": ["flower", "tulip"],
+      "url": "/stickers/tulip-cee824984f58.svg",
+      "sourcePath": "assets/Tulip/Color/tulip_color.svg",
+      "gitBlob": "a6d1c1654e85a80e8b644924aed0a3caafd732de",
+      "sha256": "cee824984f5822e15b377a8184e39b5f82065a927f96dd1e5066cbdc572e4a18"
+    },
+    {
+      "id": "tumbler-glass",
+      "name": "Tumbler glass",
+      "category": "Food & Drink",
+      "keywords": ["glass", "liquor", "shot", "tumbler", "whisky"],
+      "url": "/stickers/tumbler-glass-02db0ea419fc.svg",
+      "sourcePath": "assets/Tumbler glass/Color/tumbler_glass_color.svg",
+      "gitBlob": "487e158a9506bf14a7d7f47af06f38867ddaffbe",
+      "sha256": "02db0ea419fcf9c16c7d814c141cecba4398e9c872ffca4273788428e5735a6a"
+    },
+    {
+      "id": "turkey",
+      "name": "Turkey",
+      "category": "Animals & Nature",
+      "keywords": ["bird", "turkey"],
+      "url": "/stickers/turkey-3f360fe65afa.svg",
+      "sourcePath": "assets/Turkey/Color/turkey_color.svg",
+      "gitBlob": "57c5ec3d6076ad911217fa3ff7ded0ebe0956a1c",
+      "sha256": "3f360fe65afaec21b57363f3888c7fcc15d689340111c9d551fecd7a6fddf9bf"
+    },
+    {
+      "id": "umbrella-on-ground",
+      "name": "Umbrella on ground",
+      "category": "Travel & Places",
+      "keywords": ["rain", "sun", "umbrella", "umbrella on ground"],
+      "url": "/stickers/umbrella-on-ground-59c445d45111.svg",
+      "sourcePath": "assets/Umbrella on ground/Color/umbrella_on_ground_color.svg",
+      "gitBlob": "2ca7c64449296b4120cf427548fdef3e9c181513",
+      "sha256": "59c445d45111a486730a23ce6d3b5e4b53ed6c67bdeca9e8040b636265186fa5"
+    },
+    {
+      "id": "umbrella-with-rain-drops",
+      "name": "Umbrella with rain drops",
+      "category": "Travel & Places",
+      "keywords": ["clothing", "drop", "rain", "umbrella", "umbrella with rain drops"],
+      "url": "/stickers/umbrella-with-rain-drops-1e1560084d83.svg",
+      "sourcePath": "assets/Umbrella with rain drops/Color/umbrella_with_rain_drops_color.svg",
+      "gitBlob": "b4fc2ac0c7a9a63a6d1ce382f748d401b2cf09c6",
+      "sha256": "1e1560084d8382fb8fd55b54e073eaf435c85f545cc85692d56ca8c4375e1f55"
+    },
+    {
+      "id": "up-left-arrow",
+      "name": "Up-left arrow",
+      "category": "Symbols",
+      "keywords": ["arrow", "direction", "intercardinal", "northwest", "up-left arrow"],
+      "url": "/stickers/up-left-arrow-bca77e373704.svg",
+      "sourcePath": "assets/Up-left arrow/Color/up-left_arrow_color.svg",
+      "gitBlob": "4f3d763e6cff057afc0b4c1d18250f1965b9e2af",
+      "sha256": "bca77e37370423a692addc545c63a442258a5a4369efd1df849995348d0c97a7"
+    },
+    {
+      "id": "upside-down-face",
+      "name": "Upside-down face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "upside-down"],
+      "url": "/stickers/upside-down-face-0aa5c76b7212.svg",
+      "sourcePath": "assets/Upside-down face/Color/upside-down_face_color.svg",
+      "gitBlob": "3200762fb29f6f0312bff3106d73c0b30d571cee",
+      "sha256": "0aa5c76b7212d50781e6a138a47aeae803c88cd6634a037926ee14cd06785ea5"
+    },
+    {
+      "id": "video-game",
+      "name": "Video game",
+      "category": "Activities",
+      "keywords": ["controller", "game", "video game"],
+      "url": "/stickers/video-game-6f04069cc291.svg",
+      "sourcePath": "assets/Video game/Color/video_game_color.svg",
+      "gitBlob": "ac5d7b4d0d2d507e4daba5a5b7ed51837b92b2a1",
+      "sha256": "6f04069cc291fb9dba619d6a6363d2530c266ce5ac08b454f5f1e21b25aafa80"
+    },
+    {
+      "id": "wastebasket",
+      "name": "Wastebasket",
+      "category": "Objects",
+      "keywords": ["wastebasket"],
+      "url": "/stickers/wastebasket-766cf71ecc9d.svg",
+      "sourcePath": "assets/Wastebasket/Color/wastebasket_color.svg",
+      "gitBlob": "9330d7c72be390dcb02a2031f463d17c8a00c2de",
+      "sha256": "766cf71ecc9d9e537a6f55ee06b3f52587d3f1bacca6736f98b1a332431ed93b"
+    },
+    {
+      "id": "watermelon",
+      "name": "Watermelon",
+      "category": "Food & Drink",
+      "keywords": ["fruit", "watermelon"],
+      "url": "/stickers/watermelon-65a089485a93.svg",
+      "sourcePath": "assets/Watermelon/Color/watermelon_color.svg",
+      "gitBlob": "f0209307dce562c5642b1dd138b0f333768fe7a9",
+      "sha256": "65a089485a93ac9a2a895b468b52b102afcafded0f27f881dc8b1a3e099ba494"
+    },
+    {
+      "id": "waving-hand",
+      "name": "Waving hand",
+      "category": "People & Body",
+      "keywords": ["hand", "wave", "waving"],
+      "url": "/stickers/waving-hand-a4264cfcb080.svg",
+      "sourcePath": "assets/Waving hand/Default/Color/waving_hand_color_default.svg",
+      "gitBlob": "9086a40c927c7f47f293b97ccedbdfd518efc79d",
+      "sha256": "a4264cfcb0807d0e223ff95174321ce4e5bebc9558a7281fc57203d089bf34b6"
+    },
+    {
+      "id": "wheelchair-symbol",
+      "name": "Wheelchair symbol",
+      "category": "Symbols",
+      "keywords": ["access", "wheelchair symbol"],
+      "url": "/stickers/wheelchair-symbol-0bf5740c8b2d.svg",
+      "sourcePath": "assets/Wheelchair symbol/Color/wheelchair_symbol_color.svg",
+      "gitBlob": "fdf8550d903a8f0fc7adf0b3911d86b2f487b5c0",
+      "sha256": "0bf5740c8b2dd3539a148618fda247b43128ec33bf447c6cfd054f9d29a0d863"
+    },
+    {
+      "id": "white-exclamation-mark",
+      "name": "White exclamation mark",
+      "category": "Symbols",
+      "keywords": ["!", "exclamation", "mark", "outlined", "punctuation", "white exclamation mark"],
+      "url": "/stickers/white-exclamation-mark-1d552b1c49dd.svg",
+      "sourcePath": "assets/White exclamation mark/Color/white_exclamation_mark_color.svg",
+      "gitBlob": "720b2e132dd37c6f33e087b3d0d6b6dfac55d2ba",
+      "sha256": "1d552b1c49dd64732b2556a23d3af492498726277181d5336b70f1508ea92629"
+    },
+    {
+      "id": "white-small-square",
+      "name": "White small square",
+      "category": "Symbols",
+      "keywords": ["geometric", "square", "white small square"],
+      "url": "/stickers/white-small-square-cf886266c994.svg",
+      "sourcePath": "assets/White small square/Color/white_small_square_color.svg",
+      "gitBlob": "8be5e0fc861f9a33d52d9c883cb65967a6ba8a3e",
+      "sha256": "cf886266c99434e2669080282f2cff7173255fd84ecbc61257c85a120820544e"
+    },
+    {
+      "id": "wind-chime",
+      "name": "Wind chime",
+      "category": "Activities",
+      "keywords": ["bell", "celebration", "chime", "wind"],
+      "url": "/stickers/wind-chime-44020ce32bfc.svg",
+      "sourcePath": "assets/Wind chime/Color/wind_chime_color.svg",
+      "gitBlob": "dcb73ba620f37acabc177751d4da1b5c380aae54",
+      "sha256": "44020ce32bfcd2015463ec570fb716840d7aa4ad0c9be7933321779a332a9826"
+    },
+    {
+      "id": "window",
+      "name": "Window",
+      "category": "Objects",
+      "keywords": ["frame", "fresh air", "opening", "transparent", "view", "window"],
+      "url": "/stickers/window-300ef798ba55.svg",
+      "sourcePath": "assets/Window/Color/window_color.svg",
+      "gitBlob": "6843d9e781bae2eb592465cc8114bcbef4fab106",
+      "sha256": "300ef798ba55406638453e5e24a5acf01370fa09b8800041fbda5e0c42968ede"
+    },
+    {
+      "id": "wine-glass",
+      "name": "Wine glass",
+      "category": "Food & Drink",
+      "keywords": ["bar", "beverage", "drink", "glass", "wine"],
+      "url": "/stickers/wine-glass-a347a31beb11.svg",
+      "sourcePath": "assets/Wine glass/Color/wine_glass_color.svg",
+      "gitBlob": "5c1061ee8423b1efe2165a47d48da1aa6f555ff4",
+      "sha256": "a347a31beb111a8fc503591ce6216b638a505f00d8ea317dc761c6af40763664"
+    },
+    {
+      "id": "woman-bald",
+      "name": "Woman bald",
+      "category": "People & Body",
+      "keywords": ["adult", "bald", "woman"],
+      "url": "/stickers/woman-bald-e17a2a795681.svg",
+      "sourcePath": "assets/Woman bald/Default/Color/woman_bald_color_default.svg",
+      "gitBlob": "ce53ba919e84d75b65b285bee4db010132c0273b",
+      "sha256": "e17a2a79568179578b0f220bf9362da35857ba9fe6badf811810093d8063edc4"
+    },
+    {
+      "id": "woman-cartwheeling",
+      "name": "Woman cartwheeling",
+      "category": "People & Body",
+      "keywords": ["cartwheel", "gymnastics", "woman", "woman cartwheeling"],
+      "url": "/stickers/woman-cartwheeling-3b199205dd54.svg",
+      "sourcePath": "assets/Woman cartwheeling/Default/Color/woman_cartwheeling_color_default.svg",
+      "gitBlob": "64792f468723ac41818f74815aafccee884ecc16",
+      "sha256": "3b199205dd54331ccad49c3da0f361aa0d51d5d5b4f9b18c2c47914df899d866"
+    },
+    {
+      "id": "woman-climbing",
+      "name": "Woman climbing",
+      "category": "People & Body",
+      "keywords": ["climber", "woman climbing"],
+      "url": "/stickers/woman-climbing-ab136b9ee40f.svg",
+      "sourcePath": "assets/Woman climbing/Default/Color/woman_climbing_color_default.svg",
+      "gitBlob": "56afec53db295021e93976488f8d76ca8663d666",
+      "sha256": "ab136b9ee40f4302de453fb574e9988face1b04631cdefd77d0e26115e66eb15"
+    },
+    {
+      "id": "woman-factory-worker",
+      "name": "Woman factory worker",
+      "category": "People & Body",
+      "keywords": ["assembly", "factory", "industrial", "woman", "worker"],
+      "url": "/stickers/woman-factory-worker-3f895bf5bdd9.svg",
+      "sourcePath": "assets/Woman factory worker/Default/Color/woman_factory_worker_color_default.svg",
+      "gitBlob": "c6d30816fe425c1a1969e3070832c7cb251bcaa4",
+      "sha256": "3f895bf5bdd90dd8c1858c75e90d1b19dc9fd503541a53b2e93749e8d0b9ce3c"
+    },
+    {
+      "id": "woman-fairy",
+      "name": "Woman fairy",
+      "category": "People & Body",
+      "keywords": ["Titania", "woman fairy"],
+      "url": "/stickers/woman-fairy-d1e952582d56.svg",
+      "sourcePath": "assets/Woman fairy/Default/Color/woman_fairy_color_default.svg",
+      "gitBlob": "7456b18cded488a4a99d29cf928efc70b50756c0",
+      "sha256": "d1e952582d56e698c86269275465312bd475c57d5e813ec6c3431a8f34f9b925"
+    },
+    {
+      "id": "woman-genie",
+      "name": "Woman genie",
+      "category": "People & Body",
+      "keywords": ["djinn", "woman genie"],
+      "url": "/stickers/woman-genie-c99b0de014b7.svg",
+      "sourcePath": "assets/Woman genie/Color/woman_genie_color.svg",
+      "gitBlob": "b535fb76bf4be52b58c47e70c6d0a992058b8451",
+      "sha256": "c99b0de014b7bce9cc86a922f15cecd080207add7b35827699a69ddf7a1c1ada"
+    },
+    {
+      "id": "woman-getting-massage",
+      "name": "Woman getting massage",
+      "category": "People & Body",
+      "keywords": ["face", "massage", "woman", "woman getting massage"],
+      "url": "/stickers/woman-getting-massage-7c4d2de54ccc.svg",
+      "sourcePath": "assets/Woman getting massage/Default/Color/woman_getting_massage_color_default.svg",
+      "gitBlob": "35e022237e096641db11155cf335c3744a9451e0",
+      "sha256": "7c4d2de54ccc2a8af364b655651e393e34285eaf72a762f11713dfd38dcae2da"
+    },
+    {
+      "id": "woman-guard",
+      "name": "Woman guard",
+      "category": "People & Body",
+      "keywords": ["guard", "woman"],
+      "url": "/stickers/woman-guard-337bfcebf494.svg",
+      "sourcePath": "assets/Woman guard/Default/Color/woman_guard_color_default.svg",
+      "gitBlob": "d3f7aa8bbdd12b59fc7e59ff4143ea3862796a98",
+      "sha256": "337bfcebf494f8f0af476a25fabadb3e129065e1e441cf7a37854a0f35f014d8"
+    },
+    {
+      "id": "woman-judge",
+      "name": "Woman judge",
+      "category": "People & Body",
+      "keywords": ["judge", "justice", "scales", "woman"],
+      "url": "/stickers/woman-judge-b545b365eddc.svg",
+      "sourcePath": "assets/Woman judge/Default/Color/woman_judge_color_default.svg",
+      "gitBlob": "e5c4d77c9c5abaf8ec54f4185f05483b0eaddb22",
+      "sha256": "b545b365eddc31a3d6c31dec0bfefb14d20f46fccd4e81bedbe4152111d15411"
+    },
+    {
+      "id": "woman-office-worker",
+      "name": "Woman office worker",
+      "category": "People & Body",
+      "keywords": [
+        "architect",
+        "business",
+        "manager",
+        "white-collar",
+        "woman",
+        "woman office worker"
+      ],
+      "url": "/stickers/woman-office-worker-d26bc519beb8.svg",
+      "sourcePath": "assets/Woman office worker/Default/Color/woman_office_worker_color_default.svg",
+      "gitBlob": "a5a4d41768e9878d6abc8f398271f043e36d90ad",
+      "sha256": "d26bc519beb8ea45bc0473b0502ffa3381bec96b5d09b6d0e12b0525a5d40fa7"
+    },
+    {
+      "id": "woman-standing",
+      "name": "Woman standing",
+      "category": "People & Body",
+      "keywords": ["standing", "woman"],
+      "url": "/stickers/woman-standing-8acd6e703694.svg",
+      "sourcePath": "assets/Woman standing/Default/Color/woman_standing_color_default.svg",
+      "gitBlob": "04b8c9a91e7874492e99194c9c8a2b5708a6134e",
+      "sha256": "8acd6e7036941fbcd2b0cddd519c31fccd096ecec2531ec1f0a361f8626e1e57"
+    },
+    {
+      "id": "woman-superhero",
+      "name": "Woman superhero",
+      "category": "People & Body",
+      "keywords": ["good", "hero", "heroine", "superpower", "woman", "woman superhero"],
+      "url": "/stickers/woman-superhero-13af9118779d.svg",
+      "sourcePath": "assets/Woman superhero/Default/Color/woman_superhero_color_default.svg",
+      "gitBlob": "4f1c375339966d5d8499a82b181edccaedebdd7d",
+      "sha256": "13af9118779d8e8aed24307da53c749bfc058fa3ef60e2cf74a0322fbb6fc40a"
+    },
+    {
+      "id": "woman-teacher",
+      "name": "Woman teacher",
+      "category": "People & Body",
+      "keywords": ["instructor", "professor", "teacher", "woman"],
+      "url": "/stickers/woman-teacher-b9108a7e351d.svg",
+      "sourcePath": "assets/Woman teacher/Default/Color/woman_teacher_color_default.svg",
+      "gitBlob": "15bf9c90e23611abc3dcfa1eb912868c61b546ae",
+      "sha256": "b9108a7e351da51386e8182c539744faaa06953ddbbf5c12748ba3f967eb1e63"
+    },
+    {
+      "id": "woman-wearing-turban",
+      "name": "Woman wearing turban",
+      "category": "People & Body",
+      "keywords": ["turban", "woman", "woman wearing turban"],
+      "url": "/stickers/woman-wearing-turban-d756b880df7d.svg",
+      "sourcePath": "assets/Woman wearing turban/Default/Color/woman_wearing_turban_color_default.svg",
+      "gitBlob": "eafa9cdaff4b4a7a1440aa1769404bc2599fe28b",
+      "sha256": "d756b880df7d6e794022ad2c8b66f5e3c8f8f3cb582cecb06d9a9e503f7733f9"
+    },
+    {
+      "id": "woman-with-veil",
+      "name": "Woman with veil",
+      "category": "People & Body",
+      "keywords": ["veil", "woman", "woman with veil"],
+      "url": "/stickers/woman-with-veil-dbaece7e0ece.svg",
+      "sourcePath": "assets/Woman with veil/Default/Color/woman_with_veil_color_default.svg",
+      "gitBlob": "a17492193a69db8fb755ddd51391cf2f76003858",
+      "sha256": "dbaece7e0ece181be14aa9681d816590e5b2c5a704e6d930a8dca657f8db3154"
+    },
+    {
+      "id": "wrapped-gift",
+      "name": "Wrapped gift",
+      "category": "Activities",
+      "keywords": ["box", "celebration", "gift", "present", "wrapped"],
+      "url": "/stickers/wrapped-gift-6d0ee74b5617.svg",
+      "sourcePath": "assets/Wrapped gift/Color/wrapped_gift_color.svg",
+      "gitBlob": "912bcad3ef40da720c87c4f88616fb757e5aed1b",
+      "sha256": "6d0ee74b56170abdefcbbd373cdde0576aa7a262af0960037a1371e57728e88f"
+    },
+    {
+      "id": "zebra",
+      "name": "Zebra",
+      "category": "Animals & Nature",
+      "keywords": ["stripe", "zebra"],
+      "url": "/stickers/zebra-d3b29f1330f6.svg",
+      "sourcePath": "assets/Zebra/Color/zebra_color.svg",
+      "gitBlob": "9eb68f3932acab843e60a7b44c77b66e1d80d619",
+      "sha256": "d3b29f1330f69cbd9886a7ef1ef6305796ee6240a3f78c9c7c97a71b978c2125"
+    },
+    {
+      "id": "zipper-mouth-face",
+      "name": "Zipper-mouth face",
+      "category": "Smileys & Emotion",
+      "keywords": ["face", "mouth", "zipper", "zipper-mouth face"],
+      "url": "/stickers/zipper-mouth-face-0b14080fe89c.svg",
+      "sourcePath": "assets/Zipper-mouth face/Color/zipper-mouth_face_color.svg",
+      "gitBlob": "d4b0bf5a06c4d8c74854073c6cb61610cd482d6c",
+      "sha256": "0b14080fe89c97047ec71099f328ec5187f6b95a11a5d3b6ba5fb7f0eaea425b"
+    }
+  ]
+}

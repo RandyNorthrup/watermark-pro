@@ -3,6 +3,8 @@ import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HTTP_STATUS } from '../../../shared/constants'
+import { activeOrganizationQueryOptions } from '../../lib/queries'
+import { createQueryClient } from '../../lib/query-client'
 import {
   makeMember,
   makeOrganization,
@@ -12,6 +14,7 @@ import {
   VIEWER,
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
+import { installLibraryApi } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
 import { requestUrl } from '../../test-support/request-url'
 
@@ -76,21 +79,37 @@ describe('authenticated layout', () => {
     expect(router.state.location.search).toEqual({ redirect: '/app/audit' })
   })
 
-  it('sends a user without organizations to create one', async () => {
+  it('automatically provisions an isolated workspace for a new account', async () => {
     client().state.user = OWNER
+    const privateId = `personal-${OWNER.id}`
+    installLibraryApi()
     const { router } = renderApp('/app')
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app/organizations/new'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      'Create your first organization',
-    )
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('My workspace')
+    expect(router.state.location.pathname).toBe('/app')
+    expect(client().state.organizations).toHaveLength(1)
+    expect(client().state.activeOrganizationId).toBe(privateId)
   })
 
-  it('activates the first organization when none is active', async () => {
+  it('defaults to the personal workspace when no collaboration is explicitly active', async () => {
     seedOwnerWorkspace(client())
     client().state.activeOrganizationId = null
     renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Acme Studio')
-    expect(client().organization.setActive).toHaveBeenCalledWith({ organizationId: 'org-1' })
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('My workspace')
+    expect(client().organization.setActive).toHaveBeenCalledWith({
+      organizationId: `personal-${OWNER.id}`,
+    })
+    expect(client().state.organizations.map((organization) => organization.id)).toContain('org-1')
+  })
+
+  it('refetches a cached empty organization after a workspace becomes available', async () => {
+    seedOwnerWorkspace(client())
+    const queryClient = createQueryClient()
+    queryClient.setQueryData(activeOrganizationQueryOptions.queryKey, null)
+    renderApp('/app', queryClient)
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Acme Studio'),
+    )
+    expect(screen.queryByRole('heading', { name: 'Your workspace' })).toBeNull()
   })
 
   it('shows the dashboard with membership numbers and the user menu', async () => {

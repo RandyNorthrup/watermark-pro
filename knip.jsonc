@@ -17,6 +17,8 @@
   "entry": [
     // Route modules are discovered by the router plugin, not imported by hand.
     "src/client/routes/**/*.tsx",
+    // Build-only SSR entry named by vite.prerender.config.ts.
+    "src/client/prerender.tsx",
   ],
 
   // CSS is included so `@import` inside stylesheets is followed.
@@ -38,7 +40,7 @@
   ],
 
   // System binaries invoked from package.json scripts that are not npm packages.
-  "ignoreBinaries": ["gitleaks", "semgrep"],
+  "ignoreBinaries": ["semgrep"],
 
   "ignoreExportsUsedInFile": true,
 

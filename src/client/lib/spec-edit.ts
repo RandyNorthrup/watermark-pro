@@ -9,7 +9,6 @@ import {
   DEFAULT_TEXT_SPEC,
   type WatermarkSpec,
 } from '../../shared/watermark'
-import { DEFAULT_FONT_FAMILY } from '../fonts/catalogue'
 
 export type MarkKind = WatermarkSpec['kind']
 
@@ -21,7 +20,7 @@ export const MARK_KINDS: readonly { value: MarkKind; label: string }[] = [
   { value: 'qr', label: 'QR code' },
 ]
 
-/** QR codes need room for their modules; a quarter of the width scans from a phone. */
+/** QR codes start large and opaque; reading depends on the final size, content and image. */
 const DEFAULT_QR_SCALE = 0.18
 export const DEFAULT_QR_CONTENT = 'https://'
 
@@ -45,7 +44,7 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
         ...settings,
         kind: 'text',
         text: DEFAULT_TEXT_SPEC.text,
-        fontFamily: DEFAULT_FONT_FAMILY,
+        fontFamily: DEFAULT_TEXT_SPEC.fontFamily,
         fontWeight: 600,
         letterSpacing: 0,
         curve: 0,
@@ -68,7 +67,7 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
         ...settings,
         style: { ...settings.style, scale: DEFAULT_SYMBOL_SCALE },
         kind: 'symbol',
-        symbol: { type: 'glyph', glyph: DEFAULT_GLYPH, fontFamily: DEFAULT_FONT_FAMILY },
+        symbol: { type: 'glyph', glyph: DEFAULT_GLYPH, fontFamily: DEFAULT_TEXT_SPEC.fontFamily },
       }
     }
     case 'image': {
@@ -77,7 +76,7 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
     case 'qr': {
       return {
         ...settings,
-        style: { ...settings.style, scale: DEFAULT_QR_SCALE },
+        style: { ...settings.style, scale: DEFAULT_QR_SCALE, opacity: 1, rotation: 0 },
         kind: 'qr',
         content: DEFAULT_QR_CONTENT,
       }
