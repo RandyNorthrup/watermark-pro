@@ -8,9 +8,16 @@ import { JSDOM } from 'jsdom'
 
 const OUTPUT_DIR = path.join('dist', 'client', 'landing')
 const LOCALES_DIR = path.join('src', 'client', 'locales')
+const CLIENT_ASSETS_DIR = path.join('dist', 'client', 'assets')
+const INTER_FONT_PATTERN = /^inter-latin-wght-normal-[A-Za-z0-9_-]+\.woff2$/
 const rendererPath = path.resolve('dist', 'prerender', 'entry.mjs')
 const { locales, renderPublicPage } = await import(pathToFileURL(rendererPath).href)
 const shell = await readFile(path.join('dist', 'client', 'index.html'), 'utf8')
+const clientAssets = await readdir(CLIENT_ASSETS_DIR)
+const interFonts = clientAssets.filter((name) => INTER_FONT_PATTERN.test(name))
+if (interFonts.length !== 1 || interFonts[0] === undefined)
+  throw new Error('Prerender requires exactly one built Inter variable font.')
+const interFontUrl = `/assets/${interFonts[0]}`
 
 const entries = await readdir(LOCALES_DIR, { withFileTypes: true })
 const onDisk = new Set(entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name))
@@ -56,6 +63,15 @@ function staticHtml(content, locale, pathname) {
   for (const script of document.querySelectorAll('script[src]')) script.remove()
   for (const preload of document.querySelectorAll('link[rel="modulepreload"]')) preload.remove()
   for (const preload of document.querySelectorAll('[data-app-preload]')) preload.remove()
+  const stylesheet = document.querySelector('link[rel="stylesheet"]')
+  if (stylesheet === null) throw new Error('Built document has no application stylesheet.')
+  const fontPreload = document.createElement('link')
+  fontPreload.setAttribute('rel', 'preload')
+  fontPreload.setAttribute('as', 'font')
+  fontPreload.setAttribute('type', 'font/woff2')
+  fontPreload.setAttribute('crossorigin', 'anonymous')
+  fontPreload.setAttribute('href', interFontUrl)
+  stylesheet.before(fontPreload)
   for (const style of document.querySelectorAll('style')) {
     if (style.textContent?.includes('wm-skeleton') === true) style.remove()
   }

@@ -56,6 +56,11 @@ test('built app route hints have a matching CSP hash and reference the real new-
     runScripts: 'outside-only',
   })
   const { document } = dom.window
+  assert.equal(
+    document.querySelector('link[rel="preload"][as="font"]'),
+    null,
+    'The application shell must not restore the removed global font preload',
+  )
   const map = document.querySelector('template#app-route-preloads')
   const controller = document.querySelector('script[data-app-preload]')
   assert.ok(map, 'The application resource map must be emitted')
@@ -158,6 +163,16 @@ for (const locale of SUPPORTED_LOCALES) {
       assert.equal(document.querySelector('script[type="module"]'), null)
       assert.equal(document.querySelector('link[rel="modulepreload"]'), null)
       assert.equal(document.querySelector('[data-app-preload]'), null)
+      const fontPreload = document.querySelector('link[rel="preload"][as="font"]')
+      const stylesheet = document.querySelector('link[rel="stylesheet"]')
+      assert.match(fontPreload?.getAttribute('href') ?? '', /inter-latin-wght-normal-.+\.woff2$/)
+      assert.equal(fontPreload?.getAttribute('type'), 'font/woff2')
+      assert.equal(fontPreload?.getAttribute('crossorigin'), 'anonymous')
+      assert.equal(
+        fontPreload?.compareDocumentPosition(stylesheet),
+        dom.window.Node.DOCUMENT_POSITION_FOLLOWING,
+        'Public font discovery must precede the blocking stylesheet',
+      )
       assert.ok(
         document.querySelector('footer a[href="https://github.com/RandyNorthrup/watermark-pro"]'),
       )

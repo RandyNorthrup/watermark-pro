@@ -78,9 +78,11 @@ candidate passes its hosted gates.
   the large Tools-section shift without delaying the page or adding an empty
   placeholder. The first visible thumbnail is eager/high priority; later images
   remain lazy.
-- Inter remains the interface and watermark font, but its normal stylesheet load
-  replaces a redundant early preload that competed with the app entry bundle on
-  a cold mobile connection. The metric-matched fallback prevents font-swap shift.
+- Inter remains the interface and watermark font. The application shell keeps
+  its normal stylesheet discovery so the font does not compete with private
+  startup, while prerendered landing/legal documents preload the one built Inter
+  file before their stylesheet. Linux evidence identified the public font swap
+  as the layout-shift source; the targeted preload removes it.
 - Commit hooks invoke the pinned formatter and linters through Node directly.
   Native Windows argument handling avoids repeated small command batches while
   retaining staged-only formatting, strict lint and publication checks. Isolated

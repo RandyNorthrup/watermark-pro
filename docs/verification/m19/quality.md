@@ -285,3 +285,12 @@ Fresh SAST passed 509 rules over the then-tracked 1,923 targets with zero
 findings. It must run again after the final candidate is staged so newly added
 files enter its tracked-file inventory. New-head remote device/UI matrices,
 final screenshots, migration and hosted proof remain required.
+
+The first new-head UI run's redacted diagnostics identified the remaining public
+Linux CLS source precisely: the prerendered Home `FIGURE` and legal-page
+`SECTION` shifted when the Inter web font loaded (Home 0.1419, Privacy 0.0670).
+Prerendered public documents now preload their one hashed Inter font before the
+blocking stylesheet; the private SPA still has no font preload. The built-output
+gate asserts both sides. A fresh local HTTP/2 mobile diagnostic passes Home and
+Privacy at 100/100/100 with zero CLS and zero TBT under
+`docs/lighthouse/m19-public-preload/`. Fresh Linux proof remains required.
