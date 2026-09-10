@@ -148,7 +148,8 @@ candidate passes its hosted gates.
   checks keep every visible control inside the viewport and preserve keyboard
   selection with the matching native radio state.
 - Lighthouse content checks wait a bounded interval for the final asynchronous
-  heading, while still rejecting wrong screens. CI report JSON retains only
+  heading and visible-image decode, while still rejecting wrong screens, broken
+  images and decode timeouts. CI report JSON retains only
   finite benchmark, layout-path, rectangle and task-source diagnostics; page
   text, selectors and full URLs are omitted.
 - Selecting an Insert detail token could let the closing menu return focus to

@@ -50,8 +50,8 @@ export async function assertAuditContent(
     )
       throw new Error('Audit page did not select its expected view')
   }
-  const decoded = await page.locator('img:visible').evaluateAll(async (images) => {
-    for (const image of images) {
+  const decoded = await page.locator('img:visible').evaluateAll(async (images, timeout) => {
+    const checks = images.map(async (image) => {
       const rect = image.getBoundingClientRect()
       if (
         rect.right <= 0 ||
@@ -59,15 +59,22 @@ export async function assertAuditContent(
         rect.left >= globalThis.innerWidth ||
         rect.top >= globalThis.innerHeight
       )
-        continue
-      if (!image.complete || image.naturalWidth === 0 || image.naturalHeight === 0) return false
+        return true
       try {
         await image.decode()
       } catch {
         return false
       }
+      return image.complete && image.naturalWidth > 0 && image.naturalHeight > 0
+    })
+    const allDecoded = async () => {
+      const results = await Promise.all(checks)
+      return results.every(Boolean)
     }
-    return true
-  })
+    return await Promise.race([
+      allDecoded(),
+      new Promise((resolve) => setTimeout(() => resolve(false), timeout)),
+    ])
+  }, timeout)
   if (!decoded) throw new Error('Audit page has an undecoded visible image')
 }

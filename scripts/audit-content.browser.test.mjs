@@ -123,3 +123,39 @@ test('waits for the final asynchronous heading but still refuses the wrong scree
     await browser.close()
   }
 })
+
+test('waits for a visible image to decode and still rejects a decode timeout', async () => {
+  const browser = await chromium.launch()
+  try {
+    const page = await browser.newPage()
+    const catalogue = { library: { newPreset: 'New preset' } }
+    const surface = requireSurface('designer-new')
+    await page.setContent('<h1>New preset</h1><img id="preview" width="20" height="20">')
+    await page.locator('#preview').evaluate((image, delay) => {
+      Object.defineProperties(image, {
+        complete: { configurable: true, value: false },
+        naturalWidth: { configurable: true, value: 0 },
+        naturalHeight: { configurable: true, value: 0 },
+      })
+      image.decode = async () => {
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        Object.defineProperties(image, {
+          complete: { configurable: true, value: true },
+          naturalWidth: { configurable: true, value: 20 },
+          naturalHeight: { configurable: true, value: 20 },
+        })
+      }
+    }, DELAYED_CONTENT_MS)
+    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+
+    await page.locator('#preview').evaluate((image, delay) => {
+      image.decode = async () => await new Promise((resolve) => setTimeout(resolve, delay))
+    }, ASSERTION_TIMEOUT_MS * 2)
+    await assert.rejects(
+      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
+      /undecoded visible image/,
+    )
+  } finally {
+    await browser.close()
+  }
+})

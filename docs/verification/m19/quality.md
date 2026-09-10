@@ -332,3 +332,11 @@ archive entries. The app shell is 137.4 KiB gzip. The ignored log is
 `91d74f5b4a3d66bc4818413d6a970b9f4f2b046bf7346af213631ed2d3021f65`.
 Fresh SAST passes 509 rules over 1,937 targets with zero findings. Remote
 new-head device, complete UI and Linux performance proof remain required.
+
+The next Linux Home audit reached the correct page but its post-measurement
+content check ran before the visible hero finished decoding, so it emitted no
+performance report. The content gate now awaits visible-image `decode()` within
+the same bounded readiness interval used for headings, then independently
+requires complete nonzero dimensions. A delayed decode passes; a broken image
+and a decode beyond the deadline remain red. Lighthouse scoring and budgets are
+unchanged.
