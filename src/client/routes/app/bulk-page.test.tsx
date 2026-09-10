@@ -347,6 +347,11 @@ describe('bulk page', () => {
     await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg')])
     fireEvent.change(screen.getByLabelText('File names'), { target: { value: ' '.repeat(3) } })
     expect(screen.getByText(/must produce a name/)).toBeInTheDocument()
+    expect(screen.getByLabelText('File names')).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByLabelText('File names')).toHaveAccessibleDescription(/must produce a name/)
+    fireEvent.change(screen.getByLabelText('File names'), { target: { value: '{index}-{name}' } })
+    expect(screen.getByLabelText('File names')).toHaveAttribute('aria-invalid', 'false')
+    expect(screen.getByLabelText('File names')).toHaveAccessibleDescription(/Example: 1-a.jpg/)
   })
 
   it('pauses a running batch and resumes it', async () => {

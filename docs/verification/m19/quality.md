@@ -159,3 +159,48 @@ The Windows pass validates configuration, trust/refusal branches and the real
 certificate browser check. The new Linux helper installation still requires its
 fresh hosted-runner preflight, and all 104 device cases require the new-head CI
 run. Full UI, performance, red-drill and hosted release gates remain open.
+
+## Hosted runner and device findings
+
+CI for commit `94d2b941837ac0215a83924d232227f1bf3cf7aa` proved the pinned
+publisher sandbox helper on GitHub's Linux runner, then passed quality, SAST and
+dependency review. The four device jobs completed 98 of 104 journeys: desktop
+24/26, Android 24/26, iPhone 25/26 and iPad 25/26. All six WebKit offline,
+reconnect, replay and Recent work journeys passed remotely, as did the earlier
+iPhone bulk/video reflow fixes.
+
+The six failures reduce to two shared causes. All devices used an exact-text
+locator against a composite filename-feedback paragraph; desktop and Android
+also proved the token menu returned focus to its trigger after insertion. The
+feedback now has an explicit accessible description/invalid state, and token
+selection preserves the text destination while Escape retains normal trigger
+focus. Eighteen focused tests pass with positive and negative behavior. Fresh
+104-case CI remains required for these corrections.
+
+The first release UI jobs proved the Linux browser launch, then exposed a shared
+audit-lifecycle defect: Lighthouse had already closed its measured target before
+the post-run content assertion. Those jobs were stopped rather than repeating
+the same failure. The runner now retains that exact target through content and
+image checks; focused home and populated-dashboard samples pass the corrected
+check. Full remote UI audits remain open.
+
+## Final interaction and selected-dashboard checkpoint
+
+With the corrected interaction behavior, stable Recent work panel, compact phone
+thumbnails, redundant font-preload removal and exact Lighthouse page ownership,
+`npm run quality` passed again. The run includes 2,363 application tests, 42
+real-Workers tests, twelve gate/transport checks, 28 performance/audit helper
+checks, 15 publication checks, 24 Python asset/recovery checks and 40 built-output
+checks. Coverage remains above the unchanged floors: statements 93.21%, branches
+85.24%, functions 93.04% and lines 93.55%.
+
+Source/index/history scanning passed 12,161 candidate/object checks and 228
+archive entries. Built scanning passed 2,387 checks and 114 archive entries; four
+configured private values were compared, with no historical exception applied
+to current output. Bundle budgets passed. The ignored log is
+`temp/lumafoil-quality-interaction-performance.log`, SHA-256
+`9730714a922c71ac5b5b3510a575b368b439a2b016c38f69a993963999bbdf54`.
+
+The populated dashboard separately passed its required five mobile traces, but
+the complete route/UI matrices, new-head 104-case device run, full red drills and
+hosted release proof remain open.

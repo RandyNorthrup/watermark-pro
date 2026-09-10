@@ -1128,6 +1128,22 @@ Existing stale receipts are retained as history.
         {
           "path": "scripts/lib/test-http-request.mjs",
           "action": "modify"
+        },
+        {
+          "path": "scripts/lib/lighthouse-page.mjs",
+          "action": "modify"
+        },
+        {
+          "path": "scripts/lighthouse-page.test.mjs",
+          "action": "modify"
+        },
+        {
+          "path": "src/client/components/recent-work/recent-thumbnail.tsx",
+          "action": "modify"
+        },
+        {
+          "path": "src/client/components/recent-work/recent-work.tsx",
+          "action": "modify"
         }
       ],
       "status": "active",

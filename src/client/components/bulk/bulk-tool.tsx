@@ -325,7 +325,8 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
 
   const presetName = presets.data?.find((candidate) => candidate.id === presetId)?.name ?? ''
   const namePatternId = useId()
-  const namePreview = ((): string => {
+  const nameFeedbackId = `${namePatternId}-feedback`
+  const namePreview = (() => {
     try {
       const first = files[0]
       const example = resolveNamePattern(namePattern, {
@@ -337,9 +338,12 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
         width: PREVIEW_WIDTH,
         height: PREVIEW_HEIGHT,
       })
-      return t('bulk.names.example', { example: `${example}.${extensionFor(format)}` })
+      return {
+        text: t('bulk.names.example', { example: `${example}.${extensionFor(format)}` }),
+        isInvalid: false,
+      }
     } catch {
-      return t('bulk.names.mustProduceName')
+      return { text: t('bulk.names.mustProduceName'), isInvalid: true }
     }
   })()
 
@@ -905,17 +909,19 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               </label>
               <Input
                 id={namePatternId}
+                aria-describedby={nameFeedbackId}
+                aria-invalid={namePreview.isInvalid}
                 value={namePattern}
                 disabled={snapshot.isRunning}
                 onChange={(event) => {
                   setNamePattern(event.currentTarget.value)
                 }}
               />
-              <p className="text-xs text-ink-muted">
+              <p id={nameFeedbackId} className="text-xs text-ink-muted">
                 {t('bulk.tokensLabel', {
                   tokens: '{name} {index} {count} {date} {preset} {width} {height}',
                 })}{' '}
-                {namePreview}
+                {namePreview.text}
               </p>
             </div>
 

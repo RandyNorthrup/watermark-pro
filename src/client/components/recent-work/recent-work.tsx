@@ -257,9 +257,12 @@ export function RecentWork({ organizationId, organizationName, role }: RecentWor
         onChange={(event) => setSearch(event.currentTarget.value)}
         className="max-w-sm"
       />
-      <div className="flex min-h-36 flex-col gap-4">
+      <div
+        data-testid="recent-results"
+        className="flex h-80 min-h-0 flex-col gap-4 overflow-y-auto sm:h-[22rem]"
+      >
         {history.isPending ? (
-          <div className="flex min-h-36 items-center justify-center">
+          <div className="flex min-h-full items-center justify-center">
             <Spinner label={t('recent.loading')} />
           </div>
         ) : null}
@@ -287,7 +290,7 @@ export function RecentWork({ organizationId, organizationName, role }: RecentWor
           <Alert tone="info">{t('recent.activityPending')}</Alert>
         )}
         {history.isSuccess && items.length === 0 ? (
-          <Card className="flex min-h-36 flex-col items-start justify-center gap-3">
+          <Card className="flex min-h-full flex-col items-start justify-center gap-3">
             <p className="text-sm text-ink-muted">
               {t(search === '' ? 'recent.empty' : 'recent.noMatches')}
             </p>
@@ -344,7 +347,7 @@ export function RecentWork({ organizationId, organizationName, role }: RecentWor
                 : 'flex flex-col divide-y divide-line overflow-hidden rounded-card border border-line bg-surface-raised'
             }
           >
-            {items.map((item) => {
+            {items.map((item, index) => {
               const Icon = item.kind === 'photo' ? Image : Stamp
               return (
                 <li key={recentResourceKey(recentItemIdentity(item))}>
@@ -353,12 +356,14 @@ export function RecentWork({ organizationId, organizationName, role }: RecentWor
                       {openLink(
                         item,
                         <>
-                          <span className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-lg bg-surface">
-                            <RecentThumbnail item={item} />
+                          <span className="flex aspect-[4/3] w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface sm:w-full">
+                            <RecentThumbnail item={item} isPriority={index === 0} />
                           </span>
-                          <span className="block font-medium break-words">{itemName(item)}</span>
+                          <span className="block min-w-0 flex-1 font-medium break-words sm:flex-none">
+                            {itemName(item)}
+                          </span>
                         </>,
-                        'flex w-full min-w-0 flex-col gap-2 rounded-card p-3 text-start focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none',
+                        'flex w-full min-w-0 flex-row items-center gap-3 rounded-card p-3 text-start focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none sm:flex-col sm:items-stretch sm:gap-2',
                       )}
                       <div className="min-w-0 px-3 pb-3">
                         <p className="text-xs text-ink-muted">

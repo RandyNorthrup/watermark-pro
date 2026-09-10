@@ -1,0 +1,33 @@
+{
+  "mode": "diagnostic",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 1,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 946.623,
+        "lcp": 1396.623,
+        "cls": 0,
+        "tbt": 0
+      },
+      "protocols": [
+        "h2"
+      ]
+    }
+  ],
+  "scores": {
+    "performance": 1,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 946.623,
+    "lcp": 1396.623,
+    "cls": 0,
+    "tbt": 0
+  }
+}

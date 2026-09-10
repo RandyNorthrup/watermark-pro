@@ -66,6 +66,19 @@ test('recent work opens real content in three accessible views, survives offline
   await expect(photo).toBeVisible()
   await expectImage(photo)
   await expectImage(preset)
+  const firstThumbnail = await photo.locator('img').boundingBox()
+  const viewport = page.viewportSize()
+  expect(firstThumbnail).not.toBeNull()
+  expect(viewport).not.toBeNull()
+  if (firstThumbnail !== null && viewport !== null) {
+    if (viewport.width < 640) {
+      expect(firstThumbnail.width).toBeLessThanOrEqual(96)
+      expect(firstThumbnail.height).toBeLessThanOrEqual(72)
+    } else {
+      expect(firstThumbnail.width).toBeGreaterThan(96)
+      expect(firstThumbnail.height).toBeGreaterThan(72)
+    }
+  }
   await expect(recents.getByRole('listitem').first()).toContainText(
     'private-recent-watermarked.png',
   )

@@ -57,6 +57,17 @@ function spyOnDateFormatting() {
 }
 
 describe('recent work dashboard', () => {
+  it('prioritizes the first real thumbnail and keeps remaining thumbnails lazy', async () => {
+    seedRecents()
+    renderApp('/app')
+    const photo = await screen.findByRole('button', { name: 'Private saved photo.jpg' })
+    await waitFor(() => expect(photo.querySelector('img')).toHaveAttribute('loading', 'eager'))
+    expect(photo.querySelector('img')).toHaveAttribute('fetchpriority', 'high')
+    const preset = screen.getByRole('link', { name: 'Private saved mark' })
+    await waitFor(() => expect(preset.querySelector('img')).toHaveAttribute('loading', 'lazy'))
+    expect(preset.querySelector('img')).toHaveAttribute('fetchpriority', 'auto')
+  })
+
   it('does not initialize a date formatter when no dated rows are rendered', async () => {
     installLibraryApi()
     const formatter = spyOnDateFormatting()

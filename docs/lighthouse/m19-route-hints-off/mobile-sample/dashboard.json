@@ -1,0 +1,65 @@
+{
+  "mode": "diagnostic",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.9,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1206.458,
+        "lcp": 2929.458,
+        "cls": 0.00001509355272086945,
+        "tbt": 263.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.77,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1650.6661,
+        "lcp": 3334.6661,
+        "cls": 0.00001509355272086945,
+        "tbt": 558.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.84,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1650.664,
+        "lcp": 3171.6639999999998,
+        "cls": 0.00001509355272086945,
+        "tbt": 380.4999999999998
+      },
+      "protocols": [
+        "h2"
+      ]
+    }
+  ],
+  "scores": {
+    "performance": 0.84,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1650.664,
+    "lcp": 3171.6639999999998,
+    "cls": 0.00001509355272086945,
+    "tbt": 380.4999999999998
+  }
+}

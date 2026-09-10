@@ -39,6 +39,7 @@ import {
 } from './lib/lighthouse-budget.mjs'
 import { setAuditCookies } from './lib/lighthouse-cookies.mjs'
 import { validateAuditNavigation } from './lib/lighthouse-navigation.mjs'
+import { auditContentFailure, withLighthousePage } from './lib/lighthouse-page.mjs'
 
 const BASE_URL = process.env.APP_URL ?? 'http://localhost:5273'
 const MILESTONE = process.argv[2] ?? 'm19'
@@ -117,6 +118,15 @@ async function auditMedian(origin, chrome, surface) {
 }
 
 async function audit(origin, chrome, surface, attempt = 1) {
+  const result = await withLighthousePage(
+    chrome.port,
+    async (page, inspectionPage) =>
+      await auditOwnedPage(origin, chrome, surface, attempt, page, inspectionPage),
+  )
+  return result === RETRY_TRACE ? await audit(origin, chrome, surface, attempt + 1) : result
+}
+
+async function auditOwnedPage(origin, chrome, surface, attempt, page, inspectionPage) {
   const { pathname } = surface
   // Desktop preset: 40 ms RTT, 10 Mbps, no CPU slowdown. Mobile: Lighthouse's
   // default config, which emulates a phone screen, slow 4G and a 4x slower CPU.
@@ -137,6 +147,7 @@ async function audit(origin, chrome, surface, attempt = 1) {
       ],
     },
     FORM_FACTOR === 'desktop' ? desktopConfig : undefined,
+    page,
   )
   if (result === undefined) {
     throw new Error(`Lighthouse produced no result for ${surface.id}`)
@@ -146,7 +157,7 @@ async function audit(origin, chrome, surface, attempt = 1) {
     // to rerun. A sample that never traces causes the required five-trace aggregate to fail.
     if (attempt < MAX_ATTEMPTS) {
       console.warn(`Retrying trace capture for ${surface.id}`)
-      return await audit(origin, chrome, surface, attempt + 1)
+      return RETRY_TRACE
     }
     console.warn(`Trace capture failed for ${surface.id}`)
     return null
@@ -157,19 +168,17 @@ async function audit(origin, chrome, surface, attempt = 1) {
     finalDisplayedUrl: result.lhr.finalDisplayedUrl,
     requests: result.lhr.audits['network-requests']?.details?.items,
   })
-  const inspection = await chromium.connectOverCDP(`http://127.0.0.1:${chrome.port}`)
+  let contentFailure
   try {
-    const page = inspection
-      .contexts()
-      .flatMap((context) => context.pages())
-      .find((candidate) => candidate.url() === result.lhr.finalDisplayedUrl)
-    if (page === undefined)
-      throw new Error('Lighthouse audit page is no longer available for content verification')
-    await assertAuditContent(page, surface, CATALOGUE)
-  } catch {
-    throw new Error(`Lighthouse did not render the required state for ${surface.id}`)
-  } finally {
-    await inspection.close()
+    await assertAuditContent(inspectionPage, surface, CATALOGUE)
+  } catch (error) {
+    // Protocol exceptions can contain private DOM; carry only their finite cause.
+    contentFailure = auditContentFailure(error)
+  }
+  if (contentFailure !== undefined) {
+    throw new Error(`Lighthouse content check failed for ${surface.id}: ${contentFailure}.`, {
+      cause: contentFailure,
+    })
   }
   const scores = Object.fromEntries(
     Object.entries(result.lhr.categories).map(([key, category]) => [key, category.score ?? 0]),
@@ -198,6 +207,7 @@ const selected = AUDIT_SURFACES.filter(
 )
 const PROXY_PORT = 0
 const MAX_ATTEMPTS = 3
+const RETRY_TRACE = Symbol('retry-trace')
 const TRANSPORT = 'HTTP/2 over TLS with an ephemeral key pinned only in the audit browser'
 async function createAuditProfile() {
   const workspace = await realpath(process.cwd())

@@ -1,9 +1,15 @@
-# M19 startup performance experiments — 2026-09-09
+# M19 startup performance experiments — 2026-09-09 to 2026-09-10
 
 These are local production-artifact measurements through the existing brotli
 proxy. They do not certify the full milestone or the deployed service. Numeric
 budgets, the five-trace certification rule, and the cold-storage configuration
 were unchanged.
+
+The latest verified **populated mobile dashboard** passes the required five-run
+gate: performance **97**, accessibility **100**, best practices **100**, FCP
+**1875 ms**, LCP **2251 ms**, CLS **0.000018**, and TBT **52 ms**. This is a
+selected-page result, not certification of the full route/state matrix or the
+deployed service. The final progression and source decisions are recorded below.
 
 ## Measured sequence
 
@@ -119,9 +125,11 @@ and 126232 brotli bytes before grouping. MSAL, Mediabunny, PDF, engine and edito
 component modules remain outside that closure. All actual route chunk budgets
 remain enforced, with no exclusions added.
 
-The application document also preloads its mandatory English catalogue and the
-actual installed Inter Latin variable font. Static public documents remove the
-app-only catalogue hint. A fresh Chromium check passed for all twelve locales:
+At this experimental stage, the application document preloaded its mandatory
+English catalogue and the actual installed Inter Latin variable font. The English
+catalogue hint remains; the font hint was removed in the final measured change
+described below. Static public documents remove the app-only catalogue hint.
+A fresh Chromium check at this stage passed for all twelve locales:
 each made exactly one English catalogue request and one Inter font request; each
 non-English locale fetched exactly one additional catalogue. Translated navigation,
 `lang`, and Arabic `dir=rtl` were checked, as was removal of the application hint
@@ -153,7 +161,7 @@ the measured startup work. No scheduling change was made. Its evidence is
 `temp/performance-sw-timing.{mjs,json,log}`. Later telemetry hardening and package
 metadata changes still require a fresh artifact and aggregate verification.
 
-## Open work
+## Subsequent measurements and verification
 
 ### Transport correction and first HTTP/2 diagnostic
 
@@ -416,13 +424,100 @@ the real certificate check, five focused launcher tests pass, as do lint and for
 disposable-copy drill removed the root-ownership check, failed the unsafe-helper
 assertion, then passed after exact restoration. Evidence is in
 `temp/audit-chrome-red.log` and `temp/audit-chrome-ci-install-tests.log`. YAML,
-Bash and embedded Node syntax checks also pass. The actual Linux runner remains
-the required confirmation before a full remote audit matrix can be accepted.
+Bash and embedded Node syntax checks also pass. Subsequent remote composite setup
+on commit `94d2b94` passed the real certificate preflight, and the public-home UI
+job confirmed `verified-setuid-helper` startup. This closes the Linux browser
+startup blocker; it does not establish that every UI/content/performance audit
+passed. The separate measured-page lifecycle defect is addressed below.
+
+### Final populated-dashboard progression
+
+The content-verification failure after the browser-startup repair was a separate
+harness lifecycle defect. Installed Lighthouse closes a page it creates before
+returning the result. The harness now supplies an owned Puppeteer page through
+Lighthouse's supported fourth argument, using Lighthouse's existing locked driver
+dependency. Its inspector is bound before measurement and checked against the
+same CDP target ID. Content and visible-image decoding are checked on that exact
+measured target before the owner closes it; there is no second navigation or
+unthrottled clone. Cookie setup, cold-storage settings, throttling and thresholds
+remain unchanged. Public-home and populated-dashboard diagnostics then passed
+their actual content, image and HTTP/2 checks.
+
+The initial populated dashboard exposed a real shift hidden by the earlier empty
+fixture: the Tools section contributed 0.102752 of the total 0.102767 CLS. A
+controlled real-response geometry check showed it moving from y=692 to y=1319
+when the 144 px loading area became the populated thumbnail grid. The route-loader
+experiment fetched history and view before first layout, eliminating that shift,
+but its sample still missed LCP and TBT. That additional loader wait was reverted;
+the final dashboard loader again performs its original admitted-member-role read.
+
+The retained design provides a stable, scrollable Office-style results panel:
+`h-80` on mobile and `sm:h-[22rem]` on larger screens (320 and 352 px at the default
+root font size). Loading, empty, filtered and populated states use the same panel;
+all real results remain available by scrolling. On mobile, the thumbnail opener
+is a horizontal row with a visible **96×72 px** preview beside the filename,
+with the real status and date retained. At `sm` and above, it returns to the full
+card/grid layout. The first thumbnail is eager/high priority only once its real
+data exists; the remaining thumbnails stay lazy. No image is hidden or held back
+to change the metric.
+
+These reports use the canonical populated fixture, unchanged mobile budgets and
+HTTP/2 transport. Most rows are successive build diagnostics, not isolated
+single-variable experiments. The route-hint pair is the matched exception: it
+used the same artifact and an isolated, equal-length transformation of only the
+dashboard's preload controller. Its CSP headers, inert map, asset bytes and offline
+inventory remained unchanged. Disabling hints worsened the three-run median, so
+the private hints were retained. Accessibility and best practices were 100 in
+every row below.
+
+| Populated dashboard variant                    | Traces | Performance | FCP ms   | LCP ms   | CLS          | TBT ms |
+| ---------------------------------------------- | ------ | ----------- | -------- | -------- | ------------ | ------ |
+| Owned-page baseline                            | 1      | 84          | 1323     | 2823     | 0.102767     | 373    |
+| History/view loader experiment                 | 1      | 91          | 1504     | 3034     | 0.0000       | 181    |
+| Matched route hints enabled                    | 3      | 92          | 1875     | 3027     | 0.0000       | 148    |
+| Matched route hints disabled                   | 3      | 84          | 1651     | 3172     | 0.0000       | 381    |
+| Compact mobile thumbnails                      | 1      | 89          | 1693     | 3038     | 0.0000       | 223    |
+| Stable results panel; original loader restored | 1      | 93          | 1590     | 2859     | 0.0000       | 164    |
+| Early Inter preload removed                    | 1      | 96          | 1622     | 2522     | 0.0000       | 118    |
+| Final artifact, required five-run aggregate    | 5      | **97**      | **1875** | **2251** | **0.000018** | **52** |
+
+Retained report directories are `m19-owned-page-proof`,
+`m19-dashboard-prefetch`, `m19-route-hints-on`, `m19-route-hints-off`, and
+`m19-no-font-preload-five` under `docs/lighthouse/`. Intermediate single-run
+commands remain in ignored `temp/` logs instead of duplicating public reports.
+The first seven rows are explicit diagnostics. The final evidence is
+`docs/lighthouse/m19-no-font-preload-five/mobile/dashboard.json` and its HTML and
+summary reports, with the command log in
+`temp/lighthouse-no-font-preload-five.log`.
+
+The final source diff removes only the early Inter `<link rel="preload"
+as="font">` from `index.html`. It does not remove the font: `main.tsx` still
+imports `@fontsource-variable/inter`, the application CSS still selects
+`Inter Variable`, and the font catalogue still includes that package and family.
+Its normal `@font-face` rule remains available to the page and the existing font
+loader remains available to the editor/renderer. The retained final Lighthouse
+report records successful HTTP/2 requests for the Inter Latin WOFF2 with
+`isLinkPreload: false`. The change removes an early high-priority request rather
+than substituting a different font. The English catalogue preload remains.
+
+The five final traces all completed the same-target content/image checks and
+recorded `h2` for HTTP(S) traffic. Individual performance scores were
+97/97/97/97/96; LCP was 2476/2250/2251/2250/2252 ms and TBT was
+94.5/52/41.5/46.5/137.5 ms. Each trace was within the mobile limits; the required
+aggregate uses median performance/timings and minimum accessibility/best-practice
+scores. The fresh build also passed its bundle and built-publication gates, as
+recorded in `temp/lumafoil-build-no-font-preload.log`.
+
+**Certification boundary:** this passing aggregate covers only the populated
+`dashboard` scenario on the local final build. It does not certify the empty
+dashboard, every Recents view, other routes, the desktop matrix, all device E2E or
+screenshot checks, or production-hosted TLS/performance. Those gates require their
+own final-artifact evidence; no completion is inferred from this selected page.
 
 ### Remaining gates
 
-- Reduce the authenticated request chain without weakening live session admission,
-  account ownership or server authorization.
+- Resolve any other route-specific performance failures exposed by the complete
+  matrix without weakening live session admission, ownership or authorization.
 - Keep the now-passing application byte budget green through final source changes.
 - Recheck fresh first visit, offline reload and reconnect behavior after the final
   startup change, including explicit boot failures and redirected routes.

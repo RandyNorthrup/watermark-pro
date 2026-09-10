@@ -1,0 +1,97 @@
+{
+  "mode": "certification",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.97,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1500.545,
+        "lcp": 2475.545,
+        "cls": 0.00001760914484101436,
+        "tbt": 94.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.97,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.3962000000001,
+        "lcp": 2250.3962,
+        "cls": 0,
+        "tbt": 52
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.97,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.5139,
+        "lcp": 2250.5139,
+        "cls": 0.00001760914484101436,
+        "tbt": 41.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.97,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.4274999999998,
+        "lcp": 2250.4275,
+        "cls": 0.00001760914484101436,
+        "tbt": 46.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    },
+    {
+      "scores": {
+        "performance": 0.96,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.4274999999998,
+        "lcp": 2252.4275,
+        "cls": 0,
+        "tbt": 137.5
+      },
+      "protocols": [
+        "h2"
+      ]
+    }
+  ],
+  "scores": {
+    "performance": 0.97,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1875.4274999999998,
+    "lcp": 2250.5139,
+    "cls": 0.00001760914484101436,
+    "tbt": 52
+  }
+}

@@ -61,6 +61,14 @@ cutover are not yet certified; focused evidence lives under
 
 ### Changed
 
+- Recent work now uses a stable scrollable results panel, with compact horizontal
+  thumbnails on phones and the full card grid on larger screens. This removes
+  the large Tools-section shift without delaying the page or adding an empty
+  placeholder. The first visible thumbnail is eager/high priority; later images
+  remain lazy.
+- Inter remains the interface and watermark font, but its normal stylesheet load
+  replaces a redundant early preload that competed with the app entry bundle on
+  a cold mobile connection. The metric-matched fallback prevents font-swap shift.
 - Commit hooks invoke the pinned formatter and linters through Node directly.
   Native Windows argument handling avoids repeated small command batches while
   retaining staged-only formatting, strict lint and publication checks. Isolated
@@ -106,6 +114,15 @@ cutover are not yet certified; focused evidence lives under
 
 ### Fixed
 
+- Selecting an Insert detail token could let the closing menu return focus to
+  its trigger after the designer restored the text caret. Selection now retains
+  the insertion field; Escape dismissal still returns focus to the trigger.
+- Bulk filename validation now exposes its composite token/example feedback
+  through `aria-describedby` and reports the real invalid state. Device tests
+  assert both the blank-pattern failure and valid-pattern negative control.
+- Lighthouse previously closed its internally created tab before the rendered
+  content assertion ran. The runner now supplies and owns the exact measured
+  browser target until route, seeded-state and image decoding checks finish.
 - WebKit's automation-level offline switch disabled service-worker cache delivery
   even when the complete cache was active. Offline browser journeys now sever a
   per-test loopback proxy, prove uncached traffic is blocked and cached assets

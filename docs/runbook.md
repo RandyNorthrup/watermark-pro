@@ -14,8 +14,13 @@ Cloudflare identity and target bindings:
 ```powershell
 npx wrangler whoami
 npx wrangler d1 info DB --env production
-npx wrangler d1 migrations list DB --remote --env production
+npx wrangler d1 execute DB --remote --env production --command "SELECT id, name, applied_at FROM d1_migrations ORDER BY id"
 ```
+
+Use the explicit `SELECT` for a read-only preflight. The installed Wrangler
+`d1 migrations list` implementation initializes its bookkeeping table with
+`CREATE TABLE IF NOT EXISTS`; it is therefore excluded from observation-only
+checks. Applying migrations remains a deliberate release step below.
 
 `DB` and `BUCKET` bind D1 and private R2 storage. Objects use workspace-scoped
 keys. `AUTH_RATE_LIMITER`, `API_RATE_LIMITER` and `IMPORT_RATE_LIMITER` enforce

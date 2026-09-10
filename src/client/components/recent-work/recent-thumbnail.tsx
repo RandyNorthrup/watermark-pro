@@ -10,15 +10,33 @@ import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { useWorkspaceMedia } from '../../lib/use-workspace-media'
 
 /** A preview uses the real saved content, never a fabricated project image. */
-export function RecentThumbnail({ item }: { item: RecentWorkItem }) {
+export function RecentThumbnail({
+  item,
+  isPriority = false,
+}: {
+  item: RecentWorkItem
+  isPriority?: boolean
+}) {
   return item.kind === 'photo' ? (
-    <PhotoThumbnail organizationId={item.photo.organizationId} id={item.photo.id} />
+    <PhotoThumbnail
+      organizationId={item.photo.organizationId}
+      id={item.photo.id}
+      isPriority={isPriority}
+    />
   ) : (
-    <PresetThumbnail preset={item.preset} />
+    <PresetThumbnail preset={item.preset} isPriority={isPriority} />
   )
 }
 
-function PhotoThumbnail({ organizationId, id }: { organizationId: string; id: string }) {
+function PhotoThumbnail({
+  organizationId,
+  id,
+  isPriority,
+}: {
+  organizationId: string
+  id: string
+  isPriority: boolean
+}) {
   const url = useWorkspaceMedia(organizationId, photoThumbnailUrl(organizationId, id))
   const [failed, setFailed] = useState(false)
   return url === undefined || failed ? (
@@ -27,14 +45,15 @@ function PhotoThumbnail({ organizationId, id }: { organizationId: string; id: st
     <img
       src={url}
       alt=""
-      loading="lazy"
+      loading={isPriority ? 'eager' : 'lazy'}
+      fetchPriority={isPriority ? 'high' : 'auto'}
       className="h-full w-full object-contain"
       onError={() => setFailed(true)}
     />
   )
 }
 
-function PresetThumbnail({ preset }: { preset: WatermarkDto }) {
+function PresetThumbnail({ preset, isPriority }: { preset: WatermarkDto; isPriority: boolean }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
     const owner = captureOfflineOwner()
@@ -83,6 +102,12 @@ function PresetThumbnail({ preset }: { preset: WatermarkDto }) {
   return url === null ? (
     <Stamp aria-hidden="true" className="size-8 text-ink-muted" />
   ) : (
-    <img src={url} alt="" className="h-full w-full object-contain" />
+    <img
+      src={url}
+      alt=""
+      loading={isPriority ? 'eager' : 'lazy'}
+      fetchPriority={isPriority ? 'high' : 'auto'}
+      className="h-full w-full object-contain"
+    />
   )
 }
