@@ -13,6 +13,7 @@ import {
   currentOfflineUser,
 } from './offline-context'
 import { updateOfflineStatus } from './offline-status'
+import { installPrivateBoot } from './private-boot'
 import {
   activeOrganizationQueryOptions,
   organizationsQueryOptions,
@@ -39,6 +40,7 @@ const ONLINE_ONLY_PATHS = [
 
 /** Validate the live account before any private cached workspace is admitted. */
 export async function loadAppContext(queryClient: QueryClient, pathname: string) {
+  installPrivateBoot(queryClient, pathname)
   const admission = captureOfflineGeneration()
   let hasNetwork = navigator.onLine
   const isOnlineOnly = ONLINE_ONLY_PATHS.some((path) => pathname.startsWith(path))

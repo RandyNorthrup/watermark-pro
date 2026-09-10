@@ -64,6 +64,11 @@ candidate passes its hosted gates.
 
 ### Changed
 
+- Private query restoration, account observers and offline admission now load
+  only before an `/app` route is admitted. Public auth pages avoid that private
+  startup work; same-document sign-in still installs it before rendering a
+  workspace. Signed-in public language changes use a fresh exact-session fence
+  and never restore workspace data to save the account preference.
 - Core login, audit and invitation queries now load a four-schema validation
   leaf instead of initializing unrelated media and administration schemas.
   Desktop file-launch delivery, the bulk engine pool, mark resource catalogues,
@@ -128,6 +133,11 @@ candidate passes its hosted gates.
 
 ### Fixed
 
+- Administrator totals and Gallery filters/actions now retain their final
+  geometry while real responses are pending. Loading, empty and failure states
+  remain labelled; actions stay disabled until valid data exists. Held-response
+  checks across desktop, iPhone, iPad and Android report no shift, overflow or
+  axe violations.
 - Library export and invitation referral controls now reserve their final
   layout while data loads, eliminating the measured desktop and phone shifts
   without enabling actions before valid data exists. The language chooser is a

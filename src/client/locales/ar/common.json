@@ -1333,8 +1333,7 @@
     "users": "الحسابات المسجلة",
     "verifiedUsers": "الحسابات المؤكدة",
     "pendingInvitations": "الدعوات المعلّقة",
-    "acceptedInvitations": "الدعوات المقبولة",
-    "loading": "جارٍ تحميل أعداد الحسابات…"
+    "acceptedInvitations": "الدعوات المقبولة"
   },
   "accountAuth": {
     "heading": "إعدادات الحساب",

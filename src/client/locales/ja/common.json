@@ -1243,8 +1243,7 @@
     "users": "登録アカウント",
     "verifiedUsers": "確認済みアカウント",
     "pendingInvitations": "保留中の招待",
-    "acceptedInvitations": "承認済みの招待",
-    "loading": "アカウント数を読み込み中…"
+    "acceptedInvitations": "承認済みの招待"
   },
   "accountAuth": {
     "heading": "アカウント設定",

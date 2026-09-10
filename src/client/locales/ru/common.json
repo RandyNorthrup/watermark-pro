@@ -1297,8 +1297,7 @@
     "users": "Всего аккаунтов",
     "verifiedUsers": "Подтверждённые аккаунты",
     "pendingInvitations": "Ожидающие приглашения",
-    "acceptedInvitations": "Принятые приглашения",
-    "loading": "Загрузка итогов…"
+    "acceptedInvitations": "Принятые приглашения"
   },
   "accountAuth": {
     "heading": "Настройки аккаунта",

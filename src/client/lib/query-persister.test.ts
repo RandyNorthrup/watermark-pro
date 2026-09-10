@@ -180,6 +180,20 @@ describe('persist and load', () => {
 })
 
 describe('installQueryPersister', () => {
+  it('stops pending and future persistence when its application client is replaced', () => {
+    vi.useFakeTimers()
+    const client = new QueryClient()
+    const stop = installQueryPersister(client, localStorage)
+    client.setQueryData(['session'], SESSION)
+    stop?.()
+    vi.runAllTimers()
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+    client.setQueryData(['session'], { ...SESSION, user: { ...SESSION.user, name: 'Changed' } })
+    vi.runAllTimers()
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+    client.clear()
+  })
+
   it('clears immediately on sign-out and cannot restore a queued stale write', () => {
     vi.useFakeTimers()
     const client = new QueryClient()

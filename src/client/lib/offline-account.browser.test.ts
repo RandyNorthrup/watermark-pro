@@ -2,12 +2,8 @@
 import { QueryClient } from '@tanstack/react-query'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  activateOfflineAccount,
-  clearOfflineAccount,
-  installOfflineAccountBoundary,
-  lockOfflineAccount,
-} from './offline-account'
+import { activateOfflineAccount, clearOfflineAccount, lockOfflineAccount } from './offline-account'
+import { installOfflineAccountBoundary } from './offline-account-boundary'
 import { captureOfflineOwner, currentOfflineUser, setOfflineUser } from './offline-context'
 import type * as OfflineDatabase from './offline-database'
 import {

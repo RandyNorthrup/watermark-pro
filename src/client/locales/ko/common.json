@@ -1243,8 +1243,7 @@
     "users": "등록 계정",
     "verifiedUsers": "인증된 계정",
     "pendingInvitations": "대기 중인 초대",
-    "acceptedInvitations": "수락된 초대",
-    "loading": "계정 수 불러오는 중…"
+    "acceptedInvitations": "수락된 초대"
   },
   "accountAuth": {
     "heading": "계정 설정",

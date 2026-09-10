@@ -7,10 +7,8 @@ import { createRoot } from 'react-dom/client'
 import { hasInterfaceLanguage, initI18n } from './i18n'
 import { showBootFailure } from './lib/boot-failure'
 import { receiveLaunchFiles } from './lib/launch-files'
-import { installOfflineAccountBoundary } from './lib/offline-account'
 import { preloadRouteImages } from './lib/preload'
 import { createQueryClient } from './lib/query-client'
-import { installQueryPersister } from './lib/query-persister'
 import { installErrorReporting } from './lib/report-error'
 import { applyTheme, readTheme, watchSystemTheme } from './lib/theme'
 import { createAppRouter } from './router'
@@ -32,10 +30,8 @@ if (import.meta.env.PROD) {
 }
 
 const queryClient = createQueryClient()
-// Restore validated display queries for offline access. Online route admission
-// still validates live identity before displaying any cached private workspace.
-installQueryPersister(queryClient)
-installOfflineAccountBoundary(queryClient)
+// The private route installs offline services before admission, including an
+// in-app navigation from sign-in. Public startup does not restore private data.
 const router = createAppRouter(queryClient)
 
 // The routes for this URL need their code as soon as the session check

@@ -1261,8 +1261,7 @@
     "users": "Registrierte Konten",
     "verifiedUsers": "Verifizierte Konten",
     "pendingInvitations": "Ausstehende Einladungen",
-    "acceptedInvitations": "Angenommene Einladungen",
-    "loading": "Kontozahlen werden geladen…"
+    "acceptedInvitations": "Angenommene Einladungen"
   },
   "accountAuth": {
     "heading": "Kontoeinstellungen",

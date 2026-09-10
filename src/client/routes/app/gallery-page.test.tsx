@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -8,6 +8,7 @@ import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { makePhoto } from '../../test-support/fake-gallery-api'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
+import { requestUrl } from '../../test-support/request-url'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 
@@ -34,6 +35,38 @@ afterEach(() => {
 })
 
 describe('gallery page', () => {
+  it('keeps real filters and disabled selection actions available while gallery data loads', async () => {
+    seedOwnerWorkspace(client())
+    installLibraryApi({
+      watermarks: [makeWatermark()],
+      gallery: { photos: seedPhotos(1), maxBytes: 1024, uploadFailsWith: null },
+    })
+    const original = globalThis.fetch
+    const release = Promise.withResolvers<undefined>()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = requestUrl(input)
+        if (url.includes('/photos') || url.includes('/watermarks')) await release.promise
+        return await original(input, init)
+      }),
+    )
+    renderApp('/app/gallery')
+    expect(await screen.findByLabelText('Search')).toBeEnabled()
+    expect(screen.getByLabelText('Preset')).toBeEnabled()
+    expect(screen.getByRole('progressbar', { name: 'Storage used' })).not.toHaveAttribute('value')
+    expect(screen.getByRole('button', { name: 'Select all' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Share' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Delete' })).toBeDisabled()
+    await act(async () => {
+      release.resolve(undefined)
+      await release.promise
+    })
+    await waitFor(() => expect(screen.getByTestId('usage-summary')).toHaveTextContent('1 photo ·'))
+    expect(screen.getByRole('button', { name: 'Select all' })).toBeEnabled()
+    expect(screen.getByRole('progressbar', { name: 'Storage used' })).toHaveAttribute('value')
+  })
+
   it('shows usage, pages through photos, filters by preset and search, and opens a photo', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
@@ -47,8 +80,10 @@ describe('gallery page', () => {
     })
     renderApp('/app/gallery')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Gallery')
-    expect(await screen.findByTestId('usage-summary')).toHaveTextContent(
-      `${String(PHOTO_PAGE_SIZE + 5)} photos · `,
+    await waitFor(() =>
+      expect(screen.getByTestId('usage-summary')).toHaveTextContent(
+        `${String(PHOTO_PAGE_SIZE + 5)} photos · `,
+      ),
     )
     expect(screen.getByRole('progressbar', { name: 'Storage used' })).toBeInTheDocument()
 
@@ -140,6 +175,9 @@ describe('gallery page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ failWith: 'forbidden' })
     renderApp('/app/gallery')
-    expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
+    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2))
+    for (const alert of screen.getAllByRole('alert')) {
+      expect(alert).toHaveTextContent('Your role does not allow this.')
+    }
   })
 })

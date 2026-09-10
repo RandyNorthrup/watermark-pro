@@ -1261,8 +1261,7 @@
     "users": "Registered accounts",
     "verifiedUsers": "Verified accounts",
     "pendingInvitations": "Pending invitations",
-    "acceptedInvitations": "Accepted invitations",
-    "loading": "Loading account totals…"
+    "acceptedInvitations": "Accepted invitations"
   },
   "accountAuth": {
     "heading": "Account settings",

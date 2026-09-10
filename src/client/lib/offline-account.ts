@@ -4,10 +4,10 @@ import type { QueryClient } from '@tanstack/react-query'
 import { clearLaunchFiles, retainInitialLaunch } from './launch-files'
 import { currentOfflineUser, hasOfflineDatabase, setOfflineUser } from './offline-context'
 import { updateOfflineStatus } from './offline-status'
-import { clearPersistedQueries } from './query-persister'
+import { clearPersistedQueries } from './persisted-shell-storage'
 import { clearSharedFiles } from './shared-files'
 
-const ACCOUNT_KEY = 'lumafoil:active-account'
+export const ACCOUNT_KEY = 'lumafoil:active-account'
 export const ACCOUNT_CHANGED_EVENT = 'lumafoil:account-changed'
 const boundary = { generation: 0 }
 const ACCOUNT_TRANSITION_LOCK = 'lumafoil-account-transition'
@@ -116,34 +116,4 @@ export async function clearOfflineAccount(queryClient: QueryClient, userId: stri
       })
     await clearSharedFiles(userId)
   })
-}
-
-/** Another tab's account change immediately removes private state and returns this tab to sign-in. */
-export function installOfflineAccountBoundary(
-  queryClient: QueryClient,
-  onChange: () => void = () => window.location.replace('/login'),
-): () => void {
-  const changed = (event: StorageEvent) => {
-    if (event.key !== ACCOUNT_KEY || event.newValue === null) {
-      return
-    }
-    const previous = currentOfflineUser()
-    let userId: unknown
-    try {
-      const message: unknown = JSON.parse(event.newValue)
-      userId =
-        typeof message === 'object' && message !== null && 'userId' in message
-          ? message.userId
-          : undefined
-    } catch {
-      return
-    }
-    if (previous === userId || (typeof userId !== 'string' && userId !== null)) {
-      return
-    }
-    lockOfflineAccount(queryClient)
-    onChange()
-  }
-  window.addEventListener('storage', changed)
-  return () => window.removeEventListener('storage', changed)
 }

@@ -1261,8 +1261,7 @@
     "users": "Geregistreerde accounts",
     "verifiedUsers": "Geverifieerde accounts",
     "pendingInvitations": "Openstaande uitnodigingen",
-    "acceptedInvitations": "Geaccepteerde uitnodigingen",
-    "loading": "Accounttotalen laden…"
+    "acceptedInvitations": "Geaccepteerde uitnodigingen"
   },
   "accountAuth": {
     "heading": "Accountinstellingen",

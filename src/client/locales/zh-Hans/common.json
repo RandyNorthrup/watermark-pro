@@ -1243,8 +1243,7 @@
     "users": "注册账号",
     "verifiedUsers": "已验证账号",
     "pendingInvitations": "待接受邀请",
-    "acceptedInvitations": "已接受邀请",
-    "loading": "正在加载账号统计…"
+    "acceptedInvitations": "已接受邀请"
   },
   "accountAuth": {
     "heading": "账号设置",

@@ -1279,8 +1279,7 @@
     "users": "Contas registradas",
     "verifiedUsers": "Contas verificadas",
     "pendingInvitations": "Convites pendentes",
-    "acceptedInvitations": "Convites aceitos",
-    "loading": "Carregando totais…"
+    "acceptedInvitations": "Convites aceitos"
   },
   "accountAuth": {
     "heading": "Configurações da conta",

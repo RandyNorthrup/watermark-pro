@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { apiRequest, fetchJson } from './api'
-import { setOfflineUser } from './offline-context'
+import { captureOfflineGeneration, setOfflineUser } from './offline-context'
 import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
 
 const OWNER = 'rendered-account'
@@ -53,6 +53,7 @@ describe('account-bound API requests', () => {
 })
 
 it.each([
+  '/api/me',
   '/api/orgs/studio/photos',
   '/api/me/invitations',
   '/api/admin/accounts',
@@ -64,6 +65,39 @@ it.each([
   vi.stubGlobal('fetch', fetcher)
   setOfflineUser(null)
   await expect(apiRequest(path, { method: 'POST' })).rejects.toThrow('Sign in before')
+  expect(fetcher).not.toHaveBeenCalled()
+})
+
+it.each(['/api/me/invitations', '/api/orgs/studio/photos', '/api/admin/accounts', '/api/config'])(
+  'refuses to widen a live-session profile binding to %s',
+  async (path) => {
+    setOfflineUser(null)
+    const fetcher = vi.fn<typeof fetch>()
+    vi.stubGlobal('fetch', fetcher)
+    const account = { userId: OWNER, ...captureOfflineGeneration() }
+    await expect(apiRequest(path, { method: 'PATCH' }, account)).rejects.toThrow('only update')
+    expect(fetcher).not.toHaveBeenCalled()
+  },
+)
+
+it('refuses a live binding for a read, a conflicting header, or another admitted owner', async () => {
+  setOfflineUser(null)
+  const fetcher = vi.fn<typeof fetch>()
+  vi.stubGlobal('fetch', fetcher)
+  const account = { userId: OWNER, ...captureOfflineGeneration() }
+  await expect(apiRequest('/api/me', {}, account)).rejects.toThrow('only update')
+  await expect(
+    apiRequest(
+      '/api/me',
+      { method: 'PATCH', headers: { [ACCOUNT_ID_HEADER]: 'another-account' } },
+      account,
+    ),
+  ).rejects.toThrow('account changed')
+  setOfflineUser('another-account')
+  const mismatched = { userId: OWNER, ...captureOfflineGeneration() }
+  await expect(apiRequest('/api/me', { method: 'PATCH' }, mismatched)).rejects.toThrow(
+    'account changed',
+  )
   expect(fetcher).not.toHaveBeenCalled()
 })
 

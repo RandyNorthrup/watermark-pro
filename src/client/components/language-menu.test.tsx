@@ -5,9 +5,10 @@ import i18next from 'i18next'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LanguageMenu } from './language-menu'
+import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
 import { SUPPORTED_LOCALES } from '../../shared/locales'
 import { setLocale } from '../i18n'
-import { setOfflineUser } from '../lib/offline-context'
+import { currentOfflineUser, setOfflineUser } from '../lib/offline-context'
 import { sessionQueryOptions } from '../lib/queries'
 import { createQueryClient } from '../lib/query-client'
 import french from '../locales/fr/common.json'
@@ -21,11 +22,14 @@ vi.mock('../lib/auth-client', () => import('../test-support/fake-auth-module'))
  * first paint. `isSignedIn` decides whether the account save runs: a member
  * has a session, the landing/auth pages do not.
  */
-async function mountMenu(isSignedIn: boolean): Promise<void> {
+async function mountMenu(
+  isSignedIn: boolean,
+  { workspace = true }: { workspace?: boolean } = {},
+): Promise<void> {
   const queryClient = createQueryClient()
   if (isSignedIn) {
     fakeAuth().state.user = OWNER
-    setOfflineUser(OWNER.id)
+    if (workspace) setOfflineUser(OWNER.id)
   }
   await queryClient.query(sessionQueryOptions)
   render(
@@ -67,6 +71,53 @@ afterEach(async () => {
 })
 
 describe('LanguageMenu', () => {
+  it('saves a freshly verified public session without admitting a private workspace', async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(Response.json({ locale: 'es' }))
+    await mountMenu(true, { workspace: false })
+    expect(currentOfflineUser()).toBeNull()
+
+    await pickLanguage('Español')
+
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce())
+    const [url, init] = fetchSpy.mock.calls[0] ?? []
+    expect(url).toBe('/api/me')
+    expect(new Headers(init?.headers).get(ACCOUNT_ID_HEADER)).toBe(OWNER.id)
+    expect(requestBody(init)).toEqual({ locale: 'es' })
+    expect(fakeAuth().getSession).toHaveBeenLastCalledWith({
+      query: { disableCookieCache: true },
+      fetchOptions: { cache: 'no-store' },
+    })
+    expect(currentOfflineUser()).toBeNull()
+  })
+
+  it.each(['signed-out', 'different-account', 'different-session'] as const)(
+    'keeps a stale public session choice local after %s',
+    async (change) => {
+      await mountMenu(true, { workspace: false })
+      if (change === 'signed-out') fakeAuth().state.user = null
+      else if (change === 'different-account')
+        fakeAuth().state.user = { ...OWNER, id: 'another-account' }
+      else
+        fakeAuth().getSession.mockResolvedValue({
+          error: null,
+          data: {
+            user: OWNER,
+            session: { id: 'replacement-session', userId: OWNER.id, activeOrganizationId: null },
+          },
+        })
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+
+      await pickLanguage('Español')
+
+      await waitFor(() => expect(document.documentElement.lang).toBe('es'))
+      expect(fakeAuth().getSession).toHaveBeenCalledTimes(2)
+      expect(fetchSpy).not.toHaveBeenCalled()
+      expect(currentOfflineUser()).toBeNull()
+    },
+  )
+
   it('keeps the page accessible while choosing a language and restores focus on Escape', async () => {
     await mountMenu(false)
     const user = userEvent.setup()
@@ -97,20 +148,24 @@ describe('LanguageMenu', () => {
     expect(document.documentElement.lang).toBe('en')
   })
 
-  it('does not save an old account choice to a new account after a delayed catalogue download', async () => {
-    await mountMenu(true)
-    i18next.removeResourceBundle('fr', 'common')
-    const download = Promise.withResolvers<Response>()
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => download.promise)
-    await pickLanguage('Français')
-    await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce())
-    setOfflineUser('different-account')
-    act(() => {
-      download.resolve(Response.json(french))
-    })
-    await waitFor(() => expect(document.documentElement.lang).toBe('fr'))
-    expect(fetchSpy.mock.calls.some(([url]) => url === '/api/me')).toBe(false)
-  })
+  it.each([true, false])(
+    'does not save a stale catalogue choice after relocking (workspace %s)',
+    async (workspace) => {
+      await mountMenu(true, { workspace })
+      i18next.removeResourceBundle('fr', 'common')
+      const download = Promise.withResolvers<Response>()
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => download.promise)
+      await pickLanguage('Français')
+      await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce())
+      setOfflineUser(workspace ? 'different-account' : null)
+      act(() => {
+        download.resolve(Response.json(french))
+      })
+      await waitFor(() => expect(document.documentElement.lang).toBe('fr'))
+      expect(fetchSpy.mock.calls.some(([url]) => url === '/api/me')).toBe(false)
+      expect(fakeAuth().getSession).toHaveBeenCalledOnce()
+    },
+  )
   it('lists every language by its native name and applies the choice', async () => {
     await mountMenu(false)
 

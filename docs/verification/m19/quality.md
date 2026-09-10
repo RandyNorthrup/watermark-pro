@@ -294,3 +294,41 @@ blocking stylesheet; the private SPA still has no font preload. The built-output
 gate asserts both sides. A fresh local HTTP/2 mobile diagnostic passes Home and
 Privacy at 100/100/100 with zero CLS and zero TBT under
 `docs/lighthouse/m19-public-preload/`. Fresh Linux proof remains required.
+
+## Private boot and final asynchronous-layout checkpoint
+
+The private query persister, account observer and offline admission installer
+are absent from the public Login closure and load before the first `/app`
+admission, including a same-document sign-in. The browser proof retains an
+existing public-page snapshot unchanged, then observes all three private module
+identities and the correct authenticated snapshot after navigation. Sixty-two
+focused unit and eleven account-boundary browser checks pass. The app boot fell
+from 143,329 to 140,759 gzip bytes, leaving 2,601 bytes under the unchanged
+140 KiB limit. A matched mobile Login diagnostic reduced TBT from 231 to 108 ms;
+the single LCP sample was 2,502 ms, so the required five-run and Linux matrices
+remain authoritative.
+
+Public signed-in locale changes do not depend on restored workspace ownership.
+They capture the live session, revalidate it with cookie caching disabled and
+bind the existing `/api/me` request to the exact user/session generation. A
+sign-out, replacement session, mixed identity, relock, 401 or 403 cannot save a
+stale preference. Four intended reds and 63 focused tests cover those cases.
+
+Admin totals and Gallery controls now reserve their final functional layout
+while real responses are held. The original proof measured 74 px of Admin shift
+and independent Gallery shifts from usage, preset width and delayed actions.
+Eight production-build journeys across desktop, iPhone, iPad and Android now
+keep the measured controls at identical rectangles before/after responses, with
+zero overflow and zero axe violations. Loading/failure labels remain visible
+and actions remain disabled until their required data is valid.
+
+The combined source then passed `npm run quality`: 2,422 application tests,
+42 real-Workers tests, all supporting gate/publication/asset checks and the
+production build. Coverage is 93.29% statements, 85.55% branches, 93.07%
+functions and 93.61% lines. Source scanning passed 12,548 candidate/object
+checks and 297 archive entries; built scanning passed 2,401 checks and 114
+archive entries. The app shell is 137.4 KiB gzip. The ignored log is
+`temp/lumafoil-quality-private-layout-locale-3.log`, SHA-256
+`91d74f5b4a3d66bc4818413d6a970b9f4f2b046bf7346af213631ed2d3021f65`.
+Fresh SAST passes 509 rules over 1,937 targets with zero findings. Remote
+new-head device, complete UI and Linux performance proof remain required.

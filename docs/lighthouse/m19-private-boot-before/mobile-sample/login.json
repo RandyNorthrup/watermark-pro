@@ -1,0 +1,68 @@
+{
+  "mode": "diagnostic",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.93,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1179.137,
+        "lcp": 2560.1369999999997,
+        "cls": 0,
+        "tbt": 231
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 3461,
+        "layoutShifts": [],
+        "longTasks": [
+          {
+            "source": "asset:watermark-pro-dNlBzYY5.js",
+            "duration": 198,
+            "startTime": 2529.1369999999997
+          },
+          {
+            "source": "asset:watermark-pro-dNlBzYY5.js",
+            "duration": 133,
+            "startTime": 1779.137
+          },
+          {
+            "source": "document",
+            "duration": 59,
+            "startTime": 917.137
+          }
+        ],
+        "bootup": [
+          {
+            "source": "asset:watermark-pro-dNlBzYY5.js",
+            "duration": 382.7400000000025
+          },
+          {
+            "source": "document",
+            "duration": 281.6439999999999
+          },
+          {
+            "source": "unattributable",
+            "duration": 224.2719999999998
+          }
+        ]
+      }
+    }
+  ],
+  "scores": {
+    "performance": 0.93,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1179.137,
+    "lcp": 2560.1369999999997,
+    "cls": 0,
+    "tbt": 231
+  }
+}

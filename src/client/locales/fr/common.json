@@ -1279,8 +1279,7 @@
     "users": "Comptes inscrits",
     "verifiedUsers": "Comptes vérifiés",
     "pendingInvitations": "Invitations en attente",
-    "acceptedInvitations": "Invitations acceptées",
-    "loading": "Chargement des totaux…"
+    "acceptedInvitations": "Invitations acceptées"
   },
   "accountAuth": {
     "heading": "Paramètres du compte",

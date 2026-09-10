@@ -2,10 +2,10 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { setOfflineUser } from './offline-context'
+import { clearPersistedQueries, SHELL_STORAGE_KEY } from './persisted-shell-storage'
 import { MILLISECONDS_PER_SECOND } from '../../shared/constants'
 import { shellCacheSchema } from '../../shared/shell-cache'
 
-const STORAGE_KEY = 'watermark-pro:query-cache'
 const PERSIST_DEBOUNCE_MS = MILLISECONDS_PER_SECOND
 const SESSION_KEY = ['session'] as const
 const ORGANIZATIONS_KEY = ['organizations'] as const
@@ -20,19 +20,10 @@ export function isPersistedQuery(queryKey: readonly unknown[]): boolean {
   )
 }
 
-/** Storage denial is handled inside the boundary, including access to localStorage itself. */
-export function clearPersistedQueries(storage?: Storage): void {
-  try {
-    ;(storage ?? localStorage).removeItem(STORAGE_KEY)
-  } catch {
-    /* Online sign-out still succeeds when storage is denied. */
-  }
-}
-
 /** Validated display data remains available during sustained outages; live identity gates all online admission. */
 export function loadPersistedQueries(queryClient: QueryClient, storage: Storage): void {
   try {
-    const raw = storage.getItem(STORAGE_KEY)
+    const raw = storage.getItem(SHELL_STORAGE_KEY)
     if (raw === null) {
       return
     }
@@ -73,14 +64,17 @@ export function persistQueries(queryClient: QueryClient, storage: Storage): void
       clearPersistedQueries(storage)
       return
     }
-    storage.setItem(STORAGE_KEY, JSON.stringify(parsed.data))
+    storage.setItem(SHELL_STORAGE_KEY, JSON.stringify(parsed.data))
   } catch {
     /* Shell persistence is optional; durable saves report storage failures separately. */
   }
 }
 
 /** Restore once and persist updates. Removing the session clears the snapshot synchronously. */
-export function installQueryPersister(queryClient: QueryClient, storage?: Storage): void {
+export function installQueryPersister(
+  queryClient: QueryClient,
+  storage?: Storage,
+): (() => void) | undefined {
   let target: Storage
   try {
     target = storage ?? localStorage
@@ -89,7 +83,7 @@ export function installQueryPersister(queryClient: QueryClient, storage?: Storag
   }
   loadPersistedQueries(queryClient, target)
   let timer: ReturnType<typeof setTimeout> | null = null
-  queryClient.getQueryCache().subscribe((event) => {
+  const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
     const key: unknown = event.query.queryKey
     if (!Array.isArray(key) || !isPersistedQuery(key)) {
       return
@@ -105,4 +99,8 @@ export function installQueryPersister(queryClient: QueryClient, storage?: Storag
       persistQueries(queryClient, target)
     }, PERSIST_DEBOUNCE_MS)
   })
+  return () => {
+    if (timer !== null) clearTimeout(timer)
+    unsubscribe()
+  }
 }

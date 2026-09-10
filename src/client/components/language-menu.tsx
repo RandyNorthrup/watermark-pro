@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { type Locale, SUPPORTED_LOCALES } from '../../shared/locales'
 import { setLocale, useLocale } from '../i18n'
 import { saveLocale } from '../lib/locale-api'
-import { captureOfflineOwner, currentOfflineUser } from '../lib/offline-context'
+import { captureOfflineGeneration } from '../lib/offline-context'
 import { sessionQueryOptions } from '../lib/queries'
 import { Button } from './ui/button'
 import {
@@ -30,12 +30,18 @@ export function LanguageMenu() {
   async function choose(locale: Locale): Promise<void> {
     // Bind the user's action before a catalogue download can yield to an
     // account change. Public/local language choices need no private owner.
-    const owner = session?.user.id === currentOfflineUser() ? captureOfflineOwner() : null
+    const account =
+      session === undefined || session === null
+        ? null
+        : {
+            userId: session.user.id,
+            sessionId: session.session.id,
+            ...captureOfflineGeneration(),
+          }
     await setLocale(locale)
-    if (owner !== null) {
+    if (account !== null) {
       try {
-        owner.assertCurrent()
-        await saveLocale(locale)
+        await saveLocale(locale, account)
       } catch {
         // The language already switched locally and is saved in localStorage;
         // the account copy is best-effort and retried on the next change.
