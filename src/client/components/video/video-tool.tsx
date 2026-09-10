@@ -304,8 +304,8 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
   return (
     <PresetGate query={presets} emptyHint={t('video.emptyHint')}>
       {(list) => (
-        <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-          <Card className="flex flex-col gap-4 p-4">
+        <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <Card className="flex min-w-0 flex-col gap-4 p-4">
             <div
               onDragOver={allowDrop}
               onDrop={onDrop}
@@ -446,7 +446,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
             )}
           </Card>
 
-          <Card className="flex flex-col gap-5">
+          <Card className="flex min-w-0 flex-col gap-5">
             <fieldset className="flex flex-col gap-2">
               <legend className="mb-1.5 text-sm font-medium">{t('video.presets')}</legend>
               <ul className="flex flex-col gap-1">

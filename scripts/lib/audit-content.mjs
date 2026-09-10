@@ -34,4 +34,24 @@ export async function assertAuditContent(page, surface, catalogue) {
     )
       throw new Error('Audit page did not select its expected view')
   }
+  const decoded = await page.locator('img:visible').evaluateAll(async (images) => {
+    for (const image of images) {
+      const rect = image.getBoundingClientRect()
+      if (
+        rect.right <= 0 ||
+        rect.bottom <= 0 ||
+        rect.left >= globalThis.innerWidth ||
+        rect.top >= globalThis.innerHeight
+      )
+        continue
+      if (!image.complete || image.naturalWidth === 0 || image.naturalHeight === 0) return false
+      try {
+        await image.decode()
+      } catch {
+        return false
+      }
+    }
+    return true
+  })
+  if (!decoded) throw new Error('Audit page has an undecoded visible image')
 }

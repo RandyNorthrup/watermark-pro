@@ -335,16 +335,66 @@ metadata. Its new order assertion failed the previous placement with
 controller/map, route selection, public/auth negatives and malformed-order
 rejection. Focused lint and Node TypeScript checks pass. The emitted-artifact check
 also requires this order. Evidence is in `temp/preload-order-{red,green,types}.log`.
-The held artifact remains unchanged during the full E2E run; a fresh build and
-quiet timing measurement are still required before claiming a benefit.
+The held artifact remained unchanged during the full E2E run. The subsequent
+canonical quality run passed with the PDF fallback and earlier preload placement
+in its fresh build; a successful quiet timing measurement is still required
+before claiming a benefit.
 
-Lighthouse also estimated 414 ms of origin server latency despite 22.6 ms observed
+The first canonical populated/empty attempt began at 2026-09-10 05:59:21 UTC and
+stopped on the populated page before scoring. An isolated capture identified a
+harness defect: among 93 resources, two valid same-origin photo/preview images
+used `blob:` URLs and the `blob` protocol. Every HTTPS request negotiated `h2`.
+The guard incorrectly applied a network-transport requirement to those in-memory
+images. It now applies protocol and HTTP-status checks only to HTTP(S) requests,
+while retaining the successful-document requirement. The added blob-positive
+regression failed the previous guard; all three navigation tests now pass,
+including existing HTTP/1.1, wrong-page and failed-API negatives. Focused lint
+passes. Evidence is in `temp/lighthouse-rejected-transport.json` and
+`temp/lighthouse-blob-navigation-{red,green}.log`. No application code, byte budget,
+or performance threshold changed; no score from the rejected attempt is claimed.
+
+The cold trace estimated 414 ms of origin server latency despite 22.6 ms observed
 document TTFB. The local proxy awaits maximum-quality Brotli compression before
-sending asset headers and caches the result for later traces. Cold compression
-and its worker-pool queue are therefore a plausible measurement contributor,
-requiring direct upstream-versus-encoding timing before any proxy behavior change.
-Only an isolated ignored timing helper was prepared; canonical proxy behavior
-remains unchanged.
+sending asset headers and caches that result. A later warm trace estimated only
+2.1 ms of server latency while still missing the timing targets, so cold encoding
+cannot explain every remaining failure. Only an isolated ignored timing helper
+was prepared; no proxy behavior change was made.
+
+### Linux audit-browser startup
+
+The first remote UI audit jobs failed before navigation with an opaque debugger
+connection refusal. The retained public-home job identifies Ubuntu 24.04.4 but
+does not preserve the browser's underlying stderr. Inspection of the installed
+`chrome-launcher` shows that it automatically disables the setuid sandbox on
+Linux, writes stderr under the owned profile, and defaults to silent logging.
+The existing audit cleanup then removed that profile. This establishes why the
+original failure lacked a useful diagnostic; it does not establish the exact
+Linux crash reason from that log alone.
+
+Chromium documents Ubuntu's restrictions on user namespaces for downloaded
+browser builds and the supported use of the already installed Chrome sandbox
+helper through `CHROME_DEVEL_SANDBOX`:
+[Chromium sandbox guidance](https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md).
+The audit launcher now checks `/opt/google/chrome/chrome-sandbox` with `lstat`.
+Only a root-owned, setuid, executable regular file that is not group/world writable
+is selected. When verified, the launcher keeps the pinned Playwright Chromium and
+copies its ordinary default flags while omitting only the automatic setuid
+prohibition; the helper path is supplied only to that child process. Other hosts
+retain Chrome's normal namespace mode. The selected mode is logged explicitly.
+No operating-system permission or security setting is modified, and no
+`--no-sandbox` option is added.
+
+Launch failures are classified into finite reasons before profile cleanup, without
+printing raw browser stderr or arguments. The failed launcher instance is also
+closed even when startup never returned its normal kill handle. Three injected
+launcher/metadata tests cover trusted and unsafe helpers, flag preservation and
+finite failures. The existing real certificate test now uses this canonical
+launcher, accepting the pinned key and rejecting a different key. Together with
+the navigation checks, seven focused tests pass, as do lint and formatting. A
+disposable-copy drill removed the root-ownership check, failed the unsafe-helper
+assertion, then passed after exact restoration. Evidence is in
+`temp/audit-chrome-{final,red}.log`. The actual Linux runner remains the required
+confirmation before a full remote audit matrix can be accepted.
 
 ### Remaining gates
 
@@ -353,8 +403,8 @@ remains unchanged.
 - Keep the now-passing application byte budget green through final source changes.
 - Recheck fresh first visit, offline reload and reconnect behavior after the final
   startup change, including explicit boot failures and redirected routes.
-- Complete the shared 27-leaf-route inventory and deterministic Recents states,
-  then run the complete five-trace desktop and mobile matrices against the final
-  build. The previous 17-target inventory cannot certify that expanded scope.
+- Run complete five-trace desktop and mobile matrices for the shared 33-state,
+  27-leaf-route inventory against the final build. The previous 17-target inventory
+  cannot certify that expanded scope.
 - Run final quality, SAST, full Playwright/axe and screenshot gates. No completion
   box may be inferred from these selected-page diagnostics.

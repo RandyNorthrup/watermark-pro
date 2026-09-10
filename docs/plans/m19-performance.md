@@ -1100,6 +1100,14 @@ Existing stale receipts are retained as history.
         {
           "path": "src/client/pdf/raster.browser.test.ts",
           "action": "modify"
+        },
+        {
+          "path": "scripts/lib/audit-chrome.mjs",
+          "action": "modify"
+        },
+        {
+          "path": "scripts/audit-chrome.test.mjs",
+          "action": "modify"
         }
       ],
       "status": "active",

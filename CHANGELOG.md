@@ -106,6 +106,23 @@ cutover are not yet certified; focused evidence lives under
 
 ### Fixed
 
+- Completed bulk and video results could expand the iPhone document by six and
+  eight pixels. Their grids now use a zero-minimum flexible column and
+  shrinkable cards. Replay of the captured pages shows no overflow or axe
+  violations, with every control remaining within the viewport.
+- Linux audit startup now retains the pinned Chromium build while allowing a
+  verified existing root-owned sandbox helper. Startup failures are classified
+  before profile cleanup; no operating-system permissions or global browser
+  settings are changed.
+- Folder import could mount after preset loading, after its mount-only setup
+  effect had already run. The directory attribute is now attached when the
+  actual input mounts. A loading-to-ready regression reproduced the missing
+  attribute; normal photo input remains a separate control.
+- The first populated Lighthouse run misclassified browser-local blob images as
+  HTTP requests because they share the page's origin. Protocol checks now apply
+  only to HTTP(S) traffic, while visible in-viewport images must already be
+  complete and decode successfully. Audits use the real sample photograph and
+  a normal thumbnail instead of a one-pixel photo fixture.
 - PDF export assumed `OffscreenCanvas` existed and failed on the WebKit device
   profile. Rasterization now uses the existing canvas backend, including its DOM
   fallback. A real pixel test first reproduced the missing-capability failure

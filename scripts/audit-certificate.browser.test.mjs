@@ -1,5 +1,6 @@
 /** A certificate exception is restricted to the run's exact public key, never global trust. */
 import assert from 'node:assert/strict'
+import { mkdir } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import path from 'node:path'
 import { test } from 'node:test'
@@ -7,6 +8,7 @@ import { test } from 'node:test'
 import { chromium } from '@playwright/test'
 
 import { createAuditCertificate } from './lib/audit-certificate.mjs'
+import { launchAuditChrome } from './lib/audit-chrome.mjs'
 import { startCompressingProxy } from './lib/compressing-proxy.mjs'
 
 test('owned Chromium accepts the pinned HTTP2 certificate and rejects a different untrusted key', async () => {
@@ -22,14 +24,21 @@ test('owned Chromium accepts the pinned HTTP2 certificate and rejects a differen
   const wrong = await createAuditCertificate()
   const correctProxy = await startCompressingProxy({ upstream: origin, port: 0, tls: trusted })
   const wrongProxy = await startCompressingProxy({ upstream: origin, port: 0, tls: wrong })
-  let context
+  let browser
+  let chrome
   try {
     assert.notEqual(trusted.browserFlag, wrong.browserFlag)
     assert.match(trusted.browserFlag, /^--ignore-certificate-errors-spki-list=/)
-    context = await chromium.launchPersistentContext(path.join(trusted.directory, 'browser'), {
-      headless: true,
-      args: [trusted.browserFlag],
+    const profile = path.join(trusted.directory, 'browser')
+    await mkdir(profile)
+    chrome = await launchAuditChrome({
+      userDataDir: profile,
+      chromePath: chromium.executablePath(),
+      chromeFlags: ['--headless=new', trusted.browserFlag],
     })
+    browser = await chromium.connectOverCDP('http://127.0.0.1:' + String(chrome.port))
+    const context = browser.contexts()[0]
+    assert.ok(context)
     const page = await context.newPage()
     const response = await page.goto(correctProxy.origin)
     assert.equal(response.status(), 200)
@@ -44,7 +53,8 @@ test('owned Chromium accepts the pinned HTTP2 certificate and rejects a differen
     const back = await page.reload()
     assert.equal(back.status(), 200)
   } finally {
-    await context?.close()
+    await browser?.close()
+    await chrome?.kill()
     await correctProxy.close()
     await wrongProxy.close()
     await trusted.dispose()

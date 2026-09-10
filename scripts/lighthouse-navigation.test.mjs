@@ -74,3 +74,21 @@ test('an API failure invalidates a successful-looking page while unfinished work
     ['h2'],
   )
 })
+
+test('in-memory blob images are valid resources without an HTTP transport protocol', () => {
+  assert.deepEqual(
+    validateAuditNavigation({
+      ...baseline,
+      requests: [
+        ...baseline.requests,
+        {
+          ...asset,
+          url: `blob:${origin}/saved-photo`,
+          resourceType: 'Image',
+          protocol: 'blob',
+        },
+      ],
+    }),
+    ['h2'],
+  )
+})

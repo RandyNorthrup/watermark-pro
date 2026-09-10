@@ -107,7 +107,12 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
   await page.getByRole('button', { name: 'Insert detail', exact: true }).click()
   await page.getByRole('menuitem', { name: /^Camera/ }).click()
   await expect(text).toHaveValue('{camera}')
-  await text.fill('{camera} ')
+  // Token insertion restores focus/caret on the next animation frame. Wait
+  // for that user-visible state before adding the separator and second token.
+  await expect(text).toBeFocused()
+  await text.press('End')
+  await text.press('Space')
+  await expect(text).toHaveValue('{camera} ')
   await page.getByRole('button', { name: 'Insert detail', exact: true }).click()
   await page.getByRole('menuitem', { name: /^ISO/ }).click()
   await expect(text).toHaveValue(TOKENS)

@@ -15,7 +15,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { type DragEvent, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { type DragEvent, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { OverrideDialog } from './override-dialog'
@@ -211,9 +211,11 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   // The job whose photo is open in the override dialog, or null.
   const [adjusting, setAdjusting] = useState<{ id: string; input: BulkJobInput } | null>(null)
   const canPickFolder = canPickDirectory()
-  // `webkitdirectory` is not a typed React attribute; set it on the element.
-  useEffect(() => {
-    folderInputRef.current?.setAttribute('webkitdirectory', '')
+  // The preset gate can mount this input after the component's first effect.
+  // Attach its untyped directory attribute to each actual node as it appears.
+  const attachFolderInput = useCallback((input: HTMLInputElement | null) => {
+    folderInputRef.current = input
+    input?.setAttribute('webkitdirectory', '')
   }, [])
   // OS launches also arrive while this route is already open. They must not
   // wait for the separate, transactional Android share-target inbox.
@@ -531,8 +533,8 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   return (
     <PresetGate query={presets} emptyHint={t('bulk.emptyHint')}>
       {(list) => (
-        <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-          <Card className="flex flex-col gap-4 p-4">
+        <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <Card className="flex min-w-0 flex-col gap-4 p-4">
             <div
               onDragOver={(event) => {
                 event.preventDefault()
@@ -557,7 +559,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 }}
               />
               <input
-                ref={folderInputRef}
+                ref={attachFolderInput}
                 type="file"
                 accept={ACCEPTED_PHOTO_TYPES}
                 multiple
@@ -821,7 +823,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
             )}
           </Card>
 
-          <Card className="flex flex-col gap-5">
+          <Card className="flex min-w-0 flex-col gap-5">
             <PresetChecklist
               presets={list}
               selectedIds={presetIds}

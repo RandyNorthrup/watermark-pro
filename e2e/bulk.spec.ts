@@ -76,7 +76,9 @@ test('preserves folder paths, names outputs by size, and reports a one-photo ove
       'A non-image must not become a job or ZIP entry.',
     )
     await expect(folderButton).toBeVisible()
-    await page.getByLabel('Add a folder', { exact: true }).setInputFiles(directory)
+    const folderInput = page.getByLabel('Add a folder', { exact: true })
+    await expect(folderInput).toHaveAttribute('webkitdirectory', '')
+    await folderInput.setInputFiles(directory)
     await expect(page.getByText(/1 file skipped/)).toBeVisible()
     prefix = 'source-folder/'
   } else {
@@ -111,6 +113,7 @@ test('preserves folder paths, names outputs by size, and reports a one-photo ove
 
   await page.getByRole('button', { name: `Adjust ${widePath}`, exact: true }).click()
   const dialog = page.getByRole('dialog', { name: `Adjust ${widePath}`, exact: true })
+  await expect(dialog.getByText('wide.png · 640 × 400 px', { exact: true })).toBeVisible()
   await dialog.getByRole('tab', { name: 'Crop', exact: true }).click()
   await dialog.getByRole('button', { name: '1:1', exact: true }).click()
   await expect(dialog.getByLabel('Width (px)', { exact: true })).toHaveValue('400')

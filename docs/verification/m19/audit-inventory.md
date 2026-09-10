@@ -68,3 +68,14 @@ The all-profile screenshot matrix and five-run Lighthouse matrices remain open.
 This prepared-state browser proof is not a visual, accessibility or performance
 certification. Earlier 17-target Lighthouse results cannot certify this larger
 inventory.
+
+The first populated Lighthouse attempt exposed a transport-check defect:
+same-origin `blob:` image resources were incorrectly required to negotiate
+HTTP/2. The corrected predicate classifies only HTTP(S) requests as network
+traffic; existing HTTP/1 and failed-API negatives remain. Visible in-viewport
+images must also be complete with nonzero dimensions and decode successfully
+when the recorded trace ends. Broken visible images fail, while hidden or
+offscreen lazy images are not forced into the measured viewport. Fixture photo
+traffic now uses the application's real sample JPEG and a 320-pixel thumbnail.
+These corrections passed focused real-browser and protocol checks; updated
+five-trace measurements remain required.

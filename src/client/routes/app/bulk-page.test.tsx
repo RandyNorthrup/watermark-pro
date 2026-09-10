@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FILTER_BY_ID, IDENTITY_ADJUSTMENTS } from '../../../shared/adjustments'
 import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
 import { clearLaunchFiles, receiveLaunchFiles, takeLaunchFiles } from '../../lib/launch-files'
+import { watermarksQueryOptions } from '../../lib/library'
 import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace } from '../../test-support/fake-auth-client'
@@ -93,6 +94,20 @@ afterEach(() => {
 })
 
 describe('bulk page', () => {
+  it('enables directory selection when the input mounts after the library gate opens', async () => {
+    seedOwnerWorkspace(client())
+    const library = installLibraryApi()
+    const { queryClient } = renderApp('/app/bulk')
+    await screen.findByRole('link', { name: 'Create a preset in the library' })
+    expect(screen.queryByLabelText('Add a folder')).not.toBeInTheDocument()
+    library.watermarks.push(makeWatermark())
+    await act(() =>
+      queryClient.invalidateQueries({ queryKey: watermarksQueryOptions('org-1').queryKey }),
+    )
+    expect(await screen.findByLabelText('Add a folder')).toHaveAttribute('webkitdirectory', '')
+    expect(screen.getByLabelText('Add photos')).not.toHaveAttribute('webkitdirectory')
+  })
+
   it('adopts startup and later OS batches once while preserving editor-targeted launches', async () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })

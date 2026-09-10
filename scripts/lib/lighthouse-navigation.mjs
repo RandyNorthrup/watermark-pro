@@ -14,9 +14,12 @@ export function validateAuditNavigation({ origin, pathname, finalDisplayedUrl, r
   ) {
     throw new Error('Lighthouse did not reach the expected successful page.')
   }
-  const completed = requests.filter(
-    (request) => request.finished && new URL(request.url).origin === origin,
-  )
+  const completed = requests.filter((request) => {
+    const url = new URL(request.url)
+    // Decoded photo and canvas-preview blobs are in-memory resources, not HTTP requests.
+    const isHttp = url.protocol === 'http:' || url.protocol === 'https:'
+    return request.finished && isHttp && url.origin === origin
+  })
   if (completed.some((request) => request.statusCode < 200 || request.statusCode >= 400))
     throw new Error('Lighthouse observed an unexpected HTTP error on the audit origin.')
   const protocols = [...new Set(completed.map((request) => request.protocol))]

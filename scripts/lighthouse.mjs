@@ -21,12 +21,12 @@ import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promi
 import path from 'node:path'
 
 import { chromium } from '@playwright/test'
-import { launch } from 'chrome-launcher'
 import lighthouse from 'lighthouse'
 import desktopConfig from 'lighthouse/core/config/desktop-config.js'
 
 import { prepareLighthouseSurfaces } from './fixtures/lighthouse-surfaces.mjs'
 import { createAuditCertificate } from './lib/audit-certificate.mjs'
+import { launchAuditChrome } from './lib/audit-chrome.mjs'
 import { assertAuditContent } from './lib/audit-content.mjs'
 import { AUDIT_SURFACES } from './lib/audit-surfaces.mjs'
 import { startCompressingProxy } from './lib/compressing-proxy.mjs'
@@ -226,7 +226,7 @@ try {
   certificate = await createAuditCertificate()
   proxy = await startCompressingProxy({ upstream: BASE_URL, port: PROXY_PORT, tls: certificate })
   profile = await createAuditProfile()
-  chrome = await launch({
+  chrome = await launchAuditChrome({
     userDataDir: profile.directory,
     chromePath: chromium.executablePath(),
     chromeFlags: ['--headless=new', '--no-first-run', '--disable-gpu', certificate.browserFlag],

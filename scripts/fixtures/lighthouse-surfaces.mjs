@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto'
+import { readFile } from 'node:fs/promises'
 
 import { request } from '@playwright/test'
+import processImage from 'sharp'
 
 import {
   auditCookies,
@@ -12,10 +14,6 @@ import {
 } from './audit-accounts.mjs'
 import { ensureTestSiteOwner } from '../lib/test-site-owner.ts'
 
-const PHOTO = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
-  'base64',
-)
 const PRESET_NAME = 'Studio signature'
 const ALBUM_NAME = 'Client preview'
 const STUDIO_NAME = 'Audit Studio'
@@ -86,6 +84,14 @@ export async function prepareLighthouseSurfaces(origin, surfaces) {
     const signupPath = await fixtureLink(member.context, base, inviteEmail, '/signup?invitation=')
     const resetPath = await createAuditReset(member.context, base, member.person.email)
     const root = `/api/orgs/${member.organizationId}`
+    const image = await readFile(new URL('../../public/sample-scene.jpg', import.meta.url))
+    const dimensions = await processImage(image).metadata()
+    if (dimensions.width === undefined || dimensions.height === undefined)
+      throw new Error('The audit sample image has no readable dimensions')
+    const thumbnail = await processImage(image)
+      .resize({ width: 320, withoutEnlargement: true })
+      .jpeg({ quality: 80 })
+      .toBuffer()
     const preset = await fixtureJson(
       await member.context.post(`${root}/watermarks`, {
         data: { name: PRESET_NAME, spec: PRESET_SPEC },
@@ -94,11 +100,11 @@ export async function prepareLighthouseSurfaces(origin, surfaces) {
     const photo = await fixtureJson(
       await member.context.post(`${root}/photos`, {
         multipart: {
-          file: { name: 'audit.png', mimeType: 'image/png', buffer: PHOTO },
-          thumbnail: { name: 'thumb.png', mimeType: 'image/png', buffer: PHOTO },
+          file: { name: 'audit.jpg', mimeType: 'image/jpeg', buffer: image },
+          thumbnail: { name: 'thumb.jpg', mimeType: 'image/jpeg', buffer: thumbnail },
           name: 'Audit photo',
-          width: '1',
-          height: '1',
+          width: String(dimensions.width),
+          height: String(dimensions.height),
         },
       }),
     )

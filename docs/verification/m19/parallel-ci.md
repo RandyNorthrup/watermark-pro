@@ -28,6 +28,13 @@ inspection remain required; workflow source alone is not passing evidence.
 Source/publication review precedes the release-candidate push, and production
 migration, domain cutover and hosted checks remain separate.
 
+The initial draft pull request exposed disabled repository dependency analysis,
+not a dependency vulnerability finding. Enabling Dependency Graph and Dependabot
+alerts for this repository restored the actual base/head comparison endpoint
+(HTTP 200, 80 changes). The failed job could not be rerun while its workflow was
+active; the next source update receives fresh dependency review. No broader
+account or paid settings were changed.
+
 This repository is public. Standard GitHub-hosted runner execution is free
 for public repositories, according to [GitHub's current billing documentation](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
 The workflow uses standard Ubuntu runners, not the separately billed larger
