@@ -109,8 +109,11 @@ export function buildAuthOptions(deps: AuthDependencies) {
       encryptOAuthTokens: true,
       accountLinking: {
         enabled: true,
-        disableImplicitLinking: true,
-        trustedProviders: ['microsoft'],
+        // validateUserInfo permits only verified Google recovery for a matching
+        // verified existing user with no sign-in methods; other links stay explicit.
+        disableImplicitLinking: false,
+        requireLocalEmailVerified: true,
+        trustedProviders: ['google', 'microsoft'],
         allowDifferentEmails: false,
         allowUnlinkingAll: false,
       },

@@ -21,6 +21,7 @@ const SESSION = z
   .object({ user: z.object({ email: z.email(), emailVerified: z.boolean() }) })
   .nullable()
 const PROVIDERS = ['google', 'microsoft'] as const
+const LEGACY_USER_ID = 'legacy-oauth-user'
 
 type Provider = (typeof PROVIDERS)[number]
 
@@ -96,6 +97,113 @@ async function fixture(providerId: Provider, isEmailVerified = true) {
   }
   return { harness, context, client, identity, start }
 }
+
+async function legacyFixture(
+  provider: Provider = 'google',
+  isLocalEmailVerified = true,
+  role: 'admin' | 'user' = 'user',
+) {
+  const setup = await fixture(provider)
+  await setup.context.adapter.create({
+    model: 'user',
+    forceAllowId: true,
+    data: {
+      id: LEGACY_USER_ID,
+      name: PERSON.name,
+      email: PERSON.email,
+      emailVerified: isLocalEmailVerified,
+      role,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  })
+  await setup.harness.services.accounts.revokeInvitation('fixture-inviter', 'invitation')
+  expect(await setup.context.adapter.count({ model: 'account' })).toBe(0)
+  return setup
+}
+
+describe('verified Google recovery for an existing account without sign-in methods', () => {
+  it.each(['admin', 'user'] as const)(
+    'links the matching verified %s without an invitation or a new workspace',
+    async (role) => {
+      const { harness, context, client, start } = await legacyFixture('google', true, role)
+      const workspace = await harness.services.accounts.ensurePrivateWorkspace(LEGACY_USER_ID)
+      const flow = await start()
+      const completed = await client.get(flow.callback)
+      expect(completed.headers.get('location')).toContain('/app')
+      expect(await responseJson(client.get('/api/auth/get-session'))).toMatchObject({
+        user: { id: LEGACY_USER_ID, email: PERSON.email, emailVerified: true, role },
+      })
+      expect(await context.adapter.count({ model: 'user' })).toBe(2)
+      expect(await context.adapter.count({ model: 'account' })).toBe(1)
+      const accounts = await context.adapter.findMany<{ providerId: string; userId: string }>({
+        model: 'account',
+      })
+      expect(accounts).toMatchObject([{ providerId: 'google', userId: LEGACY_USER_ID }])
+      expect(await harness.services.accounts.ensurePrivateWorkspace(LEGACY_USER_ID)).toBe(workspace)
+      expect(await context.adapter.count({ model: 'organization' })).toBe(1)
+      expect(await context.adapter.count({ model: 'member' })).toBe(1)
+      const replay = await client.get(flow.callback)
+      expect(replay.headers.get('location')).not.toContain('/app')
+      expect(await context.adapter.count({ model: 'account' })).toBe(1)
+    },
+  )
+
+  it.each(['provider-unverified', 'local-unverified', 'email-mismatch', 'microsoft'] as const)(
+    'refuses implicit recovery for %s without creating accounts or users',
+    async (reason) => {
+      const provider = reason === 'microsoft' ? 'microsoft' : 'google'
+      const { context, client, identity, start } = await legacyFixture(
+        provider,
+        reason !== 'local-unverified',
+      )
+      if (reason === 'provider-unverified' || reason === 'email-mismatch')
+        identity.mockResolvedValue({
+          user: {
+            name: PERSON.name,
+            email: reason === 'email-mismatch' ? 'different@example.test' : PERSON.email,
+            emailVerified: reason !== 'provider-unverified',
+          },
+          data: { sub: 'fixture-subject', iss: 'https://accounts.google.com' },
+        })
+      const flow = await start()
+      const completed = await client.get(flow.callback)
+      expect(completed.headers.get('location')).not.toContain('/app')
+      expect(await responseJson(client.get('/api/auth/get-session'))).toBeNull()
+      expect(await context.adapter.count({ model: 'user' })).toBe(2)
+      expect(await context.adapter.count({ model: 'account' })).toBe(0)
+    },
+  )
+
+  it.each([false, true])(
+    'requires explicit linking for an existing provider account (forged link %s)',
+    async (forgeLink) => {
+      const { context, client, start } = await legacyFixture()
+      await context.adapter.create({
+        model: 'account',
+        data: {
+          userId: LEGACY_USER_ID,
+          providerId: 'microsoft',
+          accountId: 'existing-microsoft-subject',
+          issuer: 'https://login.microsoftonline.com/fixture-tenant/v2.0',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      })
+      const flow = await start(
+        undefined,
+        forgeLink
+          ? { additionalData: { link: { userId: LEGACY_USER_ID, email: PERSON.email } } }
+          : {},
+      )
+      const completed = await client.get(flow.callback)
+      expect(completed.headers.get('location')).not.toContain('/app')
+      expect(await responseJson(client.get('/api/auth/get-session'))).toBeNull()
+      expect(await context.adapter.count({ model: 'account' })).toBe(1)
+      expect(await context.adapter.count({ model: 'user' })).toBe(2)
+    },
+  )
+})
 
 describe.each(PROVIDERS)('%s account OAuth admission', (provider) => {
   it.each([

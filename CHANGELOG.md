@@ -139,6 +139,11 @@ the version tag remain explicit post-launch work.
 
 ### Fixed
 
+- Verified Google sign-in can recover an existing matching verified account
+  whose provider rows were lost or never created, but only when that account has
+  no sign-in method. Existing password/provider accounts still require explicit
+  authenticated linking; unverified, mismatched, forged, replayed and uninvited
+  identities remain refused.
 - Administrator totals and Gallery filters/actions now retain their final
   geometry while real responses are pending. Loading, empty and failure states
   remain labelled; actions stay disabled until valid data exists. Held-response
