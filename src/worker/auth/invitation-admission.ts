@@ -78,6 +78,30 @@ export function validateAccountAdmission(
   canSignUpWithoutInvitation: boolean,
 ): UserValidator {
   return async ({ user, source }, context) => {
+    if (source.method === 'oauth' && source.action === 'link-account') {
+      const state = await getOAuthState()
+      if (state?.link === undefined) {
+        const identity = admissionSchema.safeParse(user)
+        const existing =
+          typeof user.id === 'string'
+            ? await context.context.internalAdapter.findUserById(user.id)
+            : null
+        const canRecover =
+          source.oauth?.providerId === 'google' &&
+          user.emailVerified === true &&
+          identity.success &&
+          existing?.emailVerified === true &&
+          existing.email.toLowerCase() === identity.data.email.toLowerCase()
+        const methods = canRecover
+          ? await context.context.internalAdapter.findAccounts(existing.id)
+          : null
+        if (methods?.length !== 0)
+          return {
+            error: 'account_linking_requires_sign_in',
+            errorDescription: 'Sign in with an existing method before linking this identity.',
+          }
+      }
+    }
     if (canSignUpWithoutInvitation || source.action !== 'create-user' || source.method === 'admin')
       return
     const body = admissionSchema.safeParse(user)
