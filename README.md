@@ -8,8 +8,8 @@ The hosted service is live at **[lumafoil.com](https://lumafoil.com)** with
 **invitation-only** admission. Admitted users can
 invite people through a personal invitation link or an email invitation; new
 users receive their own private workspace. Invitations do not grant access to
-the inviter's photos or presets. Only the sole site administrator can view
-aggregate account numbers; workspace ownership does not grant that access.
+the inviter's photos or presets. The site Owner and explicitly appointed Admins
+can view aggregate account numbers; workspace ownership does not grant that access.
 
 Want to run your own instance? The source is **free under the MIT license**.
 Start with [the self-hosting guide](docs/self-hosting.md). Bundled fonts and
@@ -223,24 +223,28 @@ Permissions are declared once in `src/shared/permissions.ts` and enforced by
 the Worker (`requirePermission`); the client uses the same table only to hide
 controls.
 
-### Platform administrators
+### Site management
 
-Exactly one account holds site administration: its ID must match the database
-owner anchor and its Better Auth role must be `admin`. The guarded bootstrap
-procedure is documented in [docs/runbook.md](docs/runbook.md). The console at
-`/app/admin` can:
+Exactly one account is the immutable site **Owner**: its ID must match the
+database owner anchor and its global role is `owner`. Migration `0012` converts
+the anchored account and leaves every other existing account as a User, so the
+initial production state has zero Admins. The Owner can later invite an Admin or
+promote a non-owner User. The guarded bootstrap procedure is documented in
+[docs/runbook.md](docs/runbook.md). Owner and Admin accounts can use `/app/admin`
+to:
 
 - search users by email, ban and unban them with a reason (a banned user's
   sessions are revoked and sign-in is refused), and sign a user out everywhere;
 - list every organization with its member count, photo count and storage;
 - browse the global audit trail, account totals, health and sanitized client-error records.
 
-Normal APIs cannot add another site administrator, demote/delete the anchored
-owner, impersonate another user, or replace another account's email or password.
+Normal site-management APIs can grant or revoke Admin on non-owner accounts.
+They cannot create another Owner, demote/delete/ban the anchored Owner,
+impersonate another user, or replace another account's email or password.
 
-Every admin action is recorded in the audit log with the administrator as
-the actor. The Worker enforces both role and owner identity on its admin routes
-and guards Better Auth's administrative endpoints with the same owner boundary.
+Every management action is recorded in the audit log with the actor. The Worker
+checks the Owner/Admin role and the immutable owner anchor on its global routes
+and guards Better Auth's administrative endpoints with the same boundary.
 
 ### Bot protection
 
@@ -581,7 +585,8 @@ controls, and [docs/threat-model.md](docs/threat-model.md) for the STRIDE
 review of every trust boundary. Controls include explicit CSP origins for
 Turnstile and cloud pickers, same-origin checks for mutations, HttpOnly SameSite
 session cookies, mandatory verification and invitation admission, server-side
-roles and account bindings, and exactly one anchored site administrator.
+roles and account bindings, exactly one anchored Owner, and protected Admin
+delegation.
 Offline data and asynchronous results are scoped to their originating account;
 server authorization is rechecked before synchronization. Quotas are reserved
 atomically, and failed uploads have durable cleanup.

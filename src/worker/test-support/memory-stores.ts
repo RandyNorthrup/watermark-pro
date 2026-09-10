@@ -2,8 +2,8 @@ import {
   ADMIN_ORGANIZATION_PAGE_SIZE,
   CLIENT_ERROR_PAGE_SIZE,
   HEALTH_CHECK_PAGE_SIZE,
-  PLATFORM_ADMIN_ROLE,
 } from '../../shared/constants'
+import { SITE_ROLE } from '../../shared/site-roles'
 import type {
   AssetRecord,
   AssetStore,
@@ -254,14 +254,14 @@ export interface MemoryTenantTables {
 /** Promotes straight in the array Better Auth's memory adapter reads users from. */
 export function createMemoryUserStore(tables: Pick<MemoryTenantTables, 'user'>): UserStore {
   return {
-    promoteToPlatformAdmin(email) {
-      const currentAdmin = tables.user.find((candidate) => candidate.role === PLATFORM_ADMIN_ROLE)
-      if (currentAdmin !== undefined && currentAdmin.email !== email) return Promise.resolve(false)
+    promoteToSiteOwner(email) {
+      const currentOwner = tables.user.find((candidate) => candidate.role === SITE_ROLE.owner)
+      if (currentOwner !== undefined && currentOwner.email !== email) return Promise.resolve(false)
       const row = tables.user.find((candidate) => candidate.email === email)
       if (row === undefined) {
         return Promise.resolve(false)
       }
-      row.role = PLATFORM_ADMIN_ROLE
+      row.role = SITE_ROLE.owner
       return Promise.resolve(true)
     },
   }

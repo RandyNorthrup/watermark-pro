@@ -1,8 +1,8 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { SiteInvitationDto } from '../../../shared/api-accounts'
+import { siteInvitationRequestSchema, type SiteInvitationDto } from '../../../shared/api-accounts'
 import {
   makeMember,
   makeOrganization,
@@ -18,6 +18,7 @@ vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-modu
 const INVITATION: SiteInvitationDto = {
   id: 'own-invitation',
   email: 'friend@example.test',
+  role: 'user',
   status: 'pending',
   createdAt: '2026-09-08T00:00:00.000Z',
   expiresAt: '2026-09-15T00:00:00.000Z',
@@ -42,11 +43,15 @@ function invitationApi(hasFailure = false, referralResponse?: Promise<Response>)
     if (hasFailure)
       return Promise.resolve(Response.json({ error: 'rate_limited' }, { status: 429 }))
     if (init?.method === 'POST') {
-      records.push({ ...INVITATION })
-      return Promise.resolve(Response.json(INVITATION, { status: 201 }))
+      if (typeof init.body !== 'string') throw new Error('Invitation fixture expects JSON text')
+      const request = siteInvitationRequestSchema.parse(JSON.parse(init.body))
+      const invitation = { ...INVITATION, role: request.role }
+      records.push(invitation)
+      return Promise.resolve(Response.json(invitation, { status: 201 }))
     }
     if (init?.method === 'DELETE') {
-      records[0] = { ...INVITATION, status: 'revoked' }
+      const invitation = records[0]
+      if (invitation !== undefined) records[0] = { ...invitation, status: 'revoked' }
       return Promise.resolve(new Response(null, { status: 204 }))
     }
     return Promise.resolve(Response.json({ invitations: records }))
@@ -64,6 +69,33 @@ afterEach(() => {
 })
 
 describe('site invitation page', () => {
+  it.each(['owner', 'admin'] as const)(
+    'lets the site %s invite an Admin while defaulting to User',
+    async (role) => {
+      fakeAuth().state.user = { ...OWNER, role }
+      const fetcher = invitationApi()
+      const user = userEvent.setup()
+      renderApp('/app/invitations')
+      const selector = await screen.findByRole('combobox', { name: 'Site role' })
+      expect(selector).toHaveValue('user')
+      expect(screen.queryByRole('option', { name: 'Owner' })).not.toBeInTheDocument()
+      await user.selectOptions(selector, 'admin')
+      await user.type(screen.getByLabelText('Email address'), INVITATION.email)
+      await user.click(screen.getByRole('button', { name: 'Send invitation' }))
+      await screen.findByText('Invitation sent. It expires in seven days.')
+      expect(
+        fetcher.mock.calls.some(
+          ([url, init]) =>
+            url === '/api/me/invitations' &&
+            init?.body === JSON.stringify({ email: INVITATION.email, role: 'admin' }),
+        ),
+      ).toBe(true)
+      expect(selector).toHaveValue('user')
+      const row = screen.getByText(INVITATION.email).closest('li')
+      if (row === null) throw new Error('Sent invitation row was not rendered')
+      expect(within(row).getByText('Admin')).toBeInTheDocument()
+    },
+  )
   it('renders stable referral controls while loading without offering an unavailable link', async () => {
     const pending = Promise.withResolvers<Response>()
     invitationApi(false, pending.promise)
@@ -121,6 +153,7 @@ describe('site invitation page', () => {
     const user = userEvent.setup()
     const { queryClient } = renderApp('/app/invitations')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Invite people')
+    expect(screen.queryByRole('combobox', { name: 'Site role' })).not.toBeInTheDocument()
     expect(screen.getByText(/shares none of your photos/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Send invitation' }))
     expect(screen.getByText('Enter a valid email address.')).toBeInTheDocument()
@@ -141,7 +174,7 @@ describe('site invitation page', () => {
       fetcher.mock.calls.some(
         ([url, init]) =>
           url === '/api/me/invitations' &&
-          init?.body === JSON.stringify({ email: INVITATION.email }),
+          init?.body === JSON.stringify({ email: INVITATION.email, role: 'user' }),
       ),
     ).toBe(true)
     await user.click(

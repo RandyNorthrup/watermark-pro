@@ -13,7 +13,7 @@ import {
   adminOrganizationListSchema,
   auditListResponseSchema,
 } from '../../shared/api'
-import { PLATFORM_ADMIN_ROLE } from '../../shared/constants'
+import { canManageSite, siteRoleSchema, type AssignableSiteRole } from '../../shared/site-roles'
 
 export const ADMIN_USER_PAGE_SIZE = 50
 
@@ -22,7 +22,7 @@ export const adminUserSchema = z.object({
   name: z.string(),
   email: z.string(),
   emailVerified: z.boolean(),
-  role: z.string().nullish(),
+  role: siteRoleSchema,
   banned: z.boolean().nullish(),
   banReason: z.string().nullish(),
   createdAt: z.coerce.date(),
@@ -32,8 +32,9 @@ export type AdminUser = z.infer<typeof adminUserSchema>
 
 const userListSchema = z.object({ users: z.array(adminUserSchema), total: z.number() })
 
+/** Site management comes from the account role, never workspace ownership. */
 export function isPlatformAdmin(user: { role?: string | null | undefined }): boolean {
-  return user.role === PLATFORM_ADMIN_ROLE
+  return canManageSite(user.role)
 }
 
 export const ADMIN_QUERY_KEY = ['admin'] as const
@@ -113,6 +114,11 @@ export async function banUser(userId: string, reason: string): Promise<void> {
 
 export async function unbanUser(userId: string): Promise<void> {
   unwrap('/api/auth/admin/unban-user', await authClient.admin.unbanUser({ userId }))
+}
+
+/** Site ownership is never an assignable role. The server also protects the owner target. */
+export async function setUserRole(userId: string, role: AssignableSiteRole): Promise<void> {
+  unwrap('/api/auth/admin/set-role', await authClient.admin.setRole({ userId, role }))
 }
 
 export async function revokeUserSessions(userId: string): Promise<void> {

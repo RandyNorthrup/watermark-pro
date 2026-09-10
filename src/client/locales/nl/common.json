@@ -719,7 +719,7 @@
   "admin": {
     "heading": "Beheer",
     "description": "Alleen voor de sitebeheerder: accounts beheren en totalen bekijken. Eigenaar zijn van een werkruimte geeft geen toegang tot het sitebeheer.",
-    "onlyAdmins": "Alleen de sitebeheerder kan deze pagina openen.",
+    "onlyAdmins": "Alleen de site-eigenaar of een beheerder kan deze pagina openen.",
     "sectionsLabel": "Beheersecties",
     "tabs": {
       "users": "Gebruikers",
@@ -762,7 +762,6 @@
     "you": "(jij)",
     "joined": "Lid geworden {{date}}",
     "emailNotVerified": " · e-mail niet geverifieerd",
-    "platformAdmin": "Sitebeheerder",
     "banned": "geblokkeerd",
     "bannedReason": "geblokkeerd: {{reason}}",
     "unban": "Deblokkeren",
@@ -790,7 +789,10 @@
     "auditErrorTitle": "Kon het auditspoor niet laden",
     "auditCaption": "Auditvermeldingen over alle organisaties, nieuwste eerst",
     "auditDetailHeading": "Organisatie",
-    "platform": "platform"
+    "platform": "platform",
+    "siteRole": "Siterol: {{role}}",
+    "roleFor": "Siterol voor {{email}}",
+    "ownerProtected": "Het account van de eigenaar is beschermd."
   },
   "members": {
     "orgRequired": "Maak een organisatie aan of word er lid van om leden te beheren.",
@@ -1127,7 +1129,7 @@
       },
       "audit": {
         "heading": "Auditspoor",
-        "p1": "Werkruimtelogboeken vereisen de rol eigenaar of beheerder van die werkruimte. De enige sitebeheerder beheert accounts en bekijkt totalen, moderatie, auditregels en status-/foutgegevens. Recente werkgeschiedenis is persoonlijk. Foutlogs van de app laten tokens en verzoekinhoud weg."
+        "p1": "Werkruimtelogboeken vereisen de rol eigenaar of beheerder van die werkruimte. De site-eigenaar en beheerders beheren accounts en bekijken totalen, moderatie, auditregels en status-/foutgegevens. Recente werkgeschiedenis is persoonlijk. Foutlogs van de app laten tokens en verzoekinhoud weg."
       },
       "reporting": {
         "heading": "Een probleem melden",
@@ -1255,7 +1257,9 @@
       "revoked": "Ingetrokken",
       "expired": "Verlopen"
     },
-    "collaborationNotice": "Een uitnodiging voor deze werkruimte geeft toegang tot de foto’s en voorinstellingen. De ontvanger moet al een Lumafoil-account hebben. Gebruik anders eerst Mensen uitnodigen."
+    "collaborationNotice": "Een uitnodiging voor deze werkruimte geeft toegang tot de foto’s en voorinstellingen. De ontvanger moet al een Lumafoil-account hebben. Gebruik anders eerst Mensen uitnodigen.",
+    "role": "Siterol",
+    "roleHelp": "Beheerders beheren siteaccounts. Lidmaatschap van werkruimten staat daar los van."
   },
   "accountStats": {
     "users": "Geregistreerde accounts",
@@ -1322,5 +1326,10 @@
       "list": "Lijst",
       "details": "Details"
     }
+  },
+  "siteRoles": {
+    "owner": "Eigenaar",
+    "admin": "Beheerder",
+    "user": "Gebruiker"
   }
 }

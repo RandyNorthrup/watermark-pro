@@ -32,7 +32,7 @@ export function LegalPage({ title, lastUpdated, intro, sections, sibling }: Lega
     timeZone: 'UTC',
   }).format(new Date(lastUpdated))
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="workspace-scene flex min-h-svh flex-col">
       <header className="flex items-center justify-between gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4 sm:px-6">
         <BrandMark />
         <div className="flex items-center gap-1 sm:gap-2">

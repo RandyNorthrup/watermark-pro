@@ -327,7 +327,12 @@ export function WatermarkDesigner({
           <p className="text-sm text-ink-muted">{t('designer.readOnlyHint')}</p>
         )}
       </Card>
-      <PreviewPanel organizationId={organizationId} spec={spec} initialPhoto={previewPhoto} />
+      <PreviewPanel
+        organizationId={organizationId}
+        spec={spec}
+        initialPhoto={previewPhoto}
+        onSpecChange={canManage ? setSpec : undefined}
+      />
     </form>
   )
 }

@@ -37,10 +37,11 @@ Only the `main` branch and the latest tagged release receive fixes.
   callbacks. Banning through the application revokes outstanding admissions;
   unbanning does not revive those links. Deleting the inviter cascades their
   invitation/link rows. Explicit collaboration uses separate workspaces.
-- Exactly one anchored site administrator. Workspace owner/admin roles do not
-  grant site administration. API and D1 guards refuse additional administrators,
-  anchor changes, owner removal/demotion, impersonation, or administrative
-  takeover of another user's email or password.
+- Exactly one anchored site Owner. Workspace owner/admin roles do not grant
+  global site management. The Owner may appoint Admins; both roles can manage
+  non-owner users. API and D1 guards refuse another Owner, anchor changes,
+  owner removal/demotion/ban, impersonation, or administrative takeover of
+  another user's email or password.
 - Rate limiting through Workers Rate Limiting bindings: 10 requests per minute
   per address on credential endpoints, 120 on the rest of the auth API.
 - Role-based access control enforced server-side on every custom route;
@@ -48,8 +49,8 @@ Only the `main` branch and the latest tagged release receive fixes.
   whether the organization exists.
 - Application audit records cover account, workspace, invitation, library,
   gallery and sharing changes. Workspace audit routes require an owner/admin
-  role; the site administrator can review global moderation and audit records.
-  Account/invitation totals are site-admin-only; recent-work history is per user.
+  role; the site Owner and Admins can review global moderation and audit records.
+  Account/invitation totals are site-manager-only; recent-work history is per user.
 - Validated offline display snapshots have no arbitrary age cutoff. Online boot
   validates the live session before showing private workspace data. A real
   transport outage may admit only the prepared account and unchanged account

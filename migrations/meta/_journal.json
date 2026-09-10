@@ -85,6 +85,13 @@
       "when": 1788935967874,
       "tag": "0011_recent_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1789072920971,
+      "tag": "0012_site_roles",
+      "breakpoints": true
     }
   ]
 }

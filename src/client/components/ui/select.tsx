@@ -44,7 +44,7 @@ export function Select<T extends string>({
         id={id}
         aria-label={aria['aria-label']}
         className={cn(
-          'inline-flex h-10 min-w-32 items-center justify-between gap-2 rounded-lg border border-line bg-surface-raised px-3 text-sm shadow-xs',
+          'glass-control inline-flex h-10 min-w-32 items-center justify-between gap-2 rounded-xl border border-line bg-surface-raised px-3 text-sm shadow-xs',
           'focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none disabled:opacity-50',
           className,
         )}
@@ -58,7 +58,7 @@ export function Select<T extends string>({
         <Radix.Content
           position="popper"
           sideOffset={6}
-          className="z-50 min-w-(--radix-select-trigger-width) rounded-lg border border-line bg-surface-raised p-1 text-sm shadow-card"
+          className="glass-popover z-50 min-w-(--radix-select-trigger-width) rounded-xl border border-line bg-surface-raised p-1 text-sm shadow-card"
         >
           <Radix.Viewport>
             {options.map((option) => (

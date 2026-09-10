@@ -55,6 +55,7 @@ async function fixture(providerId: Provider, isEmailVerified = true) {
     },
   })
   await harness.services.accounts.createInvitation({
+    role: 'user',
     id: 'invitation',
     inviterId: 'fixture-inviter',
     email: PERSON.email,

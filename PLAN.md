@@ -685,10 +685,10 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
 - **Certification checklist:**
   - [ ] every raised §5.5 budget met on every page (`docs/lighthouse/m19/`); bundle report under `docs/bundle/m19.md`
   - [ ] offline journey green; update flow checked across two deploys (§8)
-  - [x] competitor re-check done (2026-09-08; `docs/competitor-research.md`
-        gained a WMP column, a new browser-based `WEB` field, and §5 scoring;
-        matches/exceeds eZy on every axis bar font count + sticker packs);
-        README status updated. Remaining gaps in that doc's §5.3.
+  - [x] competitor re-check done (2026-09-08; corrected 2026-09-10 in
+        `docs/competitor-research.md`). No unsupported overall winner or parity
+        score is assigned; the matrix records verified, partial, missing and
+        untested capabilities and their practical limits.
   - [ ] full gates, drills, device matrix, screenshots in `en` and `ar`
   - [ ] 2.0.0 tagged, deployed, released
 - **Owner launch decision (2026-09-10):** deploy the verified functional and
@@ -698,6 +698,15 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   checks pass. The manual production deployment, guarded account split and
   domain cutover completed; unchecked performance, interactive provider,
   screenshot/update-flow and tag/release items remain unchecked.
+- **Role and UI correction (2026-09-10):** the owner clarified that the global
+  model is one immutable Owner, initially zero Admins, and ordinary Users;
+  Owner/Admin may manage non-owner roles while Admin can never alter the Owner.
+  Migration `0012` and the management UI implement that model without changing
+  private-workspace roles. The owner also rejected the subtle deployed glass
+  pass and fragmented editor controls. The replacement uses the supplied liquid-
+  glass reference visibly, adds a searchable font dropdown, provider marks,
+  redesigned import panels, grouped preset actions, and direct mouse/touch/
+  keyboard canvas manipulation in the designer and editor.
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
   (not relaxed budgets) for the perf work; landing it in small green increments.
   - **§3 diet, first pass (done).** Dropped the `ui` chunk group (it forced all

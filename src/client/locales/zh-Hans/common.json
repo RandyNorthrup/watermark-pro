@@ -708,7 +708,7 @@
   "admin": {
     "heading": "管理",
     "description": "仅供网站管理员管理账号和查看汇总数据。拥有工作区并不授予网站管理权限。",
-    "onlyAdmins": "只有网站管理员可以打开此页面。",
+    "onlyAdmins": "只有网站所有者或管理员可以打开此页面。",
     "sectionsLabel": "管理分区",
     "tabs": {
       "users": "用户",
@@ -750,7 +750,6 @@
     "you": "（您）",
     "joined": "加入于 {{date}}",
     "emailNotVerified": " · 邮箱未验证",
-    "platformAdmin": "网站管理员",
     "banned": "已封禁",
     "bannedReason": "已封禁：{{reason}}",
     "unban": "解除封禁",
@@ -778,7 +777,10 @@
     "auditErrorTitle": "无法加载审计追踪",
     "auditCaption": "所有组织的审计条目，最新在前",
     "auditDetailHeading": "组织",
-    "platform": "平台"
+    "platform": "平台",
+    "siteRole": "网站角色：{{role}}",
+    "roleFor": "{{email}} 的网站角色",
+    "ownerProtected": "所有者账号受到保护。"
   },
   "members": {
     "orgRequired": "创建或加入一个组织，以管理成员。",
@@ -1110,7 +1112,7 @@
       },
       "audit": {
         "heading": "审计追踪",
-        "p1": "工作区审计日志仅对该工作区的所有者和管理员开放。唯一的网站管理员可以管理账号并查看汇总、管理操作、审计以及健康/错误记录。最近工作历史按用户隔离。应用故障日志不包含令牌和请求正文。"
+        "p1": "工作区审计日志仅对该工作区的所有者和管理员开放。网站所有者和管理员可以管理账号并查看汇总、管理操作、审计以及健康/错误记录。最近工作历史按用户隔离。应用故障日志不包含令牌和请求正文。"
       },
       "reporting": {
         "heading": "报告问题",
@@ -1237,7 +1239,9 @@
       "revoked": "已撤销",
       "expired": "已过期"
     },
-    "collaborationNotice": "工作区邀请会授予其中照片和预设的访问权限。收件人必须已有 Lumafoil 账号；如未注册，请先使用邀请用户功能。"
+    "collaborationNotice": "工作区邀请会授予其中照片和预设的访问权限。收件人必须已有 Lumafoil 账号；如未注册，请先使用邀请用户功能。",
+    "role": "网站角色",
+    "roleHelp": "管理员管理网站账号。工作区成员权限与此独立。"
   },
   "accountStats": {
     "users": "注册账号",
@@ -1304,5 +1308,10 @@
       "list": "列表",
       "details": "详细信息"
     }
+  },
+  "siteRoles": {
+    "owner": "所有者",
+    "admin": "管理员",
+    "user": "用户"
   }
 }

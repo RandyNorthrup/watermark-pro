@@ -52,8 +52,10 @@ an operator procedure; it has not been executed against the original production
 database. The bootstrap's SQL behavior is verified against SQLite and the
 resulting verification/password flow is tested through real Better Auth.
 
-The inserted owner starts **unverified and without a password**. Mailbox control
-is required before access:
+The inserted account has the global **Owner** role and starts **unverified and
+without a password**. Bootstrap does not create an Admin account. Global Owner
+is separate from ownership of an individual workspace. Mailbox control is
+required before access:
 
 1. Open your site's `/check-email?email=YOUR_URL_ENCODED_EMAIL` page and select
    **Resend verification email**.
@@ -88,22 +90,34 @@ remain the operator's responsibility; a local build alone is not hosted proof.
 See [Private accounts](private-accounts.md) for invitation limits, token handling,
 account linking, and migration constraints.
 
-## Existing deployments and one site administrator
+## Existing deployments and the anchored site owner
 
-Site administration is a singleton. Private workspace ownership does not make a
-user a site administrator. The application cannot promote another administrator,
-demote or delete its anchored owner, or rewrite another account's email/password.
-Use normal mailbox-based recovery and explicit provider linking.
+The global Owner is a singleton anchored to one account. An Admin is not that
+owner, and private workspace ownership grants neither global role. Normal
+account-management operations cannot demote or delete the anchored owner or
+rewrite another account's email/password. Use normal mailbox-based recovery and
+explicit provider linking.
 
-For an occupied pre-singleton database, migration 0010 requires exactly one
-existing administrator. If there are none or several, first verify the intended
-owner's identity privately, back up the database, and select that verified user
-explicitly with `bootstrap-owner.mjs --existing-user-id` plus the same explicit
-database/target flags. This operation preserves accounts/content and changes only
-site roles. After the singleton migration, the anchor cannot be transferred by
-this command; an ownership change requires a separately reviewed operator
-migration. Do not place live user/database identifiers in public documentation,
-SQL files, screenshots, or verification artifacts.
+On an existing deployment already anchored by historical migration 0010, the
+`0012_site_roles.sql` upgrades the anchored account from the former `admin` role
+to `owner` and normalizes the other existing accounts to `user`. The anchor,
+account identities, workspace memberships, and saved content remain intact.
+
+The bootstrap tool also accepts `--existing-user-id` with the same explicit
+database/target flags for a deliberately prepared database **before its owner
+guards are installed**. The target must already exist and have verified email.
+The single SQL update assigns that account `owner` and every other account
+`user`, leaving no global admins. It preserves account identities, workspace
+roles, and content. Back up the database, privately verify the chosen identity,
+and review the compatible migration path before using this form.
+
+Do not use this current selector as a generic repair before historical migration
+0010: that immutable migration expects the old `admin` representation, while the
+selector now writes `owner`. An occupied deployment that has not reached the
+historical anchor requires a separately reviewed migration procedure. After an
+anchor exists, this command cannot transfer ownership; a transfer requires its
+own reviewed operator migration. Keep live identities and database identifiers
+out of public documentation, SQL files, screenshots, and verification artifacts.
 
 An old shared workspace may be split only when the deployment has no saved
 content or sessions and its identity/member counts match the operator's explicit

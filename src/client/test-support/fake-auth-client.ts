@@ -7,6 +7,7 @@
 import { vi } from 'vitest'
 
 import type { OrganizationRole } from '../../shared/permissions'
+import { SITE_ROLE, type SiteRole } from '../../shared/site-roles'
 
 export interface FakeUser {
   id: string
@@ -14,8 +15,8 @@ export interface FakeUser {
   email: string
   emailVerified: boolean
   image: string | null
-  /** Platform role; `admin` unlocks the administration page. */
-  role?: 'admin' | 'user'
+  /** Site role; independent of ownership or membership in a workspace. */
+  role?: SiteRole
   banned?: boolean
   banReason?: string | null
   createdAt?: string
@@ -138,7 +139,7 @@ export function createFakeAuthClient() {
           .filter((user) => user.email.toLowerCase().includes(needle))
           .map((user) => ({
             ...user,
-            role: user.role ?? 'user',
+            role: user.role ?? SITE_ROLE.user,
             banned: user.banned ?? false,
             banReason: user.banReason ?? null,
             createdAt: user.createdAt ?? '2026-09-01T00:00:00.000Z',
@@ -167,6 +168,7 @@ export function createFakeAuthClient() {
         if (user !== undefined) {
           user.role = input.role
         }
+        if (state.user?.id === input.userId) state.user.role = input.role
         return ok({ user })
       }),
       revokeUserSessions: vi.fn(() => ok({ success: true })),

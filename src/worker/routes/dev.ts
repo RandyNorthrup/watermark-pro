@@ -12,8 +12,8 @@ import { apiErrors } from '../errors'
  *
  * `GET /dev/mailbox` exposes the console provider's captured messages so
  * end-to-end tests can follow verification and invitation links.
- * `POST /dev/promote` establishes the single initial administrator in a
- * disposable test database. It refuses a second administrator. The
+ * `POST /dev/promote-site-owner` establishes the single initial owner in a
+ * disposable test database. It refuses a second owner. The
  * end-to-end suite and the audit scripts use it instead of running
  * `wrangler d1 execute` against the preview's database while the preview
  * is serving, which the local SQLite file does not survive under load.
@@ -29,7 +29,7 @@ export const devRoutes = new Hono<AppContext>()
     }
     return c.json(body, HTTP_STATUS.ok)
   })
-  .post('/dev/promote', async (c) => {
+  .post('/dev/promote-site-owner', async (c) => {
     const { devMailbox, users } = c.get('services')
     if (devMailbox === undefined) {
       throw apiErrors.notFound()
@@ -44,7 +44,7 @@ export const devRoutes = new Hono<AppContext>()
     if (!body.success) {
       throw apiErrors.validation(body.error.issues)
     }
-    if (!(await users.promoteToPlatformAdmin(body.data.email))) {
+    if (!(await users.promoteToSiteOwner(body.data.email))) {
       throw apiErrors.notFound()
     }
     return c.json({ promoted: true }, HTTP_STATUS.ok)

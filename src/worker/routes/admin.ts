@@ -2,7 +2,7 @@
  * Platform administration (PLAN.md M8). User management is handled by
  * Better Auth's admin plugin under /api/auth/admin/*; these routes add what
  * it lacks: a cross-organization view of tenants and the global audit trail.
- * Only users with the platform `admin` role may call them.
+ * Only the anchored site owner and appointed site administrators may call them.
  */
 import { Hono } from 'hono'
 

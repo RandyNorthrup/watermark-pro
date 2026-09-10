@@ -24,6 +24,7 @@ async function fixture({
   const context = await harness.services.auth.$context
   await seedInviter(harness, 'inviter')
   await harness.services.accounts.createInvitation({
+    role: 'user',
     id: 'invitation-record',
     tokenHash: await invitationTokenHash(TOKEN),
     inviterId: 'inviter',

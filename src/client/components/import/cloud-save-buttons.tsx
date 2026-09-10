@@ -1,4 +1,3 @@
-import { UploadCloud } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -18,6 +17,8 @@ import {
 } from '../../lib/imports/source'
 import { ACCOUNT_CHANGED_EVENT } from '../../lib/offline-account'
 import { captureOfflineOwner } from '../../lib/offline-context'
+import { ProviderLogo } from '../provider-logo'
+import { cloudProviderLogo } from '../provider-logo-id'
 import { Button } from '../ui/button'
 
 /** Each provider writes the watermarked photos into its "Lumafoil" folder. */
@@ -112,7 +113,7 @@ export function CloudSaveButtons({
             void save(provider)
           }}
         >
-          <UploadCloud aria-hidden="true" className="size-4" />
+          <ProviderLogo provider={cloudProviderLogo(provider)} />
           {t('import.saveToProvider', { provider: PROVIDER_LABELS[provider] })}
         </Button>
       ))}

@@ -12,6 +12,7 @@ import type { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { captcha } from 'better-auth/plugins'
 import { admin } from 'better-auth/plugins/admin'
+import { adminAc, userAc } from 'better-auth/plugins/admin/access'
 import { organization } from 'better-auth/plugins/organization'
 import { z } from 'zod'
 
@@ -37,6 +38,7 @@ import {
 } from '../../shared/constants'
 import { LOCALE_CODES } from '../../shared/locales'
 import { accessControl, roles } from '../../shared/permissions'
+import { SITE_ROLE } from '../../shared/site-roles'
 import { newOrganizationSchema } from '../../shared/validation'
 import type { AuditStore } from '../audit'
 import type { RateLimitStorage } from './rate-limit'
@@ -190,6 +192,8 @@ export function buildAuthOptions(deps: AuthDependencies) {
           after: async (user) => {
             if ('banned' in user && user['banned'] === true)
               await deps.accounts.revokePendingAdmissions(user.id)
+            if ('role' in user && user['role'] === SITE_ROLE.user)
+              await deps.accounts.revokePendingAdministratorAdmissions(user.id)
           },
         },
         create: {
@@ -334,8 +338,9 @@ export function buildAuthOptions(deps: AuthDependencies) {
         },
       }),
       admin({
-        defaultRole: 'user',
-        adminRoles: ['admin'],
+        defaultRole: SITE_ROLE.user,
+        adminRoles: [SITE_ROLE.owner, SITE_ROLE.admin],
+        roles: { owner: adminAc, admin: adminAc, user: userAc },
       }),
       ...(deps.captcha === undefined
         ? []

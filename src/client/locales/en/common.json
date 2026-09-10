@@ -719,7 +719,7 @@
   "admin": {
     "heading": "Administration",
     "description": "Site administrator only. Manage accounts and review totals. Owning a workspace does not grant site administration.",
-    "onlyAdmins": "Only the site administrator can open this page.",
+    "onlyAdmins": "Only the site owner or an admin can open this page.",
     "sectionsLabel": "Administration sections",
     "tabs": {
       "users": "Users",
@@ -738,7 +738,6 @@
     "you": "(you)",
     "joined": "Joined {{date}}",
     "emailNotVerified": " · email not verified",
-    "platformAdmin": "Site administrator",
     "banned": "banned",
     "bannedReason": "banned: {{reason}}",
     "unban": "Unban",
@@ -790,7 +789,10 @@
       "route": "on {{route}}",
       "request": "request {{id}}",
       "unknownRoute": "unknown route"
-    }
+    },
+    "siteRole": "Site role: {{role}}",
+    "roleFor": "Site role for {{email}}",
+    "ownerProtected": "The owner account is protected."
   },
   "members": {
     "orgRequired": "Create or join an organization to manage members.",
@@ -1127,7 +1129,7 @@
       },
       "audit": {
         "heading": "Audit trail",
-        "p1": "Workspace audit logs require a workspace owner/admin role. The sole site administrator can manage accounts and review totals, moderation, audit entries and health/error records. Recent-work history is user-specific. Application failure logs omit tokens and request bodies."
+        "p1": "Workspace audit logs require a workspace owner/admin role. The site owner and admins can manage accounts and review totals, moderation, audit entries and health/error records. Recent-work history is user-specific. Application failure logs omit tokens and request bodies."
       },
       "reporting": {
         "heading": "Reporting a problem",
@@ -1255,7 +1257,9 @@
       "revoked": "Revoked",
       "expired": "Expired"
     },
-    "collaborationNotice": "A workspace invitation gives access to the photos and presets in this workspace. The recipient must already have a Lumafoil account. Use Invite people first if they need one."
+    "collaborationNotice": "A workspace invitation gives access to the photos and presets in this workspace. The recipient must already have a Lumafoil account. Use Invite people first if they need one.",
+    "role": "Site role",
+    "roleHelp": "Admins manage site accounts. Workspace membership is separate."
   },
   "accountStats": {
     "users": "Registered accounts",
@@ -1322,5 +1326,10 @@
       "list": "List",
       "details": "Details"
     }
+  },
+  "siteRoles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "user": "User"
   }
 }

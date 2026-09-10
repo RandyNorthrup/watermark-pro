@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import type { TFunction } from 'i18next'
 import { Ban, UserCheck, UserX } from 'lucide-react'
 import { AlertDialog, Tabs } from 'radix-ui'
 import { useDeferredValue, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { assignableSiteRoleSchema, SITE_ROLE } from '../../../shared/site-roles'
 import { AccountStatistics } from '../../components/account-statistics'
 import { AuditTable } from '../../components/audit-table'
 import { Alert } from '../../components/ui/alert'
@@ -25,11 +26,13 @@ import {
   banUser,
   isPlatformAdmin,
   revokeUserSessions,
+  setUserRole,
   unbanUser,
 } from '../../lib/admin'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { dateTimeFormatter } from '../../lib/format-date'
+import { resetShellQueries } from '../../lib/queries'
 
 export const Route = createFileRoute('/app/admin')({
   component: AdminPage,
@@ -37,6 +40,20 @@ export const Route = createFileRoute('/app/admin')({
 
 const tabClassName =
   'rounded-md px-3 py-1.5 text-sm font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white'
+
+function siteRoleLabel(t: TFunction, role: AdminUser['role']): string {
+  switch (role) {
+    case SITE_ROLE.owner: {
+      return t('siteRoles.owner')
+    }
+    case SITE_ROLE.admin: {
+      return t('siteRoles.admin')
+    }
+    default: {
+      return t('siteRoles.user')
+    }
+  }
+}
 
 function AdminPage() {
   const { t } = useTranslation()
@@ -161,8 +178,10 @@ function banLabel(t: TFunction, user: AdminUser): string {
 function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const roleId = useId()
   const [error, setError] = useState<string | null>(null)
-  const isAdmin = isPlatformAdmin(user)
+  const isOwner = user.role === SITE_ROLE.owner
   const isBanned = user.banned === true
   const act = useMutation({
     mutationFn: (action: () => Promise<void>) => action(),
@@ -190,7 +209,7 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {isAdmin ? <Badge>{t('admin.platformAdmin')}</Badge> : null}
+            <Badge>{t('admin.siteRole', { role: siteRoleLabel(t, user.role) })}</Badge>
             {isBanned ? (
               <Badge className="bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-100">
                 {banLabel(t, user)}
@@ -198,7 +217,37 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
             ) : null}
           </div>
         </div>
-        {isSelf ? null : (
+        {isOwner ? (
+          <p className="text-sm text-ink-muted">{t('admin.ownerProtected')}</p>
+        ) : (
+          <div className="flex max-w-xs flex-col gap-1.5">
+            <label htmlFor={roleId} className="text-sm font-medium break-all">
+              {t('admin.roleFor', { email: user.email })}
+            </label>
+            <select
+              id={roleId}
+              value={user.role}
+              disabled={act.isPending}
+              className="h-10 w-full rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none"
+              onChange={(event) => {
+                const next = assignableSiteRoleSchema.safeParse(event.currentTarget.value)
+                if (!next.success || next.data === user.role) return
+                act.mutate(async () => {
+                  await setUserRole(user.id, next.data)
+                  if (isSelf) {
+                    queryClient.removeQueries({ queryKey: ADMIN_QUERY_KEY })
+                    resetShellQueries(queryClient)
+                    await navigate({ to: '/app' })
+                  }
+                })
+              }}
+            >
+              <option value={SITE_ROLE.user}>{t('siteRoles.user')}</option>
+              <option value={SITE_ROLE.admin}>{t('siteRoles.admin')}</option>
+            </select>
+          </div>
+        )}
+        {isSelf || isOwner ? null : (
           <div className="flex flex-wrap gap-2">
             {isBanned ? (
               <Button

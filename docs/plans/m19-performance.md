@@ -80,7 +80,10 @@ role) before rendering.
 - The owner selected the original rounded landing icon over the heavier OAuth icon; all kit/provider assets must use its exact geometry.
 - Parallel agents are explicitly authorized. Root owns integration/provider setup/landing; scoped agents own private accounts, offline reliability and creative/cloud capabilities.
 
-- The owner explicitly requires Randy to be the only site administrator. Private workspace ownership is distinct from platform administration.
+- The 2026-09-10 correction supersedes the earlier single-administrator wording:
+  Randy is the immutable global Owner; the initial state has zero Admins; Owner
+  and later Admins may manage non-owner users, while no Admin can alter the
+  Owner. Private workspace ownership is distinct from global site roles.
 - Explain invitation-only hosting and free self-hostable GitHub source clearly near the landing actions; add a secure empty-database owner procedure.
 
 ### Additional owner decisions — 2026-09-09

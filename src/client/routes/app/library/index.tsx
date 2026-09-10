@@ -293,15 +293,17 @@ function PresetList({ query, organizationId, canManage, onExport }: PresetListPr
   }
   return (
     <div className="flex flex-col gap-4">
-      <label className="flex min-h-11 items-center gap-2 self-start text-sm">
-        <input
-          type="checkbox"
-          checked={qrOnly}
-          onChange={(event) => setQrOnly(event.currentTarget.checked)}
-          className="size-4 accent-brand-600"
-        />
+      <Button
+        type="button"
+        variant={qrOnly ? 'primary' : 'secondary'}
+        size="sm"
+        className="self-start"
+        aria-pressed={qrOnly}
+        onClick={() => setQrOnly((current) => !current)}
+      >
+        <QrCode aria-hidden="true" className="size-4" />
         {t('library.qrOnly')}
-      </label>
+      </Button>
       {qrOnly && query.data.every((preset) => preset.spec.kind !== 'qr') ? (
         <p className="text-sm text-ink-muted">{t('library.noQr')}</p>
       ) : null}
@@ -342,59 +344,65 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
   return (
     <li>
       <Card className="flex h-full flex-col gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
-            <Icon aria-hidden="true" className="size-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold">
-              <Link
-                to="/app/library/$watermarkId"
-                params={{ watermarkId: preset.id }}
-                className="block truncate hover:underline"
-              >
-                {preset.name}
-              </Link>
-            </h2>
-            <p className="truncate text-sm text-ink-muted">{describeSpec(t, preset.spec)}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={t('library.exportPreset', { name: preset.name })}
-            className="text-ink-muted"
-            onClick={() => {
-              onExport(preset)
-            }}
-          >
-            <Download aria-hidden="true" className="size-4" />
-          </Button>
+        <div className="flex min-w-0 items-start justify-between gap-3">
           <Link
-            to="/app/editor"
-            search={{ preset: preset.id }}
-            aria-label={t('library.openInEditor', { name: preset.name })}
-            className={buttonVariants({ variant: 'ghost', size: 'icon' })}
+            to="/app/library/$watermarkId"
+            params={{ watermarkId: preset.id }}
+            aria-label={preset.name}
+            className="flex min-w-0 flex-1 items-start gap-3 rounded-xl focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
           >
-            <PencilRuler aria-hidden="true" className="size-4" />
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
+              <Icon aria-hidden="true" className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-base font-semibold hover:underline">
+                {preset.name}
+              </span>
+              <span className="block truncate text-sm text-ink-muted">
+                {describeSpec(t, preset.spec)}
+              </span>
+            </span>
           </Link>
-          {canManage ? (
+          <div className="glass-control flex shrink-0 items-center gap-0.5 rounded-xl border p-1">
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              aria-label={t('library.deletePreset', { name: preset.name })}
-              disabled={remove.isPending}
+              aria-label={t('library.exportPreset', { name: preset.name })}
+              title={t('library.exportPreset', { name: preset.name })}
+              className="text-ink-muted"
               onClick={() => {
-                remove.mutate()
+                onExport(preset)
               }}
-              className="text-ink-muted hover:text-rose-600"
             >
-              <Trash2 aria-hidden="true" className="size-4" />
+              <Download aria-hidden="true" className="size-4" />
             </Button>
-          ) : null}
+            <Link
+              to="/app/editor"
+              search={{ preset: preset.id }}
+              aria-label={t('library.openInEditor', { name: preset.name })}
+              title={t('library.openInEditor', { name: preset.name })}
+              className={buttonVariants({ variant: 'ghost', size: 'icon' })}
+            >
+              <PencilRuler aria-hidden="true" className="size-4" />
+            </Link>
+            {canManage ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={t('library.deletePreset', { name: preset.name })}
+                title={t('library.deletePreset', { name: preset.name })}
+                disabled={remove.isPending}
+                onClick={() => {
+                  remove.mutate()
+                }}
+                className="text-ink-muted hover:text-rose-600"
+              >
+                <Trash2 aria-hidden="true" className="size-4" />
+              </Button>
+            ) : null}
+          </div>
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-2 text-xs text-ink-muted">
           <Badge>{preset.spec.kind === 'image' ? t('library.logoBadge') : preset.spec.kind}</Badge>

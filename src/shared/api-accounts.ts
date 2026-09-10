@@ -1,6 +1,7 @@
 /** Account admission controls are separate from workspace membership. */
 import { z } from 'zod'
 
+import { assignableSiteRoleSchema, SITE_ROLE } from './site-roles'
 import { emailSchema } from './validation'
 
 export const SITE_INVITATION_POLICY = {
@@ -14,10 +15,13 @@ export const SITE_INVITATION_POLICY = {
   listLimit: 100,
 } as const
 
-export const siteInvitationRequestSchema = z.object({ email: emailSchema }).strict()
+export const siteInvitationRequestSchema = z
+  .object({ email: emailSchema, role: assignableSiteRoleSchema.default(SITE_ROLE.user) })
+  .strict()
 export const siteInvitationDtoSchema = z.object({
   id: z.string(),
   email: z.email(),
+  role: assignableSiteRoleSchema,
   status: z.enum(['pending', 'accepted', 'revoked', 'expired']),
   createdAt: z.iso.datetime(),
   expiresAt: z.iso.datetime(),
@@ -31,6 +35,8 @@ export const accountStatsSchema = z.object({
   acceptedInvitations: z.number().int().nonnegative(),
 })
 export type SiteInvitationDto = z.infer<typeof siteInvitationDtoSchema>
+/** Validated admission request with an explicit default User role. */
+export type SiteInvitationRequest = z.infer<typeof siteInvitationRequestSchema>
 export type AccountStats = z.infer<typeof accountStatsSchema>
 
 export const referralLinkSchema = z.object({

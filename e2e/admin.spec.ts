@@ -1,9 +1,9 @@
 /**
  * Platform administration journey against the production build in workerd:
- * an ordinary owner cannot reach the console, the single test administrator can
+ * an ordinary workspace owner cannot reach the console, the synthetic site owner can
  * search users, ban one (whose session ends and whose sign-in is refused),
  * unban them, see every organization, and find the ban in the global audit
- * trail. Every device signs into the same administrator in isolated gate state.
+ * trail. Every device signs into the same site owner in isolated gate state.
  */
 
 import { PREVIEW_ORIGIN } from './preview'
@@ -19,8 +19,8 @@ import {
 import { ensureTestSiteOwner, TEST_SITE_OWNER } from '../scripts/lib/test-site-owner'
 
 const runId = Date.now().toString(36)
-const admin = {
-  name: 'Ada Admin',
+const workspaceOwner = {
+  name: 'Ada Workspace Owner',
   email: `ada-${runId}@example.test`,
   password: 'correct horse battery',
 }
@@ -29,22 +29,18 @@ const member = {
   email: `mo-${runId}@example.test`,
   password: 'correct horse battery',
 }
-const adminOrganization = `Admin Org ${runId}`
+const ownerOrganization = `Owner Workspace ${runId}`
 const memberOrganization = `Member Org ${runId}`
 
-test('the sole administrator manages users and sees account totals', async ({
-  browser,
-  page,
-  request,
-}) => {
-  // Two full sign-ups, a wrangler subprocess and five axe scans: three times the default budget.
+test('the site owner manages users and sees account totals', async ({ browser, page, request }) => {
+  // Independent verified accounts and repeated accessibility scans cover the full moderation flow.
   test.slow()
-  await createWorkspace(page, request, admin, adminOrganization)
+  await createWorkspace(page, request, workspaceOwner, ownerOrganization)
 
-  // Before promotion the console is a dead end and the nav does not offer it.
+  // Workspace ownership alone never grants a global management role.
   await expectNoNavLink(page, 'Admin')
   await page.goto('/app/admin')
-  await expect(page.getByRole('alert')).toContainText('Only the site administrator')
+  await expect(page.getByRole('alert')).toContainText('Only the site owner or an admin')
   await expectAccessible(page)
 
   // A second, unrelated account with its own organization and live session.
@@ -89,7 +85,7 @@ test('the sole administrator manages users and sees account totals', async ({
 
   await page.getByRole('tab', { name: 'Organizations' }).click()
   const organizations = page.getByRole('table', { name: /Organizations/ })
-  await expect(organizations).toContainText(adminOrganization)
+  await expect(organizations).toContainText(ownerOrganization)
   await expect(organizations).toContainText(memberOrganization)
   await expectAccessible(page)
 

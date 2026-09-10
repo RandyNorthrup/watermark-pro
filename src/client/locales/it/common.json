@@ -730,7 +730,7 @@
   "admin": {
     "heading": "Amministrazione",
     "description": "Solo per l’amministratore del sito: gestione degli account e consultazione dei totali. Essere proprietari di uno spazio non concede diritti di amministrazione del sito.",
-    "onlyAdmins": "Solo l’amministratore del sito può aprire questa pagina.",
+    "onlyAdmins": "Solo il proprietario del sito o un amministratore può aprire questa pagina.",
     "sectionsLabel": "Sezioni di amministrazione",
     "tabs": {
       "users": "Utenti",
@@ -774,7 +774,6 @@
     "you": "(tu)",
     "joined": "Iscritto il {{date}}",
     "emailNotVerified": " · email non verificata",
-    "platformAdmin": "Amministratore del sito",
     "banned": "bloccato",
     "bannedReason": "bloccato: {{reason}}",
     "unban": "Sblocca",
@@ -802,7 +801,10 @@
     "auditErrorTitle": "Impossibile caricare la traccia di controllo",
     "auditCaption": "Voci di controllo di tutte le organizzazioni, dalla più recente",
     "auditDetailHeading": "Organizzazione",
-    "platform": "piattaforma"
+    "platform": "piattaforma",
+    "siteRole": "Ruolo del sito: {{role}}",
+    "roleFor": "Ruolo del sito per {{email}}",
+    "ownerProtected": "L’account del proprietario è protetto."
   },
   "members": {
     "orgRequired": "Crea un'organizzazione o unisciti a una per gestire i membri.",
@@ -1144,7 +1146,7 @@
       },
       "audit": {
         "heading": "Traccia di controllo",
-        "p1": "I registri di uno spazio richiedono il ruolo di proprietario o amministratore di quello spazio. L’unico amministratore del sito gestisce account e consulta totali, moderazione, audit e dati di stato/errori. La cronologia recente è personale. I registri degli errori dell’app omettono token e corpi delle richieste."
+        "p1": "I registri di uno spazio richiedono il ruolo di proprietario o amministratore di quello spazio. Il proprietario e gli amministratori del sito gestiscono account e consultano totali, moderazione, audit e dati di stato/errori. La cronologia recente è personale. I registri degli errori dell’app omettono token e corpi delle richieste."
       },
       "reporting": {
         "heading": "Segnalare un problema",
@@ -1273,7 +1275,9 @@
       "revoked": "Revocato",
       "expired": "Scaduto"
     },
-    "collaborationNotice": "Un invito a questo spazio dà accesso alle sue foto e ai preset. Il destinatario deve già avere un account Lumafoil. Se necessario, usa prima Invita persone."
+    "collaborationNotice": "Un invito a questo spazio dà accesso alle sue foto e ai preset. Il destinatario deve già avere un account Lumafoil. Se necessario, usa prima Invita persone.",
+    "role": "Ruolo del sito",
+    "roleHelp": "Gli amministratori gestiscono gli account del sito. L’appartenenza agli spazi è separata."
   },
   "accountStats": {
     "users": "Account registrati",
@@ -1340,5 +1344,10 @@
       "list": "Elenco",
       "details": "Dettagli"
     }
+  },
+  "siteRoles": {
+    "owner": "Proprietario",
+    "admin": "Amministratore",
+    "user": "Utente"
   }
 }

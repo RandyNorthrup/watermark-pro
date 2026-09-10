@@ -10,6 +10,7 @@ import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
 import type { RecentActivity, RecentView } from '../../shared/recent-work'
+import type { AssignableSiteRole } from '../../shared/site-roles'
 import type { WatermarkSpec } from '../../shared/watermark'
 
 const now = () => new Date()
@@ -48,9 +49,9 @@ export const user = sqliteTable(
   },
   (table) => [
     uniqueIndex('user_email_unique').on(table.email),
-    uniqueIndex('user_single_site_admin')
+    uniqueIndex('user_single_site_owner')
       .on(sql`(1)`)
-      .where(sql`instr(',' || coalesce(${table.role}, '') || ',', ',admin,') > 0`),
+      .where(sql`${table.role} = 'owner'`),
   ],
 )
 
@@ -343,6 +344,7 @@ export const siteInvitation = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     email: text('email').notNull(),
+    role: text('role').$type<AssignableSiteRole>().notNull().default('user'),
     tokenHash: text('token_hash').notNull(),
     referralId: text('referral_id').references(() => referralLink.id, { onDelete: 'set null' }),
     createdAt: createdAtColumn(),
@@ -416,7 +418,7 @@ export const uploadReservation = sqliteTable(
   ],
 )
 
-/** The site's single administrator is an anchored account, not a workspace role. */
+/** The site's immutable owner is an anchored account, separate from workspace ownership. */
 export const siteOwner = sqliteTable(
   'site_owner',
   {

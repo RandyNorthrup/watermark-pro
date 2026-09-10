@@ -20,7 +20,7 @@ function localServer() {
   return harness
 }
 
-describe('isolated shared verification administrator', () => {
+describe('isolated shared verification site owner', () => {
   it('bootstraps once and authenticates independent sessions for successive gate callers', async () => {
     const harness = localServer()
     const first = await ensureTestSiteOwner(TEST_APP_URL)
@@ -35,7 +35,7 @@ describe('isolated shared verification administrator', () => {
       role: string
       emailVerified: boolean
     }>({ model: 'user', where: [{ field: 'email', value: TEST_SITE_OWNER.email }] })
-    expect(account).toMatchObject({ role: 'admin', emailVerified: true })
+    expect(account).toMatchObject({ role: 'owner', emailVerified: true })
     expect(await harness.services.accounts.siteOwnerId()).toBe(account?.id)
     for (const result of [first, second]) {
       const response = await harness.app.fetch(
@@ -47,7 +47,7 @@ describe('isolated shared verification administrator', () => {
       expect(response.status).toBe(200)
     }
   })
-  it('cannot replace an existing administrator', async () => {
+  it('cannot replace an existing site owner', async () => {
     const harness = localServer()
     const client = new TestClient(harness.app, harness.env)
     const other = {
@@ -56,9 +56,9 @@ describe('isolated shared verification administrator', () => {
       password: 'existing owner passphrase',
     }
     await client.signUpAndVerify(harness.mailbox, other)
-    await harness.services.users.promoteToPlatformAdmin(other.email)
+    await harness.services.users.promoteToSiteOwner(other.email)
     const original = await harness.services.accounts.siteOwnerId()
-    await expect(ensureTestSiteOwner(TEST_APP_URL)).rejects.toThrow('another administrator')
+    await expect(ensureTestSiteOwner(TEST_APP_URL)).rejects.toThrow('another site owner')
     expect(await harness.services.accounts.siteOwnerId()).toBe(original)
   })
   it.each([

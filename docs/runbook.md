@@ -35,7 +35,9 @@ Reconcile `PLAN.md` and run the required quality, E2E/axe, SAST, screenshot,
 Lighthouse and hosted checks. Focused results are not full release certification.
 Automated browser gates use isolated storage and generated test secrets, separate
 from manual QA and production. E2E, screenshots and Lighthouse share the one
-synthetic owner in `scripts/lib/test-site-owner.ts`, with independent sessions.
+synthetic global Owner in `scripts/lib/test-site-owner.ts`, with independent
+sessions. The helper uses the console-only `/api/dev/promote-site-owner`
+endpoint and verifies a fresh owner-role session before preparing its workspace.
 
 Before schema or identity changes:
 
@@ -53,25 +55,32 @@ Before schema or identity changes:
 
 Site invitations create separate private accounts, never membership in the
 inviter's workspace. Collaboration is a separate explicit operation. Exactly
-one anchored site administrator exists; workspace ownership does not grant it.
+one anchored global Owner exists; workspace ownership does not grant that role.
 
 For a new database, follow [self-hosting](self-hosting.md). The first-owner tool
-creates an unverified owner without generating a password; mailbox verification
-and normal recovery finish setup. Inspect the syntax without changing data:
+creates an unverified account with global role `owner`, without generating a
+password or creating an Admin account; mailbox verification and normal recovery
+finish setup. Inspect the syntax without changing data:
 
 ```powershell
 node scripts/bootstrap-owner.mjs --help
 node scripts/split-empty-workspace.mjs --help
 ```
 
-Migration 0010 accepts an empty database or exactly one existing administrator.
-An occupied database with zero or multiple administrators fails closed. Before
-that migration, the bootstrap tool's `--existing-user-id` selects an explicitly
-named verified owner, preserving accounts/content while normalizing site roles.
-After anchoring, an ownership transfer requires a separately reviewed operator
-migration. Normal APIs cannot add another administrator or demote/delete the
-owner, change the anchor, impersonate users, or replace another user's email or
-password.
+Historical migration 0010 accepts an empty database or exactly one account in its
+former `admin` representation. Migration `0012_site_roles.sql` upgrades the
+existing anchor to `owner` and the other existing accounts to `user`. Do not
+rewrite the historical migration or treat today's owner selector as its old
+admin-selection workaround.
+
+For a reviewed pre-owner-guard migration procedure, `--existing-user-id` selects
+an explicitly named, verified account as `owner` and assigns every other global
+role `user`, leaving no admins. Identities, workspace roles, and content remain
+unchanged. The current tool is not a migration planner; see the compatibility
+boundary in [self-hosting](self-hosting.md#existing-deployments-and-the-anchored-site-owner).
+After anchoring, ownership transfer requires a separately reviewed operator
+migration. Normal APIs cannot demote/delete the owner, change the anchor,
+impersonate users, or replace another user's email or password.
 
 Migration 0008 is a no-op marker. For an old deployment containing only one
 confirmed-empty shared workspace, `split-empty-workspace.mjs` takes exact private

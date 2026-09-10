@@ -29,6 +29,7 @@ async function fixture() {
   const token = 'bootstrap-referrer'
   await seedInviter(harness, 'fixture-operator')
   await harness.services.accounts.createInvitation({
+    role: 'user',
     id: 'bootstrap',
     inviterId: 'fixture-operator',
     email: OWNER.email,

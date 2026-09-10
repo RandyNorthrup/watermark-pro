@@ -117,7 +117,7 @@ export function AppShell({ session, organization, organizations, children }: App
       >
         {t('shell.skipToContent')}
       </a>
-      <aside className="glass-chrome sticky top-0 hidden h-svh w-60 shrink-0 flex-col overflow-y-auto border-e border-line bg-surface-muted px-4 py-6 md:flex">
+      <aside className="glass-chrome sticky top-4 my-4 ms-4 hidden h-[calc(100svh-2rem)] w-60 shrink-0 flex-col overflow-y-auto rounded-3xl border border-line px-4 py-6 md:flex">
         <BrandMark to="/app" className="px-2 py-1" />
         <div className="mt-6">
           <OrganizationSwitcher organization={organization} organizations={organizations} />
@@ -125,7 +125,7 @@ export function AppShell({ session, organization, organizations, children }: App
         <NavList items={navItems} label={t('shell.primaryNav')} className="mt-7" />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="glass-chrome sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur md:px-8 md:pt-3">
+        <header className="glass-chrome sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:top-4 md:mx-4 md:mt-4 md:rounded-2xl md:border md:px-6 md:pt-3">
           <div className="flex min-w-0 items-center gap-1 md:hidden">
             <MobileMenu
               items={navItems}
@@ -150,7 +150,7 @@ export function AppShell({ session, organization, organizations, children }: App
         <main
           id="main"
           tabIndex={-1}
-          className="flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:py-8 md:pb-8"
+          className="flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:pt-6 md:pb-8"
         >
           <div className="mx-auto w-full max-w-7xl">
             {hasOfflineDatabase() ? (
@@ -186,7 +186,7 @@ function NavList({ items, label, className, onNavigate }: NavListProps) {
           to={to}
           activeOptions={{ exact }}
           onClick={onNavigate}
-          className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition-shadow hover:bg-surface-raised hover:text-ink"
+          className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition-all hover:translate-x-0.5 hover:bg-surface-raised hover:text-ink"
           activeProps={{
             className:
               'glass-nav-active bg-surface-raised text-brand-700 shadow-sm dark:text-brand-200',

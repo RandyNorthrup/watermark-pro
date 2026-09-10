@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { ProviderLogo } from './provider-logo'
 import { Alert } from './ui/alert'
 import { Button } from './ui/button'
 import { INVITATION_HEADER } from '../../shared/invitation'
@@ -78,6 +79,7 @@ export function SocialAuth({ invitation, mode = 'sign-in' }: SocialAuthProps) {
             disabled={pending !== null}
             onClick={() => void start(provider.id)}
           >
+            <ProviderLogo provider={provider.id} />
             {t(mode === 'link' ? 'accountAuth.linkProvider' : 'accountAuth.continueProvider', {
               provider: provider.name,
             })}

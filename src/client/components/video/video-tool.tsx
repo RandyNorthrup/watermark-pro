@@ -309,7 +309,7 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
             <div
               onDragOver={allowDrop}
               onDrop={onDrop}
-              className="flex flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed border-line px-4 py-8 text-center"
+              className="flex min-h-72 flex-col items-center justify-center rounded-3xl border-2 border-dashed border-brand-300/70 bg-white/35 px-6 py-10 text-center transition-colors hover:border-brand-400 dark:border-brand-700/70 dark:bg-black/10"
             >
               <input
                 ref={inputRef}
@@ -325,13 +325,14 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                   event.currentTarget.value = ''
                 }}
               />
-              <Film aria-hidden="true" className="size-8 text-ink-muted" />
-              <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
-                {t('video.dropHint')}
+              <span className="glass-control mb-5 inline-flex size-16 items-center justify-center rounded-2xl border text-brand-700 shadow-card dark:text-brand-200">
+                <Film aria-hidden="true" className="size-8" />
+              </span>
+              <p className="text-xl font-semibold tracking-tight text-ink">{t('video.dropHint')}</p>
+              <div className="mt-5">
                 <Button
                   type="button"
-                  variant="secondary"
-                  size="sm"
+                  size="lg"
                   disabled={isRunning}
                   onClick={() => {
                     inputRef.current?.click()
@@ -339,9 +340,9 @@ function VideoWorkbench({ organizationId, capability }: WorkbenchProps) {
                 >
                   {t('video.addVideo')}
                 </Button>
-              </p>
-              <p className="text-sm font-medium text-ink">{capability.label}</p>
-              <p className="text-xs text-ink-muted">{t('video.formatsHint')}</p>
+              </div>
+              <p className="mt-5 text-sm font-medium text-ink">{capability.label}</p>
+              <p className="mt-1 text-xs text-ink-muted">{t('video.formatsHint')}</p>
             </div>
 
             {loadError === null ? null : <Alert tone="error">{loadError}</Alert>}

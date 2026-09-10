@@ -30,6 +30,10 @@ interface MarkOverlayProps {
   rotation: number
   /** The mark's margin as a fraction of the shorter image side, for the snap lines. */
   margin: number
+  /** Whether this mark owns the visible transform handles. */
+  active?: boolean | undefined
+  /** Selects the mark before a direct manipulation starts. */
+  onSelect?: (() => void) | undefined
   onGesture: (gesture: MarkGesture) => void
 }
 
@@ -173,6 +177,8 @@ export function MarkOverlay({
   scale,
   rotation,
   margin,
+  active = true,
+  onSelect,
   onGesture,
 }: MarkOverlayProps) {
   const { t } = useTranslation()
@@ -246,6 +252,7 @@ export function MarkOverlay({
   }
 
   function frameDown(event: PointerEvent<HTMLElement>) {
+    onSelect?.()
     pointersRef.current.set(event.pointerId, localPoint(event))
     const drag = dragRef.current
     if (drag === null) {
@@ -396,13 +403,15 @@ export function MarkOverlay({
         role="group"
         tabIndex={0}
         aria-label={t('editor.mark.position')}
+        aria-current={active ? 'true' : undefined}
         aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight + - [ ]"
+        onFocus={onSelect}
         onPointerDown={frameDown}
         onPointerMove={move}
         onPointerUp={end}
         onPointerCancel={end}
         onKeyDown={keyboard}
-        className="pointer-events-auto absolute cursor-move touch-none rounded-sm outline-2 outline-offset-2 outline-white/90 focus-visible:outline-brand-400"
+        className={`pointer-events-auto absolute cursor-move touch-none rounded-sm outline-2 outline-offset-2 focus-visible:outline-brand-400 ${active ? 'outline-white/90' : 'outline-transparent hover:outline-brand-300/80'}`}
         style={{
           left: centre.x - width / 2,
           top: centre.y - height / 2,
@@ -412,37 +421,41 @@ export function MarkOverlay({
           boxShadow: '0 0 0 1px rgb(0 0 0 / 0.6)',
         }}
       >
-        <button
-          type="button"
-          aria-label={t('editor.mark.rotate')}
-          onPointerDown={(event) => {
-            beginSingle(event, 'rotate')
-          }}
-          onPointerMove={handleMove}
-          onPointerUp={handleEnd}
-          onPointerCancel={handleEnd}
-          className={`${HANDLE_CLASS} left-1/2 size-4 -translate-x-1/2 cursor-grab rounded-full`}
-          style={{ top: -ROTATE_HANDLE_OFFSET_PX }}
-        />
-        <span
-          aria-hidden="true"
-          className="absolute left-1/2 w-px -translate-x-1/2 bg-white/90"
-          style={{
-            top: -ROTATE_HANDLE_OFFSET_PX + ROTATE_STEM_GAP_PX,
-            height: ROTATE_HANDLE_OFFSET_PX - ROTATE_STEM_GAP_PX,
-          }}
-        />
-        <button
-          type="button"
-          aria-label={t('editor.mark.resize')}
-          onPointerDown={(event) => {
-            beginSingle(event, 'scale')
-          }}
-          onPointerMove={handleMove}
-          onPointerUp={handleEnd}
-          onPointerCancel={handleEnd}
-          className={`${HANDLE_CLASS} -right-2 -bottom-2 size-4 cursor-nwse-resize rounded-sm pointer-coarse:-right-3 pointer-coarse:-bottom-3`}
-        />
+        {active ? (
+          <>
+            <button
+              type="button"
+              aria-label={t('editor.mark.rotate')}
+              onPointerDown={(event) => {
+                beginSingle(event, 'rotate')
+              }}
+              onPointerMove={handleMove}
+              onPointerUp={handleEnd}
+              onPointerCancel={handleEnd}
+              className={`${HANDLE_CLASS} left-1/2 size-4 -translate-x-1/2 cursor-grab rounded-full`}
+              style={{ top: -ROTATE_HANDLE_OFFSET_PX }}
+            />
+            <span
+              aria-hidden="true"
+              className="absolute left-1/2 w-px -translate-x-1/2 bg-white/90"
+              style={{
+                top: -ROTATE_HANDLE_OFFSET_PX + ROTATE_STEM_GAP_PX,
+                height: ROTATE_HANDLE_OFFSET_PX - ROTATE_STEM_GAP_PX,
+              }}
+            />
+            <button
+              type="button"
+              aria-label={t('editor.mark.resize')}
+              onPointerDown={(event) => {
+                beginSingle(event, 'scale')
+              }}
+              onPointerMove={handleMove}
+              onPointerUp={handleEnd}
+              onPointerCancel={handleEnd}
+              className={`${HANDLE_CLASS} -right-2 -bottom-2 size-4 cursor-nwse-resize rounded-sm pointer-coarse:-right-3 pointer-coarse:-bottom-3`}
+            />
+          </>
+        ) : null}
       </div>
     </div>
   )

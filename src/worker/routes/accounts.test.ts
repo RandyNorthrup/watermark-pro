@@ -80,6 +80,7 @@ describe('site invitations and private workspaces', () => {
     const token = 'owner-fixture-token'
     await seedInviter(harness, 'bootstrap')
     await harness.services.accounts.createInvitation({
+      role: 'user',
       id: 'seed',
       tokenHash: await invitationTokenHash(token),
       inviterId: 'bootstrap',
@@ -157,7 +158,7 @@ describe('site invitations and private workspaces', () => {
     await context.adapter.update({
       model: 'user',
       where: [{ field: 'id', value: await idOf(owner) }],
-      update: { role: 'admin' },
+      update: { role: 'owner' },
     })
     const otherUserId = await idOf(other)
     expect(

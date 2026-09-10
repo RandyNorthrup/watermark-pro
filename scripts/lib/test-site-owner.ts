@@ -2,7 +2,7 @@
 import { z } from 'zod'
 
 export const TEST_SITE_OWNER = {
-  name: 'Verification Administrator',
+  name: 'Verification Owner',
   email: 'verification-owner@example.test',
   password: 'disposable local verification passphrase',
 } as const
@@ -10,6 +10,15 @@ export const TEST_SITE_OWNER = {
 const messageSchema = z.object({ to: z.string(), text: z.string() })
 const mailboxSchema = z.object({ messages: z.array(messageSchema) })
 const workspaceSchema = z.object({ organizationId: z.string().min(1) })
+const ownerSessionSchema = z.object({
+  session: z.object({ userId: z.string().min(1) }),
+  user: z.object({
+    id: z.string().min(1),
+    email: z.literal(TEST_SITE_OWNER.email),
+    emailVerified: z.literal(true),
+    role: z.literal('owner'),
+  }),
+})
 const POLICY = {
   attempts: 20,
   intervalMs: 250,
@@ -111,9 +120,24 @@ export async function ensureTestSiteOwner(
   if (!signedIn.ok) throw new Error(`Verified gate sign-in failed: ${String(signedIn.status)}`)
   let cookie = mergeCookies('', signedIn)
   if (cookie === '') throw new Error('Gate sign-in returned no session cookie')
-  const promotion = await request('/api/dev/promote', { email: TEST_SITE_OWNER.email })
+  const promotion = await request('/api/dev/promote-site-owner', { email: TEST_SITE_OWNER.email })
   if (!promotion.ok)
-    throw new Error('Gate database has another administrator; use isolated gate state')
+    throw new Error('Gate database has another site owner; use isolated gate state')
+  const ownerResponse = await request(
+    '/api/auth/get-session?disableCookieCache=true',
+    undefined,
+    cookie,
+  )
+  const ownerSession = ownerResponse.ok
+    ? ownerSessionSchema.safeParse(await ownerResponse.json())
+    : null
+  if (
+    ownerSession === null ||
+    !ownerSession.success ||
+    ownerSession.data.session.userId !== ownerSession.data.user.id
+  )
+    throw new Error('Gate session is not the verified synthetic site owner')
+  cookie = mergeCookies(cookie, ownerResponse)
   const workspace = await request('/api/me/workspace', {}, cookie)
   if (!workspace.ok) throw new Error(`Gate workspace setup failed: ${String(workspace.status)}`)
   cookie = mergeCookies(cookie, workspace)

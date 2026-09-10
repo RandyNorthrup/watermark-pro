@@ -5,6 +5,7 @@ import {
   accountStatsSchema,
   siteInvitationDtoSchema,
   siteInvitationListSchema,
+  type SiteInvitationRequest,
 } from '../../shared/api-accounts'
 
 /** Private sent-invitation query keys always include the authenticated account. */
@@ -20,11 +21,11 @@ export const accountStatsQueryOptions = queryOptions({
   queryFn: () => fetchJson('/api/admin/account-stats', accountStatsSchema),
 })
 
-export async function inviteToSite(email: string) {
+export async function inviteToSite(invitation: SiteInvitationRequest) {
   return await fetchJson('/api/me/invitations', siteInvitationDtoSchema, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(invitation),
   })
 }
 

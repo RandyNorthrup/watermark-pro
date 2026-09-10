@@ -77,7 +77,7 @@ test('site invitations create separate private workspaces and protect account to
   const forbiddenStats = await page.request.get('/api/admin/account-stats')
   expect(forbiddenStats.status()).toBe(403)
   await page.goto('/app/admin')
-  await expect(page.getByRole('alert')).toContainText('Only the site administrator')
+  await expect(page.getByRole('alert')).toContainText('Only the site owner or an admin')
   await expect(page.getByText('Registered accounts', { exact: true })).toHaveCount(0)
   await expectAccessible(page)
 })

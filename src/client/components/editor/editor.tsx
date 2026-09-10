@@ -209,7 +209,6 @@ export function Editor({
   // The active layer: the chosen one while it exists, else the topmost.
   const activeLayer: Layer | null =
     document.layers.find((layer) => layer.id === activeLayerId) ?? document.layers.at(-1) ?? null
-  const activeIndex = activeLayer === null ? -1 : document.layers.indexOf(activeLayer)
   const [aspectId, setAspectId] = useState('free')
   const [photo, setPhoto] = useState<Photo | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
@@ -416,13 +415,14 @@ export function Editor({
     dispatch({ type: 'commit', document: { ...document, ...patch } })
   }
 
-  function markGesture(gesture: MarkGesture) {
-    if (activeLayer === null) {
+  function markGesture(layerId: string, gesture: MarkGesture) {
+    const layer = document.layers.find((candidate) => candidate.id === layerId)
+    if (layer === undefined) {
       return
     }
     const next = withLayer(document, {
-      ...activeLayer,
-      spec: applyMarkPatch(activeLayer.spec, gesture.patch),
+      ...layer,
+      spec: applyMarkPatch(layer.spec, gesture.patch),
     })
     switch (gesture.phase) {
       case 'start': {
@@ -561,12 +561,6 @@ export function Editor({
   const crop: CropRect = document.crop ?? fullCrop(cropBaseSize)
   const aspectPreset = ASPECT_PRESETS.find((candidate) => candidate.id === aspectId)
   const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, cropBaseSize)
-  const activeOutcome = result?.marks[activeIndex]
-  const isShowMarkOverlay =
-    tool === 'watermark' &&
-    activeLayer !== null &&
-    !activeLayer.spec.style.tiling.enabled &&
-    activeOutcome !== undefined
   const previewSize: Size | null =
     result === null ? null : { width: result.width, height: result.height }
 
@@ -704,17 +698,30 @@ export function Editor({
                 height={result.height}
                 className="block max-h-[42svh] max-w-full lg:max-h-[70vh]"
               />
-              {isShowMarkOverlay && previewSize !== null ? (
-                <MarkOverlay
-                  placement={activeOutcome.placement}
-                  previewSize={previewSize}
-                  displaySize={displaySize}
-                  scale={activeLayer.spec.style.scale}
-                  rotation={activeLayer.spec.style.rotation}
-                  margin={activeLayer.spec.style.margin}
-                  onGesture={markGesture}
-                />
-              ) : null}
+              {tool === 'watermark' && previewSize !== null
+                ? document.layers.map((layer, index) => {
+                    const outcome = result.marks[index]
+                    if (outcome === undefined || layer.spec.style.tiling.enabled) return null
+                    return (
+                      <MarkOverlay
+                        key={layer.id}
+                        placement={outcome.placement}
+                        previewSize={previewSize}
+                        displaySize={displaySize}
+                        scale={layer.spec.style.scale}
+                        rotation={layer.spec.style.rotation}
+                        margin={layer.spec.style.margin}
+                        active={layer.id === activeLayer?.id}
+                        onSelect={() => {
+                          setActiveLayerId(layer.id)
+                        }}
+                        onGesture={(gesture) => {
+                          markGesture(layer.id, gesture)
+                        }}
+                      />
+                    )
+                  })
+                : null}
               {isCropping ? (
                 <CropOverlay
                   crop={crop}
@@ -727,11 +734,18 @@ export function Editor({
             </div>
           )}
         </div>
-        <p className="text-xs text-ink-muted" aria-live="polite">
-          {document.layers.length === 0
-            ? t(canCreatePresets ? 'editor.watermark.firstUseHint' : 'editor.choosePresetHint')
-            : t('editor.outputSize', { width: outputSize.width, height: outputSize.height })}
-        </p>
+        <div className="flex flex-col gap-1 text-xs text-ink-muted" aria-live="polite">
+          <p>
+            {document.layers.length === 0
+              ? t(canCreatePresets ? 'editor.watermark.firstUseHint' : 'editor.choosePresetHint')
+              : t('editor.outputSize', { width: outputSize.width, height: outputSize.height })}
+          </p>
+          {tool === 'watermark' &&
+          activeLayer !== null &&
+          !activeLayer.spec.style.tiling.enabled ? (
+            <p>{t('editor.mark.position')}</p>
+          ) : null}
+        </div>
         {photoError === null ? null : <Alert tone="error">{photoError}</Alert>}
         {error === null ? null : (
           <Alert tone="error" title={t('editor.previewFailed')}>

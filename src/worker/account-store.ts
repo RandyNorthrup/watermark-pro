@@ -1,9 +1,11 @@
 import type { AccountStats } from '../shared/api-accounts'
+import type { AssignableSiteRole } from '../shared/site-roles'
 
 export interface SiteInvitationRecord {
   id: string
   inviterId: string
   email: string
+  role: AssignableSiteRole
   tokenHash: string
   referralId?: string | null | undefined
   createdAt: Date
@@ -22,6 +24,7 @@ export interface AccountStore {
   acceptInvitation(tokenHash: string, email: string, userId: string): Promise<void>
   revokeInvitation(inviterId: string, id: string): Promise<boolean>
   revokePendingAdmissions(inviterId: string): Promise<void>
+  revokePendingAdministratorAdmissions(inviterId: string): Promise<void>
   ensurePrivateWorkspace(userId: string): Promise<string>
   isPrivateWorkspace(organizationId: string): Promise<boolean>
   findReferralLink(userId: string): Promise<ReferralLinkRecord | null>

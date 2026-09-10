@@ -21,9 +21,11 @@ the final release has passed every device, accessibility and performance gate.
   also shows both approved icon sizes after the owner completed its final selection.
 - Use Inter for the site and controls, warm neutral surfaces, and clear type
   hierarchy. Creative fonts belong in watermarks and feature examples.
-- Preserve the approved landing layout. The application follows the owner's
-  supplied liquid-glass UI kit: translucent panels, rounded controls, quiet
-  highlights and depth, retaining the rose palette. The reference is Margarita's
+- Preserve the approved landing layout. The first subtle glass pass was rejected
+  on 2026-09-10 because the deployed application still read as flat and its
+  controls lacked hierarchy. The replacement follows the owner's supplied
+  liquid-glass UI kit visibly: translucent panels, rounded controls, reflections,
+  floating chrome and stronger depth, retaining the rose palette. The reference is Margarita's
   MIT-licensed [CSS UI kit](https://codepen.io/Margarita-the-solid/pen/NPRPBjd);
   its required notice is retained in `public/brand/UI-KIT-LICENSE.txt`.
 - The standard dashboard presents actual recent work in thumbnail, list and
@@ -50,7 +52,8 @@ The Windows host requests reduced transparency. Its solid fallback was observed
 in an unmodified browser context. Marketing captures explicitly emulate
 `prefers-reduced-transparency: no-preference` to demonstrate the glass appearance;
 separate device audits retain and test reduced transparency. Theme transitions
-finish before the screenshots are taken.
+finish before the screenshots are taken. The final scene uses slow rose/peach
+blob motion only when reduced motion is not requested.
 
 `scripts/fixtures/build-product-images.mjs` derives width variants from those
 full-size captures. The hero uses one responsive picture with a themed source,
@@ -84,8 +87,8 @@ confirmed server saves and conflict recovery remain visibly distinct.
 
 Glass styling is applied to application chrome and panels, never to exported
 photo pixels. Solid surfaces remain available when backdrop filters are absent,
-transparency is reduced, or forced colors are enabled. Decorative backgrounds
-do not animate. Shared buttons transition their shadows only: interpolating
+transparency is reduced, or forced colors are enabled. Decorative motion stops
+under `prefers-reduced-motion`. Shared buttons transition their shadows only: interpolating
 foreground and background colors produced a real transient axe contrast failure
 when selecting recent-work views, so those colors now change together.
 
@@ -109,3 +112,9 @@ pass; fresh measured dashboard results are still required.
   thresholds or reclassified large chunks solely to make the gate pass.
 - Rebuilt brand-kit archive and social images from final screenshots;
   consistent approved icon on all provider screens.
+
+The stale 2026-09-09 product captures were replaced on 2026-09-10 through the
+isolated console-mailbox fixture server. The responsive landing assets now show
+the final glass editor, direct canvas handles, QR output and the library's grouped
+top-right actions. The broader screenshot audit remains separate from these
+marketing captures.

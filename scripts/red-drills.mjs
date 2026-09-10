@@ -89,10 +89,10 @@ export const DRILLS = [
     ...unitWorker('src/worker/library.test.ts'),
   },
   {
-    name: 'Platform admin: any signed-in user reaches the admin API',
+    name: 'Site management: ordinary users reach the admin API',
     file: 'src/worker/middleware/platform-admin.ts',
-    find: 'if (user.role !== PLATFORM_ADMIN_ROLE || user.id !== ownerId) {',
-    replace: 'if (user.role === PLATFORM_ADMIN_ROLE && user.id === ownerId) {',
+    find: 'if (!hasSiteManagementAccess(user, ownerId)) {',
+    replace: 'if (hasSiteManagementAccess(user, ownerId)) {',
     ...unitWorker('src/worker/admin.test.ts'),
   },
   {

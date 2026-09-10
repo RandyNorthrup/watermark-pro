@@ -1,4 +1,3 @@
-import { Cloud } from 'lucide-react'
 import { useState } from 'react'
 
 import { OneDriveDialog } from './onedrive-dialog'
@@ -12,6 +11,8 @@ import {
   type CloudProviderId,
 } from '../../lib/imports/source'
 import { captureOfflineOwner } from '../../lib/offline-context'
+import { ProviderLogo } from '../provider-logo'
+import { cloudProviderLogo } from '../provider-logo-id'
 import { Button } from '../ui/button'
 
 interface CloudImportButtonsProps {
@@ -88,7 +89,7 @@ export function CloudImportButtons({
               onImport={onImport}
               trigger={
                 <Button type="button" variant="secondary" size="sm" disabled={disabled}>
-                  <Cloud aria-hidden="true" className="size-4" />
+                  <ProviderLogo provider="onedrive" />
                   {label}
                 </Button>
               }
@@ -111,7 +112,7 @@ export function CloudImportButtons({
               void runImperative(provider, pick)
             }}
           >
-            <Cloud aria-hidden="true" className="size-4" />
+            <ProviderLogo provider={cloudProviderLogo(provider)} />
             {label}
           </Button>
         )
