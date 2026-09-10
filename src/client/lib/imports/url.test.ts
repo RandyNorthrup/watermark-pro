@@ -1,10 +1,12 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { deriveFileName, importFromUrl } from './url'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../../shared/constants'
+import { setOfflineUser } from '../offline-context'
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  setOfflineUser(null)
 })
 
 describe('deriveFileName', () => {
@@ -116,6 +118,32 @@ describe('deriveFileName', () => {
 })
 
 describe('importFromUrl', () => {
+  beforeEach(() => {
+    setOfflineUser('url-import-owner')
+  })
+
+  it('refuses to start an import while no account is admitted', async () => {
+    setOfflineUser(null)
+    const fetchMock = vi.fn<typeof fetch>()
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(importFromUrl('org-1', 'https://cdn.example.com/a.jpg')).rejects.toThrow()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('discards old account bytes when ownership changes while the body downloads', async () => {
+    const body = Promise.withResolvers<Blob>()
+    const response = new Response()
+    const readBody = vi.spyOn(response, 'blob').mockReturnValue(body.promise)
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(response))
+    const imported = importFromUrl('org-1', 'https://cdn.example.com/private.jpg')
+    const rejected = expect(imported).rejects.toThrow(/account/i)
+    await vi.waitFor(() => {
+      expect(readBody).toHaveBeenCalled()
+    })
+    setOfflineUser('different-url-import-owner')
+    body.resolve(new Blob(['original owner bytes'], { type: 'image/jpeg' }))
+    await rejected
+  })
   it('returns a File named from the response headers', async () => {
     const fetchMock = vi.fn<typeof fetch>(() =>
       Promise.resolve(

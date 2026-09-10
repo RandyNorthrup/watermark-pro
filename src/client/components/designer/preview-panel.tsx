@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next'
 
 import type { Anchor, WatermarkSpec } from '../../../shared/watermark'
 import { INK } from '../../engine/contrast'
-import { apiRequest } from '../../lib/api'
 import { describeError } from '../../lib/errors'
 import { assetFileUrl } from '../../lib/library'
+import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { PreviewRenderer, type PreviewResult } from '../../lib/preview'
 import { SampleScene } from '../sample-scene'
 import { Alert } from '../ui/alert'
@@ -16,6 +16,7 @@ import { Spinner } from '../ui/spinner'
 interface PreviewPanelProps {
   organizationId: string
   spec: WatermarkSpec
+  initialPhoto?: File | undefined
 }
 
 /** Slider drags fire continuously; one render per pause keeps the worker responsive. */
@@ -63,30 +64,48 @@ function PendingPreview({
  * Renders the current spec over a subject photo through the engine worker.
  * Uses a bundled sample scene until the user drops in a photo of their own.
  */
-export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
+export function PreviewPanel({ organizationId, spec, initialPhoto }: PreviewPanelProps) {
   const { t } = useTranslation()
   const rendererRef = useRef<PreviewRenderer | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [result, setResult] = useState<PreviewResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isRendering, setIsRendering] = useState(false)
-  const [hasOwnPhoto, setHasOwnPhoto] = useState(false)
+  const [hasOwnPhoto, setHasOwnPhoto] = useState(initialPhoto !== undefined)
+  const [preparedPhoto, setPreparedPhoto] = useState<File | undefined>(undefined)
+  const isSubjectReady = initialPhoto === undefined || preparedPhoto === initialPhoto
   const [subjectVersion, setSubjectVersion] = useState(0)
 
   useEffect(() => {
+    let isActive = true
     const renderer = new PreviewRenderer(async (assetId) => {
-      const response = await apiRequest(assetFileUrl(organizationId, assetId))
-      return await response.blob()
+      return await loadWorkspaceMedia(organizationId, assetFileUrl(organizationId, assetId))
     })
     rendererRef.current = renderer
+    if (initialPhoto !== undefined) {
+      const photo = initialPhoto
+      async function preparePhoto() {
+        try {
+          await renderer.setSubject(photo)
+          if (isActive) {
+            setPreparedPhoto(photo)
+            setHasOwnPhoto(true)
+          }
+        } catch (error_) {
+          if (isActive) setError(describeError(error_))
+        }
+      }
+      void preparePhoto()
+    }
     return () => {
+      isActive = false
       renderer.dispose()
       rendererRef.current = null
     }
-  }, [organizationId])
+  }, [organizationId, initialPhoto])
 
   useEffect(() => {
-    if (!isRenderable(spec)) {
+    if (!isSubjectReady || !isRenderable(spec)) {
       return
     }
     async function renderFrame(renderer: PreviewRenderer) {
@@ -114,7 +133,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
     return () => {
       clearTimeout(timer)
     }
-  }, [spec, subjectVersion])
+  }, [spec, subjectVersion, isSubjectReady])
 
   // Each object URL lives until the next result replaces it or the panel unmounts.
   useEffect(
@@ -177,6 +196,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
           ) : null}
           <input
             ref={inputRef}
+            hidden={initialPhoto !== undefined}
             type="file"
             accept={ACCEPTED_PHOTO_TYPES}
             className="sr-only"
@@ -191,6 +211,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
           />
           <Button
             type="button"
+            hidden={initialPhoto !== undefined}
             variant="secondary"
             size="sm"
             onClick={() => {
@@ -200,7 +221,7 @@ export function PreviewPanel({ organizationId, spec }: PreviewPanelProps) {
             <ImagePlus aria-hidden="true" className="size-4" />
             {t('designer.preview.tryYourPhoto')}
           </Button>
-          {hasOwnPhoto ? (
+          {hasOwnPhoto && initialPhoto === undefined ? (
             <Button
               type="button"
               variant="ghost"

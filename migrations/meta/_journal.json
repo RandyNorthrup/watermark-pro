@@ -43,6 +43,48 @@
       "when": 1788893836135,
       "tag": "0005_charming_swarm",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1788928324282,
+      "tag": "0006_private_admission",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1788930024646,
+      "tag": "0007_referral_links",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1788930667627,
+      "tag": "0008_isolate_initial_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1788934703400,
+      "tag": "0009_storage_reservations",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1788935456907,
+      "tag": "0010_sole_site_admin",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1788935967874,
+      "tag": "0011_recent_activity",
+      "breakpoints": true
     }
   ]
 }

@@ -167,7 +167,7 @@ export async function parsePresetFile(file: File): Promise<PresetFile> {
   precheckLogoSizes(raw)
   const result = presetFileSchema.safeParse(raw)
   if (!result.success) {
-    throw new PresetFileError('This file is not a Watermark Pro preset file.', {
+    throw new PresetFileError('This file is not a Lumafoil preset file.', {
       cause: result.error,
     })
   }

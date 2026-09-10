@@ -1,0 +1,26 @@
+Lumafoil artwork licences
+
+Microsoft Fluent Emoji stickers are available under the MIT licence. Lucide
+icons use ISC, with MIT notices for icons derived from Feather. These licences
+permit commercial use and require their copyright and permission notices to
+remain with copies of the included artwork. They are not attribution-free.
+
+Lumafoil includes the applicable full notices in exported photo metadata,
+video comment metadata, and a PDF attachment. Batch ZIPs also include
+Lumafoil-artwork-licenses.txt. The notice applies only to the bundled artwork;
+it does not claim ownership of your original photos, videos, documents, logos
+or text. A text-only watermark does not add an artwork notice.
+
+Keep the applicable notice when redistributing the artwork. Other editing
+tools, image optimizers and social platforms may remove metadata or PDF
+attachments. If that happens, retain the complete notice alongside the
+redistributed artwork through another supported means. These files explain
+the bundled licences; they are not a guarantee about every downstream use.
+
+Full licences:
+Microsoft Fluent Emoji: LICENSE.txt
+Lucide / Feather: ICON-LICENSE.txt
+
+Primary sources:
+https://github.com/microsoft/fluentui-emoji/blob/1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/LICENSE
+https://lucide.dev/license

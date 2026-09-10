@@ -1,41 +1,50 @@
-# Watermark Pro
+# Lumafoil
 
-Watermark photographs at scale, beautifully. Bulk jobs, a reusable watermark
-library, smart placement that keeps the mark off the subject, auto-contrast, an
-editor with crop and resize, storage, sharing, multi-format export, and
-role-based access control. A spiritual competitor to eZy Watermark, MIT
-licensed, hosted on Cloudflare Workers at `watermark.blowmoney.net`.
+Watermark photos, videos, and PDFs with text, logos, signatures, QR codes, and
+reusable presets. Process files on your device, save finished photos to a private
+gallery, and share selected results when you choose.
 
-As of the M19 competitor re-check (2026-09-08) it matches or exceeds eZy
-Watermark on every axis bar font count and sticker packs, and is the only tool
-in the field to combine video **and** PDF watermarking, an invisible mark with a
-read-back verify page, organisation roles with an audit trail, secure signed
-share links, SSRF-guarded URL import and a browser hot-folder, and twelve
-languages (incl. Arabic RTL) — see `docs/competitor-research.md` §5. Remaining
-gaps (fonts, HEIC/RAW input, gradient fill, sticker library) are tracked there.
+The hosted service is configured for **lumafoil.com** and **invitation-only**
+admission; final cutover is pending. Admitted users can
+invite people through a personal invitation link or an email invitation; new
+users receive their own private workspace. Invitations do not grant access to
+the inviter's photos or presets. Only the sole site administrator can view
+aggregate account numbers; workspace ownership does not grant that access.
 
-**Status:** milestones M1 (foundation: accounts, organizations, roles, audit
-trail, design system), M2 (watermark engine: smart placement, auto contrast,
-tiling, PNG/JPEG/WebP output in a Web Worker) M3 (watermark library:
-preset designer with live preview, 51 bundled font families, glyph and icon
-catalogue, logo uploads) M4 (single-photo editor with crop, resize,
-hand placement, undo and download) M5 (bulk processing with a worker
-pool, progress, cancel, retry and ZIP export) M6 (stored photos with a
-searchable gallery), M7 (revocable share links with the Web Share API) and
-M8 (platform admin console, Turnstile bot protection, threat model, runbook,
-dependency review and tag-driven deploys), M9 (phone and tablet layouts,
-touch gestures, Safari support through a main-thread engine path, the
-four-device end-to-end matrix, mobile Lighthouse budgets and the red drill)
-and M10 (parity with the market: ink colour, multi-line text with a box,
-date and file-name stamps, QR codes, drawn signatures, several marks per
-photo, snap-to-grid, the share sheet for exports and a no-metadata export
-policy) are complete: 1.2.0. Next: the feature series M11–M18 (photo adjustments,
-arc text and shapes, EXIF tokens and metadata policy, per-photo batch
-overrides and folders, preset files and logo tools, camera/URL/cloud import,
-video and PDF, twelve languages) followed by the performance milestone M19;
-each has a full specification under [docs/plans/](docs/plans/). See
-[PLAN.md](PLAN.md) for the roadmap and [CHANGELOG.md](CHANGELOG.md) for what
-has actually shipped.
+Want to run your own instance? The source is **free under the MIT license**.
+Start with [the self-hosting guide](docs/self-hosting.md). Bundled fonts and
+stickers retain their included open-source licenses; hosting and provider
+services have their own costs.
+
+- **Creative tools:** 551 distinct font families, 400 colour vector stickers,
+  drawn signatures, text effects, shapes, tiling, multiple marks and saved QR codes.
+- **Photo workflow:** single-image editing, batch processing, crop/resize,
+  brightness/contrast/saturation controls, and JPEG/PNG/WebP export.
+- **Save and share:** reusable preset import/export, gallery storage,
+  expiring/revocable gallery links and optional cloud-file connections.
+- **Offline work:** prepare the app, edit presets and save photos without a
+  connection, then synchronize with visible retry and conflict recovery.
+- **Accounts:** invite-only email registration and optional Google/Microsoft
+  sign-in, explicit provider linking, private workspaces, and separate deliberate
+  collaboration workspaces.
+- **Interface:** twelve languages, Arabic right-to-left layout, light/dark
+  themes and responsive phone/tablet/desktop controls.
+
+**Release status:** M19 production-readiness work is in progress. Focused
+implementation evidence is recorded under [docs/verification/m19](docs/verification/m19/).
+Final full-suite coverage, browser/device, performance, security, hosted OAuth
+and domain-cutover evidence remains required before release certification.
+Historical milestone results do not certify the current checkout.
+
+Offline access requires an already prepared account and its cached resources.
+Online startup validates the live session before showing private data; sign-out,
+server access denial, or an account change cannot authorize a cached fallback.
+Administration, account management and cloud connections require a network.
+
+The [competitor audit](docs/competitor-research.md) distinguishes working
+capabilities, vendor claims, limitations and untested comparisons. Earlier
+claims of superiority on every feature axis were withdrawn. See
+[PLAN.md](PLAN.md) and [CHANGELOG.md](CHANGELOG.md) for the roadmap and release history.
 
 ## Stack
 
@@ -54,21 +63,25 @@ has actually shipped.
 
 - Node.js 24 (see `.nvmrc`) and npm 11.10 or newer (`min-release-age` support).
 - Git.
+- Python 3 for the standard-library asset-download and recovery-SQL preparation
+  tests in `npm run test:assets` and the full quality gate (3.14 verified locally).
 - [gitleaks](https://github.com/gitleaks/gitleaks) on `PATH` (8.30.1 verified).
   Used by the pre-commit hook and `npm run security:secrets`.
-- [semgrep](https://semgrep.dev/) on `PATH` for `npm run security:sast`
-  (1.174.0 verified; `pip install semgrep`). CI runs it regardless.
+- [semgrep](https://semgrep.dev/) for `npm run security:sast`
+  (1.174.0 verified). The wrapper accepts the executable on `PATH` or the
+  installed package through Python's console entry point. CI runs it regardless.
 - Playwright browsers for `npm run test:e2e`:
   `npx playwright install chromium webkit` (WebKit runs the iPhone and iPad
-  projects; Playwright's Windows WebKit build has no `OffscreenCanvas`, which
-  exercises the main-thread engine path). CI installs both.
+  projects). The image engine selects its worker or main-thread fallback by
+  runtime capability. CI installs both.
   If the Playwright downloader times out on your network, fetch the zip with
   `curl` and unpack it under `%LOCALAPPDATA%\ms-playwright\` with an empty
   `INSTALLATION_COMPLETE` marker file; that is what was done on the original
   development machine.
-- Google Chrome (or set `CHROME_PATH`) for `npm run audit:lighthouse`.
-- A Cloudflare account for deployment (`wrangler login`). Development and
-  tests run fully offline in workerd.
+- The installed Playwright Chromium build is used by `npm run audit:lighthouse`.
+- A Cloudflare account for deployment (`wrangler login`). Local Worker, D1 and
+  R2 execution uses workerd without a deployed instance. Dependency installation,
+  vulnerability checks and real provider workflows require network access.
 
 ## Installation
 
@@ -108,34 +121,37 @@ refuses in production.
 
 ## Quality gates
 
-Every command exits non-zero on a finding. Each one was deliberately broken
-and observed to fail before being trusted; the log is in PLAN.md §8.
+Each gate exits non-zero on its defined failures. Historical and focused
+negative-control results live in PLAN.md §8 and `docs/red-drill/`; the final
+current-source drill run remains a separate certification obligation.
 
-| Command                     | Gate                                                                           |
-| --------------------------- | ------------------------------------------------------------------------------ |
-| `npm run format:check`      | Prettier (with Tailwind class sorting)                                         |
-| `npm run lint`              | ESLint, type-checked, zero warnings                                            |
-| `npm run lint:css`          | stylelint, zero warnings                                                       |
-| `npm run typecheck`         | `tsc -b` over client, worker, and tooling projects                             |
-| `npm run deadcode`          | knip: unused files, exports, dependencies                                      |
-| `npm run lint:cycles`       | dpdm: circular imports                                                         |
-| `npm run lint:dup`          | jscpd: copy-paste, zero tolerance                                              |
-| `npm run security:secrets`  | gitleaks over git history                                                      |
-| `npm run security:audit`    | `npm audit --audit-level=high`                                                 |
-| `npm run security:sast`     | semgrep (`p/default`, `p/typescript`, `p/react`, `p/secrets`)                  |
-| `npm run test`              | Vitest with coverage thresholds, then the workerd project                      |
-| `npm run test:e2e`          | Playwright against the production build on four devices, axe on every page     |
-| `npm run test:drill`        | Red drill: every mutation in `scripts/red-drills.mjs` must turn a test red     |
-| `npm run audit:lighthouse`  | Lighthouse desktop and mobile budgets (PLAN.md §5.5) against a running preview |
-| `npm run audit:screenshots` | Visual record of every screen, both themes, desktop, iPhone and iPad           |
-| `npm run build`             | Vite production build                                                          |
-| `npm run quality`           | All gates except `security:sast`, `test:e2e`, and the audits                   |
+| Command                     | Gate                                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `npm run format:check`      | Prettier (with Tailwind class sorting)                                                                  |
+| `npm run lint`              | ESLint, type-checked, zero warnings                                                                     |
+| `npm run lint:css`          | stylelint, zero warnings                                                                                |
+| `npm run typecheck`         | `tsc -b` over client, worker, and tooling projects                                                      |
+| `npm run deadcode`          | knip: unused files, exports, dependencies                                                               |
+| `npm run lint:cycles`       | dpdm: circular imports                                                                                  |
+| `npm run lint:dup`          | jscpd: copy-paste, zero tolerance                                                                       |
+| `npm run security:secrets`  | Publication audit of history, working/index candidates and archives                                     |
+| `npm run security:audit`    | `npm audit --audit-level=high`                                                                          |
+| `npm run security:sast`     | semgrep (`p/default`, `p/typescript`, `p/react`, `p/secrets`)                                           |
+| `npm run test`              | Vitest coverage/workerd plus bootstrap, performance, publication and asset tests                        |
+| `npm run test:e2e`          | Playwright against the production build on four devices, axe on every page                              |
+| `npm run test:drill`        | Red drill: every mutation in `scripts/red-drills.mjs` must turn a test red                              |
+| `npm run audit:lighthouse`  | Lighthouse desktop/mobile budgets for the configured page inventory on the isolated gate                |
+| `npm run audit:screenshots` | Required surface inventory, English/Arabic, both themes, desktop/iPhone/iPad/Android; axe and reflow    |
+| `npm run build`             | Vite production build                                                                                   |
+| `npm run quality`           | Formatting, lint, types, dead code, catalogue, cycle/duplicate, secret/dependency, test and build chain |
 
-`npm run quality` omits the tools that need a browser or a machine install so
-it stays runnable anywhere. CI runs `quality:ci`, the e2e job, and the semgrep
+`npm run quality` includes real Chromium tests and installed security/asset
+tools. Full Playwright, SAST, red-drill, Lighthouse and screenshot commands are
+separate gates. CI runs `quality:ci`, the e2e job, and the semgrep
 job on every push and pull request, plus GitHub dependency review on pull
 requests. The Lighthouse and screenshot audits are run at UI milestones
-against `npm run preview`; their output is committed under `docs/lighthouse/`
+against `node scripts/gate-server.mjs`, which builds the application and serves
+it with isolated local D1/R2 state; their output is committed under `docs/lighthouse/`
 and `docs/screenshots/`.
 
 Other test commands: `npm run test:unit` (jsdom + Node projects),
@@ -150,32 +166,41 @@ and `android` (Pixel 7, Chromium). Pass `--project iphone` to run one.
 WebKit needs `npx playwright install webkit` once.
 
 The red drill (`npm run test:drill`, or `node scripts/red-drill.mjs --unit`
-to skip the two end-to-end drills) is how the tests prove themselves: each
+to skip end-to-end drills) is how the tests prove themselves: each
 entry in `scripts/red-drills.mjs` breaks one behaviour, runs the test or
 gate that owns it, and restores the file. A drill whose command stays green
 fails the run. Reports are written to `docs/red-drill/`.
 
 ## Environment variables and bindings
 
-| Name                     | Kind       | Where                                          | Purpose                                                                        |
-| ------------------------ | ---------- | ---------------------------------------------- | ------------------------------------------------------------------------------ |
-| `APP_ENV`                | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | `development`, `test`, `staging`, `production`                                 |
-| `APP_URL`                | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Public origin; auth links and the same-origin guard                            |
-| `EMAIL_PROVIDER`         | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | `console` (dev/test only) or `cloudflare`                                      |
-| `EMAIL_FROM`             | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Sender address; must be on a zone in the account                               |
-| `BETTER_AUTH_SECRET`     | secret     | `.dev.vars`, `wrangler secret put`             | Signs sessions and tokens; at least 32 random characters                       |
-| `TURNSTILE_SITE_KEY`     | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Optional; Turnstile widget key, served to the client via `/api/config`         |
-| `TURNSTILE_SECRET_KEY`   | secret     | `.dev.vars`, `wrangler secret put`             | Optional; must be set together with the site key                               |
-| `GOOGLE_OAUTH_CLIENT_ID` | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Drive picker. Public client id, served via `/api/config`      |
-| `GOOGLE_PICKER_API_KEY`  | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Picker API key (restrict it to the Picker API + your origins) |
-| `GOOGLE_PICKER_APP_ID`   | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Cloud project number the Picker needs                         |
-| `MICROSOFT_CLIENT_ID`    | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; OneDrive picker. Microsoft Entra SPA app client id                   |
-| `DROPBOX_APP_KEY`        | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Dropbox Chooser app key                                              |
-| `DB`                     | D1         | `wrangler.jsonc` `d1_databases`                | Users, organizations, members, invitations, audit log, presets                 |
-| `BUCKET`                 | R2         | `wrangler.jsonc` `r2_buckets`                  | Logos, photos and thumbnails; never public, streamed via the API               |
-| `AUTH_RATE_LIMITER`      | ratelimit  | `wrangler.jsonc` `ratelimits`                  | 10 requests / 60 s per IP on credential endpoints                              |
-| `API_RATE_LIMITER`       | ratelimit  | `wrangler.jsonc` `ratelimits`                  | 120 requests / 60 s per IP on other auth endpoints                             |
-| `SEND_EMAIL`             | send_email | `wrangler.jsonc` `send_email`                  | Cloudflare Email Sending; required when provider is `cloudflare`               |
+| Name                           | Kind       | Where                                          | Purpose                                                                                                          |
+| ------------------------------ | ---------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `APP_ENV`                      | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | `development`, `test`, `staging`, `production`                                                                   |
+| `APP_URL`                      | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Public origin; auth links and the same-origin guard                                                              |
+| `EMAIL_PROVIDER`               | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | `console` (dev/test only) or `cloudflare`                                                                        |
+| `EMAIL_FROM`                   | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Sender address; must be on a zone in the account                                                                 |
+| `BETTER_AUTH_SECRET`           | secret     | `.dev.vars`, `wrangler secret put`             | Signs sessions and tokens; at least 32 random characters                                                         |
+| `TURNSTILE_SITE_KEY`           | var        | `wrangler.jsonc` `vars`, `.dev.vars`           | Optional; Turnstile widget key, served to the client via `/api/config`                                           |
+| `TURNSTILE_SECRET_KEY`         | secret     | `.dev.vars`, `wrangler secret put`             | Optional; must be set together with the site key                                                                 |
+| `GOOGLE_OAUTH_CLIENT_ID`       | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Drive picker. Public client id, served via `/api/config`                                        |
+| `GOOGLE_PICKER_API_KEY`        | secret     | `.dev.vars`, `wrangler secret put`             | Optional; browser-visible Picker key stored encrypted in the Worker; restrict APIs/hosts, never commit its value |
+| `GOOGLE_PICKER_APP_ID`         | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Google Cloud project number the Picker needs                                                           |
+| `MICROSOFT_CLIENT_ID`          | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; OneDrive picker. Microsoft Entra SPA app client id                                                     |
+| `DROPBOX_APP_KEY`              | var        | `wrangler.jsonc` `env.production`, `.dev.vars` | Optional; Dropbox Chooser app key                                                                                |
+| `GOOGLE_AUTH_CLIENT_ID`        | secret     | `.dev.vars`, `wrangler secret put`             | Optional account-sign-in Web client; separate from Drive                                                         |
+| `GOOGLE_AUTH_CLIENT_SECRET`    | secret     | `.dev.vars`, `wrangler secret put`             | Required with the Google account client ID                                                                       |
+| `MICROSOFT_AUTH_CLIENT_ID`     | secret     | `.dev.vars`, `wrangler secret put`             | Optional account-sign-in Web client; separate from OneDrive                                                      |
+| `MICROSOFT_AUTH_CLIENT_SECRET` | secret     | `.dev.vars`, `wrangler secret put`             | Required with the Microsoft account client ID                                                                    |
+| `MICROSOFT_AUTH_TENANT_ID`     | secret     | `.dev.vars`, `wrangler secret put`             | Optional Microsoft identity tenant selection                                                                     |
+| `DB`                           | D1         | `wrangler.jsonc` `d1_databases`                | Users, organizations, members, invitations, audit log, presets                                                   |
+| `BUCKET`                       | R2         | `wrangler.jsonc` `r2_buckets`                  | Logos, photos and thumbnails; never public, streamed via the API                                                 |
+| `AUTH_RATE_LIMITER`            | ratelimit  | `wrangler.jsonc` `ratelimits`                  | 10 requests / 60 s per IP on credential endpoints                                                                |
+| `API_RATE_LIMITER`             | ratelimit  | `wrangler.jsonc` `ratelimits`                  | 120 requests / 60 s per IP on other auth endpoints                                                               |
+| `SEND_EMAIL`                   | send_email | `wrangler.jsonc` `send_email`                  | Cloudflare Email Sending; required when provider is `cloudflare`                                                 |
+
+Hosted account-sign-in client identifiers and tenant selection use encrypted
+Worker bindings too. These identifiers are public metadata; their storage choice
+does not make them authentication credentials.
 
 Every variable and binding is validated on the first request an isolate
 handles (`src/worker/env.ts`); a misconfigured Worker answers 500 with
@@ -199,21 +224,22 @@ controls.
 
 ### Platform administrators
 
-Separate from organization roles, a user whose Better Auth `role` is `admin`
-is a platform administrator. The first one is promoted with a single D1
-update (see [docs/runbook.md](docs/runbook.md)); after that the console at
+Exactly one account holds site administration: its ID must match the database
+owner anchor and its Better Auth role must be `admin`. The guarded bootstrap
+procedure is documented in [docs/runbook.md](docs/runbook.md). The console at
 `/app/admin` can:
 
 - search users by email, ban and unban them with a reason (a banned user's
-  sessions are revoked and sign-in is refused), grant or remove the platform
-  role, and sign a user out everywhere;
+  sessions are revoked and sign-in is refused), and sign a user out everywhere;
 - list every organization with its member count, photo count and storage;
-- browse the global audit trail, including the admin actions themselves.
+- browse the global audit trail, account totals, health and sanitized client-error records.
+
+Normal APIs cannot add another site administrator, demote/delete the anchored
+owner, impersonate another user, or replace another account's email or password.
 
 Every admin action is recorded in the audit log with the administrator as
-the actor. The Worker enforces the role on its own admin routes
-(`requirePlatformAdmin`) and Better Auth's admin plugin enforces it on user
-management.
+the actor. The Worker enforces both role and owner identity on its admin routes
+and guards Better Auth's administrative endpoints with the same owner boundary.
 
 ### Bot protection
 
@@ -223,7 +249,7 @@ and password-reset requests must carry a Cloudflare Turnstile token in the
 Better Auth handles the request. The sign-up and forgot-password pages render
 the widget and keep their submit button disabled until it produces a token.
 Without the keys the deployment runs without a challenge and the pages show
-nothing extra. Create a widget for `watermark.blowmoney.net` in the Cloudflare
+nothing extra. Create a widget for `lumafoil.com` in the Cloudflare
 dashboard under Turnstile, put the site key in `wrangler.jsonc`
 (`env.production.vars`) and the secret in
 `wrangler secret put TURNSTILE_SECRET_KEY --env production`.
@@ -234,12 +260,12 @@ Presets belong to an organization and are shared by all of its members. A
 preset is a mark plus placement, contrast and style settings
 (`src/shared/watermark.ts`):
 
-- **Marks:** text in any of 51 bundled font families (Fontsource, OFL or
+- **Marks:** text in any of 551 bundled font families (Fontsource, OFL or
   Apache licensed, latin subset, loaded only when chosen), up to four lines,
   with `{date}`, `{time}` and `{filename}` tokens filled in per photo from
-  the file's last-modified time and name; a Unicode glyph from eight groups
-  (legal, stars, arrows, shapes, checks, nature, objects, currency); one of
-  70 lucide icons; an uploaded logo; a signature drawn with a finger or mouse
+  capture metadata or the file's last-modified time and name; a Unicode glyph
+  from nine groups (including Emoji); one of 70 lucide icons or 400 bundled
+  colour stickers; an uploaded logo; a signature drawn with a finger or mouse
   on the designer's pad (saved as a transparent PNG logo); or a QR code
   (up to 512 characters, always dark on a light field so it scans).
 - **Placement:** smart (the engine scores each corner and edge of every
@@ -251,7 +277,7 @@ preset is a mark plus placement, contrast and style settings
   tiling with adjustable spacing, and for text and symbols an optional box
   behind the mark with its own opacity.
 
-Logos are PNG, JPEG or WebP up to 5 MB, at most 50 per organization. The
+Logos are PNG, JPEG or WebP up to 5 MiB, at most 50 per organization. The
 Worker checks the file signature rather than the declared type, stores the
 bytes in R2 under a key that includes the organization id, serves them only
 to signed-in members through `/api/orgs/:orgId/assets/:id/file`, and refuses
@@ -273,7 +299,8 @@ photo never leaves the browser.
 ## Editor
 
 `/app/editor` watermarks one photo at a time. Open a photo (or drop it on the
-canvas), add a preset, and adjust it for this photo only: drag the mark,
+canvas), create a watermark in place or add a saved preset, and adjust it for
+this photo only: drag the mark,
 scale it from the corner handle, rotate it from the top handle, pinch and
 twist on a touch screen, or use the keyboard (arrow keys nudge, Shift for
 larger steps, `+`/`-` resize, `[`/`]` rotate). While dragging, the mark's
@@ -318,10 +345,10 @@ Press Start; the browser decodes each photo and a pool of engine workers (one
 per core, up to eight) renders them in parallel with smart placement and auto
 contrast worked out per photo and per mark. A running batch can be **paused**
 and resumed. The list shows the first 60 photos with a "Show all" control so a
-large batch stays responsive. When it settles, download everything as one ZIP
+large batch avoids rendering every row at once. When it settles, download everything as one ZIP
 (tree preserved), save to the gallery, share or download file by file, and
 download a **CSV report** of every job. Nothing is uploaded unless you save the
-results to the gallery.
+results to the gallery or explicitly send them to a configured cloud provider.
 
 One photo can be **adjusted on its own**: "Adjust" opens it in the full editor
 (embedded, no export step); "Apply to this photo" re-runs just that job with
@@ -331,32 +358,37 @@ override" restores the batch settings. An adjusted row is marked **Custom**.
 **Watch a folder** (desktop browsers with the File System Access API): pick an
 input and an output folder and any new photo dropped into the input is
 watermarked with the ticked presets and written to the output while the page
-stays open — a hands-free hot folder no competitor offers.
+stays open.
 
 ## Video
 
 Watermark MP4, WebM and MOV in the browser with WebCodecs — the same presets,
-placement and contrast as photos, on every frame, with the audio kept. Files up
-to 2 GB, 600 s and 3840 px are accepted; anything larger is refused before a
+placement and contrast as photos, on every frame. Audio preservation depends on
+the source codec and available encoders. Files up to 2 GiB, 600 s and 3840 px
+pass the size limits; supported container and codec decoding is also required.
+Anything larger is refused before a
 single frame is decoded. "Quality" is a bitrate ladder (Low 2, Standard 6, High
 12 Mbit/s at 1080p, scaled by pixel count) and the output fits Original, 1080p
 or 720p. The container follows whichever codec the browser can encode — MP4
 (H.264/HEVC) or WebM (VP9/AV1) — and is shown before you start ("Saves as MP4
 (H.264)"). Audio is copied without re-encoding when it fits the container
-(AAC→MP4, Opus→WebM), otherwise re-encoded at 128 kbit/s. Everything runs in a
+(AAC→MP4, Opus→WebM), otherwise re-encoded at 128 kbit/s when the target audio
+encoder is available. Otherwise output has no audio track, as shown before
+processing. Everything runs in a
 dedicated Web Worker; nothing is uploaded and the gallery does not store videos.
-Browsers without a WebCodecs `VideoEncoder` (Firefox ≤ 129, older Safari) see an
-unsupported message; Chrome, Edge and Safari 17+ can encode.
+Browsers without `VideoEncoder` or an encodable supported codec see an
+unsupported message. Support is detected at runtime; a browser name or version
+alone does not guarantee encoding on a particular device.
 
 ## Documents
 
 Watermark every page of a PDF with the same presets as photos. Drop or pick up
-to 50 PDFs (≤ 50 MB, ≤ 200 pages each); the ticked layers are rasterised once
+to 50 PDFs (≤ 50 MiB, ≤ 200 pages each); the ticked layers are rasterised once
 per distinct page size at 150 dpi and drawn on every page with `pdf-lib`. Smart
 placement reads a photo, so on a blank page it falls back to a bottom-right
 anchor (the tool says so); choose a corner or a custom position instead. Output
 is `<name>-watermarked.pdf`, one per input or a ZIP for several, with the Info
-dictionary kept, `Producer` set to "Watermark Pro" and `ModDate` refreshed.
+dictionary kept, `Producer` set to "Lumafoil" and `ModDate` refreshed.
 Encrypted PDFs are refused. Everything runs in the browser; nothing is uploaded.
 
 ## Exports and metadata
@@ -390,8 +422,8 @@ A PNG export (from the editor or the bulk tool) can carry an **invisible
 mark**: a short message hidden in the pixels themselves — the least significant
 bit of the blue channel along a seeded walk, protected by a CRC so a corrupted
 read fails rather than lies. It defaults to the workspace name. It is **PNG
-only**: a JPEG or WebP re-encode would destroy it, so the option is refused for
-lossy formats, and a message too large for the photo blocks the export instead
+only**: lossy re-encoding can destroy it, so this export option is offered only
+for PNG. A message too large for the photo blocks the export instead
 of being truncated. Open **/app/verify** (or "Check a photo" in the gallery)
 and choose a PNG to read the message back, or confirm a photo carries no mark.
 The mark is honest steganography, not DRM — anyone re-saving the PNG as JPEG
@@ -426,7 +458,7 @@ with search, a preset filter and paging; select several and delete them after
 a confirmation, or open one to download or delete it. Viewers can browse and
 download; editors and above can save and delete.
 
-Limits: 40 MB per photo, PNG, JPEG or WebP, 10 000 photos and 2 GB per
+Limits: 40 MiB per photo, PNG, JPEG or WebP, 10 000 photos and 2 GiB per
 organization. Files live in R2 under organization-scoped keys and are served
 only to signed-in members.
 
@@ -440,8 +472,9 @@ organization is reachable from it. `/app/shares` lists every link with its
 status and revokes it instantly. Editors and above can share; viewers cannot.
 
 Tokens are signed (HMAC-SHA-256 with a key derived from the application
-secret) and carry their expiry, so nothing secret is stored and a link can be
-shown again later; revocation is recorded in the database. Public routes are
+secret) and carry their expiry. The database stores share metadata and
+revocation state rather than the bearer token; the server can reconstruct the
+link for authorized members. Public routes are
 rate limited per address and answer every refusal with the same 404.
 
 ## Languages
@@ -455,15 +488,16 @@ it to your account so it follows you across devices. Before you pick, the app
 chooses from your saved preference, then your browser's languages, then English;
 `<html lang>`/`dir` follow the locale, and Arabic mirrors the layout.
 
-Every string comes from the i18next catalogues under `src/client/locales/`, and
-an ESLint gate (`no-literal-string`) stops an untranslated string reaching a
-component. **To add a language:** copy `locales/en/common.json`, translate it
+Interface catalogues live under `src/client/locales/`; an ESLint
+`no-literal-string` rule checks the components in its configured scope.
+Some runtime errors and email text remain English. **To add a language:** copy
+`locales/en/common.json`, translate it
 (the terms in `locales/GLOSSARY.md` must stay consistent; keep every
 `{{placeholder}}` and provide the plural forms `Intl.PluralRules(<locale>)`
 lists), add the code to `SUPPORTED_LOCALES` in `src/shared/locales.ts`, then run
 `npm run quality` — the completeness test and `i18n:check` verify it. See
-`docs/i18n/` for the translation-quality record. Date and number formatting and
-the error/email text are not yet localised (PLAN §4).
+`docs/i18n/` for the translation-quality record. Locale-aware date/number helpers
+exist; final layout and language acceptance still require the device matrix.
 
 ## Project structure
 
@@ -495,39 +529,35 @@ built. CI fails if the committed tree differs from what the build produced.
 
 ## Deployment
 
-Production is the `production` environment in `wrangler.jsonc`. Releases
-are deployed from CI when a version tag is pushed:
-
-```bash
-git tag v1.0.0 && git push origin v1.0.0
-```
-
-`.github/workflows/deploy.yml` runs the full quality chain and the Playwright
-suite on the tagged commit, then `npm run deploy` in the `production` GitHub
+Production is the `production` environment in `wrangler.jsonc`. A version tag
+runs the release workflow. Its generated-file checks, full quality chain,
+Playwright/axe suite and shared pinned SAST workflow must pass on that tagged
+commit before `npm run deploy` runs in the `production` GitHub
 environment. It needs two repository secrets: `CLOUDFLARE_API_TOKEN` (Workers
 Scripts, D1, R2, Email Sending and Zone DNS edit rights for the account) and
 `CLOUDFLARE_ACCOUNT_ID`. The same command works from an authenticated
 workstation:
 
 ```bash
-npm run deploy   # CLOUDFLARE_ENV=production vite build → remote D1 migrations → wrangler deploy
+npm run deploy
 ```
 
-The deploy script applies migrations non-interactively and refuses to upload
-the Worker while any migration is still pending, so the schema is never
-behind the code that needs it. Rollback, secret rotation, D1 Time Travel, log
-tailing and the incident playbook are in [docs/runbook.md](docs/runbook.md).
+The deploy script builds the production Worker, static locale pages, dependency
+notices and source offer, then verifies artifacts and applies pending migrations
+before uploading. The initial private-workspace cutover has additional guarded
+operator steps: complete them before publishing. Backup, preservation checks,
+rollback compatibility, secret rotation and recovery procedures are in
+[docs/runbook.md](docs/runbook.md).
 
-One-time setup, already done for this account on 2026-09-06: `wrangler d1
-create watermark-pro` (id in `wrangler.jsonc`) and
-`wrangler secret put BETTER_AUTH_SECRET --env production`. The Worker is
-routed to the Custom Domain `watermark.blowmoney.net`; wrangler created the
-DNS record and certificate on the first deploy. The `workers.dev` subdomain is
-disabled.
+The configured custom domain is `lumafoil.com`; M19's hostname/TLS/application
+cutover remains pending until its final gates pass. The Cloudflare zone, mail and
+provider registrations are configured. Current evidence and remaining steps are
+recorded in [the domain migration review](docs/verification/m19/domain-migration.md).
+The `workers.dev` subdomain is disabled.
 
-The top-level configuration is the local-development one and is named
-`watermark-pro-dev` on purpose: a stray `wrangler deploy` without the
-environment creates an unrouted Worker instead of overwriting production.
+Use the deployment script to select production. A bare `wrangler deploy` follows
+the latest Vite deployment redirect; the top-level development name alone does
+not guarantee which already-built environment it will upload.
 
 Useful production commands:
 
@@ -536,43 +566,45 @@ npx wrangler tail --env production --format pretty
 npx wrangler d1 migrations list watermark-pro --remote --env production
 ```
 
-Email Sending is enabled for `watermark.blowmoney.net`
-(`wrangler email sending list blowmoney.net`); the sender is
-`no-reply@watermark.blowmoney.net`. If a sender domain is ever changed it must
-be enabled the same way first, otherwise sign-ups still succeed but the
-verification email is logged as rejected instead of delivered.
+Email Sending is enabled for `lumafoil.com`, with sender
+`no-reply@lumafoil.com`. The separate `support@lumafoil.com` shared mailbox has
+verified inbound and Send As delivery. Hosted verification/reset links remain
+part of the final domain-cutover tests.
 
 ## Security
 
 See [SECURITY.md](SECURITY.md) for the reporting process and the list of
 controls, and [docs/threat-model.md](docs/threat-model.md) for the STRIDE
-review of every trust boundary. Headline items: strict CSP on both API and
-static responses (the only third-party origin is `challenges.cloudflare.com`
-for Turnstile), a same-origin guard on every state-changing request, HttpOnly
-SameSite session cookies, mandatory email verification, rate limiting on
-credential and public share endpoints, optional Turnstile on sign-up and
-password reset, server-side RBAC on every route, a platform admin role with
-audited bans and role changes, an append-only audit trail, signed share
-tokens, fail-closed configuration validation, secret scanning in the hook and
-in CI, dependency audit and dependency review on pull requests, semgrep, exact
-pins with a seven-day release age, GitHub Actions pinned to commit SHAs, and
-exports that carry no EXIF (see "Exports and metadata").
+review of every trust boundary. Controls include explicit CSP origins for
+Turnstile and cloud pickers, same-origin checks for mutations, HttpOnly SameSite
+session cookies, mandatory verification and invitation admission, server-side
+roles and account bindings, and exactly one anchored site administrator.
+Offline data and asynchronous results are scoped to their originating account;
+server authorization is rechecked before synchronization. Quotas are reserved
+atomically, and failed uploads have durable cleanup.
+
+Publication checks cover working/index/history candidates and archives without
+printing credentials. GitHub secret scanning and push protection are enabled;
+OAuth credentials and the Picker key use encrypted Worker bindings. Dependency
+audits, pinned SAST, exact package versions and pinned Actions remain enforced.
+Exports strip original metadata by default; explicit retention choices and
+required artwork notices are described in "Exports and metadata".
 
 ## Troubleshooting
 
 - **`tsc -b` reports stale errors after renaming files.** Delete
   `node_modules/.tmp` (build info cache) and rerun.
 - **The `workers` test project fails with "compatibility date not supported".**
-  `compatibility_date` in `wrangler.jsonc` must not exceed the newest date the
-  Workers pool's bundled workerd supports (2026-08-22 for pool 0.22.0).
+  Check the configured compatibility date against the workerd version bundled
+  with the installed Workers pool; upgrade and verify the pinned pair together.
 - **Sign-up returns 403 locally.** The request origin must equal `APP_URL`;
   serve the app from `http://localhost:5273`.
 - **Sign-up returns 500 `invalid_configuration`.** `.dev.vars` is missing or
   `BETTER_AUTH_SECRET` is shorter than 32 characters.
 - **Tables do not exist.** Run `npm run db:migrate:local`.
-- **`npm run security:sast` says semgrep is not found.** Add your Python
-  `Scripts` directory to `PATH` (on Windows,
-  `%APPDATA%\Python\Python3xx\Scripts`).
+- **`npm run security:sast` says semgrep is not found.** Install Semgrep into
+  the Python environment used by the `python` command, or make its executable
+  available on `PATH`. The wrapper does not change machine-wide settings.
 - **`npm install` refuses a brand-new package version.** That is
   `min-release-age=7` in `.npmrc` doing its job; wait, or pin an older version.
 - **CI fails on "Verify generated Worker types are current".** Run

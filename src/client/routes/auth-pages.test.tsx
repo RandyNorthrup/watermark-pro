@@ -17,11 +17,15 @@ beforeEach(() => {
 describe('landing page', () => {
   it('shows the product pitch to visitors', async () => {
     renderApp('/')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(/watermark/i)
-    expect(screen.getByRole('link', { name: 'Create your workspace' })).toHaveAttribute(
-      'href',
-      '/signup',
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
+      'Watermark photos, videos, and PDFs.',
     )
+    expect(
+      screen
+        .getAllByRole('link', { name: 'Sign in' })
+        .every((link) => link.getAttribute('href') === '/login'),
+    ).toBe(true)
+    expect(screen.queryByRole('link', { name: 'Create your workspace' })).toBeNull()
   })
 
   it('sends signed-in users straight to the dashboard', async () => {
@@ -38,6 +42,19 @@ describe('landing page', () => {
 })
 
 describe('sign in', () => {
+  it('does not offer public signup without an invitation return path', async () => {
+    renderApp('/login')
+    expect(await screen.findByText(/Lumafoil is invite-only/)).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Create an account' })).toBeNull()
+  })
+
+  it('carries an emailed invitation into account creation', async () => {
+    renderApp('/login?invitation=known-id')
+    expect(await screen.findByRole('link', { name: 'Create an account' })).toHaveAttribute(
+      'href',
+      '/signup?invitation=known-id',
+    )
+  })
   it('validates before calling the API', async () => {
     const user = userEvent.setup()
     renderApp('/login')
@@ -47,7 +64,7 @@ describe('sign in', () => {
     expect(client().signIn.email).not.toHaveBeenCalled()
   })
 
-  it('signs in and lands on the dashboard, honouring a redirect target', async () => {
+  it('signs in to the personal workspace while honouring the requested destination', async () => {
     const user = userEvent.setup()
     client().state.organizations = seedOrganizationsWithoutSession()
     const { router } = renderApp('/login?redirect=/app/members')
@@ -55,7 +72,9 @@ describe('sign in', () => {
     await user.type(screen.getByLabelText('Password'), 'correct horse battery')
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/members'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Members')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Your private workspace' }),
+    ).toBeInTheDocument()
   })
 
   it('explains an unverified email and offers to resend', async () => {
@@ -89,7 +108,7 @@ describe('sign in', () => {
 describe('sign up', () => {
   it('requires a strong password and then sends the user to check their inbox', async () => {
     const user = userEvent.setup()
-    const { router } = renderApp('/signup')
+    const { router } = renderApp('/signup?invitation=invite-example')
     await user.type(await screen.findByLabelText('Name'), 'New Person')
     await user.type(screen.getByLabelText('Email'), 'new@example.test')
     await user.type(screen.getByLabelText('Password'), 'short')
@@ -102,14 +121,17 @@ describe('sign up', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/check-email'))
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Check your inbox')
     expect(client().signUp.email).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'new@example.test', callbackURL: '/app' }),
-      { headers: {} },
+      expect.objectContaining({
+        email: 'new@example.test',
+        callbackURL: '/app',
+      }),
+      { headers: { 'x-lumafoil-invitation': 'invite-example' } },
     )
   })
 
   it('surfaces a server rejection', async () => {
     const user = userEvent.setup()
-    renderApp('/signup')
+    renderApp('/signup?invitation=invite-example')
     await user.type(await screen.findByLabelText('Name'), 'Dup')
     await user.type(screen.getByLabelText('Email'), 'dup@taken.test')
     await user.type(screen.getByLabelText('Password'), 'a much longer passphrase')
@@ -119,6 +141,15 @@ describe('sign up', () => {
 })
 
 describe('check email', () => {
+  it('keeps an invitation through a verification resend', async () => {
+    const user = userEvent.setup()
+    renderApp('/check-email?email=new%40example.test&invitation=known-id')
+    await user.click(await screen.findByRole('button', { name: 'Resend verification email' }))
+    expect(client().sendVerificationEmail).toHaveBeenCalledWith({
+      email: 'new@example.test',
+      callbackURL: '/app',
+    })
+  })
   it('resends the verification email on request', async () => {
     const user = userEvent.setup()
     renderApp('/check-email?email=new%40example.test')

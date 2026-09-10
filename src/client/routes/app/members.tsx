@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
+import { ASSIGNABLE_ROLES } from '../../../shared/constants'
 import {
-  ASSIGNABLE_ROLES,
   type AssignableRole,
   isOrganizationRole,
   type OrganizationRole,
@@ -26,7 +26,7 @@ import {
 } from '../../lib/auth-client'
 import { describeAuthError } from '../../lib/errors'
 import {
-  activeMemberRoleQueryOptions,
+  readActiveMemberRole,
   activeOrganizationQueryOptions,
   ORGANIZATION_QUERY_KEY,
 } from '../../lib/queries'
@@ -37,7 +37,7 @@ import { useFormErrors } from '../../lib/use-form-errors'
 const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/members')({
-  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: MembersPage,
 })
 
@@ -61,6 +61,27 @@ function MembersPage() {
     return <Alert tone="info">{t('members.orgRequired')}</Alert>
   }
 
+  if (organization.id === `personal-${session.user.id}`) {
+    return (
+      <div className="flex max-w-2xl flex-col gap-4">
+        <h1 className="text-3xl font-semibold">{t('siteInvites.privateHeading')}</h1>
+        <p className="text-ink-muted">{t('siteInvites.privateBody')}</p>
+        <Link
+          className="min-h-11 py-3 text-brand-700 underline dark:text-brand-300"
+          to="/app/invitations"
+        >
+          {t('siteInvites.heading')}
+        </Link>
+        <Link
+          className="min-h-11 py-3 text-brand-700 underline dark:text-brand-300"
+          to="/app/organizations/new"
+        >
+          {t('siteInvites.collaborate')}
+        </Link>
+      </div>
+    )
+  }
+
   const isManager = canRole(membership?.role, { member: ['update'] })
   const pendingInvitations = organization.invitations.filter(
     (invitation) => invitation.status === 'pending',
@@ -75,7 +96,12 @@ function MembersPage() {
         </p>
       </header>
 
-      {isManager ? <InviteForm organizationId={organization.id} /> : null}
+      {isManager ? (
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-ink-muted">{t('siteInvites.collaborationNotice')}</p>
+          <InviteForm organizationId={organization.id} />
+        </div>
+      ) : null}
 
       <section aria-labelledby="members-heading" className="flex flex-col gap-3">
         <h2 id="members-heading" className="text-xl font-semibold tracking-tight">

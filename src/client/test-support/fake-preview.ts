@@ -15,6 +15,7 @@ export const renderedBatches: WatermarkSpec[][] = []
 /** The topmost mark of every render that drew one, for single-mark assertions. */
 export const renderedSpecs: WatermarkSpec[] = []
 export const renderedTransforms: (Transform | undefined)[] = []
+export const previewSubjects: (File | null)[] = []
 export const exports: { specs: WatermarkSpec[]; output: EncodeOptions; transform?: Transform }[] =
   []
 
@@ -28,16 +29,17 @@ const FAKE_CENTRE_X = 0.8
 const FAKE_CENTRE_Y = 0.9
 const FAKE_ASPECT = 4
 
+function recordSubject(file: File | null): Promise<void> {
+  previewSubjects.push(file)
+  return Promise.resolve()
+}
+
 /** Smart placement always "finds" the bottom right, as the real engine does on the sample scene. */
 function fakeAnchor(spec: WatermarkSpec): Anchor | null {
   if (spec.placement.mode === 'anchor') {
     return spec.placement.anchor
   }
   return spec.placement.mode === 'smart' ? 'bottom-right' : null
-}
-
-function resolved(): Promise<void> {
-  return Promise.resolve()
 }
 
 export class PreviewRenderer {
@@ -48,7 +50,7 @@ export class PreviewRenderer {
 
   subjectScale = 1
 
-  setSubject = vi.fn(resolved)
+  setSubject = vi.fn(recordSubject)
 
   forgetLogo = vi.fn()
 
@@ -100,6 +102,7 @@ export function resetFakePreview(): void {
   renderedBatches.length = 0
   renderedSpecs.length = 0
   renderedTransforms.length = 0
+  previewSubjects.length = 0
   exports.length = 0
   PreviewRenderer.instances = 0
   PreviewRenderer.disposed = 0

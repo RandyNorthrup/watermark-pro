@@ -10,6 +10,8 @@
 import { createAccessControl } from 'better-auth/plugins/access'
 import { adminAc, defaultStatements, ownerAc } from 'better-auth/plugins/organization/access'
 
+import type { ASSIGNABLE_ROLES } from './constants'
+
 export const statement = {
   ...defaultStatements,
   watermark: ['create', 'read', 'update', 'delete'],
@@ -53,7 +55,6 @@ export const ORGANIZATION_ROLES = ['owner', 'admin', 'editor', 'viewer'] as cons
 export type OrganizationRole = (typeof ORGANIZATION_ROLES)[number]
 
 /** Roles a user may assign when inviting or promoting; `owner` transfers are a separate flow. */
-export const ASSIGNABLE_ROLES = ['admin', 'editor', 'viewer'] as const
 
 export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number]
 

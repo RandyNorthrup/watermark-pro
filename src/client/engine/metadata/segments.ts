@@ -333,7 +333,7 @@ export function extractPngMetadata(bytes: Uint8Array): RawMetadata {
   return found
 }
 
-function buildPngChunk(type: string, chunkData: Uint8Array): Uint8Array {
+export function buildPngChunk(type: string, chunkData: Uint8Array): Uint8Array {
   const typeBytes = new TextEncoder().encode(type)
   const out = new Uint8Array(PNG_CHUNK_HEADER + chunkData.length + PNG_CRC_FIELD)
   const data = view(out)

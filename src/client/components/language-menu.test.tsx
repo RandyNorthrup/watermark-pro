@@ -1,13 +1,16 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import i18next from 'i18next'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LanguageMenu } from './language-menu'
 import { SUPPORTED_LOCALES } from '../../shared/locales'
 import { setLocale } from '../i18n'
+import { setOfflineUser } from '../lib/offline-context'
 import { sessionQueryOptions } from '../lib/queries'
 import { createQueryClient } from '../lib/query-client'
+import french from '../locales/fr/common.json'
 import { OWNER } from '../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../test-support/fake-auth-module'
 
@@ -22,6 +25,7 @@ async function mountMenu(isSignedIn: boolean): Promise<void> {
   const queryClient = createQueryClient()
   if (isSignedIn) {
     fakeAuth().state.user = OWNER
+    setOfflineUser(OWNER.id)
   }
   await queryClient.query(sessionQueryOptions)
   render(
@@ -48,15 +52,31 @@ function requestBody(init: RequestInit | undefined): unknown {
 
 beforeEach(() => {
   installFakeAuth()
+  setOfflineUser(null)
 })
 
 afterEach(async () => {
   vi.restoreAllMocks()
+  i18next.addResourceBundle('fr', 'common', french, true, true)
   // Leave the shared instance back on English for any later test.
   await setLocale('en')
 })
 
 describe('LanguageMenu', () => {
+  it('does not save an old account choice to a new account after a delayed catalogue download', async () => {
+    await mountMenu(true)
+    i18next.removeResourceBundle('fr', 'common')
+    const download = Promise.withResolvers<Response>()
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => download.promise)
+    await pickLanguage('Français')
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledOnce())
+    setOfflineUser('different-account')
+    act(() => {
+      download.resolve(Response.json(french))
+    })
+    await waitFor(() => expect(document.documentElement.lang).toBe('fr'))
+    expect(fetchSpy.mock.calls.some(([url]) => url === '/api/me')).toBe(false)
+  })
   it('lists every language by its native name and applies the choice', async () => {
     await mountMenu(false)
 

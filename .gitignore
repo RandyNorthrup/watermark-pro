@@ -44,3 +44,8 @@ docs/lighthouse/**/*.html
 .claude/settings.local.json
 # Ephemeral agent git worktrees; local only, never committed
 .claude/worktrees/
+
+# Local verification output and Python helper bytecode are never release source.
+/temp/
+__pycache__/
+*.py[cod]

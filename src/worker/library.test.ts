@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { API_BODY_LIMITS } from './middleware/body-limit'
 import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
+import { ACCOUNT_ID_HEADER } from '../shared/account-identity'
 import { assetDtoSchema, assetListResponseSchema } from '../shared/api'
 import { watermarkDtoSchema, watermarkListResponseSchema } from '../shared/api-watermark'
 import {
@@ -10,6 +12,8 @@ import {
   MAX_LOGO_BYTES,
   MAX_LOGOS_PER_ORGANIZATION,
 } from '../shared/constants'
+import { shellSessionSchema } from '../shared/shell-cache'
+import { SYNC_OPERATION_HEADER } from '../shared/sync'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC, type WatermarkSpec } from '../shared/watermark'
 
 const owner = {
@@ -36,6 +40,7 @@ const TEXT_BYTES = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/
 let harness: TestHarness
 let ownerClient: TestClient
 let organizationId: string
+let ownerId: string
 
 function base(path = ''): string {
   return `/api/orgs/${organizationId}${path}`
@@ -74,9 +79,97 @@ beforeEach(async () => {
     name: 'Acme Studio',
     slug: 'acme-studio',
   }))
+  const session = await ownerClient.get('/api/auth/get-session')
+  ownerId = shellSessionSchema.parse(await session.json()).user.id
 })
 
 describe('watermark presets', () => {
+  it('acknowledges a logo replay and rejects reuse with different bytes', async () => {
+    const id = crypto.randomUUID()
+    const send = (bytes: Uint8Array) =>
+      ownerClient.request(base('/assets'), {
+        method: 'POST',
+        headers: { [SYNC_OPERATION_HEADER]: id, [ACCOUNT_ID_HEADER]: ownerId },
+        body: logoForm(bytes),
+      })
+    const initial = await send(PNG_BYTES)
+    expect(initial.status).toBe(HTTP_STATUS.created)
+    const replay = await send(PNG_BYTES)
+    expect(replay.status).toBe(HTTP_STATUS.ok)
+    expect(assetDtoSchema.parse(await replay.json()).id).toBe(id)
+    const changed = await send(new Uint8Array([...PNG_BYTES, 1]))
+    expect(changed.status).toBe(HTTP_STATUS.conflict)
+    expect(await harness.services.assets.countForOrganization(organizationId, 'logo')).toBe(1)
+    const entries = await harness.audit.listForOrganization(organizationId)
+    expect(entries.filter((entry) => entry.action === 'asset.uploaded')).toHaveLength(1)
+  })
+  it('acknowledges a replay once and rejects an operation reused with different content', async () => {
+    const operationId = crypto.randomUUID()
+    const save = (name: string) =>
+      ownerClient.request(base('/watermarks'), {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          [SYNC_OPERATION_HEADER]: operationId,
+          [ACCOUNT_ID_HEADER]: ownerId,
+        },
+        body: JSON.stringify({ name, spec: DEFAULT_TEXT_SPEC }),
+      })
+    const firstSave = await save('Offline preset')
+    expect(firstSave.status).toBe(HTTP_STATUS.created)
+    const replay = await save('Offline preset')
+    expect(replay.status).toBe(HTTP_STATUS.ok)
+    expect(watermarkDtoSchema.parse(await replay.json()).id).toBe(operationId)
+    const changedReplay = await save('Changed replay')
+    expect(changedReplay.status).toBe(HTTP_STATUS.conflict)
+    const listed = await ownerClient.get(base('/watermarks'))
+    expect(
+      watermarkListResponseSchema.parse(await listed.json()).watermarks.map((item) => item.name),
+    ).toEqual(['Offline preset'])
+    const entries = await harness.audit.listForOrganization(organizationId)
+    expect(entries.filter((entry) => entry.action === 'watermark.created')).toHaveLength(1)
+  })
+
+  it('rejects stale preset edits and acknowledges the same completed edit without overwriting again', async () => {
+    const response = await ownerClient.post(base('/watermarks'), {
+      name: 'Original',
+      spec: DEFAULT_TEXT_SPEC,
+    })
+    const original = watermarkDtoSchema.parse(await response.json())
+    const edit = (name: string) =>
+      ownerClient.request(base(`/watermarks/${original.id}`), {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          spec: DEFAULT_TEXT_SPEC,
+          expectedUpdatedAt: original.updatedAt,
+        }),
+      })
+    const firstEdit = await edit('First edit')
+    expect(firstEdit.status).toBe(HTTP_STATUS.ok)
+    const retriedEdit = await edit('First edit')
+    expect(retriedEdit.status).toBe(HTTP_STATUS.ok)
+    const staleEdit = await edit('Stale edit')
+    expect(staleEdit.status).toBe(HTTP_STATUS.conflict)
+    const listed = await ownerClient.get(base('/watermarks'))
+    expect(watermarkListResponseSchema.parse(await listed.json()).watermarks[0]?.name).toBe(
+      'First edit',
+    )
+  })
+
+  it('rejects malformed synchronization identities', async () => {
+    const response = await ownerClient.request(base('/watermarks'), {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        [SYNC_OPERATION_HEADER]: '../other-workspace',
+        [ACCOUNT_ID_HEADER]: ownerId,
+      },
+      body: JSON.stringify({ name: 'Rejected', spec: DEFAULT_TEXT_SPEC }),
+    })
+    expect(response.status).toBe(HTTP_STATUS.badRequest)
+  })
   it('creates, lists, updates and deletes a preset with an audit trail', async () => {
     const created = await ownerClient.post(base('/watermarks'), {
       name: 'Default text',
@@ -162,7 +255,11 @@ describe('logo assets', () => {
     expect(asset.contentType).toBe('image/png')
     expect(asset.size).toBe(PNG_BYTES.byteLength)
     expect(asset.width).toBe(64)
-    expect(harness.objects.keys()).toEqual([`org/${organizationId}/logos/${asset.id}`])
+    expect(harness.objects.keys()).toEqual([
+      expect.stringMatching(
+        new RegExp(`^org/${organizationId}/logos/${asset.id}/[a-f0-9-]{36}/[a-f0-9]{64}$`),
+      ),
+    ])
 
     const listed = await ownerClient.get(base('/assets'))
     expect(assetListResponseSchema.parse(await listed.json()).assets).toHaveLength(1)
@@ -170,7 +267,7 @@ describe('logo assets', () => {
     const file = await ownerClient.get(base(`/assets/${asset.id}/file`))
     expect(file.status).toBe(HTTP_STATUS.ok)
     expect(file.headers.get('content-type')).toBe('image/png')
-    expect(file.headers.get('cache-control')).toContain('private')
+    expect(file.headers.get('cache-control')).toBe('private, no-store')
     expect(new Uint8Array(await file.arrayBuffer())).toEqual(PNG_BYTES)
 
     const spec: WatermarkSpec = {
@@ -207,7 +304,7 @@ describe('logo assets', () => {
   it('rejects oversized files and malformed forms', async () => {
     const declared = await ownerClient.request(base('/assets'), {
       method: 'POST',
-      headers: { 'content-length': String(MAX_LOGO_BYTES + 1) },
+      headers: { 'content-length': String(MAX_LOGO_BYTES + API_BODY_LIMITS.multipartOverhead + 1) },
       body: logoForm(PNG_BYTES),
     })
     expect(declared.status).toBe(HTTP_STATUS.payloadTooLarge)

@@ -16,6 +16,10 @@ export interface CloudUpload {
   readonly blob: Blob
 }
 
+/** Lazy export generation lets authorization open directly from the user's click. */
+export type CloudUploadSource =
+  readonly CloudUpload[] | (() => Promise<readonly CloudUpload[]> | readonly CloudUpload[])
+
 /** Display labels for the import menu. */
 export const PROVIDER_LABELS: Record<CloudProviderId, string> = {
   google: 'Google Drive',

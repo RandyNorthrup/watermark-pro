@@ -1,0 +1,20 @@
+name: Static analysis
+
+# Called by both branch/PR CI and version-tag deployment at the caller's commit.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Static analysis (semgrep)
+    runs-on: ubuntu-latest
+    container:
+      # Pinned by manifest digest so a moved tag cannot change the scanner.
+      image: semgrep/semgrep:1.174.0@sha256:f1f7b71861c7b28b6e0f661225a2c4f58a484f5d0f182465c6d6b3b22f972ade
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Keep the same rules/error behavior as the existing CI scan; no telemetry.
+      - run: semgrep scan --config p/default --config p/typescript --config p/react --config p/secrets --error --metrics=off

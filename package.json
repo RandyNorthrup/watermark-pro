@@ -1,17 +1,23 @@
 {
-  "name": "watermark-pro",
+  "name": "lumafoil",
   "version": "1.10.0",
   "private": true,
-  "description": "Enterprise-grade photo watermarking on Cloudflare Workers: bulk jobs, watermark library, smart placement, editor, sharing, RBAC.",
+  "description": "Lumafoil: invite-only photo, video and PDF watermarking with reusable presets, offline saves and cloud sharing.",
   "license": "MIT",
   "type": "module",
+  "overrides": {
+    "sharp": "0.35.4",
+    "@esbuild-kit/core-utils": {
+      "esbuild": "0.25.12"
+    }
+  },
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=11.0.0"
   },
   "scripts": {
     "dev": "vite --port 5273 --strictPort",
-    "build": "vite build",
+    "build": "node scripts/build.mjs",
     "preview": "vite preview --port 5273 --strictPort",
     "deploy": "node scripts/deploy.mjs",
     "cf-typegen": "wrangler types --strict-vars=false --env-file .env.example",
@@ -27,7 +33,7 @@
     "typecheck": "tsc -b",
     "deadcode": "knip --treat-config-hints-as-errors",
     "i18n:check": "node scripts/i18n-extract.mjs",
-    "test": "vitest run --coverage --project unit-client --project unit-worker --project browser && vitest run --project workers",
+    "test": "vitest run --coverage --project unit-client --project unit-worker --project browser && vitest run --project workers && npm run test:bootstrap && npm run test:gate && npm run test:performance && npm run test:publication && npm run test:assets",
     "test:unit": "vitest run --project unit-client --project unit-worker",
     "test:workers": "vitest run --project workers",
     "test:watch": "vitest",
@@ -39,12 +45,19 @@
     "bundle:budget": "node scripts/bundle-budget.mjs",
     "prerender": "node scripts/prerender.mjs",
     "security:audit": "npm audit --audit-level=high",
-    "security:secrets": "gitleaks git --redact --no-banner .",
-    "security:sast": "semgrep scan --config p/default --config p/typescript --config p/react --config p/secrets --error --metrics=off",
+    "security:secrets": "node scripts/publication-scan.mjs",
+    "security:sast": "node scripts/security-sast.mjs",
     "quality": "npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run deadcode && npm run i18n:check && npm run lint:cycles && npm run lint:dup && npm run security:secrets && npm run security:audit && npm run test && npm run build",
     "quality:ci": "npm run quality",
     "prepare": "husky",
-    "test:browser": "vitest run --project browser"
+    "test:browser": "vitest run --project browser",
+    "bootstrap:owner": "node scripts/bootstrap-owner.mjs",
+    "test:bootstrap": "node --test scripts/bootstrap-owner.test.mjs",
+    "test:gate": "node --test scripts/gate-http-bridge.test.mjs scripts/gate-runtime.test.mjs",
+    "test:performance": "node --test --test-concurrency=2 scripts/lighthouse-budget.test.mjs scripts/lighthouse-navigation.test.mjs scripts/audit-surfaces.test.mjs scripts/audit-content.browser.test.mjs scripts/bundle-budget.test.mjs scripts/compressing-proxy.test.mjs scripts/route-preloads.test.mjs scripts/audit-certificate.browser.test.mjs",
+    "security:publication:build": "node scripts/publication-scan.mjs --built",
+    "test:publication": "node --test scripts/publication.test.mjs",
+    "test:assets": "python scripts/test-vendor-downloads.py && python scripts/test-prepare-d1-restore.py"
   },
   "dependencies": {
     "@azure/msal-browser": "5.20.0",
@@ -154,11 +167,13 @@
     "husky": "9.1.7",
     "jscpd": "5.1.2",
     "jsdom": "30.0.1",
+    "jsqr": "1.4.0",
     "knip": "6.34.0",
     "lighthouse": "13.4.1",
     "lint-staged": "17.5.0",
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "sharp": "0.35.4",
     "stylelint": "17.15.0",
     "stylelint-config-standard": "40.0.0",
     "tailwindcss": "4.3.3",
@@ -170,15 +185,15 @@
   },
   "lint-staged": {
     "*.{ts,tsx,mjs}": [
-      "prettier --write",
-      "eslint --max-warnings=0 --no-warn-ignored"
+      "node node_modules/prettier/bin/prettier.cjs --write",
+      "node node_modules/eslint/bin/eslint.js --max-warnings=0 --no-warn-ignored"
     ],
     "*.css": [
-      "prettier --write",
-      "stylelint --max-warnings=0"
+      "node node_modules/prettier/bin/prettier.cjs --write",
+      "node node_modules/stylelint/bin/stylelint.mjs --max-warnings=0"
     ],
     "*.{json,jsonc,md,yml,yaml,html}": [
-      "prettier --write"
+      "node node_modules/prettier/bin/prettier.cjs --write"
     ]
   }
 }

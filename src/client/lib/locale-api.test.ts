@@ -1,10 +1,14 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ZodError } from 'zod'
 
-import { ApiRequestError } from './api'
 import { saveLocale } from './locale-api'
+import { setOfflineUser } from './offline-context'
 import { API_ERROR_CODE } from '../../shared/constants'
 
+beforeEach(() => setOfflineUser('locale-owner'))
+
 afterEach(() => {
+  setOfflineUser(null)
   vi.restoreAllMocks()
 })
 
@@ -45,6 +49,6 @@ describe('saveLocale', () => {
   it('rejects a response whose locale is not a supported code', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({ locale: 'klingon' }))
 
-    await expect(saveLocale('ja')).rejects.not.toBeInstanceOf(ApiRequestError)
+    await expect(saveLocale('ja')).rejects.toBeInstanceOf(ZodError)
   })
 })

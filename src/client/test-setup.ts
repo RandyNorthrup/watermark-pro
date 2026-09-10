@@ -3,11 +3,12 @@ import { cleanup, configure } from '@testing-library/react'
 import { afterEach } from 'vitest'
 
 import { initI18n } from './i18n'
+import { sourceCatalogues } from './i18n/source-catalogues'
 
 // Every page test renders components that read the catalogue through
 // `useTranslation`, so i18next must be initialised (in English) before any of
 // them run. English is bundled, so this resolves without a network fetch.
-await initI18n('en')
+await initI18n('en', sourceCatalogues)
 
 /**
  * Page tests drive the real router, query client and a fake engine through

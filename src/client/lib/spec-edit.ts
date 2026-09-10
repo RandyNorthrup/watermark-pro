@@ -21,7 +21,7 @@ export const MARK_KINDS: readonly { value: MarkKind; label: string }[] = [
   { value: 'qr', label: 'QR code' },
 ]
 
-/** QR codes need room for their modules; a quarter of the width scans from a phone. */
+/** QR codes start large and opaque; reading depends on the final size, content and image. */
 const DEFAULT_QR_SCALE = 0.18
 export const DEFAULT_QR_CONTENT = 'https://'
 
@@ -77,7 +77,7 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
     case 'qr': {
       return {
         ...settings,
-        style: { ...settings.style, scale: DEFAULT_QR_SCALE },
+        style: { ...settings.style, scale: DEFAULT_QR_SCALE, opacity: 1, rotation: 0 },
         kind: 'qr',
         content: DEFAULT_QR_CONTENT,
       }

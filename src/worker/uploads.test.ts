@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { SNIFF_LENGTH, sniffImageType } from './uploads'
+import { imageContentDisposition, SNIFF_LENGTH, sniffImageType } from './uploads'
 
 function bytes(...values: (number | string)[]): Uint8Array {
   const out: number[] = []
@@ -13,6 +13,19 @@ function bytes(...values: (number | string)[]): Uint8Array {
   }
   return new Uint8Array(out)
 }
+
+it('encodes Unicode file names and header delimiters without losing the name', () => {
+  const name = "写真 d'été\r\n.png"
+  const value = imageContentDisposition(name)
+  expect(value).toBe("inline; filename*=UTF-8''%E5%86%99%E7%9C%9F%20d%27%C3%A9t%C3%A9%0D%0A.png")
+  expect(
+    new Response(null, { headers: { 'content-disposition': value } }).headers.get(
+      'content-disposition',
+    ),
+  ).toBe(value)
+  expect(value).not.toContain('\r')
+  expect(value).not.toContain('\n')
+})
 
 describe('sniffImageType', () => {
   it('recognises the supported signatures from the first bytes only', () => {

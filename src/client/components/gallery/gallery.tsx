@@ -29,7 +29,9 @@ import {
   storageUsageQueryOptions,
 } from '../../lib/gallery'
 import { watermarksQueryOptions } from '../../lib/library'
+import { noteRecentWork } from '../../lib/recent-work-events'
 import { canRole } from '../../lib/roles'
+import { useWorkspaceMedia } from '../../lib/use-workspace-media'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { buttonVariants } from '../ui/button-variants'
@@ -72,6 +74,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
   const canShare = canRole(role, { share: ['create'] })
 
   const remove = useMutation({
+    networkMode: 'always',
     mutationFn: (ids: readonly string[]) => deletePhotos(organizationId, ids),
     onSuccess: async (_deleted, ids) => {
       setSelected((previous) => new Set([...previous].filter((id) => !ids.includes(id))))
@@ -262,13 +265,15 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                   type="button"
                   aria-label={t('gallery.openPhoto', { name: photo.name })}
                   onClick={() => {
+                    noteRecentWork(organizationId, { kind: 'photo', photo })
                     setOpen(photo)
                   }}
                   className="flex w-full flex-col gap-1 rounded-lg border border-line bg-surface-raised p-1.5 text-start focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none"
                 >
                   <span className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
-                    <img
-                      src={photoThumbnailUrl(organizationId, photo.id)}
+                    <GalleryThumbnail
+                      organizationId={organizationId}
+                      photo={photo}
                       alt=""
                       loading="lazy"
                       className="max-h-full max-w-full object-contain"
@@ -318,7 +323,7 @@ export function Gallery({ organizationId, role }: GalleryProps) {
         </Button>
       ) : null}
 
-      <Lightbox
+      <GalleryLightbox
         organizationId={organizationId}
         photo={open}
         canDelete={canDelete}
@@ -333,6 +338,21 @@ export function Gallery({ organizationId, role }: GalleryProps) {
       />
     </div>
   )
+}
+
+function GalleryThumbnail({
+  organizationId,
+  photo,
+  ...props
+}: {
+  organizationId: string
+  photo: PhotoDto
+  alt: string
+  className: string
+  loading?: 'lazy' | 'eager'
+}) {
+  const src = useWorkspaceMedia(organizationId, photoThumbnailUrl(organizationId, photo.id))
+  return <img {...props} src={src} />
 }
 
 interface DeleteDialogProps {
@@ -391,7 +411,7 @@ interface LightboxProps {
   onDelete: (photo: PhotoDto) => void
 }
 
-function Lightbox({
+export function GalleryLightbox({
   organizationId,
   photo,
   canDelete,
@@ -401,6 +421,10 @@ function Lightbox({
   onDelete,
 }: LightboxProps) {
   const { t } = useTranslation()
+  const photoUrl = useWorkspaceMedia(
+    organizationId,
+    photo === null ? null : photoFileUrl(organizationId, photo.id),
+  )
   return (
     <Dialog.Root
       open={photo !== null}
@@ -446,7 +470,7 @@ function Lightbox({
               {/* Actions on their own row so a long file name never squeezes them, or vice versa, on a phone. */}
               <div className="flex flex-wrap items-center gap-2">
                 <a
-                  href={photoFileUrl(organizationId, photo.id)}
+                  href={photoUrl}
                   download={photo.name}
                   className={buttonVariants({ variant: 'secondary', size: 'sm' })}
                 >
@@ -483,7 +507,7 @@ function Lightbox({
               </div>
               <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-md bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
                 <img
-                  src={photoFileUrl(organizationId, photo.id)}
+                  src={photoUrl}
                   alt={photo.name}
                   className="max-h-full max-w-full object-contain"
                 />

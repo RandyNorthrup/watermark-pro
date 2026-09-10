@@ -23,7 +23,7 @@
     "toolsNav": "Tools",
     "signOut": "Sign out",
     "accountMenu": "Account menu for {{name}}",
-    "menuDescription": "Switch organization or go to any part of Watermark Pro.",
+    "menuDescription": "Switch organization or go to any part of Lumafoil.",
     "switchOrganizationFor": "Organization: {{name}}. Switch organization",
     "chooseOrganization": "Choose an organization",
     "chooseOrganizationShort": "Choose organization",
@@ -33,7 +33,8 @@
       "system": "Theme: follows system. Switch to light",
       "light": "Theme: light. Switch to dark",
       "dark": "Theme: dark. Switch to system"
-    }
+    },
+    "closeMenu": "Close menu"
   },
   "auth": {
     "backToSignIn": "Back to sign in",
@@ -87,12 +88,16 @@
       "roleLabel": "Role:",
       "decline": "Decline",
       "accept": "Accept invitation"
+    },
+    "inviteOnly": {
+      "title": "Invitation required",
+      "body": "Lumafoil is invite-only. Open the invitation link in your email to create your account."
     }
   },
   "dashboard": {
     "signedInAs": "Signed in as {{email}}",
     "yourWorkspace": "Your workspace",
-    "yourRole": "Your role:",
+    "yourRole": "Your workspace role:",
     "toolsHeading": "Tools",
     "tools": {
       "library": {
@@ -109,7 +114,7 @@
       },
       "gallery": {
         "label": "Gallery",
-        "body": "Browse what the team has saved, then share albums with a link."
+        "body": "Browse saved photos, then choose which to share with a link."
       }
     },
     "overviewHeading": "Overview",
@@ -125,7 +130,7 @@
   "library": {
     "orgRequired": "Create or join an organization to build a watermark library.",
     "heading": "Watermark library",
-    "description": "Presets shared by everyone in {{name}}. Apply them one at a time or in bulk.",
+    "description": "Saved watermarks in {{name}}. Apply them to one file or a whole batch.",
     "export": "Export",
     "exportPreset": "Export {{name}}",
     "importPresets": "Import presets",
@@ -139,7 +144,7 @@
     "loadingPreset": "Loading preset",
     "loadPresetErrorTitle": "Could not load the preset",
     "presetGone": "That preset no longer exists.",
-    "editSubtitleManage": "Changes apply to everyone who uses this preset.",
+    "editSubtitleManage": "Your changes update this saved preset for future use.",
     "editSubtitleReadOnly": "Read-only view.",
     "cannotCreate": "Your role does not allow creating presets.",
     "newPresetSubtitle": "Design the mark, decide where it goes, then save it to the library.",
@@ -156,7 +161,8 @@
       "glyph": "Glyph {{glyph}}",
       "icon": "Icon {{name}}",
       "logo": "Logo",
-      "qr": "QR code for {{content}}"
+      "qr": "QR code for {{content}}",
+      "sticker": "Sticker {{name}}"
     },
     "shape": {
       "rectangle": "Rectangle",
@@ -168,7 +174,10 @@
       "smart": "Smart placement",
       "custom": "Custom position",
       "random": "Random placement"
-    }
+    },
+    "newQr": "New QR code",
+    "qrOnly": "QR codes only",
+    "noQr": "No saved QR codes yet. Create one for each link you use."
   },
   "designer": {
     "presetName": "Preset name",
@@ -192,7 +201,8 @@
     },
     "qr": {
       "content": "QR code content",
-      "hint": "A link, usually. Up to {{max}} characters; the code is always dark on a light field so it scans."
+      "hint": "A link, usually. Up to {{max}} characters; the code is always dark on a light field so it scans.",
+      "savedHint": "Name and save each QR code separately. Reuse it from your library, or keep several for different links. Test a finished export at its intended size before sharing."
     },
     "tokens": {
       "menu": "Insert detail",
@@ -216,12 +226,16 @@
     "font": {
       "family": "Font",
       "weight": "Weight",
-      "specimen": "The quick brown fox"
+      "specimen": "The quick brown fox",
+      "search": "Search fonts",
+      "resultCount": "{{count}} font families",
+      "license": "Font licence"
     },
     "symbol": {
       "icons": "Icons",
       "glyphLabel": "Glyph {{glyph}}",
-      "iconLabel": "Icon {{label}}"
+      "iconLabel": "Icon {{label}}",
+      "license": "Icon licences"
     },
     "shape": {
       "label": "Shape",
@@ -369,12 +383,25 @@
         "cancel": "Cancel",
         "save": "Save as logo"
       }
+    },
+    "stickers": {
+      "heading": "Colour stickers",
+      "search": "Search stickers",
+      "category": "Category",
+      "all": "All categories",
+      "results": "{{total}} matching stickers",
+      "choose": "Choose {{name}}",
+      "previous": "Previous",
+      "next": "Next",
+      "license": "Fluent Emoji · MIT licence",
+      "usage": "Commercial use allowed; keep the included artwork licence notice when redistributing.",
+      "guide": "Artwork licence guide"
     }
   },
   "editor": {
     "orgRequired": "Create or join an organization to use the editor.",
     "heading": "Editor",
-    "description": "Watermark one photo: pick a preset, place it by hand if you like, crop, resize and download. Nothing leaves your browser.",
+    "description": "Pick a preset, adjust its placement, crop and resize on your device. Download the result or choose a gallery or cloud save.",
     "tabs": {
       "watermark": "Watermark",
       "crop": "Crop",
@@ -424,7 +451,13 @@
       "removeLayer": "Remove {{name}} from this photo",
       "adjusted": "Adjusted for this photo; the library preset is unchanged.",
       "revert": "Revert",
-      "placement": "Placement"
+      "placement": "Placement",
+      "create": "Create watermark",
+      "createHint": "Design your watermark here. Save it once to use on this photo and keep it in your library.",
+      "cancelCreate": "Cancel",
+      "saveAndUse": "Save and use",
+      "emptyReadOnly": "No watermarks are available in this library yet.",
+      "firstUseHint": "Add a watermark, then open Export to download your photo."
     },
     "crop": {
       "aspectRatio": "Aspect ratio",
@@ -492,7 +525,7 @@
         "label": "Keep everything",
         "help": "Including the GPS position, if the photo has one."
       },
-      "webpNote": "WebP exports are always stripped."
+      "webpNote": "WebP removes original photo metadata. Required artwork licence notices remain."
     },
     "export": {
       "format": "Format",
@@ -600,7 +633,7 @@
   "gallery": {
     "orgRequired": "Create or join an organization to keep a gallery.",
     "heading": "Gallery",
-    "description": "Watermarked photos saved by {{name}}. Search, filter by preset, download or delete.",
+    "description": "Watermarked photos saved in {{name}}. Search, filter, download or delete.",
     "usage_one": "{{count}} photo · {{used}} of {{max}}",
     "usage_other": "{{count}} photos · {{used}} of {{max}}",
     "maxCount": "Up to {{count}} photos per organization",
@@ -685,8 +718,8 @@
   },
   "admin": {
     "heading": "Administration",
-    "description": "Every user and organization on this deployment. Actions here are recorded in the audit trail.",
-    "onlyAdmins": "Only platform administrators can open this page.",
+    "description": "Site administrator only. Manage accounts and review totals. Owning a workspace does not grant site administration.",
+    "onlyAdmins": "Only the site administrator can open this page.",
     "sectionsLabel": "Administration sections",
     "tabs": {
       "users": "Users",
@@ -705,15 +738,11 @@
     "you": "(you)",
     "joined": "Joined {{date}}",
     "emailNotVerified": " · email not verified",
-    "platformAdmin": "platform admin",
+    "platformAdmin": "Site administrator",
     "banned": "banned",
     "bannedReason": "banned: {{reason}}",
     "unban": "Unban",
     "unbanUser": "Unban {{email}}",
-    "removeAdmin": "Remove admin",
-    "makeAdminShort": "Make admin",
-    "removeAdminFrom": "Remove admin from {{email}}",
-    "makeAdmin": "Make {{email}} an admin",
     "signOutEverywhereButton": "Sign out everywhere",
     "signOutEverywhere": "Sign out {{email}} everywhere",
     "ban": "Ban",
@@ -800,7 +829,7 @@
   "organizations": {
     "firstTitle": "Create your first organization",
     "newTitle": "New organization",
-    "description": "Organizations hold your watermarks, photos and team. You will be its owner.",
+    "description": "Create a separate workspace for your watermarks and photos. It stays private unless you explicitly invite members.",
     "createFailed": "The organization could not be created.",
     "nameLabel": "Name",
     "slugLabel": "URL identifier",
@@ -830,7 +859,15 @@
       "noneSelected": "No photos selected",
       "selectedCount": "{{count}} selected",
       "addSelected": "Add selected"
-    }
+    },
+    "cloudSaved": "Saved cloud files ({{total}})",
+    "cloudSavedTitle": "Saved cloud files",
+    "cloudSharingHint": "Saving does not create a public link. Create one only when you want anyone with that link to view the file. Existing folder permissions still apply. Manage other access directly in the provider.",
+    "openProvider": "Open in {{provider}}",
+    "createPublicLink": "Create public link",
+    "revokePublicLink": "Revoke public link",
+    "linkCopied": "Link copied",
+    "copyLink": "Copy link"
   },
   "video": {
     "orgRequired": "Create or join an organization to watermark video.",
@@ -921,7 +958,7 @@
     },
     "tool": {
       "title": "Verify a photo",
-      "description": "Check whether a PNG carries an invisible Watermark Pro mark and read its hidden message. Nothing leaves your browser."
+      "description": "Check whether a PNG carries an invisible Lumafoil mark and read its hidden message. Nothing leaves your browser."
     },
     "checkPng": "Check a PNG",
     "checking": "Checking…",
@@ -938,7 +975,7 @@
     "createInLibrary": "Create a preset in the library",
     "legend": "Presets",
     "importTitle": "Import presets",
-    "importDescription": "Choose a Watermark Pro preset file. Its presets, and any logos they use, are added to this library.",
+    "importDescription": "Choose a Lumafoil preset file. Its presets, and any logos they use, are added to this library.",
     "presetFileLabel": "Preset file",
     "noPresets": "This preset file has no presets.",
     "fileCount_one": "{{count}} preset in this file",
@@ -951,111 +988,174 @@
   "landing": {
     "nav": "Account",
     "signIn": "Sign in",
-    "createAccount": "Create account",
-    "eyebrow": "Free and open source",
-    "heroBody": "Protect your photography without losing the picture. Watermark Pro runs the heavy lifting in your browser, keeps your originals private, and gives your team roles that actually mean something.",
-    "createWorkspace": "Create your workspace",
-    "featuresHeading": "What it does",
-    "features": {
-      "bulk": {
-        "title": "Bulk jobs",
-        "body": "Drop hundreds of photos and watermark them all in one pass, in your browser."
+    "heroBody": "Add text, logos or signatures. Reuse presets across single files and batches, with offline editing and sync when you reconnect.",
+    "featuresHeading": "Features for the whole job",
+    "footer": "Lumafoil is open source under the MIT licence.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "heroTitleStart": "Watermark photos,",
+    "heroTitleEnd": "videos, and PDFs.",
+    "heroAlt": "Lumafoil photo editor with watermark placement and export controls",
+    "previewLabel": "The Lumafoil editor",
+    "privacyNote": "Files process on your device. Cloud saves are optional.",
+    "formatsLabel": "Photos · PDFs · Video",
+    "workflowHeading": "Open. Adjust. Export.",
+    "workflowNote": "Your invited workspace keeps presets and saved files together.",
+    "steps": {
+      "openTitle": "Bring your photos",
+      "openBody": "Open a single image or an entire batch. Your originals stay untouched.",
+      "markTitle": "Make your mark",
+      "markBody": "Choose a saved preset or create something unmistakably yours.",
+      "exportTitle": "Export and go",
+      "exportBody": "Download finished files, or save to your gallery and sync."
+    },
+    "github": "GitHub",
+    "featuresIntro": "Design a watermark, apply it across your files, and choose how to save or share the results.",
+    "moreHeading": "More ways to finish your work",
+    "capabilities": {
+      "marks": {
+        "title": "Text, logos, and your own signature",
+        "body": "Type your name or copyright notice, upload a logo, or draw a signature. Adjust size, angle, opacity, and colour; combine several marks when one is not enough."
       },
-      "library": {
-        "title": "Watermark library",
-        "body": "Save text, symbol and logo marks once; apply them anywhere with a click."
+      "batch": {
+        "title": "Watermark a whole batch",
+        "body": "Apply a saved watermark to multiple photos in one job. Review the results, adjust placement for individual images, and download your finished batch as a ZIP."
+      },
+      "fonts": {
+        "title": "551 unique font families",
+        "body": "Choose from serif, sans serif, script, display, and monospace fonts. Search by name, preview your text, and save the style with your watermark. Fonts are bundled locally under open licences."
+      },
+      "stickers": {
+        "title": "400 colourful vector stickers",
+        "body": "Browse animals, flowers, food, travel, celebrations, and everyday objects. Search the sticker library, add a design to your watermark, and resize it without fuzzy edges."
+      },
+      "qr": {
+        "title": "Create and save QR watermarks",
+        "body": "Turn a website address or text into a QR code. Keep separate saved codes for your portfolio, contact page, or different projects, then reuse them on your files."
+      },
+      "templates": {
+        "title": "Save your watermarks as templates",
+        "body": "Keep the text, artwork, style, and placement you use most. Apply saved presets in the editor or bulk tool, and import or export presets to move them between your devices."
+      },
+      "editing": {
+        "title": "Crop, resize, and adjust",
+        "body": "Crop your photo, choose export dimensions, and adjust brightness, contrast, and saturation before adding the final watermark."
       },
       "smart": {
-        "title": "Smart placement",
-        "body": "Each photo is analysed so the mark lands where it reads best and stays off the subject."
+        "title": "Smart placement and contrast",
+        "body": "Let Lumafoil suggest a position and a light or dark mark based on the image. Review the result and move or restyle it yourself."
       },
-      "contrast": {
-        "title": "Auto contrast",
-        "body": "Light or dark variant and outline strength chosen per image, adjustable when you disagree."
+      "video": {
+        "title": "Watermark videos",
+        "body": "Apply watermarks to supported videos in your browser, with controls for placement and timing. Preview the result before exporting."
       },
-      "teams": {
-        "title": "Teams and roles",
-        "body": "Organizations with owner, admin, editor and viewer roles, enforced on the server."
+      "pdf": {
+        "title": "Watermark PDF documents",
+        "body": "Apply a saved watermark across selected PDF pages. Process one document or a batch and download the watermarked PDFs."
       },
-      "trusted": {
-        "title": "Built to be trusted",
-        "body": "Strict content security policy, audited actions, and photos that never leave your browser unless you save them."
+      "export": {
+        "title": "Choose your export format",
+        "body": "Export photos as JPEG, PNG, or WebP. Set output size and quality, or download a processed batch together as a ZIP."
+      },
+      "gallery": {
+        "title": "Keep a private gallery",
+        "body": "Save finished images to your account and find them later in your gallery. Download individual files or select photos to share."
+      },
+      "sharing": {
+        "title": "Share the files you choose",
+        "body": "Create a Lumafoil gallery link for selected photos. Set an expiry or revoke the link when you no longer want it available."
+      },
+      "offline": {
+        "title": "Work offline, sync later",
+        "body": "Prepare Lumafoil for offline use, then edit presets and save photos without a connection. Pending work syncs when you reconnect, with visible errors and conflict recovery."
+      },
+      "privacy": {
+        "title": "Your account, your workspace",
+        "body": "New users need an invitation and receive their own private workspace. Inviting someone does not give them access to your photos or presets."
+      },
+      "languages": {
+        "title": "12 interface languages",
+        "body": "Use Lumafoil in English, Spanish, French, German, Italian, Portuguese, Dutch, Japanese, Korean, Chinese, Russian, or Arabic, including right-to-left layouts."
+      },
+      "theme": {
+        "title": "Light and dark modes",
+        "body": "Choose a light or dark workspace, or follow your device setting. The responsive interface adapts to phones, tablets, and larger screens."
       }
     },
-    "footer": "Watermark Pro is open source under the MIT licence.",
-    "privacy": "Privacy",
-    "terms": "Terms"
+    "inviteHosting": "Lumafoil is invitation-only. Want to self-host?",
+    "selfHost": "Get the source code free on GitHub.",
+    "featuresNav": "Features"
   },
   "legal": {
     "signIn": "Sign in",
     "lastUpdated": "Last updated {{date}}",
     "readSibling": "Read the <sibling>{{siblingLabel}}</sibling>, or return to the <home>home page</home>.",
-    "footer": "Watermark Pro is open source under the MIT licence.",
+    "footer": "Lumafoil source is MIT-licensed. Bundled fonts and artwork retain their own licences.",
     "privacy": {
       "title": "Privacy",
-      "intro": "Watermark Pro is built so your photographs stay yours. This page explains what happens to your images and your account information in plain language, drawn from the controls the project actually enforces.",
+      "intro": "Lumafoil is built so your photographs stay yours. This page explains what happens to your images and your account information in plain language, drawn from the controls the project actually enforces.",
       "siblingLabel": "terms of service",
       "photos": {
-        "heading": "Your photos stay in your browser",
-        "p1": "Watermarking runs entirely on your device. The editor and the bulk tool decode your photos in the browser, render them in Web Workers, and build the finished files in memory. Previewing a watermark never uploads the photo it is applied to.",
-        "p2": "Exports are assembled locally and handed to you through a same-origin download link that is released the instant the download starts. Your originals are never sent to a server to be previewed or watermarked."
+        "heading": "Photos are processed on your device",
+        "p1": "Editing and watermarking run on your device. A preview does not upload your originals to Lumafoil.",
+        "p2": "You choose whether to download the output, save it to your gallery, transfer it to connected cloud storage, or create a sharing link."
       },
       "storage": {
-        "heading": "What we store, and only when you ask",
-        "p1": "Nothing is kept on our servers unless you choose to save it. When you save a photo, a thumbnail, or a logo, it is stored in Cloudflare R2 under keys scoped to your organization, never made public, and served only to signed-in members of that organization with private caching.",
-        "p2": "Each organization has photo, logo, and storage quotas. Every upload and deletion is recorded in the audit trail."
+        "heading": "Accounts, saved work and offline copies",
+        "p1": "Cloudflare hosts account records, saved presets, gallery photos, thumbnails, uploaded logos, sharing records and recent-work history. Saved content belongs to its workspace; other users need explicit membership or a sharing link.",
+        "p2": "Account-scoped copies and queued edits are kept on this device for offline use. Reconnecting with the same account retries them. Pending edits block sign-out; completed sign-out clears the app’s offline data. Session expiry locks access without erasing pending work. Clearing browser data can erase unsynced edits."
       },
       "metadata": {
-        "heading": "Metadata is removed by default",
-        "p1": "Every export is re-encoded from pixels, so no metadata is carried over unless you decide to keep it. The default strips all camera and location data before the file reaches your download, the share sheet, or the gallery.",
-        "p2": "Two opt-in per-export modes let you keep the camera data with the GPS location removed, or keep everything as-is. Metadata is read and written in the browser; nothing is uploaded to do it."
+        "heading": "Personal metadata and artwork notices",
+        "p1": "Image exports remove camera and location metadata by default. Supported options can retain camera fields without GPS, or retain supported original metadata. This processing happens in your browser.",
+        "p2": "Exports using bundled artwork retain its licence notice in metadata, a document attachment or an archive sidecar. Other software may remove these notices; retain the applicable notice when redistributing that artwork."
       },
       "sharing": {
         "heading": "Sharing links",
-        "p1": "A share link carries a signed token with a built-in expiry and can be revoked at any time. The public pages a link opens carry no session and are rate limited by address.",
-        "p2": "Expired, revoked, tampered, and unknown links all return the same neutral “not found” response, so a link reveals nothing once it stops working. Creating and revoking links is limited to members with permission and is audited."
+        "p1": "Anyone with a Lumafoil gallery link can view its selected saved photos until the link expires or is revoked. A site invitation creates access to a separate private account; it does not share the inviter’s workspace or content.",
+        "p2": "Cloud providers’ own links follow their permissions and revocation rules. Revoking a link cannot recall downloads or copies already made."
       },
       "account": {
         "heading": "Your account",
-        "p1": "An account needs an email address and a password, and the email must be verified before the account is active. Sessions are held in HttpOnly, SameSite=Lax cookies, marked Secure on secure origins.",
-        "p2": "Password-reset links expire after an hour and sign out your other sessions when used."
+        "p1": "New accounts require an invitation and a verified email. Sign in with a password or configured Google/Microsoft sign-in. Existing accounts need no new invitation. Adding another sign-in method requires authenticated account linking.",
+        "p2": "Sessions use HttpOnly, SameSite=Lax cookies, marked Secure on HTTPS. Password-reset links expire after an hour and revoke other server sessions when used."
       },
       "analytics": {
-        "heading": "Analytics and cookies",
-        "p1": "We set no third-party analytics or advertising cookies. The only measurement is Cloudflare Web Analytics, which is cookieless and does not track you across sites.",
-        "p2": "The app talks to just two third-party origins, both Cloudflare’s: the Turnstile widget that screens sign-up and password-reset requests for bots, and the cookieless analytics beacon. Fonts, styles, and everything else are served from this site."
+        "heading": "Cookies and outside services",
+        "p1": "Lumafoil includes no analytics beacon or advertising cookies. Essential cookies maintain sessions; device storage holds settings, offline copies and queued changes.",
+        "p2": "When enabled, Cloudflare Turnstile checks account requests for bots; see its <turnstile>privacy notice</turnstile>. Google/Microsoft handle chosen sign-in. Google Drive, Dropbox and OneDrive receive requests through cloud features you choose; their own privacy policies apply."
       },
       "audit": {
         "heading": "Audit trail",
-        "p1": "Sign-ups and every organization, membership, invitation, library, photo, and share change are written to an append-only audit log. That log is readable only by an organization’s owners and admins."
+        "p1": "Workspace audit logs require a workspace owner/admin role. The sole site administrator can manage accounts and review totals, moderation, audit entries and health/error records. Recent-work history is user-specific. Application failure logs omit tokens and request bodies."
       },
       "reporting": {
         "heading": "Reporting a problem",
-        "p1": "Security issues can be reported privately through the project’s GitHub repository rather than a public issue. The security policy in the repository describes what to include and how quickly you will hear back."
+        "p1": "For support, email <support>support@lumafoil.com</support>. Report vulnerabilities through <security>GitHub’s private reporting form</security> or that email address. Do not put tokens or personal content in public issues."
       }
     },
     "terms": {
       "title": "Terms of service",
-      "intro": "These terms cover your use of Watermark Pro. They are written to be read, and they describe how the service actually behaves rather than adding claims it does not keep.",
+      "intro": "These terms cover your use of Lumafoil. They are written to be read, and they describe how the service actually behaves rather than adding claims it does not keep.",
       "siblingLabel": "privacy policy",
       "accepting": {
         "heading": "Accepting these terms",
-        "p1": "Using Watermark Pro means you agree to these terms. If you do not agree, please do not use the service."
+        "p1": "Using Lumafoil means you agree to these terms. If you do not agree, please do not use the service."
       },
       "whatItDoes": {
         "heading": "What the service does",
-        "p1": "Watermark Pro watermarks photographs. The watermarking itself runs in your browser; optional features such as saving photos and logos, working in a team, and sharing use server-side storage on Cloudflare.",
-        "p2": "The software is free and open source under the MIT licence."
+        "p1": "Lumafoil adds watermarks to photos and supported documents and videos on your device. Accounts, saved galleries/presets, recent-work history, invitations and sharing use server storage; optional cloud features contact the chosen provider.",
+        "p2": "The source is free and open source under MIT. Bundled fonts and artwork have their own licences."
       },
       "account": {
         "heading": "Your account",
-        "p1": "Team features need an account with a verified email address. Keep your password to yourself; you are responsible for what happens under your account.",
-        "p2": "You can sign out of your sessions at any time, and using a password-reset link signs out your other sessions."
+        "p1": "Access is currently by invitation. A verified email is required; password and configured Google/Microsoft sign-in are available. Keep your credentials and provider account secure; you are responsible for use of your account.",
+        "p2": "Sign-out needs a connection and resolved pending edits; it clears this browser’s offline app data. Password reset revokes other server sessions. Disconnected devices can retain local copies until they reconnect or their browser data is cleared."
       },
       "content": {
         "heading": "Your content",
         "p1": "You keep every right you already hold in the photos and watermarks you upload or create. You are responsible for having the right to use the images you bring to the service.",
-        "p2": "The app processes your content only to provide the features you use, and stores it only when you choose to save it. It is never used to train anything or shared with third parties."
+        "p2": "Content is processed for the features you choose. Gallery saves use Cloudflare; selected cloud transfers and sharing send content to providers or recipients. Lumafoil does not use it to train models. Bundled artwork has separate licence-notice requirements."
       },
       "acceptableUse": {
         "heading": "Acceptable use",
@@ -1063,8 +1163,8 @@
         "p2": "Access within an organization follows your role, and those roles are enforced on the server."
       },
       "teams": {
-        "heading": "Teams and roles",
-        "p1": "An organization can have owner, admin, editor, and viewer roles. What each member can see and do is limited to their role, checked on every request rather than only hidden in the interface."
+        "heading": "Private workspaces and collaboration",
+        "p1": "Every account has a private workspace. Invitations to the site do not share it. Separate collaboration workspaces can explicitly add owners, admins, editors or viewers; permissions are enforced on the server. Workspace ownership or administration does not grant site administration."
       },
       "availability": {
         "heading": "Availability, warranty, and changes",
@@ -1073,11 +1173,11 @@
       },
       "openSource": {
         "heading": "Open source",
-        "p1": "Watermark Pro’s source code is available under the MIT licence, which lets you inspect, run, and modify it under that licence’s terms."
+        "p1": "Lumafoil’s source is MIT-licensed for inspection, use and modification under that licence. Bundled fonts and artwork retain their own licences and notices, linked in their pickers and the asset-licence index."
       },
       "contact": {
         "heading": "Contact",
-        "p1": "Questions about these terms, and reports of security problems, can be raised through the project’s GitHub repository."
+        "p1": "Questions: <support>support@lumafoil.com</support>. Security reports: <security>GitHub’s private reporting form</security> or that email address. Keep sensitive details out of public issues."
       }
     }
   },
@@ -1085,7 +1185,7 @@
     "loading": "Loading photos",
     "unavailableTitle": "This link is not available",
     "unavailableBody": "It may have expired or been revoked, or the address is incomplete. Ask whoever sent it for a new one.",
-    "about": "About Watermark Pro",
+    "about": "About Lumafoil",
     "photoCount_one": "{{count}} photo",
     "photoCount_other": "{{count}} photos",
     "availableUntil": " · available until {{date}}",
@@ -1094,7 +1194,7 @@
     "linkShared": "Link shared.",
     "openPhoto": "Open {{name}}",
     "dimensions": "{{width}} × {{height}}",
-    "footer": "Shared with <home>Watermark Pro</home>. Photos stay the property of their owner.",
+    "footer": "Shared with <home>Lumafoil</home>. Photos stay the property of their owner.",
     "download": "Download",
     "close": "Close"
   },
@@ -1104,6 +1204,124 @@
       "title": "Page not found",
       "body": "The address may be mistyped, or the page may have moved.",
       "back": "Back to the start"
+    }
+  },
+  "offline": {
+    "label": "Offline work",
+    "syncing": "Synchronizing saved work…",
+    "disconnected": "Offline — saves stay on this device.",
+    "pending": "Pending saves: {{count}}",
+    "upToDate": "Saved work is synchronized.",
+    "syncNow": "Sync now",
+    "review": "Review saved work ({{count}})",
+    "deletion": "Deletion",
+    "conflict": "This preset changed elsewhere. Keep both versions or discard this local edit.",
+    "savedHere": "Saved on this device. It will sync while the app is open and connected.",
+    "retry": "Retry",
+    "keepBoth": "Keep both versions",
+    "discard": "Discard local change",
+    "discardTitle": "Discard this local change?",
+    "discardBody": "This removes the pending change from this device. It does not undo a change already saved on the server.",
+    "cancel": "Cancel",
+    "signOutPending": "Sync or discard pending saves in Offline work before signing out.",
+    "signOutFailed": "Could not sign out. Try again.",
+    "connectionRequired": "Connection required",
+    "connectOnce": "Sign in and open this workspace once while connected before using it offline.",
+    "onlineOnly": "Account, sharing, and membership administration need a connection. Your photo tools and saved presets remain available offline.",
+    "ready": "App files are ready for offline use.",
+    "preparing": "Preparing offline app files. Keep this tab open.",
+    "updateAvailable": "An update is ready. Finish unsaved edits before reloading; saved work stays on this device.",
+    "reload": "Reload to update"
+  },
+  "siteInvites": {
+    "heading": "Invite people",
+    "description": "Invite someone to create their own Lumafoil account.",
+    "email": "Email address",
+    "privacy": "They get a private workspace. This invitation shares none of your photos, presets, or account details.",
+    "sent": "Invitation sent. It expires in seven days.",
+    "send": "Send invitation",
+    "sentHeading": "Your invitations",
+    "loading": "Loading invitations…",
+    "empty": "You have not sent any invitations.",
+    "revoke": "Revoke",
+    "revokeEmail": "Revoke invitation to {{email}}",
+    "invalidEmail": "Enter a valid email address.",
+    "privateHeading": "Your private workspace",
+    "privateBody": "Only you can access this workspace. Invite people to Lumafoil without sharing it, or create a separate workspace for intentional collaboration.",
+    "collaborate": "Create a collaboration workspace",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "revoked": "Revoked",
+      "expired": "Expired"
+    },
+    "collaborationNotice": "A workspace invitation gives access to the photos and presets in this workspace. The recipient must already have a Lumafoil account. Use Invite people first if they need one."
+  },
+  "accountStats": {
+    "users": "Registered accounts",
+    "verifiedUsers": "Verified accounts",
+    "pendingInvitations": "Pending invitations",
+    "acceptedInvitations": "Accepted invitations",
+    "loading": "Loading account totals…"
+  },
+  "accountAuth": {
+    "heading": "Account settings",
+    "connected": "Sign-in methods",
+    "loading": "Loading sign-in methods…",
+    "password": "Email and password",
+    "linkProvider": "Link {{provider}}",
+    "continueProvider": "Continue with {{provider}}",
+    "linkHelp": "Link a provider while signed in. Use the same email as this account.",
+    "identityOnly": "For your Lumafoil account only. Cloud storage connects separately.",
+    "linkError": "Could not link this identity. Use the same email and sign in again before retrying.",
+    "verifyEmail": "Check your email to verify this account, then try signing in again.",
+    "signInError": "Sign-in could not finish. If you already have a password account, sign in below, open Account settings, and link the provider there."
+  },
+  "referral": {
+    "heading": "Your invitation link",
+    "description": "Anyone with this link can request their own private account. Share it only with people you want to invite.",
+    "count": "Accounts created from your link: {{count}}",
+    "url": "Invitation link",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "copyError": "Could not copy. Select the link and copy it manually.",
+    "rotate": "Create new link",
+    "revoke": "Disable link",
+    "revoked": "This link is disabled.",
+    "rotateHelp": "A new link disables the previous one. Existing accounts keep access. You see counts only; their profiles and content stay private."
+  },
+  "recent": {
+    "heading": "Recent work",
+    "description": "Photos you've opened or saved and watermarks you've used in this workspace.",
+    "viewLabel": "Recent work view",
+    "search": "Search recent work",
+    "loading": "Loading recent work",
+    "loadError": "Couldn't load recent work",
+    "retry": "Try again",
+    "preferenceError": "Couldn't save your view preference.",
+    "activityPending": "Recent work could not be updated. Reopen the item to try again.",
+    "empty": "Your recent work appears here. Save photos to Gallery and open watermarks to keep them close.",
+    "noMatches": "No recent work matches your search.",
+    "start": "Open editor",
+    "detailsLabel": "Recent work details",
+    "itemsLabel": "Recent work items",
+    "name": "Name",
+    "type": "Type",
+    "location": "Location",
+    "lastUsed": "Last used",
+    "status": "Sync status",
+    "photo": "Saved photo",
+    "preset": "Watermark",
+    "pending": "Activity waiting to sync",
+    "saved": "Saved",
+    "gallery": "Gallery",
+    "library": "Watermark library",
+    "needsAttention": "Needs attention",
+    "workPending": "Work waiting to sync",
+    "views": {
+      "thumbnails": "Thumbnails",
+      "list": "List",
+      "details": "Details"
     }
   }
 }

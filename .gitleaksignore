@@ -1,0 +1,3 @@
+# Historical Google Picker credential revoked on 2026-09-09 after installing a restricted replacement.
+# This exact past commit/location is retained for history scanning; no live key value is allowlisted.
+730aee4f9e5f96dcadeee227db5bb95d24addf46:wrangler.jsonc:gcp-api-key:120

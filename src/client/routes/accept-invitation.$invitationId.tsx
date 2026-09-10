@@ -6,7 +6,7 @@ import {
   useNavigate,
   useRouter,
 } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { AuthLayout } from '../components/auth-layout'
@@ -16,19 +16,36 @@ import { Button } from '../components/ui/button'
 import { ApiRequestError } from '../lib/api'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError, describeError } from '../lib/errors'
-import { resetShellQueries, sessionQueryOptions } from '../lib/queries'
+import { ACCOUNT_CHANGED_EVENT } from '../lib/offline-account'
+import { captureOfflineOwner, currentOfflineUser } from '../lib/offline-context'
+import { resetShellQueries } from '../lib/queries'
+
+function subscribeAccount(listener: () => void): () => void {
+  window.addEventListener(ACCOUNT_CHANGED_EVENT, listener)
+  return () => window.removeEventListener(ACCOUNT_CHANGED_EVENT, listener)
+}
 
 export const Route = createFileRoute('/accept-invitation/$invitationId')({
   beforeLoad: async ({ context, location }) => {
-    const session = await context.queryClient.query(sessionQueryOptions)
+    const { sessionQueryOptions } = await import('../lib/queries')
+    const session = await context.queryClient.query({
+      ...sessionQueryOptions,
+      staleTime: 0,
+      retry: false,
+    })
     if (session === null) {
       throw redirect({ to: '/login', search: { redirect: location.pathname } })
     }
+    const { activateOfflineAccount } = await import('../lib/offline-account')
+    await activateOfflineAccount(context.queryClient, session.user.id)
+    return { invitationOwner: captureOfflineOwner() }
   },
-  loader: async ({ params }) => {
+  loader: async ({ params, context }) => {
+    context.invitationOwner.assertCurrent()
     const result = await authClient.organization.getInvitation({
       query: { id: params.invitationId },
     })
+    context.invitationOwner.assertCurrent()
     if (result.error !== null) {
       throw new ApiRequestError(
         '/api/auth/organization/get-invitation',
@@ -54,6 +71,8 @@ function InvitationUnavailable({ error }: ErrorComponentProps) {
 function AcceptInvitationPage() {
   const { t } = useTranslation()
   const invitation = Route.useLoaderData()
+  const { invitationOwner } = Route.useRouteContext()
+  const currentAccount = useSyncExternalStore(subscribeAccount, currentOfflineUser)
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -63,25 +82,43 @@ function AcceptInvitationPage() {
   async function respond(decision: 'accept' | 'reject') {
     setIsPending(decision)
     setServerError(null)
-    const result =
-      decision === 'accept'
-        ? await authClient.organization.acceptInvitation({ invitationId: invitation.id })
-        : await authClient.organization.rejectInvitation({ invitationId: invitation.id })
-    setIsPending(null)
-    const failure = describeAuthError(result.error)
-    if (failure !== null) {
-      setServerError(failure)
-      return
+    try {
+      invitationOwner.assertCurrent()
+      const result =
+        decision === 'accept'
+          ? await authClient.organization.acceptInvitation({ invitationId: invitation.id })
+          : await authClient.organization.rejectInvitation({ invitationId: invitation.id })
+      invitationOwner.assertCurrent()
+      const failure = describeAuthError(result.error)
+      if (failure !== null) {
+        setServerError(failure)
+        return
+      }
+      if (decision === 'accept') {
+        const active = await authClient.organization.setActive({
+          organizationId: invitation.organizationId,
+        })
+        invitationOwner.assertCurrent()
+        const activeFailure = describeAuthError(active.error)
+        if (activeFailure !== null) {
+          setServerError(activeFailure)
+          return
+        }
+      }
+      await queryClient.invalidateQueries()
+      invitationOwner.assertCurrent()
+      resetShellQueries(queryClient)
+      await router.invalidate()
+      invitationOwner.assertCurrent()
+      await navigate({ to: decision === 'accept' ? '/app/members' : '/app' })
+    } catch (error) {
+      setServerError(describeError(error))
+    } finally {
+      setIsPending(null)
     }
-    if (decision === 'accept') {
-      await authClient.organization.setActive({ organizationId: invitation.organizationId })
-    }
-    await queryClient.invalidateQueries()
-    resetShellQueries(queryClient)
-    await router.invalidate()
-    await navigate({ to: decision === 'accept' ? '/app/members' : '/app' })
   }
 
+  if (currentAccount !== invitationOwner.userId) return null
   return (
     <AuthLayout
       title={t('auth.acceptInvitation.title', { organizationName: invitation.organizationName })}

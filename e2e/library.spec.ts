@@ -10,6 +10,7 @@ import {
   createWorkspace,
   expect,
   expectAccessible,
+  expectActiveWorkspace,
   gotoRetrying,
   latestLinkFor,
   navigateTo,
@@ -18,6 +19,7 @@ import {
   signUpAndVerify,
   test,
 } from './support'
+import { DEFAULT_TEXT_SPEC } from '../src/shared/watermark'
 
 const runId = Date.now().toString(36)
 const owner = {
@@ -45,6 +47,44 @@ async function expectPreviewRendered(page: Page) {
 
 test.describe.configure({ mode: 'serial' })
 
+test('saves multiple QR codes and a licensed sticker for reuse', async ({ page, request }) => {
+  await createWorkspace(
+    page,
+    request,
+    { ...owner, email: `creative-${runId}@example.test` },
+    `Creative ${runId}`,
+  )
+  await navigateTo(page, 'Library')
+  for (const [name, content] of [
+    ['Portfolio QR', 'https://example.com/portfolio'],
+    ['Contact QR', 'https://example.com/contact'],
+  ] as const) {
+    await page.getByRole('link', { name: 'New QR code' }).click()
+    await page.getByLabel('Preset name').fill(name)
+    await page.getByLabel('QR code content').fill(content)
+    await expectPreviewRendered(page)
+    await expectAccessible(page)
+    await page.getByRole('button', { name: 'Save preset' }).click()
+    await expect(page.getByRole('link', { name: name, exact: true })).toBeVisible()
+  }
+  await page.getByRole('link', { name: 'New preset' }).click()
+  await page.getByRole('tab', { name: 'Symbol' }).click()
+  await page.getByRole('searchbox', { name: 'Search stickers' }).fill('camera')
+  await page.getByRole('button', { name: 'Choose Camera', exact: true }).click()
+  await expectPreviewRendered(page)
+  await expectAccessible(page)
+  await page.getByLabel('Preset name').fill('Camera sticker')
+  await page.getByRole('button', { name: 'Save preset' }).click()
+  await page.getByRole('checkbox', { name: 'QR codes only' }).check()
+  await expect(page.getByRole('link', { name: 'Portfolio QR', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Contact QR', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Camera sticker', exact: true })).toHaveCount(0)
+  await page.getByRole('link', { name: 'Portfolio QR', exact: true }).click()
+  await expect(page.getByLabel('QR code content')).toHaveValue('https://example.com/portfolio')
+  await expect(page.getByLabel('QR code content')).not.toHaveValue('https://example.com/contact')
+  await expectPreviewRendered(page)
+})
+
 test('owner designs, saves, edits and deletes presets', async ({ page, request }) => {
   await createWorkspace(page, request, owner, organizationName)
 
@@ -60,7 +100,8 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await expectAccessible(page)
 
   await page.getByRole('textbox', { name: 'Text' }).fill(`© ${organizationName}`)
-  await page.getByLabel('Font').selectOption('Pacifico')
+  await page.getByRole('combobox', { name: 'Font', exact: true }).selectOption('Pacifico')
+  await expect(page.getByRole('combobox', { name: 'Font', exact: true })).toHaveValue('Pacifico')
   await page.getByRole('tab', { name: 'Placement' }).click()
   await page.getByRole('radio', { name: 'Corner' }).click()
   await page.getByRole('button', { name: 'Bottom left' }).click()
@@ -132,6 +173,9 @@ test('a viewer can browse presets but cannot change them', async ({ browser, pag
   // commit-wait navigation (see gotoRetrying).
   await gotoRetrying(viewerPage, acceptPath)
   await viewerPage.getByRole('button', { name: 'Accept invitation' }).click()
+  await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Members')
+  const joined = await expectActiveWorkspace(viewerPage, viewer, organizationName)
+  expect(joined.member.role).toBe('viewer')
   await navigateTo(viewerPage, 'Library')
   await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
   await expect(viewerPage.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
@@ -145,14 +189,12 @@ test('a viewer can browse presets but cannot change them', async ({ browser, pag
   await expectPreviewRendered(viewerPage)
   await expectAccessible(viewerPage)
 
-  const session = await viewerContext.request.get('/api/auth/get-session')
-  const { session: active } = (await session.json()) as {
-    session: { activeOrganizationId: string }
-  }
-  const orgId = active.activeOrganizationId
-  const forbidden = await viewerContext.request.post(`/api/orgs/${orgId}/watermarks`, {
-    data: { name: 'Nope', spec: {} },
-  })
+  const forbidden = await viewerContext.request.post(
+    `/api/orgs/${joined.organization.id}/watermarks`,
+    {
+      data: { name: 'Viewer cannot create this preset', spec: DEFAULT_TEXT_SPEC },
+    },
+  )
   expect(forbidden.status()).toBe(403)
   await viewerContext.close()
 })

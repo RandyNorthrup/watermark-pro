@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
+import { ACCOUNT_ID_HEADER } from '../shared/account-identity'
 import {
   photoDeleteResponseSchema,
   photoDtoSchema,
@@ -18,6 +19,8 @@ import {
   MAX_STORAGE_BYTES_PER_ORGANIZATION,
   PHOTO_PAGE_SIZE,
 } from '../shared/constants'
+import { shellSessionSchema } from '../shared/shell-cache'
+import { SYNC_OPERATION_HEADER } from '../shared/sync'
 import { DEFAULT_TEXT_SPEC } from '../shared/watermark'
 
 const owner = {
@@ -38,6 +41,7 @@ const GIF_BYTES = new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0, 0, 0, 0
 let harness: TestHarness
 let ownerClient: TestClient
 let organizationId: string
+let ownerId: string
 
 function base(path = ''): string {
   return `/api/orgs/${organizationId}${path}`
@@ -78,9 +82,34 @@ beforeEach(async () => {
     name: 'Gallery Studio',
     slug: 'gallery-studio',
   }))
+  const session = await ownerClient.get('/api/auth/get-session')
+  ownerId = shellSessionSchema.parse(await session.json()).user.id
 })
 
 describe('photo storage', () => {
+  it('replays the same photo once and refuses different bytes under the same operation', async () => {
+    const id = crypto.randomUUID()
+    const save = (bytes: Uint8Array) =>
+      ownerClient.request(base('/photos'), {
+        method: 'POST',
+        headers: { [SYNC_OPERATION_HEADER]: id, [ACCOUNT_ID_HEADER]: ownerId },
+        body: photoForm('Offline photo', bytes),
+      })
+    const first = await save(PNG_BYTES)
+    expect(first.status).toBe(HTTP_STATUS.created)
+    const repeated = await save(PNG_BYTES)
+    expect(repeated.status).toBe(HTTP_STATUS.ok)
+    const dto = photoDtoSchema.parse(await repeated.json())
+    expect(dto.id).toBe(id)
+    const mismatched = await save(JPEG_BYTES)
+    expect(mismatched.status).toBe(HTTP_STATUS.conflict)
+    const listed = await ownerClient.get(base('/photos'))
+    expect(photoListResponseSchema.parse(await listed.json()).photos).toHaveLength(1)
+    const downloaded = await ownerClient.get(base(`/photos/${id}/file`))
+    expect(new Uint8Array(await downloaded.arrayBuffer())).toEqual(PNG_BYTES)
+    const entries = await harness.audit.listForOrganization(organizationId)
+    expect(entries.filter((entry) => entry.action === 'photo.uploaded')).toHaveLength(1)
+  })
   it('uploads a photo with its thumbnail, records the preset, serves both, and audits', async () => {
     const preset = await ownerClient.post(base('/watermarks'), {
       name: 'Studio mark',
@@ -98,15 +127,19 @@ describe('photo storage', () => {
       presetName: 'Studio mark',
     })
     expect(harness.objects.keys().toSorted((a, b) => a.localeCompare(b))).toEqual([
-      `org/${organizationId}/photos/${photo.id}`,
-      `org/${organizationId}/thumbnails/${photo.id}`,
+      expect.stringMatching(
+        new RegExp(`^org/${organizationId}/photos/${photo.id}/[a-f0-9-]{36}/[a-f0-9]{64}$`),
+      ),
+      expect.stringMatching(
+        new RegExp(`^org/${organizationId}/thumbnails/${photo.id}/[a-f0-9-]{36}/[a-f0-9]{64}$`),
+      ),
     ])
 
     const file = await ownerClient.get(base(`/photos/${photo.id}/file`))
     expect(file.status).toBe(HTTP_STATUS.ok)
     expect(file.headers.get('content-type')).toBe('image/png')
-    expect(file.headers.get('cache-control')).toContain('private')
-    expect(file.headers.get('content-disposition')).toBe('inline; filename="Beach"')
+    expect(file.headers.get('cache-control')).toBe('private, no-store')
+    expect(file.headers.get('content-disposition')).toBe("inline; filename*=UTF-8''Beach")
     expect(new Uint8Array(await file.arrayBuffer())).toEqual(PNG_BYTES)
 
     const thumbnail = await ownerClient.get(base(`/photos/${photo.id}/thumbnail`))
@@ -121,7 +154,7 @@ describe('photo storage', () => {
     const usage = await ownerClient.get(base('/photos/usage'))
     expect(storageUsageSchema.parse(await usage.json())).toEqual({
       count: 1,
-      bytes: PNG_BYTES.byteLength,
+      bytes: PNG_BYTES.byteLength + JPEG_BYTES.byteLength,
       maxCount: MAX_PHOTOS_PER_ORGANIZATION,
       maxBytes: MAX_STORAGE_BYTES_PER_ORGANIZATION,
     })
@@ -264,8 +297,12 @@ describe('photo storage', () => {
     expect(response.status).toBe(HTTP_STATUS.ok)
     expect(photoDeleteResponseSchema.parse(await response.json())).toEqual({ deleted: 2 })
     expect(harness.objects.keys().toSorted((a, b) => a.localeCompare(b))).toEqual([
-      `org/${organizationId}/photos/${three.id}`,
-      `org/${organizationId}/thumbnails/${three.id}`,
+      expect.stringMatching(
+        new RegExp(`^org/${organizationId}/photos/${three.id}/[a-f0-9-]{36}/[a-f0-9]{64}$`),
+      ),
+      expect.stringMatching(
+        new RegExp(`^org/${organizationId}/thumbnails/${three.id}/[a-f0-9-]{36}/[a-f0-9]{64}$`),
+      ),
     ])
     const gone = await ownerClient.get(base(`/photos/${one.id}/file`))
     expect(gone.status).toBe(HTTP_STATUS.notFound)

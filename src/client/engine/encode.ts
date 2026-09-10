@@ -14,7 +14,7 @@ export const METADATA_POLICIES = ['strip', 'keep-except-location', 'keep'] as co
 export type MetadataPolicy = (typeof METADATA_POLICIES)[number]
 export const DEFAULT_METADATA_POLICY: MetadataPolicy = 'strip'
 
-/** Whether a format can carry the keep policies; WebP cannot (always stripped). */
+/** Whether the application supports keeping source photo metadata in this format. */
 export function canCarryMetadata(format: OutputFormat): boolean {
   return format !== 'image/webp'
 }

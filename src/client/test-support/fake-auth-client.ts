@@ -198,7 +198,7 @@ export function createFakeAuthClient() {
           ? fail('No active organization', 'NO_ACTIVE_ORGANIZATION')
           : ok({ role: member.role })
       }),
-      setActive: vi.fn((input: { organizationId: string }) => {
+      setActive: vi.fn((input: { organizationId: string | null }) => {
         state.activeOrganizationId = input.organizationId
         return ok(activeOrganization())
       }),

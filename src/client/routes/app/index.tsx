@@ -2,9 +2,10 @@ import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
 import { Images, Layers, PencilRuler, ScrollText, Stamp, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { RecentWork } from '../../components/recent-work/recent-work'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
-import { activeMemberRoleQueryOptions } from '../../lib/queries'
+import { readActiveMemberRole } from '../../lib/queries'
 
 const appRoute = getRouteApi('/app')
 
@@ -36,7 +37,7 @@ const TOOLS = [
 ] as const
 
 export const Route = createFileRoute('/app/')({
-  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: DashboardPage,
 })
 
@@ -64,6 +65,13 @@ function DashboardPage() {
           </p>
         )}
       </header>
+      {organization === null ? null : (
+        <RecentWork
+          organizationId={organization.id}
+          organizationName={organization.name}
+          role={membership?.role}
+        />
+      )}
       <section aria-labelledby="tools-heading" className="flex flex-col gap-3">
         <h2 id="tools-heading" className="text-xl font-semibold tracking-tight">
           {t('dashboard.toolsHeading')}

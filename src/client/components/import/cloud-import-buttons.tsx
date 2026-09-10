@@ -11,6 +11,7 @@ import {
   PROVIDER_LABELS,
   type CloudProviderId,
 } from '../../lib/imports/source'
+import { captureOfflineOwner } from '../../lib/offline-context'
 import { Button } from '../ui/button'
 
 interface CloudImportButtonsProps {
@@ -55,13 +56,20 @@ export function CloudImportButtons({
     provider: CloudProviderId,
     pick: (config: PublicConfig) => Promise<File[]>,
   ) {
+    const owner = captureOfflineOwner()
     setPending(provider)
     try {
       const files = await pick(config)
+      owner.assertCurrent()
       if (files.length > 0) {
         onImport(files)
       }
     } catch (error) {
+      try {
+        owner.assertCurrent()
+      } catch {
+        return
+      }
       onError(describeError(error))
     } finally {
       setPending(null)

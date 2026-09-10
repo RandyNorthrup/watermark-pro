@@ -7,11 +7,13 @@
 import { z } from 'zod'
 
 import { presetNameSchema } from './api'
+import { presetVersionSchema } from './sync'
 import { watermarkSpecSchema } from './watermark'
 
 export const saveWatermarkRequestSchema = z.object({
   name: presetNameSchema,
   spec: watermarkSpecSchema,
+  expectedUpdatedAt: presetVersionSchema.optional(),
 })
 
 export type SaveWatermarkRequest = z.infer<typeof saveWatermarkRequestSchema>

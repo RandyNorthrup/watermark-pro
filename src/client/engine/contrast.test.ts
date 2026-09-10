@@ -34,7 +34,7 @@ describe('resolveContrast', () => {
 
 describe('qrMatrix', () => {
   it('encodes content into a square with the three finder patterns', () => {
-    const matrix = qrMatrix('https://watermark.blowmoney.net/share/abc')
+    const matrix = qrMatrix('https://lumafoil.com/share/abc')
     // Versions are 21 modules plus four per step.
     expect((matrix.size - 21) % 4).toBe(0)
     expect(matrix.size).toBeGreaterThanOrEqual(21)

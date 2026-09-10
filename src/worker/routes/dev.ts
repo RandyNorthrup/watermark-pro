@@ -12,8 +12,8 @@ import { apiErrors } from '../errors'
  *
  * `GET /dev/mailbox` exposes the console provider's captured messages so
  * end-to-end tests can follow verification and invitation links.
- * `POST /dev/promote` grants the platform admin role to an account, the
- * operation the runbook prescribes as a D1 update in production. The
+ * `POST /dev/promote` establishes the single initial administrator in a
+ * disposable test database. It refuses a second administrator. The
  * end-to-end suite and the audit scripts use it instead of running
  * `wrangler d1 execute` against the preview's database while the preview
  * is serving, which the local SQLite file does not survive under load.

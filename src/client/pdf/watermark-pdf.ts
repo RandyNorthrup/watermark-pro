@@ -11,9 +11,8 @@
  * `PDF_PRODUCER`, and `ModDate`, refreshed; encrypted documents are refused and
  * a document over the page cap is rejected before any drawing.
  */
-import { PDFDocument } from 'pdf-lib'
-
 import { distinctPageSizes, type PageSize, sizeKey } from './raster-layout'
+import { ARTWORK_NOTICE_FILE } from '../../shared/asset-licenses'
 import { MAX_PDF_PAGES, PDF_PRODUCER } from '../../shared/constants'
 
 /** A document that cannot be watermarked without its password first being removed. */
@@ -36,7 +35,9 @@ export type RasteriseForSize = (size: PageSize) => Promise<Uint8Array>
 export async function watermarkPdf(
   input: Uint8Array,
   rasterise: RasteriseForSize,
+  assetNotice: string | null = null,
 ): Promise<Uint8Array> {
+  const { PDFDocument } = await import('pdf-lib')
   // Keep the existing Info dictionary: `updateMetadata` would overwrite
   // Producer and ModDate on load, and we set exactly those two ourselves.
   // `ignoreEncryption` lets an encrypted document load far enough to be
@@ -70,6 +71,16 @@ export async function watermarkPdf(
   }
 
   document.setProducer(PDF_PRODUCER)
+  if (assetNotice !== null) {
+    await document.attach(
+      Uint8Array.from(new TextEncoder().encode(assetNotice)),
+      ARTWORK_NOTICE_FILE,
+      {
+        mimeType: 'text/plain',
+        description: 'Licences for bundled artwork only; original document rights are unchanged.',
+      },
+    )
+  }
   document.setModificationDate(new Date())
   return await document.save()
 }

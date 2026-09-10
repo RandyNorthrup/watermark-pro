@@ -60,7 +60,7 @@ describe('bot protection', () => {
   it('holds sign-up until the challenge is solved and sends the token', async () => {
     const user = userEvent.setup()
     stubConfig('site-key')
-    renderApp('/signup')
+    renderApp('/signup?invitation=captcha-invite')
     const solve = await screen.findByRole('button', { name: 'Solve bot check' })
     expect(screen.getByRole('button', { name: 'Create account' })).toBeDisabled()
     await user.type(screen.getByLabelText('Name'), 'New Person')
@@ -73,7 +73,10 @@ describe('bot protection', () => {
     await user.click(screen.getByRole('button', { name: 'Create account' }))
     await waitFor(() =>
       expect(client().signUp.email).toHaveBeenCalledWith(expect.anything(), {
-        headers: { 'x-captcha-response': 'token-for-site-key' },
+        headers: {
+          'x-captcha-response': 'token-for-site-key',
+          'x-lumafoil-invitation': 'captcha-invite',
+        },
       }),
     )
   })
@@ -96,7 +99,7 @@ describe('bot protection', () => {
 
   it('shows no challenge when the deployment has no Turnstile keys', async () => {
     stubConfig(null)
-    renderApp('/signup')
+    renderApp('/signup?invitation=captcha-invite')
     await screen.findByLabelText('Name')
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Create account' })).toBeEnabled(),

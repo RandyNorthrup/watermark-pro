@@ -5,9 +5,10 @@ import { expect, test } from './support'
 test('landing page renders and has no accessibility violations', async ({ page }) => {
   await page.goto('/')
 
-  await expect(page).toHaveTitle(/Watermark Pro/)
+  await expect(page).toHaveTitle(/Lumafoil/)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Create your workspace' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Sign in' }).first()).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Create your workspace' })).toHaveCount(0)
 
   const results = await new AxeBuilder({ page }).analyze()
   expect(results.violations).toEqual([])

@@ -10,8 +10,8 @@ import type { BulkJobInput, BulkResult, BulkSettings } from '../../bulk/processo
 import { JobQueue, type QueueSnapshot } from '../../bulk/queue'
 import { type BulkRuntime, createBulkRuntime } from '../../bulk/runtime'
 import type { EditorDocument } from '../../editor/state'
-import { apiRequest } from '../../lib/api'
 import { assetFileUrl } from '../../lib/library'
+import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { readPhotoMetadata } from '../../lib/photo-metadata'
 
 export type BulkSnapshot = QueueSnapshot<BulkJobInput, BulkResult>
@@ -59,8 +59,7 @@ export function useBulkQueue(organizationId: string) {
 
   useEffect(() => {
     const runtime = createBulkRuntime(async (assetId) => {
-      const response = await apiRequest(assetFileUrl(organizationId, assetId))
-      return await response.blob()
+      return await loadWorkspaceMedia(organizationId, assetFileUrl(organizationId, assetId))
     })
     const queue = new JobQueue<BulkJobInput, BulkResult>({
       concurrency: runtime.workers,

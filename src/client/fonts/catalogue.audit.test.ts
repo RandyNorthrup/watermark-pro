@@ -27,8 +27,23 @@ describe('bundled font packages', () => {
   it.each(FONT_CATALOGUE.map((font) => [font.family, font] as const))(
     '%s ships an open licence, the files it promises, and stays within budget',
     (_family, font) => {
+      if (font.files !== undefined) {
+        expect(['OFL-1.1', 'Apache-2.0']).toContain(font.license)
+        expect(font.licensePath).toBeDefined()
+        expect(existsSync(path.join('public', font.licensePath ?? 'missing'))).toBe(true)
+        for (const file of font.files) {
+          const location = path.join('public', file.url)
+          expect(statSync(location).size).toBeLessThanOrEqual(FONT_FILE_BUDGET_BYTES)
+          expect(readFileSync(location).subarray(0, 4).toString()).toBe('wOF2')
+        }
+        return
+      }
       const directory = path.dirname(require.resolve(`${font.packageName}/package.json`))
       expect(existsSync(path.join(directory, 'LICENSE'))).toBe(true)
+      expect(font.licensePath).toBeDefined()
+      expect(readFileSync(path.join('public', font.licensePath ?? 'missing'), 'utf8')).toBe(
+        readFileSync(path.join(directory, 'LICENSE'), 'utf8'),
+      )
       const metadata = JSON.parse(readFileSync(path.join(directory, 'metadata.json'), 'utf8')) as {
         license: { type: string }
         family: string

@@ -12,6 +12,7 @@ interface PresetGateProps {
   query: UseQueryResult<WatermarkDto[]>
   /** Completes the sentence "Create a preset in the library …". */
   emptyHint: string
+  emptyContent?: ReactNode
   children: (presets: WatermarkDto[]) => ReactNode
 }
 
@@ -19,7 +20,7 @@ interface PresetGateProps {
  * Loading, error and empty states for tools that need at least one library
  * preset; renders the children with the loaded list otherwise.
  */
-export function PresetGate({ query, emptyHint, children }: PresetGateProps) {
+export function PresetGate({ query, emptyHint, emptyContent, children }: PresetGateProps) {
   const { t } = useTranslation()
   if (query.isPending) {
     return <Spinner className="size-5" label={t('presets.loading')} />
@@ -32,6 +33,7 @@ export function PresetGate({ query, emptyHint, children }: PresetGateProps) {
     )
   }
   if (query.data.length === 0) {
+    if (emptyContent !== undefined) return emptyContent
     return (
       <Alert tone="info" title={t('presets.emptyTitle')}>
         <Link to="/app/library/new" className="font-medium underline">

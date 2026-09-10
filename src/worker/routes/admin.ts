@@ -24,6 +24,8 @@ export const adminRoutes = new Hono<AppContext>()
     const { config } = c.get('services')
     return c.json(
       publicConfigSchema.parse({
+        googleAuthEnabled: config.GOOGLE_AUTH_CLIENT_ID !== undefined,
+        microsoftAuthEnabled: config.MICROSOFT_AUTH_CLIENT_ID !== undefined,
         turnstileSiteKey: config.TURNSTILE_SITE_KEY ?? null,
         googleOAuthClientId: config.GOOGLE_OAUTH_CLIENT_ID ?? null,
         googlePickerApiKey: config.GOOGLE_PICKER_API_KEY ?? null,
@@ -35,10 +37,10 @@ export const adminRoutes = new Hono<AppContext>()
     )
   })
   .get('/admin/organizations', requireSession, requirePlatformAdmin, async (c) => {
-    const { organizations, photos } = c.get('services')
+    const { organizations, uploads } = c.get('services')
     const [summaries, usage] = await Promise.all([
       organizations.listSummaries(),
-      photos.usageByOrganization(),
+      uploads.usageByOrganization(),
     ])
     return c.json(
       adminOrganizationListSchema.parse({

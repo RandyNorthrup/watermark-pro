@@ -106,6 +106,9 @@ export default defineEslintConfig(
       '.claude/**',
       'playwright-report/**',
       'test-results/**',
+      // Disposable gate databases, scanner mirrors and red-drill checkout copies.
+      // Publication policy rejects this entire directory; canonical code stays outside it.
+      'temp/**',
       'worker-configuration.d.ts',
       'src/client/routeTree.gen.ts',
     ],
@@ -308,7 +311,7 @@ export default defineEslintConfig(
           words: {
             // The brand name is the one allowed word; the middot is a decorative
             // separator (always in an aria-hidden span), not translatable text.
-            exclude: ['Watermark Pro', '·'],
+            exclude: ['Lumafoil', '·'],
           },
         },
       ],

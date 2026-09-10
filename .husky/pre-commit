@@ -1,7 +1,9 @@
-# Secrets never reach a commit: scan the staged diff before anything else.
-gitleaks git --pre-commit --staged --redact --no-banner
 # Format and lint only what is staged; the full gate set runs in CI.
-# lint-staged's Windows default (8191) counts only the file arguments; the
-# .cmd shim that launches each tool adds its own prefix, so a milestone-sized
-# commit overflowed cmd.exe. Half the limit keeps every chunk safe.
-npx lint-staged --max-arg-length=4000
+# Direct Node CLI entries avoid cmd.exe's 8191-character limit. This budget
+# leaves room for executable paths and quoted filenames below Windows' native
+# 32767-character limit, with fewer repeated type-aware ESLint startups.
+node node_modules/lint-staged/bin/lint-staged.js --max-arg-length=28000
+
+# Inspect the final index after lint-staged, plus working candidates, reachable
+# history, bounded ZIP contents and locally configured private values.
+node scripts/publication-scan.mjs

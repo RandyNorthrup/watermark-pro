@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 
 import { BulkTool } from '../../components/bulk/bulk-tool'
 import { Alert } from '../../components/ui/alert'
-import { activeMemberRoleQueryOptions } from '../../lib/queries'
+import { readActiveMemberRole } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
 
 const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/bulk')({
-  loader: async ({ context }) => await context.queryClient.query(activeMemberRoleQueryOptions),
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: BulkPage,
 })
 

@@ -1,0 +1,29 @@
+{
+  "mode": "diagnostic",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.77,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1237.1606,
+        "lcp": 4790.7045,
+        "cls": 0.00001760914484101436,
+        "tbt": 280.99999999999955
+      }
+    }
+  ],
+  "scores": {
+    "performance": 0.77,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1237.1606,
+    "lcp": 4790.7045,
+    "cls": 0.00001760914484101436,
+    "tbt": 280.99999999999955
+  }
+}

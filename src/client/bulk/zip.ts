@@ -6,9 +6,12 @@
  */
 import { Zip, ZipPassThrough } from 'fflate'
 
+import { ARTWORK_NOTICE_FILE } from '../../shared/asset-licenses'
+
 export interface ZipEntry {
   name: string
   blob: Blob
+  assetNotice?: string | undefined
 }
 
 /** Stops a duplicate name from silently overwriting an earlier entry. */
@@ -49,8 +52,23 @@ export async function zipEntries(entries: readonly ZipEntry[]): Promise<Blob> {
 }
 
 async function appendAll(zip: Zip, entries: readonly ZipEntry[]): Promise<void> {
-  const names = uniqueNames(entries.map((entry) => entry.name))
-  for (const [index, entry] of entries.entries()) {
+  const notices = [
+    ...new Set(
+      entries.flatMap((entry) => (entry.assetNotice === undefined ? [] : [entry.assetNotice])),
+    ),
+  ]
+  const complete =
+    notices.length === 0
+      ? entries
+      : [
+          ...entries,
+          {
+            name: ARTWORK_NOTICE_FILE,
+            blob: new Blob([notices.join('\n\n')], { type: 'text/plain' }),
+          },
+        ]
+  const names = uniqueNames(complete.map((entry) => entry.name))
+  for (const [index, entry] of complete.entries()) {
     const file = new ZipPassThrough(names[index] ?? entry.name)
     file.mtime = new Date()
     zip.add(file)

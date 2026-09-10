@@ -9,16 +9,26 @@
  */
 import type { BetterAuthOptions } from 'better-auth'
 import type { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { createAuthMiddleware } from 'better-auth/api'
+import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { captcha } from 'better-auth/plugins'
 import { admin } from 'better-auth/plugins/admin'
 import { organization } from 'better-auth/plugins/organization'
 import { z } from 'zod'
 
+import type { AccountStore } from '../account-store'
+import {
+  acceptSiteAdmission,
+  invitationAdmission,
+  validateAccountAdmission,
+} from './invitation-admission'
+import { authenticationLogger } from './logger'
+import { accountSocialProviders, type AccountOAuthConfiguration } from './social-providers'
 import {
   APP_NAME,
+  AUTH_COOKIE_PREFIX,
   AUTH_RATE_LIMIT,
   INVITATION_TTL_SECONDS,
+  OAUTH_STATE_TTL_SECONDS,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   SESSION_EXPIRES_IN_SECONDS,
@@ -27,6 +37,7 @@ import {
 } from '../../shared/constants'
 import { LOCALE_CODES } from '../../shared/locales'
 import { accessControl, roles } from '../../shared/permissions'
+import { newOrganizationSchema } from '../../shared/validation'
 import type { AuditStore } from '../audit'
 import type { RateLimitStorage } from './rate-limit'
 import { invitationEmail, resetPasswordEmail, verificationEmail } from './templates'
@@ -54,9 +65,12 @@ const ADMIN_AUDIT_ACTIONS: Record<string, string> = {
 
 export interface AuthDependencies {
   /** Better Auth database adapter: drizzle over D1 in production, memory in Node tests. */
+  accountOAuth?: AccountOAuthConfiguration | undefined
+  accounts: AccountStore
+  hasWorkspaceContent: (organizationId: string) => Promise<boolean>
   database: DatabaseAdapter
   secret: string
-  /** Public origin, e.g. https://watermark.blowmoney.net */
+  /** Public origin, e.g. https://lumafoil.com */
   appUrl: string
   email: EmailSender
   rateLimit: RateLimitStorage
@@ -65,18 +79,47 @@ export interface AuthDependencies {
   audit: AuditStore
   /** Rate limiting is disabled only for the Node unit tests, which have no binding. */
   rateLimitEnabled: boolean
+  /** Explicit fixture bootstrap only; production always uses invitation admission. */
+  canSignUpWithoutInvitation?: boolean | undefined
 }
 
 export function buildAuthOptions(deps: AuthDependencies) {
   const appOrigin = new URL(deps.appUrl)
+  async function requireSharedWorkspace({ organization }: { organization: { id: string } }) {
+    if (await deps.accounts.isPrivateWorkspace(organization.id)) {
+      throw new APIError('FORBIDDEN', {
+        code: 'PRIVATE_WORKSPACE',
+        message: 'Personal workspaces cannot be shared. Create a separate collaboration workspace.',
+      })
+    }
+  }
   return {
     appName: APP_NAME,
+    logger: authenticationLogger,
+    // Better Call otherwise prints raw non-API errors after Better Auth's logger.
+    // Let the outer Worker error handler emit the sanitized diagnostic instead.
+    onAPIError: { throw: true },
     baseURL: deps.appUrl,
     basePath: '/api/auth',
     secret: deps.secret,
     trustedOrigins: [appOrigin.origin],
     database: deps.database,
+    socialProviders: accountSocialProviders(deps.accountOAuth),
+    account: {
+      encryptOAuthTokens: true,
+      accountLinking: {
+        enabled: true,
+        disableImplicitLinking: true,
+        trustedProviders: ['microsoft'],
+        allowDifferentEmails: false,
+        allowUnlinkingAll: false,
+      },
+    },
     user: {
+      validateUserInfo: validateAccountAdmission(
+        deps.accounts,
+        deps.canSignUpWithoutInvitation === true,
+      ),
       additionalFields: {
         // Nullable until the user picks a language; the validator rejects any
         // code outside SUPPORTED_LOCALES before it reaches the database.
@@ -101,6 +144,7 @@ export function buildAuthOptions(deps: AuthDependencies) {
     },
     emailVerification: {
       sendOnSignUp: true,
+      sendOnSignIn: true,
       autoSignInAfterVerification: true,
       expiresIn: VERIFICATION_TOKEN_TTL_SECONDS,
       sendVerificationEmail: async ({ user, url }) => {
@@ -118,6 +162,8 @@ export function buildAuthOptions(deps: AuthDependencies) {
       customStorage: deps.rateLimit,
     },
     advanced: {
+      cookiePrefix: AUTH_COOKIE_PREFIX,
+      cookies: { state: { attributes: { maxAge: OAUTH_STATE_TTL_SECONDS } } },
       useSecureCookies: appOrigin.protocol === 'https:',
       defaultCookieAttributes: {
         sameSite: 'lax',
@@ -129,9 +175,24 @@ export function buildAuthOptions(deps: AuthDependencies) {
       },
     },
     databaseHooks: {
+      // Identity tokens are used during callback verification only. Better Auth's
+      // encryptOAuthTokens protects access/refresh tokens but does not transform
+      // every idToken write path, so do not persist identity-token claims at all.
+      account: {
+        create: { before: (account) => Promise.resolve({ data: { ...account, idToken: null } }) },
+        update: { before: (account) => Promise.resolve({ data: { ...account, idToken: null } }) },
+      },
       user: {
-        create: {
+        update: {
           after: async (user) => {
+            if ('banned' in user && user['banned'] === true)
+              await deps.accounts.revokePendingAdmissions(user.id)
+          },
+        },
+        create: {
+          before: (user) => Promise.resolve({ data: { ...user, image: null } }),
+          after: async (user, context) => {
+            await acceptSiteAdmission(deps.accounts, context?.headers, user)
             await deps.audit.append({
               actorUserId: user.id,
               actorName: user.name,
@@ -158,6 +219,30 @@ export function buildAuthOptions(deps: AuthDependencies) {
           )
         },
         organizationHooks: {
+          beforeCreateOrganization: ({ organization }) => {
+            const parsed = newOrganizationSchema.safeParse(organization)
+            if (!parsed.success || parsed.data.slug.startsWith('personal-')) {
+              throw new APIError('BAD_REQUEST', {
+                code: 'INVALID_WORKSPACE',
+                message: 'Use a valid workspace name and a non-reserved slug.',
+              })
+            }
+            return Promise.resolve()
+          },
+          beforeAddMember: requireSharedWorkspace,
+          beforeRemoveMember: requireSharedWorkspace,
+          beforeUpdateMemberRole: requireSharedWorkspace,
+          beforeCreateInvitation: requireSharedWorkspace,
+          beforeAcceptInvitation: requireSharedWorkspace,
+          beforeDeleteOrganization: async (data) => {
+            await requireSharedWorkspace(data)
+            if (await deps.hasWorkspaceContent(data.organization.id)) {
+              throw new APIError('CONFLICT', {
+                message:
+                  'Remove saved content and finish storage cleanup before deleting the workspace.',
+              })
+            }
+          },
           afterCreateOrganization: async ({ organization: org, user }) => {
             await deps.audit.append({
               organizationId: org.id,
@@ -263,6 +348,7 @@ export function buildAuthOptions(deps: AuthDependencies) {
           ]),
     ],
     hooks: {
+      before: invitationAdmission(deps.accounts, deps.canSignUpWithoutInvitation === true),
       // Platform-admin actions are not covered by the organization hooks; record them here.
       after: createAuthMiddleware(async (ctx) => {
         const action = ADMIN_AUDIT_ACTIONS[ctx.path]

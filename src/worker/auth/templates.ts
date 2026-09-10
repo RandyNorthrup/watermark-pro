@@ -20,7 +20,7 @@ function layout(title: string, body: string, actionUrl: string, actionLabel: str
   return `<!doctype html><html lang="en"><body style="font-family:system-ui,sans-serif;line-height:1.5;color:#1f2937;padding:24px">
 <h1 style="font-size:20px">${escapeHtml(title)}</h1>
 <p>${escapeHtml(body)}</p>
-<p><a href="${safeUrl}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px">${escapeHtml(actionLabel)}</a></p>
+<p><a href="${safeUrl}" style="display:inline-block;background:#a94965;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px">${escapeHtml(actionLabel)}</a></p>
 <p style="color:#6b7280;font-size:13px">If the button does not work, copy this link:<br>${safeUrl}</p>
 <p style="color:#6b7280;font-size:13px">${escapeHtml(APP_NAME)}</p>
 </body></html>`
@@ -70,5 +70,16 @@ export function invitationEmail(
       url,
       'Accept invitation',
     ),
+  }
+}
+
+/** Account admission email: it explicitly promises no membership or content access. */
+export function siteInvitationEmail(to: string, inviterName: string, url: string): EmailMessage {
+  const body = `${inviterName} invited you to ${APP_NAME}. Create your own private account and workspace. This invitation does not give either of you access to the other's photos or presets. The invitation expires in seven days.`
+  return {
+    to,
+    subject: `${inviterName} invited you to ${APP_NAME}`,
+    text: `${body}\n\n${url}`,
+    html: layout(`You're invited to ${APP_NAME}`, body, url, 'Create your account'),
   }
 }

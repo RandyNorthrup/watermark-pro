@@ -13,7 +13,7 @@ export function DropdownMenuContent({ className, ...props }: ComponentProps<type
         sideOffset={6}
         align="end"
         className={cn(
-          'z-50 min-w-48 rounded-lg border border-line bg-surface-raised p-1 text-sm shadow-card',
+          'glass-popover z-50 min-w-48 rounded-xl border border-line bg-surface-raised p-1 text-sm shadow-card',
           className,
         )}
         {...props}

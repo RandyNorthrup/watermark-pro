@@ -6,9 +6,9 @@
  * frame so the mark never jumps. Cancellation resolves with a `CancelledError`,
  * releases the encoder, and closes every decoded frame — no dangling frames.
  *
- * Browser-bound (WebCodecs + mediabunny + OffscreenCanvas) and runs inside the
- * Web Worker, so it is coverage-excluded; its pure arithmetic lives in
- * `plan.ts`. It matches the proven M17.0 spike pipeline exactly.
+ * Runs inside the Web Worker in production. Native browser tests call this
+ * same WebCodecs/mediabunny/OffscreenCanvas pipeline directly, with V8 coverage;
+ * the separate worker entry is verified through its message boundary.
  */
 import {
   ALL_FORMATS,
@@ -31,6 +31,7 @@ import type { InputAudioTrack, InputVideoTrack, OutputFormat } from 'mediabunny'
 import { CancelledError } from './errors'
 import { context2d } from './frame'
 import type { AudioPlan, TranscodePlan, VideoContainer } from './plan'
+import { artworkLicenseNotice } from '../../shared/asset-licenses'
 import type { LuminanceMap } from '../engine/analysis'
 import type { Size } from '../engine/layout'
 import { analysePixels, composeMark } from '../engine/pipeline'
@@ -171,6 +172,8 @@ export async function transcodeVideo(
   const canvas = new OffscreenCanvas(width, height)
   const ctx = context2d(canvas)
   const output = new Output({ format: outputFormatFor(plan.container), target: new BufferTarget() })
+  const assetNotice = artworkLicenseNotice(marks.map((mark) => mark.spec))
+  if (assetNotice !== null) output.setMetadataTags({ comment: assetNotice })
   const videoSource = new CanvasSource(canvas, {
     codec: plan.videoCodec,
     quality: new Quality({ bitrate: plan.bitrate }),

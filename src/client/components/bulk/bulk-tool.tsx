@@ -58,11 +58,12 @@ import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { PROVIDER_LABELS } from '../../lib/imports/source'
-import { takeLaunchFiles } from '../../lib/launch-files'
+import { subscribeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
+import { captureOfflineOwner } from '../../lib/offline-context'
 import { publicConfigQueryOptions } from '../../lib/queries'
 import { canShareFiles, shareFile } from '../../lib/share-file'
-import { clearSharedFiles, readSharedFiles } from '../../lib/shared-files'
+import { consumeSharedFiles } from '../../lib/shared-files'
 import { baseName } from '../../lib/spec-tokens'
 import { AdjustPanel } from '../editor/adjust-panel'
 import { FORMAT_OPTIONS } from '../editor/formats'
@@ -214,19 +215,44 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   useEffect(() => {
     folderInputRef.current?.setAttribute('webkitdirectory', '')
   }, [])
-  // Consume photos shared to the app (Android share target) or opened through
-  // the OS (installed-PWA file handling), once, when the bulk page mounts.
+  // OS launches also arrive while this route is already open. They must not
+  // wait for the separate, transactional Android share-target inbox.
+  useEffect(
+    () =>
+      subscribeLaunchFiles('/app/bulk', (incoming) => {
+        const scan = collectImages(incoming)
+        setFiles((previous) => dedupe(previous, scan.files))
+      }),
+    [],
+  )
+  // Consume the account-bound Android share-target inbox once on mount.
   useEffect(() => {
+    const owner = captureOfflineOwner()
+    let isDisposed = false
+    const assertCurrent = () => {
+      owner.assertCurrent()
+      if (isDisposed) throw new Error('The shared-file destination was closed.')
+    }
     void (async () => {
-      const shared = await readSharedFiles()
-      await clearSharedFiles()
-      const incoming = [...shared, ...takeLaunchFiles()]
-      if (incoming.length === 0) {
+      const shared = await consumeSharedFiles(owner.userId, assertCurrent)
+      assertCurrent()
+      if (shared.length === 0) {
         return
       }
-      const scan = collectImages(incoming)
+      const scan = collectImages(shared)
       setFiles((previous) => dedupe(previous, scan.files))
-    })()
+    })().catch((error: unknown) => {
+      if (isDisposed) return
+      try {
+        owner.assertCurrent()
+      } catch {
+        return
+      }
+      setImportError(describeError(error))
+    })
+    return () => {
+      isDisposed = true
+    }
   }, [])
   /** Chosen presets in the order they were ticked, which is the order they are drawn. */
   const [presetIds, setPresetIds] = useState<string[]>([])
@@ -469,6 +495,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               {
                 name: zipPath(job.output.relativePath, job.output.fileName),
                 blob: job.output.blob,
+                assetNotice: job.output.assetNotice,
               },
             ],
       )
@@ -496,7 +523,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
       durationMs: job.durationMs,
       error: job.error,
       presets: presetNames,
-      override: false,
+      override: job.input.override !== null,
     }))
     downloadBlob(new Blob([buildReportCsv(reportRows)], { type: 'text/csv' }), 'report.csv')
   }

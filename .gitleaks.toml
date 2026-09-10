@@ -1,23 +1,18 @@
-# gitleaks configuration.
-#
-# Extends the full default ruleset (so every built-in secret pattern still
-# fires) and allowlists exactly two values: the public, restricted cloud-import
-# picker keys committed under env.production in wrangler.jsonc (M16). Both are
-# client-side identifiers deliberately served to every browser through
-# GET /api/config — not secrets:
-#   - the Google Picker API key (AIzaSy…) is restricted in Google Cloud to the
-#     Picker API and the watermark.blowmoney.net + localhost:5273 HTTP referrers;
-#   - the Dropbox app key ships inside the Dropbox Chooser <script> tag by design.
-# See PLAN.md §9 and public/_headers. The account-scoped values are matched
-# literally so no other secret of the same shape is ever allowlisted.
-title = "watermark-pro"
+# Extends every default rule. The only value-based allowlist entries are the
+# current and retired public Dropbox application identifiers used by its SDK.
+# They do not grant access to a user's files without that user's OAuth consent.
+# Google Picker keys are runtime configuration, never committed key values.
+# A revoked historical Google key is tracked by an immutable fingerprint/digest;
+# the publication gate never exempts working, staged or built credentials.
+# See docs/verification/m19/picker-key-rotation.md and PLAN.md section9.
+title = "Lumafoil"
 
 [extend]
 useDefault = true
 
 [allowlist]
-description = "Public, restricted M16 cloud-import picker keys committed in wrangler.jsonc"
+description = "Public Dropbox SDK application identifiers"
 regexes = [
-  '''AIzaSyDc5o5xSa8OiRz94fQbkQpcf6u-PZkJcfw''',
   '''s93kl2ruaou8f3p''',
+  '''n4p4sfvxnat9ccd''',
 ]

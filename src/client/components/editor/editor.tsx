@@ -13,7 +13,7 @@ import {
   Undo2,
 } from 'lucide-react'
 import { Tabs } from 'radix-ui'
-import { type DragEvent, useEffect, useReducer, useRef, useState } from 'react'
+import { type DragEvent, useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { AdjustPanel } from './adjust-panel'
@@ -66,10 +66,12 @@ import { describeError } from '../../lib/errors'
 import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
 import { readImageSize } from '../../lib/image-size'
 import type { CloudUpload } from '../../lib/imports/source'
-import { takeLaunchFiles } from '../../lib/launch-files'
+import { subscribeLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
+import { captureOfflineOwner } from '../../lib/offline-context'
 import { readPhotoMetadata } from '../../lib/photo-metadata'
 import { publicConfigQueryOptions } from '../../lib/queries'
+import { noteRecentWork } from '../../lib/recent-work-events'
 import { SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from '../../lib/sample-photo'
 import { shareFile } from '../../lib/share-file'
 import { withPlacement, withStyle } from '../../lib/spec-edit'
@@ -103,6 +105,7 @@ interface EditorProps {
   initialPresetId?: string | null | undefined
   /** Whether the current member may store photos in the gallery. */
   canSave?: boolean | undefined
+  canCreatePresets?: boolean | undefined
   /** When set, the editor runs embedded in the bulk override dialog. */
   embedded?: EmbeddedEditing | undefined
 }
@@ -193,6 +196,7 @@ export function Editor({
   organizationName,
   initialPresetId,
   canSave = false,
+  canCreatePresets = false,
   embedded,
 }: EditorProps) {
   const { t } = useTranslation()
@@ -216,6 +220,7 @@ export function Editor({
   const [cloudSaved, setCloudSaved] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const save = useMutation({
+    networkMode: 'always',
     mutationFn: async (options: EncodeOptions) => {
       const current = renderer.current
       const first = document.layers[0]
@@ -249,6 +254,13 @@ export function Editor({
     },
   })
   const inputRef = useRef<HTMLInputElement>(null)
+  const photoRequest = useRef(0)
+  useEffect(
+    () => () => {
+      photoRequest.current += 1
+    },
+    [],
+  )
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
   const displaySize = useElementSize(imageElement)
   const presets = useQuery(watermarksQueryOptions(organizationId))
@@ -311,20 +323,6 @@ export function Editor({
     }
   }, [embeddedFile, setSubject, t])
 
-  // A single photo opened through the OS (installed-PWA file handling) loads
-  // into the standalone editor once, on mount.
-  useEffect(() => {
-    if (embedded !== undefined) {
-      return
-    }
-    const [launched] = takeLaunchFiles()
-    if (launched !== undefined) {
-      void choosePhoto(launched)
-    }
-    // Runs once to drain the launch queue; choosePhoto and embedded are read once.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (!(event.ctrlKey || event.metaKey) || isEditableTarget(event.target)) {
@@ -348,30 +346,56 @@ export function Editor({
     }
   }, [])
 
-  async function choosePhoto(file: File) {
-    try {
-      const [size, metadata] = await Promise.all([readImageSize(file), readPhotoMetadata(file)])
-      setPhoto({ file, size })
-      setPhotoError(null)
-      setAspectId('free')
-      dispatch({
-        type: 'reset',
-        document: {
-          ...document,
-          orientation: IDENTITY_ORIENTATION,
-          crop: null,
-          resize: null,
-          adjust: IDENTITY_ADJUSTMENTS,
-          border: null,
-        },
-      })
-      await setSubject(file, metadata)
-    } catch {
-      setPhotoError(t('editor.notAnImage'))
-    }
-  }
+  const choosePhoto = useCallback(
+    async (file: File) => {
+      const owner = captureOfflineOwner()
+      photoRequest.current += 1
+      const request = photoRequest.current
+      const assertCurrent = () => {
+        owner.assertCurrent()
+        if (request !== photoRequest.current) throw new Error('The photo selection changed.')
+      }
+      try {
+        const [size, metadata] = await Promise.all([readImageSize(file), readPhotoMetadata(file)])
+        assertCurrent()
+        setPhoto({ file, size })
+        setPhotoError(null)
+        setAspectId('free')
+        dispatch({
+          type: 'reset',
+          document: {
+            ...document,
+            orientation: IDENTITY_ORIENTATION,
+            crop: null,
+            resize: null,
+            adjust: IDENTITY_ADJUSTMENTS,
+            border: null,
+          },
+        })
+        await setSubject(file, metadata)
+      } catch {
+        try {
+          assertCurrent()
+        } catch {
+          return
+        }
+        setPhotoError(t('editor.notAnImage'))
+      }
+    },
+    [document, setSubject, t],
+  )
+
+  // Subscribe as well as draining on mount: an installed app can receive a new
+  // OS launch while this route is already open. Embedded editors never consume it.
+  useEffect(() => {
+    if (embedded !== undefined) return
+    return subscribeLaunchFiles('/app/editor', ([launched]) => {
+      if (launched !== undefined) void choosePhoto(launched)
+    })
+  }, [choosePhoto, embedded])
 
   async function restoreSample() {
+    photoRequest.current += 1
     setPhoto(null)
     setAspectId('free')
     dispatch({
@@ -435,6 +459,7 @@ export function Editor({
     if (document.layers.length >= MAX_LAYERS) {
       return
     }
+    noteRecentWork(organizationId, { kind: 'preset', preset })
     const layer = createLayer(preset.id, preset.spec)
     commit({ layers: [...document.layers, layer] })
     setActiveLayerId(layer.id)
@@ -704,7 +729,7 @@ export function Editor({
         </div>
         <p className="text-xs text-ink-muted" aria-live="polite">
           {document.layers.length === 0
-            ? t('editor.choosePresetHint')
+            ? t(canCreatePresets ? 'editor.watermark.firstUseHint' : 'editor.choosePresetHint')
             : t('editor.outputSize', { width: outputSize.width, height: outputSize.height })}
         </p>
         {photoError === null ? null : <Alert tone="error">{photoError}</Alert>}
@@ -727,13 +752,13 @@ export function Editor({
         >
           <Tabs.List
             aria-label={t('editor.toolsLabel')}
-            className={`grid ${embedded === undefined ? 'grid-cols-5' : 'grid-cols-4'} gap-1 rounded-lg border border-line bg-surface-raised p-1`}
+            className="flex flex-wrap gap-1 rounded-lg border border-line bg-surface-raised p-1"
           >
             {visibleTools.map(({ value, label, icon: Icon }) => (
               <Tabs.Trigger
                 key={value}
                 value={value}
-                className="flex flex-col items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
+                className="flex min-w-16 flex-1 flex-col items-center gap-1 rounded-md px-2 py-2 text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
               >
                 <Icon aria-hidden="true" className="size-4" />
                 {t(label)}
@@ -743,6 +768,8 @@ export function Editor({
           <Tabs.Content value="watermark" className="outline-none">
             <WatermarkPanel
               organizationId={organizationId}
+              canCreate={canCreatePresets}
+              photo={photo?.file ?? embedded?.file}
               layers={document.layers}
               activeLayerId={activeLayer?.id ?? null}
               onAddPreset={addPreset}

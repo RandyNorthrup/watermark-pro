@@ -4,9 +4,9 @@ import type { PhotoMetadata } from '../../../shared/metadata'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import type { Size } from '../../engine/layout'
 import type { Transform } from '../../engine/pipeline'
-import { apiRequest } from '../../lib/api'
 import { describeError } from '../../lib/errors'
 import { assetFileUrl } from '../../lib/library'
+import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { PreviewRenderer, type PreviewResult } from '../../lib/preview'
 
 /** Slider drags fire continuously; one render per pause keeps the worker responsive. */
@@ -45,8 +45,7 @@ export function useRenderer(
 
   useEffect(() => {
     const renderer = new PreviewRenderer(async (assetId) => {
-      const response = await apiRequest(assetFileUrl(organizationId, assetId))
-      return await response.blob()
+      return await loadWorkspaceMedia(organizationId, assetFileUrl(organizationId, assetId))
     })
     rendererRef.current = renderer
     return () => {

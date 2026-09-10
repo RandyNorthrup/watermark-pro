@@ -20,6 +20,7 @@ import {
   SHARE_EXPIRY_DAYS,
   MAX_PRESET_NAME_LENGTH,
 } from './constants'
+import { classifyClientError, redactRoutePath, sanitizeErrorSource } from './observability'
 
 export const healthResponseSchema = z.object({
   status: z.literal('ok'),
@@ -207,6 +208,8 @@ export type PublicShare = z.infer<typeof publicShareSchema>
 
 /** Configuration the browser may know before signing in. */
 export const publicConfigSchema = z.object({
+  googleAuthEnabled: z.boolean().default(false),
+  microsoftAuthEnabled: z.boolean().default(false),
   /** Turnstile site key when bot protection is enabled; null otherwise. */
   turnstileSiteKey: z.string().nullable(),
   /** Cloud import (M16): each picker is offered only when its keys are configured; null hides it. */
@@ -233,12 +236,27 @@ export const adminOrganizationListSchema = z.object({
   organizations: z.array(adminOrganizationSchema),
 })
 
-/** Body of `POST /api/client-errors`: bounded, low-PII (M19 observability). */
+/** Normalize again at the server boundary; direct callers cannot store raw diagnostic text. */
 export const clientErrorReportSchema = z.object({
-  message: z.string().trim().min(1).max(CLIENT_ERROR_MAX_MESSAGE_LENGTH),
-  /** The single top stack frame; the client never sends the whole stack. */
-  source: z.string().trim().max(CLIENT_ERROR_MAX_SOURCE_LENGTH).optional(),
-  route: z.string().trim().max(CLIENT_ERROR_MAX_ROUTE_LENGTH).optional(),
+  message: z
+    .string()
+    .trim()
+    .min(1)
+    .max(CLIENT_ERROR_MAX_MESSAGE_LENGTH)
+    .transform(classifyClientError),
+  source: z
+    .string()
+    .trim()
+    .max(CLIENT_ERROR_MAX_SOURCE_LENGTH)
+    .transform(sanitizeErrorSource)
+    .optional(),
+  route: z
+    .string()
+    .trim()
+    .startsWith('/')
+    .max(CLIENT_ERROR_MAX_ROUTE_LENGTH)
+    .transform(redactRoutePath)
+    .optional(),
 })
 
 export type ClientErrorReport = z.infer<typeof clientErrorReportSchema>

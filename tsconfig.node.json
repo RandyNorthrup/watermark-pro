@@ -8,12 +8,21 @@
   },
   "include": [
     "vite.config.ts",
+    "vite.prerender.config.ts",
     "vitest.config.ts",
     "vitest.workers.config.ts",
     "playwright.config.ts",
     "drizzle.config.ts",
     "e2e",
+    "scripts/lib/bundle-inventory.ts",
+    "scripts/lib/route-preloads.ts",
+    "scripts/lib/test-site-owner.ts",
+    "scripts/lib/software-notices.ts",
+    "scripts/private-workspace-sql.ts",
     // Filesystem audit of the bundled font packages; imports the catalogue only.
-    "src/client/fonts/catalogue.audit.test.ts"
+    "src/client/fonts/catalogue.audit.test.ts",
+    "src/worker/offline-assets.test.ts",
+    // Filesystem/JSONC deployment-policy proof runs in the Node Vitest project.
+    "src/worker/observability-config.test.ts"
   ]
 }

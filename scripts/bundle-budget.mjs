@@ -7,23 +7,28 @@
  *
  *   npm run build && node scripts/bundle-budget.mjs
  *
- * The route-chunk budget excludes the engine chunks reached only from the media
- * tools (video, pdf, the watermark worker): each rides its own long-cached chunk
- * by design (vite.config.ts) and is never part of a first paint.
+ * Every statically required route dependency is measured, with no engine exemptions.
+ * Action/detection imports are listed separately by bundle:report; Lighthouse
+ * observes actual route startup, including async work.
  */
-import { closureSizes, entryKey, fileSizes, kib, readManifest } from './lib/bundle-sizes.mjs'
+import {
+  applicationBootSizes,
+  entryKey,
+  fileSizes,
+  kib,
+  publicPageSizes,
+  readManifest,
+  staticClosure,
+} from './lib/bundle-sizes.mjs'
 
 const KB = 1024
 /** PLAN.md §5.5 gzip budgets. */
 const INITIAL_JS_BUDGET = 90 * KB
 const SHELL_JS_BUDGET = 140 * KB
 const ROUTE_CHUNK_BUDGET = 60 * KB
-/** Chunks that ride their own long-cached group and never load on a first paint. */
-const ENGINE_CHUNKS = new Set(['video', 'pdf', 'watermark', 'pipeline'])
-
 const manifest = readManifest()
 const entry = entryKey(manifest)
-const initial = closureSizes(manifest, entry)
+const initial = applicationBootSizes(manifest, entry)
 
 const failures = []
 function check(label, actual, budget) {
@@ -36,20 +41,23 @@ function check(label, actual, budget) {
   }
 }
 
-// The public entry is the boot closure every page shares today. Once public
-// pages are split from the app shell (PLAN.md §5.5 §1–2) these diverge; the
-// budgets are written for that end state and measured against it here.
-check('initial JS for /', initial.js.gzip, INITIAL_JS_BUDGET)
+for (const page of publicPageSizes())
+  check(`public landing JS (${page.locale})`, page.gzip, INITIAL_JS_BUDGET)
 check('initial JS for /app/* shell', initial.js.gzip, SHELL_JS_BUDGET)
 
+const routeDependencies = new Set()
 for (const [key, chunk] of Object.entries(manifest)) {
   if (chunk.isDynamicEntry !== true || !(chunk.src ?? '').includes('/routes/')) {
     continue
   }
-  const name = (chunk.name ?? key).replace(/\.\w+$/, '')
-  if (ENGINE_CHUNKS.has(name)) {
-    continue
+  for (const dependency of staticClosure(manifest, key)) {
+    if (!initial.keys.has(dependency)) routeDependencies.add(dependency)
   }
+}
+for (const key of routeDependencies) {
+  const chunk = manifest[key]
+  const name = (chunk.name ?? key).replace(/\.\w+$/, '')
+  if (!chunk.file.endsWith('.js')) continue
   const gzip = fileSizes(chunk.file).gzip
   if (gzip > ROUTE_CHUNK_BUDGET) {
     failures.push(

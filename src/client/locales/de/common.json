@@ -23,7 +23,7 @@
     "toolsNav": "Tools",
     "signOut": "Abmelden",
     "accountMenu": "Kontomenü für {{name}}",
-    "menuDescription": "Organisation wechseln oder zu einem beliebigen Bereich von Watermark Pro springen.",
+    "menuDescription": "Organisation wechseln oder zu einem beliebigen Bereich von Lumafoil springen.",
     "switchOrganizationFor": "Organisation: {{name}}. Organisation wechseln",
     "chooseOrganization": "Organisation auswählen",
     "chooseOrganizationShort": "Organisation wählen",
@@ -33,7 +33,8 @@
       "system": "Design: folgt System. Zu Hell wechseln",
       "light": "Design: hell. Zu Dunkel wechseln",
       "dark": "Design: dunkel. Zu System wechseln"
-    }
+    },
+    "closeMenu": "Menü schließen"
   },
   "auth": {
     "backToSignIn": "Zurück zur Anmeldung",
@@ -87,12 +88,16 @@
       "roleLabel": "Rolle:",
       "decline": "Ablehnen",
       "accept": "Einladung annehmen"
+    },
+    "inviteOnly": {
+      "title": "Einladung erforderlich",
+      "body": "Lumafoil ist nur auf Einladung verfügbar. Öffnen Sie den Einladungslink in Ihrer E-Mail, um Ihr Konto zu erstellen."
     }
   },
   "dashboard": {
     "signedInAs": "Angemeldet als {{email}}",
     "yourWorkspace": "Ihr Workspace",
-    "yourRole": "Ihre Rolle:",
+    "yourRole": "Deine Rolle in diesem Arbeitsbereich:",
     "toolsHeading": "Tools",
     "tools": {
       "library": {
@@ -109,7 +114,7 @@
       },
       "gallery": {
         "label": "Galerie",
-        "body": "Durchsuchen, was das Team gespeichert hat, und Alben per Link teilen."
+        "body": "Durchsuche gespeicherte Fotos und wähle aus, welche du per Link teilst."
       }
     },
     "overviewHeading": "Übersicht",
@@ -125,7 +130,7 @@
   "library": {
     "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um eine Wasserzeichen-Bibliothek aufzubauen.",
     "heading": "Wasserzeichen-Bibliothek",
-    "description": "Presets, die alle in {{name}} teilen. Einzeln oder im Stapel anwenden.",
+    "description": "Gespeicherte Wasserzeichen in {{name}}. Auf eine Datei oder einen ganzen Stapel anwenden.",
     "export": "Exportieren",
     "exportPreset": "{{name}} exportieren",
     "importPresets": "Presets importieren",
@@ -139,7 +144,7 @@
     "loadingPreset": "Preset wird geladen",
     "loadPresetErrorTitle": "Preset konnte nicht geladen werden",
     "presetGone": "Dieses Preset existiert nicht mehr.",
-    "editSubtitleManage": "Änderungen gelten für alle, die dieses Preset verwenden.",
+    "editSubtitleManage": "Deine Änderungen aktualisieren diese gespeicherte Vorlage für die weitere Nutzung.",
     "editSubtitleReadOnly": "Schreibgeschützte Ansicht.",
     "cannotCreate": "Ihre Rolle erlaubt das Erstellen von Presets nicht.",
     "newPresetSubtitle": "Gestalten Sie die Markierung, legen Sie ihre Position fest und speichern Sie sie in der Bibliothek.",
@@ -156,7 +161,8 @@
       "glyph": "Glyphe {{glyph}}",
       "icon": "Icon {{name}}",
       "logo": "Logo",
-      "qr": "QR-Code für {{content}}"
+      "qr": "QR-Code für {{content}}",
+      "sticker": "Sticker {{name}}"
     },
     "shape": {
       "rectangle": "Rechteck",
@@ -168,7 +174,10 @@
       "smart": "Intelligente Platzierung",
       "custom": "Eigene Position",
       "random": "Zufällige Platzierung"
-    }
+    },
+    "newQr": "Neuer QR-Code",
+    "qrOnly": "Nur QR-Codes",
+    "noQr": "Noch keine QR-Codes gespeichert. Erstelle einen für jeden verwendeten Link."
   },
   "designer": {
     "presetName": "Preset-Name",
@@ -192,7 +201,8 @@
     },
     "qr": {
       "content": "QR-Code-Inhalt",
-      "hint": "Meist ein Link. Bis zu {{max}} Zeichen; der Code ist stets dunkel auf hellem Grund, damit er scanbar bleibt."
+      "hint": "Meist ein Link. Bis zu {{max}} Zeichen; der Code ist stets dunkel auf hellem Grund, damit er scanbar bleibt.",
+      "savedHint": "Benenne und speichere jeden QR-Code einzeln. Verwende ihn aus der Bibliothek erneut oder speichere mehrere für unterschiedliche Links. Prüfe den fertigen Export vor dem Teilen in der vorgesehenen Größe."
     },
     "tokens": {
       "menu": "Detail einfügen",
@@ -216,12 +226,16 @@
     "font": {
       "family": "Schriftart",
       "weight": "Schriftstärke",
-      "specimen": "Zwölf Boxkämpfer jagen Viktor"
+      "specimen": "Zwölf Boxkämpfer jagen Viktor",
+      "search": "Schriften suchen",
+      "resultCount": "{{count}} Schriftfamilien",
+      "license": "Schriftlizenz"
     },
     "symbol": {
       "icons": "Icons",
       "glyphLabel": "Glyphe {{glyph}}",
-      "iconLabel": "Icon {{label}}"
+      "iconLabel": "Icon {{label}}",
+      "license": "Icon-Lizenzen"
     },
     "shape": {
       "label": "Form",
@@ -369,12 +383,25 @@
         "cancel": "Abbrechen",
         "save": "Als Logo speichern"
       }
+    },
+    "stickers": {
+      "heading": "Farbige Sticker",
+      "search": "Sticker suchen",
+      "category": "Kategorie",
+      "all": "Alle Kategorien",
+      "results": "{{total}} passende Sticker",
+      "choose": "{{name}} auswählen",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "license": "Fluent Emoji · MIT-Lizenz",
+      "usage": "Kommerzielle Nutzung erlaubt; bewahre den Lizenzhinweis der Grafiken bei der Weitergabe auf.",
+      "guide": "Lizenzhinweise für Grafiken"
     }
   },
   "editor": {
     "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um den Editor zu nutzen.",
     "heading": "Editor",
-    "description": "Ein Foto mit Wasserzeichen versehen: Preset wählen, bei Bedarf von Hand platzieren, zuschneiden, skalieren und herunterladen. Nichts verlässt Ihren Browser.",
+    "description": "Wähle eine Vorlage, passe ihre Position an und beschneide oder skaliere auf deinem Gerät. Lade das Ergebnis herunter oder speichere es wahlweise in Galerie oder Cloud.",
     "tabs": {
       "watermark": "Wasserzeichen",
       "crop": "Zuschneiden",
@@ -424,7 +451,13 @@
       "removeLayer": "{{name}} von diesem Foto entfernen",
       "adjusted": "Für dieses Foto angepasst; das Preset in der Bibliothek bleibt unverändert.",
       "revert": "Zurücksetzen",
-      "placement": "Platzierung"
+      "placement": "Platzierung",
+      "create": "Wasserzeichen erstellen",
+      "createHint": "Gestalte dein Wasserzeichen hier. Speichere es für dieses Foto und zur Wiederverwendung in der Bibliothek.",
+      "cancelCreate": "Abbrechen",
+      "saveAndUse": "Speichern und verwenden",
+      "emptyReadOnly": "In dieser Bibliothek sind noch keine Wasserzeichen verfügbar.",
+      "firstUseHint": "Füge ein Wasserzeichen hinzu und öffne Exportieren, um dein Foto herunterzuladen."
     },
     "crop": {
       "aspectRatio": "Seitenverhältnis",
@@ -492,7 +525,7 @@
         "label": "Alles behalten",
         "help": "Einschließlich der GPS-Position, falls das Foto eine hat."
       },
-      "webpNote": "Bei WebP-Exporten werden Metadaten immer entfernt."
+      "webpNote": "WebP entfernt die ursprünglichen Fotometadaten. Erforderliche Lizenzhinweise für Grafiken bleiben erhalten."
     },
     "export": {
       "format": "Format",
@@ -600,7 +633,7 @@
   "gallery": {
     "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um eine Galerie zu führen.",
     "heading": "Galerie",
-    "description": "Von {{name}} gespeicherte Fotos mit Wasserzeichen. Suchen, nach Preset filtern, herunterladen oder löschen.",
+    "description": "Mit Wasserzeichen versehene Fotos in {{name}}. Suchen, filtern, herunterladen oder löschen.",
     "usage_one": "{{count}} Foto · {{used}} von {{max}}",
     "usage_other": "{{count}} Fotos · {{used}} von {{max}}",
     "maxCount": "Bis zu {{count}} Fotos pro Organisation",
@@ -685,8 +718,8 @@
   },
   "admin": {
     "heading": "Administration",
-    "description": "Alle Benutzer und Organisationen dieser Instanz. Aktionen hier werden im Audit-Trail aufgezeichnet.",
-    "onlyAdmins": "Nur Plattform-Administratoren können diese Seite öffnen.",
+    "description": "Nur für den Websiteadministrator: Konten verwalten und Gesamtzahlen prüfen. Der Besitz eines Arbeitsbereichs verleiht keine Website-Administratorrechte.",
+    "onlyAdmins": "Nur der Websiteadministrator kann diese Seite öffnen.",
     "sectionsLabel": "Administrationsbereiche",
     "tabs": {
       "users": "Benutzer",
@@ -704,7 +737,11 @@
       "ok": "OK",
       "failed": "Fehlgeschlagen",
       "duration": "{{ms}} ms",
-      "th": { "time": "Zeit", "status": "Status", "duration": "Dauer" }
+      "th": {
+        "time": "Zeit",
+        "status": "Status",
+        "duration": "Dauer"
+      }
     },
     "clientErrors": {
       "loading": "Client-Fehler werden geladen",
@@ -725,15 +762,11 @@
     "you": "(Sie)",
     "joined": "Beigetreten {{date}}",
     "emailNotVerified": " · E-Mail nicht bestätigt",
-    "platformAdmin": "Plattform-Admin",
+    "platformAdmin": "Websiteadministrator",
     "banned": "gesperrt",
     "bannedReason": "gesperrt: {{reason}}",
     "unban": "Entsperren",
     "unbanUser": "{{email}} entsperren",
-    "removeAdmin": "Admin entfernen",
-    "makeAdminShort": "Zum Admin machen",
-    "removeAdminFrom": "Admin-Rechte von {{email}} entfernen",
-    "makeAdmin": "{{email}} zum Admin machen",
     "signOutEverywhereButton": "Überall abmelden",
     "signOutEverywhere": "{{email}} überall abmelden",
     "ban": "Sperren",
@@ -796,7 +829,7 @@
   "organizations": {
     "firstTitle": "Erstellen Sie Ihre erste Organisation",
     "newTitle": "Neue Organisation",
-    "description": "Organisationen enthalten Ihre Wasserzeichen, Fotos und Ihr Team. Sie werden ihr Inhaber.",
+    "description": "Erstelle einen separaten Bereich für Wasserzeichen und Fotos. Er bleibt privat, bis du ausdrücklich Mitglieder einlädst.",
     "createFailed": "Die Organisation konnte nicht erstellt werden.",
     "nameLabel": "Name",
     "slugLabel": "URL-Kennung",
@@ -826,7 +859,15 @@
       "noneSelected": "Keine Fotos ausgewählt",
       "selectedCount": "{{count}} ausgewählt",
       "addSelected": "Auswahl hinzufügen"
-    }
+    },
+    "cloudSaved": "Gespeicherte Cloud-Dateien ({{total}})",
+    "cloudSavedTitle": "Gespeicherte Cloud-Dateien",
+    "cloudSharingHint": "Speichern erstellt keinen öffentlichen Link. Erstelle ihn nur, wenn jeder mit dem Link die Datei sehen darf. Bestehende Ordnerberechtigungen gelten weiterhin. Verwalte weitere Zugriffe direkt beim Anbieter.",
+    "openProvider": "In {{provider}} öffnen",
+    "createPublicLink": "Öffentlichen Link erstellen",
+    "revokePublicLink": "Öffentlichen Link widerrufen",
+    "linkCopied": "Link kopiert",
+    "copyLink": "Link kopieren"
   },
   "video": {
     "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Videos mit Wasserzeichen zu versehen.",
@@ -917,7 +958,7 @@
     },
     "tool": {
       "title": "Foto prüfen",
-      "description": "Prüfen, ob ein PNG eine unsichtbare Markierung von Watermark Pro enthält, und die verborgene Nachricht lesen. Nichts verlässt Ihren Browser."
+      "description": "Prüfen, ob ein PNG eine unsichtbare Markierung von Lumafoil enthält, und die verborgene Nachricht lesen. Nichts verlässt Ihren Browser."
     },
     "checkPng": "PNG prüfen",
     "checking": "Wird geprüft…",
@@ -934,7 +975,7 @@
     "createInLibrary": "Ein Preset in der Bibliothek erstellen",
     "legend": "Presets",
     "importTitle": "Presets importieren",
-    "importDescription": "Wählen Sie eine Preset-Datei von Watermark Pro. Ihre Presets und alle darin verwendeten Logos werden dieser Bibliothek hinzugefügt.",
+    "importDescription": "Wählen Sie eine Preset-Datei von Lumafoil. Ihre Presets und alle darin verwendeten Logos werden dieser Bibliothek hinzugefügt.",
     "presetFileLabel": "Preset-Datei",
     "noPresets": "Diese Preset-Datei enthält keine Presets.",
     "fileCount_one": "{{count}} Preset in dieser Datei",
@@ -947,111 +988,174 @@
   "landing": {
     "nav": "Konto",
     "signIn": "Anmelden",
-    "createAccount": "Konto erstellen",
-    "eyebrow": "Kostenlos und quelloffen",
-    "heroBody": "Schützen Sie Ihre Fotografie, ohne das Bild zu verlieren. Watermark Pro erledigt die schwere Arbeit in Ihrem Browser, hält Ihre Originale privat und gibt Ihrem Team Rollen, die wirklich etwas bedeuten.",
-    "createWorkspace": "Workspace erstellen",
-    "featuresHeading": "Was es kann",
-    "features": {
-      "bulk": {
-        "title": "Stapelaufträge",
-        "body": "Hunderte Fotos ablegen und alle in einem Durchgang in Ihrem Browser mit Wasserzeichen versehen."
+    "heroBody": "Fügen Sie Text, Logos oder Signaturen hinzu. Nutzen Sie Vorlagen für einzelne Dateien und Stapel, bearbeiten Sie offline und synchronisieren Sie nach dem Verbinden.",
+    "featuresHeading": "Werkzeuge für den ganzen Ablauf",
+    "footer": "Lumafoil ist Open Source unter der MIT-Lizenz.",
+    "privacy": "Datenschutz",
+    "terms": "Nutzungsbedingungen",
+    "heroTitleStart": "Wasserzeichen für Fotos,",
+    "heroTitleEnd": "Videos und PDFs.",
+    "heroAlt": "Lumafoil-Fotoeditor mit Platzierungs- und Exportsteuerung",
+    "previewLabel": "Der Lumafoil-Editor",
+    "privacyNote": "Dateien werden auf Ihrem Gerät verarbeitet. Cloud-Speichern ist optional.",
+    "formatsLabel": "Fotos · PDFs · Video",
+    "workflowHeading": "Öffnen. Anpassen. Exportieren.",
+    "workflowNote": "Ihr Arbeitsbereich hält Vorlagen und gespeicherte Dateien zusammen.",
+    "steps": {
+      "openTitle": "Fotos mitbringen",
+      "openBody": "Ein einzelnes Bild oder einen ganzen Stapel öffnen. Die Originale bleiben unverändert.",
+      "markTitle": "Dein Zeichen setzen",
+      "markBody": "Eine gespeicherte Vorlage wählen oder etwas unverwechselbar Eigenes gestalten.",
+      "exportTitle": "Exportieren und fertig",
+      "exportBody": "Fertige Dateien herunterladen oder in der Galerie speichern und synchronisieren."
+    },
+    "github": "GitHub",
+    "featuresIntro": "Gestalte ein Wasserzeichen, wende es auf deine Dateien an und entscheide, wie du die Ergebnisse speicherst oder teilst.",
+    "moreHeading": "Weitere Werkzeuge für deine Arbeit",
+    "capabilities": {
+      "marks": {
+        "title": "Text, Logos und deine Unterschrift",
+        "body": "Schreibe deinen Namen oder Copyright-Hinweis, lade ein Logo hoch oder zeichne eine Unterschrift. Passe Größe, Winkel, Deckkraft und Farbe an und kombiniere mehrere Zeichen."
       },
-      "library": {
-        "title": "Wasserzeichen-Bibliothek",
-        "body": "Text-, Symbol- und Logo-Markierungen einmal speichern; überall mit einem Klick anwenden."
+      "batch": {
+        "title": "Wasserzeichen für ganze Stapel",
+        "body": "Wende ein gespeichertes Wasserzeichen auf mehrere Fotos an. Prüfe die Ergebnisse, passe einzelne Positionen an und lade den fertigen Stapel als ZIP herunter."
+      },
+      "fonts": {
+        "title": "551 verschiedene Schriftfamilien",
+        "body": "Suche nach Serifenschriften, serifenlosen, handschriftlichen, dekorativen und Monospace-Schriften. Sieh deinen Text in der Vorschau und speichere den Stil. Alle Schriften werden lokal mit offenen Lizenzen bereitgestellt."
+      },
+      "stickers": {
+        "title": "400 farbige Vektorsticker",
+        "body": "Entdecke Tiere, Blumen, Essen, Reisen, Feste und Alltagsgegenstände. Suche ein Motiv, füge es als Wasserzeichen hinzu und ändere die Größe ohne unscharfe Kanten."
+      },
+      "qr": {
+        "title": "QR-Wasserzeichen erstellen und speichern",
+        "body": "Verwandle eine Webadresse oder Text in einen QR-Code. Speichere eigene Codes für Portfolio, Kontaktseite oder Projekte und verwende sie erneut."
+      },
+      "templates": {
+        "title": "Wasserzeichen als Vorlagen speichern",
+        "body": "Bewahre Text, Grafiken, Stil und Position auf. Nutze Vorlagen im Editor oder für Stapel und importiere oder exportiere sie zwischen Geräten."
+      },
+      "editing": {
+        "title": "Zuschneiden, skalieren und anpassen",
+        "body": "Schneide Fotos zu, wähle Ausgabegrößen und passe Helligkeit, Kontrast und Sättigung vor dem Wasserzeichen an."
       },
       "smart": {
-        "title": "Intelligente Platzierung",
-        "body": "Jedes Foto wird analysiert, damit die Markierung dort landet, wo sie am besten lesbar ist, und das Motiv freibleibt."
+        "title": "Intelligente Platzierung und Kontrast",
+        "body": "Lumafoil schlägt eine Position und ein helles oder dunkles Zeichen passend zum Bild vor. Prüfe das Ergebnis und passe es selbst an."
       },
-      "contrast": {
-        "title": "Auto-Kontrast",
-        "body": "Helle oder dunkle Variante und Umrissstärke je Bild gewählt, anpassbar, wenn Sie anderer Meinung sind."
+      "video": {
+        "title": "Videos mit Wasserzeichen",
+        "body": "Versehe unterstützte Videos im Browser mit Wasserzeichen. Passe Position und Einblendzeit an und prüfe die Vorschau vor dem Export."
       },
-      "teams": {
-        "title": "Teams und Rollen",
-        "body": "Organisationen mit den Rollen Inhaber, Admin, Bearbeiter und Betrachter, serverseitig durchgesetzt."
+      "pdf": {
+        "title": "PDF-Dokumente markieren",
+        "body": "Wende ein gespeichertes Wasserzeichen auf ausgewählte PDF-Seiten an. Verarbeite einzelne Dokumente oder Stapel und lade die Ergebnisse herunter."
       },
-      "trusted": {
-        "title": "Auf Vertrauen gebaut",
-        "body": "Strenge Content-Security-Policy, protokollierte Aktionen und Fotos, die Ihren Browser nie verlassen, sofern Sie sie nicht speichern."
+      "export": {
+        "title": "Exportformat wählen",
+        "body": "Exportiere Fotos als JPEG, PNG oder WebP. Bestimme Größe und Qualität oder lade einen fertigen Stapel als ZIP herunter."
+      },
+      "gallery": {
+        "title": "Private Galerie",
+        "body": "Speichere fertige Bilder in deinem Konto und finde sie später wieder. Lade Dateien herunter oder wähle Fotos zum Teilen aus."
+      },
+      "sharing": {
+        "title": "Ausgewählte Fotos teilen",
+        "body": "Erstelle einen Lumafoil-Galerielink für ausgewählte Fotos. Lege ein Ablaufdatum fest oder widerrufe den Link."
+      },
+      "offline": {
+        "title": "Offline arbeiten, später synchronisieren",
+        "body": "Bereite Lumafoil für die Offline-Nutzung vor. Bearbeite Vorlagen und speichere Fotos ohne Verbindung. Änderungen werden nach dem Verbinden synchronisiert; Fehler und Konflikte bleiben sichtbar."
+      },
+      "privacy": {
+        "title": "Dein Konto, dein Arbeitsbereich",
+        "body": "Neue Nutzer benötigen eine Einladung und erhalten einen privaten Arbeitsbereich. Deine Einladung gewährt keinen Zugriff auf deine Fotos oder Vorlagen."
+      },
+      "languages": {
+        "title": "Oberfläche in 12 Sprachen",
+        "body": "Wähle eine der 12 Sprachen, darunter Arabisch mit einem Layout von rechts nach links."
+      },
+      "theme": {
+        "title": "Heller und dunkler Modus",
+        "body": "Wähle ein Design oder übernimm die Geräteeinstellung. Die Oberfläche passt sich Smartphones, Tablets und größeren Bildschirmen an."
       }
     },
-    "footer": "Watermark Pro ist Open Source unter der MIT-Lizenz.",
-    "privacy": "Datenschutz",
-    "terms": "Nutzungsbedingungen"
+    "inviteHosting": "Lumafoil ist nur auf Einladung zugänglich. Möchtest du es selbst hosten?",
+    "selfHost": "Den Quellcode gibt es kostenlos auf GitHub.",
+    "featuresNav": "Funktionen"
   },
   "legal": {
     "signIn": "Anmelden",
     "lastUpdated": "Zuletzt aktualisiert {{date}}",
     "readSibling": "Lesen Sie die <sibling>{{siblingLabel}}</sibling> oder kehren Sie zur <home>Startseite</home> zurück.",
-    "footer": "Watermark Pro ist Open Source unter der MIT-Lizenz.",
+    "footer": "Lumafoils Quellcode steht unter MIT. Enthaltene Schriften und Grafiken behalten ihre eigenen Lizenzen.",
     "privacy": {
       "title": "Datenschutz",
-      "intro": "Watermark Pro ist so gebaut, dass Ihre Fotografien Ihre bleiben. Diese Seite erklärt in klarer Sprache, was mit Ihren Bildern und Ihren Kontodaten geschieht, basierend auf den Kontrollen, die das Projekt tatsächlich durchsetzt.",
+      "intro": "Lumafoil ist so gebaut, dass Ihre Fotografien Ihre bleiben. Diese Seite erklärt in klarer Sprache, was mit Ihren Bildern und Ihren Kontodaten geschieht, basierend auf den Kontrollen, die das Projekt tatsächlich durchsetzt.",
       "siblingLabel": "Nutzungsbedingungen",
       "photos": {
-        "heading": "Ihre Fotos bleiben in Ihrem Browser",
-        "p1": "Die Wasserzeichen-Erstellung läuft vollständig auf Ihrem Gerät. Der Editor und das Stapel-Tool decodieren Ihre Fotos im Browser, rendern sie in Web Workern und erstellen die fertigen Dateien im Arbeitsspeicher. Bei der Vorschau eines Wasserzeichens wird das Foto, auf das es angewendet wird, nie hochgeladen.",
-        "p2": "Exporte werden lokal zusammengestellt und Ihnen über einen Same-Origin-Download-Link übergeben, der freigegeben wird, sobald der Download startet. Ihre Originale werden nie an einen Server gesendet, um in der Vorschau angezeigt oder mit einem Wasserzeichen versehen zu werden."
+        "heading": "Fotos werden auf deinem Gerät verarbeitet",
+        "p1": "Bearbeitung und Wasserzeichen laufen auf deinem Gerät. Eine Vorschau lädt deine Originale nicht zu Lumafoil hoch.",
+        "p2": "Du entscheidest, ob du das Ergebnis herunterlädst, in deiner Galerie speicherst, an einen verbundenen Cloudspeicher überträgst oder einen Freigabelink erstellst."
       },
       "storage": {
-        "heading": "Was wir speichern, und nur, wenn Sie es möchten",
-        "p1": "Nichts wird auf unseren Servern gespeichert, sofern Sie es nicht speichern. Wenn Sie ein Foto, eine Miniaturansicht oder ein Logo speichern, wird es in Cloudflare R2 unter auf Ihre Organisation beschränkten Schlüsseln gespeichert, nie öffentlich gemacht und nur angemeldeten Mitgliedern dieser Organisation mit privatem Caching bereitgestellt.",
-        "p2": "Jede Organisation hat Kontingente für Fotos, Logos und Speicher. Jeder Upload und jede Löschung wird im Audit-Trail aufgezeichnet."
+        "heading": "Konten, gespeicherte Arbeit und Offlinekopien",
+        "p1": "Cloudflare speichert Kontodaten, Vorlagen, Galeriefotos, Vorschaubilder, hochgeladene Logos, Freigaben und den Verlauf zuletzt verwendeter Inhalte. Inhalte gehören zum jeweiligen Arbeitsbereich; andere Nutzer benötigen eine ausdrückliche Mitgliedschaft oder einen Freigabelink.",
+        "p2": "Dieses Gerät hält kontogebundene Kopien und ausstehende Änderungen für die Offlinenutzung vor. Eine Verbindung mit demselben Konto startet neue Synchronisierungsversuche. Ausstehende Änderungen verhindern die Abmeldung; eine erfolgreiche Abmeldung löscht Offline-Appdaten. Sitzungsablauf sperrt den Zugriff, ohne ausstehende Arbeit zu löschen. Das Löschen von Browserdaten kann sie entfernen."
       },
       "metadata": {
-        "heading": "Metadaten werden standardmäßig entfernt",
-        "p1": "Jeder Export wird aus Pixeln neu codiert, sodass keine Metadaten übernommen werden, sofern Sie sie nicht behalten möchten. Standardmäßig werden alle Kamera- und Standortdaten entfernt, bevor die Datei Ihren Download, das Teilen-Menü oder die Galerie erreicht.",
-        "p2": "Zwei optionale Modi pro Export erlauben Ihnen, die Kameradaten mit entfernter GPS-Position zu behalten oder alles unverändert zu behalten. Metadaten werden im Browser gelesen und geschrieben; dafür wird nichts hochgeladen."
+        "heading": "Persönliche Metadaten und Lizenzhinweise",
+        "p1": "Bildexporte entfernen standardmäßig Kamera- und Standortmetadaten. Unterstützte Optionen behalten Kameradaten ohne GPS oder unterstützte Originalmetadaten. Die Verarbeitung erfolgt im Browser.",
+        "p2": "Exporte mit enthaltenen Grafiken bewahren deren Lizenzhinweis in Metadaten, einem Dokumentanhang oder einer Begleitdatei im Archiv. Andere Programme können Hinweise entfernen; bewahre den geltenden Hinweis bei der Weitergabe dieser Grafiken auf."
       },
       "sharing": {
         "heading": "Freigabelinks",
-        "p1": "Ein Freigabelink trägt ein signiertes Token mit integriertem Ablaufdatum und kann jederzeit widerrufen werden. Die öffentlichen Seiten, die ein Link öffnet, enthalten keine Sitzung und sind pro Adresse ratenbegrenzt.",
-        "p2": "Abgelaufene, widerrufene, manipulierte und unbekannte Links geben alle dieselbe neutrale Antwort „nicht gefunden“ zurück, sodass ein Link nichts preisgibt, sobald er nicht mehr funktioniert. Das Erstellen und Widerrufen von Links ist auf berechtigte Mitglieder beschränkt und wird protokolliert."
+        "p1": "Jeder mit einem Lumafoil-Galerielink kann die ausgewählten gespeicherten Fotos bis zum Ablauf oder Widerruf sehen. Eine Websiteeinladung öffnet ein eigenes privates Konto; sie teilt weder Arbeitsbereich noch Inhalte der einladenden Person.",
+        "p2": "Links von Cloudanbietern folgen deren Berechtigungs- und Widerrufsregeln. Ein Widerruf holt bereits angefertigte Downloads oder Kopien nicht zurück."
       },
       "account": {
         "heading": "Ihr Konto",
-        "p1": "Ein Konto benötigt eine E-Mail-Adresse und ein Passwort, und die E-Mail muss bestätigt werden, bevor das Konto aktiv ist. Sitzungen werden in HttpOnly-, SameSite=Lax-Cookies gehalten, auf sicheren Origins als Secure markiert.",
-        "p2": "Links zum Zurücksetzen des Passworts laufen nach einer Stunde ab und melden bei Verwendung Ihre anderen Sitzungen ab."
+        "p1": "Neue Konten benötigen eine Einladung und eine bestätigte E-Mail-Adresse. Melde dich mit Passwort oder eingerichtetem Google-/Microsoft-Zugang an. Bestehende Konten brauchen keine neue Einladung. Weitere Anmeldemethoden müssen im angemeldeten Konto verknüpft werden.",
+        "p2": "Sitzungen verwenden HttpOnly- und SameSite=Lax-Cookies, bei HTTPS mit Secure. Passwort-Reset-Links laufen nach einer Stunde ab und widerrufen bei Verwendung andere Serversitzungen."
       },
       "analytics": {
-        "heading": "Analyse und Cookies",
-        "p1": "Wir setzen keine Analyse- oder Werbe-Cookies von Drittanbietern. Die einzige Messung ist Cloudflare Web Analytics, das ohne Cookies auskommt und Sie nicht über Websites hinweg verfolgt.",
-        "p2": "Die App kommuniziert mit nur zwei Origins von Drittanbietern, beide von Cloudflare: dem Turnstile-Widget, das Registrierungs- und Passwort-Zurücksetzungs-Anfragen auf Bots prüft, und dem cookielosen Analyse-Beacon. Schriftarten, Stile und alles andere werden von dieser Website bereitgestellt."
+        "heading": "Cookies und externe Dienste",
+        "p1": "Lumafoil enthält weder Analysebeacons noch Werbecookies. Notwendige Cookies erhalten Sitzungen; der Gerätespeicher hält Einstellungen, Offlinekopien und ausstehende Änderungen.",
+        "p2": "Wenn aktiviert, prüft Cloudflare Turnstile Kontoanfragen auf Bots; siehe <turnstile>Datenschutzhinweis</turnstile>. Google/Microsoft übernehmen die gewählte Anmeldung. Google Drive, Dropbox und OneDrive erhalten Anfragen über ausgewählte Cloudfunktionen; ihre eigenen Datenschutzregeln gelten."
       },
       "audit": {
         "heading": "Audit-Trail",
-        "p1": "Registrierungen und jede Änderung an Organisation, Mitgliedschaft, Einladung, Bibliothek, Foto und Freigabe werden in ein nur erweiterbares Audit-Log geschrieben. Dieses Log ist nur für die Inhaber und Admins einer Organisation lesbar."
+        "p1": "Arbeitsbereichsprotokolle erfordern eine Eigentümer- oder Administratorrolle dieses Bereichs. Der einzige Websiteadministrator verwaltet Konten und prüft Gesamtzahlen, Moderation, Audit- und Zustands-/Fehlerdaten. Der Verlauf zuletzt verwendeter Inhalte ist nutzerbezogen. App-Fehlerprotokolle lassen Tokens und Anfrageinhalte weg."
       },
       "reporting": {
         "heading": "Ein Problem melden",
-        "p1": "Sicherheitsprobleme können privat über das GitHub-Repository des Projekts gemeldet werden, statt über ein öffentliches Issue. Die Sicherheitsrichtlinie im Repository beschreibt, was anzugeben ist und wie schnell Sie eine Antwort erhalten."
+        "p1": "Support: <support>support@lumafoil.com</support>. Melde Sicherheitslücken über <security>GitHubs privates Meldeformular</security> oder diese Adresse. Keine Tokens oder persönlichen Inhalte in öffentliche Issues stellen."
       }
     },
     "terms": {
       "title": "Nutzungsbedingungen",
-      "intro": "Diese Bedingungen regeln Ihre Nutzung von Watermark Pro. Sie sind zum Lesen geschrieben und beschreiben, wie der Dienst sich tatsächlich verhält, statt Behauptungen aufzustellen, die er nicht einhält.",
+      "intro": "Diese Bedingungen regeln Ihre Nutzung von Lumafoil. Sie sind zum Lesen geschrieben und beschreiben, wie der Dienst sich tatsächlich verhält, statt Behauptungen aufzustellen, die er nicht einhält.",
       "siblingLabel": "Datenschutzerklärung",
       "accepting": {
         "heading": "Annahme dieser Bedingungen",
-        "p1": "Die Nutzung von Watermark Pro bedeutet, dass Sie diesen Bedingungen zustimmen. Wenn Sie nicht zustimmen, nutzen Sie den Dienst bitte nicht."
+        "p1": "Die Nutzung von Lumafoil bedeutet, dass Sie diesen Bedingungen zustimmen. Wenn Sie nicht zustimmen, nutzen Sie den Dienst bitte nicht."
       },
       "whatItDoes": {
         "heading": "Was der Dienst leistet",
-        "p1": "Watermark Pro versieht Fotografien mit Wasserzeichen. Das Erstellen der Wasserzeichen selbst läuft in Ihrem Browser; optionale Funktionen wie das Speichern von Fotos und Logos, die Arbeit im Team und das Teilen nutzen serverseitigen Speicher bei Cloudflare.",
-        "p2": "Die Software ist kostenlos und quelloffen unter der MIT-Lizenz."
+        "p1": "Lumafoil versieht Fotos sowie unterstützte Dokumente und Videos auf deinem Gerät mit Wasserzeichen. Konten, gespeicherte Galerien/Vorlagen, Verlauf, Einladungen und Freigaben nutzen Serverspeicher; optionale Cloudfunktionen kontaktieren den gewählten Anbieter.",
+        "p2": "Der Quellcode ist frei und quelloffen unter MIT. Enthaltene Schriften und Grafiken haben eigene Lizenzen."
       },
       "account": {
         "heading": "Ihr Konto",
-        "p1": "Team-Funktionen erfordern ein Konto mit bestätigter E-Mail-Adresse. Behalten Sie Ihr Passwort für sich; Sie sind für alles verantwortlich, was unter Ihrem Konto geschieht.",
-        "p2": "Sie können sich jederzeit von Ihren Sitzungen abmelden, und die Verwendung eines Links zum Zurücksetzen des Passworts meldet Ihre anderen Sitzungen ab."
+        "p1": "Der Zugang erfolgt derzeit per Einladung und erfordert eine bestätigte E-Mail-Adresse. Passwort und konfigurierte Google-/Microsoft-Anmeldung sind verfügbar. Schütze deine Zugangsdaten und dein Anbieterkonto; du bist für die Nutzung deines Kontos verantwortlich.",
+        "p2": "Abmelden erfordert eine Verbindung und geklärte ausstehende Änderungen; Offline-Appdaten dieses Browsers werden gelöscht. Passwort-Reset widerruft andere Serversitzungen. Getrennte Geräte können lokale Kopien behalten, bis sie sich verbinden oder ihre Browserdaten gelöscht werden."
       },
       "content": {
         "heading": "Ihre Inhalte",
         "p1": "Sie behalten alle Rechte, die Sie an den Fotos und Wasserzeichen, die Sie hochladen oder erstellen, bereits haben. Sie sind dafür verantwortlich, die Rechte an den Bildern zu besitzen, die Sie in den Dienst einbringen.",
-        "p2": "Die App verarbeitet Ihre Inhalte nur, um die von Ihnen genutzten Funktionen bereitzustellen, und speichert sie nur, wenn Sie sie speichern. Sie werden nie zum Trainieren von irgendetwas verwendet oder an Dritte weitergegeben."
+        "p2": "Inhalte werden für die von dir gewählten Funktionen verarbeitet. Galeriespeicherung nutzt Cloudflare; gewählte Cloudübertragungen und Freigaben senden Inhalte an Anbieter oder Empfänger. Lumafoil trainiert damit keine Modelle. Enthaltene Grafiken haben eigene Pflichten zur Beibehaltung von Lizenzhinweisen."
       },
       "acceptableUse": {
         "heading": "Zulässige Nutzung",
@@ -1059,8 +1163,8 @@
         "p2": "Der Zugriff innerhalb einer Organisation richtet sich nach Ihrer Rolle, und diese Rollen werden auf dem Server durchgesetzt."
       },
       "teams": {
-        "heading": "Teams und Rollen",
-        "p1": "Eine Organisation kann die Rollen Inhaber, Admin, Bearbeiter und Betrachter haben. Was jedes Mitglied sehen und tun kann, ist auf seine Rolle beschränkt und wird bei jeder Anfrage geprüft, statt nur in der Oberfläche ausgeblendet zu werden."
+        "heading": "Private Arbeitsbereiche und Zusammenarbeit",
+        "p1": "Jedes Konto hat einen privaten Arbeitsbereich. Websiteeinladungen teilen ihn nicht. Separate gemeinsame Arbeitsbereiche können ausdrücklich Eigentümer, Administratoren, Bearbeiter oder Betrachter aufnehmen; der Server setzt Rechte durch. Diese Rollen gewähren keine Websiteadministration."
       },
       "availability": {
         "heading": "Verfügbarkeit, Gewährleistung und Änderungen",
@@ -1069,11 +1173,11 @@
       },
       "openSource": {
         "heading": "Open Source",
-        "p1": "Der Quellcode von Watermark Pro ist unter der MIT-Lizenz verfügbar, die es Ihnen erlaubt, ihn zu den Bedingungen dieser Lizenz einzusehen, auszuführen und zu ändern."
+        "p1": "Lumafoils Quellcode darf nach MIT eingesehen, genutzt und verändert werden. Enthaltene Schriften und Grafiken behalten ihre Lizenzen und Hinweise, verlinkt in ihren Auswahldialogen und im Lizenzverzeichnis der Ressourcen."
       },
       "contact": {
         "heading": "Kontakt",
-        "p1": "Fragen zu diesen Bedingungen sowie Meldungen von Sicherheitsproblemen können über das GitHub-Repository des Projekts eingereicht werden."
+        "p1": "Fragen: <support>support@lumafoil.com</support>. Sicherheit: <security>GitHubs privates Meldeformular</security> oder diese Adresse. Vertrauliche Angaben gehören nicht in öffentliche Issues."
       }
     }
   },
@@ -1081,7 +1185,7 @@
     "loading": "Fotos werden geladen",
     "unavailableTitle": "Dieser Link ist nicht verfügbar",
     "unavailableBody": "Er ist möglicherweise abgelaufen oder wurde widerrufen, oder die Adresse ist unvollständig. Bitten Sie den Absender um einen neuen.",
-    "about": "Über Watermark Pro",
+    "about": "Über Lumafoil",
     "photoCount_one": "{{count}} Foto",
     "photoCount_other": "{{count}} Fotos",
     "availableUntil": " · verfügbar bis {{date}}",
@@ -1090,7 +1194,7 @@
     "linkShared": "Link geteilt.",
     "openPhoto": "{{name}} öffnen",
     "dimensions": "{{width}} × {{height}}",
-    "footer": "Geteilt mit <home>Watermark Pro</home>. Fotos bleiben Eigentum ihres Inhabers.",
+    "footer": "Geteilt mit <home>Lumafoil</home>. Fotos bleiben Eigentum ihres Inhabers.",
     "download": "Herunterladen",
     "close": "Schließen"
   },
@@ -1100,6 +1204,124 @@
       "title": "Seite nicht gefunden",
       "body": "Die Adresse ist möglicherweise falsch geschrieben, oder die Seite wurde verschoben.",
       "back": "Zurück zum Anfang"
+    }
+  },
+  "offline": {
+    "label": "Offline-Arbeit",
+    "syncing": "Gespeicherte Arbeit wird synchronisiert…",
+    "disconnected": "Offline — Änderungen bleiben auf diesem Gerät.",
+    "pending": "Ausstehende Änderungen: {{count}}",
+    "upToDate": "Gespeicherte Arbeit ist synchronisiert.",
+    "syncNow": "Jetzt synchronisieren",
+    "review": "Änderungen prüfen ({{count}})",
+    "deletion": "Löschung",
+    "conflict": "Diese Vorlage wurde anderswo geändert. Beide Versionen behalten oder die lokale Änderung verwerfen.",
+    "savedHere": "Auf diesem Gerät gespeichert. Die Synchronisierung erfolgt bei geöffneter App und bestehender Verbindung.",
+    "retry": "Erneut versuchen",
+    "keepBoth": "Beide Versionen behalten",
+    "discard": "Lokale Änderung verwerfen",
+    "discardTitle": "Diese lokale Änderung verwerfen?",
+    "discardBody": "Entfernt die ausstehende Änderung von diesem Gerät. Bereits auf dem Server gespeicherte Änderungen werden nicht rückgängig gemacht.",
+    "cancel": "Abbrechen",
+    "signOutPending": "Ausstehende Änderungen unter Offline-Arbeit synchronisieren oder verwerfen, bevor Sie sich abmelden.",
+    "signOutFailed": "Abmelden fehlgeschlagen. Bitte erneut versuchen.",
+    "connectionRequired": "Verbindung erforderlich",
+    "connectOnce": "Melden Sie sich an und öffnen Sie diesen Arbeitsbereich einmal mit Internetverbindung, bevor Sie ihn offline nutzen.",
+    "onlineOnly": "Konto-, Freigabe- und Mitgliederverwaltung benötigen eine Verbindung. Fotowerkzeuge und gespeicherte Vorlagen bleiben offline verfügbar.",
+    "ready": "Die App-Dateien sind offline verfügbar.",
+    "preparing": "Offline-Dateien werden vorbereitet. Diesen Tab geöffnet lassen.",
+    "updateAvailable": "Ein Update ist bereit. Ungespeicherte Änderungen vor dem Neuladen abschließen; gespeicherte Arbeit bleibt auf diesem Gerät.",
+    "reload": "Zum Aktualisieren neu laden"
+  },
+  "siteInvites": {
+    "heading": "Personen einladen",
+    "description": "Lade jemanden ein, ein eigenes Lumafoil-Konto zu erstellen.",
+    "email": "E-Mail-Adresse",
+    "privacy": "Die Person erhält einen privaten Arbeitsbereich. Die Einladung teilt keine Fotos, Vorlagen oder Kontodaten.",
+    "sent": "Einladung gesendet. Sie läuft in sieben Tagen ab.",
+    "send": "Einladung senden",
+    "sentHeading": "Deine Einladungen",
+    "loading": "Einladungen werden geladen…",
+    "empty": "Du hast noch keine Einladungen gesendet.",
+    "revoke": "Widerrufen",
+    "revokeEmail": "Einladung an {{email}} widerrufen",
+    "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
+    "privateHeading": "Dein privater Arbeitsbereich",
+    "privateBody": "Nur du hast Zugriff. Lade Personen zu Lumafoil ein, ohne diesen Bereich zu teilen, oder erstelle einen separaten Bereich für Zusammenarbeit.",
+    "collaborate": "Gemeinsamen Arbeitsbereich erstellen",
+    "status": {
+      "pending": "Ausstehend",
+      "accepted": "Angenommen",
+      "revoked": "Widerrufen",
+      "expired": "Abgelaufen"
+    },
+    "collaborationNotice": "Eine Einladung in diesen Bereich gewährt Zugriff auf seine Fotos und Vorlagen. Die Person braucht bereits ein Lumafoil-Konto. Nutze andernfalls zuerst Personen einladen."
+  },
+  "accountStats": {
+    "users": "Registrierte Konten",
+    "verifiedUsers": "Verifizierte Konten",
+    "pendingInvitations": "Ausstehende Einladungen",
+    "acceptedInvitations": "Angenommene Einladungen",
+    "loading": "Kontozahlen werden geladen…"
+  },
+  "accountAuth": {
+    "heading": "Kontoeinstellungen",
+    "connected": "Anmeldemethoden",
+    "loading": "Anmeldemethoden werden geladen…",
+    "password": "E-Mail und Passwort",
+    "linkProvider": "{{provider}} verknüpfen",
+    "continueProvider": "Mit {{provider}} fortfahren",
+    "linkHelp": "Verknüpfe den Anbieter nach der Anmeldung mit derselben E-Mail-Adresse.",
+    "identityOnly": "Nur für dein Lumafoil-Konto. Cloudspeicher wird separat verbunden.",
+    "linkError": "Verknüpfung fehlgeschlagen. Nutze dieselbe E-Mail und melde dich erneut an.",
+    "verifyEmail": "Bestätige dein Konto per E-Mail und melde dich erneut an.",
+    "signInError": "Anmeldung fehlgeschlagen. Melde dich bei einem bestehenden Passwortkonto unten an und verknüpfe den Anbieter in den Kontoeinstellungen."
+  },
+  "referral": {
+    "heading": "Dein Einladungslink",
+    "description": "Jeder mit diesem Link kann ein eigenes privates Konto anfordern. Teile ihn nur mit gewünschten Personen.",
+    "count": "Über deinen Link erstellte Konten: {{count}}",
+    "url": "Einladungslink",
+    "copy": "Link kopieren",
+    "copied": "Kopiert",
+    "copyError": "Kopieren fehlgeschlagen. Wähle den Link aus und kopiere ihn manuell.",
+    "rotate": "Neuen Link erstellen",
+    "revoke": "Link deaktivieren",
+    "revoked": "Dieser Link ist deaktiviert.",
+    "rotateHelp": "Ein neuer Link deaktiviert den alten. Bestehende Konten bleiben zugänglich. Du siehst nur Zahlen; Profile und Inhalte bleiben privat."
+  },
+  "recent": {
+    "heading": "Zuletzt verwendet",
+    "description": "Fotos, die du in diesem Arbeitsbereich geöffnet oder gespeichert hast, und verwendete Wasserzeichen.",
+    "viewLabel": "Ansicht zuletzt verwendeter Inhalte",
+    "search": "Zuletzt verwendete Inhalte suchen",
+    "loading": "Zuletzt verwendete Inhalte werden geladen",
+    "loadError": "Inhalte konnten nicht geladen werden",
+    "retry": "Erneut versuchen",
+    "preferenceError": "Deine Ansicht konnte nicht gespeichert werden.",
+    "activityPending": "Die zuletzt verwendeten Elemente konnten nicht aktualisiert werden. Öffne das Element erneut, um es noch einmal zu versuchen.",
+    "empty": "Deine letzten Arbeiten erscheinen hier. Speichere Fotos in der Galerie und öffne Wasserzeichen für schnellen Zugriff.",
+    "noMatches": "Keine passenden zuletzt verwendeten Inhalte.",
+    "start": "Editor öffnen",
+    "detailsLabel": "Details zuletzt verwendeter Inhalte",
+    "itemsLabel": "Zuletzt verwendete Elemente",
+    "name": "Name",
+    "type": "Typ",
+    "location": "Speicherort",
+    "lastUsed": "Zuletzt verwendet",
+    "status": "Synchronisierung",
+    "photo": "Gespeichertes Foto",
+    "preset": "Wasserzeichen",
+    "pending": "Aktivität wartet auf Synchronisierung",
+    "saved": "Gespeichert",
+    "gallery": "Galerie",
+    "library": "Wasserzeichenbibliothek",
+    "needsAttention": "Aktion erforderlich",
+    "workPending": "Arbeit wartet auf Synchronisierung",
+    "views": {
+      "thumbnails": "Vorschaubilder",
+      "list": "Liste",
+      "details": "Details"
     }
   }
 }

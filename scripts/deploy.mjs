@@ -9,26 +9,13 @@
  * `wrangler secret put BETTER_AUTH_SECRET --env production`.
  */
 import { spawnSync } from 'node:child_process'
-import { createRequire } from 'node:module'
-import path from 'node:path'
+
+import { binOf, runNode } from './lib/cli.mjs'
 
 const ENVIRONMENT = 'production'
 const DATABASE = 'watermark-pro'
 
-// Tool entry points are resolved from node_modules and executed by the
-// current Node binary, so no shell is involved and PATH does not matter.
-const require = createRequire(import.meta.url)
-
-/** Absolute path of a package's CLI entry, read from its package.json `bin`. */
-function binOf(packageName, binName) {
-  const manifestPath = require.resolve(`${packageName}/package.json`)
-  const manifest = require(manifestPath)
-  const bin = typeof manifest.bin === 'string' ? manifest.bin : manifest.bin[binName]
-  return path.join(path.dirname(manifestPath), bin)
-}
-
 const TOOLS = {
-  vite: binOf('vite', 'vite'),
   wrangler: binOf('wrangler', 'wrangler'),
 }
 
@@ -70,7 +57,7 @@ function assertNoPendingMigrations() {
 
 // The Cloudflare Vite plugin resolves wrangler.jsonc for the environment named
 // by CLOUDFLARE_ENV and writes the resolved config next to the build output.
-run('vite', ['build'], { CLOUDFLARE_ENV: ENVIRONMENT })
+runNode('scripts/build.mjs', [], { CLOUDFLARE_ENV: ENVIRONMENT })
 // CI=true makes wrangler skip its confirmation prompt instead of treating a
 // closed stdin as "no", which once left a migration unapplied while the
 // Worker that needed it deployed anyway.

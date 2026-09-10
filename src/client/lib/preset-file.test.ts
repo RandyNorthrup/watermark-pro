@@ -132,7 +132,7 @@ describe('parsePresetFile', () => {
 
   it('rejects a JSON file that is not a preset bundle', async () => {
     const file = new File([JSON.stringify({ format: 'other', presets: [] })], 'x.wmp.json')
-    await expect(parsePresetFile(file)).rejects.toThrow(/not a Watermark Pro preset file/)
+    await expect(parsePresetFile(file)).rejects.toThrow(/not a Lumafoil preset file/)
   })
 
   it('rejects an embedded logo larger than the logo limit before parsing', async () => {

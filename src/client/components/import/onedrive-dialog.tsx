@@ -1,6 +1,6 @@
 import { ChevronRight, Cloud, FileImage, Folder } from 'lucide-react'
 import { Dialog } from 'radix-ui'
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { PublicConfig } from '../../../shared/api'
@@ -13,6 +13,8 @@ import {
   type OneDriveImage,
   type OneDriveItem,
 } from '../../lib/imports/onedrive'
+import { ACCOUNT_CHANGED_EVENT } from '../../lib/offline-account'
+import { captureOfflineOwner } from '../../lib/offline-context'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
@@ -43,6 +45,18 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
   const [isLoading, setIsLoading] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  useEffect(() => {
+    const changed = () => {
+      setToken(null)
+      setItems([])
+      setPath([])
+      setSelected(new Set())
+      setError(null)
+      setIsOpen(false)
+    }
+    window.addEventListener(ACCOUNT_CHANGED_EVENT, changed)
+    return () => window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
+  }, [])
 
   const clientId = config.microsoftClientId
   if (clientId === null) {
@@ -63,16 +77,24 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
     if (clientId === null) {
       return
     }
+    const owner = captureOfflineOwner()
     setIsLoading(true)
     setError(null)
     try {
       const acquired = await acquireGraphToken(clientId)
+      owner.assertCurrent()
       const listing = await listOneDriveImages(acquired)
+      owner.assertCurrent()
       setToken(acquired)
       setItems(listing)
       setPath([])
       setSelected(new Set())
     } catch (error_) {
+      try {
+        owner.assertCurrent()
+      } catch {
+        return
+      }
       setError(describeError(error_))
     } finally {
       setIsLoading(false)
@@ -83,14 +105,21 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
     if (token === null) {
       return
     }
+    const owner = captureOfflineOwner()
     setIsLoading(true)
     setError(null)
     setSelected(new Set())
     try {
       const listing = await listOneDriveImages(token, nextPath.at(-1)?.id)
+      owner.assertCurrent()
       setItems(listing)
       setPath(nextPath)
     } catch (error_) {
+      try {
+        owner.assertCurrent()
+      } catch {
+        return
+      }
       setError(describeError(error_))
     } finally {
       setIsLoading(false)
@@ -110,6 +139,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
   }
 
   async function addSelected() {
+    const owner = captureOfflineOwner()
     const chosen = items.filter(
       (item): item is OneDriveImage => item.kind === 'image' && selected.has(item.id),
     )
@@ -120,9 +150,15 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
     setError(null)
     try {
       const files = await Promise.all(chosen.map((image) => downloadOneDriveImage(image)))
+      owner.assertCurrent()
       onImport(files)
       setIsOpen(false)
     } catch (error_) {
+      try {
+        owner.assertCurrent()
+      } catch {
+        return
+      }
       setError(describeError(error_))
     } finally {
       setIsImporting(false)

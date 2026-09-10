@@ -1,9 +1,10 @@
 # Threat model
 
-Scope: Watermark Pro as deployed at `watermark.blowmoney.net` on Cloudflare
+Scope: Lumafoil as deployed at `lumafoil.com` on Cloudflare
 Workers (single Worker, D1, R2, Rate Limiting, Email Sending, optional
 Turnstile). Reviewed 2026-09-06 for milestone M8 against the controls listed
-in [SECURITY.md](../SECURITY.md). Re-review when a new trust boundary is
+in [SECURITY.md](../SECURITY.md); the platform-telemetry boundary was reviewed
+again on 2026-09-09 for M19. Re-review when a new trust boundary is
 added (a new binding, a new public route, a new third-party origin).
 
 ## Assets
@@ -30,6 +31,10 @@ added (a new binding, a new public route, a new third-party origin).
    Turnstile siteverify (outbound HTTPS).
 4. **CI → Cloudflare**: `wrangler deploy` from a tag with a scoped API token.
 5. **Email → user**: verification, reset and invitation links.
+6. **Worker invocation → platform telemetry**: Cloudflare can enrich a sanitized
+   application log with the original request URL, independently of the
+   application's formatter. The local deployment configuration disables
+   persistent platform logs and traces; live operator tails remain sensitive.
 
 ## Threats and mitigations (STRIDE)
 
@@ -91,6 +96,15 @@ added (a new binding, a new public route, a new third-party origin).
 | Banned user continuing                  | Better Auth rejects sign-in for banned users and revokes sessions on ban                                            | `admin.test.ts`                      |
 
 ## Accepted residual risks
+
+- **Platform request enrichment** can expose bearer values carried in URL paths.
+  A 2026-09-09 hosted probe proved that disabling invocation records and
+  redacting query strings still leaves paths in persisted custom-log metadata.
+  The reviewed Wrangler configuration therefore disables platform logs/traces
+  and persistence while retaining application D1 diagnostics and private live
+  tailing. See [hosted evidence](verification/m19/platform-observability-privacy.md).
+  Applying this configuration to production is a separate release check; it
+  does not remove historical provider records or sanitize operator captures.
 
 - **Client-reported image dimensions** are stored for display; the Worker
   never decodes images, so a client could misreport them. Impact: cosmetic.

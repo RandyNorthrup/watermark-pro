@@ -3,6 +3,7 @@ import { type SubmitEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
+import { resetPasswordSearchSchema } from '../../shared/client-search'
 import { PASSWORD_MIN_LENGTH } from '../../shared/constants'
 import { passwordSchema } from '../../shared/validation'
 import { AuthLayout } from '../components/auth-layout'
@@ -14,21 +15,14 @@ import { authClient } from '../lib/auth-client'
 import { describeAuthError } from '../lib/errors'
 import { useFormErrors } from '../lib/use-form-errors'
 
-const searchSchema = z.object({
-  token: z.string().optional(),
-  /** Better Auth redirects here with ?error=INVALID_TOKEN when the link is stale. */
-  error: z.string().optional(),
-})
-
 export const Route = createFileRoute('/reset-password')({
-  validateSearch: (search) => searchSchema.parse(search),
+  validateSearch: (search) => resetPasswordSearchSchema.parse(search),
   component: ResetPasswordPage,
 })
 
-const formFields = z.object({ password: passwordSchema, confirm: z.string() })
-type FormValues = z.infer<typeof formFields>
-
 function ResetPasswordPage() {
+  const formFields = z.object({ password: passwordSchema, confirm: z.string() })
+  type FormValues = z.infer<typeof formFields>
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { token, error: linkError } = Route.useSearch()

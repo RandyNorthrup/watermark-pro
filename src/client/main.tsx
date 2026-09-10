@@ -4,8 +4,10 @@ import { RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { initI18n } from './i18n'
-import { launchTarget, setLaunchFiles } from './lib/launch-files'
+import { hasInterfaceLanguage, initI18n } from './i18n'
+import { showBootFailure } from './lib/boot-failure'
+import { receiveLaunchFiles } from './lib/launch-files'
+import { installOfflineAccountBoundary } from './lib/offline-account'
 import { preloadRouteImages } from './lib/preload'
 import { createQueryClient } from './lib/query-client'
 import { installQueryPersister } from './lib/query-persister'
@@ -30,9 +32,10 @@ if (import.meta.env.PROD) {
 }
 
 const queryClient = createQueryClient()
-// Restore the shell's session/organization queries from the last visit and keep
-// them persisted, so a return visit renders the frame from cache (PLAN §2).
+// Restore validated display queries for offline access. Online route admission
+// still validates live identity before displaying any cached private workspace.
 installQueryPersister(queryClient)
+installOfflineAccountBoundary(queryClient)
 const router = createAppRouter(queryClient)
 
 // The routes for this URL need their code as soon as the session check
@@ -47,19 +50,15 @@ for (const route of matchedRoutes) {
 // Likewise the image a matched route paints first (`lib/preload.ts`).
 preloadRouteImages(matchedRoutes)
 
+// Route admission does not depend on translated UI. Start its session and data
+// requests while the language catalogue loads, retaining the same route guards.
+void router.load()
+
 // Web Share Target (Android): a single-purpose service worker receives shared
 // photos and hands them to /app/bulk. Registered under its own scope so it
 // never intercepts anything else.
 if ('serviceWorker' in navigator) {
   void navigator.serviceWorker.register('/share-target-sw.js', { scope: '/share-target' })
-}
-
-// Offline support (M19): a root-scope worker caches hashed assets and serves
-// navigations network-first, so the installed app works without a network once
-// visited. Production only — in development it would cache dev assets and fight
-// hot-module reloading. It never touches the /share-target scope above.
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  void navigator.serviceWorker.register('/sw.js')
 }
 
 // Desktop file handling (installed PWA): the OS opens the app with the files
@@ -71,15 +70,7 @@ const launchWindow = window as unknown as {
   launchQueue?: { setConsumer: (consumer: (params: LaunchParams) => void) => void }
 }
 launchWindow.launchQueue?.setConsumer((params) => {
-  void (async () => {
-    const handles = params.files ?? []
-    if (handles.length === 0) {
-      return
-    }
-    const files = await Promise.all(handles.map((handle) => handle.getFile()))
-    setLaunchFiles(files)
-    await router.navigate({ to: launchTarget(files.length) })
-  })()
+  void receiveLaunchFiles(params.files ?? [], (to) => router.navigate({ to }))
 })
 
 const root = createRoot(rootElement)
@@ -97,7 +88,11 @@ function renderApp(): void {
 // English; render regardless of the outcome so a catalogue hiccup cannot leave
 // a blank page (i18next falls back to English on its own).
 void initI18n()
+  .then(renderApp)
   .catch(() => {
-    // A catalogue failure still renders: i18next falls back to English.
+    if (hasInterfaceLanguage()) {
+      renderApp()
+      return
+    }
+    showBootFailure(rootElement)
   })
-  .finally(renderApp)

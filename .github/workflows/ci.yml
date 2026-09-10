@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Tagged releases reuse these exact gates without receiving deployment secrets.
+  workflow_call:
 
 permissions:
   contents: read
@@ -26,12 +28,11 @@ jobs:
 
       # Regenerates worker-configuration.d.ts and fails if the committed file
       # is stale, so wrangler.jsonc and the types can never drift apart.
-      - name: Verify generated Worker types are current
-        run: |
-          npm run cf-typegen
-          git diff --exit-code -- worker-configuration.d.ts
+      - uses: ./.github/actions/verify-worker-types
 
-      - name: Format, lint, types, dead code, cycles, duplication, secrets, audit, tests, build
+      # quality scans working/index/history plus bounded ZIP contents; build
+      # separately scans every browser-served output. CI has no production secrets.
+      - name: Format, lint, types, dead code, cycles, duplication, publication, audit, tests, build
         run: npm run quality:ci
 
       # The router plugin rewrites the route tree during the build above; the
@@ -47,39 +48,73 @@ jobs:
           path: coverage/lcov.info
           if-no-files-found: error
 
-  e2e:
-    name: End-to-end (Playwright + axe)
+  e2e-device:
+    name: Playwright + axe (${{ matrix.project }})
     runs-on: ubuntu-latest
-    needs: quality
+    needs: [quality, sast]
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop-chrome, iphone, ipad, android]
+    # Unique output names preserve one success receipt from every matrix child.
+    # A missing/skipped child cannot be mistaken for a complete green matrix.
+    outputs:
+      desktop_chrome: ${{ steps.verify.outputs.desktop_chrome }}
+      iphone: ${{ steps.verify.outputs.iphone }}
+      ipad: ${{ steps.verify.outputs.ipad }}
+      android: ${{ steps.verify.outputs.android }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/setup-node-gitleaks
-      # The preview Worker validates its configuration like production does,
-      # so it needs a session secret. A random one per run is never committed
-      # and never leaves the runner.
-      - name: Provide a throwaway local secret for the preview Worker
-        run: echo "BETTER_AUTH_SECRET=$(openssl rand -base64 48)" > .dev.vars
-      - run: npm run test:e2e
+      # Every runner builds its own app and owns isolated temporary D1/R2 state.
+      - name: Run every journey for this device
+        id: verify
+        shell: bash
+        env:
+          PLAYWRIGHT_PROJECT: ${{ matrix.project }}
+        run: |
+          npm run test:e2e -- --project "$PLAYWRIGHT_PROJECT"
+          printf '%s=success\n' "${PLAYWRIGHT_PROJECT//-/_}" >> "$GITHUB_OUTPUT"
       # The GitHub reporter writes no HTML report; what a failure leaves behind
       # is the trace, screenshot and page snapshot under test-results/.
       - name: Upload Playwright traces
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: playwright-traces
+          name: playwright-traces-${{ matrix.project }}
           path: test-results/
           retention-days: 7
 
+  e2e:
+    # Required branch-protection check: keep this name stable as shards change.
+    name: End-to-end (Playwright + axe)
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    needs: [quality, sast, e2e-device]
+    steps:
+      - name: Require every device and prerequisite to succeed
+        shell: bash
+        env:
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          SAST_RESULT: ${{ needs.sast.result }}
+          MATRIX_RESULT: ${{ needs.e2e-device.result }}
+          DESKTOP_RESULT: ${{ needs.e2e-device.outputs.desktop_chrome }}
+          IPHONE_RESULT: ${{ needs.e2e-device.outputs.iphone }}
+          IPAD_RESULT: ${{ needs.e2e-device.outputs.ipad }}
+          ANDROID_RESULT: ${{ needs.e2e-device.outputs.android }}
+        run: |
+          for gate in QUALITY_RESULT SAST_RESULT MATRIX_RESULT DESKTOP_RESULT IPHONE_RESULT IPAD_RESULT ANDROID_RESULT; do
+            if [[ "${!gate}" != success ]]; then
+              printf '::error::%s did not succeed (%s). Every device is required.\n' "$gate" "${!gate}"
+              exit 1
+            fi
+          done
+
   sast:
     name: Static analysis (semgrep)
-    runs-on: ubuntu-latest
-    container:
-      # Pinned by manifest digest so a moved tag cannot change the scanner.
-      image: semgrep/semgrep:1.174.0@sha256:f1f7b71861c7b28b6e0f661225a2c4f58a484f5d0f182465c6d6b3b22f972ade
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # Explicit rulesets: `--config auto` requires telemetry, which is off.
-      - run: semgrep scan --config p/default --config p/typescript --config p/react --config p/secrets --error --metrics=off
+    uses: ./.github/workflows/sast.yml
 
   dependency-review:
     name: Dependency review
@@ -87,7 +122,6 @@ jobs:
     if: github.event_name == 'pull_request'
     permissions:
       contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Fails the pull request when it introduces a dependency with a known
@@ -96,4 +130,5 @@ jobs:
         with:
           fail-on-severity: high
           allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, OFL-1.1, MPL-2.0, CC0-1.0, Unlicense, BlueOak-1.0.0, Python-2.0, CC-BY-4.0
-          comment-summary-in-pr: on-failure
+          # Findings remain in the check/job summary. Reusable tag callers stay read-only.
+          comment-summary-in-pr: never

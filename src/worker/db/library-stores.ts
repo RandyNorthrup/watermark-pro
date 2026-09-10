@@ -16,6 +16,13 @@ import { asset, photo, share, watermark } from './schema'
 /** D1-backed preset store. Exercised by the Workers test project. */
 export function createDrizzleWatermarkStore(db: Database): WatermarkStore {
   return {
+    async findMany(organizationId, ids) {
+      if (ids.length === 0) return []
+      return await db
+        .select()
+        .from(watermark)
+        .where(and(eq(watermark.organizationId, organizationId), inArray(watermark.id, [...ids])))
+    },
     async listForOrganization(organizationId) {
       return await db
         .select()
@@ -39,10 +46,19 @@ export function createDrizzleWatermarkStore(db: Database): WatermarkStore {
       return row
     },
     async update(organizationId, id, patch) {
+      const expected =
+        patch.expectedUpdatedAt === undefined ? null : new Date(patch.expectedUpdatedAt)
+      const nextTimestamp = new Date(Math.max(Date.now(), (expected?.getTime() ?? 0) + 1))
       const [row] = await db
         .update(watermark)
-        .set({ name: patch.name, spec: patch.spec, updatedAt: new Date() })
-        .where(and(eq(watermark.organizationId, organizationId), eq(watermark.id, id)))
+        .set({ name: patch.name, spec: patch.spec, updatedAt: nextTimestamp })
+        .where(
+          and(
+            eq(watermark.organizationId, organizationId),
+            eq(watermark.id, id),
+            expected === null ? undefined : eq(watermark.updatedAt, expected),
+          ),
+        )
         .returning()
       return row ?? null
     },
@@ -236,7 +252,10 @@ export function createDrizzlePhotoStore(db: Database): PhotoStore {
     },
     async usage(organizationId) {
       const [row] = await db
-        .select({ count: count(), bytes: sql<number>`coalesce(sum(${photo.size}), 0)` })
+        .select({
+          count: count(),
+          bytes: sql<number>`coalesce(sum(${photo.size} + ${photo.thumbnailSize}), 0)`,
+        })
         .from(photo)
         .where(eq(photo.organizationId, organizationId))
       return { count: row?.count ?? 0, bytes: row?.bytes ?? 0 }
@@ -246,7 +265,7 @@ export function createDrizzlePhotoStore(db: Database): PhotoStore {
         .select({
           organizationId: photo.organizationId,
           count: count(),
-          bytes: sql<number>`coalesce(sum(${photo.size}), 0)`,
+          bytes: sql<number>`coalesce(sum(${photo.size} + ${photo.thumbnailSize}), 0)`,
         })
         .from(photo)
         .groupBy(photo.organizationId)

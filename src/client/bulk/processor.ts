@@ -14,6 +14,7 @@ import {
   isIdentityOrientation,
   type Orientation,
 } from '../../shared/adjustments'
+import { artworkLicenseNotice } from '../../shared/asset-licenses'
 import type { PhotoMetadata } from '../../shared/metadata'
 import type { WatermarkSpec } from '../../shared/watermark'
 import { fitLongestSide, isSameSize } from '../editor/geometry'
@@ -134,6 +135,7 @@ export function outputSizeForJob(
 }
 
 export interface BulkResult {
+  assetNotice?: string | undefined
   blob: Blob
   /** The output file's base name plus extension (from the name pattern). */
   fileName: string
@@ -218,8 +220,10 @@ export class BulkProcessor {
       width: result.width,
       height: result.height,
     })
+    const assetNotice = artworkLicenseNotice(inputs.marks.map((mark) => mark.spec))
     return {
       blob: result.blob,
+      ...(assetNotice !== null && { assetNotice }),
       fileName: `${name}.${extensionFor(settings.output.format)}`,
       relativePath: input.relativePath,
       width: result.width,

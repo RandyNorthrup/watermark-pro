@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 
 import { NO_CLOUD_CONFIG } from './cloud-config'
 import { type FakeGalleryState, handleGallery } from './fake-gallery-api'
+import { emptyRecentState, handleRecent, type FakeRecentState } from './fake-recent-api'
 import { type FakeShareState, handleShares } from './fake-share-api'
 import { requestUrl } from './request-url'
 import type { AssetDto, PublicConfig } from '../../shared/api'
@@ -22,6 +23,7 @@ export interface FakeLibraryState {
   shares: FakeShareState
   /** Served from GET /api/config; defaults to every cloud provider off. */
   publicConfig: PublicConfig
+  recents: FakeRecentState
 }
 
 const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
@@ -114,6 +116,8 @@ function handle(state: FakeLibraryState, url: string, init: RequestInit): Respon
   if (state.failWith !== null) {
     return errorResponse(state.failWith)
   }
+  const recent = handleRecent(state, url, init)
+  if (recent !== null) return recent
   const gallery = handleGallery(state.gallery, url, init)
   if (gallery !== null) {
     return gallery
@@ -208,6 +212,7 @@ export function installLibraryApi(initial: Partial<FakeLibraryState> = {}): Fake
     gallery: { photos: [], maxBytes: 2 * 1024 * 1024 * 1024, uploadFailsWith: null },
     shares: { shares: [] },
     publicConfig: NO_CLOUD_CONFIG,
+    recents: emptyRecentState(),
     ...initial,
   }
   vi.stubGlobal(

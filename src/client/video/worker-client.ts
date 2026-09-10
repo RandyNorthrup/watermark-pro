@@ -35,6 +35,7 @@ export class VideoTranscoder {
   readonly #worker: Worker
   #pending: Pending | null = null
   #nextId = 1
+  #isTerminated = false
 
   constructor(worker: Worker = createVideoWorker()) {
     this.#worker = worker
@@ -90,8 +91,11 @@ export class VideoTranscoder {
     return this.#pending !== null
   }
 
-  /** Starts one transcode; rejects if another is already running. */
+  /** Starts one transcode; rejects overlapping work and calls after termination. */
   transcode(input: VideoTranscodeInput, callbacks: VideoTranscodeCallbacks = {}): Promise<Blob> {
+    if (this.#isTerminated) {
+      return Promise.reject(new VideoTranscodeError('video transcoder terminated'))
+    }
     if (this.#pending !== null) {
       return Promise.reject(new VideoTranscodeError('a transcode is already running'))
     }
@@ -103,7 +107,14 @@ export class VideoTranscoder {
     )
     return new Promise<Blob>((resolve, reject) => {
       this.#pending = { id, resolve, reject, onProgress: callbacks.onProgress }
-      this.#worker.postMessage(message, transfer)
+      try {
+        this.#worker.postMessage(message, transfer)
+      } catch (error) {
+        // A failed structured clone produces no worker response to clear this job.
+        this.#fail(
+          new VideoTranscodeError('Could not send the video to the worker.', { cause: error }),
+        )
+      }
     })
   }
 
@@ -118,6 +129,7 @@ export class VideoTranscoder {
   }
 
   terminate(): void {
+    this.#isTerminated = true
     this.#worker.terminate()
     this.#fail(new VideoTranscodeError('video transcoder terminated'))
   }

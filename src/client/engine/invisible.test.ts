@@ -37,7 +37,7 @@ describe('embedInvisibleMark / readInvisibleMark', () => {
     const width = 64
     const height = 64
     const data = noisyBuffer(width, height)
-    const message = 'Hello, Watermark Pro!'
+    const message = 'Hello, Lumafoil!'
     embedInvisibleMark(data, width, height, message)
     expect(readInvisibleMark(data, width, height)).toBe(message)
   })

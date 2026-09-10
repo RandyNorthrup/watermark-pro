@@ -1,19 +1,8 @@
-/**
- * Builds a fully functional application for Node unit tests: real Hono
- * routing, real Better Auth on the in-memory adapter, in-memory audit store,
- * console mailbox, and no rate limiting (there is no binding to consult).
- * Everything that talks to a Cloudflare binding is exercised separately in
- * the Workers test project.
- */
 import { memoryAdapter } from 'better-auth/adapters/memory'
 
-import { createAuth } from '../auth/auth'
-import { type RateLimitStorage, unlimitedRateLimitStorage } from '../auth/rate-limit'
-import { createConsoleEmailSender, type DevMailbox } from '../email/console'
-import { validateEnv } from '../env'
-import { createApp } from '../index'
-import type { ImportLimiter, Services } from '../services'
+import { createMemoryAccountStore } from './memory-account-store'
 import { createMemoryAuditStore } from './memory-audit-store'
+import { createMemoryRecentStore } from './memory-recent-store'
 import {
   createMemoryAssetStore,
   createMemoryObjectStore,
@@ -24,6 +13,14 @@ import {
   createMemoryShareStore,
   createMemoryWatermarkStore,
 } from './memory-stores'
+import { createMemoryUploadStore } from './memory-upload-store'
+import { createAuth } from '../auth/auth'
+import { type RateLimitStorage, unlimitedRateLimitStorage } from '../auth/rate-limit'
+import type { AccountOAuthConfiguration } from '../auth/social-providers'
+import { createConsoleEmailSender, type DevMailbox } from '../email/console'
+import { validateEnv } from '../env'
+import { createApp } from '../index'
+import type { ImportLimiter, Services } from '../services'
 
 export const TEST_APP_URL = 'http://localhost:5273'
 export const TEST_SECRET = 'test-secret-with-at-least-thirty-two-characters'
@@ -44,6 +41,7 @@ function notABinding(): never {
  */
 export type TestEnv = Env & {
   BETTER_AUTH_SECRET: string
+  GOOGLE_PICKER_API_KEY?: string
   TURNSTILE_SITE_KEY?: string
   TURNSTILE_SECRET_KEY?: string
 }
@@ -76,6 +74,9 @@ export interface TestHarness {
 }
 
 export interface TestHarnessOptions {
+  accountOAuth?: AccountOAuthConfiguration | undefined
+  /** Exercise real production signup admission rather than the fixture bootstrap. */
+  invitationOnly?: boolean | undefined
   /** Replaces the never-limiting default, for tests that exercise 429 paths. */
   rateLimit?: RateLimitStorage | undefined
   /** Replaces the always-allow import limiter, for tests that exercise the 429 path. */
@@ -117,14 +118,24 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     member: [],
     invitation: [],
   }
+  const accounts = createMemoryAccountStore(tables)
+  const assets = createMemoryAssetStore()
+  const photos = createMemoryPhotoStore()
+  const organizations = createMemoryOrganizationStore(tables)
+  const watermarks = createMemoryWatermarkStore()
+  const uploads = createMemoryUploadStore({ assets, photos, organizations, audit, watermarks })
   const auth = createAuth({
     database: memoryAdapter(tables),
     secret: config.BETTER_AUTH_SECRET,
     appUrl: config.APP_URL,
     email: mailbox,
+    accounts,
+    accountOAuth: options.accountOAuth,
+    hasWorkspaceContent: async (organizationId) => await uploads.hasContent(organizationId),
     audit,
     rateLimit: unlimitedRateLimitStorage,
     rateLimitEnabled: false,
+    canSignUpWithoutInvitation: options.invitationOnly !== true,
     ...(options.captcha !== undefined && {
       captcha: {
         secretKey: options.captcha.secretKey,
@@ -138,12 +149,15 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     db: notABinding(),
     auth,
     email: mailbox,
+    accounts,
     audit,
-    watermarks: createMemoryWatermarkStore(),
-    assets: createMemoryAssetStore(),
-    photos: createMemoryPhotoStore(),
+    recents: createMemoryRecentStore(),
+    watermarks,
+    assets,
+    photos,
+    uploads,
     shares: createMemoryShareStore(),
-    organizations: createMemoryOrganizationStore(tables),
+    organizations,
     users: createMemoryUserStore(tables),
     observability: createMemoryObservabilityStore(),
     objects,

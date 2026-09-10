@@ -36,25 +36,29 @@
     'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', roboto,
     sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', menlo, consolas, monospace;
-  --color-brand-50: oklch(97% 0.02 285deg);
-  --color-brand-100: oklch(93% 0.05 285deg);
-  --color-brand-200: oklch(87% 0.09 285deg);
-  --color-brand-300: oklch(79% 0.14 285deg);
-  --color-brand-400: oklch(70% 0.19 285deg);
-  --color-brand-500: oklch(62% 0.22 285deg);
-  --color-brand-600: oklch(55% 0.23 285deg);
-  --color-brand-700: oklch(48% 0.21 285deg);
-  --color-brand-800: oklch(40% 0.17 285deg);
-  --color-brand-900: oklch(33% 0.13 285deg);
-  --color-accent-400: oklch(75% 0.18 320deg);
-  --color-accent-500: oklch(67% 0.22 320deg);
+  --font-editorial: 'Cormorant Garamond', georgia, 'Times New Roman', serif;
+  --color-brand-50: #fcf4f5;
+  --color-brand-100: #f7e5e9;
+  --color-brand-200: #ecc7d1;
+  --color-brand-300: #e1a6b7;
+  --color-brand-400: #d6869d;
+  --color-brand-500: #c86b82;
+  --color-brand-600: #a94965;
+  --color-brand-700: #8e354f;
+  --color-brand-800: #712c42;
+  --color-brand-900: #49222f;
+  --color-brand-950: #2c1720;
+  --color-accent-400: #dcb8a7;
+  --color-accent-500: #ca9684;
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
+  --color-surface-muted: var(--surface-muted);
+  --color-control-line: var(--control-line);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-line: var(--line);
   --radius-card: 1rem;
-  --shadow-card: 0 1px 2px oklch(0% 0 0deg / 6%), 0 12px 32px -12px oklch(0% 0 0deg / 18%);
+  --shadow-card: 0 2px 4px #49222f03, 0 8px 28px -16px #49222f14;
   --animate-sheet-in: sheet-in 200ms ease-out;
   --animate-sheet-out: sheet-out 150ms ease-in;
   --animate-fade-in: fade-in 200ms ease-out;
@@ -62,13 +66,13 @@
 
   @keyframes sheet-in {
     from {
-      transform: translateX(-100%);
+      transform: translateX(var(--sheet-offset, -100%));
     }
   }
 
   @keyframes sheet-out {
     to {
-      transform: translateX(-100%);
+      transform: translateX(var(--sheet-offset, -100%));
     }
   }
 
@@ -93,25 +97,51 @@
    * 3.5rem plus the home indicator. Scrolling something into view (a focused
    * field, a tapped tab) keeps clear of both.
    */
-  --app-header-height: calc(max(0.75rem, env(safe-area-inset-top)) + 3.0625rem);
+  --app-header-height: calc(max(0.75rem, env(safe-area-inset-top)) + 3.5625rem);
   --app-tab-bar-height: calc(3.5rem + env(safe-area-inset-bottom));
-  --surface: oklch(99% 0.004 285deg);
-  --surface-raised: oklch(100% 0 0deg);
-  --ink: oklch(20% 0.02 285deg);
-  --ink-muted: oklch(48% 0.02 285deg);
-  --line: oklch(90% 0.01 285deg);
+  --surface: #fbf9f7;
+  --surface-raised: #fff;
+  --surface-muted: #f3edeb;
+  --ink: #292329;
+  --ink-muted: #746973;
+  --line: #e7dfe2;
+  --control-line: #9f8c94;
+  --glass-card: #ffffffe0;
+  --glass-chrome: #fbf7f5e8;
+  --glass-popover: #fff9f6f7;
+  --glass-edge: #cfbdc680;
+  --glass-highlight: #ffffffed;
+  --glass-shadow: #49222f12;
+  --glass-wash-rose: #e9b3c359;
+  --glass-wash-peach: #e7c5ad52;
+  --glass-wash-mauve: #ce9daf24;
+  --glass-radius: 1.25rem;
+  --glass-blur: 18px;
 
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --surface: oklch(16% 0.015 285deg);
-    --surface-raised: oklch(21% 0.018 285deg);
-    --ink: oklch(95% 0.01 285deg);
-    --ink-muted: oklch(70% 0.015 285deg);
-    --line: oklch(30% 0.015 285deg);
-  }
+/* The pre-paint resolver also runs with blocked storage, so manual and system
+   choices share one selector instead of competing with a media-query palette. */
+:root[data-theme='dark'] {
+  --surface: #191619;
+  --surface-raised: #211d21;
+  --surface-muted: #292127;
+  --ink: #f7f1f3;
+  --ink-muted: #bfafb6;
+  --line: #43373e;
+  --control-line: #947f8a;
+  --glass-card: #2b242be0;
+  --glass-chrome: #221b22e8;
+  --glass-popover: #2c232bf7;
+  --glass-edge: #aa829b4d;
+  --glass-highlight: #fbd6e526;
+  --glass-shadow: #08050752;
+  --glass-wash-rose: #96475a42;
+  --glass-wash-peach: #865d4233;
+  --glass-wash-mauve: #b3667c24;
+
+  color-scheme: dark;
 }
 
 @layer base {
@@ -120,6 +150,11 @@
     color: var(--ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-brand-200);
+    color: var(--color-brand-950);
   }
 
   :focus-visible {
@@ -139,12 +174,115 @@
     }
   }
 
+  @media (pointer: coarse) {
+    :where(
+      button,
+      select,
+      input:not([type='checkbox'], [type='radio'], [type='range']),
+      [role='button']
+    ) {
+      min-block-size: 2.75rem;
+    }
+
+    :where(button, [role='button']) {
+      min-inline-size: 2.75rem;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
     ::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
+}
+
+/* Adapted glass-surface treatment: Margarita's MIT Liquid Glass UI Kit.
+ * Notice: public/brand/UI-KIT-LICENSE.txt. The rose palette, geometry and
+ * existing controls remain Lumafoil's; no filtering is applied to photo pixels.
+ */
+.workspace-scene {
+  isolation: isolate;
+  background-color: var(--surface);
+  background-image:
+    radial-gradient(ellipse at 0% 0%, var(--glass-wash-rose), transparent 58%),
+    radial-gradient(ellipse at 100% 45%, var(--glass-wash-peach), transparent 55%),
+    radial-gradient(ellipse at 45% 100%, var(--glass-wash-mauve), transparent 60%);
+}
+
+.glass-panel,
+.workspace-scene .rounded-card.bg-surface-raised {
+  border-color: var(--glass-edge);
+  border-radius: var(--glass-radius);
+  background-color: var(--surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 12px 36px -18px var(--glass-shadow),
+    0 2px 8px -4px var(--glass-shadow);
+}
+
+.glass-chrome {
+  background-color: var(--surface-raised);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
+
+.glass-popover {
+  background-color: var(--surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 14px 40px -14px var(--glass-shadow);
+}
+
+.glass-nav-active,
+.glass-control {
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 3px 9px -6px var(--glass-shadow);
+}
+
+.glass-action {
+  box-shadow:
+    inset 0 1px 0 #ffffff40,
+    0 5px 14px -8px #712c4273;
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .glass-panel,
+  .workspace-scene .rounded-card.bg-surface-raised {
+    background-color: var(--glass-card);
+    backdrop-filter: blur(var(--glass-blur)) saturate(115%);
+  }
+
+  .glass-chrome {
+    background-color: var(--glass-chrome);
+    backdrop-filter: blur(var(--glass-blur));
+  }
+
+  .glass-popover {
+    background-color: var(--glass-popover);
+    backdrop-filter: blur(var(--glass-blur));
+  }
+}
+
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .workspace-scene {
+    background-image: none;
+  }
+
+  .glass-panel,
+  .glass-chrome,
+  .glass-popover,
+  .workspace-scene .rounded-card.bg-surface-raised {
+    background-color: var(--surface-raised);
+    backdrop-filter: none;
+  }
+}
+
+/* A leading-edge sheet enters from the right in an RTL workspace. */
+:root[dir='rtl'] {
+  --sheet-offset: 100%;
 }

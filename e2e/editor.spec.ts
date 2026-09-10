@@ -4,6 +4,7 @@
  * a real PNG whose dimensions match the chosen output size.
  */
 import type { Page } from '@playwright/test'
+import rasterize from 'sharp'
 
 import {
   createWorkspace,
@@ -12,6 +13,8 @@ import {
   expectAccessible,
   navigateTo,
   pngSize,
+  pngFixture,
+  signUpAndVerify,
   test,
 } from './support'
 
@@ -22,6 +25,52 @@ const owner = {
   password: 'correct horse battery',
 }
 const organizationName = `Editor ${runId}`
+
+test('first photo goes from an empty library to a real watermarked export in the editor', async ({
+  page,
+  request,
+}, testInfo) => {
+  await signUpAndVerify(page, request, { ...owner, email: `first-editor-${runId}@example.test` })
+  await navigateTo(page, 'Editor')
+  const colour: [number, number, number] = [48, 93, 104]
+  const photo = pngFixture(960, 640, colour)
+  await page
+    .getByLabel('Open a photo')
+    .setInputFiles({ name: 'first-photo.png', mimeType: 'image/png', buffer: photo })
+  await page.getByRole('button', { name: 'Create watermark' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Create watermark' })
+  await dialog.getByLabel('Preset name').fill('First signature')
+  await dialog.getByRole('textbox', { name: 'Text' }).fill('© My first photo')
+  await expectRendered(page, /Watermark preview on the subject photo/)
+  await expectAccessible(page)
+  await page.screenshot({ path: testInfo.outputPath('first-watermark-designer.png') })
+  await dialog.getByRole('button', { name: 'Save and use' }).click()
+  await expect(dialog).toHaveCount(0)
+  await expect(page).toHaveURL(/\/app\/editor$/)
+  await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(
+    'First signature',
+  )
+  await page.getByRole('tab', { name: 'Export' }).click()
+  await page.getByRole('combobox', { name: 'Format' }).click()
+  await page.getByRole('option', { name: 'PNG' }).click()
+  await expectAccessible(page)
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Download' }).click()
+  const bytes = await downloadBytes(await downloadPromise)
+  expect(pngSize(bytes)).toEqual({ width: 960, height: 640 })
+  const pixels = await rasterize(bytes).removeAlpha().raw().toBuffer()
+  let changed = 0
+  for (let offset = 0; offset < pixels.length; offset += 3)
+    if (
+      pixels[offset] !== colour[0] ||
+      pixels[offset + 1] !== colour[1] ||
+      pixels[offset + 2] !== colour[2]
+    )
+      changed += 1
+  expect(changed).toBeGreaterThan(100)
+  await navigateTo(page, 'Library')
+  await expect(page.getByRole('link', { name: 'First signature', exact: true })).toBeVisible()
+})
 
 async function expectRendered(page: Page, name: RegExp) {
   const image = page.getByRole('img', { name })
@@ -44,7 +93,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   // A QR code preset for the second layer.
   await page.getByRole('link', { name: 'New preset' }).click()
   await page.getByRole('tab', { name: 'QR code' }).click()
-  await page.getByLabel('QR code content').fill('https://watermark.blowmoney.net')
+  await page.getByLabel('QR code content').fill('https://lumafoil.com')
   await page.getByLabel('Preset name').fill('QR link')
   await expect(
     page.getByRole('img', { name: 'Watermark preview on the subject photo' }),

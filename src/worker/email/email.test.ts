@@ -10,16 +10,16 @@ const message = { to: 'a@example.test', subject: 'Hello', text: 'plain', html: '
 describe('createCloudflareEmailSender', () => {
   it('passes the message to the binding with the configured sender', async () => {
     const binding = { send: vi.fn(() => Promise.resolve({ messageId: 'm1' })) }
-    await createCloudflareEmailSender(binding, 'no-reply@watermark.blowmoney.net').send(message)
+    await createCloudflareEmailSender(binding, 'no-reply@lumafoil.com').send(message)
     expect(binding.send).toHaveBeenCalledWith({
-      from: 'no-reply@watermark.blowmoney.net',
+      from: 'no-reply@lumafoil.com',
       ...message,
     })
   })
 
   it('wraps binding failures without dropping the cause', async () => {
     const binding = { send: vi.fn(() => Promise.reject(new Error('quota exceeded'))) }
-    const sender = createCloudflareEmailSender(binding, 'no-reply@watermark.blowmoney.net')
+    const sender = createCloudflareEmailSender(binding, 'no-reply@lumafoil.com')
     await expect(sender.send(message)).rejects.toBeInstanceOf(EmailDeliveryError)
     await expect(sender.send(message)).rejects.toMatchObject({
       message: expect.stringContaining('quota exceeded'),

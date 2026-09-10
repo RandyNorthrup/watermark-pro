@@ -184,6 +184,40 @@ describe('library page', () => {
 })
 
 describe('preset designer', () => {
+  it('saves separate QR destinations and filters the library without mixing their contents', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ watermarks: [makeWatermark()] })
+    const { router } = renderApp('/app/library/new?kind=qr')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('New QR code')
+    await user.type(screen.getByLabelText('Preset name'), 'Portfolio QR')
+    await user.clear(screen.getByLabelText('QR code content'))
+    await user.type(screen.getByLabelText('QR code content'), 'https://example.com/portfolio')
+    await user.click(screen.getByRole('button', { name: 'Save preset' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
+    await user.click(await screen.findByRole('link', { name: 'New QR code' }))
+    await screen.findByLabelText('QR code content')
+    await user.type(screen.getByLabelText('Preset name'), 'Contact QR')
+    await user.clear(screen.getByLabelText('QR code content'))
+    await user.type(screen.getByLabelText('QR code content'), 'https://example.com/contact')
+    await user.click(screen.getByRole('button', { name: 'Save preset' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
+    await user.click(await screen.findByRole('checkbox', { name: 'QR codes only' }))
+    expect(screen.getByRole('link', { name: 'Portfolio QR' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Contact QR' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Studio signature' })).not.toBeInTheDocument()
+    expect(
+      api.watermarks
+        .filter((preset) => preset.spec.kind === 'qr')
+        .map((preset) => (preset.spec.kind === 'qr' ? preset.spec.content : '')),
+    ).toEqual(['https://example.com/portfolio', 'https://example.com/contact'])
+    await user.click(screen.getByRole('link', { name: 'Portfolio QR' }))
+    expect(await screen.findByLabelText('QR code content')).toHaveValue(
+      'https://example.com/portfolio',
+    )
+    expect(screen.getByLabelText('QR code content')).not.toHaveValue('https://example.com/contact')
+  })
+
   it('creates a text preset, previewing each change through the engine', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())

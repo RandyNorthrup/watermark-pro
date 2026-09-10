@@ -1,12 +1,16 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FILTER_BY_ID } from '../../../shared/adjustments'
+import * as imageSize from '../../lib/image-size'
 import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
+import { clearLaunchFiles, receiveLaunchFiles, takeLaunchFiles } from '../../lib/launch-files'
+import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace, seedViewerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
+import { cloudUploadBatches, fakeCloudSaver } from '../../test-support/fake-cloud-save'
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import {
@@ -15,6 +19,7 @@ import {
   renderedSpecs,
   renderedTransforms,
   resetFakePreview,
+  previewSubjects,
 } from '../../test-support/fake-preview'
 import { renderApp } from '../../test-support/render-app'
 
@@ -43,7 +48,9 @@ async function openSquareCrop(user: ReturnType<typeof userEvent.setup>) {
   seedOwnerWorkspace(client())
   installLibraryApi({ watermarks: [makeWatermark()] })
   renderApp('/app/editor?preset=wm-1')
-  await screen.findByLabelText('Preset')
+  // URL selection replaces the empty picker's label; wait for the selected
+  // state rather than racing a transient label before the preset is applied.
+  await screen.findByRole('combobox', { name: 'Add another preset' })
   await user.click(screen.getByRole('tab', { name: 'Crop' }))
   await user.click(screen.getByRole('button', { name: '1:1' }))
   expect(screen.getByLabelText('Width (px)')).toHaveValue(640)
@@ -63,6 +70,8 @@ async function openExportCloudSave(): Promise<{ user: ReturnType<typeof userEven
 }
 
 beforeEach(() => {
+  clearLaunchFiles()
+  setOfflineUser(null)
   installFakeAuth()
   resetFakePreview()
   downloads.mockClear()
@@ -83,17 +92,105 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  clearLaunchFiles()
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
 })
 
 describe('editor page', () => {
+  it('adopts a fresh startup launch after authentication and another launch while already open', async () => {
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    const first = new File(['synthetic'], 'startup.png', { type: 'image/png' })
+    await receiveLaunchFiles(
+      [{ getFile: () => Promise.resolve(first) }],
+      vi.fn().mockResolvedValue(undefined),
+    )
+    const { router } = renderApp('/app/editor')
+    expect(await screen.findByText(/startup.png/)).toBeInTheDocument()
+    expect(previewSubjects).toContain(first)
+    const next = new File(['synthetic'], 'next.png', { type: 'image/png' })
+    await act(() =>
+      receiveLaunchFiles([{ getFile: () => Promise.resolve(next) }], (to) =>
+        router.navigate({ to }),
+      ),
+    )
+    expect(await screen.findByText(/next.png/)).toBeInTheDocument()
+    expect(screen.queryByText(/startup.png/)).not.toBeInTheDocument()
+    expect(previewSubjects.at(-1)).toBe(next)
+    expect(takeLaunchFiles('/app/editor')).toEqual([])
+  })
+
+  it('never drains a multi-photo launch into the single-photo editor', async () => {
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/editor')
+    await screen.findByRole('heading', { level: 1, name: 'Editor' })
+    const files = ['bulk-one.png', 'bulk-two.png'].map(
+      (name) => new File(['synthetic'], name, { type: 'image/png' }),
+    )
+    await act(() =>
+      receiveLaunchFiles(
+        files.map((file) => ({ getFile: () => Promise.resolve(file) })),
+        vi.fn().mockResolvedValue(undefined),
+      ),
+    )
+    expect(previewSubjects).toEqual([])
+    expect(screen.queryByText(/bulk-one.png/)).not.toBeInTheDocument()
+    expect(takeLaunchFiles('/app/bulk')).toEqual(files)
+  })
+
+  it.each(['switch', 'unmount', 'new-photo'] as const)(
+    'rejects delayed launch metadata after %s',
+    async (change) => {
+      seedOwnerWorkspace(client())
+      installLibraryApi({ watermarks: [makeWatermark()] })
+      const view = renderApp('/app/editor')
+      await screen.findByRole('heading', { level: 1, name: 'Editor' })
+      const size = Promise.withResolvers<{ width: number; height: number }>()
+      const readSize = vi
+        .spyOn(imageSize, 'readImageSize')
+        .mockImplementationOnce(() => size.promise)
+      const stale = new File(['synthetic'], 'stale.png', { type: 'image/png' })
+      await act(() =>
+        receiveLaunchFiles(
+          [{ getFile: () => Promise.resolve(stale) }],
+          vi.fn().mockResolvedValue(undefined),
+        ),
+      )
+      expect(readSize).toHaveBeenCalledWith(stale)
+      if (change === 'unmount') view.unmount()
+      else if (change === 'switch') setOfflineUser('different-account')
+      else {
+        const fresh = new File(['synthetic'], 'fresh.png', { type: 'image/png' })
+        await act(() =>
+          receiveLaunchFiles(
+            [{ getFile: () => Promise.resolve(fresh) }],
+            vi.fn().mockResolvedValue(undefined),
+          ),
+        )
+        await screen.findByText(/fresh.png/)
+      }
+      await act(async () => {
+        size.resolve({ width: 100, height: 100 })
+        await size.promise
+      })
+      expect(previewSubjects).not.toContain(stale)
+      expect(screen.queryByText(/stale.png/)).not.toBeInTheDocument()
+      if (change === 'new-photo') expect(screen.getByText(/fresh.png/)).toBeInTheDocument()
+    },
+  )
+
   it('loads the preset from the URL, places it by hand, and undoes', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark(), makeWatermark({ id: 'wm-2', name: 'Two' })] })
     renderApp('/app/editor?preset=wm-1')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(
+      screen.getByText(/Download the result or choose a gallery or cloud save/),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/Nothing leaves your browser/)).not.toBeInTheDocument()
     // The preset from the URL is the first (and active) layer.
     const layers = within(await screen.findByRole('list', { name: 'Layers, bottom to top' }))
     expect(layers.getByRole('button', { pressed: true })).toHaveTextContent('Studio signature')
@@ -204,7 +301,9 @@ describe('editor page', () => {
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor')
     await screen.findByLabelText('Preset')
-    expect(screen.getByText(/Choose a preset to place a watermark/)).toBeInTheDocument()
+    expect(
+      screen.getByText('Add a watermark, then open Export to download your photo.'),
+    ).toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     expect(screen.getByRole('button', { name: 'Download' })).toBeDisabled()
 
@@ -308,13 +407,13 @@ describe('editor page', () => {
   })
 
   it('saves the export to a configured cloud provider', async () => {
-    googleSave.mockResolvedValue()
+    googleSave.mockImplementation(fakeCloudSaver('google'))
     await openExportCloudSave()
 
     await waitFor(() => expect(googleSave).toHaveBeenCalledTimes(1))
-    expect(googleSave.mock.calls[0]?.[1]).toHaveLength(1)
+    expect(cloudUploadBatches.at(-1)).toHaveLength(1)
     expect(
-      await screen.findByText(/Saved to your Google Drive .Watermark Pro. folder/),
+      await screen.findByText(/Saved to your Google Drive .Lumafoil. folder/),
     ).toBeInTheDocument()
   })
 
@@ -336,12 +435,43 @@ describe('editor page', () => {
     expect(screen.queryByRole('button', { name: 'Save to gallery' })).not.toBeInTheDocument()
   })
 
-  it('points at the library when there are no presets', async () => {
+  it('creates and applies a first watermark without leaving the uploaded photo', async () => {
+    const user = userEvent.setup()
     seedOwnerWorkspace(client())
+    const api = installLibraryApi()
+    const { router } = renderApp('/app/editor')
+    await screen.findByRole('button', { name: 'Create watermark' })
+    const photo = new File(['photo fixture'], 'first-photo.png', { type: 'image/png' })
+    await user.upload(screen.getByLabelText('Open a photo'), photo)
+    await user.click(screen.getByRole('button', { name: 'Create watermark' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Create watermark' })
+    await within(dialog).findByLabelText('Preset name')
+    await user.type(within(dialog).getByLabelText('Preset name'), 'First signature')
+    await user.clear(within(dialog).getByRole('textbox', { name: 'Text' }))
+    await user.type(within(dialog).getByRole('textbox', { name: 'Text' }), '© My first photo')
+    await user.click(within(dialog).getByRole('button', { name: 'Save and use' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(router.state.location.pathname).toBe('/app/editor')
+    expect(api.watermarks).toHaveLength(1)
+    expect(api.watermarks[0]?.spec).toMatchObject({ kind: 'text', text: '© My first photo' })
+    expect(previewSubjects.filter((subject) => subject === photo).length).toBeGreaterThanOrEqual(2)
+    expect(await screen.findByRole('list', { name: 'Layers, bottom to top' })).toHaveTextContent(
+      'First signature',
+    )
+    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    await user.click(await screen.findByRole('button', { name: 'Download' }))
+    await waitFor(() =>
+      expect(exports.at(-1)?.specs[0]).toMatchObject({ kind: 'text', text: '© My first photo' }),
+    )
+  })
+
+  it('does not offer creation to a read-only member with an empty library', async () => {
+    seedViewerWorkspace(client())
     installLibraryApi()
     renderApp('/app/editor')
     expect(
-      await screen.findByRole('link', { name: 'Create a preset in the library' }),
-    ).toHaveAttribute('href', '/app/library/new')
+      await screen.findByText('No watermarks are available in this library yet.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create watermark' })).not.toBeInTheDocument()
   })
 })

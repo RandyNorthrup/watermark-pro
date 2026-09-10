@@ -23,7 +23,7 @@
     "toolsNav": "Tools",
     "signOut": "Afmelden",
     "accountMenu": "Accountmenu voor {{name}}",
-    "menuDescription": "Wissel van organisatie of ga naar een onderdeel van Watermark Pro.",
+    "menuDescription": "Wissel van organisatie of ga naar een onderdeel van Lumafoil.",
     "switchOrganizationFor": "Organisatie: {{name}}. Wissel van organisatie",
     "chooseOrganization": "Kies een organisatie",
     "chooseOrganizationShort": "Organisatie kiezen",
@@ -33,7 +33,8 @@
       "system": "Thema: volgt systeem. Wissel naar licht",
       "light": "Thema: licht. Wissel naar donker",
       "dark": "Thema: donker. Wissel naar systeem"
-    }
+    },
+    "closeMenu": "Menu sluiten"
   },
   "auth": {
     "backToSignIn": "Terug naar aanmelden",
@@ -87,12 +88,16 @@
       "roleLabel": "Rol:",
       "decline": "Weigeren",
       "accept": "Uitnodiging accepteren"
+    },
+    "inviteOnly": {
+      "title": "Uitnodiging vereist",
+      "body": "Lumafoil is alleen op uitnodiging beschikbaar. Open de uitnodigingslink in je e-mail om je account aan te maken."
     }
   },
   "dashboard": {
     "signedInAs": "Aangemeld als {{email}}",
     "yourWorkspace": "Je werkruimte",
-    "yourRole": "Je rol:",
+    "yourRole": "Je rol in deze werkruimte:",
     "toolsHeading": "Tools",
     "tools": {
       "library": {
@@ -109,7 +114,7 @@
       },
       "gallery": {
         "label": "Galerie",
-        "body": "Blader door wat het team heeft opgeslagen en deel albums met een link."
+        "body": "Bekijk opgeslagen foto’s en kies welke je met een link deelt."
       }
     },
     "overviewHeading": "Overzicht",
@@ -125,7 +130,7 @@
   "library": {
     "orgRequired": "Maak een organisatie aan of word er lid van om een watermerkbibliotheek op te bouwen.",
     "heading": "Watermerkbibliotheek",
-    "description": "Presets die iedereen in {{name}} deelt. Pas ze één voor één of in bulk toe.",
+    "description": "Opgeslagen watermerken in {{name}}. Pas ze toe op één bestand of een hele reeks.",
     "export": "Exporteren",
     "exportPreset": "{{name}} exporteren",
     "importPresets": "Presets importeren",
@@ -139,7 +144,7 @@
     "loadingPreset": "Preset wordt geladen",
     "loadPresetErrorTitle": "Kon de preset niet laden",
     "presetGone": "Die preset bestaat niet meer.",
-    "editSubtitleManage": "Wijzigingen gelden voor iedereen die deze preset gebruikt.",
+    "editSubtitleManage": "Je wijzigingen werken deze opgeslagen voorinstelling bij voor later gebruik.",
     "editSubtitleReadOnly": "Alleen-lezen weergave.",
     "cannotCreate": "Je rol staat het maken van presets niet toe.",
     "newPresetSubtitle": "Ontwerp de markering, bepaal waar die komt en sla haar op in de bibliotheek.",
@@ -156,7 +161,8 @@
       "glyph": "Teken {{glyph}}",
       "icon": "Icoon {{name}}",
       "logo": "Logo",
-      "qr": "QR-code voor {{content}}"
+      "qr": "QR-code voor {{content}}",
+      "sticker": "Sticker {{name}}"
     },
     "shape": {
       "rectangle": "Rechthoek",
@@ -168,7 +174,10 @@
       "smart": "Slimme plaatsing",
       "custom": "Aangepaste positie",
       "random": "Willekeurige plaatsing"
-    }
+    },
+    "newQr": "Nieuwe QR-code",
+    "qrOnly": "Alleen QR-codes",
+    "noQr": "Nog geen QR-codes opgeslagen. Maak er één voor elke link die je gebruikt."
   },
   "designer": {
     "presetName": "Presetnaam",
@@ -192,7 +201,8 @@
     },
     "qr": {
       "content": "QR-code-inhoud",
-      "hint": "Meestal een link. Tot {{max}} tekens; de code is altijd donker op een licht vlak, zodat hij scanbaar is."
+      "hint": "Meestal een link. Tot {{max}} tekens; de code is altijd donker op een licht vlak, zodat hij scanbaar is.",
+      "savedHint": "Geef elke QR-code een naam en sla deze apart op. Hergebruik deze vanuit je bibliotheek of bewaar meerdere voor verschillende links. Test het resultaat op de bedoelde grootte voordat je het deelt."
     },
     "tokens": {
       "menu": "Detail invoegen",
@@ -216,12 +226,16 @@
     "font": {
       "family": "Lettertype",
       "weight": "Dikte",
-      "specimen": "Pa's wijze lynx bezag vroom het fikse aquaduct"
+      "specimen": "Pa's wijze lynx bezag vroom het fikse aquaduct",
+      "search": "Lettertypen zoeken",
+      "resultCount": "{{count}} lettertypefamilies",
+      "license": "Lettertypelicentie"
     },
     "symbol": {
       "icons": "Iconen",
       "glyphLabel": "Teken {{glyph}}",
-      "iconLabel": "Icoon {{label}}"
+      "iconLabel": "Icoon {{label}}",
+      "license": "Pictogramlicenties"
     },
     "shape": {
       "label": "Vorm",
@@ -369,12 +383,25 @@
         "cancel": "Annuleren",
         "save": "Opslaan als logo"
       }
+    },
+    "stickers": {
+      "heading": "Kleurenstickers",
+      "search": "Stickers zoeken",
+      "category": "Categorie",
+      "all": "Alle categorieën",
+      "results": "{{total}} gevonden stickers",
+      "choose": "{{name}} kiezen",
+      "previous": "Vorige",
+      "next": "Volgende",
+      "license": "Fluent Emoji · MIT-licentie",
+      "usage": "Commercieel gebruik toegestaan; behoud de licentietekst van de illustraties bij verspreiding.",
+      "guide": "Licentiehandleiding voor illustraties"
     }
   },
   "editor": {
     "orgRequired": "Maak een organisatie aan of word er lid van om de editor te gebruiken.",
     "heading": "Editor",
-    "description": "Watermerk één foto: kies een preset, plaats het desgewenst met de hand, snijd bij, wijzig de grootte en download. Niets verlaat je browser.",
+    "description": "Kies een voorinstelling, pas de positie aan, snijd bij en wijzig het formaat op je apparaat. Download het resultaat of kies voor opslaan in de galerie of cloud.",
     "tabs": {
       "watermark": "Watermerk",
       "crop": "Bijsnijden",
@@ -424,7 +451,13 @@
       "removeLayer": "{{name}} van deze foto verwijderen",
       "adjusted": "Aangepast voor deze foto; de preset in de bibliotheek blijft ongewijzigd.",
       "revert": "Terugzetten",
-      "placement": "Plaatsing"
+      "placement": "Plaatsing",
+      "create": "Watermerk maken",
+      "createHint": "Ontwerp hier je watermerk. Sla het op voor deze foto en bewaar het in je bibliotheek.",
+      "cancelCreate": "Annuleren",
+      "saveAndUse": "Opslaan en gebruiken",
+      "emptyReadOnly": "Deze bibliotheek bevat nog geen watermerken.",
+      "firstUseHint": "Voeg een watermerk toe en open Exporteren om je foto te downloaden."
     },
     "crop": {
       "aspectRatio": "Beeldverhouding",
@@ -492,7 +525,7 @@
         "label": "Alles behouden",
         "help": "Inclusief de GPS-positie, als de foto die heeft."
       },
-      "webpNote": "Bij WebP-export worden metadata altijd verwijderd."
+      "webpNote": "WebP verwijdert de oorspronkelijke fotometadata. Verplichte licentieteksten voor illustraties blijven behouden."
     },
     "export": {
       "format": "Formaat",
@@ -600,7 +633,7 @@
   "gallery": {
     "orgRequired": "Maak een organisatie aan of word er lid van om een galerie bij te houden.",
     "heading": "Galerie",
-    "description": "Foto's met watermerk die door {{name}} zijn opgeslagen. Zoek, filter op preset, download of verwijder.",
+    "description": "Foto’s met watermerk opgeslagen in {{name}}. Zoek, filter, download of verwijder.",
     "usage_one": "{{count}} foto · {{used}} van {{max}}",
     "usage_other": "{{count}} foto's · {{used}} van {{max}}",
     "maxCount": "Tot {{count}} foto's per organisatie",
@@ -685,8 +718,8 @@
   },
   "admin": {
     "heading": "Beheer",
-    "description": "Elke gebruiker en organisatie op deze installatie. Acties hier worden vastgelegd in het auditspoor.",
-    "onlyAdmins": "Alleen platformbeheerders kunnen deze pagina openen.",
+    "description": "Alleen voor de sitebeheerder: accounts beheren en totalen bekijken. Eigenaar zijn van een werkruimte geeft geen toegang tot het sitebeheer.",
+    "onlyAdmins": "Alleen de sitebeheerder kan deze pagina openen.",
     "sectionsLabel": "Beheersecties",
     "tabs": {
       "users": "Gebruikers",
@@ -704,7 +737,11 @@
       "ok": "OK",
       "failed": "Mislukt",
       "duration": "{{ms}} ms",
-      "th": { "time": "Tijd", "status": "Status", "duration": "Duur" }
+      "th": {
+        "time": "Tijd",
+        "status": "Status",
+        "duration": "Duur"
+      }
     },
     "clientErrors": {
       "loading": "Clientfouten worden geladen",
@@ -725,15 +762,11 @@
     "you": "(jij)",
     "joined": "Lid geworden {{date}}",
     "emailNotVerified": " · e-mail niet geverifieerd",
-    "platformAdmin": "platformbeheerder",
+    "platformAdmin": "Sitebeheerder",
     "banned": "geblokkeerd",
     "bannedReason": "geblokkeerd: {{reason}}",
     "unban": "Deblokkeren",
     "unbanUser": "{{email}} deblokkeren",
-    "removeAdmin": "Beheerder verwijderen",
-    "makeAdminShort": "Beheerder maken",
-    "removeAdminFrom": "Beheerdersrechten van {{email}} verwijderen",
-    "makeAdmin": "{{email}} beheerder maken",
     "signOutEverywhereButton": "Overal afmelden",
     "signOutEverywhere": "{{email}} overal afmelden",
     "ban": "Blokkeren",
@@ -796,7 +829,7 @@
   "organizations": {
     "firstTitle": "Maak je eerste organisatie aan",
     "newTitle": "Nieuwe organisatie",
-    "description": "Organisaties bevatten je watermerken, foto's en team. Jij wordt de eigenaar.",
+    "description": "Maak een aparte werkruimte voor watermerken en foto’s. Deze blijft privé totdat je uitdrukkelijk leden uitnodigt.",
     "createFailed": "De organisatie kon niet worden aangemaakt.",
     "nameLabel": "Naam",
     "slugLabel": "URL-identificatie",
@@ -826,7 +859,15 @@
       "noneSelected": "Geen foto's geselecteerd",
       "selectedCount": "{{count}} geselecteerd",
       "addSelected": "Selectie toevoegen"
-    }
+    },
+    "cloudSaved": "Opgeslagen cloudbestanden ({{total}})",
+    "cloudSavedTitle": "Opgeslagen cloudbestanden",
+    "cloudSharingHint": "Opslaan maakt geen openbare link. Maak die alleen als iedereen met de link het bestand mag bekijken. Bestaande maprechten blijven gelden. Beheer andere toegang bij de aanbieder.",
+    "openProvider": "Openen in {{provider}}",
+    "createPublicLink": "Openbare link maken",
+    "revokePublicLink": "Openbare link intrekken",
+    "linkCopied": "Link gekopieerd",
+    "copyLink": "Link kopiëren"
   },
   "video": {
     "orgRequired": "Maak een organisatie aan of word er lid van om video te watermerken.",
@@ -917,7 +958,7 @@
     },
     "tool": {
       "title": "Foto verifiëren",
-      "description": "Controleer of een PNG een onzichtbare markering van Watermark Pro bevat en lees het verborgen bericht. Niets verlaat je browser."
+      "description": "Controleer of een PNG een onzichtbare markering van Lumafoil bevat en lees het verborgen bericht. Niets verlaat je browser."
     },
     "checkPng": "Een PNG controleren",
     "checking": "Bezig met controleren…",
@@ -934,7 +975,7 @@
     "createInLibrary": "Maak een preset in de bibliotheek",
     "legend": "Presets",
     "importTitle": "Presets importeren",
-    "importDescription": "Kies een presetbestand van Watermark Pro. De presets, en alle logo's die ze gebruiken, worden aan deze bibliotheek toegevoegd.",
+    "importDescription": "Kies een presetbestand van Lumafoil. De presets, en alle logo's die ze gebruiken, worden aan deze bibliotheek toegevoegd.",
     "presetFileLabel": "Presetbestand",
     "noPresets": "Dit presetbestand bevat geen presets.",
     "fileCount_one": "{{count}} preset in dit bestand",
@@ -947,111 +988,174 @@
   "landing": {
     "nav": "Account",
     "signIn": "Aanmelden",
-    "createAccount": "Account aanmaken",
-    "eyebrow": "Gratis en opensource",
-    "heroBody": "Bescherm je fotografie zonder het beeld te verliezen. Watermark Pro doet het zware werk in je browser, houdt je originelen privé en geeft je team rollen die echt iets betekenen.",
-    "createWorkspace": "Maak je werkruimte",
-    "featuresHeading": "Wat het doet",
-    "features": {
-      "bulk": {
-        "title": "Bulktaken",
-        "body": "Sleep honderden foto's en watermerk ze allemaal in één keer, in je browser."
+    "heroBody": "Voeg tekst, logo’s of handtekeningen toe. Gebruik presets voor losse bestanden of batches, werk offline en synchroniseer zodra je weer verbinding hebt.",
+    "featuresHeading": "Gereedschap voor het hele proces",
+    "footer": "Lumafoil is opensource onder de MIT-licentie.",
+    "privacy": "Privacy",
+    "terms": "Voorwaarden",
+    "heroTitleStart": "Watermerken voor foto’s,",
+    "heroTitleEnd": "video’s en pdf’s.",
+    "heroAlt": "Lumafoil-foto-editor met plaatsings- en exportinstellingen",
+    "previewLabel": "De Lumafoil-editor",
+    "privacyNote": "Bestanden worden op je apparaat verwerkt. Opslaan in de cloud is optioneel.",
+    "formatsLabel": "Foto’s · PDF’s · Video",
+    "workflowHeading": "Openen. Aanpassen. Exporteren.",
+    "workflowNote": "Je werkruimte houdt presets en opgeslagen bestanden bij elkaar.",
+    "steps": {
+      "openTitle": "Breng je foto’s mee",
+      "openBody": "Open één afbeelding of een hele reeks. Je originelen blijven ongewijzigd.",
+      "markTitle": "Maak jouw merk",
+      "markBody": "Kies een opgeslagen voorinstelling of maak iets onmiskenbaar eigens.",
+      "exportTitle": "Exporteren en klaar",
+      "exportBody": "Download de bestanden of sla ze op in je galerij en synchroniseer."
+    },
+    "github": "GitHub",
+    "featuresIntro": "Ontwerp een watermerk, pas het toe op je bestanden en kies hoe je het resultaat opslaat of deelt.",
+    "moreHeading": "Meer gereedschap om je werk af te maken",
+    "capabilities": {
+      "marks": {
+        "title": "Tekst, logo’s en je eigen handtekening",
+        "body": "Typ je naam of copyrightmelding, upload een logo of teken een handtekening. Pas grootte, hoek, dekking en kleur aan en combineer meerdere merken."
       },
-      "library": {
-        "title": "Watermerkbibliotheek",
-        "body": "Sla tekst-, symbool- en logomarkeringen één keer op; pas ze overal met één klik toe."
+      "batch": {
+        "title": "Watermerken voor een hele reeks",
+        "body": "Pas een opgeslagen watermerk toe op meerdere foto’s. Bekijk de resultaten, pas afzonderlijke posities aan en download de reeks als ZIP."
+      },
+      "fonts": {
+        "title": "551 verschillende lettertypefamilies",
+        "body": "Zoek schreefletters, schreefloze, handgeschreven, decoratieve en monospaced lettertypen. Bekijk je tekst en sla de stijl op. De lettertypen zijn lokaal meegeleverd met open licenties."
+      },
+      "stickers": {
+        "title": "400 kleurrijke vectorstickers",
+        "body": "Ontdek dieren, bloemen, eten, reizen, feesten en dagelijkse voorwerpen. Zoek een ontwerp, voeg het toe aan je watermerk en vergroot het zonder wazige randen."
+      },
+      "qr": {
+        "title": "Maak en bewaar QR-watermerken",
+        "body": "Zet een webadres of tekst om in een QR-code. Bewaar verschillende codes voor je portfolio, contactpagina of projecten en gebruik ze opnieuw."
+      },
+      "templates": {
+        "title": "Bewaar je watermerken als sjablonen",
+        "body": "Bewaar tekst, afbeeldingen, stijl en positie. Gebruik sjablonen in de editor of voor reeksen en importeer of exporteer ze tussen apparaten."
+      },
+      "editing": {
+        "title": "Bijsnijden, schalen en aanpassen",
+        "body": "Snijd je foto bij, kies afmetingen en pas helderheid, contrast en verzadiging aan vóór het uiteindelijke watermerk."
       },
       "smart": {
-        "title": "Slimme plaatsing",
-        "body": "Elke foto wordt geanalyseerd, zodat de markering belandt waar die het best leesbaar is en van het onderwerp af blijft."
+        "title": "Slimme plaatsing en contrast",
+        "body": "Lumafoil stelt een positie en een licht of donker merk voor op basis van de foto. Bekijk en wijzig het resultaat zelf."
       },
-      "contrast": {
-        "title": "Automatisch contrast",
-        "body": "Lichte of donkere variant en omtreksterkte per afbeelding gekozen, aanpasbaar als je het er niet mee eens bent."
+      "video": {
+        "title": "Watermerken op video’s",
+        "body": "Voeg in je browser watermerken toe aan ondersteunde video’s. Pas positie en timing aan en bekijk de voorvertoning vóór het exporteren."
       },
-      "teams": {
-        "title": "Teams en rollen",
-        "body": "Organisaties met de rollen eigenaar, beheerder, bewerker en kijker, afgedwongen op de server."
+      "pdf": {
+        "title": "Watermerken op PDF’s",
+        "body": "Pas een opgeslagen watermerk toe op geselecteerde PDF-pagina’s. Verwerk één document of een reeks en download de gemarkeerde PDF’s."
       },
-      "trusted": {
-        "title": "Gebouwd op vertrouwen",
-        "body": "Streng content-securitybeleid, gecontroleerde acties en foto's die je browser nooit verlaten tenzij je ze opslaat."
+      "export": {
+        "title": "Kies je exportformaat",
+        "body": "Exporteer foto’s als JPEG, PNG of WebP. Stel grootte en kwaliteit in of download een verwerkte reeks als ZIP."
+      },
+      "gallery": {
+        "title": "Een privégalerij",
+        "body": "Sla afgewerkte afbeeldingen op in je account en vind ze later terug. Download bestanden of selecteer foto’s om te delen."
+      },
+      "sharing": {
+        "title": "Deel de gekozen foto’s",
+        "body": "Maak een Lumafoil-galerijlink voor geselecteerde foto’s. Stel een vervaldatum in of trek de link weer in."
+      },
+      "offline": {
+        "title": "Offline werken, later synchroniseren",
+        "body": "Bereid Lumafoil voor op offline gebruik. Bewerk sjablonen en sla foto’s op zonder verbinding. Wijzigingen synchroniseren bij terugkeer, met zichtbare fouten en conflictherstel."
+      },
+      "privacy": {
+        "title": "Jouw account, jouw werkruimte",
+        "body": "Nieuwe gebruikers hebben een uitnodiging nodig en krijgen een eigen privéwerkruimte. Een uitnodiging geeft geen toegang tot jouw foto’s of sjablonen."
+      },
+      "languages": {
+        "title": "Interface in 12 talen",
+        "body": "Kies uit de 12 talen van Lumafoil, waaronder Arabisch met een indeling van rechts naar links."
+      },
+      "theme": {
+        "title": "Lichte en donkere modus",
+        "body": "Kies een thema of volg je apparaatinstelling. De interface past zich aan telefoons, tablets en grotere schermen aan."
       }
     },
-    "footer": "Watermark Pro is opensource onder de MIT-licentie.",
-    "privacy": "Privacy",
-    "terms": "Voorwaarden"
+    "inviteHosting": "Lumafoil werkt alleen op uitnodiging. Wil je het zelf hosten?",
+    "selfHost": "Download de broncode gratis op GitHub.",
+    "featuresNav": "Functies"
   },
   "legal": {
     "signIn": "Aanmelden",
     "lastUpdated": "Laatst bijgewerkt {{date}}",
     "readSibling": "Lees de <sibling>{{siblingLabel}}</sibling> of ga terug naar de <home>startpagina</home>.",
-    "footer": "Watermark Pro is opensource onder de MIT-licentie.",
+    "footer": "De broncode van Lumafoil heeft een MIT-licentie. Meegeleverde lettertypen en illustraties behouden hun eigen licenties.",
     "privacy": {
       "title": "Privacy",
-      "intro": "Watermark Pro is zo gebouwd dat je foto's van jou blijven. Deze pagina legt in gewone taal uit wat er met je afbeeldingen en je accountgegevens gebeurt, gebaseerd op de maatregelen die het project daadwerkelijk afdwingt.",
+      "intro": "Lumafoil is zo gebouwd dat je foto's van jou blijven. Deze pagina legt in gewone taal uit wat er met je afbeeldingen en je accountgegevens gebeurt, gebaseerd op de maatregelen die het project daadwerkelijk afdwingt.",
       "siblingLabel": "gebruiksvoorwaarden",
       "photos": {
-        "heading": "Je foto's blijven in je browser",
-        "p1": "Watermerken gebeurt volledig op je apparaat. De editor en de bulktool decoderen je foto's in de browser, renderen ze in Web Workers en bouwen de voltooide bestanden in het geheugen op. Bij het bekijken van een watermerk wordt de foto waarop het wordt toegepast nooit geüpload.",
-        "p2": "Exports worden lokaal samengesteld en aan je overhandigd via een same-origin-downloadlink die wordt vrijgegeven zodra de download begint. Je originelen worden nooit naar een server gestuurd om te bekijken of te watermerken."
+        "heading": "Foto’s worden op je apparaat verwerkt",
+        "p1": "Bewerken en watermerken gebeurt op je apparaat. Een voorbeeld uploadt je originelen niet naar Lumafoil.",
+        "p2": "Je kiest of je het resultaat downloadt, in je galerie opslaat, naar gekoppelde cloudopslag verstuurt of een deellink maakt."
       },
       "storage": {
-        "heading": "Wat we opslaan, en alleen als je daarom vraagt",
-        "p1": "Er wordt niets op onze servers bewaard tenzij je ervoor kiest het op te slaan. Wanneer je een foto, een miniatuur of een logo opslaat, wordt het bewaard in Cloudflare R2 onder sleutels die tot je organisatie beperkt zijn, nooit openbaar gemaakt en alleen geleverd aan aangemelde leden van die organisatie met privécaching.",
-        "p2": "Elke organisatie heeft quota voor foto's, logo's en opslag. Elke upload en verwijdering wordt vastgelegd in het auditspoor."
+        "heading": "Accounts, opgeslagen werk en offlinekopieën",
+        "p1": "Cloudflare bewaart accounts, voorinstellingen, galeriefoto’s, miniaturen, geüploade logo’s, deelgegevens en recente werkgeschiedenis. Inhoud hoort bij de werkruimte; anderen hebben expliciet lidmaatschap of een deellink nodig.",
+        "p2": "Dit apparaat bewaart kopieën en wachtende wijzigingen per account voor offlinegebruik. Verbinden met hetzelfde account probeert opnieuw te synchroniseren. Wachtende wijzigingen blokkeren afmelden; geslaagde afmelding wist offline-appgegevens. Een verlopen sessie blokkeert toegang zonder wachtend werk te wissen. Browsergegevens wissen kan niet-gesynchroniseerd werk verwijderen."
       },
       "metadata": {
-        "heading": "Metadata worden standaard verwijderd",
-        "p1": "Elke export wordt opnieuw uit pixels gecodeerd, zodat er geen metadata worden meegenomen tenzij je besluit ze te behouden. Standaard worden alle camera- en locatiegegevens verwijderd voordat het bestand je download, het deelmenu of de galerie bereikt.",
-        "p2": "Twee optionele modi per export laten je de cameragegevens behouden met de GPS-locatie verwijderd, of alles ongewijzigd behouden. Metadata worden in de browser gelezen en geschreven; daarvoor wordt niets geüpload."
+        "heading": "Persoonlijke metadata en licentievermeldingen",
+        "p1": "Afbeeldingsexports verwijderen standaard camera- en locatiemetadata. Ondersteunde opties bewaren cameravelden zonder GPS of ondersteunde oorspronkelijke metadata. Dit gebeurt in je browser.",
+        "p2": "Exports met meegeleverde illustraties bewaren de licentievermelding in metadata, een documentbijlage of een apart bestand in het archief. Andere software kan deze verwijderen; bewaar de toepasselijke vermelding wanneer je die illustraties verder verspreidt."
       },
       "sharing": {
         "heading": "Deellinks",
-        "p1": "Een deellink bevat een ondertekend token met een ingebouwde vervaldatum en kan op elk moment worden ingetrokken. De openbare pagina's die een link opent, bevatten geen sessie en zijn per adres in snelheid begrensd.",
-        "p2": "Verlopen, ingetrokken, gemanipuleerde en onbekende links geven allemaal dezelfde neutrale reactie “niet gevonden”, zodat een link niets prijsgeeft zodra hij niet meer werkt. Het aanmaken en intrekken van links is beperkt tot leden met toestemming en wordt gecontroleerd."
+        "p1": "Iedereen met een Lumafoil-galerielink kan de geselecteerde opgeslagen foto’s bekijken totdat de link verloopt of wordt ingetrokken. Een site-uitnodiging geeft toegang tot een afzonderlijk privéaccount; de werkruimte en inhoud van de uitnodiger worden niet gedeeld.",
+        "p2": "Links van cloudproviders volgen hun eigen toegangs- en intrekkingsregels. Een link intrekken haalt eerder gemaakte downloads of kopieën niet terug."
       },
       "account": {
         "heading": "Je account",
-        "p1": "Een account heeft een e-mailadres en een wachtwoord nodig, en de e-mail moet worden geverifieerd voordat het account actief is. Sessies worden bewaard in HttpOnly-, SameSite=Lax-cookies, gemarkeerd als Secure op beveiligde origins.",
-        "p2": "Wachtwoordherstellinks verlopen na een uur en melden je andere sessies af wanneer ze worden gebruikt."
+        "p1": "Nieuwe accounts vereisen een uitnodiging en geverifieerd e-mailadres. Meld je aan met een wachtwoord of ingestelde Google-/Microsoft-aanmelding. Bestaande accounts hebben geen nieuwe uitnodiging nodig. Een extra aanmeldmethode moet vanuit een aangemeld account worden gekoppeld.",
+        "p2": "Sessies gebruiken HttpOnly- en SameSite=Lax-cookies, met Secure op HTTPS. Wachtwoordresetlinks verlopen na een uur en trekken bij gebruik andere serversessies in."
       },
       "analytics": {
-        "heading": "Analyse en cookies",
-        "p1": "We plaatsen geen analyse- of advertentiecookies van derden. De enige meting is Cloudflare Web Analytics, dat zonder cookies werkt en je niet over websites heen volgt.",
-        "p2": "De app communiceert met slechts twee origins van derden, beide van Cloudflare: de Turnstile-widget die aanmeld- en wachtwoordherstelverzoeken op bots controleert, en de cookieloze analysebeacon. Lettertypen, stijlen en al het andere worden vanaf deze site geleverd."
+        "heading": "Cookies en externe diensten",
+        "p1": "Lumafoil bevat geen analysebeacon of advertentiecookies. Essentiële cookies houden sessies bij; apparaatopslag bewaart instellingen, offlinekopieën en wachtende wijzigingen.",
+        "p2": "Indien ingeschakeld controleert Cloudflare Turnstile accountverzoeken op bots; zie de <turnstile>privacyverklaring</turnstile>. Google/Microsoft verzorgen de gekozen aanmelding. Google Drive, Dropbox en OneDrive ontvangen verzoeken via cloudfuncties die je kiest; hun eigen privacybeleid geldt."
       },
       "audit": {
         "heading": "Auditspoor",
-        "p1": "Aanmeldingen en elke wijziging in organisatie, lidmaatschap, uitnodiging, bibliotheek, foto en deling worden naar een alleen-toevoegen auditlogboek geschreven. Dat logboek is alleen leesbaar voor de eigenaren en beheerders van een organisatie."
+        "p1": "Werkruimtelogboeken vereisen de rol eigenaar of beheerder van die werkruimte. De enige sitebeheerder beheert accounts en bekijkt totalen, moderatie, auditregels en status-/foutgegevens. Recente werkgeschiedenis is persoonlijk. Foutlogs van de app laten tokens en verzoekinhoud weg."
       },
       "reporting": {
         "heading": "Een probleem melden",
-        "p1": "Beveiligingsproblemen kunnen privé worden gemeld via de GitHub-repository van het project in plaats van via een openbaar issue. Het beveiligingsbeleid in de repository beschrijft wat je moet vermelden en hoe snel je een reactie krijgt."
+        "p1": "Ondersteuning: <support>support@lumafoil.com</support>. Meld kwetsbaarheden via <security>GitHubs privéformulier</security> of dat e-mailadres. Plaats geen tokens of persoonlijke inhoud in openbare issues."
       }
     },
     "terms": {
       "title": "Gebruiksvoorwaarden",
-      "intro": "Deze voorwaarden regelen je gebruik van Watermark Pro. Ze zijn geschreven om gelezen te worden en beschrijven hoe de dienst zich werkelijk gedraagt, in plaats van beloftes toe te voegen die hij niet nakomt.",
+      "intro": "Deze voorwaarden regelen je gebruik van Lumafoil. Ze zijn geschreven om gelezen te worden en beschrijven hoe de dienst zich werkelijk gedraagt, in plaats van beloftes toe te voegen die hij niet nakomt.",
       "siblingLabel": "privacybeleid",
       "accepting": {
         "heading": "Deze voorwaarden accepteren",
-        "p1": "Door Watermark Pro te gebruiken ga je akkoord met deze voorwaarden. Als je niet akkoord gaat, gebruik de dienst dan niet."
+        "p1": "Door Lumafoil te gebruiken ga je akkoord met deze voorwaarden. Als je niet akkoord gaat, gebruik de dienst dan niet."
       },
       "whatItDoes": {
         "heading": "Wat de dienst doet",
-        "p1": "Watermark Pro voorziet foto's van een watermerk. Het watermerken zelf gebeurt in je browser; optionele functies zoals het opslaan van foto's en logo's, in een team werken en delen gebruiken serveropslag bij Cloudflare.",
-        "p2": "De software is gratis en opensource onder de MIT-licentie."
+        "p1": "Lumafoil voegt op je apparaat watermerken toe aan foto’s en ondersteunde documenten en video’s. Accounts, opgeslagen galeries/voorinstellingen, recente geschiedenis, uitnodigingen en delen gebruiken serveropslag; optionele cloudfuncties benaderen de gekozen provider.",
+        "p2": "De broncode is vrij en open source onder MIT. Meegeleverde lettertypen en illustraties hebben eigen licenties."
       },
       "account": {
         "heading": "Je account",
-        "p1": "Teamfuncties vereisen een account met een geverifieerd e-mailadres. Houd je wachtwoord voor jezelf; je bent verantwoordelijk voor wat er onder je account gebeurt.",
-        "p2": "Je kunt je op elk moment van je sessies afmelden, en het gebruik van een wachtwoordherstellink meldt je andere sessies af."
+        "p1": "Toegang is momenteel op uitnodiging en vereist een geverifieerd e-mailadres. Wachtwoord en ingestelde Google-/Microsoft-aanmelding zijn beschikbaar. Beveilig je inloggegevens en provideraccount; je bent verantwoordelijk voor gebruik van je account.",
+        "p2": "Afmelden vereist verbinding en opgeloste wachtende wijzigingen; het wist offline-appgegevens in deze browser. Wachtwoordreset trekt andere serversessies in. Offlineapparaten kunnen kopieën bewaren tot ze verbinden of hun browsergegevens worden gewist."
       },
       "content": {
         "heading": "Je content",
         "p1": "Je behoudt alle rechten die je al hebt op de foto's en watermerken die je uploadt of maakt. Je bent er zelf verantwoordelijk voor dat je het recht hebt om de afbeeldingen die je naar de dienst brengt te gebruiken.",
-        "p2": "De app verwerkt je content alleen om de functies die je gebruikt te leveren, en slaat deze alleen op als je ervoor kiest die op te slaan. Ze wordt nooit gebruikt om iets te trainen of gedeeld met derden."
+        "p2": "Inhoud wordt verwerkt voor de functies die je kiest. Galerieopslag gebruikt Cloudflare; gekozen cloudtransfers en delen sturen inhoud naar providers of ontvangers. Lumafoil gebruikt die niet om modellen te trainen. Meegeleverde illustraties hebben eigen vereisten voor licentievermeldingen."
       },
       "acceptableUse": {
         "heading": "Aanvaardbaar gebruik",
@@ -1059,8 +1163,8 @@
         "p2": "Toegang binnen een organisatie volgt je rol, en die rollen worden op de server afgedwongen."
       },
       "teams": {
-        "heading": "Teams en rollen",
-        "p1": "Een organisatie kan de rollen eigenaar, beheerder, bewerker en kijker hebben. Wat elk lid kan zien en doen is beperkt tot zijn rol, gecontroleerd bij elk verzoek in plaats van alleen verborgen in de interface."
+        "heading": "Privéwerkruimten en samenwerking",
+        "p1": "Elk account heeft een privéwerkruimte. Site-uitnodigingen delen die niet. Afzonderlijke samenwerkingsruimten kunnen expliciet eigenaren, beheerders, bewerkers of kijkers toevoegen; de server handhaaft hun rechten. Deze rollen geven geen sitebeheer."
       },
       "availability": {
         "heading": "Beschikbaarheid, garantie en wijzigingen",
@@ -1069,11 +1173,11 @@
       },
       "openSource": {
         "heading": "Opensource",
-        "p1": "De broncode van Watermark Pro is beschikbaar onder de MIT-licentie, waarmee je hem kunt inspecteren, uitvoeren en aanpassen onder de voorwaarden van die licentie."
+        "p1": "De broncode van Lumafoil mag volgens MIT worden bekeken, gebruikt en aangepast. Meegeleverde lettertypen en illustraties behouden hun licenties en vermeldingen, gelinkt in hun selectiemenu’s en de licentie-index voor middelen."
       },
       "contact": {
         "heading": "Contact",
-        "p1": "Vragen over deze voorwaarden en meldingen van beveiligingsproblemen kunnen worden ingediend via de GitHub-repository van het project."
+        "p1": "Vragen: <support>support@lumafoil.com</support>. Beveiliging: <security>GitHubs privéformulier</security> of dat e-mailadres. Houd gevoelige details buiten openbare issues."
       }
     }
   },
@@ -1081,7 +1185,7 @@
     "loading": "Foto's worden geladen",
     "unavailableTitle": "Deze link is niet beschikbaar",
     "unavailableBody": "Deze is mogelijk verlopen of ingetrokken, of het adres is onvolledig. Vraag degene die hem heeft gestuurd om een nieuwe.",
-    "about": "Over Watermark Pro",
+    "about": "Over Lumafoil",
     "photoCount_one": "{{count}} foto",
     "photoCount_other": "{{count}} foto's",
     "availableUntil": " · beschikbaar tot {{date}}",
@@ -1090,7 +1194,7 @@
     "linkShared": "Link gedeeld.",
     "openPhoto": "{{name}} openen",
     "dimensions": "{{width}} × {{height}}",
-    "footer": "Gedeeld met <home>Watermark Pro</home>. Foto's blijven eigendom van hun eigenaar.",
+    "footer": "Gedeeld met <home>Lumafoil</home>. Foto's blijven eigendom van hun eigenaar.",
     "download": "Downloaden",
     "close": "Sluiten"
   },
@@ -1100,6 +1204,124 @@
       "title": "Pagina niet gevonden",
       "body": "Het adres is mogelijk verkeerd getypt, of de pagina is verplaatst.",
       "back": "Terug naar het begin"
+    }
+  },
+  "offline": {
+    "label": "Offline werk",
+    "syncing": "Opgeslagen werk synchroniseren…",
+    "disconnected": "Offline — wijzigingen blijven op dit apparaat.",
+    "pending": "Openstaande wijzigingen: {{count}}",
+    "upToDate": "Opgeslagen werk is gesynchroniseerd.",
+    "syncNow": "Nu synchroniseren",
+    "review": "Wijzigingen bekijken ({{count}})",
+    "deletion": "Verwijdering",
+    "conflict": "Deze voorinstelling is elders gewijzigd. Bewaar beide versies of verwerp de lokale wijziging.",
+    "savedHere": "Opgeslagen op dit apparaat. Synchronisatie volgt wanneer de app open is en verbinding heeft.",
+    "retry": "Opnieuw proberen",
+    "keepBoth": "Beide versies bewaren",
+    "discard": "Lokale wijziging verwerpen",
+    "discardTitle": "Deze lokale wijziging verwerpen?",
+    "discardBody": "Verwijdert de openstaande wijziging van dit apparaat. Wijzigingen die al op de server staan, worden niet ongedaan gemaakt.",
+    "cancel": "Annuleren",
+    "signOutPending": "Synchroniseer of verwerp openstaande wijzigingen bij Offline werk voordat u afmeldt.",
+    "signOutFailed": "Afmelden is mislukt. Probeer opnieuw.",
+    "connectionRequired": "Verbinding vereist",
+    "connectOnce": "Meld u aan en open deze werkruimte eenmaal met verbinding voordat u deze offline gebruikt.",
+    "onlineOnly": "Account-, deel- en ledenbeheer vereisen een verbinding. Fototools en opgeslagen voorinstellingen blijven offline beschikbaar.",
+    "ready": "De app-bestanden zijn klaar voor offline gebruik.",
+    "preparing": "Offline bestanden voorbereiden. Houd dit tabblad open.",
+    "updateAvailable": "Er staat een update klaar. Rond niet-opgeslagen wijzigingen af voordat u herlaadt; opgeslagen werk blijft op dit apparaat.",
+    "reload": "Herladen om bij te werken"
+  },
+  "siteInvites": {
+    "heading": "Mensen uitnodigen",
+    "description": "Nodig iemand uit om een eigen Lumafoil-account te maken.",
+    "email": "E-mailadres",
+    "privacy": "De persoon krijgt een privéwerkruimte. Deze uitnodiging deelt geen foto’s, voorinstellingen of accountgegevens.",
+    "sent": "Uitnodiging verzonden. Deze verloopt over zeven dagen.",
+    "send": "Uitnodiging versturen",
+    "sentHeading": "Je uitnodigingen",
+    "loading": "Uitnodigingen laden…",
+    "empty": "Je hebt nog geen uitnodigingen verstuurd.",
+    "revoke": "Intrekken",
+    "revokeEmail": "Uitnodiging aan {{email}} intrekken",
+    "invalidEmail": "Voer een geldig e-mailadres in.",
+    "privateHeading": "Je privéwerkruimte",
+    "privateBody": "Alleen jij hebt toegang. Nodig mensen uit voor Lumafoil zonder deze ruimte te delen, of maak een aparte ruimte om samen te werken.",
+    "collaborate": "Samenwerkingsruimte maken",
+    "status": {
+      "pending": "In afwachting",
+      "accepted": "Geaccepteerd",
+      "revoked": "Ingetrokken",
+      "expired": "Verlopen"
+    },
+    "collaborationNotice": "Een uitnodiging voor deze werkruimte geeft toegang tot de foto’s en voorinstellingen. De ontvanger moet al een Lumafoil-account hebben. Gebruik anders eerst Mensen uitnodigen."
+  },
+  "accountStats": {
+    "users": "Geregistreerde accounts",
+    "verifiedUsers": "Geverifieerde accounts",
+    "pendingInvitations": "Openstaande uitnodigingen",
+    "acceptedInvitations": "Geaccepteerde uitnodigingen",
+    "loading": "Accounttotalen laden…"
+  },
+  "accountAuth": {
+    "heading": "Accountinstellingen",
+    "connected": "Aanmeldmethoden",
+    "loading": "Aanmeldmethoden laden…",
+    "password": "E-mail en wachtwoord",
+    "linkProvider": "{{provider}} koppelen",
+    "continueProvider": "Doorgaan met {{provider}}",
+    "linkHelp": "Koppel een provider terwijl je bent aangemeld, met hetzelfde e-mailadres.",
+    "identityOnly": "Alleen voor je Lumafoil-account. Cloudopslag koppel je apart.",
+    "linkError": "Koppelen mislukt. Gebruik hetzelfde e-mailadres en meld je opnieuw aan.",
+    "verifyEmail": "Verifieer je account via e-mail en meld je opnieuw aan.",
+    "signInError": "Aanmelden mislukt. Meld je hieronder aan met je bestaande wachtwoord en koppel de provider bij Accountinstellingen."
+  },
+  "referral": {
+    "heading": "Je uitnodigingslink",
+    "description": "Iedereen met deze link kan een eigen privéaccount aanvragen. Deel hem alleen met mensen die je wilt uitnodigen.",
+    "count": "Via je link gemaakte accounts: {{count}}",
+    "url": "Uitnodigingslink",
+    "copy": "Link kopiëren",
+    "copied": "Gekopieerd",
+    "copyError": "Kopiëren mislukt. Selecteer de link en kopieer hem handmatig.",
+    "rotate": "Nieuwe link maken",
+    "revoke": "Link uitschakelen",
+    "revoked": "Deze link is uitgeschakeld.",
+    "rotateHelp": "Een nieuwe link schakelt de vorige uit. Bestaande accounts behouden toegang. Je ziet alleen aantallen; profielen en inhoud blijven privé."
+  },
+  "recent": {
+    "heading": "Recent werk",
+    "description": "Foto’s die je in deze werkruimte hebt geopend of opgeslagen en watermerken die je hebt gebruikt.",
+    "viewLabel": "Weergave van recent werk",
+    "search": "Recent werk zoeken",
+    "loading": "Recent werk laden",
+    "loadError": "Recent werk kon niet worden geladen",
+    "retry": "Opnieuw proberen",
+    "preferenceError": "Je weergavevoorkeur kon niet worden opgeslagen.",
+    "activityPending": "Recente bestanden konden niet worden bijgewerkt. Open het item opnieuw om het nogmaals te proberen.",
+    "empty": "Je recente werk verschijnt hier. Bewaar foto’s in de galerij en open watermerken om ze snel terug te vinden.",
+    "noMatches": "Geen recent werk komt overeen met je zoekopdracht.",
+    "start": "Editor openen",
+    "detailsLabel": "Details van recent werk",
+    "itemsLabel": "Recente items",
+    "name": "Naam",
+    "type": "Type",
+    "location": "Locatie",
+    "lastUsed": "Laatst gebruikt",
+    "status": "Synchronisatie",
+    "photo": "Opgeslagen foto",
+    "preset": "Watermerk",
+    "pending": "Activiteit wacht op synchronisatie",
+    "saved": "Opgeslagen",
+    "gallery": "Galerij",
+    "library": "Watermerkbibliotheek",
+    "needsAttention": "Aandacht nodig",
+    "workPending": "Werk wacht op synchronisatie",
+    "views": {
+      "thumbnails": "Miniaturen",
+      "list": "Lijst",
+      "details": "Details"
     }
   }
 }

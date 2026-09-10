@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
 import { PASSWORD_MIN_LENGTH } from '../../shared/constants'
+import { INVITATION_HEADER, signupSearchSchema } from '../../shared/invitation'
 import { signUpSchema } from '../../shared/validation'
 import { EmailField, PasswordField } from '../components/auth-fields'
 import { AuthLayout } from '../components/auth-layout'
+import { SocialAuth } from '../components/social-auth'
 import { Turnstile } from '../components/turnstile'
 import { Alert } from '../components/ui/alert'
 import { Button } from '../components/ui/button'
@@ -14,18 +16,20 @@ import { Field } from '../components/ui/field'
 import { Input } from '../components/ui/input'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError } from '../lib/errors'
+import { clearPendingInvitation } from '../lib/pending-invitation'
 import { useCaptcha } from '../lib/use-captcha'
 import { useFormErrors } from '../lib/use-form-errors'
 
 export const Route = createFileRoute('/signup')({
+  validateSearch: signupSearchSchema,
   component: SignUpPage,
 })
 
-type SignUpValues = z.infer<typeof signUpSchema>
-
 function SignUpPage() {
+  type SignUpValues = z.infer<typeof signUpSchema>
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { invitation } = Route.useSearch()
   const [values, setValues] = useState<SignUpValues>({ name: '', email: '', password: '' })
   const [isPending, setIsPending] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
@@ -41,15 +45,33 @@ function SignUpPage() {
     setIsPending(true)
     setServerError(null)
     const result = await authClient.signUp.email(
-      { ...parsed, callbackURL: '/app' },
-      { headers: captcha.headers },
+      {
+        ...parsed,
+        callbackURL: '/app',
+      },
+      { headers: { ...captcha.headers, [INVITATION_HEADER]: invitation ?? '' } },
     )
     setIsPending(false)
     if (result.error !== null) {
       setServerError(describeAuthError(result.error))
       return
     }
+    clearPendingInvitation()
     await navigate({ to: '/check-email', search: { email: parsed.email } })
+  }
+
+  if (invitation === undefined) {
+    return (
+      <AuthLayout title={t('auth.inviteOnly.title')} description={t('auth.inviteOnly.body')}>
+        <Link
+          to="/login"
+          search={{ invitation }}
+          className="font-medium text-brand-600 dark:text-brand-300"
+        >
+          {t('auth.signup.signIn')}
+        </Link>
+      </AuthLayout>
+    )
   }
 
   return (
@@ -59,12 +81,17 @@ function SignUpPage() {
       footer={
         <>
           {t('auth.signup.footerPrompt')}{' '}
-          <Link to="/login" className="font-medium text-brand-600 dark:text-brand-300">
+          <Link
+            to="/login"
+            search={{ invitation }}
+            className="font-medium text-brand-600 dark:text-brand-300"
+          >
             {t('auth.signup.signIn')}
           </Link>
         </>
       }
     >
+      <SocialAuth invitation={invitation} />
       <form
         onSubmit={(event) => void handleSubmit(event)}
         noValidate

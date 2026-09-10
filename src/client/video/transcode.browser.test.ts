@@ -20,9 +20,11 @@ import {
   encodeTestClipWithAudio,
 } from './test-support/clip'
 import { transcodeVideo } from './transcode'
+import { FLUENT_STICKER_NOTICE } from '../../shared/asset-licenses'
 import { VIDEO_CODEC_PREFERENCE } from '../../shared/constants'
 import { DEFAULT_STYLE, type WatermarkSpec } from '../../shared/watermark'
 import type { RenderableMark } from '../engine/render'
+import { loadSticker } from '../stickers/load'
 
 const TRANSCODE_TIMEOUT_MS = 30_000
 const LATE_TIMESTAMP = (CLIP_FRAMES - 3) / CLIP_FPS
@@ -148,6 +150,44 @@ function countDecodedFrames(): FrameTally {
 }
 
 describe('transcodeVideo', () => {
+  it.each(['mp4', 'webm'] as const)(
+    'retains the full artwork notice in %s without claiming authorship',
+    async (container) => {
+      const { blob } = await encodeTestClip()
+      const bitmap = await loadSticker('cherries')
+      const videoCodec = await getFirstEncodableVideoCodec(['vp9', 'av1'], {
+        width: CLIP_WIDTH,
+        height: CLIP_HEIGHT,
+      })
+      if (videoCodec === null) throw new Error('No common MP4/WebM test encoder')
+      const mark: RenderableMark = {
+        spec: { ...MARK.spec, kind: 'symbol', symbol: { type: 'sticker', id: 'cherries' } },
+        image: bitmap,
+      }
+      try {
+        const output = await transcodeVideo({
+          source: blob,
+          marks: [mark],
+          plan: {
+            container,
+            videoCodec,
+            bitrate: scaleVideoBitrate('standard', CLIP_WIDTH * CLIP_HEIGHT),
+            output: { width: CLIP_WIDTH, height: CLIP_HEIGHT },
+            audio: { mode: 'none' },
+          },
+          signal: new AbortController().signal,
+        })
+        const input = new Input({ source: new BlobSource(output), formats: ALL_FORMATS })
+        const metadata = await input.getMetadataTags()
+        expect(metadata.comment).toBe(FLUENT_STICKER_NOTICE)
+        expect(metadata.artist).toBeUndefined()
+        expect(await frameCount(output)).toBe(CLIP_FRAMES)
+      } finally {
+        bitmap.close()
+      }
+    },
+    TRANSCODE_TIMEOUT_MS,
+  )
   it(
     'marks every frame, keeps the frame count, and closes every decoded frame',
     async () => {

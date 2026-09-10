@@ -24,14 +24,22 @@
  */
 import { z } from 'zod'
 
+import {
+  cloudFileIdSchema,
+  cloudFileName,
+  cloudRequest,
+  uploadCloudBatch,
+  type CloudSavedFile,
+} from './cloud-transfer'
 import { acquireGoogleDriveToken } from './google-picker'
-import type { CloudUpload } from './source'
+import type { CloudUpload, CloudUploadSource } from './source'
 import type { PublicConfig } from '../../../shared/api'
 import {
   CLOUD_SAVE_FOLDER,
   GOOGLE_DRIVE_FILES_ENDPOINT,
   GOOGLE_DRIVE_UPLOAD_ENDPOINT,
 } from '../../../shared/constants'
+import { captureOfflineOwner } from '../offline-context'
 
 /** Drive's own MIME type for a folder; matching it in a query finds folders only. */
 const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
@@ -76,7 +84,7 @@ export interface MultipartUpload {
 }
 
 /** A Drive file reference narrowed to just its id (extracted to keep Zod calls shallow). */
-const driveFileRefSchema = z.object({ id: z.string() })
+const driveFileRefSchema = z.object({ id: cloudFileIdSchema })
 
 /** Only the ids of the matching files are read back from the lookup. */
 const folderListSchema = z.object({
@@ -146,17 +154,22 @@ export async function findFolderId(
   accessToken: string,
   folderName: string,
 ): Promise<string | null> {
-  const response = await fetch(folderSearchUrl(folderName), {
-    headers: authorizationHeader(accessToken),
-  })
-  if (!response.ok) {
-    throw new Error(
-      `Could not search Google Drive for the "${folderName}" folder (HTTP ${String(response.status)}).`,
-    )
-  }
-  const payload: unknown = await response.json()
-  const { files } = folderListSchema.parse(payload)
-  return files[0]?.id ?? null
+  return await cloudRequest(
+    folderSearchUrl(folderName),
+    {
+      headers: authorizationHeader(accessToken),
+    },
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Could not search Google Drive for the "${folderName}" folder (HTTP ${String(response.status)}).`,
+        )
+      }
+      const payload: unknown = await response.json()
+      const { files } = folderListSchema.parse(payload)
+      return files[0]?.id ?? null
+    },
+  )
 }
 
 /**
@@ -164,18 +177,23 @@ export async function findFolderId(
  * with a readable Error.
  */
 export async function createFolder(accessToken: string, folderName: string): Promise<string> {
-  const response = await fetch(GOOGLE_DRIVE_FILES_ENDPOINT, {
-    method: 'POST',
-    headers: { ...authorizationHeader(accessToken), [CONTENT_TYPE_HEADER]: JSON_MIME_TYPE },
-    body: JSON.stringify({ name: folderName, mimeType: FOLDER_MIME_TYPE }),
-  })
-  if (!response.ok) {
-    throw new Error(
-      `Could not create the "${folderName}" folder in Google Drive (HTTP ${String(response.status)}).`,
-    )
-  }
-  const payload: unknown = await response.json()
-  return createdFolderSchema.parse(payload).id
+  return await cloudRequest(
+    GOOGLE_DRIVE_FILES_ENDPOINT,
+    {
+      method: 'POST',
+      headers: { ...authorizationHeader(accessToken), [CONTENT_TYPE_HEADER]: JSON_MIME_TYPE },
+      body: JSON.stringify({ name: folderName, mimeType: FOLDER_MIME_TYPE }),
+    },
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Could not create the "${folderName}" folder in Google Drive (HTTP ${String(response.status)}).`,
+        )
+      }
+      const payload: unknown = await response.json()
+      return createdFolderSchema.parse(payload).id
+    },
+  )
 }
 
 /** Find the destination folder, creating it when it does not yet exist. */
@@ -192,21 +210,34 @@ export async function uploadFile(
   accessToken: string,
   folderId: string,
   upload: CloudUpload,
-): Promise<void> {
-  const { contentType, body } = buildMultipartBody(
-    { name: upload.name, parents: [folderId] },
-    upload.blob,
+): Promise<CloudSavedFile> {
+  const owner = captureOfflineOwner()
+  const name = cloudFileName(upload.name)
+  const { contentType, body } = buildMultipartBody({ name, parents: [folderId] }, upload.blob)
+  return await cloudRequest(
+    multipartUploadUrl(),
+    {
+      method: 'POST',
+      headers: { ...authorizationHeader(accessToken), [CONTENT_TYPE_HEADER]: contentType },
+      body,
+    },
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Could not save ${upload.name} to Google Drive (HTTP ${String(response.status)}).`,
+        )
+      }
+      const payload: unknown = await response.json()
+      const file = driveFileRefSchema.parse(payload)
+      return {
+        provider: 'google',
+        id: file.id,
+        name,
+        manageUrl: `https://drive.google.com/file/d/${encodeURIComponent(file.id)}/view`,
+        userId: owner.userId,
+      }
+    },
   )
-  const response = await fetch(multipartUploadUrl(), {
-    method: 'POST',
-    headers: { ...authorizationHeader(accessToken), [CONTENT_TYPE_HEADER]: contentType },
-    body,
-  })
-  if (!response.ok) {
-    throw new Error(
-      `Could not save ${upload.name} to Google Drive (HTTP ${String(response.status)}).`,
-    )
-  }
 }
 
 /**
@@ -221,8 +252,8 @@ export async function uploadFile(
  */
 export async function saveToGoogleDrive(
   config: PublicConfig,
-  uploads: readonly CloudUpload[],
-): Promise<void> {
+  uploads: CloudUploadSource,
+): Promise<CloudSavedFile[]> {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('Saving to Google Drive is only available in a browser.')
   }
@@ -231,9 +262,13 @@ export async function saveToGoogleDrive(
     throw new Error('Google Drive save is not configured for this deployment.')
   }
 
+  const owner = captureOfflineOwner()
   const accessToken = await acquireGoogleDriveToken(clientId)
+  owner.assertCurrent()
+  const files = typeof uploads === 'function' ? await uploads() : uploads
+  owner.assertCurrent()
+  if (files.length === 0) return []
   const folderId = await ensureSaveFolder(accessToken)
-  for (const upload of uploads) {
-    await uploadFile(accessToken, folderId, upload)
-  }
+  owner.assertCurrent()
+  return await uploadCloudBatch(files, (upload) => uploadFile(accessToken, folderId, upload))
 }

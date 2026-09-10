@@ -1,6 +1,7 @@
-import { QueryClientProvider } from '@tanstack/react-query'
+import { type QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
 import { render } from '@testing-library/react'
+import { vi } from 'vitest'
 
 import { createQueryClient } from '../lib/query-client'
 import { createAppRouter } from '../router'
@@ -10,8 +11,8 @@ import { createAppRouter } from '../router'
  * and memory history. Pair with the fake auth client (`vi.mock` of
  * `../lib/auth-client`) to drive full page flows in jsdom.
  */
-export function renderApp(path: string) {
-  const queryClient = createQueryClient()
+export function renderApp(path: string, queryClient: QueryClient = createQueryClient()) {
+  vi.doMock('../lib/bootstrap-request', () => import('./fake-bootstrap'))
   const router = createAppRouter(queryClient, createMemoryHistory({ initialEntries: [path] }))
   const view = render(
     <QueryClientProvider client={queryClient}>

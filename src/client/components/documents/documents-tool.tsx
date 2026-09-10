@@ -11,13 +11,14 @@ import {
 import { type DragEvent, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { artworkLicenseNotice } from '../../../shared/asset-licenses'
 import { MAX_PDF_BYTES, MAX_PDF_FILES } from '../../../shared/constants'
 import { zipEntries } from '../../bulk/zip'
-import { apiRequest } from '../../lib/api'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { assetFileUrl, watermarksQueryOptions } from '../../lib/library'
+import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { baseName } from '../../lib/spec-tokens'
 import { DocumentRasteriser } from '../../pdf/raster'
 import { hasSmartPlacement } from '../../pdf/raster-layout'
@@ -38,7 +39,7 @@ const ACCEPTED_PDF_TYPES = 'application/pdf'
 /** One finished (or failed) document, kept in input order for the results list. */
 interface Outcome {
   name: string
-  output: { blob: Blob; fileName: string } | null
+  output: { blob: Blob; fileName: string; assetNotice?: string | undefined } | null
   error: string | null
 }
 
@@ -134,14 +135,14 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
   }
 
   async function loadLogo(assetId: string): Promise<Blob> {
-    const response = await apiRequest(assetFileUrl(organizationId, assetId))
-    return await response.blob()
+    return await loadWorkspaceMedia(organizationId, assetFileUrl(organizationId, assetId))
   }
 
   async function processOne(rasteriser: DocumentRasteriser, file: File): Promise<Outcome> {
     try {
       const bytes = new Uint8Array(await file.arrayBuffer())
-      const output = await watermarkPdf(bytes, (size) => rasteriser.rasterise(size))
+      const assetNotice = artworkLicenseNotice(specs)
+      const output = await watermarkPdf(bytes, (size) => rasteriser.rasterise(size), assetNotice)
       return {
         name: file.name,
         output: {
@@ -149,6 +150,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
           // cast bridges TS 6's narrower lib.dom BlobPart (as in metadata/write.ts).
           blob: new Blob([output] as BlobPart[], { type: 'application/pdf' }),
           fileName: outputName(file.name),
+          ...(assetNotice !== null && { assetNotice }),
         },
         error: null,
       }
@@ -188,7 +190,11 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
     setZipError(null)
     try {
       const blob = await zipEntries(
-        done.map((output) => ({ name: output.fileName, blob: output.blob })),
+        done.map((output) => ({
+          name: output.fileName,
+          blob: output.blob,
+          assetNotice: output.assetNotice,
+        })),
       )
       downloadBlob(blob, `watermarked-${String(done.length)}-documents.zip`)
     } catch (error) {

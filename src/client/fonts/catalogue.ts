@@ -9,6 +9,8 @@
  * the designer. Static families ship 400 and, when available, 700. The
  * loaders that turn an entry into CSS and a woff2 URL live in `load.ts`.
  */
+import extendedFonts from './extended-catalogue.json'
+
 export const FONT_CATEGORIES = ['sans', 'serif', 'display', 'script', 'mono'] as const
 
 export type FontCategory = (typeof FONT_CATEGORIES)[number]
@@ -31,9 +33,12 @@ export interface FontFamily {
   isVariable: boolean
   weights: readonly number[]
   license: string
+  /** Vendored, immutable resources for families without a runtime npm package. */
+  files?: readonly { weight: number; url: string }[]
+  licensePath?: string
 }
 
-export const FONT_CATALOGUE: readonly FontFamily[] = [
+const BASE_FONTS: readonly FontFamily[] = [
   {
     id: 'abril-fatface',
     packageName: '@fontsource/abril-fatface',
@@ -493,6 +498,17 @@ export const FONT_CATALOGUE: readonly FontFamily[] = [
     weights: [400, 500, 600, 700, 800],
     license: 'OFL-1.1',
   },
+]
+
+function categoryOf(value: string): FontCategory {
+  const category = FONT_CATEGORIES.find((candidate) => candidate === value)
+  if (category === undefined) throw new Error(`Unknown font category: ${value}`)
+  return category
+}
+
+export const FONT_CATALOGUE: readonly FontFamily[] = [
+  ...BASE_FONTS.map((font) => ({ ...font, licensePath: `/fonts/licenses/${font.id}.txt` })),
+  ...extendedFonts.map((font) => ({ ...font, category: categoryOf(font.category) })),
 ]
 
 export const DEFAULT_FONT_FAMILY = 'Inter Variable'

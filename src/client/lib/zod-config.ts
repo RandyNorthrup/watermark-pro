@@ -3,6 +3,6 @@
  * `new Function` while Better Auth builds its schemas at module load, which
  * the strict Content-Security-Policy reports as a violation on every page.
  */
-import { z } from 'zod'
+import { config } from 'zod/v4/core'
 
-z.config({ jitless: true })
+config({ jitless: true })

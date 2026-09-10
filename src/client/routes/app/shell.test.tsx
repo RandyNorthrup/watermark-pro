@@ -1,8 +1,11 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { focusManager, onlineManager } from '@tanstack/react-query'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HTTP_STATUS } from '../../../shared/constants'
+import { shellOrganizationSchema } from '../../../shared/shell-cache'
+import { activeOrganizationQueryOptions, sessionQueryOptions } from '../../lib/queries'
 import {
   makeMember,
   makeOrganization,
@@ -15,8 +18,8 @@ import { renderApp } from '../../test-support/render-app'
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 
 const client = fakeAuth
-/** Dashboard, Library, Editor, Bulk, Video, Documents, Gallery, Shares, Members, Audit log. */
-const NAV_ITEM_COUNT = 10
+/** Dashboard, Account, Invite people, Library, Editor, Bulk, Video, Documents, Gallery, Shares, Members, Audit log. */
+const NAV_ITEM_COUNT = 12
 
 beforeEach(() => {
   installFakeAuth()
@@ -25,10 +28,57 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  focusManager.setFocused(undefined)
+  onlineManager.setOnline(true)
   vi.unstubAllGlobals()
 })
 
 describe('application shell', () => {
+  it('withholds child content for an unusable workspace and recovers through the existing chooser', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    client().state.activeOrganizationId = 'missing-workspace'
+    const previous = client().state.organizations[0]
+    if (previous === undefined) throw new Error('Expected previous workspace fixture')
+    const { router, queryClient } = renderApp('/app/library')
+    await screen.findByRole('button', { name: 'Choose an organization' })
+    const stale = shellOrganizationSchema.parse({ ...previous, name: 'STALE_WORKSPACE_CANARY' })
+    act(() => {
+      queryClient.setQueryData(activeOrganizationQueryOptions.queryKey, stale)
+    })
+    expect(screen.queryByText('STALE_WORKSPACE_CANARY')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Choose an organization' }))
+    expect(client().organization.getFullOrganization).not.toHaveBeenCalled()
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
+    await user.click(await screen.findByRole('menuitem', { name: 'My workspace' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('My workspace')
+    expect(client().state.activeOrganizationId).toBe(`personal-${OWNER.id}`)
+  })
+
+  it.each(['focus', 'reconnect'] as const)(
+    'revalidates the session on %s after bootstrap freshness expires',
+    async (event) => {
+      seedOwnerWorkspace(client())
+      const { router, queryClient } = renderApp('/app')
+      await screen.findByRole('heading', { level: 1 })
+      client().getSession.mockResolvedValue({ data: null, error: null })
+      act(() => {
+        queryClient.setQueryData(sessionQueryOptions.queryKey, (session) => session, {
+          updatedAt: 0,
+        })
+        if (event === 'focus') {
+          focusManager.setFocused(false)
+          focusManager.setFocused(true)
+        } else {
+          onlineManager.setOnline(false)
+          onlineManager.setOnline(true)
+        }
+      })
+      await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+      expect(screen.queryByRole('heading', { name: 'Acme Studio' })).not.toBeInTheDocument()
+    },
+  )
   it('signs out from the account menu', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())

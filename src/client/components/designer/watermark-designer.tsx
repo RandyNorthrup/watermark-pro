@@ -41,6 +41,9 @@ interface WatermarkDesignerProps {
   organizationId: string
   /** Existing preset to edit; omitted for a new one. */
   initial?: WatermarkDto | undefined
+  initialSpec?: WatermarkSpec | undefined
+  previewPhoto?: File | undefined
+  submitLabel?: string | undefined
   canManage: boolean
   canManageLogos: boolean
   onSaved: (saved: WatermarkDto) => void
@@ -78,6 +81,9 @@ function isMarkKind(value: string): value is MarkKind {
 export function WatermarkDesigner({
   organizationId,
   initial,
+  initialSpec,
+  previewPhoto,
+  submitLabel,
   canManage,
   canManageLogos,
   onSaved,
@@ -86,7 +92,7 @@ export function WatermarkDesigner({
   const queryClient = useQueryClient()
   const [name, setName] = useState(initial?.name ?? '')
   const [nameError, setNameError] = useState<string | null>(null)
-  const [spec, setSpec] = useState<WatermarkSpec>(() => initial?.spec ?? blankSpec())
+  const [spec, setSpec] = useState<WatermarkSpec>(() => initial?.spec ?? initialSpec ?? blankSpec())
   const [drafts, setDrafts] = useState<Partial<Record<MarkKind, WatermarkSpec>>>({})
   const textRef = useRef<HTMLTextAreaElement>(null)
 
@@ -108,10 +114,14 @@ export function WatermarkDesigner({
   }
 
   const save = useMutation({
+    networkMode: 'always',
     mutationFn: (body: { name: string; spec: WatermarkSpec }) =>
       initial === undefined
         ? createWatermark(organizationId, body)
-        : updateWatermark(organizationId, initial.id, body),
+        : updateWatermark(organizationId, initial.id, {
+            ...body,
+            expectedUpdatedAt: initial.updatedAt,
+          }),
     onSuccess: async (saved) => {
       await queryClient.invalidateQueries({ queryKey: libraryQueryKey(organizationId) })
       onSaved(saved)
@@ -182,7 +192,7 @@ export function WatermarkDesigner({
             >
               <Tabs.List
                 aria-label={t('designer.markType')}
-                className="flex gap-1 border-b border-line"
+                className="flex flex-wrap gap-1 border-b border-line"
               >
                 {MARK_KINDS.map((kind) => (
                   <Tabs.Trigger
@@ -221,8 +231,8 @@ export function WatermarkDesigner({
                     <FontPicker
                       family={spec.fontFamily}
                       weight={spec.fontWeight}
-                      onFamilyChange={(fontFamily) => {
-                        setSpec({ ...spec, fontFamily })
+                      onFamilyChange={(fontFamily, fontWeight) => {
+                        setSpec({ ...spec, fontFamily, fontWeight: fontWeight ?? spec.fontWeight })
                       }}
                       onWeightChange={(fontWeight) => {
                         setSpec({ ...spec, fontWeight })
@@ -258,6 +268,7 @@ export function WatermarkDesigner({
                 ) : null}
               </Tabs.Content>
               <Tabs.Content value="qr" className="flex flex-col gap-4 outline-none">
+                <p className="text-sm text-ink-muted">{t('designer.qr.savedHint')}</p>
                 {spec.kind === 'qr' ? (
                   <Field
                     label={t('designer.qr.content')}
@@ -306,13 +317,14 @@ export function WatermarkDesigner({
             disabled={isIncomplete}
             className="self-start"
           >
-            {t(initial === undefined ? 'designer.savePreset' : 'designer.saveChanges')}
+            {submitLabel ??
+              t(initial === undefined ? 'designer.savePreset' : 'designer.saveChanges')}
           </Button>
         ) : (
           <p className="text-sm text-ink-muted">{t('designer.readOnlyHint')}</p>
         )}
       </Card>
-      <PreviewPanel organizationId={organizationId} spec={spec} />
+      <PreviewPanel organizationId={organizationId} spec={spec} initialPhoto={previewPhoto} />
     </form>
   )
 }

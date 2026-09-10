@@ -12,7 +12,7 @@ const DARK_QUERY = '(prefers-color-scheme: dark)'
  * resolved theme: the raised surface colour from src/client/styles/app.css,
  * as sRGB hex because the meta tag takes no oklch.
  */
-const CHROME_COLOURS: Record<ResolvedTheme, string> = { light: '#ffffff', dark: '#26242f' }
+const CHROME_COLOURS: Record<ResolvedTheme, string> = { light: '#ffffff', dark: '#211d21' }
 
 function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && (THEMES as readonly string[]).includes(value)
@@ -43,6 +43,9 @@ function resolve(theme: Theme): ResolvedTheme {
 export function applyTheme(theme: Theme): void {
   const resolved = resolve(theme)
   document.documentElement.dataset['theme'] = resolved
+  for (const source of document.querySelectorAll('source[data-theme-picture="dark"]')) {
+    source.setAttribute('media', resolved === 'dark' ? 'all' : 'not all')
+  }
   // index.html ships one theme-color per system scheme for the first paint;
   // once the app decides, both carry the resolved colour so a manual choice
   // wins over the system setting in the browser chrome too.

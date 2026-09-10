@@ -3,12 +3,9 @@
 # src/worker/index.ts. Keep the two in sync when adding origins.
 #
 # style-src allows inline styles because UI primitives position popovers with
-# style attributes. Third-party origins, both Cloudflare's: challenges.cloudflare.com
-# serves the Turnstile widget (script and frame) when bot protection is enabled;
-# static.cloudflareinsights.com / cloudflareinsights.com is the cookie-less Web
-# Analytics beacon the blowmoney.net zone injects into HTML ("automatic setup").
-# Turn that off in the dashboard (Analytics & Logs -> Web Analytics) and remove
-# the two insights entries to drop it.
+# style attributes. challenges.cloudflare.com serves the Turnstile widget
+# (script and frame) when bot protection is enabled.
+# Third-party analytics is not loaded on account, invitation, or content routes.
 #
 # Cloud import pickers (M16, PLAN.md §9). Each is offered only when its keys are
 # configured, but the CSP allowances are static, so they are always present:
@@ -27,7 +24,7 @@
 #   graph.microsoft.com (token + Graph browse/save) plus the download and upload
 #   hosts, which differ by account type: *.files.1drv.com / *.up.1drv.com and
 #   my.microsoftpersonalcontent.com (personal), *.sharepoint.com and
-#   *-my.sharepoint.com (work/school).
+#   tenant-my.sharepoint.com (work/school), already covered by *.sharepoint.com.
 # Every other script stays self-hosted. Cross-Origin-Opener-Policy is relaxed to
 # same-origin-allow-popups because all three pickers hand their result back
 # through a popup's window.opener, which a bare same-origin policy severs.
@@ -39,7 +36,7 @@
 # applies the directive to plain-http localhost, which Chromium exempts, so the
 # directive made the local preview unrenderable in the iPhone test projects.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com https://apis.google.com https://accounts.google.com https://www.dropbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://www.googleapis.com https://accounts.google.com https://*.dropboxusercontent.com https://api.dropboxapi.com https://content.dropboxapi.com https://login.microsoftonline.com https://graph.microsoft.com https://*.files.1drv.com https://*.up.1drv.com https://my.microsoftpersonalcontent.com https://*.sharepoint.com https://*-my.sharepoint.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com https://docs.google.com https://accounts.google.com https://www.dropbox.com https://login.microsoftonline.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://apis.google.com https://accounts.google.com https://www.dropbox.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://www.googleapis.com https://accounts.google.com https://*.dropboxusercontent.com https://api.dropboxapi.com https://content.dropboxapi.com https://login.microsoftonline.com https://graph.microsoft.com https://*.files.1drv.com https://*.up.1drv.com https://my.microsoftpersonalcontent.com https://*.sharepoint.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com https://docs.google.com https://accounts.google.com https://www.dropbox.com https://login.microsoftonline.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

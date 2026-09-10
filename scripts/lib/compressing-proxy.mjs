@@ -1,23 +1,10 @@
-/**
- * A brotli-compressing reverse proxy in front of `vite preview`.
- *
- * The preview serves every byte uncompressed; production sits behind
- * Cloudflare, which serves scripts, styles and JSON with brotli. Lighthouse's
- * phone emulation (slow 4G) turns that difference into seconds of load time,
- * so the audits fetch pages through this proxy to measure what a phone
- * downloads. Everything else (status, headers, cookies) passes through
- * untouched.
- *
- * Upstream requests use one fresh connection each (`agent: false`): the
- * preview closes idle keep-alive sockets, and reusing them under a burst of
- * asset requests produced resets mid-audit.
- */
+/** Brotli edge model with optional HTTP/2 TLS; forwarding preserves origin, response and cookie boundaries. */
 import { createServer, request as httpRequest } from 'node:http'
+import { createSecureServer } from 'node:http2'
 import { promisify } from 'node:util'
 import { brotliCompress, constants } from 'node:zlib'
 
 const compress = promisify(brotliCompress)
-
 const COMPRESSIBLE_TYPES = [
   'text/',
   'application/javascript',
@@ -25,31 +12,85 @@ const COMPRESSIBLE_TYPES = [
   'application/manifest+json',
   'image/svg+xml',
 ]
-/** Length-dependent headers the proxy must set itself. */
-const HEADERS_TO_DROP = new Set(['content-length', 'content-encoding', 'transfer-encoding'])
+const HOP_HEADERS = new Set([
+  'connection',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'proxy-connection',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+])
+const RESPONSE_LENGTH_HEADERS = new Set(['content-length', 'content-encoding'])
+const BAD_REQUEST = 400
 const BAD_GATEWAY = 502
-/**
- * Hashed build assets are immutable, so they are compressed once at the
- * quality a CDN precompresses with and served from memory after that;
- * everything else (HTML, JSON) gets the quality a CDN uses on the fly.
- */
+const OK = 200
 const ASSET_PATH = /^\/assets\//
 const DYNAMIC_QUALITY = 5
-const assetCache = new Map()
+const CLOSE_TIMEOUT_MS = 1000
 
-function isCompressible(contentType) {
-  return COMPRESSIBLE_TYPES.some((type) => contentType.startsWith(type))
+class ProxyTargetError extends Error {}
+
+/** Strip transport-only fields while preserving ordinary headers and repeated cookie values. */
+export function forwardedHeaders(headers) {
+  const nominated = new Set(
+    String(headers.connection ?? '')
+      .split(',')
+      .map((name) => name.trim().toLowerCase())
+      .filter(Boolean),
+  )
+  return Object.fromEntries(
+    Object.entries(headers).filter(
+      ([name]) => !name.startsWith(':') && !HOP_HEADERS.has(name) && !nominated.has(name),
+    ),
+  )
 }
 
-/** Fetches the upstream response in full: status, headers and body. */
-function fetchUpstream(upstream, request) {
-  const url = new URL(request.url ?? '/', upstream)
+function targetUrl(upstream, requestUrl) {
+  let target
+  try {
+    target = new URL(requestUrl ?? '/', upstream)
+  } catch {
+    throw new ProxyTargetError('Audit proxy received an invalid request target.')
+  }
+  if (
+    target.origin !== upstream.origin ||
+    target.username !== '' ||
+    target.password !== '' ||
+    target.hash !== ''
+  )
+    throw new ProxyTargetError('Audit request target must remain on the configured upstream.')
+  return target
+}
+
+function acceptsBrotli(header) {
+  return String(header ?? '')
+    .split(',')
+    .some((part) => {
+      const [name, ...parameters] = part.trim().split(';')
+      const quality = parameters.find((parameter) => parameter.trimStart().startsWith('q='))
+      const weight = quality === undefined ? 1 : Number(quality.trim().slice(2))
+      return name === 'br' && Number.isFinite(weight) && weight > 0 && weight <= 1
+    })
+}
+
+/** Identity upstream bytes avoid double compression; only this proxy's exact Origin is rewritten. */
+function fetchUpstream(context, target, request) {
+  const headers = forwardedHeaders(request.headers)
+  const origin = headers.origin === context.origin ? context.upstream.origin : headers.origin
   return new Promise((resolve, reject) => {
     const upstreamRequest = httpRequest(
-      url,
+      target,
       {
         method: request.method,
-        headers: { ...request.headers, host: url.host },
+        headers: {
+          ...headers,
+          host: target.host,
+          'accept-encoding': 'identity',
+          ...(origin !== undefined && { origin }),
+        },
         agent: false,
       },
       (upstreamResponse) => {
@@ -58,6 +99,11 @@ function fetchUpstream(upstream, request) {
           chunks.push(chunk)
         })
         upstreamResponse.on('end', () => {
+          const encoding = upstreamResponse.headers['content-encoding']
+          if (encoding !== undefined && encoding !== 'identity') {
+            reject(new Error('Audit upstream ignored the identity encoding request.'))
+            return
+          }
           resolve({
             status: upstreamResponse.statusCode ?? BAD_GATEWAY,
             headers: upstreamResponse.headers,
@@ -72,104 +118,135 @@ function fetchUpstream(upstream, request) {
   })
 }
 
-/** Everything an error has to say, including the members of an AggregateError. */
 function describe(error) {
-  if (error instanceof AggregateError) {
+  if (error instanceof AggregateError)
     return error.errors.map((member) => describe(member)).join(' | ')
-  }
-  return error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+  return error instanceof Error ? error.name + ': ' + error.message : String(error)
 }
 
-/** One retry for safe methods: a socket the preview closed while the request was in flight. */
-async function fetchUpstreamWithRetry(upstream, request) {
+/** Only safe requests may be retried after a transport failure; posted bodies are never replayed. */
+async function fetchUpstreamWithRetry(context, target, request) {
   try {
-    return await fetchUpstream(upstream, request)
+    return await fetchUpstream(context, target, request)
   } catch (error) {
-    if (request.method !== 'GET' && request.method !== 'HEAD') {
-      throw error
-    }
-    console.warn(`proxy: retrying ${request.url ?? ''} after ${describe(error)}`)
-    return await fetchUpstream(upstream, request)
+    if (request.method !== 'GET' && request.method !== 'HEAD') throw error
+    console.warn('proxy: retrying safe upstream request after ' + describe(error))
+    return await fetchUpstream(context, target, request)
   }
 }
 
-/** Compresses like a CDN: assets once at top quality, the rest quickly. */
 function compressBody(body, isAsset) {
   const quality = isAsset ? constants.BROTLI_MAX_QUALITY : DYNAMIC_QUALITY
   return compress(body, { params: { [constants.BROTLI_PARAM_QUALITY]: quality } })
 }
 
 function send(response, { status, headers, output }) {
-  for (const [name, value] of Object.entries(headers)) {
-    if (value !== undefined && !HEADERS_TO_DROP.has(name)) {
-      response.setHeader(name, value)
-    }
+  const fields = Object.entries(forwardedHeaders(headers))
+  for (const [name, value] of fields) {
+    if (value !== undefined && !RESPONSE_LENGTH_HEADERS.has(name)) response.setHeader(name, value)
   }
   if (output.isCompressed) {
     response.setHeader('content-encoding', 'br')
-    response.setHeader('vary', 'accept-encoding')
+    const vary = new Set(
+      String(headers.vary ?? '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean),
+    )
+    vary.add('Accept-Encoding')
+    response.setHeader('vary', [...vary].join(', '))
   }
   response.writeHead(status)
   response.end(output.bytes)
 }
 
-async function forward(upstream, request, response) {
-  const pathname = request.url ?? '/'
-  const acceptsBrotli = String(request.headers['accept-encoding'] ?? '').includes('br')
-  const isAsset = ASSET_PATH.test(pathname)
-  const cached = acceptsBrotli && isAsset ? assetCache.get(pathname) : undefined
+async function forward(context, request, response) {
+  const target = targetUrl(context.upstream, request.url)
+  const pathname = target.pathname + target.search
+  const brotli = acceptsBrotli(request.headers['accept-encoding'])
+  const isAsset = ASSET_PATH.test(target.pathname)
+  const isCacheableRequest = request.method === 'GET' && brotli && isAsset
+  const cached = isCacheableRequest ? context.cache.get(pathname) : undefined
   if (cached !== undefined) {
     send(response, cached)
     return
   }
-  const { status, headers, body } = await fetchUpstreamWithRetry(upstream, request)
+  const { status, headers, body } = await fetchUpstreamWithRetry(context, target, request)
   const contentType = String(headers['content-type'] ?? '')
-  const isCompressed = acceptsBrotli && isCompressible(contentType) && body.length > 0
+  const isCompressed =
+    brotli && COMPRESSIBLE_TYPES.some((type) => contentType.startsWith(type)) && body.length > 0
   const entry = {
     status,
     headers,
     output: { isCompressed, bytes: isCompressed ? await compressBody(body, isAsset) : body },
   }
-  if (isCompressed && isAsset) {
-    assetCache.set(pathname, entry)
-  }
+  if (
+    isCacheableRequest &&
+    isCompressed &&
+    status === OK &&
+    headers['set-cookie'] === undefined &&
+    !/\b(?:private|no-store)\b/i.test(String(headers['cache-control'] ?? ''))
+  )
+    context.cache.set(pathname, entry)
   send(response, entry)
 }
 
-/**
- * Starts the proxy and resolves with its origin and a `close` function.
- *
- * @param {{ upstream: string; port: number }} options
- * @returns {Promise<{ origin: string; close: () => Promise<void> }>}
- */
-export function startCompressingProxy({ upstream, port }) {
-  const server = createServer(async (request, response) => {
+/** HTTP/2 sessions are owned by this proxy and must close before the browser-profile cleanup. */
+function closeProxy(server, sessions) {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      for (const session of sessions) session.destroy()
+      server.closeAllConnections?.()
+    }, CLOSE_TIMEOUT_MS)
+    server.close(() => {
+      clearTimeout(timeout)
+      resolve()
+    })
+    for (const session of sessions) session.close()
+  })
+}
+
+/** Bind only loopback; TLS callers provide an ephemeral certificate and pin it in their owned browser. */
+export function startCompressingProxy({ upstream, port, tls }) {
+  const target = new URL(upstream)
+  if (target.protocol !== 'http:' || target.username !== '' || target.password !== '')
+    throw new Error('The audit upstream must be an HTTP origin without embedded credentials.')
+  const context = { upstream: target, origin: '', cache: new Map() }
+  const sessions = new Set()
+  const handler = async (request, response) => {
     try {
-      await forward(upstream, request, response)
+      await forward(context, request, response)
     } catch (error) {
-      // A failed upstream request must not take the proxy (and the audit) down.
-      console.error(
-        `proxy: ${request.method ?? ''} ${request.url ?? ''} failed: ${describe(error)}`,
-      )
-      if (!response.headersSent) {
-        response.writeHead(BAD_GATEWAY)
-      }
+      if (response.destroyed) return
+      // Targets can contain private path/query values; diagnostics omit them.
+      console.error('proxy: upstream forwarding failed: ' + describe(error))
+      if (!response.headersSent)
+        response.writeHead(error instanceof ProxyTargetError ? BAD_REQUEST : BAD_GATEWAY)
       response.end()
     }
+  }
+  const server =
+    tls === undefined
+      ? createServer(handler)
+      : createSecureServer({ key: tls.key, cert: tls.cert, allowHTTP1: false }, handler)
+  server.on('session', (session) => {
+    sessions.add(session)
+    session.on('close', () => sessions.delete(session))
   })
   return new Promise((resolve, reject) => {
     server.once('error', reject)
-    // Every interface, so a port already taken on IPv6 or IPv4 fails here
-    // instead of letting the browser reach some other local server.
-    server.listen(port, () => {
+    server.listen(port, 'localhost', () => {
+      const address = server.address()
+      if (address === null || typeof address === 'string') {
+        server.close()
+        reject(new Error('The audit proxy did not bind a TCP port.'))
+        return
+      }
+      context.origin =
+        (tls === undefined ? 'http' : 'https') + '://localhost:' + String(address.port)
       resolve({
-        origin: `http://localhost:${String(port)}`,
-        close: () =>
-          new Promise((resolveClose) => {
-            server.close(() => {
-              resolveClose()
-            })
-          }),
+        origin: context.origin,
+        close: () => closeProxy(server, sessions),
       })
     })
   })

@@ -20,6 +20,15 @@ function stubAdminApi(failure: number | null = null) {
         return Promise.resolve(Response.json({ error: 'forbidden' }, { status: failure }))
       }
       const url = requestUrl(input)
+      if (url.endsWith('/api/admin/account-stats'))
+        return Promise.resolve(
+          Response.json({
+            users: 2,
+            verifiedUsers: 2,
+            pendingInvitations: 1,
+            acceptedInvitations: 1,
+          }),
+        )
       if (url.endsWith('/api/admin/organizations')) {
         return Promise.resolve(
           Response.json({
@@ -126,14 +135,14 @@ describe('administration page', () => {
     seedOwnerWorkspace(client())
     stubAdminApi()
     renderApp('/app/admin')
-    expect(await screen.findByRole('alert')).toHaveTextContent('Only platform administrators')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Only the site administrator')
     // The refusal still has a page heading, so assistive tech knows where it landed.
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Administration')
     expect(screen.queryByRole('tab', { name: 'Users' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument()
   })
 
-  it('lets a platform admin search, ban, unban, promote and sign out users', async () => {
+  it('lets the site administrator manage users without offering additional administrators', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
     client().state.user = { ...OWNER, role: 'admin' }
@@ -161,13 +170,13 @@ describe('administration page', () => {
     await user.click(screen.getByRole('button', { name: `Unban ${VIEWER.email}` }))
     await waitFor(() => expect(screen.queryByText('banned: spam')).not.toBeInTheDocument())
 
-    await user.click(screen.getByRole('button', { name: `Make ${VIEWER.email} an admin` }))
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: `Remove admin from ${VIEWER.email}` }),
-      ).toBeInTheDocument(),
-    )
-    expect(client().admin.setRole).toHaveBeenCalledWith({ userId: VIEWER.id, role: 'admin' })
+    expect(
+      screen.queryByRole('button', { name: `Make ${VIEWER.email} an admin` }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: `Remove admin from ${OWNER.email}` }),
+    ).not.toBeInTheDocument()
+    expect(client().admin.setRole).not.toHaveBeenCalled()
 
     await user.click(screen.getByRole('button', { name: `Sign out ${VIEWER.email} everywhere` }))
     await waitFor(() =>
@@ -205,6 +214,9 @@ describe('administration page', () => {
   it('reports failed admin loads', async () => {
     const user = await renderAsAdmin(HTTP_STATUS.forbidden)
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
+    const alerts = await screen.findAllByRole('alert')
+    expect(
+      alerts.every((alert) => alert.textContent.includes('Your role does not allow this.')),
+    ).toBe(true)
   })
 })

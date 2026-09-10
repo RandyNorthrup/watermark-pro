@@ -18,10 +18,9 @@ export const Route = createFileRoute('/forgot-password')({
   component: ForgotPasswordPage,
 })
 
-const formSchema = z.object({ email: emailSchema })
-type FormValues = z.infer<typeof formSchema>
-
 function ForgotPasswordPage() {
+  const formSchema = z.object({ email: emailSchema })
+  type FormValues = z.infer<typeof formSchema>
   const { t } = useTranslation()
   const [values, setValues] = useState<FormValues>({ email: '' })
   const [isPending, setIsPending] = useState(false)
