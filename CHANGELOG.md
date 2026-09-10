@@ -19,6 +19,18 @@ what was planned; superseded entries stay.
 
 ### Changed
 
+- Focused the workspace primary rail on Dashboard, Library, Editor, Bulk, Video,
+  Documents, Gallery and Shares. Profile/account, invitations, members and audit
+  are reached from the account menu, alongside Administration for site Owners
+  and Admins. Account routes use a contextual account rail with a return to the
+  workspace.
+- Administration now uses a contextual desktop sidebar and the phone's More
+  sheet for Users, Organizations, Audit trail, Health and Client errors. The
+  selected section is validated URL state, so direct links, reloads and browser
+  history retain the destination; Users is the default section.
+- Organized the account page into identity and global-role information alongside
+  a separate sign-in-method panel, including connected providers and the existing
+  account-linking actions.
 - Rebuilt the public, authentication and application surfaces from the supplied
   liquid-glass reference with a visible rose/peach scene, translucent panels,
   stronger depth, floating desktop chrome and responsive fallbacks for reduced

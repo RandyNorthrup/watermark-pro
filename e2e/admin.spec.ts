@@ -83,13 +83,15 @@ test('the site owner manages users and sees account totals', async ({ browser, p
   await signIn(memberPage, member, memberOrganization)
   await memberContext.close()
 
-  await page.getByRole('tab', { name: 'Organizations' }).click()
+  await navigateTo(page, 'Organizations')
+  await expect(page).toHaveURL(/\/app\/admin\?section=organizations/)
   const organizations = page.getByRole('table', { name: /Organizations/ })
   await expect(organizations).toContainText(ownerOrganization)
   await expect(organizations).toContainText(memberOrganization)
   await expectAccessible(page)
 
-  await page.getByRole('tab', { name: 'Audit trail' }).click()
+  await navigateTo(page, 'Audit trail')
+  await expect(page).toHaveURL(/\/app\/admin\?section=audit/)
   const audit = page.getByRole('table', { name: /Audit entries/ })
   await expect(audit.getByText('admin.user_banned').first()).toBeVisible()
   await expect(audit.getByText('admin.user_unbanned').first()).toBeVisible()
