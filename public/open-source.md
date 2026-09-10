@@ -9,10 +9,10 @@ copyright and license terms; the application's MIT license does not replace them
 
 ## Mediabunny source offer
 
-The video tools include unmodified Mediabunny **1.55.5**, licensed under the
+The video tools include unmodified Mediabunny **1.55.6**, licensed under the
 Mozilla Public License 2.0. Its corresponding TypeScript source, original README,
 package metadata and license are provided without charge in
-[mediabunny-1.55.5-source.zip](/open-source/mediabunny-1.55.5-source.zip).
+[mediabunny-1.55.6-source.zip](/open-source/mediabunny-1.55.6-source.zip).
 
 The upstream project is https://github.com/Vanilagy/mediabunny. The included MPL
 license and source notices remain applicable to that library. Bundling it does

@@ -44,13 +44,13 @@ export function LanguageMenu() {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button type="button" variant="ghost" size="icon" aria-label={t('language.menuLabel')}>
           <Languages aria-hidden />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" landmarkLabel={t('language.menuLabel')}>
         {SUPPORTED_LOCALES.map((locale) => (
           <DropdownMenuItem
             key={locale.code}

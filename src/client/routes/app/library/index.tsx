@@ -200,19 +200,18 @@ function LibraryPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {items.length > 0 ? (
-            <Button
-              type="button"
-              variant="secondary"
-              isPending={exportPresets.isPending}
-              onClick={() => {
-                exportPresets.mutate(items)
-              }}
-            >
-              {exportPresets.isPending ? null : <Download aria-hidden="true" className="size-4" />}
-              {t('library.export')}
-            </Button>
-          ) : null}
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={items.length === 0}
+            isPending={exportPresets.isPending}
+            onClick={() => {
+              exportPresets.mutate(items)
+            }}
+          >
+            {exportPresets.isPending ? null : <Download aria-hidden="true" className="size-4" />}
+            {t('library.export')}
+          </Button>
           {canManage ? (
             <Link
               to="/app/library/new"

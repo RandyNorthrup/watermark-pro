@@ -17,6 +17,7 @@ import { encoded, resetFakeCanvasBackend } from '../../test-support/fake-canvas-
 import { installLibraryApi, makeAsset, makeWatermark } from '../../test-support/fake-library-api'
 import { renderedSpecs, resetFakePreview } from '../../test-support/fake-preview'
 import { renderApp } from '../../test-support/render-app'
+import { requestUrl } from '../../test-support/request-url'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
@@ -40,6 +41,25 @@ afterEach(() => {
 })
 
 describe('library page', () => {
+  it('keeps Export in the toolbar while presets load and enables it only for real records', async () => {
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    const fetcher = globalThis.fetch
+    const pending = Promise.withResolvers<Response>()
+    vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+      requestUrl(input).endsWith('/watermarks') ? pending.promise : fetcher(input, init),
+    )
+    renderApp('/app/library')
+    await screen.findByRole('heading', { name: 'Watermark library' })
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    expect(exportButton).toBeDisabled()
+    expect(screen.queryByText('Studio signature')).not.toBeInTheDocument()
+    pending.resolve(Response.json({ watermarks: [makeWatermark()] }))
+    await screen.findByText('Studio signature')
+    expect(exportButton).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Export' })).toBe(exportButton)
+  })
+
   it('lists presets with their kind and placement and lets an owner delete one', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
@@ -101,6 +121,7 @@ describe('library page', () => {
     installLibraryApi()
     renderApp('/app/library')
     expect(await screen.findByText(/No presets yet/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
     expect(screen.queryByRole('link', { name: 'New preset' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Create the first preset' })).not.toBeInTheDocument()
   })
@@ -110,6 +131,7 @@ describe('library page', () => {
     installLibraryApi({ failWith: 'forbidden' })
     renderApp('/app/library')
     expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
+    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
   })
 
   it('exports every preset as a parseable preset file', async () => {

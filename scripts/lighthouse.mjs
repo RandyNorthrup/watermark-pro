@@ -38,6 +38,7 @@ import {
   summarizeRuns,
 } from './lib/lighthouse-budget.mjs'
 import { setAuditCookies } from './lib/lighthouse-cookies.mjs'
+import { lighthouseDiagnostics } from './lib/lighthouse-diagnostics.mjs'
 import { validateAuditNavigation } from './lib/lighthouse-navigation.mjs'
 import { auditContentFailure, withLighthousePage } from './lib/lighthouse-page.mjs'
 
@@ -107,7 +108,12 @@ async function auditMedian(origin, chrome, surface) {
       {
         mode: IS_SAMPLE ? 'diagnostic' : 'certification',
         transport: TRANSPORT,
-        runs: runs.map(({ scores, metrics, protocols }) => ({ scores, metrics, protocols })),
+        runs: runs.map(({ scores, metrics, protocols, diagnostics }) => ({
+          scores,
+          metrics,
+          protocols,
+          diagnostics,
+        })),
         ...aggregate,
       },
       null,
@@ -190,7 +196,14 @@ async function auditOwnedPage(origin, chrome, surface, attempt, page, inspection
       result.lhr.audits[auditId]?.numericValue,
     ]),
   )
-  return { scores, metrics, protocols, slug, report: result.report }
+  return {
+    scores,
+    metrics,
+    protocols,
+    diagnostics: lighthouseDiagnostics(result.lhr),
+    slug,
+    report: result.report,
+  }
 }
 
 const requested = process.env.LIGHTHOUSE_PAGES?.split(',')

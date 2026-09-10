@@ -7,9 +7,12 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
-M19 production-readiness work is in progress. The final release and domain
-cutover are not yet certified; focused evidence lives under
-[docs/verification/m19](docs/verification/m19/).
+## [2.0.0] - 2026-09-10
+
+M19 is the production-readiness release for Lumafoil. Source and local evidence
+live under [docs/verification/m19](docs/verification/m19/); provider and domain
+cutover outcomes are recorded separately because they occur after the tagged
+candidate passes its hosted gates.
 
 ### Added
 
@@ -61,6 +64,15 @@ cutover are not yet certified; focused evidence lives under
 
 ### Changed
 
+- Core login, audit and invitation queries now load a four-schema validation
+  leaf instead of initializing unrelated media and administration schemas.
+  Desktop file-launch delivery, the bulk engine pool, mark resource catalogues,
+  photo metadata parsing and PDF processing load only when their actual action
+  needs them; account leases and early error reporting remain synchronous.
+- Updated the exact compatible dependency pins for MSAL Browser, i18next,
+  react-i18next, Lucide, Mediabunny, Testing Library user-event and
+  chrome-launcher. TypeScript 7 and Vitest 5 remain held by the installed
+  typed-ESLint and Cloudflare Workers test peer ranges.
 - Recent work now uses a stable scrollable results panel, with compact horizontal
   thumbnails on phones and the full card grid on larger screens. This removes
   the large Tools-section shift without delaying the page or adding an empty
@@ -114,6 +126,19 @@ cutover are not yet certified; focused evidence lives under
 
 ### Fixed
 
+- Library export and invitation referral controls now reserve their final
+  layout while data loads, eliminating the measured desktop and phone shifts
+  without enabling actions before valid data exists. The language chooser is a
+  labelled nonmodal menu, so opening it no longer hides the page landmarks or
+  headings from assistive technology.
+- Filled preset designers now constrain grid tracks, font specimens and hidden
+  radio inputs at phone and tablet widths. English and Arabic production-build
+  checks keep every visible control inside the viewport and preserve keyboard
+  selection with the matching native radio state.
+- Lighthouse content checks wait a bounded interval for the final asynchronous
+  heading, while still rejecting wrong screens. CI report JSON retains only
+  finite benchmark, layout-path, rectangle and task-source diagnostics; page
+  text, selectors and full URLs are omitted.
 - Selecting an Insert detail token could let the closing menu return focus to
   its trigger after the designer restored the text caret. Selection now retains
   the insertion field; Escape dismissal still returns focus to the trigger.

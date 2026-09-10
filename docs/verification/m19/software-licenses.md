@@ -32,7 +32,7 @@ entries and changed versions/notices. Independent built checks require every
 actual dependency entry to have full text; the current artifact has no empty
 entries. These notices apply to bundled software, not users' input content.
 
-The video tools bundle Mediabunny 1.55.5 under MPL-2.0. Before building,
+The video tools bundle Mediabunny 1.55.6 under MPL-2.0. Before building,
 `scripts/build-open-source.mjs` verifies the installed version against the exact
 project pin and packages its original `src` files, README, package metadata and
 license. The 69-file, 470,420-byte archive is available through the explicit

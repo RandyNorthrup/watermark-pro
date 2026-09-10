@@ -5,7 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FILTER_BY_ID } from '../../../shared/adjustments'
 import * as imageSize from '../../lib/image-size'
 import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
-import { clearLaunchFiles, receiveLaunchFiles, takeLaunchFiles } from '../../lib/launch-files'
+import { takeLaunchFiles } from '../../lib/launch-consumer'
+import { clearLaunchFiles, receiveLaunchFiles } from '../../lib/launch-files'
 import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace, seedViewerWorkspace } from '../../test-support/fake-auth-client'
@@ -265,7 +266,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
-    await screen.findByLabelText('Preset')
+    await screen.findByRole('combobox', { name: 'Add another preset' })
 
     await user.click(screen.getByRole('tab', { name: 'Adjust' }))
     await user.click(screen.getByRole('radio', { name: 'Vivid' }))

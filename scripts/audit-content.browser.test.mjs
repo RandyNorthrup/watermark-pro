@@ -4,6 +4,29 @@ import { test } from 'node:test'
 import { chromium } from '@playwright/test'
 
 import { assertAuditContent } from './lib/audit-content.mjs'
+import { requireSurface } from './lib/audit-surfaces.mjs'
+
+const ASSERTION_TIMEOUT_MS = 100
+const DELAYED_CONTENT_MS = 10
+const QUICK_ASSERTION = { timeout: ASSERTION_TIMEOUT_MS }
+
+test('default designer audit rejects the distinct QR creation screen', async () => {
+  const browser = await chromium.launch()
+  try {
+    const page = await browser.newPage()
+    const catalogue = { library: { newPreset: 'New preset' } }
+    const surface = requireSurface('designer-new')
+    await page.setContent('<h1>New preset</h1>')
+    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await page.setContent('<h1>New QR code</h1>')
+    await assert.rejects(
+      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
+      /expected heading/,
+    )
+  } finally {
+    await browser.close()
+  }
+})
 
 test('rendered audit checks refuse successful HTTP error screens, missing content, and wrong views', async () => {
   const browser = await chromium.launch()
@@ -21,7 +44,7 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
     const good =
       '<h1>My workspace</h1><section aria-label="Recent work">Studio signature<button aria-pressed="true">Details</button></section>'
     await page.setContent(good)
-    await assertAuditContent(page, surface, catalogue)
+    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
     for (const [html, failure] of [
       [good.replace('My workspace', 'Something went wrong'), /expected heading/],
       [good.replace('Studio signature', 'No saved work'), /fixture content/],
@@ -29,7 +52,7 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
       [good.replace('<section', '<section hidden'), /required state/],
     ]) {
       await page.setContent(html)
-      await assert.rejects(assertAuditContent(page, surface, catalogue), failure)
+      await assert.rejects(assertAuditContent(page, surface, catalogue, QUICK_ASSERTION), failure)
     }
     await page.setContent(good)
     await page.evaluate(async () => {
@@ -45,7 +68,7 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
         await image.decode()
       }
     })
-    await assertAuditContent(page, surface, catalogue)
+    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
     await page.evaluate(() => {
       const broken = globalThis.document.createElement('img')
       broken.src = 'data:image/png,broken'
@@ -54,17 +77,48 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
       broken.id = 'broken-audit-image'
       globalThis.document.body.append(broken)
     })
-    await assert.rejects(assertAuditContent(page, surface, catalogue), /undecoded visible image/)
+    await assert.rejects(
+      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
+      /undecoded visible image/,
+    )
     await page.locator('#broken-audit-image').evaluate((image) => {
       image.hidden = true
     })
-    await assertAuditContent(page, surface, catalogue)
+    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
     await page.locator('#broken-audit-image').evaluate((image) => {
       image.hidden = false
       image.loading = 'lazy'
       image.style.cssText = 'position:absolute;top:10000px'
     })
-    await assertAuditContent(page, surface, catalogue)
+    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+  } finally {
+    await browser.close()
+  }
+})
+
+test('waits for the final asynchronous heading but still refuses the wrong screen', async () => {
+  const browser = await chromium.launch()
+  try {
+    const page = await browser.newPage()
+    const catalogue = { library: { newPreset: 'New preset' } }
+    const surface = requireSurface('designer-new')
+    await page.setContent('<h1>Loading</h1>')
+    await page.evaluate(
+      ({ delay, heading }) => {
+        setTimeout(() => {
+          const element = globalThis.document.querySelector('h1')
+          if (element !== null) element.textContent = heading
+        }, delay)
+      },
+      { delay: DELAYED_CONTENT_MS, heading: catalogue.library.newPreset },
+    )
+    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+
+    await page.setContent('<h1>New QR code</h1>')
+    await assert.rejects(
+      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
+      /expected heading/,
+    )
   } finally {
     await browser.close()
   }

@@ -9,7 +9,6 @@ import {
   DEFAULT_TEXT_SPEC,
   type WatermarkSpec,
 } from '../../shared/watermark'
-import { DEFAULT_FONT_FAMILY } from '../fonts/catalogue'
 
 export type MarkKind = WatermarkSpec['kind']
 
@@ -45,7 +44,7 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
         ...settings,
         kind: 'text',
         text: DEFAULT_TEXT_SPEC.text,
-        fontFamily: DEFAULT_FONT_FAMILY,
+        fontFamily: DEFAULT_TEXT_SPEC.fontFamily,
         fontWeight: 600,
         letterSpacing: 0,
         curve: 0,
@@ -68,7 +67,7 @@ export function defaultSpecFor(kind: MarkKind, base: WatermarkSpec, assetId = ''
         ...settings,
         style: { ...settings.style, scale: DEFAULT_SYMBOL_SCALE },
         kind: 'symbol',
-        symbol: { type: 'glyph', glyph: DEFAULT_GLYPH, fontFamily: DEFAULT_FONT_FAMILY },
+        symbol: { type: 'glyph', glyph: DEFAULT_GLYPH, fontFamily: DEFAULT_TEXT_SPEC.fontFamily },
       }
     }
     case 'image': {

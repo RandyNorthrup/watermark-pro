@@ -6,18 +6,30 @@ import { cn } from '../../lib/cn'
 export const DropdownMenu = Radix.Root
 export const DropdownMenuTrigger = Radix.Trigger
 
-export function DropdownMenuContent({ className, ...props }: ComponentProps<typeof Radix.Content>) {
+/** A portalled menu can name its own landmark when it is outside the page navigation. */
+export function DropdownMenuContent({
+  className,
+  landmarkLabel,
+  ...props
+}: ComponentProps<typeof Radix.Content> & { landmarkLabel?: string }) {
+  const content = (
+    <Radix.Content
+      sideOffset={6}
+      align="end"
+      className={cn(
+        'glass-popover z-50 min-w-48 rounded-xl border border-line bg-surface-raised p-1 text-sm shadow-card',
+        className,
+      )}
+      {...props}
+    />
+  )
   return (
     <Radix.Portal>
-      <Radix.Content
-        sideOffset={6}
-        align="end"
-        className={cn(
-          'glass-popover z-50 min-w-48 rounded-xl border border-line bg-surface-raised p-1 text-sm shadow-card',
-          className,
-        )}
-        {...props}
-      />
+      {landmarkLabel === undefined ? (
+        content
+      ) : (
+        <section aria-label={landmarkLabel}>{content}</section>
+      )}
     </Radix.Portal>
   )
 }

@@ -2,7 +2,7 @@ import type { ZodType } from 'zod'
 
 import { captureOfflineOwner } from './offline-context'
 import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
-import { apiErrorSchema } from '../../shared/api'
+import { apiErrorSchema } from '../../shared/api-core'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
 
 /** Wording for the error codes the Worker returns; keys are the wire codes. */

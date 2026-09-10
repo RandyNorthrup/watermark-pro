@@ -204,3 +204,84 @@ to current output. Bundle budgets passed. The ignored log is
 The populated dashboard separately passed its required five mobile traces, but
 the complete route/UI matrices, new-head 104-case device run, full red drills and
 hosted release proof remain open.
+
+The next Linux quality run exposed one remaining test race: an editor test waited
+for the transient empty `Preset` label while its URL-selected preset was still
+being applied. The same file already defined the stable selected-state contract.
+That test now waits for `Add another preset`, as the user-visible final control;
+no timeout or product behavior changed. Fresh integrated and remote checks remain
+required.
+
+## Complete red drill and first full UI matrix
+
+The complete current-source red drill ran all 93 declared faults. Every mutation
+produced the intended nonzero gate and the runner restored the exact source
+after each case. The committed report is
+[`docs/red-drill/2026-09-10.md`](../../red-drill/2026-09-10.md); the ignored log
+is `temp/lumafoil-red-drill-final.log`, SHA-256
+`4684e17232b927beab29520beb3fd109aca5b963ca86dc4b53cfc50f8ef9c479`.
+
+GitHub run `34498423486` completed all 72 UI jobs on commit `5d55ade`. It
+confirmed HTTP/2 transport and 100 accessibility/best-practices scores on every
+completed Lighthouse route. It also exposed release-blocking evidence rather
+than being accepted as green: Library and Invitations had deterministic desktop
+CLS, one designer content check observed a transient heading, every mobile route
+missed at least one timing or CLS budget on the hosted runner, and the four
+visual jobs found a modal-language-menu accessibility failure plus filled
+designer overflow on phone, tablet and Android.
+
+The fixes preserve the gates. Library and referral controls now occupy their
+final geometry while loading; selected desktop traces reduced CLS to 0.0041,
+and phone diagnostics reduced both routes to zero. The language chooser is a
+labelled nonmodal menu. Filled English/Arabic designers pass four production-
+build device checks with decoded previews, exact direction/headings, in-viewport
+controls, keyboard/native radio agreement, no overflow and zero axe findings.
+Content inspection now waits a bounded interval for a final asynchronous
+heading while continuing to reject the wrong screen. New CI diagnostics retain
+only finite benchmark, DOM path/rectangle and task-source classes; page text,
+selectors and full URLs are omitted.
+
+## Final local startup and deferred-work checkpoint
+
+Core login/audit/invitation imports initialize four schemas instead of 31 while
+retaining the same validators. Desktop launch delivery is outside the initial
+closure; its synchronous account lease and file-handle read remain before the
+lazy boundary. Focused API, launch, editor, bulk and layout suites passed 45,
+61 and 27 checks respectively. The final combined app boot is 143,335 gzip
+bytes against the unchanged 143,360-byte budget; early sanitized error reporting
+remains initial.
+
+The heaviest tool proof found no idle font, sticker, icon, EXIF or PDF-raster
+module on Bulk, Video, Documents or Editor; Documents also has no idle processing
+pipeline. Empty Bulk starts zero workers. Starting a real batch activates EXIF,
+fonts and eight bounded workers and completes an output. Processing a real
+two-page PDF activates the raster/pipeline code and places watermark image
+resources on both pages. A selected text preset loads its real font and produces
+a decoded editor preview. The ignored after-proof log is
+`temp/lumafoil-heavy-after-proof.log`, SHA-256
+`62256869380676eb0a5e4d926fea01525b1580ddafce4e8e413e5e8bbfd15e2c`.
+
+The exact compatible MSAL, i18next/react-i18next, Lucide, Mediabunny,
+user-event and chrome-launcher pins were refreshed after peer and release-note
+review. TypeScript 7 remains outside typed-ESLint's peer range; Vitest 5 remains
+outside the Cloudflare Workers pool range. The available Node 24 typings patch
+was newer than this machine's registry time cutoff, so 24.13.3 remains aligned
+with the actual Node 24 runtime. `npm ls` and `npm audit --audit-level=high`
+pass. The deterministic Mediabunny 1.55.6 source archive and public MPL source
+offer now match the shipped dependency.
+
+The final `npm run quality` passes on version 2.0.0: 2,384 application tests,
+42 real-Workers tests, three bootstrap checks, twelve gate/transport checks,
+32 performance/audit checks, fifteen publication checks, 24 Python asset/recovery
+checks and 40 built-output checks. Coverage is 93.24% statements, 85.37% branches,
+93.06% functions and 93.57% lines. Source/index/history scanning passed 12,337
+candidate/object checks and 297 archive entries; built scanning passed 2,400
+checks and 114 archive entries with four configured private values compared.
+All bundle budgets pass. The ignored log is
+`temp/lumafoil-quality-2.0.0-final.log`, SHA-256
+`8dbc5d92b662e8916e70b68560040ec52a488e797ea47385a7e8119db44a5d4c`.
+
+Fresh SAST passed 509 rules over the then-tracked 1,923 targets with zero
+findings. It must run again after the final candidate is staged so newly added
+files enter its tracked-file inventory. New-head remote device/UI matrices,
+final screenshots, migration and hosted proof remain required.

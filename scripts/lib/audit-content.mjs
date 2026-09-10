@@ -1,7 +1,23 @@
 import { auditLabel, requireSurface } from './audit-surfaces.mjs'
 
+const CONTENT_READY_TIMEOUT_MS = 5000
+
+async function becomesVisible(locator, timeout) {
+  try {
+    await locator.waitFor({ state: 'visible', timeout })
+    return true
+  } catch {
+    return false
+  }
+}
+
 /** Fail closed when a successful HTTP page renders the wrong screen, an error, or the wrong seeded state. */
-export async function assertAuditContent(page, surface, catalogue) {
+export async function assertAuditContent(
+  page,
+  surface,
+  catalogue,
+  { timeout = CONTENT_READY_TIMEOUT_MS } = {},
+) {
   requireSurface(surface.id)
   const text = (key) => auditLabel(catalogue, key)
   const headingText =
@@ -11,7 +27,7 @@ export async function assertAuditContent(page, surface, catalogue) {
       .map((key) => text(key))
       .join(' ')
   const heading = page.getByRole('heading', { level: 1, name: headingText, exact: true })
-  if (!(await heading.isVisible()))
+  if (!(await becomesVisible(heading, timeout)))
     throw new Error('Audit page did not render its expected heading')
   function locate(check) {
     if (check.label !== undefined) return page.getByLabel(text(check.label), { exact: true })
@@ -21,7 +37,7 @@ export async function assertAuditContent(page, surface, catalogue) {
   const checks = surface.checks ?? []
   for (const check of checks) {
     const control = locate(check)
-    if (!(await control.isVisible()))
+    if (!(await becomesVisible(control, timeout)))
       throw new Error('Audit page did not render its required state')
     if (check.value !== undefined && (await control.inputValue()) !== check.value)
       throw new Error('Audit form did not load its fixture value')

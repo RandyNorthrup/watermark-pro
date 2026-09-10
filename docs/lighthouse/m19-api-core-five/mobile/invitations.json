@@ -1,0 +1,380 @@
+{
+  "mode": "certification",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.96,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1833.1638,
+        "lcp": 2393.1638000000003,
+        "cls": 0.00001760914484101436,
+        "tbt": 110
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 1997.5,
+        "layoutShifts": [
+          {
+            "score": 0.00001760914484101436,
+            "path": "1,HTML,1,BODY,0,DIV,0,DIV,2,DIV,0,HEADER,2,DIV,2,BUTTON,0,SPAN",
+            "nodeId": "page-1-SPAN",
+            "rectangle": {
+              "top": 16,
+              "bottom": 52,
+              "left": 356,
+              "right": 392,
+              "width": 36,
+              "height": 36
+            }
+          }
+        ],
+        "longTasks": [
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 147,
+            "startTime": 1833.1638
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 110,
+            "startTime": 2283.1638000000003
+          },
+          {
+            "source": "unattributable",
+            "duration": 58,
+            "startTime": 919.1638
+          },
+          {
+            "source": "unattributable",
+            "duration": 57,
+            "startTime": 977.1638
+          },
+          {
+            "source": "unattributable",
+            "duration": 54,
+            "startTime": 865.1638
+          },
+          {
+            "source": "document",
+            "duration": 53,
+            "startTime": 1980.1638
+          },
+          {
+            "source": "document",
+            "duration": 50,
+            "startTime": 1034.1638
+          }
+        ],
+        "bootup": [
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 432.1000000000038
+          },
+          {
+            "source": "unattributable",
+            "duration": 424.1760000000017
+          },
+          {
+            "source": "document",
+            "duration": 390.9680000000001
+          },
+          {
+            "source": "asset:offline-database-DlNid01J.js",
+            "duration": 71.73599999999998
+          }
+        ]
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.97,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.6733,
+        "lcp": 2250.6733,
+        "cls": 0,
+        "tbt": 74
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 1610,
+        "layoutShifts": [],
+        "longTasks": [
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 146,
+            "startTime": 1650.6733
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 102,
+            "startTime": 2250.6733
+          },
+          {
+            "source": "unattributable",
+            "duration": 68,
+            "startTime": 929.6733
+          },
+          {
+            "source": "document",
+            "duration": 58,
+            "startTime": 768.6733
+          },
+          {
+            "source": "unattributable",
+            "duration": 50,
+            "startTime": 879.6733
+          }
+        ],
+        "bootup": [
+          {
+            "source": "unattributable",
+            "duration": 452.5760000000012
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 399.4080000000039
+          },
+          {
+            "source": "document",
+            "duration": 249.52400000000006
+          },
+          {
+            "source": "asset:offline-database-DlNid01J.js",
+            "duration": 56.49599999999999
+          }
+        ]
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.96,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.4699,
+        "lcp": 2250.4699,
+        "cls": 0,
+        "tbt": 130.5
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 1564,
+        "layoutShifts": [],
+        "longTasks": [
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 143,
+            "startTime": 2100.4699
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 125,
+            "startTime": 1650.4699
+          },
+          {
+            "source": "unattributable",
+            "duration": 68,
+            "startTime": 926.4699
+          },
+          {
+            "source": "unattributable",
+            "duration": 51,
+            "startTime": 875.4699
+          }
+        ],
+        "bootup": [
+          {
+            "source": "unattributable",
+            "duration": 496.0960000000003
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 419.5400000000048
+          },
+          {
+            "source": "document",
+            "duration": 259.404
+          },
+          {
+            "source": "asset:offline-database-DlNid01J.js",
+            "duration": 65.44399999999999
+          }
+        ]
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.96,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.4915,
+        "lcp": 2250.4915,
+        "cls": 0.00001760914484101436,
+        "tbt": 100
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 1406,
+        "layoutShifts": [
+          {
+            "score": 0.00001760914484101436,
+            "path": "1,HTML,1,BODY,0,DIV,0,DIV,2,DIV,0,HEADER,2,DIV,2,BUTTON,0,SPAN",
+            "nodeId": "page-1-SPAN",
+            "rectangle": {
+              "top": 16,
+              "bottom": 52,
+              "left": 356,
+              "right": 392,
+              "width": 36,
+              "height": 36
+            }
+          }
+        ],
+        "longTasks": [
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 138,
+            "startTime": 1650.4915
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 106,
+            "startTime": 2100.4915
+          },
+          {
+            "source": "unattributable",
+            "duration": 76,
+            "startTime": 935.4915
+          },
+          {
+            "source": "unattributable",
+            "duration": 54,
+            "startTime": 881.4915
+          },
+          {
+            "source": "unattributable",
+            "duration": 53,
+            "startTime": 828.4915
+          }
+        ],
+        "bootup": [
+          {
+            "source": "unattributable",
+            "duration": 513.200000000001
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 406.6440000000045
+          },
+          {
+            "source": "document",
+            "duration": 262.05199999999996
+          },
+          {
+            "source": "asset:offline-database-DlNid01J.js",
+            "duration": 67.14800000000001
+          }
+        ]
+      }
+    },
+    {
+      "scores": {
+        "performance": 0.94,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1875.4508,
+        "lcp": 2339.4508,
+        "cls": 0,
+        "tbt": 177.5
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 1460,
+        "layoutShifts": [],
+        "longTasks": [
+          {
+            "source": "unattributable",
+            "duration": 653.0000000000001,
+            "startTime": 750.4508
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 164,
+            "startTime": 2463.4508
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 157,
+            "startTime": 2013.4508
+          },
+          {
+            "source": "unattributable",
+            "duration": 94,
+            "startTime": 1594.4508
+          },
+          {
+            "source": "unattributable",
+            "duration": 72,
+            "startTime": 1522.4508
+          },
+          {
+            "source": "unattributable",
+            "duration": 55,
+            "startTime": 1467.4508
+          }
+        ],
+        "bootup": [
+          {
+            "source": "unattributable",
+            "duration": 1129.635999999986
+          },
+          {
+            "source": "asset:watermark-pro-J1-upddV.js",
+            "duration": 482.00800000000334
+          },
+          {
+            "source": "document",
+            "duration": 258.96
+          },
+          {
+            "source": "asset:offline-database-DlNid01J.js",
+            "duration": 65.57600000000001
+          }
+        ]
+      }
+    }
+  ],
+  "scores": {
+    "performance": 0.96,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1875.4699,
+    "lcp": 2250.6733,
+    "cls": 0,
+    "tbt": 110
+  }
+}

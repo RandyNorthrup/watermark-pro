@@ -120,7 +120,7 @@ export const PRELOAD_CONTROLLER =
   'const n=document.getElementById("' +
   RESOURCE_MAP_ID +
   '");' +
-  'if(!n)throw Error("Route preload map is unavailable.");' +
+  'if(!n)throw Error("Route preload map missing.");' +
   'const p=JSON.parse(n.innerHTML),r=p.routes.find(r=>new RegExp(r[0]).test(location.pathname));' +
   'if(!r)return;for(const h of p.common.concat(r[1])){' +
   'const l=document.createElement("link");l.rel="modulepreload";l.href=h;l.crossOrigin="";' +

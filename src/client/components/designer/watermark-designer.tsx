@@ -151,7 +151,10 @@ export function WatermarkDesigner({
   const isIncomplete = spec.kind === 'image' && spec.assetId === ''
 
   return (
-    <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[minmax(0,26rem)_1fr]">
+    <form
+      onSubmit={submit}
+      className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]"
+    >
       <Card className="flex flex-col gap-5">
         <Field label={t('designer.presetName')} error={nameError ?? undefined}>
           {(controlProps) => (

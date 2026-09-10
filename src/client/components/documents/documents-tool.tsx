@@ -20,7 +20,7 @@ import { formatBytes } from '../../lib/format-bytes'
 import { assetFileUrl, watermarksQueryOptions } from '../../lib/library'
 import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { baseName } from '../../lib/spec-tokens'
-import { DocumentRasteriser } from '../../pdf/raster'
+import type { DocumentRasteriser } from '../../pdf/raster'
 import { hasSmartPlacement } from '../../pdf/raster-layout'
 import { watermarkPdf } from '../../pdf/watermark-pdf'
 import { PresetChecklist } from '../presets/preset-checklist'
@@ -167,9 +167,11 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
     setZipError(null)
     setOutcomes([])
     setProgress({ done: 0, total: files.length })
-    const rasteriser = new DocumentRasteriser(loadLogo)
+    let rasteriser: DocumentRasteriser | null = null
     const collected: Outcome[] = []
     try {
+      const { DocumentRasteriser: Rasteriser } = await import('../../pdf/raster')
+      rasteriser = new Rasteriser(loadLogo)
       await rasteriser.prepare(specs)
       for (const file of files) {
         collected.push(await processOne(rasteriser, file))
@@ -181,7 +183,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
       setBatchError(describeError(error))
       setProgress({ done: files.length, total: files.length })
     } finally {
-      rasteriser.close()
+      rasteriser?.close()
     }
   }
 

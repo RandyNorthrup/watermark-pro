@@ -23,16 +23,19 @@ const INVITATION: SiteInvitationDto = {
   expiresAt: '2026-09-15T00:00:00.000Z',
 }
 
-function invitationApi(hasFailure = false) {
+function invitationApi(hasFailure = false, referralResponse?: Promise<Response>) {
   const records: SiteInvitationDto[] = []
   const fetcher = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
     const url = requestUrl(input)
     if (url.startsWith('/api/me/referral-link'))
-      return Promise.resolve(
-        Response.json({
-          url: 'https://lumafoil.com/signup?invitation=fixture-referral',
-          acceptedAccounts: 0,
-        }),
+      return (
+        referralResponse ??
+        Promise.resolve(
+          Response.json({
+            url: 'https://lumafoil.com/signup?invitation=fixture-referral',
+            acceptedAccounts: 0,
+          }),
+        )
       )
     if (!url.startsWith('/api/me/invitations'))
       throw new Error(`Unexpected fixture request: ${url}`)
@@ -61,6 +64,58 @@ afterEach(() => {
 })
 
 describe('site invitation page', () => {
+  it('renders stable referral controls while loading without offering an unavailable link', async () => {
+    const pending = Promise.withResolvers<Response>()
+    invitationApi(false, pending.promise)
+    renderApp('/app/invitations')
+    await screen.findByRole('heading', { name: 'Invite people' })
+    const link = screen.getByLabelText('Invitation link')
+    const copy = screen.getByRole('button', { name: 'Copy link' })
+    const rotate = screen.getByRole('button', { name: 'Create new link' })
+    const revoke = screen.getByRole('button', { name: 'Disable link' })
+    for (const control of [link, copy, rotate, revoke]) expect(control).toBeDisabled()
+    expect(link).toHaveValue('')
+    expect(screen.queryByText('Accounts created from your link: 0')).not.toBeInTheDocument()
+    pending.resolve(
+      Response.json({
+        url: 'https://lumafoil.com/signup?invitation=fixture-referral',
+        acceptedAccounts: 3,
+      }),
+    )
+    await screen.findByText('Accounts created from your link: 3')
+    for (const control of [link, copy, rotate, revoke]) expect(control).toBeEnabled()
+    expect(screen.getByLabelText('Invitation link')).toBe(link)
+    expect(link).toHaveValue('https://lumafoil.com/signup?invitation=fixture-referral')
+  })
+
+  it('keeps failed referral controls disabled and offers no empty-link action', async () => {
+    const fetcher = invitationApi(
+      false,
+      Promise.resolve(Response.json({ error: 'forbidden' }, { status: 403 })),
+    )
+    const user = userEvent.setup()
+    renderApp('/app/invitations')
+    await screen.findByRole('alert')
+    expect(screen.getByLabelText('Invitation link')).toBeDisabled()
+    for (const name of ['Copy link', 'Create new link', 'Disable link']) {
+      const control = screen.getByRole('button', { name })
+      expect(control).toBeDisabled()
+      await user.click(control)
+    }
+    expect(fetcher.mock.calls.some(([input]) => requestUrl(input).endsWith('/rotate'))).toBe(false)
+  })
+
+  it('keeps a disabled link visible while allowing its owner to create a replacement', async () => {
+    invitationApi(false, Promise.resolve(Response.json({ url: null, acceptedAccounts: 2 })))
+    renderApp('/app/invitations')
+    await screen.findByText('Accounts created from your link: 2')
+    expect(screen.getByLabelText('Invitation link')).toBeDisabled()
+    expect(screen.getByPlaceholderText('This link is disabled.')).toHaveValue('')
+    expect(screen.getByRole('button', { name: 'Copy link' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Disable link' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Create new link' })).toBeEnabled()
+  })
+
   it('explains isolation, validates email, sends and revokes only account-scoped invitations', async () => {
     const fetcher = invitationApi()
     const user = userEvent.setup()

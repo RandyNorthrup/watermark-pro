@@ -19,7 +19,7 @@ import './styles/app.css'
 
 const rootElement = document.querySelector('#root')
 if (rootElement === null) {
-  throw new Error('index.html must contain an element with id="root"')
+  throw new Error('No #root.')
 }
 
 applyTheme(readTheme())
@@ -75,13 +75,12 @@ launchWindow.launchQueue?.setConsumer((params) => {
 
 const root = createRoot(rootElement)
 function renderApp(): void {
-  root.render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </StrictMode>,
+  const app = (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   )
+  root.render(import.meta.env.DEV ? <StrictMode>{app}</StrictMode> : app)
 }
 
 // Load the interface language before the first paint so it never flashes

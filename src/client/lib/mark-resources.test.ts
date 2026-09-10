@@ -2,12 +2,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { MarkResources } from './mark-resources'
 import { DEFAULT_TEXT_SPEC, type WatermarkSpec } from '../../shared/watermark'
-import { loadFont } from '../fonts/load'
-import { loadSticker } from '../stickers/load'
-import { EMOJI_FONT_STACK } from '../symbols/catalogue'
+import { EMOJI_FONT_STACK } from '../symbols/emoji-font'
 
-vi.mock('../fonts/load', () => ({ loadFont: vi.fn() }))
-vi.mock('../stickers/load', () => ({ loadSticker: vi.fn() }))
+const { loadSticker } = vi.hoisted(() => ({
+  loadSticker: vi.fn<(id: string) => Promise<ImageBitmap>>(),
+}))
+vi.mock('../stickers/load', () => ({ loadSticker }))
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -16,11 +16,6 @@ afterEach(() => {
 
 describe('mark resources', () => {
   it('deduplicates actual fonts and uses the system emoji stack without downloading it', async () => {
-    vi.mocked(loadFont).mockResolvedValue({
-      family: 'Inter Variable',
-      weight: 600,
-      url: '/fonts/inter.woff2',
-    })
     const logos = vi.fn(() => Promise.resolve(new Blob()))
     const resources = new MarkResources(logos)
     const emoji: WatermarkSpec = {
@@ -45,10 +40,12 @@ describe('mark resources', () => {
       glyph,
       icon,
     ])
-    expect(result.fonts).toHaveLength(1)
-    expect(loadFont).toHaveBeenCalledTimes(3)
-    expect(loadFont).toHaveBeenCalledWith('Inter Variable', 400)
-    expect(loadFont).not.toHaveBeenCalledWith(EMOJI_FONT_STACK, expect.anything())
+    expect(result.fonts.map(({ family, weight }) => ({ family, weight }))).toEqual([
+      { family: 'Inter Variable', weight: 600 },
+      { family: 'Inter Variable', weight: 400 },
+    ])
+    expect(result.fonts[0]?.url).toContain('inter-latin-wght-normal.woff2')
+    expect(result.fonts[1]?.url).toBe(result.fonts[0]?.url)
     expect(result.marks[4]?.iconPath?.length).toBeGreaterThan(0)
     expect(logos).not.toHaveBeenCalled()
   })

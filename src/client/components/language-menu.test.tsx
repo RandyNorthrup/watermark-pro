@@ -31,6 +31,10 @@ async function mountMenu(isSignedIn: boolean): Promise<void> {
   render(
     <QueryClientProvider client={queryClient}>
       <LanguageMenu />
+      <main>
+        <h1>Account settings</h1>
+        <button type="button">Continue editing</button>
+      </main>
     </QueryClientProvider>,
   )
 }
@@ -63,6 +67,36 @@ afterEach(async () => {
 })
 
 describe('LanguageMenu', () => {
+  it('keeps the page accessible while choosing a language and restores focus on Escape', async () => {
+    await mountMenu(false)
+    const user = userEvent.setup()
+    const trigger = screen.getByRole('button', { name: 'Change language' })
+    trigger.focus()
+    await user.keyboard('{ArrowDown}')
+    const region = screen.getByRole('region', { name: 'Change language' })
+    expect(within(region).getByRole('menu')).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Account settings' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Continue editing' })).toBeVisible()
+    expect(within(region).getByRole('menuitem', { name: 'English' })).toHaveFocus()
+    await user.keyboard('{End}')
+    expect(within(region).getByRole('menuitem', { name: 'العربية' })).toHaveFocus()
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(trigger).toHaveFocus())
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    expect(document.documentElement.lang).toBe('en')
+  })
+
+  it('allows an outside control to dismiss the chooser without stealing its focus', async () => {
+    await mountMenu(false)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Change language' }))
+    const outside = screen.getByRole('button', { name: 'Continue editing' })
+    await user.click(outside)
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
+    expect(outside).toHaveFocus()
+    expect(document.documentElement.lang).toBe('en')
+  })
+
   it('does not save an old account choice to a new account after a delayed catalogue download', async () => {
     await mountMenu(true)
     i18next.removeResourceBundle('fr', 'common')

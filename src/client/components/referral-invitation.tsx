@@ -23,6 +23,7 @@ export function ReferralInvitation({ userId }: { userId: string }) {
   })
   const [copyError, setCopyError] = useState<string | null>(null)
   const [isCopied, setIsCopied] = useState(false)
+  const hasLink = link.data?.url != null
   const change = useMutation({
     mutationFn: async (action: 'rotate' | 'revoke') => {
       if (action === 'rotate')
@@ -57,55 +58,47 @@ export function ReferralInvitation({ userId }: { userId: string }) {
       {change.isError ? <Alert tone="error">{describeError(change.error)}</Alert> : null}
       {copyError === null ? null : <Alert tone="error">{copyError}</Alert>}
       {link.data === undefined ? null : (
-        <>
-          <p>{t('referral.count', { count: link.data.acceptedAccounts })}</p>
-          {link.data.url === null ? (
-            <p className="text-sm text-ink-muted">{t('referral.revoked')}</p>
-          ) : (
-            <Field label={t('referral.url')}>
-              {(control) => (
-                <Input
-                  {...control}
-                  value={link.data.url ?? ''}
-                  readOnly
-                  onFocus={(event) => {
-                    event.target.select()
-                  }}
-                />
-              )}
-            </Field>
-          )}
-          <div className="flex flex-wrap gap-2">
-            {link.data.url === null ? null : (
-              <Button variant="secondary" onClick={() => void copy()}>
-                <Copy aria-hidden="true" className="size-4" />
-                {t(isCopied ? 'referral.copied' : 'referral.copy')}
-              </Button>
-            )}
-            <Button
-              variant="secondary"
-              disabled={change.isPending}
-              onClick={() => {
-                change.mutate('rotate')
-              }}
-            >
-              {t('referral.rotate')}
-            </Button>
-            {link.data.url === null ? null : (
-              <Button
-                variant="secondary"
-                disabled={change.isPending}
-                onClick={() => {
-                  change.mutate('revoke')
-                }}
-              >
-                {t('referral.revoke')}
-              </Button>
-            )}
-          </div>
-          <p className="text-xs text-ink-muted">{t('referral.rotateHelp')}</p>
-        </>
+        <p>{t('referral.count', { count: link.data.acceptedAccounts })}</p>
       )}
+      <Field label={t('referral.url')}>
+        {(control) => (
+          <Input
+            {...control}
+            value={link.data?.url ?? ''}
+            placeholder={link.data?.url === null ? t('referral.revoked') : undefined}
+            disabled={!hasLink}
+            readOnly
+            onFocus={(event) => {
+              event.target.select()
+            }}
+          />
+        )}
+      </Field>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="secondary" disabled={!hasLink} onClick={() => void copy()}>
+          <Copy aria-hidden="true" className="size-4" />
+          {t(isCopied ? 'referral.copied' : 'referral.copy')}
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={link.data === undefined || change.isPending}
+          onClick={() => {
+            change.mutate('rotate')
+          }}
+        >
+          {t('referral.rotate')}
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={!hasLink || change.isPending}
+          onClick={() => {
+            change.mutate('revoke')
+          }}
+        >
+          {t('referral.revoke')}
+        </Button>
+      </div>
+      <p className="text-xs text-ink-muted">{t('referral.rotateHelp')}</p>
     </Card>
   )
 }

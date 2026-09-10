@@ -3,7 +3,7 @@ import { type QueryClient, queryOptions } from '@tanstack/react-query'
 import { ApiRequestError, fetchJson, isTransportFailure } from './api'
 import { authClient } from './auth-client'
 import { captureOfflineGeneration, captureOfflineOwner } from './offline-context'
-import { auditListResponseSchema, publicConfigSchema } from '../../shared/api'
+import { auditListResponseSchema, publicConfigSchema } from '../../shared/api-core'
 import type { BootstrapSnapshot } from '../../shared/bootstrap'
 import { HTTP_STATUS } from '../../shared/constants'
 import {

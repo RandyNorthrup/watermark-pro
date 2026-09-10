@@ -8,6 +8,7 @@ import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import {
+  DocumentRasteriser as FakeRasteriser,
   fakeRasterControls,
   rasterisedSizes,
   resetFakePdfRaster,
@@ -15,7 +16,11 @@ import {
 import { renderApp } from '../../test-support/render-app'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
-vi.mock('../../pdf/raster', () => import('../../test-support/fake-pdf-raster'))
+const rasterModuleLoaded = vi.hoisted(() => vi.fn())
+vi.mock('../../pdf/raster', () => {
+  rasterModuleLoaded()
+  return import('../../test-support/fake-pdf-raster')
+})
 vi.mock('../../lib/download', () => import('../../test-support/fake-download'))
 
 const client = fakeAuth
@@ -57,6 +62,7 @@ describe('documents page', () => {
   it('watermarks a PDF, shows the smart-placement hint, and downloads it', async () => {
     const user = await openDocuments()
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Documents')
+    expect(rasterModuleLoaded).not.toHaveBeenCalled()
 
     await user.upload(
       screen.getByLabelText('Add PDFs'),
@@ -73,6 +79,8 @@ describe('documents page', () => {
 
     await user.click(screen.getByRole('button', { name: /Watermark/ }))
     await waitFor(() => expect(screen.getByText(/1 of 1 finished/)).toBeInTheDocument())
+    expect(rasterModuleLoaded).toHaveBeenCalledOnce()
+    expect(FakeRasteriser.closed).toBe(1)
 
     // Two pages of one size: the fake was asked to rasterise that size once.
     expect(rasterisedSizes).toEqual([{ width: 300, height: 400 }])
@@ -99,7 +107,9 @@ describe('documents page', () => {
         ],
       },
     })
-    expect(screen.getByRole('heading', { level: 2, name: '2 documents' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { level: 2, name: '2 documents' }),
+    ).toBeInTheDocument()
     expect(screen.getByText(/1 file skipped/)).toBeInTheDocument()
 
     await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
@@ -135,7 +145,9 @@ describe('documents page', () => {
       await pdfFile('one.pdf', [[300, 400]]),
       await pdfFile('two.pdf', [[300, 400]]),
     ])
-    expect(screen.getByRole('heading', { level: 2, name: '2 documents' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { level: 2, name: '2 documents' }),
+    ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Remove one.pdf' }))
     expect(screen.getByRole('heading', { level: 2, name: '1 document' })).toBeInTheDocument()
@@ -175,7 +187,9 @@ describe('documents page', () => {
       await pdfFile('one.pdf', [[300, 400]]),
       await pdfFile('two.pdf', [[300, 400]]),
     ])
-    expect(screen.getByRole('heading', { level: 2, name: '2 documents' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { level: 2, name: '2 documents' }),
+    ).toBeInTheDocument()
 
     // Drag-over is accepted (default prevented) and changes nothing.
     const dropZone = input.parentElement

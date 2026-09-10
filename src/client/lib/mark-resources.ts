@@ -7,9 +7,7 @@
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { ApplyInput } from '../engine/engine'
 import type { FontResource, MarkInput } from '../engine/protocol'
-import { loadFont } from '../fonts/load'
-import { loadSticker } from '../stickers/load'
-import { EMOJI_FONT_STACK, iconPath } from '../symbols/catalogue'
+import { EMOJI_FONT_STACK } from '../symbols/emoji-font'
 
 /** Glyph symbols render at regular weight. */
 const GLYPH_WEIGHT = 400
@@ -21,10 +19,12 @@ export type MarkInputs = Pick<ApplyInput, 'marks' | 'fonts'>
 
 async function fontsFor(spec: WatermarkSpec): Promise<FontResource[]> {
   if (spec.kind === 'text') {
+    const { loadFont } = await import('../fonts/load')
     return [await loadFont(spec.fontFamily, spec.fontWeight)]
   }
   if (spec.kind === 'symbol' && spec.symbol.type === 'glyph') {
     if (spec.symbol.fontFamily === EMOJI_FONT_STACK) return []
+    const { loadFont } = await import('../fonts/load')
     return [await loadFont(spec.symbol.fontFamily, GLYPH_WEIGHT)]
   }
   return []
@@ -52,13 +52,17 @@ export class MarkResources {
     seed: number,
   ): Promise<{ mark: MarkInput; fonts: FontResource[] }> {
     const [fonts, image] = await Promise.all([fontsFor(spec), this.#imageFor(spec)])
+    let path: string | undefined
+    if (spec.kind === 'symbol' && spec.symbol.type === 'icon') {
+      const { iconPath } = await import('../symbols/catalogue')
+      path = iconPath(spec.symbol.name)
+    }
     return {
       fonts,
       mark: {
         spec,
         ...(image !== undefined && { image }),
-        ...(spec.kind === 'symbol' &&
-          spec.symbol.type === 'icon' && { iconPath: iconPath(spec.symbol.name) }),
+        ...(path !== undefined && { iconPath: path }),
         seed,
       },
     }
@@ -66,8 +70,10 @@ export class MarkResources {
 
   async #imageFor(spec: WatermarkSpec): Promise<ImageBitmap | undefined> {
     if (spec.kind === 'image') return await this.#logoBitmap(spec.assetId)
-    if (spec.kind === 'symbol' && spec.symbol.type === 'sticker')
+    if (spec.kind === 'symbol' && spec.symbol.type === 'sticker') {
+      const { loadSticker } = await import('../stickers/load')
       return await loadSticker(spec.symbol.id)
+    }
     return undefined
   }
 

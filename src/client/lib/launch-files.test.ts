@@ -1,14 +1,8 @@
 import { QueryClient } from '@tanstack/react-query'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  clearLaunchFiles,
-  launchTarget,
-  receiveLaunchFiles,
-  retainInitialLaunch,
-  subscribeLaunchFiles,
-  takeLaunchFiles,
-} from './launch-files'
+import { launchTarget, subscribeLaunchFiles, takeLaunchFiles } from './launch-consumer'
+import { clearLaunchFiles, receiveLaunchFiles, retainInitialLaunch } from './launch-files'
 import {
   ACCOUNT_CHANGED_EVENT,
   activateOfflineAccount,

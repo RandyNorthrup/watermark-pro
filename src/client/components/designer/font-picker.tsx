@@ -13,7 +13,7 @@ import { cn } from '../../lib/cn'
 import { Input } from '../ui/input'
 
 const selectClassName =
-  'h-10 w-full rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
+  'h-10 w-full min-w-0 rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
 
 type FontWeight = (typeof FONT_WEIGHTS)[number]
 const REGULAR_WEIGHT = 400
@@ -57,8 +57,10 @@ export function FontPicker({
     (candidate) => candidate.family === family || matches.includes(candidate),
   )
   return (
-    <div className={cn('grid gap-4 sm:grid-cols-[1fr_auto]', className)}>
-      <div className="flex flex-col gap-1.5">
+    <div
+      className={cn('grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto]', className)}
+    >
+      <div className="flex min-w-0 flex-col gap-1.5">
         <label htmlFor={searchId} className="text-sm font-medium">
           {t('designer.font.search')}
         </label>

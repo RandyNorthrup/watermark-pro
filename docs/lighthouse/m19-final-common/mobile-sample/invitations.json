@@ -1,0 +1,87 @@
+{
+  "mode": "diagnostic",
+  "transport": "HTTP/2 over TLS with an ephemeral key pinned only in the audit browser",
+  "runs": [
+    {
+      "scores": {
+        "performance": 0.96,
+        "accessibility": 1,
+        "best-practices": 1
+      },
+      "metrics": {
+        "fcp": 1824.7464,
+        "lcp": 2389.7464,
+        "cls": 0,
+        "tbt": 119.5
+      },
+      "protocols": [
+        "h2"
+      ],
+      "diagnostics": {
+        "benchmarkIndex": 3309,
+        "layoutShifts": [],
+        "longTasks": [
+          {
+            "source": "asset:watermark-pro-Bn9F5u_2.js",
+            "duration": 162,
+            "startTime": 1824.7464
+          },
+          {
+            "source": "asset:watermark-pro-Bn9F5u_2.js",
+            "duration": 115,
+            "startTime": 2424.7464
+          },
+          {
+            "source": "unattributable",
+            "duration": 93,
+            "startTime": 907.7464
+          },
+          {
+            "source": "document",
+            "duration": 81,
+            "startTime": 2026.7464
+          },
+          {
+            "source": "document",
+            "duration": 54,
+            "startTime": 790.7464
+          },
+          {
+            "source": "document",
+            "duration": 54,
+            "startTime": 1000.7464
+          }
+        ],
+        "bootup": [
+          {
+            "source": "unattributable",
+            "duration": 486.34800000000297
+          },
+          {
+            "source": "asset:watermark-pro-Bn9F5u_2.js",
+            "duration": 459.8040000000043
+          },
+          {
+            "source": "document",
+            "duration": 459.704
+          },
+          {
+            "source": "asset:offline-database-C_y7kZUh.js",
+            "duration": 68.35199999999998
+          }
+        ]
+      }
+    }
+  ],
+  "scores": {
+    "performance": 0.96,
+    "accessibility": 1,
+    "best-practices": 1
+  },
+  "metrics": {
+    "fcp": 1824.7464,
+    "lcp": 2389.7464,
+    "cls": 0,
+    "tbt": 119.5
+  }
+}
