@@ -691,6 +691,13 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
         README status updated. Remaining gaps in that doc's §5.3.
   - [ ] full gates, drills, device matrix, screenshots in `en` and `ar`
   - [ ] 2.0.0 tagged, deployed, released
+- **Owner launch decision (2026-09-10):** deploy the verified functional and
+  security candidate immediately and move the remaining mobile Lighthouse
+  timing work after launch. Local quality/SAST, the full 104-device Playwright/
+  axe matrix, desktop Lighthouse, public Home/Privacy and production anonymous
+  checks pass. The manual production deployment, guarded account split and
+  domain cutover completed; unchecked performance, interactive provider,
+  screenshot/update-flow and tag/release items remain unchecked.
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
   (not relaxed budgets) for the perf work; landing it in small green increments.
   - **§3 diet, first pass (done).** Dropped the `ui` chunk group (it forced all

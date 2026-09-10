@@ -1,6 +1,6 @@
 # Domain and provider migration verification
 
-Updated 2026-09-09. Working release evidence, **not final deployment certification**.
+Updated 2026-09-10. Live deployment evidence with explicit post-launch gaps.
 The public repository records configuration shape and outcomes; live account
 identifiers, user records, credentials and private operational logs remain in
 ignored operator records.
@@ -17,10 +17,23 @@ The new Cloudflare zone is active. Turnstile recognizes the new hostname.
 The repository's About description now names Lumafoil and its website points to
 `https://lumafoil.com`; that metadata was independently read back. The existing
 source repository URL remains the footer's GitHub target.
-Production cutover still requires the final gates, private D1 backup, migrations,
-deployment, TLS/hosted-flow verification and detaching the retired
-app hostname. Remove its temporary Turnstile allowance after successful cutover.
-Do not modify unrelated sites or tenant-wide policies.
+The production cutover completed on 2026-09-10. A private D1 export and Time
+Travel bookmark preceded the changes. Migrations 0005–0011 applied, and the
+guarded empty legacy-workspace operation preserved the existing accounts while
+giving each its own private workspace. The sole-administrator anchor and empty
+content state passed aggregate verification. Worker version 43 then deployed
+the complete static asset set and custom domain.
+
+Public DNS, TLS, production health, CSP/HSTS/nosniff, detailed landing content,
+GitHub footer, provider configuration, uninvited-signup refusal and anonymous
+admin/photo denial passed. Phone and desktop anonymous browser checks cover Home,
+Login, Signup and Privacy with zero axe findings or horizontal overflow. The
+retired app hostname has no DNS record and no redirect; its Turnstile allowance
+was removed. Do not modify unrelated sites or tenant-wide policies.
+
+Cloudflare's zone-level Web Analytics setting still injects a beacon that the
+application CSP blocks. The app has no other observed browser errors. Disable
+Web Analytics completely in the Lumafoil zone, then repeat the console check.
 
 ## Email
 
@@ -121,8 +134,10 @@ and real read/write/sharing checks remain open.
 
 ## Release evidence boundary
 
-Provider setup, local protocol tests and mailbox delivery do not substitute for
-the final hosted application journeys. Preserve explicit open gates until the
-actual deployed origin, account isolation, storage permissions and revocations
-have been observed. Only synthetic product screenshots and redacted test evidence
-belong in the public repository.
+Provider setup, local protocol tests, live configuration and mailbox delivery do
+not substitute for interactive hosted consent journeys. Google/Microsoft invited
+account entry, Drive/Dropbox/OneDrive read/write/native link creation and
+revocation, verification/reset mail, reconnect sync and cross-account denials
+remain post-launch checks on the deployed origin. Mobile Lighthouse timing also
+remains open by the owner's explicit launch decision. Only synthetic screenshots
+and redacted evidence belong in the public repository.
