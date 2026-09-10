@@ -53,7 +53,7 @@
     "test:browser": "vitest run --project browser",
     "bootstrap:owner": "node scripts/bootstrap-owner.mjs",
     "test:bootstrap": "node --test scripts/bootstrap-owner.test.mjs",
-    "test:gate": "node --test scripts/gate-http-bridge.test.mjs scripts/gate-runtime.test.mjs",
+    "test:gate": "node --test scripts/gate-http-bridge.test.mjs scripts/gate-runtime.test.mjs scripts/offline-proxy.test.mjs",
     "test:performance": "node --test --test-concurrency=2 scripts/lighthouse-budget.test.mjs scripts/lighthouse-navigation.test.mjs scripts/audit-chrome.test.mjs scripts/audit-surfaces.test.mjs scripts/audit-content.browser.test.mjs scripts/bundle-budget.test.mjs scripts/compressing-proxy.test.mjs scripts/route-preloads.test.mjs scripts/audit-certificate.browser.test.mjs",
     "security:publication:build": "node scripts/publication-scan.mjs --built",
     "test:publication": "node --test scripts/publication.test.mjs",

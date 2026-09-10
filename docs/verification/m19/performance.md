@@ -375,26 +375,49 @@ Chromium documents Ubuntu's restrictions on user namespaces for downloaded
 browser builds and the supported use of the already installed Chrome sandbox
 helper through `CHROME_DEVEL_SANDBOX`:
 [Chromium sandbox guidance](https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md).
-The audit launcher now checks `/opt/google/chrome/chrome-sandbox` with `lstat`.
+The audit launcher checks its CI installation at
+`/usr/local/lib/lumafoil/chrome-sandbox`, then an existing packaged Chrome helper
+at `/opt/google/chrome/chrome-sandbox`, using `lstat`.
 Only a root-owned, setuid, executable regular file that is not group/world writable
 is selected. When verified, the launcher keeps the pinned Playwright Chromium and
 copies its ordinary default flags while omitting only the automatic setuid
 prohibition; the helper path is supplied only to that child process. Other hosts
 retain Chrome's normal namespace mode. The selected mode is logged explicitly.
-No operating-system permission or security setting is modified, and no
-`--no-sandbox` option is added.
+No `--no-sandbox` option is added and no namespace/AppArmor setting is disabled.
+
+The next actual Ubuntu canary, run `34447701490` on commit `5da48db`, confirmed
+`sandbox-unavailable` with `platform-default`; the image did not expose a helper
+that passed the trust checks. This also blocked the quality job's real certificate
+test. The setup action now installs the helper shipped with the pinned Playwright
+Chromium **only on ephemeral GitHub-hosted Linux jobs that install browsers**.
+It verifies the locked and executable browser versions, validates the source
+helper against a reviewed publisher SHA-256, installs the same bytes into a
+root-owned directory as `root:root` mode `4755`, and checks the copied bytes and
+permissions. The user-managed browser executable remains owned by the runner so
+Chromium accepts `CHROME_DEVEL_SANDBOX`. The shared Windows machine and self-hosted
+runner settings are untouched.
+
+The exact publisher archive for Chromium **153.0.8010.12** contains
+`chrome-linux64/chrome_sandbox`: **15232 bytes**, distributed as mode `0755`, SHA-256
+`c100b678a8c171ad0733e51b6f18d98d936d38ab945681c41da00f2ee22e7571`.
+The entry's ZIP CRC, ELF header and hash were independently verified using bounded
+HTTP range reads of the same publisher URL recorded by Playwright's CI download.
+Evidence is in `temp/pinned-linux-sandbox-publisher.json`. A future browser update
+must explicitly update this reviewed pin; no independently sourced sandbox binary
+or replacement browser is introduced.
 
 Launch failures are classified into finite reasons before profile cleanup, without
 printing raw browser stderr or arguments. The failed launcher instance is also
-closed even when startup never returned its normal kill handle. Three injected
+closed even when startup never returned its normal kill handle. Four injected
 launcher/metadata tests cover trusted and unsafe helpers, flag preservation and
 finite failures. The existing real certificate test now uses this canonical
 launcher, accepting the pinned key and rejecting a different key. Together with
-the navigation checks, seven focused tests pass, as do lint and formatting. A
+the real certificate check, five focused launcher tests pass, as do lint and formatting. A
 disposable-copy drill removed the root-ownership check, failed the unsafe-helper
 assertion, then passed after exact restoration. Evidence is in
-`temp/audit-chrome-{final,red}.log`. The actual Linux runner remains the required
-confirmation before a full remote audit matrix can be accepted.
+`temp/audit-chrome-red.log` and `temp/audit-chrome-ci-install-tests.log`. YAML,
+Bash and embedded Node syntax checks also pass. The actual Linux runner remains
+the required confirmation before a full remote audit matrix can be accepted.
 
 ### Remaining gates
 

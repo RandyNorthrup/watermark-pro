@@ -4,7 +4,10 @@ import path from 'node:path'
 
 import { killAll, launch, Launcher } from 'chrome-launcher'
 
-const SANDBOX_HELPER = '/opt/google/chrome/chrome-sandbox'
+const SANDBOX_HELPERS = [
+  '/usr/local/lib/lumafoil/chrome-sandbox',
+  '/opt/google/chrome/chrome-sandbox',
+]
 const SETUID_AND_EXECUTABLE = 0o4111
 const GROUP_OR_WORLD_WRITE = 0o022
 
@@ -39,7 +42,7 @@ export async function launchAuditChrome(options, overrides = {}) {
     throw new Error('The audit browser requires an explicit owned profile directory.')
   const system = {
     platform: process.platform,
-    metadata: () => lstat(SANDBOX_HELPER),
+    metadata: (filename) => lstat(filename),
     stderr: () => readFile(path.join(options.userDataDir, 'chrome-err.log'), 'utf8'),
     launch,
     killAll,
@@ -48,13 +51,14 @@ export async function launchAuditChrome(options, overrides = {}) {
   let sandbox = 'platform-default'
   let configured = { ...options, logLevel: 'silent' }
   if (system.platform === 'linux') {
-    let metadata
-    try {
-      metadata = await system.metadata()
-    } catch {
-      // A host without this optional helper retains Chrome's ordinary namespace sandbox.
-    }
-    if (isTrustedHelper(metadata)) {
+    for (const helper of SANDBOX_HELPERS) {
+      let metadata
+      try {
+        metadata = await system.metadata(helper)
+      } catch {
+        // A host without either optional helper retains Chrome's ordinary namespace sandbox.
+      }
+      if (!isTrustedHelper(metadata)) continue
       sandbox = 'verified-setuid-helper'
       configured = {
         ...configured,
@@ -62,8 +66,9 @@ export async function launchAuditChrome(options, overrides = {}) {
         // Copy its exact normal defaults, while retaining automatic port/profile arguments.
         ignoreDefaultFlags: true,
         chromeFlags: [...Launcher.defaultFlags(), ...(options.chromeFlags ?? [])],
-        envVars: { ...process.env, ...options.envVars, CHROME_DEVEL_SANDBOX: SANDBOX_HELPER },
+        envVars: { ...process.env, ...options.envVars, CHROME_DEVEL_SANDBOX: helper },
       }
+      break
     }
   }
   console.info(`Audit Chrome sandbox: ${sandbox}.`)

@@ -18,7 +18,10 @@ test('Linux uses only a verified existing helper while preserving pinned browser
   assert.equal(
     await launchAuditChrome(options, {
       platform: 'linux',
-      metadata: async () => trusted,
+      metadata: async (filename) => {
+        assert.equal(filename, '/usr/local/lib/lumafoil/chrome-sandbox')
+        return trusted
+      },
       launch: async (input) => {
         configured = input
         return browser
@@ -32,6 +35,19 @@ test('Linux uses only a verified existing helper while preserving pinned browser
   assert.deepEqual(configured.chromeFlags, [...Launcher.defaultFlags(), ...options.chromeFlags])
   assert.equal(configured.chromeFlags.includes('--disable-setuid-sandbox'), false)
   assert.equal(configured.chromeFlags.includes('--no-sandbox'), false)
+  assert.equal(configured.envVars.CHROME_DEVEL_SANDBOX, '/usr/local/lib/lumafoil/chrome-sandbox')
+})
+
+test('a developer host can still use its verified packaged Chrome helper', async () => {
+  let configured
+  await launchAuditChrome(options, {
+    platform: 'linux',
+    metadata: async (filename) =>
+      filename === '/opt/google/chrome/chrome-sandbox' ? trusted : undefined,
+    launch: async (input) => {
+      configured = input
+    },
+  })
   assert.equal(configured.envVars.CHROME_DEVEL_SANDBOX, '/opt/google/chrome/chrome-sandbox')
 })
 

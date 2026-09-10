@@ -1108,6 +1108,26 @@ Existing stale receipts are retained as history.
         {
           "path": "scripts/audit-chrome.test.mjs",
           "action": "modify"
+        },
+        {
+          "path": "e2e/offline-network.ts",
+          "action": "modify"
+        },
+        {
+          "path": "scripts/lib/offline-proxy.mjs",
+          "action": "modify"
+        },
+        {
+          "path": "scripts/lib/offline-proxy.d.mts",
+          "action": "modify"
+        },
+        {
+          "path": "scripts/offline-proxy.test.mjs",
+          "action": "modify"
+        },
+        {
+          "path": "scripts/lib/test-http-request.mjs",
+          "action": "modify"
         }
       ],
       "status": "active",

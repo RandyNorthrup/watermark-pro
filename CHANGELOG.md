@@ -106,6 +106,17 @@ cutover are not yet certified; focused evidence lives under
 
 ### Fixed
 
+- WebKit's automation-level offline switch disabled service-worker cache delivery
+  even when the complete cache was active. Offline browser journeys now sever a
+  per-test loopback proxy, prove uncached traffic is blocked and cached assets
+  remain readable, then reconnect the same origin. A one-operation transport
+  fault drops only a real successful photo acknowledgement so replay and
+  idempotency remain end-to-end checks. Production offline code is unchanged.
+- GitHub's Ubuntu runner could not start the pinned audit browser under its
+  namespace sandbox. The ephemeral runner now verifies the exact publisher
+  sandbox helper by browser version and SHA-256 before installing that same file
+  root-owned with its required mode. No sandbox is disabled and no developer
+  machine is changed.
 - Completed bulk and video results could expand the iPhone document by six and
   eight pixels. Their grids now use a zero-minimum flexible column and
   shrinkable cards. Replay of the captured pages shows no overflow or axe

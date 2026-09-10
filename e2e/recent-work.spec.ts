@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test'
 
+import { test } from './offline-network'
 import {
   downloadBytes,
   expect,
@@ -8,7 +9,6 @@ import {
   pngFixture,
   pngSize,
   signUpAndVerify,
-  test,
 } from './support'
 
 async function expectImage(link: Locator) {
@@ -30,7 +30,7 @@ async function signOut(page: Page, name: string) {
 test('recent work opens real content in three accessible views, survives offline use and stays private on account switch', async ({
   page,
   request,
-  context,
+  offlineNetwork,
 }, testInfo) => {
   test.slow()
   const suffix = crypto.randomUUID()
@@ -111,7 +111,7 @@ test('recent work opens real content in three accessible views, survives offline
   await expect
     .poll(async () => await page.evaluate<boolean>('navigator.serviceWorker.controller !== null'))
     .toBe(true)
-  await context.setOffline(true)
+  await offlineNetwork.setOffline(true)
   await page.reload()
   await expect(photo).toBeVisible()
   await recents.getByRole('button', { name: 'List', exact: true }).click()
@@ -125,7 +125,7 @@ test('recent work opens real content in three accessible views, survives offline
     'true',
   )
   await expect(recents.getByText('Activity waiting to sync')).toBeVisible()
-  await context.setOffline(false)
+  await offlineNetwork.setOffline(false)
   await expect(recents.getByText('Activity waiting to sync')).toHaveCount(0)
   await photo.click()
   await viewer.getByRole('button', { name: 'Delete' }).click()

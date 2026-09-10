@@ -1,8 +1,8 @@
 /** Real offline saves survive document reload and synchronize without duplicate uploads after a lost acknowledgement. */
 import type { Page } from '@playwright/test'
 
-import { PREVIEW_ORIGIN } from './preview'
-import { createWorkspace, expect, expectAccessible, navigateTo, test } from './support'
+import { test } from './offline-network'
+import { createWorkspace, expect, expectAccessible, navigateTo } from './support'
 import { photoListResponseSchema } from '../src/shared/api'
 import { watermarkListResponseSchema } from '../src/shared/api-watermark'
 import { shellOrganizationsSchema } from '../src/shared/shell-cache'
@@ -27,7 +27,7 @@ async function waitForOfflineReadiness(page: Page): Promise<void> {
 test('keeps offline presets and photo saves across reload and reconnect', async ({
   page,
   request,
-  context,
+  offlineNetwork,
 }) => {
   test.slow()
   const runId = crypto.randomUUID()
@@ -83,7 +83,7 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
   )
   expect(storedShell).not.toContain('"token"')
 
-  await context.setOffline(true)
+  await offlineNetwork.setOffline(true)
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
   const image = page.getByRole('img', { name: /Photo with the watermark/ })
@@ -118,22 +118,11 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
     )
     .toBeGreaterThan(0)
 
-  let hasDroppedAcknowledgement = false
-  let isInterceptingUpload = false
-  await page.route(`**${apiRoot}/photos`, async (route) => {
-    if (!isInterceptingUpload && route.request().method() === 'POST') {
-      isInterceptingUpload = true
-      const response = await route.fetch()
-      expect(response.status()).toBe(201)
-      await route.abort('failed')
-      hasDroppedAcknowledgement = true
-      return
-    }
-    await route.continue()
-  })
-  await context.setOffline(false)
-  await expect.poll(() => hasDroppedAcknowledgement).toBe(true)
-  await page.unroute(`**${apiRoot}/photos`)
+  const acknowledgement = await offlineNetwork.loseNextPhotoAcknowledgement(`${apiRoot}/photos`)
+  await offlineNetwork.setOffline(false)
+  await expect.poll(() => acknowledgement.didDrop).toBe(true)
+  expect(acknowledgement.responseStatus).toBe(201)
+  await acknowledgement.clear()
   await page.getByRole('button', { name: 'Sync now' }).click()
   await expect(page.getByText('Saved work is synchronized.', { exact: true })).toBeVisible()
   const savedPhotosResponse = await page.request.get(`${apiRoot}/photos`)
@@ -156,7 +145,7 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
 test('preserves both versions of a conflicting offline preset edit', async ({
   page,
   request,
-  context,
+  offlineNetwork,
 }) => {
   test.slow()
   const runId = crypto.randomUUID()
@@ -203,16 +192,18 @@ test('preserves both versions of a conflicting offline preset edit', async ({
   await page.getByRole('link', { name: 'Original preset', exact: true }).click()
   await expect(page.getByLabel('Preset name')).toHaveValue('Original preset')
   await waitForOfflineReadiness(page)
-  await context.setOffline(true)
+  const observer = await offlineNetwork.createObserver()
+  await offlineNetwork.setOffline(true)
   await page.getByLabel('Preset name').fill('Local version')
-  const remote = await page.request.put(`${path}/${original.id}`, {
-    headers: { origin: PREVIEW_ORIGIN },
-    data: { name: 'Remote version', spec: original.spec, expectedUpdatedAt: original.updatedAt },
+  const remote = await observer.put(`${path}/${original.id}`, {
+    name: 'Remote version',
+    spec: original.spec,
+    expectedUpdatedAt: original.updatedAt,
   })
-  expect(remote.status()).toBe(200)
+  expect(remote).toBe(200)
   await page.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByRole('link', { name: 'Local version', exact: true })).toBeVisible()
-  await context.setOffline(false)
+  await offlineNetwork.setOffline(false)
   await page.getByText('Review saved work (1)', { exact: true }).click()
   await expect(page.getByText(/This preset changed elsewhere/)).toBeVisible()
   await expectAccessible(page)
@@ -226,7 +217,7 @@ test('preserves both versions of a conflicting offline preset edit', async ({
   await expect(page.getByRole('link', { name: 'Remote version', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Local version', exact: true })).toBeVisible()
   await page.evaluate('navigator.serviceWorker.ready.then(() => true)')
-  await context.setOffline(true)
+  await offlineNetwork.setOffline(true)
   await page.reload()
   await expect(page.getByRole('link', { name: 'Remote version', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Local version', exact: true })).toBeVisible()

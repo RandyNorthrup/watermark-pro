@@ -141,3 +141,21 @@ CSS negative controls, exact restored green and staged/unstaged preservation.
 Its ignored receipt is `temp/lumafoil-lint-staged-proof.json`.
 The checkpoint does not certify remote CI, the corrected full device matrix, final visual/performance matrices, full
 failure-drill run, or hosted deployment. Those remain explicit release gates.
+
+## Offline transport and Linux sandbox checkpoint
+
+After integrating the WebKit outage transport, pinned Linux sandbox setup and
+shared Node response helper, the complete `npm run quality` command passed again.
+It includes 2,361 application tests, 42 real-Workers tests, twelve gate/transport
+checks, 26 performance/audit helper checks and 40 built-artifact checks. Coverage
+remains above the unchanged floors at 93.2% statements, 85.25% branches, 93.03%
+functions and 93.55% lines. Source scanning passed 12,128 candidate/object checks
+and 228 archive entries; built scanning passed 2,387 checks and 114 archive
+entries, with four configured private values compared.
+
+The canonical ignored log is `temp/lumafoil-quality-offline-sandbox-2.log`,
+SHA-256 `8642b31c4c4f9fddea69ea19e11fa2dfdc95814cd5b9bf6df43668900710b55f`.
+The Windows pass validates configuration, trust/refusal branches and the real
+certificate browser check. The new Linux helper installation still requires its
+fresh hosted-runner preflight, and all 104 device cases require the new-head CI
+run. Full UI, performance, red-drill and hosted release gates remain open.

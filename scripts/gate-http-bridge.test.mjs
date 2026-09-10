@@ -4,37 +4,7 @@ import { request as httpRequest } from 'node:http'
 import { test } from 'node:test'
 
 import { createGateBridge } from './lib/gate-http-bridge.mjs'
-
-function request(origin, pathname, options = {}, body) {
-  return new Promise((resolve, reject) => {
-    const url = new URL(origin)
-    const outgoing = httpRequest(
-      {
-        hostname: '127.0.0.1',
-        port: url.port,
-        path: pathname,
-        ...options,
-        headers: { host: url.host, ...options.headers },
-      },
-      (incoming) => {
-        const chunks = []
-        incoming.on('data', (chunk) => {
-          chunks.push(chunk)
-        })
-        incoming.on('error', reject)
-        incoming.on('end', () =>
-          resolve({
-            status: incoming.statusCode,
-            headers: incoming.headers,
-            body: Buffer.concat(chunks),
-          }),
-        )
-      },
-    )
-    outgoing.on('error', reject)
-    outgoing.end(body)
-  })
-}
+import { loopbackRequest as request } from './lib/test-http-request.mjs'
 
 function expectedFailure() {
   // Intentional client aborts and gateway failures are asserted through their result and signal.
@@ -102,7 +72,7 @@ test('readiness is a failure until a dispatcher exists, then exact POST bytes, O
     assert.equal(observed[0].redirect, 'manual')
     assert.deepEqual(observed[0].bytes, payload)
     assert.equal(response.status, 201)
-    assert.deepEqual(response.body, payload)
+    assert.deepEqual(response.bytes, payload)
     assert.deepEqual(response.headers['set-cookie'], cookies)
     assert.equal(response.headers['content-length'], String(payload.length))
     assert.equal(response.headers['content-security-policy'], "default-src 'none'")
@@ -126,11 +96,11 @@ test('dispatcher exceptions and mislabeled encoded responses fail without killin
     for (const pathname of ['/throw', '/encoded']) {
       const failed = await request(bridge.origin, pathname)
       assert.equal(failed.status, 502)
-      assert.deepEqual(JSON.parse(failed.body), { error: 'gate_request_failed' })
+      assert.deepEqual(JSON.parse(failed.bytes), { error: 'gate_request_failed' })
       assert.equal(failed.headers['content-encoding'], undefined)
       const next = await request(bridge.origin, '/healthy')
       assert.equal(next.status, 200)
-      assert.equal(next.body.toString(), 'still alive')
+      assert.equal(next.bytes.toString(), 'still alive')
     }
     assert.deepEqual(
       diagnostic.mock.calls.map((call) => call.arguments[0]),
@@ -186,7 +156,7 @@ test('response chunks stream before completion and an unread client cancellation
     assert.equal(requestSignal.aborted, true)
     const healthy = await request(bridge.origin, '/healthy')
     assert.equal(healthy.status, 200)
-    assert.equal(healthy.body.toString(), 'still alive')
+    assert.equal(healthy.bytes.toString(), 'still alive')
   } finally {
     await bridge.close()
   }

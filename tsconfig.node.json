@@ -17,6 +17,7 @@
     "scripts/lib/bundle-inventory.ts",
     "scripts/lib/route-preloads.ts",
     "scripts/lib/test-site-owner.ts",
+    "scripts/lib/offline-proxy.d.mts",
     "scripts/lib/software-notices.ts",
     "scripts/private-workspace-sql.ts",
     // Filesystem audit of the bundled font packages; imports the catalogue only.
