@@ -107,7 +107,7 @@ export async function latestLinkFor(
   return `${parsed.pathname}${parsed.search}`
 }
 
-const SIDEBAR_SELECTOR = 'nav[aria-label="Primary"]'
+const SIDEBAR_SELECTOR = 'aside nav'
 
 /**
  * Follows a primary navigation link. Wide layouts show every destination in
@@ -116,21 +116,33 @@ const SIDEBAR_SELECTOR = 'nav[aria-label="Primary"]'
  */
 export async function navigateTo(page: Page, label: string) {
   const sidebar = page.getByRole('navigation', { name: 'Primary', exact: true })
+  const adminSidebar = page.getByRole('navigation', {
+    name: 'Administration sections',
+    exact: true,
+  })
   const tabBar = page.getByRole('navigation', { name: 'Tools' })
   // Both navigations are always in the document; CSS decides which one shows.
   // Waiting for the sidebar to exist means the shell has rendered (a CSS
   // locator, because role locators skip elements hidden by `display: none`).
   await page.locator(SIDEBAR_SELECTOR).waitFor({ state: 'attached' })
-  for (const container of [sidebar, tabBar]) {
+  for (const container of [sidebar, adminSidebar, tabBar]) {
     const link = container.getByRole('link', { name: label, exact: true })
     if (await link.isVisible()) {
       await link.click()
       return
     }
   }
+  const accountMenu = page.getByRole('button', { name: /^Account menu for / })
+  await accountMenu.click()
+  const accountDestination = page.getByRole('menuitem', { name: label, exact: true })
+  if ((await accountDestination.count()) > 0) {
+    await accountDestination.click()
+    return
+  }
+  await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'Menu', exact: true }).click()
   await page
-    .getByRole('navigation', { name: 'Primary (menu)' })
+    .getByRole('dialog', { name: 'Menu' })
     .getByRole('link', { name: label, exact: true })
     .click()
   await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
@@ -140,15 +152,19 @@ export async function navigateTo(page: Page, label: string) {
 export async function expectNoNavLink(page: Page, label: string) {
   await page.locator(SIDEBAR_SELECTOR).waitFor({ state: 'attached' })
   const menu = page.getByRole('button', { name: 'Menu', exact: true })
-  if (await menu.isVisible()) {
+  const isPhoneMenu = await menu.isVisible()
+  if (isPhoneMenu) {
     await menu.click()
     await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible()
   }
   await expect(page.getByRole('link', { name: label, exact: true })).toHaveCount(0)
-  if (await menu.isVisible()) {
+  if (isPhoneMenu) {
     await page.getByRole('button', { name: 'Close menu' }).click()
     await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
   }
+  await page.getByRole('button', { name: /^Account menu for / }).click()
+  await expect(page.getByRole('menuitem', { name: label, exact: true })).toHaveCount(0)
+  await page.keyboard.press('Escape')
 }
 
 /**

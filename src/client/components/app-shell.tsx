@@ -1,7 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useRouter, useRouterState } from '@tanstack/react-router'
 import {
+  Activity,
+  ArrowLeft,
+  Bug,
   Building2,
+  CircleUserRound,
   ChevronsUpDown,
   FileText,
   Film,
@@ -25,6 +29,7 @@ import { useTranslation } from 'react-i18next'
 import { BrandMark } from './brand-mark'
 import { LanguageMenu } from './language-menu'
 import { ThemeToggle } from './theme-toggle'
+import { ADMIN_SECTIONS, adminSearchSchema, type AdminSection } from '../../shared/admin-sections'
 import { isPlatformAdmin } from '../lib/admin'
 import { type ActiveOrganization, authClient, type SessionData } from '../lib/auth-client'
 import { cn } from '../lib/cn'
@@ -50,9 +55,8 @@ const OfflinePanel = lazy(async () => {
 })
 
 // `label` holds the catalogue key, not the visible word; each list translates
-// it at render (`t(item.label)`). NAV_ITEMS is `as const`, so the keys keep
-// their literal types and stay valid arguments to the typed `t`.
-const NAV_ITEMS = [
+// it at render. The two rails keep their literal keys for the typed catalogue.
+const WORKSPACE_NAV_ITEMS = [
   { to: '/app', label: 'shell.nav.dashboard', icon: LayoutDashboard, exact: true },
   { to: '/app/library', label: 'shell.nav.library', icon: Stamp, exact: false },
   { to: '/app/editor', label: 'shell.nav.editor', icon: PencilRuler, exact: false },
@@ -61,11 +65,21 @@ const NAV_ITEMS = [
   { to: '/app/documents', label: 'shell.nav.documents', icon: FileText, exact: false },
   { to: '/app/gallery', label: 'shell.nav.gallery', icon: Images, exact: false },
   { to: '/app/shares', label: 'shell.nav.shares', icon: Share2, exact: false },
+] as const
+
+const SETTINGS_NAV_ITEMS = [
   { to: '/app/account', label: 'accountAuth.heading', icon: Users, exact: false },
   { to: '/app/invitations', label: 'siteInvites.heading', icon: UserPlus, exact: false },
   { to: '/app/members', label: 'shell.nav.members', icon: Users, exact: false },
   { to: '/app/audit', label: 'shell.nav.audit', icon: ScrollText, exact: false },
 ] as const
+
+const BACK_TO_WORKSPACE_NAV_ITEM = {
+  to: '/app',
+  label: 'shell.nav.dashboard',
+  icon: ArrowLeft,
+  exact: true,
+} as const
 
 const ADMIN_NAV_ITEM = {
   to: '/app/admin',
@@ -74,19 +88,50 @@ const ADMIN_NAV_ITEM = {
   exact: false,
 } as const
 
-type NavItem = (typeof NAV_ITEMS)[number] | typeof ADMIN_NAV_ITEM
+const ADMIN_SECTION_NAV_ITEMS = [
+  { section: ADMIN_SECTIONS[0], label: 'admin.tabs.users', icon: Users },
+  { section: ADMIN_SECTIONS[1], label: 'admin.tabs.organizations', icon: Building2 },
+  { section: ADMIN_SECTIONS[2], label: 'admin.tabs.audit', icon: ScrollText },
+  { section: ADMIN_SECTIONS[3], label: 'admin.tabs.health', icon: Activity },
+  { section: ADMIN_SECTIONS[4], label: 'admin.tabs.clientErrors', icon: Bug },
+] as const
+
+const NAV_LINK_CLASS =
+  'flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition-all hover:translate-x-0.5 hover:bg-surface-raised hover:text-ink'
+const ACTIVE_NAV_LINK_CLASS =
+  'glass-nav-active bg-surface-raised text-brand-700 shadow-sm dark:text-brand-200'
+
+type NavItem =
+  | (typeof WORKSPACE_NAV_ITEMS)[number]
+  | (typeof SETTINGS_NAV_ITEMS)[number]
+  | typeof ADMIN_NAV_ITEM
+  | typeof BACK_TO_WORKSPACE_NAV_ITEM
 
 /**
  * The tools a phone user reaches for most sit in the bottom tab bar; the
  * rest, with the organization switcher, are behind the "More" sheet.
  */
-const TAB_BAR_ITEMS: readonly NavItem[] = NAV_ITEMS.filter((item) =>
+const TAB_BAR_ITEMS: readonly NavItem[] = WORKSPACE_NAV_ITEMS.filter((item) =>
   ['/app/library', '/app/editor', '/app/bulk', '/app/gallery'].includes(item.to),
 )
 
-/** Platform administrators get one more entry; everyone else never sees it. */
-function navItemsFor(session: SessionData): readonly NavItem[] {
-  return isPlatformAdmin(session.user) ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS
+function isSettingsArea(pathname: string): boolean {
+  return (
+    pathname.startsWith(ADMIN_NAV_ITEM.to) ||
+    SETTINGS_NAV_ITEMS.some((item) => pathname.startsWith(item.to))
+  )
+}
+
+function currentAdminSection(search: unknown): AdminSection {
+  const parsed = adminSearchSchema.safeParse(search)
+  return parsed.success ? parsed.data.section : ADMIN_SECTIONS[0]
+}
+
+/** Tool routes keep a focused workspace rail; account routes switch to their own section. */
+function navItemsFor(session: SessionData, pathname: string): readonly NavItem[] {
+  if (!isSettingsArea(pathname)) return WORKSPACE_NAV_ITEMS
+  const settings: readonly NavItem[] = [BACK_TO_WORKSPACE_NAV_ITEM, ...SETTINGS_NAV_ITEMS]
+  return isPlatformAdmin(session.user) ? [...settings, ADMIN_NAV_ITEM] : settings
 }
 
 interface AppShellProps {
@@ -104,11 +149,19 @@ interface AppShellProps {
  */
 export function AppShell({ session, organization, organizations, children }: AppShellProps) {
   const { t } = useTranslation()
-  const navItems = navItemsFor(session)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const search = useRouterState({ select: (state) => state.location.search })
+  const isAdminArea = pathname.startsWith(ADMIN_NAV_ITEM.to) && isPlatformAdmin(session.user)
+  const adminSection = currentAdminSection(search)
+  const isSettingsAreaActive = isSettingsArea(pathname)
+  const navItems = navItemsFor(session, pathname)
   const currentItem = navItems.find((item) =>
     item.exact ? pathname === item.to : pathname.startsWith(item.to),
   )
+  const currentLabel = isAdminArea
+    ? (ADMIN_SECTION_NAV_ITEMS.find((item) => item.section === adminSection)?.label ??
+      'shell.nav.admin')
+    : currentItem?.label
   return (
     <div className="workspace-scene flex min-h-svh">
       <a
@@ -119,26 +172,45 @@ export function AppShell({ session, organization, organizations, children }: App
       </a>
       <aside className="glass-chrome sticky top-4 my-4 ms-4 hidden h-[calc(100svh-2rem)] w-60 shrink-0 flex-col overflow-y-auto rounded-3xl border border-line px-4 py-6 md:flex">
         <BrandMark to="/app" className="px-2 py-1" />
-        <div className="mt-6">
+        {isSettingsAreaActive ? (
+          <Link
+            to="/app/account"
+            className="glass-control mt-6 flex min-w-0 items-center gap-3 rounded-2xl border p-3"
+          >
+            <Avatar name={session.user.name} image={session.user.image} className="size-11" />
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-semibold">{session.user.name}</span>
+              <span className="block truncate text-xs text-ink-muted">{session.user.email}</span>
+            </span>
+          </Link>
+        ) : null}
+        <div className={isSettingsAreaActive ? 'mt-4' : 'mt-6'}>
           <OrganizationSwitcher organization={organization} organizations={organizations} />
         </div>
-        <NavList items={navItems} label={t('shell.primaryNav')} className="mt-7" />
+        {isAdminArea ? (
+          <AdminNavList currentSection={adminSection} className="mt-7" />
+        ) : (
+          <NavList items={navItems} label={t('shell.primaryNav')} className="mt-7" />
+        )}
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="glass-chrome sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:top-4 md:mx-4 md:mt-4 md:rounded-2xl md:border md:px-6 md:pt-3">
           <div className="flex min-w-0 items-center gap-1 md:hidden">
             <MobileMenu
               items={navItems}
+              adminSection={isAdminArea ? adminSection : null}
               organization={organization}
               organizations={organizations}
             />
             <BrandMark to="/app" />
           </div>
           <div className="hidden min-w-0 items-center gap-3 text-sm md:flex">
-            <span className="truncate text-ink-muted">{organization?.name}</span>
+            <span className="truncate text-ink-muted">
+              {isSettingsAreaActive ? session.user.name : organization?.name}
+            </span>
             <span aria-hidden="true" className="h-3.5 w-px rotate-[18deg] bg-control-line/65" />
             <span className="font-medium">
-              {currentItem === undefined ? null : t(currentItem.label)}
+              {currentLabel === undefined ? null : t(currentLabel)}
             </span>
           </div>
           <div className="ms-auto flex items-center gap-2">
@@ -186,16 +258,55 @@ function NavList({ items, label, className, onNavigate }: NavListProps) {
           to={to}
           activeOptions={{ exact }}
           onClick={onNavigate}
-          className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition-all hover:translate-x-0.5 hover:bg-surface-raised hover:text-ink"
+          className={NAV_LINK_CLASS}
           activeProps={{
-            className:
-              'glass-nav-active bg-surface-raised text-brand-700 shadow-sm dark:text-brand-200',
+            className: ACTIVE_NAV_LINK_CLASS,
           }}
         >
           <Icon aria-hidden="true" className="size-4" />
           {t(itemLabel)}
         </Link>
       ))}
+    </nav>
+  )
+}
+
+function AdminNavList({
+  currentSection,
+  className,
+  onNavigate,
+}: {
+  currentSection: AdminSection
+  className?: string
+  onNavigate?: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <nav aria-label={t('admin.sectionsLabel')} className={cn('flex flex-col gap-1', className)}>
+      <Link
+        to="/app/account"
+        onClick={onNavigate}
+        className={cn(NAV_LINK_CLASS, 'mb-3 border-b border-line pb-4')}
+      >
+        <ArrowLeft aria-hidden="true" className="size-4" />
+        {t('accountAuth.heading')}
+      </Link>
+      {ADMIN_SECTION_NAV_ITEMS.map(({ section, label, icon: Icon }) => {
+        const isCurrent = section === currentSection
+        return (
+          <Link
+            key={section}
+            to="/app/admin"
+            search={{ section }}
+            onClick={onNavigate}
+            aria-current={isCurrent ? 'page' : undefined}
+            className={cn(NAV_LINK_CLASS, isCurrent && ACTIVE_NAV_LINK_CLASS)}
+          >
+            <Icon aria-hidden="true" className="size-4" />
+            {t(label)}
+          </Link>
+        )
+      })}
     </nav>
   )
 }
@@ -227,9 +338,13 @@ function TabBar({ items }: { items: readonly NavItem[] }) {
 
 function MobileMenu({
   items,
+  adminSection,
   organization,
   organizations,
-}: Pick<AppShellProps, 'organization' | 'organizations'> & { items: readonly NavItem[] }) {
+}: Pick<AppShellProps, 'organization' | 'organizations'> & {
+  items: readonly NavItem[]
+  adminSection: AdminSection | null
+}) {
   const { t } = useTranslation()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   // The sheet is open for the path it was opened on, so any navigation,
@@ -254,13 +369,22 @@ function MobileMenu({
         isDescriptionHidden
       >
         <OrganizationSwitcher organization={organization} organizations={organizations} />
-        <NavList
-          items={items}
-          label={t('shell.primaryMenuNav')}
-          onNavigate={() => {
-            setOpenPathname(null)
-          }}
-        />
+        {adminSection === null ? (
+          <NavList
+            items={items}
+            label={t('shell.primaryMenuNav')}
+            onNavigate={() => {
+              setOpenPathname(null)
+            }}
+          />
+        ) : (
+          <AdminNavList
+            currentSection={adminSection}
+            onNavigate={() => {
+              setOpenPathname(null)
+            }}
+          />
+        )}
       </SheetContent>
     </Sheet>
   )
@@ -391,6 +515,29 @@ function UserMenu({ session }: { session: SessionData }) {
           <span className="block font-medium text-ink">{session.user.name}</span>
           <span className="block truncate">{session.user.email}</span>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/account' })}>
+          <CircleUserRound aria-hidden="true" className="size-4" />
+          {t('accountAuth.heading')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/invitations' })}>
+          <UserPlus aria-hidden="true" className="size-4" />
+          {t('siteInvites.heading')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/members' })}>
+          <Users aria-hidden="true" className="size-4" />
+          {t('shell.nav.members')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/audit' })}>
+          <ScrollText aria-hidden="true" className="size-4" />
+          {t('shell.nav.audit')}
+        </DropdownMenuItem>
+        {isPlatformAdmin(session.user) ? (
+          <DropdownMenuItem onSelect={() => void navigate({ to: '/app/admin' })}>
+            <ShieldCheck aria-hidden="true" className="size-4" />
+            {t('shell.nav.admin')}
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuSeparator />
         {signOutError === null ? null : (
           <p

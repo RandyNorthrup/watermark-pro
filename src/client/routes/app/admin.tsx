@@ -2,10 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import type { TFunction } from 'i18next'
 import { Ban, UserCheck, UserX } from 'lucide-react'
-import { AlertDialog, Tabs } from 'radix-ui'
+import { AlertDialog } from 'radix-ui'
 import { useDeferredValue, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { adminSearchSchema, type AdminSection } from '../../../shared/admin-sections'
 import { assignableSiteRoleSchema, SITE_ROLE } from '../../../shared/site-roles'
 import { AccountStatistics } from '../../components/account-statistics'
 import { AuditTable } from '../../components/audit-table'
@@ -35,11 +36,17 @@ import { dateTimeFormatter } from '../../lib/format-date'
 import { resetShellQueries } from '../../lib/queries'
 
 export const Route = createFileRoute('/app/admin')({
+  validateSearch: adminSearchSchema,
   component: AdminPage,
 })
 
-const tabClassName =
-  'rounded-md px-3 py-1.5 text-sm font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white'
+const SECTION_LABELS = {
+  users: 'admin.tabs.users',
+  organizations: 'admin.tabs.organizations',
+  audit: 'admin.tabs.audit',
+  health: 'admin.tabs.health',
+  'client-errors': 'admin.tabs.clientErrors',
+} as const satisfies Record<AdminSection, string>
 
 function siteRoleLabel(t: TFunction, role: AdminUser['role']): string {
   switch (role) {
@@ -58,6 +65,7 @@ function siteRoleLabel(t: TFunction, role: AdminUser['role']): string {
 function AdminPage() {
   const { t } = useTranslation()
   const { session } = Route.useRouteContext()
+  const { section } = Route.useSearch()
   const isAdmin = isPlatformAdmin(session.user)
   return (
     <div className="flex flex-col gap-6">
@@ -68,7 +76,12 @@ function AdminPage() {
       {isAdmin ? (
         <>
           <AccountStatistics />
-          <AdminSections selfId={session.user.id} />
+          <section aria-labelledby="admin-section-heading" className="flex min-w-0 flex-col gap-4">
+            <h2 id="admin-section-heading" className="text-xl font-semibold tracking-tight">
+              {t(SECTION_LABELS[section])}
+            </h2>
+            <AdminSectionPanel section={section} selfId={session.user.id} />
+          </section>
         </>
       ) : (
         <Alert tone="error">{t('admin.onlyAdmins')}</Alert>
@@ -77,47 +90,24 @@ function AdminPage() {
   )
 }
 
-function AdminSections({ selfId }: { selfId: string }) {
-  const { t } = useTranslation()
-  return (
-    <Tabs.Root defaultValue="users" className="flex flex-col gap-4">
-      <Tabs.List
-        aria-label={t('admin.sectionsLabel')}
-        className="flex max-w-full flex-wrap gap-1 self-start rounded-lg border border-line bg-surface-raised p-1"
-      >
-        <Tabs.Trigger value="users" className={tabClassName}>
-          {t('admin.tabs.users')}
-        </Tabs.Trigger>
-        <Tabs.Trigger value="organizations" className={tabClassName}>
-          {t('admin.tabs.organizations')}
-        </Tabs.Trigger>
-        <Tabs.Trigger value="audit" className={tabClassName}>
-          {t('admin.tabs.audit')}
-        </Tabs.Trigger>
-        <Tabs.Trigger value="health" className={tabClassName}>
-          {t('admin.tabs.health')}
-        </Tabs.Trigger>
-        <Tabs.Trigger value="client-errors" className={tabClassName}>
-          {t('admin.tabs.clientErrors')}
-        </Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content value="users" className="outline-none">
-        <UsersPanel selfId={selfId} />
-      </Tabs.Content>
-      <Tabs.Content value="organizations" className="outline-none">
-        <OrganizationsPanel />
-      </Tabs.Content>
-      <Tabs.Content value="audit" className="outline-none">
-        <AuditPanel />
-      </Tabs.Content>
-      <Tabs.Content value="health" className="outline-none">
-        <HealthPanel />
-      </Tabs.Content>
-      <Tabs.Content value="client-errors" className="outline-none">
-        <ClientErrorsPanel />
-      </Tabs.Content>
-    </Tabs.Root>
-  )
+function AdminSectionPanel({ section, selfId }: { section: AdminSection; selfId: string }) {
+  switch (section) {
+    case 'users': {
+      return <UsersPanel selfId={selfId} />
+    }
+    case 'organizations': {
+      return <OrganizationsPanel />
+    }
+    case 'audit': {
+      return <AuditPanel />
+    }
+    case 'health': {
+      return <HealthPanel />
+    }
+    case 'client-errors': {
+      return <ClientErrorsPanel />
+    }
+  }
 }
 
 function UsersPanel({ selfId }: { selfId: string }) {

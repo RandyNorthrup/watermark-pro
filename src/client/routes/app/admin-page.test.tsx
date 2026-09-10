@@ -1,7 +1,12 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  ADMIN_SECTIONS,
+  parseAdminSection,
+  type AdminSection,
+} from '../../../shared/admin-sections'
 import { HTTP_STATUS } from '../../../shared/constants'
 import { OWNER, seedOwnerWorkspace, VIEWER } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
@@ -119,26 +124,42 @@ afterEach(() => {
 })
 
 /** Signs in as a platform admin, stubs the admin API, renders the page, and waits for it. */
-async function renderAsAdmin(failure: number | null = null) {
-  const user = userEvent.setup()
+async function renderAsAdmin(section?: AdminSection, failure: number | null = null) {
   seedOwnerWorkspace(client())
   client().state.user = { ...OWNER, role: 'admin' }
   client().state.allUsers = [{ ...OWNER, role: 'admin' }]
   stubAdminApi(failure)
-  renderApp('/app/admin')
+  const view = renderApp(section === undefined ? '/app/admin' : `/app/admin?section=${section}`)
   await screen.findByRole('heading', { level: 1 })
-  return user
+  return view
 }
 
 describe('administration page', () => {
-  it('is hidden from ordinary users', async () => {
+  it('validates section identifiers and defaults only an absent section to Users', () => {
+    expect(parseAdminSection({})).toBe('users')
+    for (const section of ADMIN_SECTIONS) expect(parseAdminSection({ section })).toBe(section)
+    for (const section of ['members', '', 1, null, ['users', 'health']]) {
+      expect(() => parseAdminSection({ section })).toThrow()
+    }
+  })
+
+  it('defaults to the real Users panel without rendering horizontal tabs', async () => {
+    await renderAsAdmin()
+    expect(await screen.findByRole('heading', { level: 2, name: 'Users' })).toBeInTheDocument()
+    expect(await screen.findByLabelText('Search by email')).toBeInTheDocument()
+    expect(client().admin.listUsers).toHaveBeenCalledOnce()
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
+  })
+
+  it.each(ADMIN_SECTIONS)('hides the %s section from ordinary users', async (section) => {
     seedOwnerWorkspace(client())
     stubAdminApi()
-    renderApp('/app/admin')
+    renderApp(`/app/admin?section=${section}`)
     expect(await screen.findByRole('alert')).toHaveTextContent('Only the site owner or an admin')
     // The refusal still has a page heading, so assistive tech knows where it landed.
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Administration')
-    expect(screen.queryByRole('tab', { name: 'Users' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Search by email')).not.toBeInTheDocument()
+    expect(client().admin.listUsers).not.toHaveBeenCalled()
     expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument()
   })
 
@@ -154,7 +175,7 @@ describe('administration page', () => {
     stubAdminApi()
     renderApp('/app/admin')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Administration')
-    expect(screen.getAllByRole('link', { name: 'Admin' }).length).toBeGreaterThan(0)
+    expect(screen.getByRole('heading', { level: 2, name: 'Users' })).toBeInTheDocument()
     expect(await screen.findByText('3 users.')).toBeInTheDocument()
     expect(screen.getByText('(you)')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: `Ban ${OWNER.email}` })).not.toBeInTheDocument()
@@ -189,31 +210,42 @@ describe('administration page', () => {
   })
 
   it('shows organizations and the global audit trail', async () => {
-    const user = await renderAsAdmin()
-    await user.click(screen.getByRole('tab', { name: 'Organizations' }))
+    const { router } = await renderAsAdmin('organizations')
     const table = await screen.findByRole('table', { name: /Organizations/ })
     expect(within(table).getByText('Acme Studio')).toBeInTheDocument()
     expect(within(table).getByText('5.0 MB')).toBeInTheDocument()
-    await user.click(screen.getByRole('tab', { name: 'Audit trail' }))
+    expect(screen.queryByLabelText('Search by email')).not.toBeInTheDocument()
+    expect(client().admin.listUsers).not.toHaveBeenCalled()
+    await act(async () => {
+      await router.navigate({ to: '/app/admin', search: { section: 'audit' } })
+    })
     const audit = await screen.findByRole('table', { name: /Audit entries/ })
     expect(within(audit).getByText('admin.user_banned')).toBeInTheDocument()
     expect(within(audit).getByText('platform')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Audit trail' })).toBeInTheDocument()
+    expect(screen.queryByRole('table', { name: /Organizations/ })).not.toBeInTheDocument()
+    act(() => router.history.back())
+    expect(await screen.findByRole('table', { name: /Organizations/ })).toBeInTheDocument()
+    expect(screen.queryByRole('table', { name: /Audit entries/ })).not.toBeInTheDocument()
   })
 
   it('shows recent health checks and reported client errors', async () => {
-    const user = await renderAsAdmin()
-    await user.click(screen.getByRole('tab', { name: 'Health' }))
+    const { router } = await renderAsAdmin('health')
     expect(await screen.findByText('1 of 2 recent checks passed.')).toBeInTheDocument()
     expect(screen.getByText('db unreachable')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('tab', { name: 'Client errors' }))
+    await act(async () => {
+      await router.navigate({ to: '/app/admin', search: { section: 'client-errors' } })
+    })
     expect(await screen.findByText('Cannot read properties of undefined')).toBeInTheDocument()
     expect(screen.getByText(/on \/app\/editor/)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Client errors' })).toBeInTheDocument()
+    expect(screen.queryByText('db unreachable')).not.toBeInTheDocument()
+    expect(client().admin.listUsers).not.toHaveBeenCalled()
   })
 
   it('reports failed admin loads', async () => {
-    const user = await renderAsAdmin(HTTP_STATUS.forbidden)
-    await user.click(screen.getByRole('tab', { name: 'Organizations' }))
+    await renderAsAdmin('organizations', HTTP_STATUS.forbidden)
     const alerts = await screen.findAllByRole('alert')
     expect(
       alerts.every((alert) => alert.textContent.includes('Your role does not allow this.')),

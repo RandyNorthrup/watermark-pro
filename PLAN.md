@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-09-09 (M19 verification; account isolation, recovery, publication and performance)
+Last updated: 2026-09-10 (M19 navigation and account organization)
 
 ---
 
@@ -707,6 +707,18 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   glass reference visibly, adds a searchable font dropdown, provider marks,
   redesigned import panels, grouped preset actions, and direct mouse/touch/
   keyboard canvas manipulation in the designer and editor.
+- **Navigation and account organization (implemented, 2026-09-10):** the workspace
+  primary rail contains only Dashboard, Library, Editor, Bulk, Video, Documents,
+  Gallery and Shares. The account menu opens profile/account, invitations,
+  members and audit; site Owners and Admins also receive its Administration
+  entry. Account routes switch to a contextual account rail with account
+  identity and a return to the workspace. Administration has its own contextual
+  desktop sidebar and phone More sheet for Users, Organizations, Audit trail,
+  Health and Client errors. Its validated `section` URL parameter selects the
+  panel, defaults to Users, and retains the destination through direct links,
+  reloads and browser history. The account page groups the user's identity and
+  global role separately from connected sign-in methods and provider-linking
+  actions.
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
   (not relaxed budgets) for the perf work; landing it in small green increments.
   - **§3 diet, first pass (done).** Dropped the `ui` chunk group (it forced all

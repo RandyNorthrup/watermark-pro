@@ -18,8 +18,8 @@ import { renderApp } from '../../test-support/render-app'
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 
 const client = fakeAuth
-/** Dashboard, Account, Invite people, Library, Editor, Bulk, Video, Documents, Gallery, Shares, Members, Audit log. */
-const NAV_ITEM_COUNT = 12
+/** Dashboard plus the seven workspace tools. Account destinations live under the user. */
+const WORKSPACE_NAV_ITEM_COUNT = 8
 
 beforeEach(() => {
   installFakeAuth()
@@ -152,16 +152,50 @@ describe('application shell', () => {
       within(sheet).getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
     ).toBeInTheDocument()
     const menuNav = within(sheet).getByRole('navigation', { name: 'Primary (menu)' })
-    expect(within(menuNav).getAllByRole('link')).toHaveLength(NAV_ITEM_COUNT)
-    expect(within(menuNav).queryByRole('link', { name: 'Admin' })).toBeNull()
-    await user.click(within(menuNav).getByRole('link', { name: 'Members' }))
+    expect(within(menuNav).getAllByRole('link')).toHaveLength(WORKSPACE_NAV_ITEM_COUNT)
+    expect(within(menuNav).queryByRole('link', { name: 'Account settings' })).toBeNull()
+    expect(within(menuNav).queryByRole('link', { name: 'Members' })).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Close menu' }))
+    await user.click(screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Members' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/members'))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    const settingsNav = screen.getByRole('navigation', { name: 'Primary' })
+    expect(within(settingsNav).getByRole('link', { name: 'Account settings' })).toBeInTheDocument()
+    expect(within(settingsNav).getByRole('link', { name: 'Invite people' })).toBeInTheDocument()
+    expect(within(settingsNav).queryByRole('link', { name: 'Library' })).toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Menu' }))
     await screen.findByRole('dialog', { name: 'Menu' })
     await user.click(screen.getByRole('button', { name: 'Close menu' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  it('uses contextual sidebar links for Administration instead of page tabs', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    client().state.user = { ...OWNER, role: 'owner' }
+    const { router } = renderApp('/app/admin')
+    await screen.findByRole('heading', { level: 1, name: 'Administration' })
+
+    const adminNav = screen.getByRole('navigation', { name: 'Administration sections' })
+    expect(within(adminNav).getByRole('link', { name: 'Users' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(within(adminNav).getByRole('link', { name: 'Organizations' })).toBeInTheDocument()
+    expect(within(adminNav).getByRole('link', { name: 'Audit trail' })).toBeInTheDocument()
+    expect(within(adminNav).getByRole('link', { name: 'Health' })).toBeInTheDocument()
+    expect(within(adminNav).getByRole('link', { name: 'Client errors' })).toBeInTheDocument()
+    expect(within(adminNav).queryByRole('link', { name: 'Library' })).toBeNull()
+    expect(screen.queryByRole('tab')).toBeNull()
+
+    await user.click(within(adminNav).getByRole('link', { name: 'Health' }))
+    await waitFor(() => expect(router.state.location.search).toEqual({ section: 'health' }))
+    expect(within(adminNav).getByRole('link', { name: 'Health' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
   })
 
   it('shows the layout error boundary when the organization cannot be loaded', async () => {
