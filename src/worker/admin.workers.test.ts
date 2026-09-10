@@ -58,15 +58,17 @@ describe('platform administration over D1', () => {
   it('promotes through the dev route with a real D1 update, once per existing account', async () => {
     const refused = await client.get('/api/admin/organizations')
     expect(refused.status).toBe(HTTP_STATUS.forbidden)
-    const missing = await client.post('/api/dev/promote', { email: 'nobody@example.test' })
+    const missing = await client.post('/api/dev/promote-site-owner', {
+      email: 'nobody@example.test',
+    })
     expect(missing.status).toBe(HTTP_STATUS.notFound)
-    const promoted = await client.post('/api/dev/promote', { email: owner.email })
+    const promoted = await client.post('/api/dev/promote-site-owner', { email: owner.email })
     expect(promoted.status).toBe(HTTP_STATUS.ok)
     const [row] = await getServices(env)
       .db.select({ role: user.role })
       .from(user)
       .where(eq(user.email, owner.email))
-    expect(row?.role).toBe('admin')
+    expect(row?.role).toBe('owner')
   })
 
   it('counts members per organization with the grouped query', async () => {

@@ -135,14 +135,14 @@ describe('administration page', () => {
     seedOwnerWorkspace(client())
     stubAdminApi()
     renderApp('/app/admin')
-    expect(await screen.findByRole('alert')).toHaveTextContent('Only the site administrator')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Only the site owner or an admin')
     // The refusal still has a page heading, so assistive tech knows where it landed.
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Administration')
     expect(screen.queryByRole('tab', { name: 'Users' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument()
   })
 
-  it('lets the site administrator manage users without offering additional administrators', async () => {
+  it('lets a site admin moderate non-owner accounts and search users', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
     client().state.user = { ...OWNER, role: 'admin' }

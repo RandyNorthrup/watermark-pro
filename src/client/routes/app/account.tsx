@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { KeyRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { accountSearchSchema } from '../../../shared/client-search'
+import { ProviderLogo } from '../../components/provider-logo'
 import { SocialAuth } from '../../components/social-auth'
 import { Alert } from '../../components/ui/alert'
 import { Card } from '../../components/ui/card'
@@ -14,6 +16,13 @@ export const Route = createFileRoute('/app/account')({
   validateSearch: accountSearchSchema,
   component: AccountPage,
 })
+
+function providerName(provider: string, password: string): string {
+  if (provider === 'credential') return password
+  if (provider === 'google') return 'Google'
+  if (provider === 'microsoft') return 'Microsoft'
+  return provider
+}
 
 function AccountPage() {
   const { t } = useTranslation()
@@ -45,14 +54,25 @@ function AccountPage() {
         {accounts.isPending ? (
           <p role="status">{t('accountAuth.loading')}</p>
         ) : (
-          <ul className="list-inside list-disc text-sm">
-            {accounts.data?.map((account) => (
-              <li key={account.id}>
-                {account.providerId === 'credential'
-                  ? t('accountAuth.password')
-                  : account.providerId}
-              </li>
-            ))}
+          <ul className="flex flex-col gap-2 text-sm">
+            {accounts.data?.map((account) => {
+              const provider = account.providerId
+              return (
+                <li
+                  key={account.id}
+                  className="glass-control flex min-h-11 items-center gap-3 rounded-xl border px-3"
+                >
+                  {provider === 'google' || provider === 'microsoft' ? (
+                    <ProviderLogo provider={provider} />
+                  ) : (
+                    <KeyRound aria-hidden="true" className="size-5 text-ink-muted" />
+                  )}
+                  <span className="font-medium">
+                    {providerName(provider, t('accountAuth.password'))}
+                  </span>
+                </li>
+              )
+            })}
           </ul>
         )}
         <SocialAuth mode="link" />

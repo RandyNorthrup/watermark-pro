@@ -719,7 +719,7 @@
   "admin": {
     "heading": "Administration",
     "description": "Nur für den Websiteadministrator: Konten verwalten und Gesamtzahlen prüfen. Der Besitz eines Arbeitsbereichs verleiht keine Website-Administratorrechte.",
-    "onlyAdmins": "Nur der Websiteadministrator kann diese Seite öffnen.",
+    "onlyAdmins": "Nur der Websiteinhaber oder ein Administrator kann diese Seite öffnen.",
     "sectionsLabel": "Administrationsbereiche",
     "tabs": {
       "users": "Benutzer",
@@ -762,7 +762,6 @@
     "you": "(Sie)",
     "joined": "Beigetreten {{date}}",
     "emailNotVerified": " · E-Mail nicht bestätigt",
-    "platformAdmin": "Websiteadministrator",
     "banned": "gesperrt",
     "bannedReason": "gesperrt: {{reason}}",
     "unban": "Entsperren",
@@ -790,7 +789,10 @@
     "auditErrorTitle": "Audit-Trail konnte nicht geladen werden",
     "auditCaption": "Audit-Einträge über alle Organisationen, neueste zuerst",
     "auditDetailHeading": "Organisation",
-    "platform": "Plattform"
+    "platform": "Plattform",
+    "siteRole": "Website-Rolle: {{role}}",
+    "roleFor": "Website-Rolle für {{email}}",
+    "ownerProtected": "Das Konto des Inhabers ist geschützt."
   },
   "members": {
     "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Mitglieder zu verwalten.",
@@ -1127,7 +1129,7 @@
       },
       "audit": {
         "heading": "Audit-Trail",
-        "p1": "Arbeitsbereichsprotokolle erfordern eine Eigentümer- oder Administratorrolle dieses Bereichs. Der einzige Websiteadministrator verwaltet Konten und prüft Gesamtzahlen, Moderation, Audit- und Zustands-/Fehlerdaten. Der Verlauf zuletzt verwendeter Inhalte ist nutzerbezogen. App-Fehlerprotokolle lassen Tokens und Anfrageinhalte weg."
+        "p1": "Arbeitsbereichsprotokolle erfordern eine Eigentümer- oder Administratorrolle dieses Bereichs. Der Websiteinhaber und die Administratoren verwalten Konten und prüfen Gesamtzahlen, Moderation, Audit- und Zustands-/Fehlerdaten. Der Verlauf zuletzt verwendeter Inhalte ist nutzerbezogen. App-Fehlerprotokolle lassen Tokens und Anfrageinhalte weg."
       },
       "reporting": {
         "heading": "Ein Problem melden",
@@ -1255,7 +1257,9 @@
       "revoked": "Widerrufen",
       "expired": "Abgelaufen"
     },
-    "collaborationNotice": "Eine Einladung in diesen Bereich gewährt Zugriff auf seine Fotos und Vorlagen. Die Person braucht bereits ein Lumafoil-Konto. Nutze andernfalls zuerst Personen einladen."
+    "collaborationNotice": "Eine Einladung in diesen Bereich gewährt Zugriff auf seine Fotos und Vorlagen. Die Person braucht bereits ein Lumafoil-Konto. Nutze andernfalls zuerst Personen einladen.",
+    "role": "Website-Rolle",
+    "roleHelp": "Administratoren verwalten Websitekonten. Die Mitgliedschaft in Arbeitsbereichen bleibt getrennt."
   },
   "accountStats": {
     "users": "Registrierte Konten",
@@ -1322,5 +1326,10 @@
       "list": "Liste",
       "details": "Details"
     }
+  },
+  "siteRoles": {
+    "owner": "Inhaber",
+    "admin": "Administrator",
+    "user": "Benutzer"
   }
 }

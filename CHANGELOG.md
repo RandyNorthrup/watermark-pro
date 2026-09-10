@@ -7,6 +7,41 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Added
+
+- Direct canvas manipulation in both preset design and photo editing: click a
+  mark to select it, drag to move it, use visible resize/rotate handles, pinch
+  to scale, twist to rotate, and use the documented keyboard controls.
+- Official provider marks beside Google and Microsoft account actions, Google
+  Drive, Dropbox and OneDrive file actions, connected accounts, and the GitHub
+  source link. The unmodified assets and their usage sources are documented in
+  `public/providers/README.md`.
+
+### Changed
+
+- Rebuilt the public, authentication and application surfaces from the supplied
+  liquid-glass reference with a visible rose/peach scene, translucent panels,
+  stronger depth, floating desktop chrome and responsive fallbacks for reduced
+  motion, reduced transparency and forced colors.
+- Replaced the separate font search and native 551-item selector with one
+  searchable, categorized dropdown. Replaced the QR-only checkbox filter with a
+  pressed-state filter button.
+- Rebuilt photo, video and PDF import panels with a clear drop target, a large
+  primary file action, a separate folder action and a secondary provider row.
+  Preset actions now sit in a grouped top-right toolbar instead of an unlabeled
+  row under the description.
+- Global account roles are now **Owner**, **Admin** and **User**. Migration
+  `0012_site_roles.sql` preserves the anchored owner, starts with zero admins,
+  and makes every other existing account a user. Owners and admins can manage
+  non-owner users; the owner cannot be removed, demoted, banned or altered by
+  an admin. These roles remain separate from private-workspace roles.
+
+### Fixed
+
+- Corrected earlier documentation and UI that conflated the single site owner
+  with an `admin` role and failed to distinguish global roles from workspace
+  ownership.
+
 ## [2.0.0] - 2026-09-10
 
 M19 is the production-readiness release for Lumafoil. Source and local evidence

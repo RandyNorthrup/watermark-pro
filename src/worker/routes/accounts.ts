@@ -13,10 +13,12 @@ import {
 import { BOOTSTRAP_REQUEST_BYTES, bootstrapRequestSchema } from '../../shared/bootstrap'
 import { HTTP_STATUS } from '../../shared/constants'
 import { invitationIdSchema } from '../../shared/invitation'
+import { SITE_ROLE } from '../../shared/site-roles'
 import type { SiteInvitationRecord } from '../account-store'
 import type { AppContext } from '../app-context'
 import { invitationTokenHash } from '../auth/invitation-admission'
 import { ensurePrivateWorkspace } from '../auth/private-workspace'
+import { hasSiteManagementAccess } from '../auth/site-administrator'
 import { siteInvitationEmail } from '../auth/templates'
 import { bootstrapAccount } from '../bootstrap'
 import { apiErrors } from '../errors'
@@ -32,6 +34,7 @@ function invitationDto(record: SiteInvitationRecord): SiteInvitationDto {
   return siteInvitationDtoSchema.parse({
     id: record.id,
     email: record.email,
+    role: record.role,
     status,
     createdAt: record.createdAt.toISOString(),
     expiresAt: record.expiresAt.toISOString(),
@@ -63,12 +66,18 @@ export const accountRoutes = new Hono<AppContext>()
       await readJsonBody(c.req.raw, SITE_INVITATION_POLICY.requestBytes),
     )
     if (!input.success) throw apiErrors.validation(input.error.issues)
+    if (
+      input.data.role === SITE_ROLE.admin &&
+      !hasSiteManagementAccess(inviter, await accounts.siteOwnerId())
+    )
+      throw apiErrors.forbidden()
     // Two UUIDs provide an unguessable bearer token, separate from the public record id.
     const token = `${crypto.randomUUID()}${crypto.randomUUID()}`
     const record: SiteInvitationRecord = {
       id: crypto.randomUUID(),
       inviterId: inviter.id,
       email: input.data.email.toLowerCase(),
+      role: input.data.role,
       tokenHash: await invitationTokenHash(token),
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + SITE_INVITATION_POLICY.expiresInMs),
@@ -96,6 +105,7 @@ export const accountRoutes = new Hono<AppContext>()
       action: 'site_invitation.created',
       targetType: 'site_invitation',
       targetId: record.id,
+      metadata: { role: record.role },
     })
     return c.json(invitationDto(record), HTTP_STATUS.created)
   })

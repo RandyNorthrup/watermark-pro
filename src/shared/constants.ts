@@ -74,12 +74,6 @@ export const SENSITIVE_AUTH_PATHS = [
 ] as const
 
 /**
- * Better Auth's platform-wide admin role (distinct from organization roles).
- * Never granted through the product API; see docs/runbook.md.
- */
-export const PLATFORM_ADMIN_ROLE = 'admin'
-
-/**
  * The bundled sample scene the editor and designer show before the engine's
  * first frame, written to `public/` by `scripts/sample-scene.mjs`.
  */

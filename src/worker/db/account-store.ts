@@ -3,6 +3,7 @@ import {
   count,
   desc,
   eq,
+  exists,
   gt,
   isNull,
   isNotNull,
@@ -12,6 +13,7 @@ import {
 } from 'drizzle-orm'
 
 import { SITE_INVITATION_POLICY } from '../../shared/api-accounts'
+import { SITE_ROLE } from '../../shared/site-roles'
 import type { AccountStore } from '../account-store'
 import { referralAdmissionHash } from '../referral'
 import type { Database } from './client'
@@ -25,15 +27,19 @@ import {
   user,
 } from './schema'
 
-const eligibleInviter = (id: SQLWrapper | string) =>
-  sql`EXISTS (SELECT 1 FROM user WHERE id = ${id} AND email_verified = 1 AND coalesce(banned, 0) = 0)`
+const eligibleInviter = (id: SQLWrapper | string, role: SQLWrapper | string = SITE_ROLE.user) =>
+  sql`
+    EXISTS (SELECT 1 FROM user WHERE id = ${id} AND email_verified = 1 AND coalesce(banned, 0) = 0
+        AND (${role} = ${SITE_ROLE.user} OR (EXISTS (SELECT 1 FROM site_owner) AND
+          (role = ${SITE_ROLE.admin} OR (role = ${SITE_ROLE.owner} AND id = (SELECT user_id FROM site_owner WHERE id = 1))))))
+  `
 
 const pending = () =>
   and(
     isNull(siteInvitation.acceptedAt),
     isNull(siteInvitation.revokedAt),
     gt(siteInvitation.expiresAt, new Date()),
-    eligibleInviter(siteInvitation.inviterId),
+    eligibleInviter(siteInvitation.inviterId, siteInvitation.role),
   )
 
 /** D1 admission storage. Personal workspace provisioning is one atomic, repeatable batch. */
@@ -63,9 +69,9 @@ export function createDrizzleAccountStore(db: Database): AccountStore {
       const rows = await db.all<{
         id: string
       }>(sql`
-        INSERT INTO site_invitation (id, inviter_id, email, token_hash, created_at, expires_at)
-                SELECT ${record.id}, ${record.inviterId}, ${record.email}, ${record.tokenHash}, ${record.createdAt.getTime()}, ${record.expiresAt.getTime()}
-                WHERE ${eligibleInviter(record.inviterId)} AND (SELECT COUNT(*) FROM site_invitation WHERE inviter_id = ${record.inviterId} AND referral_id IS NULL AND created_at > ${Date.now() - SITE_INVITATION_POLICY.sendWindowMs}) < ${SITE_INVITATION_POLICY.sendsPerWindow}
+        INSERT INTO site_invitation (id, inviter_id, email, role, token_hash, created_at, expires_at)
+                SELECT ${record.id}, ${record.inviterId}, ${record.email}, ${record.role}, ${record.tokenHash}, ${record.createdAt.getTime()}, ${record.expiresAt.getTime()}
+                WHERE ${eligibleInviter(record.inviterId, record.role)} AND (SELECT COUNT(*) FROM site_invitation WHERE inviter_id = ${record.inviterId} AND referral_id IS NULL AND created_at > ${Date.now() - SITE_INVITATION_POLICY.sendWindowMs}) < ${SITE_INVITATION_POLICY.sendsPerWindow}
                 RETURNING id
       `)
       return rows.length > 0
@@ -110,16 +116,38 @@ export function createDrizzleAccountStore(db: Database): AccountStore {
     async acceptInvitation(tokenHash, email, userId) {
       const normalizedEmail = email.toLowerCase()
       const hashes = [tokenHash, await referralAdmissionHash(tokenHash, normalizedEmail)]
-      await db
-        .update(siteInvitation)
-        .set({ acceptedAt: new Date(), acceptedUserId: userId })
-        .where(
-          and(
-            inArray(siteInvitation.tokenHash, hashes),
-            eq(siteInvitation.email, normalizedEmail),
-            pending(),
-          ),
-        )
+      const match = and(
+        inArray(siteInvitation.tokenHash, hashes),
+        eq(siteInvitation.email, normalizedEmail),
+        pending(),
+      )
+      const admission = db
+        .select({ role: siteInvitation.role })
+        .from(siteInvitation)
+        .where(match)
+        .limit(1)
+      const candidate = and(
+        eq(user.id, userId),
+        eq(user.email, normalizedEmail),
+        sql`coalesce(${user.role}, ${SITE_ROLE.user}) = ${SITE_ROLE.user}`,
+        exists(admission),
+      )
+      const consumption = and(
+        match,
+        sql`EXISTS (SELECT 1 FROM user WHERE id = ${userId} AND email = ${normalizedEmail} AND role = ${siteInvitation.role})`,
+      )
+      // D1 batches are transactional: the role is granted only while the same
+      // unconsumed invitation remains authorized, then consumed in that batch.
+      await db.batch([
+        db
+          .update(user)
+          .set({ role: sql`${admission}` })
+          .where(candidate),
+        db
+          .update(siteInvitation)
+          .set({ acceptedAt: new Date(), acceptedUserId: userId })
+          .where(consumption),
+      ])
     },
     async revokeInvitation(inviterId, id) {
       const result = await db
@@ -140,6 +168,19 @@ export function createDrizzleAccountStore(db: Database): AccountStore {
         db.update(siteInvitation).set({ revokedAt: now }).where(unaccepted),
         db.update(referralLink).set({ revokedAt: now }).where(eq(referralLink.userId, inviterId)),
       ])
+    },
+    async revokePendingAdministratorAdmissions(inviterId) {
+      await db
+        .update(siteInvitation)
+        .set({ revokedAt: new Date() })
+        .where(
+          and(
+            eq(siteInvitation.inviterId, inviterId),
+            eq(siteInvitation.role, SITE_ROLE.admin),
+            isNull(siteInvitation.acceptedAt),
+            isNull(siteInvitation.revokedAt),
+          ),
+        )
     },
     async ensurePrivateWorkspace(userId) {
       const organizationId = `personal-${userId}`

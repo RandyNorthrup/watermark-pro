@@ -730,7 +730,7 @@
   "admin": {
     "heading": "Administración",
     "description": "Solo para el administrador del sitio. Gestiona cuentas y consulta los totales. Ser propietario de un espacio no concede permisos de administración del sitio.",
-    "onlyAdmins": "Solo el administrador del sitio puede abrir esta página.",
+    "onlyAdmins": "Solo el propietario del sitio o un administrador puede abrir esta página.",
     "sectionsLabel": "Secciones de administración",
     "tabs": {
       "users": "Usuarios",
@@ -773,7 +773,6 @@
     "you": "(tú)",
     "joined": "Se unió el {{date}}",
     "emailNotVerified": " · correo sin verificar",
-    "platformAdmin": "Administrador del sitio",
     "banned": "bloqueado",
     "bannedReason": "bloqueado: {{reason}}",
     "unban": "Desbloquear",
@@ -802,7 +801,10 @@
     "auditCaption": "Entradas de auditoría de todas las organizaciones, de la más reciente a la más antigua",
     "auditDetailHeading": "Organización",
     "platform": "plataforma",
-    "userSummary_many": "{{count}} usuarios{{extra}}."
+    "userSummary_many": "{{count}} usuarios{{extra}}.",
+    "siteRole": "Rol del sitio: {{role}}",
+    "roleFor": "Rol del sitio de {{email}}",
+    "ownerProtected": "La cuenta del propietario está protegida."
   },
   "members": {
     "orgRequired": "Crea una organización o únete a una para gestionar los miembros.",
@@ -1144,7 +1146,7 @@
       },
       "audit": {
         "heading": "Historial de auditoría",
-        "p1": "Los registros de un espacio requieren el rol de propietario o administrador de ese espacio. El único administrador del sitio puede gestionar cuentas y revisar totales, moderación, auditorías y registros de estado/errores. El historial reciente es individual. Los registros de errores de la app omiten tokens y cuerpos de solicitudes."
+        "p1": "Los registros de un espacio requieren el rol de propietario o administrador de ese espacio. El propietario y los administradores del sitio pueden gestionar cuentas y revisar totales, moderación, auditorías y registros de estado/errores. El historial reciente es individual. Los registros de errores de la app omiten tokens y cuerpos de solicitudes."
       },
       "reporting": {
         "heading": "Informar de un problema",
@@ -1273,7 +1275,9 @@
       "revoked": "Revocada",
       "expired": "Caducada"
     },
-    "collaborationNotice": "La invitación al espacio da acceso a sus fotos y ajustes. El destinatario debe tener una cuenta de Lumafoil. Usa primero Invitar personas si necesita una."
+    "collaborationNotice": "La invitación al espacio da acceso a sus fotos y ajustes. El destinatario debe tener una cuenta de Lumafoil. Usa primero Invitar personas si necesita una.",
+    "role": "Rol del sitio",
+    "roleHelp": "Los administradores gestionan cuentas del sitio. La pertenencia a espacios es independiente."
   },
   "accountStats": {
     "users": "Cuentas registradas",
@@ -1340,5 +1344,10 @@
       "list": "Lista",
       "details": "Detalles"
     }
+  },
+  "siteRoles": {
+    "owner": "Propietario",
+    "admin": "Administrador",
+    "user": "Usuario"
   }
 }

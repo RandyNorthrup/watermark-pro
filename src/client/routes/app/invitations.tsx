@@ -5,8 +5,15 @@ import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { siteInvitationRequestSchema } from '../../../shared/api-accounts'
+import {
+  assignableSiteRoleSchema,
+  canManageSite,
+  SITE_ROLE,
+  type AssignableSiteRole,
+} from '../../../shared/site-roles'
 import { ReferralInvitation } from '../../components/referral-invitation'
 import { Alert } from '../../components/ui/alert'
+import { Badge } from '../../components/ui/badge'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
 import { Field } from '../../components/ui/field'
@@ -30,12 +37,15 @@ function InvitationsPage() {
   const options = siteInvitationsQueryOptions(session.user.id)
   const invitations = useQuery(options)
   const [email, setEmail] = useState('')
+  const [role, setRole] = useState<AssignableSiteRole>(SITE_ROLE.user)
+  const canChooseRole = canManageSite(session.user.role)
   const [validation, setValidation] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
   const invite = useMutation({
     mutationFn: inviteToSite,
     onSuccess: async () => {
       setEmail('')
+      setRole(SITE_ROLE.user)
       setSent(true)
       await queryClient.invalidateQueries({ queryKey: options.queryKey })
     },
@@ -49,9 +59,12 @@ function InvitationsPage() {
   function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setSent(false)
-    const parsed = siteInvitationRequestSchema.safeParse({ email })
+    const parsed = siteInvitationRequestSchema.safeParse({
+      email,
+      role: canChooseRole ? role : SITE_ROLE.user,
+    })
     setValidation(parsed.success ? null : t('siteInvites.invalidEmail'))
-    if (parsed.success) invite.mutate(parsed.data.email)
+    if (parsed.success) invite.mutate(parsed.data)
   }
   return (
     <div className="flex max-w-3xl flex-col gap-6">
@@ -75,6 +88,24 @@ function InvitationsPage() {
               />
             )}
           </Field>
+          {canChooseRole ? (
+            <Field label={t('siteInvites.role')} hint={t('siteInvites.roleHelp')}>
+              {(control) => (
+                <select
+                  {...control}
+                  value={role}
+                  className="h-10 w-full rounded-lg border border-line bg-surface-raised px-3 text-sm text-ink focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none"
+                  onChange={(event) => {
+                    const next = assignableSiteRoleSchema.safeParse(event.currentTarget.value)
+                    if (next.success) setRole(next.data)
+                  }}
+                >
+                  <option value={SITE_ROLE.user}>{t('siteRoles.user')}</option>
+                  <option value={SITE_ROLE.admin}>{t('siteRoles.admin')}</option>
+                </select>
+              )}
+            </Field>
+          ) : null}
           <p className="text-sm text-ink-muted">{t('siteInvites.privacy')}</p>
           {sent ? <Alert tone="success">{t('siteInvites.sent')}</Alert> : null}
           {invite.isError ? <Alert tone="error">{describeError(invite.error)}</Alert> : null}
@@ -104,6 +135,7 @@ function InvitationsPage() {
             >
               <div className="min-w-0">
                 <p className="font-medium break-all">{invitation.email}</p>
+                <Badge>{t(`siteRoles.${invitation.role}`)}</Badge>
                 <p className="text-sm text-ink-muted">
                   {t(STATUS_LABELS[invitation.status])} ·{' '}
                   {dateTimeFormatter.format(new Date(invitation.expiresAt))}

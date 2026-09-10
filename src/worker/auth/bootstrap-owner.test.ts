@@ -15,7 +15,7 @@ it('an operator-created first owner must verify the mailbox and can then choose 
       name: 'Self-host Owner',
       email,
       emailVerified: false,
-      role: 'admin',
+      role: 'owner',
       createdAt: new Date(),
       updatedAt: new Date(),
     },

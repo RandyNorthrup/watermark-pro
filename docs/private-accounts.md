@@ -29,11 +29,14 @@ reset the limit. Reservations and limits are enforced by conditional D1 writes.
 The sent-invitation list returns the newest 100 targeted invitations. Referral
 recipient addresses are excluded from that list.
 
-The sole site administrator can read aggregate registered-account, verified-account,
-pending-invitation, and accepted-invitation counts. Ordinary users receive 403.
+The site Owner and explicitly appointed Admins can read aggregate
+registered-account, verified-account, pending-invitation, and
+accepted-invitation counts. Ordinary Users receive 403.
 These counts do not contain names, addresses, workspace data, or file IDs.
 Existing owner user-management and audit views retain their separately
-authorized administrative scope. Account impersonation, administrative password replacement, and administrative identity rewriting are disabled. Workspace owners are not site administrators.
+authorized management scope. Account impersonation, administrative password
+replacement, and administrative identity rewriting are disabled. Workspace
+owners are not site managers.
 
 ## Google and Microsoft sign-in
 
@@ -66,10 +69,11 @@ is verified. Microsoft usernames and `preferred_username` are not treated as
 proof of mailbox ownership.
 
 Existing password accounts link providers explicitly from **Account settings**
-while signed in. Automatic linking by matching email is disabled. Linking uses
-the same email and a fresh authenticated session; returning sign-in then works
-with that provider. The login page explains this recovery path when social
-sign-in cannot finish.
+while signed in. A narrowly gated Google recovery path may link a verified
+Google email only to the exact verified local account when that account has no
+credential or provider record; mismatches, unverified claims and already-linked
+accounts fail closed. Normal linking uses the same email and a fresh
+authenticated session; returning sign-in then works with that provider.
 
 Access and refresh tokens are encrypted at rest. ID tokens are discarded after
 callback verification: the installed Better Auth implementation does not encrypt
@@ -125,20 +129,23 @@ account. The temporary SQL/config files are removed after execution and never
 belong in the public repository. Wrangler documents transaction rollback for
 failed migrations: [D1 migration application](https://developers.cloudflare.com/d1/wrangler-commands/).
 
-Migration `0010_sole_site_admin.sql` anchors an already-single administrator and
-adds database constraints and triggers preventing another administrator, owner
-demotion/deletion, or changes to the ownership anchor. An empty database is ready
-for the explicit bootstrap procedure. An occupied database with zero or multiple
-administrators fails closed. Before applying it, an operator may explicitly
-select a verified existing owner with the bootstrap tool's
-`--existing-user-id` option; this changes roles only and never chooses an arbitrary
-account. Keep that identifier in private operator records.
+Migration `0010_sole_site_admin.sql` created the immutable ownership anchor for
+older databases. Migration `0012_site_roles.sql` preserves that anchor, changes
+the anchored global role from `admin` to `owner`, changes every other existing
+global role to `user`, and adds explicit `user`/`admin` invitation roles. It
+therefore starts with one Owner and zero Admins. Later Admin appointments require
+an authenticated Owner/Admin operation and can never replace the Owner. Before
+the owner guard exists, an operator may explicitly select a verified existing
+owner with the bootstrap tool's `--existing-user-id` option; this changes only
+global roles and never chooses an arbitrary account. Keep that identifier in
+private operator records.
 
 After operator work, verify account counts remain unchanged, each personal
 workspace has one matching owner, the former shared workspace is absent, and
-there is exactly one anchored site administrator. Test ordinary users against
-another account's gallery/library and the global-count API. Domain migration does
-not require or install legacy-domain redirects.
+there is exactly one anchored global Owner and each other account is a User.
+Test ordinary users against another account's gallery/library and the
+global-count API. Domain migration does not require or install legacy-domain
+redirects.
 
 ## Verification limits
 

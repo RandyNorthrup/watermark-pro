@@ -730,7 +730,7 @@
   "admin": {
     "heading": "Administration",
     "description": "Réservé à l’administrateur du site : gestion des comptes et consultation des totaux. Posséder un espace de travail ne donne pas accès à l’administration du site.",
-    "onlyAdmins": "Seul l’administrateur du site peut ouvrir cette page.",
+    "onlyAdmins": "Seuls le propriétaire du site et les administrateurs peuvent ouvrir cette page.",
     "sectionsLabel": "Sections d'administration",
     "tabs": {
       "users": "Utilisateurs",
@@ -774,7 +774,6 @@
     "you": "(vous)",
     "joined": "Inscrit le {{date}}",
     "emailNotVerified": " · e-mail non vérifié",
-    "platformAdmin": "Administrateur du site",
     "banned": "banni",
     "bannedReason": "banni : {{reason}}",
     "unban": "Débannir",
@@ -802,7 +801,10 @@
     "auditErrorTitle": "Impossible de charger le journal d'audit",
     "auditCaption": "Entrées d'audit de toutes les organisations, les plus récentes d'abord",
     "auditDetailHeading": "Organisation",
-    "platform": "plateforme"
+    "platform": "plateforme",
+    "siteRole": "Rôle du site : {{role}}",
+    "roleFor": "Rôle du site pour {{email}}",
+    "ownerProtected": "Le compte du propriétaire est protégé."
   },
   "members": {
     "orgRequired": "Créez ou rejoignez une organisation pour gérer les membres.",
@@ -1144,7 +1146,7 @@
       },
       "audit": {
         "heading": "Journal d'audit",
-        "p1": "Les journaux d’un espace exigent un rôle de propriétaire ou d’administrateur de cet espace. L’unique administrateur du site gère les comptes et consulte totaux, modération, audits et données de santé/erreur. L’historique récent est individuel. Les journaux d’échec de l’app omettent les jetons et corps de requêtes."
+        "p1": "Les journaux d’un espace exigent un rôle de propriétaire ou d’administrateur de cet espace. Le propriétaire et les administrateurs du site gèrent les comptes et consultent totaux, modération, audits et données de santé/erreur. L’historique récent est individuel. Les journaux d’échec de l’app omettent les jetons et corps de requêtes."
       },
       "reporting": {
         "heading": "Signaler un problème",
@@ -1273,7 +1275,9 @@
       "revoked": "Révoquée",
       "expired": "Expirée"
     },
-    "collaborationNotice": "Une invitation à cet espace donne accès à ses photos et préréglages. Le destinataire doit déjà avoir un compte Lumafoil. Utilisez d’abord Inviter des personnes si nécessaire."
+    "collaborationNotice": "Une invitation à cet espace donne accès à ses photos et préréglages. Le destinataire doit déjà avoir un compte Lumafoil. Utilisez d’abord Inviter des personnes si nécessaire.",
+    "role": "Rôle du site",
+    "roleHelp": "Les administrateurs gèrent les comptes du site. L’appartenance aux espaces reste distincte."
   },
   "accountStats": {
     "users": "Comptes inscrits",
@@ -1340,5 +1344,10 @@
       "list": "Liste",
       "details": "Détails"
     }
+  },
+  "siteRoles": {
+    "owner": "Propriétaire",
+    "admin": "Administrateur",
+    "user": "Utilisateur"
   }
 }

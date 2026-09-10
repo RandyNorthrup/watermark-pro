@@ -218,7 +218,7 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                 event.preventDefault()
               }}
               onDrop={onDrop}
-              className="flex flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed border-line px-4 py-8 text-center"
+              className="flex min-h-72 flex-col items-center justify-center rounded-3xl border-2 border-dashed border-brand-300/70 bg-white/35 px-6 py-10 text-center transition-colors hover:border-brand-400 dark:border-brand-700/70 dark:bg-black/10"
             >
               <input
                 ref={inputRef}
@@ -234,13 +234,16 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                   event.currentTarget.value = ''
                 }}
               />
-              <FileText aria-hidden="true" className="size-8 text-ink-muted" />
-              <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
+              <span className="glass-control mb-5 inline-flex size-16 items-center justify-center rounded-2xl border text-brand-700 shadow-card dark:text-brand-200">
+                <FileText aria-hidden="true" className="size-8" />
+              </span>
+              <p className="text-xl font-semibold tracking-tight text-ink">
                 {t('documents.dropHint')}
+              </p>
+              <div className="mt-5">
                 <Button
                   type="button"
-                  variant="secondary"
-                  size="sm"
+                  size="lg"
                   disabled={isRunning}
                   onClick={() => {
                     inputRef.current?.click()
@@ -248,8 +251,8 @@ export function DocumentsTool({ organizationId }: DocumentsToolProps) {
                 >
                   {t('documents.addPdfs')}
                 </Button>
-              </p>
-              <p className="text-xs text-ink-muted">
+              </div>
+              <p className="mt-5 text-xs leading-5 text-ink-muted">
                 {t('documents.filesHint', {
                   max: MAX_PDF_FILES,
                   size: formatBytes(MAX_PDF_BYTES),

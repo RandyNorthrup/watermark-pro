@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { BrandMark } from './brand-mark'
 import { LandingFeatures } from './landing-features'
 import { LanguageMenu } from './language-menu'
+import { ProviderLogo } from './provider-logo'
 import { ThemeToggle } from './theme-toggle'
 import { APP_SOURCE_URL } from '../../shared/constants'
 
@@ -33,8 +34,8 @@ function heroThemeMedia() {
 export function LandingPage() {
   const { t } = useTranslation()
   return (
-    <div className="flex min-h-svh flex-col bg-surface">
-      <header className="border-b border-line bg-surface-raised">
+    <div className="workspace-scene flex min-h-svh flex-col">
+      <header className="glass-chrome sticky top-0 z-30 border-b border-line">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
           <BrandMark />
           <nav aria-label={t('landing.nav')} className="flex items-center gap-2 sm:gap-4">
@@ -60,7 +61,7 @@ export function LandingPage() {
       <main className="flex-1">
         <section className="mx-auto max-w-7xl px-5 pt-12 sm:px-8 sm:pt-16 lg:pt-20">
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
-            <p className="text-sm font-medium text-brand-700 dark:text-brand-300">
+            <p className="glass-control rounded-full border px-4 py-2 text-sm font-semibold text-brand-700 dark:text-brand-200">
               {t('auth.inviteOnly.title')}
             </p>
             <h1 className="text-[clamp(2.4rem,4.8vw,4.2rem)] leading-[1.1] font-semibold tracking-[-0.04em] text-balance">
@@ -83,7 +84,7 @@ export function LandingPage() {
             </p>
             <Link
               to="/login"
-              className="mt-1 inline-flex min-h-12 items-center justify-center gap-3 rounded-lg bg-brand-600 px-7 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+              className="glass-action mt-1 inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-brand-600 px-7 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5 hover:bg-brand-700"
             >
               {t('landing.signIn')}
               <ArrowRight aria-hidden="true" className="size-4 rtl:-scale-x-100" />
@@ -94,7 +95,7 @@ export function LandingPage() {
             </p>
           </div>
           <figure className="mt-10 sm:mt-12">
-            <div className="overflow-hidden rounded-xl border border-line bg-surface-raised p-1.5 shadow-card sm:p-2">
+            <div className="glass-panel overflow-hidden rounded-3xl border p-2 shadow-card sm:p-3">
               <picture>
                 <source
                   data-theme-picture="dark"
@@ -110,7 +111,7 @@ export function LandingPage() {
                   height={980}
                   fetchPriority="high"
                   alt={t('landing.heroAlt')}
-                  className="block h-auto w-full rounded-lg"
+                  className="block h-auto w-full rounded-2xl"
                 />
               </picture>
             </div>
@@ -123,7 +124,7 @@ export function LandingPage() {
         <LandingFeatures />
         <section
           aria-labelledby="workflow-heading"
-          className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[1fr_1.3fr] lg:gap-24 lg:py-20"
+          className="glass-panel mx-auto mb-16 grid max-w-7xl gap-10 border px-7 py-10 sm:px-10 lg:grid-cols-[1fr_1.3fr] lg:gap-24 lg:px-14 lg:py-14"
         >
           <div>
             <h2
@@ -152,14 +153,15 @@ export function LandingPage() {
           </ol>
         </section>
       </main>
-      <footer className="border-t border-line bg-surface-raised">
+      <footer className="glass-chrome border-t border-line">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-7 text-xs text-ink-muted sm:px-8">
           <span>{t('landing.footer')}</span>
           <div className="flex items-center gap-5">
             <a
               href={APP_SOURCE_URL}
-              className="inline-flex min-h-11 items-center hover:text-ink hover:underline"
+              className="inline-flex min-h-11 items-center gap-2 hover:text-ink hover:underline"
             >
+              <ProviderLogo provider="github" className="size-4" />
               {t('landing.github')}
             </a>
             <Link

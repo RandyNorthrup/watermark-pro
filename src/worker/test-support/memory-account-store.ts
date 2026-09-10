@@ -1,9 +1,16 @@
 import { SITE_INVITATION_POLICY } from '../../shared/api-accounts'
+import { canManageSite, SITE_ROLE, type AssignableSiteRole } from '../../shared/site-roles'
 import type { AccountStore, ReferralLinkRecord, SiteInvitationRecord } from '../account-store'
 import { referralAdmissionHash } from '../referral'
 
 interface AccountTables {
-  user: { id?: string; role?: string | null; emailVerified?: boolean; banned?: boolean | null }[]
+  user: {
+    id?: string
+    email?: string
+    role?: string | null
+    emailVerified?: boolean
+    banned?: boolean | null
+  }[]
   organization: { id: string; name: string; slug: string; createdAt: Date }[]
   member: { id: string; organizationId: string; userId: string; role: string; createdAt: Date }[]
 }
@@ -14,22 +21,32 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
   const referralLinks = new Map<string, ReferralLinkRecord>()
   const workspaces = new Map<string, string>()
   const owner = { id: null as string | null }
-  const canInvite = (id: string) =>
+  const ownerId = () => {
+    owner.id ??= tables.user.find((user) => user.role === SITE_ROLE.owner)?.id ?? null
+    return owner.id
+  }
+  const canInvite = (id: string, role: AssignableSiteRole = SITE_ROLE.user) =>
     tables.user.some(
-      (user) => user.id === id && user.emailVerified === true && user.banned !== true,
+      (user) =>
+        user.id === id &&
+        user.emailVerified === true &&
+        user.banned !== true &&
+        (role === SITE_ROLE.user ||
+          (canManageSite(user.role) &&
+            ownerId() !== null &&
+            (user.role !== SITE_ROLE.owner || user.id === ownerId()))),
     )
   const isPending = (record: SiteInvitationRecord) =>
     record.acceptedAt === null &&
     record.revokedAt === null &&
     record.expiresAt.getTime() > Date.now() &&
-    canInvite(record.inviterId)
+    canInvite(record.inviterId, record.role)
   return {
     siteOwnerId() {
-      owner.id ??= tables.user.find((user) => user.role === 'admin')?.id ?? null
-      return Promise.resolve(owner.id)
+      return Promise.resolve(ownerId())
     },
     createInvitation(record) {
-      if (!canInvite(record.inviterId)) return Promise.resolve(false)
+      if (!canInvite(record.inviterId, record.role)) return Promise.resolve(false)
       const recent = invitations
         .values()
         .filter(
@@ -91,6 +108,7 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
         id: existing?.id ?? crypto.randomUUID(),
         inviterId: link.userId,
         email: normalizedEmail,
+        role: SITE_ROLE.user,
         tokenHash: reservedHash,
         referralId: link.id,
         createdAt: new Date(),
@@ -113,6 +131,14 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
             isPending(candidate),
         )
       if (record !== undefined) {
+        const invitee = tables.user.find(
+          (user) =>
+            user.id === userId &&
+            user.email?.toLowerCase() === email.toLowerCase() &&
+            (user.role ?? SITE_ROLE.user) === SITE_ROLE.user,
+        )
+        if (invitee === undefined) return
+        invitee.role = record.role
         record.acceptedAt = new Date()
         record.acceptedUserId = userId
       }
@@ -134,6 +160,17 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
           record.revokedAt = new Date()
       const link = referralLinks.get(inviterId)
       if (link !== undefined) link.revokedAt = new Date()
+      return Promise.resolve()
+    },
+    revokePendingAdministratorAdmissions(inviterId) {
+      for (const record of invitations.values())
+        if (
+          record.inviterId === inviterId &&
+          record.role === SITE_ROLE.admin &&
+          record.acceptedAt === null &&
+          record.revokedAt === null
+        )
+          record.revokedAt = new Date()
       return Promise.resolve()
     },
     ensurePrivateWorkspace(userId) {

@@ -1,4 +1,4 @@
-import { ChevronRight, Cloud, FileImage, Folder } from 'lucide-react'
+import { ChevronRight, FileImage, Folder } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -15,6 +15,7 @@ import {
 } from '../../lib/imports/onedrive'
 import { ACCOUNT_CHANGED_EVENT } from '../../lib/offline-account'
 import { captureOfflineOwner } from '../../lib/offline-context'
+import { ProviderLogo } from '../provider-logo'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
@@ -244,7 +245,8 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
           className="fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-card border border-line bg-surface-raised p-6 shadow-card"
         >
           <div>
-            <Dialog.Title className="text-lg font-semibold">
+            <Dialog.Title className="flex items-center gap-2 text-lg font-semibold">
+              <ProviderLogo provider="onedrive" />
               {t('import.onedrive.title')}
             </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-ink-muted">
@@ -264,7 +266,7 @@ export function OneDriveDialog({ config, onImport, trigger }: OneDriveDialogProp
               }}
               disabled={path.length === 0 || isLoading}
             >
-              <Cloud aria-hidden="true" className="size-4" />
+              <ProviderLogo provider="onedrive" className="size-4" />
               {t('import.onedrive.name')}
             </button>
             {path.map((folder, index) => {

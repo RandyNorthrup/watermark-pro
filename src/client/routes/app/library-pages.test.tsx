@@ -224,16 +224,16 @@ describe('preset designer', () => {
     await user.type(screen.getByLabelText('QR code content'), 'https://example.com/contact')
     await user.click(screen.getByRole('button', { name: 'Save preset' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
-    await user.click(await screen.findByRole('checkbox', { name: 'QR codes only' }))
-    expect(screen.getByRole('link', { name: 'Portfolio QR' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Contact QR' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Studio signature' })).not.toBeInTheDocument()
+    await user.click(await screen.findByRole('button', { name: 'QR codes only' }))
+    expect(screen.getByRole('link', { name: /^Portfolio QR/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^Contact QR/ })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /^Studio signature/ })).not.toBeInTheDocument()
     expect(
       api.watermarks
         .filter((preset) => preset.spec.kind === 'qr')
         .map((preset) => (preset.spec.kind === 'qr' ? preset.spec.content : '')),
     ).toEqual(['https://example.com/portfolio', 'https://example.com/contact'])
-    await user.click(screen.getByRole('link', { name: 'Portfolio QR' }))
+    await user.click(screen.getByRole('link', { name: /^Portfolio QR/ }))
     expect(await screen.findByLabelText('QR code content')).toHaveValue(
       'https://example.com/portfolio',
     )
@@ -251,7 +251,9 @@ describe('preset designer', () => {
 
     await user.clear(screen.getByRole('textbox', { name: 'Text' }))
     await user.type(screen.getByRole('textbox', { name: 'Text' }), '© Acme')
-    await user.selectOptions(screen.getByLabelText('Font'), 'Lobster')
+    await user.click(screen.getByRole('combobox', { name: 'Font' }))
+    await user.type(screen.getByRole('searchbox', { name: 'Search fonts' }), 'Lobster')
+    await user.click(screen.getByRole('option', { name: 'Lobster' }))
     await waitFor(() => {
       const latest = renderedSpecs.at(-1)
       expect(latest?.kind === 'text' && latest.fontFamily).toBe('Lobster')

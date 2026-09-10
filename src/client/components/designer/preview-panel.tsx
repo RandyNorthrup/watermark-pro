@@ -1,5 +1,5 @@
 import { ImagePlus, RotateCcw } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { type DragEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { Anchor, WatermarkSpec } from '../../../shared/watermark'
@@ -8,6 +8,9 @@ import { describeError } from '../../lib/errors'
 import { assetFileUrl } from '../../lib/library'
 import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { PreviewRenderer, type PreviewResult } from '../../lib/preview'
+import { withPlacement, withStyle } from '../../lib/spec-edit'
+import { useElementSize } from '../../lib/use-element-size'
+import { MarkOverlay, type MarkGesture } from '../editor/mark-overlay'
 import { SampleScene } from '../sample-scene'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -17,6 +20,7 @@ interface PreviewPanelProps {
   organizationId: string
   spec: WatermarkSpec
   initialPhoto?: File | undefined
+  onSpecChange?: ((spec: WatermarkSpec) => void) | undefined
 }
 
 /** Slider drags fire continuously; one render per pause keeps the worker responsive. */
@@ -64,10 +68,17 @@ function PendingPreview({
  * Renders the current spec over a subject photo through the engine worker.
  * Uses a bundled sample scene until the user drops in a photo of their own.
  */
-export function PreviewPanel({ organizationId, spec, initialPhoto }: PreviewPanelProps) {
+export function PreviewPanel({
+  organizationId,
+  spec,
+  initialPhoto,
+  onSpecChange,
+}: PreviewPanelProps) {
   const { t } = useTranslation()
   const rendererRef = useRef<PreviewRenderer | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
+  const displaySize = useElementSize(imageElement)
   const [result, setResult] = useState<PreviewResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isRendering, setIsRendering] = useState(false)
@@ -163,6 +174,32 @@ export function PreviewPanel({ organizationId, spec, initialPhoto }: PreviewPane
     }
   }
 
+  function onDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    if (initialPhoto !== undefined) return
+    const file = event.dataTransfer.files[0]
+    if (file !== undefined) void changeSubject(file)
+  }
+
+  function changePlacement(gesture: MarkGesture) {
+    if (onSpecChange === undefined) return
+    let next = spec
+    if (gesture.patch.x !== undefined && gesture.patch.y !== undefined) {
+      next = withPlacement(next, {
+        mode: 'custom',
+        x: gesture.patch.x,
+        y: gesture.patch.y,
+      })
+    }
+    if (gesture.patch.scale !== undefined) {
+      next = withStyle(next, { scale: gesture.patch.scale })
+    }
+    if (gesture.patch.rotation !== undefined) {
+      next = withStyle(next, { rotation: gesture.patch.rotation })
+    }
+    if (next !== spec) onSpecChange(next)
+  }
+
   /** One-line readout of where the top mark landed and which ink it uses. */
   function describePlacement(result: PreviewResult): string {
     const mark = result.marks[0]
@@ -236,23 +273,52 @@ export function PreviewPanel({ organizationId, spec, initialPhoto }: PreviewPane
           ) : null}
         </div>
       </div>
-      <div className="flex min-h-64 items-center justify-center overflow-hidden rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
+      <div
+        onDragOver={(event) => {
+          event.preventDefault()
+        }}
+        onDrop={onDrop}
+        className="flex min-h-64 items-center justify-center overflow-hidden rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]"
+      >
         {shownResult === null ? (
           <PendingPreview isRenderable={isRenderable(spec)} hasOwnPhoto={hasOwnPhoto} />
         ) : (
-          <img
-            src={shownResult.url}
-            alt={t('designer.preview.alt')}
-            width={shownResult.width}
-            height={shownResult.height}
-            className="max-h-[70vh] w-full object-contain"
-          />
+          <div className="relative">
+            <img
+              ref={setImageElement}
+              src={shownResult.url}
+              alt={t('designer.preview.alt')}
+              width={shownResult.width}
+              height={shownResult.height}
+              className="block max-h-[70vh] max-w-full object-contain"
+            />
+            {onSpecChange === undefined || spec.style.tiling.enabled
+              ? null
+              : (() => {
+                  const outcome = shownResult.marks[0]
+                  if (outcome === undefined) return null
+                  return (
+                    <MarkOverlay
+                      placement={outcome.placement}
+                      previewSize={{ width: shownResult.width, height: shownResult.height }}
+                      displaySize={displaySize}
+                      scale={spec.style.scale}
+                      rotation={spec.style.rotation}
+                      margin={spec.style.margin}
+                      onGesture={changePlacement}
+                    />
+                  )
+                })()}
+          </div>
         )}
       </div>
       {shownResult === null ? null : (
-        <p className="text-xs text-ink-muted" aria-live="polite">
-          {describePlacement(shownResult)}
-        </p>
+        <div className="flex flex-col gap-1 text-xs text-ink-muted">
+          <p aria-live="polite">{describePlacement(shownResult)}</p>
+          {onSpecChange === undefined || spec.style.tiling.enabled ? null : (
+            <p>{t('editor.mark.position')}</p>
+          )}
+        </div>
       )}
       {error === null ? null : (
         <Alert tone="error" title={t('designer.preview.failed')}>

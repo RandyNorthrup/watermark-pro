@@ -30,7 +30,7 @@ beforeEach(async () => {
     name: 'Owner workspace',
     slug: 'owner-workspace',
   }))
-  expect(await harness.services.users.promoteToPlatformAdmin(OWNER.email)).toBe(true)
+  expect(await harness.services.users.promoteToSiteOwner(OWNER.email)).toBe(true)
   expect(await responseStatus(owner.get('/api/admin/account-stats'))).toBe(200)
   other = new TestClient(harness.app, harness.env)
   await other.signUpAndVerify(harness.mailbox, OTHER)
@@ -38,12 +38,13 @@ beforeEach(async () => {
   otherId = sessionIdSchema.parse(await responseJson(other.get('/api/auth/get-session'))).user.id
 })
 
-describe('single site administrator', () => {
+describe('protected site owner', () => {
   it('banning an inviter permanently revokes outstanding targeted and reusable admissions', async () => {
     const targetHash = await invitationTokenHash('targeted-ban-fixture')
     const referralHash = await invitationTokenHash('referral-ban-fixture')
     const email = 'new-invitee@example.test'
     await harness.services.accounts.createInvitation({
+      role: 'user',
       id: 'targeted-ban',
       inviterId: otherId,
       email,
@@ -84,17 +85,17 @@ describe('single site administrator', () => {
     const referral = await harness.services.accounts.findReferralLink(otherId)
     expect(referral?.revokedAt).not.toBeNull()
   })
-  it.each(['admin', ['admin'], ['user', 'admin'], 'user,admin'])(
+  it.each(['owner', ['owner'], ['user', 'admin'], 'user,admin'])(
     'refuses promotion of another account with role %j',
     async (role) => {
       const response = await owner.post('/api/auth/admin/set-role', { userId: otherId, role })
       expect(response.status).toBe(403)
       expect(await responseStatus(other.get('/api/admin/account-stats'))).toBe(403)
-      expect(await harness.services.users.promoteToPlatformAdmin(OTHER.email)).toBe(false)
+      expect(await harness.services.users.promoteToSiteOwner(OTHER.email)).toBe(false)
     },
   )
-  it.each([{ role: 'admin' }, { data: { role: 'admin' } }])(
-    'refuses creating a second admin through either Better Auth role input %j',
+  it.each([{ role: 'owner' }, { data: { role: 'owner' } }])(
+    'refuses creating a second owner through either Better Auth role input %j',
     async (roleInput) => {
       const response = await owner.post('/api/auth/admin/create-user', {
         name: 'Extra Admin',
@@ -108,7 +109,7 @@ describe('single site administrator', () => {
   )
   it('blocks nested role updates and account identity/password takeover shortcuts', async () => {
     for (const data of [
-      { role: 'admin' },
+      { role: 'owner' },
       { email: OWNER.email },
       { emailVerified: true },
       { id: ownerId },
@@ -136,16 +137,16 @@ describe('single site administrator', () => {
       expect(await responseStatus(owner.post(path, body))).toBe(403)
     expect(await responseStatus(owner.get('/api/admin/account-stats'))).toBe(200)
   })
-  it('does not treat private workspace ownership or an injected stale admin role as site authority', async () => {
+  it('does not treat workspace ownership or an injected owner label as site authority', async () => {
     expect(await responseStatus(other.post('/api/me/workspace', {}))).toBe(200)
     expect(await responseStatus(other.get('/api/auth/admin/list-users'))).toBe(403)
     const context = await harness.services.auth.$context
     // The real D1 constraint prevents this corruption; the memory fixture proves
-    // the HTTP boundary also refuses a stale or malformed additional admin row.
+    // the HTTP boundary also refuses a forged owner label on an unanchored account.
     await context.adapter.update({
       model: 'user',
       where: [{ field: 'id', value: otherId }],
-      update: { role: 'admin' },
+      update: { role: 'owner' },
     })
     expect(await responseStatus(other.get('/api/admin/account-stats'))).toBe(403)
     expect(await responseStatus(other.get('/api/auth/admin/list-users'))).toBe(403)
@@ -155,12 +156,12 @@ describe('single site administrator', () => {
       await responseStatus(
         owner.post('/api/auth/admin/set-role', { userId: ownerId, role: 'admin' }),
       ),
-    ).toBe(200)
+    ).toBe(403)
     const created = await owner.post('/api/auth/admin/create-user', {
       name: 'Ordinary User',
       email: 'ordinary@example.test',
       role: 'user',
-      data: { role: 'admin' },
+      data: { role: 'user' },
     })
     expect(created.status).toBe(200)
     expect(await created.json()).toMatchObject({ user: { role: 'user' } })

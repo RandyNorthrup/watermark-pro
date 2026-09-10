@@ -367,9 +367,12 @@ describe('editor page', () => {
     expect(await screen.findByText(/dropped\.jpg/)).toBeInTheDocument()
 
     await user.selectOptions(presetSelect(), 'wm-tiled')
-    await waitFor(() => {
-      expect(screen.queryByRole('group', { name: /Watermark position/ })).not.toBeInTheDocument()
-    })
+    const selectableMark = await screen.findByRole('group', { name: /Watermark position/ })
+    expect(selectableMark).not.toHaveAttribute('aria-current')
+    expect(screen.queryByRole('button', { name: 'Resize watermark' })).not.toBeInTheDocument()
+    await user.click(selectableMark)
+    expect(selectableMark).toHaveAttribute('aria-current', 'true')
+    expect(screen.getByRole('button', { name: 'Resize watermark' })).toBeInTheDocument()
 
     const { PreviewRenderer } = await import('../../test-support/fake-preview')
     vi.spyOn(PreviewRenderer.prototype, 'exportFull').mockRejectedValueOnce(

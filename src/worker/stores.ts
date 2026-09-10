@@ -157,12 +157,11 @@ export interface OrganizationStore {
 
 export interface UserStore {
   /**
-   * Grants the platform `admin` role to the account with this email. Never
-   * reachable from the product API: production promotes through a D1 update
-   * (docs/runbook.md); the console-provider dev route uses this for tests.
+   * Establishes the immutable site owner for this email in a disposable test
+   * database. Never reachable in production or usable to select a second owner.
    * Resolves false when no such account exists.
    */
-  promoteToPlatformAdmin(email: string): Promise<boolean>
+  promoteToSiteOwner(email: string): Promise<boolean>
 }
 
 export interface ClientErrorRecord {

@@ -12,6 +12,8 @@ import {
 import type { CloudSavedFile } from '../../lib/imports/cloud-transfer'
 import { PROVIDER_LABELS } from '../../lib/imports/source'
 import { captureOfflineOwner } from '../../lib/offline-context'
+import { ProviderLogo } from '../provider-logo'
+import { cloudProviderLogo } from '../provider-logo-id'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 
@@ -101,7 +103,10 @@ function SavedFileRow({ file, config }: { file: CloudSavedFile; config: PublicCo
   }
   return (
     <li className="flex min-w-0 flex-col gap-2 rounded-lg border border-line p-3">
-      <span className="text-sm font-medium break-all">{file.name}</span>
+      <span className="flex items-center gap-2 text-sm font-medium break-all">
+        <ProviderLogo provider={cloudProviderLogo(file.provider)} />
+        {file.name}
+      </span>
       <a
         href={file.manageUrl}
         target="_blank"

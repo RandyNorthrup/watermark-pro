@@ -28,13 +28,13 @@ const userListSchema = z.object({ users: z.array(listedUserSchema), total: z.num
 let harness: TestHarness
 let adminClient: TestClient
 
-/** Promotes a user to platform admin straight in the auth database. */
+/** Establishes the single site owner in the isolated auth database. */
 async function promote(userId: string) {
   const { adapter } = await harness.services.auth.$context
   await adapter.update({
     model: 'user',
     where: [{ field: 'id', value: userId }],
-    update: { role: 'admin' },
+    update: { role: 'owner' },
   })
 }
 
@@ -64,25 +64,27 @@ describe('dev promotion route', () => {
     await otherClient.signUpAndVerify(harness.mailbox, other)
     expect(await statusOf(otherClient.get('/api/admin/audit'))).toBe(HTTP_STATUS.forbidden)
 
-    expect(await statusOf(otherClient.post('/api/dev/promote', { email: 'not an email' }))).toBe(
-      HTTP_STATUS.badRequest,
-    )
     expect(
-      await statusOf(otherClient.post('/api/dev/promote', { email: 'nobody@example.test' })),
+      await statusOf(otherClient.post('/api/dev/promote-site-owner', { email: 'not an email' })),
+    ).toBe(HTTP_STATUS.badRequest)
+    expect(
+      await statusOf(
+        otherClient.post('/api/dev/promote-site-owner', { email: 'nobody@example.test' }),
+      ),
     ).toBe(HTTP_STATUS.notFound)
-    expect(await statusOf(otherClient.post('/api/dev/promote', { email: other.email }))).toBe(
-      HTTP_STATUS.notFound,
-    )
+    expect(
+      await statusOf(otherClient.post('/api/dev/promote-site-owner', { email: other.email })),
+    ).toBe(HTTP_STATUS.notFound)
     expect(await statusOf(otherClient.get('/api/admin/audit'))).toBe(HTTP_STATUS.forbidden)
-    expect(await statusOf(adminClient.post('/api/dev/promote', { email: owner.email }))).toBe(
-      HTTP_STATUS.ok,
-    )
+    expect(
+      await statusOf(adminClient.post('/api/dev/promote-site-owner', { email: owner.email })),
+    ).toBe(HTTP_STATUS.ok)
 
     // Without the console provider (production) the route does not exist.
     harness.services.devMailbox = undefined
-    expect(await statusOf(otherClient.post('/api/dev/promote', { email: other.email }))).toBe(
-      HTTP_STATUS.notFound,
-    )
+    expect(
+      await statusOf(otherClient.post('/api/dev/promote-site-owner', { email: other.email })),
+    ).toBe(HTTP_STATUS.notFound)
     expect(await statusOf(otherClient.get('/api/dev/mailbox'))).toBe(HTTP_STATUS.notFound)
   })
 })
@@ -143,7 +145,7 @@ describe('platform administration', () => {
       userId: otherId,
       role: 'admin',
     })
-    expect(promoted.status).toBe(HTTP_STATUS.forbidden)
+    expect(promoted.status).toBe(HTTP_STATUS.ok)
     const unbanned = await adminClient.post('/api/auth/admin/unban-user', { userId: otherId })
     expect(unbanned.status).toBe(HTTP_STATUS.ok)
 
@@ -155,7 +157,7 @@ describe('platform administration', () => {
       expect.arrayContaining(['admin.user_banned', 'admin.user_unbanned', 'organization.created']),
     )
     const roleEntry = entries.find((entry) => entry.action === 'admin.role_set')
-    expect(roleEntry).toBeUndefined()
+    expect(roleEntry).toMatchObject({ targetId: otherId, metadata: { role: 'admin' } })
 
     const users = await adminClient.get(
       '/api/auth/admin/list-users?searchValue=otto&searchField=email',

@@ -39,13 +39,13 @@ export function ownerInsert(input, id = randomUUID(), now = Date.now()) {
   return {
     id,
     sql: `INSERT INTO user (id, name, email, email_verified, created_at, updated_at, role)
-SELECT ${sqlString(id)}, ${sqlString(owner.name)}, ${sqlString(owner.email)}, 0, ${String(now)}, ${String(now)}, 'admin'
+SELECT ${sqlString(id)}, ${sqlString(owner.name)}, ${sqlString(owner.email)}, 0, ${String(now)}, ${String(now)}, 'owner'
 WHERE NOT EXISTS (SELECT 1 FROM user)
 RETURNING id;`,
   }
 }
 
-/** Explicit pre-migration selection changes roles only and requires a verified existing identity. */
+/** Explicit pre-guard selection normalizes global roles and requires a verified existing identity. */
 export function ownerSelection(userId) {
   const id = z
     .string()
@@ -55,9 +55,8 @@ export function ownerSelection(userId) {
     .parse(userId)
   return {
     id,
-    sql: `UPDATE user SET role = CASE WHEN id = ${sqlString(id)} THEN 'admin' ELSE 'user' END
-WHERE (id = ${sqlString(id)} OR instr(',' || coalesce(role, '') || ',', ',admin,') > 0)
-AND EXISTS (SELECT 1 FROM user WHERE id = ${sqlString(id)} AND email_verified = 1)
+    sql: `UPDATE user SET role = CASE WHEN id = ${sqlString(id)} THEN 'owner' ELSE 'user' END
+WHERE EXISTS (SELECT 1 FROM user WHERE id = ${sqlString(id)} AND email_verified = 1)
 RETURNING id;`,
   }
 }
@@ -79,7 +78,7 @@ function bootstrapOwner(args = process.argv.slice(2)) {
   })
   if (values.help) {
     process.stdout.write(
-      'Usage: node scripts/bootstrap-owner.mjs --database DB --target local|remote [--environment production] --email ADDRESS --name NAME\nCreates the first unverified administrator only when the user table is empty. No password is generated.\nBefore singleton migration only: replace --email/--name with --existing-user-id VERIFIED_ID to select the sole administrator, preserving accounts and content.\n',
+      'Usage: node scripts/bootstrap-owner.mjs --database DB --target local|remote [--environment production] --email ADDRESS --name NAME\nCreates the first unverified global owner only when the user table is empty. No password is generated.\nBefore owner guards only: replace --email/--name with --existing-user-id VERIFIED_ID to select one owner and make every other account a user. Workspace roles and content are preserved. Review the migration path in docs/self-hosting.md first.\n',
     )
     return
   }
@@ -112,8 +111,8 @@ function bootstrapOwner(args = process.argv.slice(2)) {
     )
   process.stdout.write(
     isSelecting
-      ? 'Sole site administrator selected. Account identities and content were preserved. Apply the singleton migration next.\n'
-      : 'Initial administrator created, pending email verification. Follow docs/self-hosting.md to verify the mailbox and choose sign-in methods.\n',
+      ? 'Site owner selected. All other global roles are user; no admins remain. Account identities, workspace roles and content were preserved. Complete the reviewed owner-guard migration before opening access.\n'
+      : 'Initial site owner created, pending email verification. Follow docs/self-hosting.md to verify the mailbox and choose sign-in methods.\n',
   )
 }
 

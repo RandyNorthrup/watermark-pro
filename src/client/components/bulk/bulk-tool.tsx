@@ -268,6 +268,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   const [adjust, setAdjust] = useState<Adjustments>(IDENTITY_ADJUSTMENTS)
   const [border, setBorder] = useState<Border | null>(null)
   const [isZipping, setIsZipping] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const [zipError, setZipError] = useState<string | null>(null)
   const [saving, setSaving] = useState<SaveProgress | null>(null)
   const queryClient = useQueryClient()
@@ -419,6 +420,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
 
   async function onDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault()
+    setIsDragging(false)
     // `items` and `webkitGetAsEntry` power folder drops; both are absent in
     // jsdom and on some browsers, so fall back to the plain file list.
     const list = event.dataTransfer.items as DataTransferItemList | undefined
@@ -540,13 +542,20 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
         <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <Card className="flex min-w-0 flex-col gap-4 p-4">
             <div
+              onDragEnter={(event) => {
+                event.preventDefault()
+                setIsDragging(true)
+              }}
               onDragOver={(event) => {
                 event.preventDefault()
+              }}
+              onDragLeave={() => {
+                setIsDragging(false)
               }}
               onDrop={(event) => {
                 void onDrop(event)
               }}
-              className="flex flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed border-line px-4 py-8 text-center"
+              className={`relative flex min-h-80 flex-col items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed px-6 py-10 text-center transition-all sm:px-10 ${isDragging ? 'scale-[1.01] border-brand-500 bg-brand-100/65 shadow-card dark:bg-brand-900/45' : 'border-brand-300/70 bg-white/35 dark:border-brand-700/70 dark:bg-black/10'}`}
             >
               <input
                 ref={inputRef}
@@ -576,13 +585,14 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                   event.currentTarget.value = ''
                 }}
               />
-              <ImagePlus aria-hidden="true" className="size-8 text-ink-muted" />
-              <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
-                {t('bulk.dropHint')}
+              <span className="glass-control mb-5 inline-flex size-16 items-center justify-center rounded-2xl border text-brand-700 shadow-card dark:text-brand-200">
+                <ImagePlus aria-hidden="true" className="size-8" />
+              </span>
+              <p className="text-xl font-semibold tracking-tight text-ink">{t('bulk.dropHint')}</p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <Button
                   type="button"
-                  variant="secondary"
-                  size="sm"
+                  size="lg"
                   disabled={snapshot.isRunning}
                   onClick={() => {
                     inputRef.current?.click()
@@ -594,7 +604,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                   <Button
                     type="button"
                     variant="secondary"
-                    size="sm"
+                    size="lg"
                     disabled={snapshot.isRunning}
                     onClick={() => {
                       folderInputRef.current?.click()
@@ -603,6 +613,8 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     {t('bulk.addFolder')}
                   </Button>
                 ) : null}
+              </div>
+              <div className="mt-6 flex w-full max-w-2xl flex-wrap items-center justify-center gap-2 border-t border-line/80 pt-5">
                 <TakePhotoButton
                   onCapture={(file) => {
                     addFiles([file])
@@ -638,8 +650,8 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                     }}
                   />
                 )}
-              </p>
-              <p className="text-xs text-ink-muted">
+              </div>
+              <p className="mt-5 max-w-2xl text-xs leading-5 text-ink-muted">
                 {t('bulk.capacity', { max: MAX_BULK_FILES, count: workers })}
               </p>
             </div>

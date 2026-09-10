@@ -55,6 +55,7 @@ describe('private account D1 wiring', () => {
     const expiresAt = new Date(Date.now() + SITE_INVITATION_POLICY.expiresInMs)
     expect(
       await services.accounts.createInvitation({
+        role: 'user',
         id: 'd1-abuse-targeted',
         inviterId: id,
         email,
@@ -149,7 +150,7 @@ describe('private account D1 wiring', () => {
     )
     expect(otherInvitations.invitations).toEqual([])
     expect(await responseStatus(owner.get('/api/admin/account-stats'))).toBe(403)
-    await services.users.promoteToPlatformAdmin(OWNER.email)
+    await services.users.promoteToSiteOwner(OWNER.email)
     const statistics = accountStatsSchema.parse(
       await responseJson(owner.get('/api/admin/account-stats')),
     )
@@ -169,45 +170,55 @@ describe('private account D1 wiring', () => {
       ),
     ).toBeNull()
   })
-  it('consumes a site admission in real auth and prevents replay without granting inviter access', async () => {
-    const ownerUser = await services.db.query.user.findFirst({
-      where: (user, { eq }) => eq(user.email, OWNER.email),
-    })
-    if (ownerUser === undefined) throw new Error('Missing verified fixture user')
-    const token = 'd1-private-admission-token'
-    const email = 'd1-invited@example.test'
-    await services.accounts.createInvitation({
-      id: crypto.randomUUID(),
-      inviterId: ownerUser.id,
-      email,
-      tokenHash: await invitationTokenHash(token),
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + SITE_INVITATION_POLICY.expiresInMs),
-      acceptedAt: null,
-      acceptedUserId: null,
-      revokedAt: null,
-    })
-    const invited = new TestClient(app, env)
-    const body = JSON.stringify({ name: 'Invited', email, password: 'a long invitation password' })
-    expect(
-      await responseStatus(
-        invited.request('/api/auth/sign-up/email', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', [INVITATION_HEADER]: token },
-          body,
-        }),
-      ),
-    ).toBe(200)
-    expect(
-      await services.accounts.pendingInvitation(await invitationTokenHash(token), email),
-    ).toBeNull()
-    const invitedUser = await services.db.query.user.findFirst({
-      where: (user, { eq }) => eq(user.email, email),
-    })
-    expect(invitedUser?.emailVerified).toBe(false)
-    const memberships = await services.db.query.member.findMany()
-    expect(memberships.filter((member) => member.userId === invitedUser?.id)).toEqual([])
-  })
+  it.each(['user', 'admin'] as const)(
+    'consumes a %s site admission in real auth without inviter access',
+    async (role) => {
+      const ownerUser = await services.db.query.user.findFirst({
+        where: (user, { eq }) => eq(user.email, OWNER.email),
+      })
+      if (ownerUser === undefined) throw new Error('Missing verified fixture user')
+      if (role === 'admin') expect(await services.users.promoteToSiteOwner(OWNER.email)).toBe(true)
+      const token = `d1-private-admission-token-${role}`
+      const email = `d1-invited-${role}@example.test`
+      await services.accounts.createInvitation({
+        role,
+        id: crypto.randomUUID(),
+        inviterId: ownerUser.id,
+        email,
+        tokenHash: await invitationTokenHash(token),
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + SITE_INVITATION_POLICY.expiresInMs),
+        acceptedAt: null,
+        acceptedUserId: null,
+        revokedAt: null,
+      })
+      const invited = new TestClient(app, env)
+      const body = JSON.stringify({
+        name: 'Invited',
+        email,
+        password: 'a long invitation password',
+      })
+      expect(
+        await responseStatus(
+          invited.request('/api/auth/sign-up/email', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', [INVITATION_HEADER]: token },
+            body,
+          }),
+        ),
+      ).toBe(200)
+      expect(
+        await services.accounts.pendingInvitation(await invitationTokenHash(token), email),
+      ).toBeNull()
+      const invitedUser = await services.db.query.user.findFirst({
+        where: (user, { eq }) => eq(user.email, email),
+      })
+      expect(invitedUser?.emailVerified).toBe(false)
+      expect(invitedUser?.role).toBe(role)
+      const memberships = await services.db.query.member.findMany()
+      expect(memberships.filter((member) => member.userId === invitedUser?.id)).toEqual([])
+    },
+  )
   it('enforces the send quota atomically for concurrent D1 inserts', async () => {
     const ownerUser = await services.db.query.user.findFirst({
       where: (user, { eq }) => eq(user.email, OTHER.email),
@@ -219,6 +230,7 @@ describe('private account D1 wiring', () => {
         { length: SITE_INVITATION_POLICY.sendsPerWindow + excessRequests },
         async () =>
           await services.accounts.createInvitation({
+            role: 'user',
             id: crypto.randomUUID(),
             inviterId: ownerUser.id,
             email: OTHER.email,

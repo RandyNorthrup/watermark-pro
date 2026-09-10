@@ -730,7 +730,7 @@
   "admin": {
     "heading": "Administração",
     "description": "Somente para o administrador do site: gerencie contas e consulte os totais. Ser proprietário de um espaço não concede direitos de administração do site.",
-    "onlyAdmins": "Somente o administrador do site pode abrir esta página.",
+    "onlyAdmins": "Somente o proprietário do site ou um administrador pode abrir esta página.",
     "sectionsLabel": "Seções de administração",
     "tabs": {
       "users": "Usuários",
@@ -773,7 +773,6 @@
     "you": "(você)",
     "joined": "Entrou em {{date}}",
     "emailNotVerified": " · e-mail não verificado",
-    "platformAdmin": "Administrador do site",
     "banned": "banido",
     "bannedReason": "banido: {{reason}}",
     "unban": "Desbanir",
@@ -802,7 +801,10 @@
     "auditCaption": "Entradas de auditoria de todas as organizações, das mais recentes às mais antigas",
     "auditDetailHeading": "Organização",
     "platform": "plataforma",
-    "userSummary_many": "{{count}} usuários{{extra}}."
+    "userSummary_many": "{{count}} usuários{{extra}}.",
+    "siteRole": "Função no site: {{role}}",
+    "roleFor": "Função no site de {{email}}",
+    "ownerProtected": "A conta do proprietário está protegida."
   },
   "members": {
     "orgRequired": "Crie uma organização ou entre em uma para gerenciar membros.",
@@ -1144,7 +1146,7 @@
       },
       "audit": {
         "heading": "Trilha de auditoria",
-        "p1": "Registros do espaço exigem o papel de proprietário ou administrador desse espaço. O único administrador do site gerencia contas e consulta totais, moderação, auditoria e dados de saúde/erros. O histórico recente é individual. Logs de falha do app omitem tokens e corpos de solicitações."
+        "p1": "Registros do espaço exigem o papel de proprietário ou administrador desse espaço. O proprietário e os administradores do site gerenciam contas e consultam totais, moderação, auditoria e dados de saúde/erros. O histórico recente é individual. Logs de falha do app omitem tokens e corpos de solicitações."
       },
       "reporting": {
         "heading": "Relatar um problema",
@@ -1273,7 +1275,9 @@
       "revoked": "Revogado",
       "expired": "Expirado"
     },
-    "collaborationNotice": "Um convite para este espaço dá acesso às suas fotos e predefinições. A pessoa já deve ter uma conta Lumafoil. Use Convidar pessoas primeiro se ela precisar de uma."
+    "collaborationNotice": "Um convite para este espaço dá acesso às suas fotos e predefinições. A pessoa já deve ter uma conta Lumafoil. Use Convidar pessoas primeiro se ela precisar de uma.",
+    "role": "Função no site",
+    "roleHelp": "Administradores gerenciam contas do site. A participação nos espaços é independente."
   },
   "accountStats": {
     "users": "Contas registradas",
@@ -1340,5 +1344,10 @@
       "list": "Lista",
       "details": "Detalhes"
     }
+  },
+  "siteRoles": {
+    "owner": "Proprietário",
+    "admin": "Administrador",
+    "user": "Usuário"
   }
 }

@@ -93,7 +93,10 @@ export function LandingFeatures() {
       </div>
       <div className="grid gap-14 lg:gap-20">
         {MAIN_FEATURES.map((key, index) => (
-          <article key={key} className="grid items-center gap-7 md:grid-cols-2 md:gap-12 lg:gap-20">
+          <article
+            key={key}
+            className="glass-panel glass-lift grid items-center gap-7 border p-6 sm:p-8 md:grid-cols-2 md:gap-12 lg:gap-16 lg:p-10"
+          >
             <div className={index % 2 === 0 ? 'md:order-2' : undefined}>
               <h3 className="text-2xl leading-tight font-semibold tracking-tight sm:text-3xl">
                 {t(FEATURE_COPY[key].title)}
@@ -110,7 +113,7 @@ export function LandingFeatures() {
         </h2>
         <ul className="mt-9 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
           {MORE_FEATURES.map(({ key, icon: Icon }) => (
-            <li key={key}>
+            <li key={key} className="glass-panel glass-lift border p-6">
               <Icon aria-hidden="true" className="mb-4 size-6 text-brand-600 dark:text-brand-300" />
               <h3 className="font-semibold">{t(FEATURE_COPY[key].title)}</h3>
               <p className="mt-2 text-sm leading-7 text-ink-muted">{t(FEATURE_COPY[key].body)}</p>
@@ -137,7 +140,7 @@ function FeatureExample({ kind }: { kind: (typeof MAIN_FEATURES)[number] }) {
         loading="lazy"
         decoding="async"
         alt={t(FEATURE_COPY[kind].title)}
-        className="aspect-4/3 w-full rounded-xl border border-line bg-surface-raised object-cover"
+        className="aspect-4/3 w-full rounded-2xl border border-line bg-surface-raised object-cover shadow-card"
       />
     )
   }

@@ -18,9 +18,11 @@ test('filled designer fits LTR and RTL viewports and retains keyboard radio sele
   await page
     .getByRole('textbox', { name: en.designer.text.label, exact: true })
     .fill('© Audit Studio')
+  await page.getByRole('combobox', { name: en.designer.font.family, exact: true }).click()
   await page
-    .getByLabel(en.designer.font.family, { exact: true })
-    .selectOption('Playfair Display Variable')
+    .getByRole('searchbox', { name: en.designer.font.search, exact: true })
+    .fill('Playfair Display Variable')
+  await page.getByRole('option', { name: 'Playfair Display Variable', exact: true }).click()
 
   for (const catalogue of [en, ar]) {
     if (catalogue === ar) {
