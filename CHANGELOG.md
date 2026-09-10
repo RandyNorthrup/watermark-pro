@@ -14,6 +14,12 @@ live under [docs/verification/m19](docs/verification/m19/); provider and domain
 cutover outcomes are recorded separately because they occur after the tagged
 candidate passes its hosted gates.
 
+The owner directed the 2026-09-10 production launch while mobile Lighthouse
+timing remained open. The guarded account split and `lumafoil.com` deployment
+completed; functional, security and four-device gates passed. Interactive
+provider journeys, Web Analytics disablement, final performance/screenshots and
+the version tag remain explicit post-launch work.
+
 ### Added
 
 - Private personal workspaces, separate site invitations, each user's unique

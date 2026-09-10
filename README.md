@@ -4,8 +4,8 @@ Watermark photos, videos, and PDFs with text, logos, signatures, QR codes, and
 reusable presets. Process files on your device, save finished photos to a private
 gallery, and share selected results when you choose.
 
-The hosted service is configured for **lumafoil.com** and **invitation-only**
-admission; final cutover is pending. Admitted users can
+The hosted service is live at **[lumafoil.com](https://lumafoil.com)** with
+**invitation-only** admission. Admitted users can
 invite people through a personal invitation link or an email invitation; new
 users receive their own private workspace. Invitations do not grant access to
 the inviter's photos or presets. Only the sole site administrator can view
@@ -30,11 +30,12 @@ services have their own costs.
 - **Interface:** twelve languages, Arabic right-to-left layout, light/dark
   themes and responsive phone/tablet/desktop controls.
 
-**Release status:** M19 production-readiness work is in progress. Focused
-implementation evidence is recorded under [docs/verification/m19](docs/verification/m19/).
-Final full-suite coverage, browser/device, performance, security, hosted OAuth
-and domain-cutover evidence remains required before release certification.
-Historical milestone results do not certify the current checkout.
+**Release status:** Lumafoil 2.0 is deployed on `lumafoil.com`. Local quality,
+coverage, security, publication and bundle gates pass; the complete four-device
+Playwright/axe matrix passes on GitHub. The owner chose to launch on 2026-09-10
+with remaining mobile Lighthouse timing work tracked after launch. Interactive
+hosted OAuth/cloud-provider journeys and the final version tag remain open and
+are not represented as certified by the deployment alone.
 
 Offline access requires an already prepared account and its cached resources.
 Online startup validates the live session before showing private data; sign-out,
@@ -549,9 +550,11 @@ operator steps: complete them before publishing. Backup, preservation checks,
 rollback compatibility, secret rotation and recovery procedures are in
 [docs/runbook.md](docs/runbook.md).
 
-The configured custom domain is `lumafoil.com`; M19's hostname/TLS/application
-cutover remains pending until its final gates pass. The Cloudflare zone, mail and
-provider registrations are configured. Current evidence and remaining steps are
+The production custom domain is `lumafoil.com`; TLS, health, security headers,
+invite-only refusal and anonymous access boundaries were verified after the
+2026-09-10 deployment. The retired app hostname has no DNS record and does not
+redirect. The Cloudflare zone, mail and provider registrations are configured.
+Current evidence and remaining steps are
 recorded in [the domain migration review](docs/verification/m19/domain-migration.md).
 The `workers.dev` subdomain is disabled.
 
@@ -568,8 +571,8 @@ npx wrangler d1 migrations list watermark-pro --remote --env production
 
 Email Sending is enabled for `lumafoil.com`, with sender
 `no-reply@lumafoil.com`. The separate `support@lumafoil.com` shared mailbox has
-verified inbound and Send As delivery. Hosted verification/reset links remain
-part of the final domain-cutover tests.
+verified inbound and Send As delivery. Interactive hosted verification/reset and
+provider-consent journeys remain post-launch checks.
 
 ## Security
 
