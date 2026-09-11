@@ -57,8 +57,8 @@ const OfflinePanel = lazy(async () => {
 // `label` holds the catalogue key, not the visible word; each list translates
 // it at render. The two rails keep their literal keys for the typed catalogue.
 const WORKSPACE_NAV_ITEMS = [
-  { to: '/app/library', label: 'shell.nav.library', icon: Stamp, exact: false },
   { to: '/app/editor', label: 'shell.nav.editor', icon: PencilRuler, exact: false },
+  { to: '/app/library', label: 'shell.nav.library', icon: Stamp, exact: false },
   { to: '/app/bulk', label: 'shell.nav.bulk', icon: Layers, exact: false },
   { to: '/app/video', label: 'shell.nav.video', icon: Film, exact: false },
   { to: '/app/documents', label: 'shell.nav.documents', icon: FileText, exact: false },

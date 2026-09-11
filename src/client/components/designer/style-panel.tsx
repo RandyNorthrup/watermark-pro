@@ -13,7 +13,7 @@ import {
   MIN_TILE_SPACING,
   type WatermarkSpec,
 } from '../../../shared/watermark'
-import { withContrast, withStyle } from '../../lib/spec-edit'
+import { blankSpec, defaultSpecFor, withContrast, withStyle } from '../../lib/spec-edit'
 import { ChoiceGroup } from '../ui/choice-group'
 import { SliderField } from '../ui/slider-field'
 
@@ -37,7 +37,7 @@ const CONTRAST_CHOICES = [
 ] as const
 
 /** A brand-ish default for the colour picker: the app's own accent. */
-const DEFAULT_INK_COLOUR = '#6d4de6'
+const DEFAULT_INK_COLOUR = '#8e354f'
 
 type InkKey = 'designer.style.inkLight' | 'designer.style.inkDark'
 
@@ -94,6 +94,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
   const tilingId = useId()
   const backdropId = useId()
   const { style, contrast } = spec
+  const defaultStyle = defaultSpecFor(spec.kind, blankSpec()).style
+  const resetLabel = (label: string) => t('editor.adjust.reset', { name: label })
   const hasBackdrop = spec.kind === 'text' || spec.kind === 'symbol'
   const contrastChoices = CONTRAST_CHOICES.map((choice) => ({
     ...choice,
@@ -151,6 +153,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
               max={1}
               step={FRACTION_STEP}
               format={percent}
+              resetValue={DEFAULT_MANUAL_OUTLINE}
+              resetLabel={resetLabel(t('designer.style.outlineStrength'))}
               onChange={(outline) => {
                 onChange(withContrast(spec, { ...contrast, outline }))
               }}
@@ -170,6 +174,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           max={1}
           step={FRACTION_STEP}
           format={percent}
+          resetValue={defaultStyle.opacity}
+          resetLabel={resetLabel(t('designer.style.opacity'))}
           onChange={(opacity) => {
             onChange(withStyle(spec, { opacity }))
           }}
@@ -181,6 +187,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           max={MAX_SCALE}
           step={FRACTION_STEP}
           format={(value) => t('designer.style.ofWidth', { percent: percent(value) })}
+          resetValue={defaultStyle.scale}
+          resetLabel={resetLabel(t('designer.style.size'))}
           onChange={(scale) => {
             onChange(withStyle(spec, { scale }))
           }}
@@ -192,6 +200,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           max={MAX_ROTATION_DEGREES}
           step={ROTATION_STEP}
           format={degrees}
+          resetValue={defaultStyle.rotation}
+          resetLabel={resetLabel(t('designer.style.rotation'))}
           onChange={(rotation) => {
             onChange(withStyle(spec, { rotation }))
           }}
@@ -203,6 +213,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           max={MAX_MARGIN}
           step={FRACTION_STEP}
           format={percent}
+          resetValue={defaultStyle.margin}
+          resetLabel={resetLabel(t('designer.style.margin'))}
           disabled={style.tiling.enabled}
           onChange={(margin) => {
             onChange(withStyle(spec, { margin }))
@@ -234,6 +246,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
             max={1}
             step={FRACTION_STEP}
             format={percent}
+            resetValue={defaultStyle.backdrop.opacity}
+            resetLabel={resetLabel(t('designer.style.boxOpacity'))}
             disabled={!style.backdrop.enabled}
             onChange={(opacity) => {
               onChange(withStyle(spec, { backdrop: { opacity } }))
@@ -265,6 +279,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
           max={MAX_TILE_SPACING}
           step={SPACING_STEP}
           format={multiple}
+          resetValue={defaultStyle.tiling.spacing}
+          resetLabel={resetLabel(t('designer.style.spacing'))}
           disabled={!style.tiling.enabled}
           onChange={(spacing) => {
             onChange(withStyle(spec, { tiling: { spacing } }))

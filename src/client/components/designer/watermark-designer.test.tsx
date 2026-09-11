@@ -71,3 +71,23 @@ it('records a complete drag as one undoable change while final render uses final
     expect(renderedSpecs.at(-1)?.placement).toEqual({ mode: 'custom', x: 0.5, y: 0.5 }),
   )
 })
+
+it('returns changed placement and appearance sliders to their defaults in one action', async () => {
+  const user = userEvent.setup()
+  renderApp('/app/library/new')
+  await screen.findByRole('textbox', { name: 'Text' })
+
+  await user.click(screen.getByRole('tab', { name: 'Style' }))
+  const rotation = screen.getByRole('slider', { name: 'Rotation' })
+  fireEvent.change(rotation, { target: { value: '27' } })
+  expect(rotation).toHaveValue('27')
+  await user.click(screen.getByRole('button', { name: 'Reset Rotation' }))
+  expect(rotation).toHaveValue('0')
+
+  await user.click(screen.getByRole('tab', { name: 'Placement' }))
+  await user.click(screen.getByRole('radio', { name: 'Custom' }))
+  const horizontal = screen.getByRole('slider', { name: 'Horizontal' })
+  fireEvent.change(horizontal, { target: { value: '0.2' } })
+  await user.click(screen.getByRole('button', { name: 'Reset Horizontal' }))
+  expect(horizontal).toHaveValue('0.5')
+})

@@ -384,6 +384,7 @@
     "heading": "Editor",
     "description": "Wähle eine Vorlage, passe ihre Position an und beschneide oder skaliere auf deinem Gerät. Lade das Ergebnis herunter oder speichere es wahlweise in Galerie oder Cloud.",
     "tabs": {
+      "presets": "Voreinstellungen",
       "watermark": "Wasserzeichen",
       "crop": "Zuschneiden",
       "adjust": "Anpassen",

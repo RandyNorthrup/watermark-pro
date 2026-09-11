@@ -384,6 +384,7 @@
     "heading": "Editor",
     "description": "Pick a preset, adjust its placement, crop and resize on your device. Download the result or choose a gallery or cloud save.",
     "tabs": {
+      "presets": "Presets",
       "watermark": "Watermark",
       "crop": "Crop",
       "adjust": "Adjust",

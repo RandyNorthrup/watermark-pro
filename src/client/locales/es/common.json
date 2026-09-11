@@ -385,6 +385,7 @@
     "heading": "Editor",
     "description": "Elige un ajuste, coloca la marca, recorta y cambia el tamaño en tu dispositivo. Descarga el resultado o elige guardarlo en la galería o la nube.",
     "tabs": {
+      "presets": "Preajustes",
       "watermark": "Marca de agua",
       "crop": "Recortar",
       "adjust": "Ajustar",

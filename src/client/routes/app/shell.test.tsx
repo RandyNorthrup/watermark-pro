@@ -198,7 +198,7 @@ describe('application shell', () => {
       within(tabBar)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Library', 'Editor', 'Bulk', 'Gallery'])
+    ).toEqual(['Editor', 'Library', 'Bulk', 'Gallery'])
     expect(screen.queryByRole('dialog')).toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Menu' }))

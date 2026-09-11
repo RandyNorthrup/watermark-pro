@@ -17,8 +17,11 @@ what was planned; superseded entries stay.
   pinch or twist gesture forms one history step.
 - Recently used fonts in the searchable 551-family picker. Recent choices and
   view preferences remain scoped to the signed-in account.
+- Account- and workspace-scoped Editor session restoration for the active
+  canvas document, draft watermark and original source photo after a reload.
+- One-click reset controls beside placement and appearance sliders.
 - A same-origin Microsoft OAuth response bridge for popup and silent-iframe
-  flows. The Worker serves only the built bridge at the two exact OAuth paths,
+  flows. The Worker serves only the built bridge at the canonical OAuth document paths,
   strips request credentials from the asset subrequest and applies no-store,
   frame and referrer protections.
 - Official provider marks beside Google and Microsoft account actions, Google
@@ -58,6 +61,11 @@ what was planned; superseded entries stay.
 - Embedded the complete watermark designer in the Editor side panel, replacing
   the separate Create watermark dialog. Export, gallery and cloud destination
   actions now share one full-width action layout.
+- Split Presets and Watermark into separate Editor tools with distinct icons.
+  The Watermark controls now live directly in their panel without a nested
+  glass card. Editor is first in the desktop and phone workspace navigation.
+- Applied rose-themed thin scrollbars throughout the app and clipped the Editor
+  panel's scrolling region inside its rounded container.
 - Scheduled interactive previews one frame at a time with latest-input
   backpressure, discarded stale subject results and coalesced pointer movement.
   Mouse, touch, pen, pinch, twist, keyboard and control changes remain responsive
@@ -80,6 +88,12 @@ what was planned; superseded entries stay.
   scrolled names cannot show through or behind the selected-font area.
 - Allowed preset-card titles and action toolbars to wrap on tablet widths instead
   of collapsing the description to zero width.
+- Prevented dragging the rendered canvas photo from re-importing it as another
+  file. Empty Logo drafts stay off the renderer until a workspace logo is
+  selected, avoiding a false cross-workspace image error.
+- Centered the navigation's Sync now action.
+- Enabled Cloudflare Always Use HTTPS for the canonical domain and raised its
+  minimum edge protocol to TLS 1.2.
 - Kept every workspace tool bound to the live, account-checked organization
   shown in the shell after creating or switching workspaces. Audit, Editor,
   Library, Gallery, Bulk, Video, Documents, Shares and preset pages can no

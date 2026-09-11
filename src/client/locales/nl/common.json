@@ -384,6 +384,7 @@
     "heading": "Editor",
     "description": "Kies een voorinstelling, pas de positie aan, snijd bij en wijzig het formaat op je apparaat. Download het resultaat of kies voor opslaan in de galerie of cloud.",
     "tabs": {
+      "presets": "Voorinstellingen",
       "watermark": "Watermerk",
       "crop": "Bijsnijden",
       "adjust": "Aanpassen",

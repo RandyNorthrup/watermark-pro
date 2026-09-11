@@ -383,6 +383,7 @@
     "heading": "编辑器",
     "description": "在设备上选择预设、调整位置、裁剪和缩放。可下载结果，也可自主选择保存到图库或云端。",
     "tabs": {
+      "presets": "预设",
       "watermark": "水印",
       "crop": "裁剪",
       "adjust": "调整",

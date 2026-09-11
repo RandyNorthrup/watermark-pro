@@ -406,16 +406,18 @@ Accepted residual risks (re-evaluated in M8):
 
 ### 5.5 Performance budgets
 
-| Metric                                                            | Budget                        |
-| ----------------------------------------------------------------- | ----------------------------- |
-| Initial JS (gzip) for the shell route                             | ≤ 180 kB                      |
-| Editor route chunk (gzip)                                         | ≤ 250 kB excluding fonts      |
-| Any single font file                                              | ≤ 120 kB (variable, subset)   |
-| Lighthouse Performance / Accessibility / Best Practices (desktop) | ≥ 90 / ≥ 95 / ≥ 95            |
-| Lighthouse Performance / Accessibility / Best Practices (mobile)  | ≥ 85 / ≥ 95 / ≥ 95            |
-| Touch targets on coarse pointers                                  | ≥ 44 × 44 px hit area         |
-| Bulk job throughput (4000×3000 JPEG, text watermark, 8 workers)   | ≥ 2 images/s on a 2023 laptop |
-| API p95 (D1 read routes)                                          | ≤ 150 ms at the edge          |
+| Metric                                                            | Budget                         |
+| ----------------------------------------------------------------- | ------------------------------ |
+| Public landing JavaScript (gzip)                                  | ≤ 90 kB                        |
+| Authenticated app shell JavaScript (gzip)                         | ≤ 140 kB                       |
+| Any route chunk (gzip)                                            | ≤ 60 kB                        |
+| Any single font file                                              | ≤ 120 kB (variable, subset)    |
+| Lighthouse Performance / Accessibility / Best Practices (desktop) | ≥ 95 / 100 / ≥ 95              |
+| Lighthouse Performance / Accessibility / Best Practices (mobile)  | ≥ 90 / 100 / ≥ 95              |
+| Mobile FCP / LCP / TBT / CLS                                      | ≤ 2.2 s / 2.5 s / 150 ms / .02 |
+| Touch targets on coarse pointers                                  | ≥ 44 × 44 px hit area          |
+| Bulk job throughput (4000×3000 JPEG, text watermark, 8 workers)   | ≥ 2 images/s on a 2023 laptop  |
+| API p95 (D1 read routes)                                          | ≤ 150 ms at the edge           |
 
 ---
 

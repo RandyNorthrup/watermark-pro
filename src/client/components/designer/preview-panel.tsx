@@ -261,6 +261,8 @@ export function PreviewPanel({
         ) : (
           <div className="relative">
             <img
+              draggable={false}
+              onDragStart={(event) => event.preventDefault()}
               ref={setImageElement}
               src={shownResult.url}
               alt={t('designer.preview.alt')}

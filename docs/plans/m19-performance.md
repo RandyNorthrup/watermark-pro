@@ -110,6 +110,13 @@ role) before rendering.
   with account-scoped recent fonts and each family name rendered in its face.
 - Export destinations use a uniform action layout. Imported images preserve
   their intrinsic aspect ratio under simultaneous viewport width/height limits.
+- Presets and Watermark are separate Editor tools. The inline designer has no
+  nested card, Editor is first in workspace navigation, scrollbars use the rose
+  theme and stay clipped inside rounded panels, and Sync now is centered.
+- Canvas documents, draft marks and source photos restore from account/workspace
+  scoped IndexedDB after reload. Native canvas-image drags cannot import a
+  duplicate, empty Logo drafts do not request an asset, and placement/appearance
+  sliders expose one-click default resets.
 
 ## Targets (`PLAN.md` §5.5 after M19)
 

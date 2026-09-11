@@ -146,6 +146,7 @@ export function OfflinePanel({
           </p>
         </div>
         <Button
+          className="self-center"
           variant="secondary"
           size="sm"
           disabled={status.syncing || !status.isOnline}
