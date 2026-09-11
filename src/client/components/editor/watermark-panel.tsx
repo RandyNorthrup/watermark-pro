@@ -3,26 +3,28 @@ import { X } from 'lucide-react'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { CreateWatermarkDialog } from './create-watermark-dialog'
 import type { WatermarkDto } from '../../../shared/api-watermark'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import { type Layer, MAX_LAYERS } from '../../editor/state'
 import { cn } from '../../lib/cn'
 import { watermarksQueryOptions } from '../../lib/library'
-import { withPlacement } from '../../lib/spec-edit'
-import { PlacementPanel } from '../designer/placement-panel'
-import { StylePanel } from '../designer/style-panel'
+import { WatermarkDesigner } from '../designer/watermark-designer'
 import { PresetGate } from '../presets/preset-gate'
 import { Button } from '../ui/button'
 
 interface WatermarkPanelProps {
   organizationId: string
   canCreate: boolean
-  photo?: File | undefined
+  draftSpec: WatermarkSpec
+  undo: () => void
+  redo: () => void
+  canUndo: boolean
+  canRedo: boolean
   /** Marks on the photo in drawing order. */
   layers: readonly Layer[]
   activeLayerId: string | null
   onAddPreset: (preset: WatermarkDto) => void
+  onNewPreset: () => void
   onSelectLayer: (layerId: string) => void
   onRemoveLayer: (layerId: string) => void
   /** Replaces the active layer's spec. */
@@ -44,23 +46,21 @@ function isSameSpec(a: WatermarkSpec, b: WatermarkSpec): boolean {
 export function WatermarkPanel({
   organizationId,
   canCreate,
-  photo,
+  draftSpec,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
   ...props
 }: WatermarkPanelProps) {
   const { t } = useTranslation()
   const selectId = useId()
   const presets = useQuery(watermarksQueryOptions(organizationId))
 
+  const active = props.layers.find((layer) => layer.id === props.activeLayerId)
+  const initial = presets.data?.find((preset) => preset.id === active?.presetId)
   return (
-    <div className="flex flex-col gap-4">
-      {canCreate ? (
-        <CreateWatermarkDialog
-          organizationId={organizationId}
-          photo={photo}
-          disabled={props.layers.length >= MAX_LAYERS}
-          onCreated={props.onAddPreset}
-        />
-      ) : null}
+    <div className="flex min-w-0 flex-col gap-4">
       <PresetGate
         query={presets}
         emptyHint={t('editor.watermark.emptyHint')}
@@ -70,17 +70,43 @@ export function WatermarkPanel({
           </p>
         }
       >
-        {(list) => <PanelBody list={list} selectId={selectId} {...props} />}
+        {(list) => <PanelBody list={list} selectId={selectId} canCreate={canCreate} {...props} />}
       </PresetGate>
+      {canCreate || active !== undefined ? (
+        <WatermarkDesigner
+          key={active?.id ?? 'draft'}
+          organizationId={organizationId}
+          initial={initial}
+          canManage
+          canSave={canCreate}
+          canManageLogos={canCreate}
+          submitLabel={t(
+            initial === undefined ? 'editor.watermark.saveAndUse' : 'designer.saveChanges',
+          )}
+          inline={{
+            spec: active?.spec ?? draftSpec,
+            onChange: props.onSpecChange,
+            undo,
+            redo,
+            canUndo,
+            canRedo,
+          }}
+          onSaved={(saved) => {
+            if (active === undefined) props.onAddPreset(saved)
+            else props.onSpecChange(saved.spec)
+          }}
+        />
+      ) : null}
     </div>
   )
 }
 
 interface PanelBodyProps extends Omit<
   WatermarkPanelProps,
-  'organizationId' | 'canCreate' | 'photo'
+  'organizationId' | 'canCreate' | 'draftSpec' | 'undo' | 'redo' | 'canUndo' | 'canRedo'
 > {
   list: WatermarkDto[]
+  canCreate: boolean
   selectId: string
 }
 
@@ -90,6 +116,8 @@ function PanelBody({
   layers,
   activeLayerId,
   onAddPreset,
+  onNewPreset,
+  canCreate,
   onSelectLayer,
   onRemoveLayer,
   onSpecChange,
@@ -116,6 +144,10 @@ function PanelBody({
           disabled={isFull}
           onChange={(event) => {
             const { value } = event.currentTarget
+            if (value === 'draft') {
+              onNewPreset()
+              return
+            }
             const chosen = list.find((candidate) => candidate.id === value)
             if (chosen !== undefined) {
               onAddPreset(chosen)
@@ -128,6 +160,7 @@ function PanelBody({
               ? t('editor.watermark.maxMarks', { max: MAX_LAYERS })
               : t('editor.watermark.choosePreset')}
           </option>
+          {canCreate ? <option value="draft">{t('library.newPreset')}</option> : null}
           {list.map((candidate) => (
             <option key={candidate.id} value={candidate.id}>
               {candidate.name}
@@ -197,23 +230,6 @@ function PanelBody({
             </div>
           ) : null}
         </section>
-      )}
-
-      {active === undefined ? null : (
-        <>
-          <section aria-labelledby="editor-placement-heading" className="flex flex-col gap-3">
-            <h2 id="editor-placement-heading" className="text-sm font-semibold">
-              {t('editor.watermark.placement')}
-            </h2>
-            <PlacementPanel
-              placement={active.spec.placement}
-              onChange={(placement) => {
-                onSpecChange(withPlacement(active.spec, placement))
-              }}
-            />
-          </section>
-          <StylePanel spec={active.spec} onChange={onSpecChange} />
-        </>
       )}
     </div>
   )

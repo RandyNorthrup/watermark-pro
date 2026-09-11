@@ -158,6 +158,7 @@ export const HTTP_STATUS = {
   tooManyRequests: 429,
   internalServerError: 500,
   serviceUnavailable: 503,
+  methodNotAllowed: 405,
 } as const
 
 /** Machine-readable error codes returned in API error bodies. */

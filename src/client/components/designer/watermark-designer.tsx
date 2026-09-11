@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Redo2, Undo2 } from 'lucide-react'
 import { Tabs } from 'radix-ui'
 import { type SubmitEvent, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +13,7 @@ import { StylePanel } from './style-panel'
 import { SymbolPicker } from './symbol-picker'
 import { TextEffects } from './text-effects'
 import { TokenMenu } from './token-menu'
+import { useDesignHistory } from './use-design-history'
 import { presetNameSchema } from '../../../shared/api'
 import type { WatermarkDto } from '../../../shared/api-watermark'
 import {
@@ -45,8 +47,26 @@ interface WatermarkDesignerProps {
   previewPhoto?: File | undefined
   submitLabel?: string | undefined
   canManage: boolean
+  canSave?: boolean | undefined
   canManageLogos: boolean
   onSaved: (saved: WatermarkDto) => void
+  /** Inline editor uses its one main canvas and authoritative document history. */
+  inline?:
+    | {
+        spec: WatermarkSpec
+        onChange: (spec: WatermarkSpec) => void
+        undo: () => void
+        redo: () => void
+        canUndo: boolean
+        canRedo: boolean
+      }
+    | undefined
+}
+
+interface DesignerDraft {
+  name: string
+  spec: WatermarkSpec
+  drafts: Partial<Record<MarkKind, WatermarkSpec>>
 }
 
 const tabTriggerClassName =
@@ -78,22 +98,52 @@ function isMarkKind(value: string): value is MarkKind {
  * left, live preview on the right. Drafts for each mark kind are kept so
  * switching tabs never discards what was typed.
  */
-export function WatermarkDesigner({
+export function WatermarkDesigner(props: WatermarkDesignerProps) {
+  return (
+    <WatermarkDesignerSession
+      key={`${props.organizationId}:${props.initial?.id ?? 'new'}`}
+      {...props}
+    />
+  )
+}
+
+function WatermarkDesignerSession({
   organizationId,
   initial,
   initialSpec,
   previewPhoto,
   submitLabel,
   canManage,
+  canSave = canManage,
   canManageLogos,
   onSaved,
+  inline,
 }: WatermarkDesignerProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const [name, setName] = useState(initial?.name ?? '')
+  const history = useDesignHistory<DesignerDraft>({
+    name: initial?.name ?? '',
+    spec: initial?.spec ?? initialSpec ?? blankSpec(),
+    drafts: {},
+  })
+  const { name, drafts } = history.value
+  const spec = inline?.spec ?? history.value.spec
+  function setName(name: string) {
+    history.change({ ...history.value, name })
+  }
+  function setSpec(spec: WatermarkSpec) {
+    history.change({ ...history.value, spec })
+    inline?.onChange(spec)
+  }
+  const undo = () => {
+    if (inline === undefined) history.undo()
+    else inline.undo()
+  }
+  const redo = () => {
+    if (inline === undefined) history.redo()
+    else inline.redo()
+  }
   const [nameError, setNameError] = useState<string | null>(null)
-  const [spec, setSpec] = useState<WatermarkSpec>(() => initial?.spec ?? initialSpec ?? blankSpec())
-  const [drafts, setDrafts] = useState<Partial<Record<MarkKind, WatermarkSpec>>>({})
   const textRef = useRef<HTMLTextAreaElement>(null)
 
   /** Inserts a token at the caret (or the end) of the text mark and keeps focus after it. */
@@ -132,13 +182,16 @@ export function WatermarkDesigner({
     if (kind === spec.kind) {
       return
     }
-    setDrafts((previous) => ({ ...previous, [spec.kind]: spec }))
     const draft = drafts[kind]
-    setSpec(draft === undefined ? defaultSpecFor(kind, spec) : withPlacement(draft, spec.placement))
+    const next =
+      draft === undefined ? defaultSpecFor(kind, spec) : withPlacement(draft, spec.placement)
+    history.change({ ...history.value, spec: next, drafts: { ...drafts, [spec.kind]: spec } })
+    inline?.onChange(next)
   }
 
   function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (!canSave) return
     const parsedName = presetNameSchema.safeParse(name)
     if (!parsedName.success) {
       setNameError(t('designer.nameError'))
@@ -153,9 +206,28 @@ export function WatermarkDesigner({
   return (
     <form
       onSubmit={submit}
-      className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]"
+      onKeyDown={(event) => {
+        if (!canManage || !(event.ctrlKey || event.metaKey)) return
+        const key = event.key.toLowerCase()
+        if (key !== 'z' && key !== 'y') return
+        event.preventDefault()
+        event.stopPropagation()
+        if (key === 'y' || event.shiftKey) redo()
+        else undo()
+      }}
+      className={
+        inline === undefined
+          ? 'grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]'
+          : 'min-w-0'
+      }
     >
-      <Card className="flex flex-col gap-5">
+      <Card
+        className={
+          inline === undefined
+            ? 'flex flex-col gap-5'
+            : 'flex min-w-0 flex-col gap-5 border-0 bg-transparent p-0 shadow-none'
+        }
+      >
         <Field label={t('designer.presetName')} error={nameError ?? undefined}>
           {(controlProps) => (
             <Input
@@ -314,25 +386,57 @@ export function WatermarkDesigner({
           </Alert>
         ) : null}
         {canManage ? (
-          <Button
-            type="submit"
-            isPending={save.isPending}
-            disabled={isIncomplete}
-            className="self-start"
-          >
-            {submitLabel ??
-              t(initial === undefined ? 'designer.savePreset' : 'designer.saveChanges')}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={!(inline?.canUndo ?? history.canUndo)}
+              onClick={undo}
+              aria-keyshortcuts="Control+Z Meta+Z"
+            >
+              <Undo2 aria-hidden="true" className="size-4" />
+              {t('editor.undo')}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={!(inline?.canRedo ?? history.canRedo)}
+              onClick={redo}
+              aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y Meta+Y"
+            >
+              <Redo2 aria-hidden="true" className="size-4" />
+              {t('editor.redo')}
+            </Button>
+            {canSave ? (
+              <Button
+                type="submit"
+                isPending={save.isPending}
+                disabled={isIncomplete}
+                className="self-start"
+              >
+                {submitLabel ??
+                  t(initial === undefined ? 'designer.savePreset' : 'designer.saveChanges')}
+              </Button>
+            ) : null}
+          </div>
         ) : (
           <p className="text-sm text-ink-muted">{t('designer.readOnlyHint')}</p>
         )}
       </Card>
-      <PreviewPanel
-        organizationId={organizationId}
-        spec={spec}
-        initialPhoto={previewPhoto}
-        onSpecChange={canManage ? setSpec : undefined}
-      />
+      {inline === undefined ? (
+        <PreviewPanel
+          organizationId={organizationId}
+          spec={spec}
+          initialPhoto={previewPhoto}
+          onSpecChange={canManage ? setSpec : undefined}
+          onGesturePhase={(phase) => {
+            if (phase === 'start') history.begin()
+            else if (phase === 'end') history.end()
+          }}
+        />
+      ) : null}
     </form>
   )
 }

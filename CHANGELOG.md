@@ -12,6 +12,15 @@ what was planned; superseded entries stay.
 - Direct canvas manipulation in both preset design and photo editing: click a
   mark to select it, drag to move it, use visible resize/rotate handles, pinch
   to scale, twist to rotate, and use the documented keyboard controls.
+- Undo and redo inside the watermark designer, including visible controls,
+  Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z and Ctrl/Cmd+Y. A complete drag, resize, rotate,
+  pinch or twist gesture forms one history step.
+- Recently used fonts in the searchable 551-family picker. Recent choices and
+  view preferences remain scoped to the signed-in account.
+- A same-origin Microsoft OAuth response bridge for popup and silent-iframe
+  flows. The Worker serves only the built bridge at the two exact OAuth paths,
+  strips request credentials from the asset subrequest and applies no-store,
+  frame and referrer protections.
 - Official provider marks beside Google and Microsoft account actions, Google
   Drive, Dropbox and OneDrive file actions, connected accounts, and the GitHub
   source link. The unmodified assets and their usage sources are documented in
@@ -19,11 +28,14 @@ what was planned; superseded entries stay.
 
 ### Changed
 
-- Focused the workspace primary rail on Dashboard, Library, Editor, Bulk, Video,
-  Documents, Gallery and Shares. Profile/account, invitations, members and audit
-  are reached from the account menu, alongside Administration for site Owners
-  and Admins. Account routes use a contextual account rail with a return to the
-  workspace.
+- Standard users now enter the Editor directly and no longer have a redundant
+  dashboard. Owners and Admins retain a compact Overview. The workspace primary
+  rail contains Library, Editor, Bulk, Video, Documents, Gallery and Shares;
+  account, invitations, members and audit are reached from the account menu.
+  Account routes use a contextual rail with a return to the workspace.
+- Moved Recent work into the Library for presets and Gallery for photos, with
+  thumbnail, list and details views on both pages. Moved offline synchronization
+  state, counts and Sync now to the bottom of the desktop rail and phone menu.
 - Administration now uses a contextual desktop sidebar and the phone's More
   sheet for Users, Organizations, Audit trail, Health and Client errors. The
   selected section is validated URL state, so direct links, reloads and browser
@@ -36,12 +48,20 @@ what was planned; superseded entries stay.
   stronger depth, floating desktop chrome and responsive fallbacks for reduced
   motion, reduced transparency and forced colors.
 - Replaced the separate font search and native 551-item selector with one
-  searchable, categorized dropdown. Replaced the QR-only checkbox filter with a
-  pressed-state filter button.
+  searchable, categorized dropdown. Font names and specimens render in their
+  own faces; the clipped list supports wheel, touch and keyboard navigation.
+  Replaced the QR-only checkbox filter with a pressed-state filter button.
 - Rebuilt photo, video and PDF import panels with a clear drop target, a large
   primary file action, a separate folder action and a secondary provider row.
   Preset actions now sit in a grouped top-right toolbar instead of an unlabeled
   row under the description.
+- Embedded the complete watermark designer in the Editor side panel, replacing
+  the separate Create watermark dialog. Export, gallery and cloud destination
+  actions now share one full-width action layout.
+- Scheduled interactive previews one frame at a time with latest-input
+  backpressure, discarded stale subject results and coalesced pointer movement.
+  Mouse, touch, pen, pinch, twist, keyboard and control changes remain responsive
+  while the rendering worker is busy.
 - Global account roles are now **Owner**, **Admin** and **User**. Migration
   `0012_site_roles.sql` preserves the anchored owner, starts with zero admins,
   and makes every other existing account a user. Owners and admins can manage
@@ -53,6 +73,17 @@ what was planned; superseded entries stay.
 - Corrected earlier documentation and UI that conflated the single site owner
   with an `admin` role and failed to distinguish global roles from workspace
   ownership.
+- Preserved each photo's intrinsic aspect ratio in editor, designer and video
+  previews when both viewport width and height constraints apply. Portrait and
+  landscape photos no longer stretch to fill both limits.
+- Kept font results clipped below their sticky search and section headers so
+  scrolled names cannot show through or behind the selected-font area.
+- Allowed preset-card titles and action toolbars to wrap on tablet widths instead
+  of collapsing the description to zero width.
+- Kept every workspace tool bound to the live, account-checked organization
+  shown in the shell after creating or switching workspaces. Audit, Editor,
+  Library, Gallery, Bulk, Video, Documents, Shares and preset pages can no
+  longer keep reading the previous route-loader organization.
 
 ## [2.0.0] - 2026-09-10
 

@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { type SubmitEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
@@ -19,22 +19,17 @@ import { Card } from '../../components/ui/card'
 import { Field } from '../../components/ui/field'
 import { Input } from '../../components/ui/input'
 import { Select, type SelectOption } from '../../components/ui/select'
+import { useActiveOrganization } from '../../lib/active-organization'
 import {
   authClient,
   type OrganizationInvitation,
   type OrganizationMember,
 } from '../../lib/auth-client'
 import { describeAuthError } from '../../lib/errors'
-import {
-  readActiveMemberRole,
-  activeOrganizationQueryOptions,
-  ORGANIZATION_QUERY_KEY,
-} from '../../lib/queries'
+import { readActiveMemberRole, ORGANIZATION_QUERY_KEY } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
 import { useAuthMutation } from '../../lib/use-auth-mutation'
 import { useFormErrors } from '../../lib/use-form-errors'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/members')({
   loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
@@ -52,11 +47,7 @@ function MembersPage() {
   const { t } = useTranslation()
   const { session } = Route.useRouteContext()
   const membership = Route.useLoaderData()
-  const initialOrganization = appRoute.useLoaderData()
-  const { data: organization } = useQuery({
-    ...activeOrganizationQueryOptions,
-    initialData: initialOrganization,
-  })
+  const organization = useActiveOrganization()
   if (organization === null) {
     return <Alert tone="info">{t('members.orgRequired')}</Alert>
   }

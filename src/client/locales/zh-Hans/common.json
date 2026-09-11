@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "仪表盘",
       "library": "水印库",
       "editor": "编辑器",
       "bulk": "批量",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "已以 {{email}} 登录",
-    "yourWorkspace": "您的工作区",
     "yourRole": "你在此工作区的角色：",
-    "toolsHeading": "工具",
-    "tools": {
-      "library": {
-        "label": "水印库",
-        "body": "一次性设计文字、符号和 Logo 水印，并将它们保存为预设。"
-      },
-      "editor": {
-        "label": "编辑器",
-        "body": "手动为一张照片添加水印：放置、裁剪、调整大小并导出。"
-      },
-      "bulk": {
-        "label": "批量",
-        "body": "将预设应用于整组照片，并以 ZIP 形式下载结果。"
-      },
-      "gallery": {
-        "label": "图库",
-        "body": "浏览已保存的照片，再选择要通过链接分享的照片。"
-      }
-    },
     "overviewHeading": "概览",
     "members": "成员",
     "noPendingInvitations": "没有待处理的邀请。",
@@ -228,6 +207,8 @@
       "specimen": "敏捷的棕色狐狸跃过懒狗",
       "search": "搜索字体",
       "resultCount": "{{count}} 个字体家族",
+      "recent": "最近使用",
+      "all": "所有字体",
       "license": "字体许可证"
     },
     "symbol": {
@@ -450,10 +431,7 @@
       "removeLayer": "从这张照片中移除 {{name}}",
       "adjusted": "已针对这张照片调整；水印库中的预设保持不变。",
       "revert": "还原",
-      "placement": "放置",
-      "create": "创建水印",
       "createHint": "在这里设计水印。保存后即可用于当前照片，并保留在素材库中以便重复使用。",
-      "cancelCreate": "取消",
       "saveAndUse": "保存并使用",
       "emptyReadOnly": "此素材库中尚无水印。",
       "firstUseHint": "添加水印后，打开“导出”即可下载照片。"

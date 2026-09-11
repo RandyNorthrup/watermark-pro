@@ -31,9 +31,12 @@ import { Button } from './ui/button'
 export function OfflinePanel({
   userId,
   organizationId,
+  shouldManageSync = true,
 }: {
   userId: string
   organizationId?: string | undefined
+  /** The persistent sidebar owns synchronization; the phone sheet shares its state and controls. */
+  shouldManageSync?: boolean
 }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -57,11 +60,12 @@ export function OfflinePanel({
     networkMode: 'always',
   })
   useEffect(() => {
+    if (!shouldManageSync) return
     if (document.querySelector('meta[name="offline-build"]') !== null) {
       void registerOfflineWorker()
     }
     return installOfflineSync(queryClient)
-  }, [queryClient, userId])
+  }, [queryClient, userId, shouldManageSync])
   useEffect(() => {
     void queryClient.invalidateQueries({ queryKey: ['offline-operations', userId] })
   }, [queryClient, userId, status.pending, status.blocked])
@@ -132,9 +136,9 @@ export function OfflinePanel({
   return (
     <section
       aria-label={t('offline.label')}
-      className="min-h-18 rounded-xl border border-line bg-surface-raised/50 px-3 py-2 text-sm"
+      className="min-w-0 rounded-xl border border-line bg-surface-raised/50 px-3 py-2 text-sm wrap-anywhere"
     >
-      <div className="grid min-h-13 grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+      <div className="flex min-w-0 flex-col items-start gap-2">
         <div className="min-w-0">
           <p role="status">{statusMessage()}</p>
           <p className="mt-0.5 text-xs leading-4 text-ink-muted">

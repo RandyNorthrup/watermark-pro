@@ -130,7 +130,11 @@ describe('library page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ failWith: 'forbidden' })
     renderApp('/app/library')
-    expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
+    expect(
+      await within(await screen.findByRole('region', { name: 'Watermark library' })).findByRole(
+        'alert',
+      ),
+    ).toHaveTextContent('Your role does not allow this.')
     expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
   })
 
@@ -225,15 +229,27 @@ describe('preset designer', () => {
     await user.click(screen.getByRole('button', { name: 'Save preset' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
     await user.click(await screen.findByRole('button', { name: 'QR codes only' }))
-    expect(screen.getByRole('link', { name: /^Portfolio QR/ })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /^Contact QR/ })).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('region', { name: 'Watermark library' })).getByRole('link', {
+        name: /^Portfolio QR/,
+      }),
+    ).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('region', { name: 'Watermark library' })).getByRole('link', {
+        name: /^Contact QR/,
+      }),
+    ).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /^Studio signature/ })).not.toBeInTheDocument()
     expect(
       api.watermarks
         .filter((preset) => preset.spec.kind === 'qr')
         .map((preset) => (preset.spec.kind === 'qr' ? preset.spec.content : '')),
     ).toEqual(['https://example.com/portfolio', 'https://example.com/contact'])
-    await user.click(screen.getByRole('link', { name: /^Portfolio QR/ }))
+    await user.click(
+      within(screen.getByRole('region', { name: 'Watermark library' })).getByRole('link', {
+        name: /^Portfolio QR/,
+      }),
+    )
     expect(await screen.findByLabelText('QR code content')).toHaveValue(
       'https://example.com/portfolio',
     )
@@ -284,7 +300,11 @@ describe('preset designer', () => {
       contrast: { mode: 'manual', variant: 'dark' },
       style: { tiling: { enabled: true } },
     })
-    expect(await screen.findByText('Tiled signature')).toBeInTheDocument()
+    expect(
+      await within(await screen.findByRole('region', { name: 'Watermark library' })).findByText(
+        'Tiled signature',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('switches to a symbol mark and keeps the text draft when switching back', async () => {

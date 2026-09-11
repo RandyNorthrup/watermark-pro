@@ -50,7 +50,7 @@ test('the site owner manages users and sees account totals', async ({ browser, p
 
   await ensureTestSiteOwner(PREVIEW_ORIGIN)
   await page.request.post('/api/auth/sign-out', { data: {}, headers: { origin: PREVIEW_ORIGIN } })
-  await signIn(page, TEST_SITE_OWNER, 'My workspace')
+  await signIn(page, TEST_SITE_OWNER, 'My workspace', { expectsSiteOverview: true })
   await navigateTo(page, 'Admin')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Administration')
   await expect(page.getByText(/\d+ users?[,.]/)).toBeVisible()

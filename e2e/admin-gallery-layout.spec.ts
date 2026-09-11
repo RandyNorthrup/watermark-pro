@@ -5,6 +5,7 @@ import {
   expect,
   expectAccessible,
   expectActiveWorkspace,
+  navigateTo,
   pngFixture,
   signIn,
   signUpAndVerify,
@@ -28,14 +29,14 @@ async function bounds(control: Locator) {
 
 test('admin metrics preserve the real controls while account totals arrive', async ({ page }) => {
   await ensureTestSiteOwner(PREVIEW_ORIGIN)
-  await signIn(page, TEST_SITE_OWNER, 'My workspace')
   const totals = Promise.withResolvers<undefined>()
   await page.route('**/api/admin/account-stats', async (route) => {
     await totals.promise
     await route.continue()
   })
   try {
-    await page.goto('/app/admin')
+    await signIn(page, TEST_SITE_OWNER, 'My workspace', { expectsSiteOverview: true })
+    await navigateTo(page, 'Admin')
     const search = page.getByLabel('Search by email', { exact: true })
     await expect(search).toBeVisible()
     await expect(page.getByText('Registered accounts', { exact: true })).toBeVisible()

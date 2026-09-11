@@ -15,6 +15,7 @@ import {
 import { ensureTestSiteOwner } from '../lib/test-site-owner.ts'
 
 const PRESET_NAME = 'Studio signature'
+const PHOTO_NAME = 'Audit photo'
 const ALBUM_NAME = 'Client preview'
 const STUDIO_NAME = 'Audit Studio'
 const PRESET_SPEC = {
@@ -102,7 +103,7 @@ export async function prepareLighthouseSurfaces(origin, surfaces) {
         multipart: {
           file: { name: 'audit.jpg', mimeType: 'image/jpeg', buffer: image },
           thumbnail: { name: 'thumb.jpg', mimeType: 'image/jpeg', buffer: thumbnail },
-          name: 'Audit photo',
+          name: PHOTO_NAME,
           width: String(dimensions.width),
           height: String(dimensions.height),
         },
@@ -194,18 +195,30 @@ export async function prepareLighthouseSurfaces(origin, surfaces) {
           surface.cookie = studioCookie
           break
         }
-        case 'private-dashboard-empty': {
+        case 'private-editor-empty': {
           surface.cookie = await auditCookies(empty.context)
-          surface.headingText = 'My workspace'
-          surface.checks.push({ textKey: 'recent.empty' })
           break
         }
-        case 'dashboard':
-        case 'recent-thumbnails':
-        case 'recent-list':
-        case 'recent-details': {
-          surface.headingText = 'My workspace'
+        case 'dashboard': {
+          surface.cookie = owner.cookie
+          break
+        }
+        case 'library-recent-thumbnails':
+        case 'library-recent-list':
+        case 'library-recent-details': {
           surface.checks.push({ role: 'region', nameKey: 'recent.heading', contains: PRESET_NAME })
+          surface.view ??= 'thumbnails'
+          surface.checks.push({
+            role: 'button',
+            nameKey: `recent.views.${surface.view}`,
+            pressed: true,
+          })
+          break
+        }
+        case 'gallery-recent-thumbnails':
+        case 'gallery-recent-list':
+        case 'gallery-recent-details': {
+          surface.checks.push({ role: 'region', nameKey: 'recent.heading', contains: PHOTO_NAME })
           surface.view ??= 'thumbnails'
           surface.checks.push({
             role: 'button',

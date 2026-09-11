@@ -30,7 +30,16 @@
     // prerendered files (dist/client/landing/<locale>.html) and the SPA shell.
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/", "/privacy", "/terms"],
+    "run_worker_first": [
+      "/api/*",
+      "/",
+      "/privacy",
+      "/terms",
+      "/oauth/microsoft",
+      "/oauth/microsoft/",
+      "/oauth/microsoft.html",
+      "/oauth/microsoft-bridge.js",
+    ],
   },
   "observability": {
     // Custom console logs retain bearer paths in platform metadata even when
@@ -149,7 +158,16 @@
       "assets": {
         "binding": "ASSETS",
         "not_found_handling": "single-page-application",
-        "run_worker_first": ["/api/*", "/", "/privacy", "/terms"],
+        "run_worker_first": [
+          "/api/*",
+          "/",
+          "/privacy",
+          "/terms",
+          "/oauth/microsoft",
+          "/oauth/microsoft/",
+          "/oauth/microsoft.html",
+          "/oauth/microsoft-bridge.js",
+        ],
       },
       "vars": {
         "APP_ENV": "production",

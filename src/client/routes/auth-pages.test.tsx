@@ -28,11 +28,11 @@ describe('landing page', () => {
     expect(screen.queryByRole('link', { name: 'Create your workspace' })).toBeNull()
   })
 
-  it('sends signed-in users straight to the dashboard', async () => {
+  it('sends signed-in standard users straight to the editor', async () => {
     seedOwnerWorkspace(client())
     const { router } = renderApp('/')
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Acme Studio')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
   })
 
   it('renders a not-found page for unknown paths', async () => {

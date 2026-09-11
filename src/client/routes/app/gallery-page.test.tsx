@@ -175,8 +175,10 @@ describe('gallery page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ failWith: 'forbidden' })
     renderApp('/app/gallery')
-    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2))
-    for (const alert of screen.getAllByRole('alert')) {
+    expect(await screen.findByText("Couldn't load recent work")).toBeInTheDocument()
+    const gallery = within(screen.getByRole('region', { name: 'Gallery' }))
+    await waitFor(() => expect(gallery.getAllByRole('alert')).toHaveLength(2))
+    for (const alert of gallery.getAllByRole('alert')) {
       expect(alert).toHaveTextContent('Your role does not allow this.')
     }
   })

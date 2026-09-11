@@ -1,5 +1,14 @@
 /** The gate supports only the proven, disjoint Worker-first rules in the built application. */
-export const GATE_WORKER_PATTERNS = ['/api/*', '/', '/privacy', '/terms']
+export const GATE_WORKER_PATTERNS = [
+  '/api/*',
+  '/',
+  '/privacy',
+  '/terms',
+  '/oauth/microsoft',
+  '/oauth/microsoft/',
+  '/oauth/microsoft.html',
+  '/oauth/microsoft-bridge.js',
+]
 const EXACT_WORKER_PATHS = new Set(GATE_WORKER_PATTERNS.slice(1))
 
 /** Matches URL pathnames only; native assets retain all redirects, SPA and method handling. */

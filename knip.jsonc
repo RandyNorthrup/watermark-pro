@@ -19,6 +19,8 @@
     "src/client/routes/**/*.tsx",
     // Build-only SSR entry named by vite.prerender.config.ts.
     "src/client/prerender.tsx",
+    // Dedicated MSAL v5 response bridge bundled by build-microsoft-bridge.mjs.
+    "src/client/oauth/microsoft.ts",
   ],
 
   // CSS is included so `@import` inside stylesheets is followed.

@@ -116,9 +116,13 @@ Only the `main` branch and the latest tagged release receive fixes.
 - Fonts, stickers, styles and application code are self-hosted. Turnstile uses
   Cloudflare's challenge origin; explicitly invoked cloud connections also use
   the Google, Dropbox and Microsoft script, frame and API origins enumerated in
-  `public/_headers`. Microsoft authentication code is bundled. Earlier analytics
-  CSP allowances were removed; final hosted verification must also confirm that
-  the zone does not inject analytics into private or bearer-link routes.
+  `public/_headers`. Microsoft authentication code is bundled. The exact
+  `/oauth/microsoft.html` and `/oauth/microsoft-redirect.html` paths serve a
+  same-origin MSAL response bridge with no-store, no-referrer and same-origin
+  frame protections; the Worker removes cookies, authorization and request data
+  before reading that static asset. Earlier analytics CSP allowances were
+  removed, and the final hosted audit confirmed that Cloudflare automatic Web
+  Analytics injection is disabled on `lumafoil.com`.
 - Logo uploads (M3): type decided by file signature, never by the declared
   MIME type or extension; size limited before the body is read; per-organization
   quota; objects stored in R2 under organization-scoped keys, never public,

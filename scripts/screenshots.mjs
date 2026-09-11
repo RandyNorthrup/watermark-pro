@@ -64,7 +64,9 @@ const PROFILES = {
   android: { browser: chromium, options: devices['Pixel 7'] },
 }
 const PUBLIC_PAGES = PUBLIC_SURFACES.map(({ id, route }) => [id, route])
-const AUTHENTICATED_PAGES = WORKSPACE_SURFACES.map(({ id, route }) => [id, route])
+const AUTHENTICATED_PAGES = WORKSPACE_SURFACES.filter(({ id }) => id !== 'dashboard').map(
+  ({ id, route }) => [id, route],
+)
 const REQUIRED_SURFACES = new Set([
   ...AUDIT_SURFACES.map(({ id }) => id),
   'language-menu',
@@ -106,11 +108,15 @@ async function imagesReady(page) {
   )
 }
 
-async function captureRecentViews(page, shoot, locale) {
-  await page.goto(`${BASE_URL}/app`, { waitUntil: 'networkidle' })
+async function captureRecentViews(page, shoot, locale, kind) {
+  const surface = kind === 'preset' ? 'library' : 'gallery'
+  await page.goto(`${BASE_URL}/app/${surface}`, { waitUntil: 'networkidle' })
   const recent = page.getByRole('region', { name: label(locale, 'recent.heading'), exact: true })
-  await expect(recent.getByRole('button', { name: SAVED_PHOTO_NAME, exact: true })).toBeVisible()
-  await expect(recent.getByRole('link', { name: 'Studio signature', exact: true })).toBeVisible()
+  if (kind === 'preset') {
+    await expect(recent.getByRole('link', { name: 'Studio signature', exact: true })).toBeVisible()
+  } else {
+    await expect(recent.getByRole('button', { name: SAVED_PHOTO_NAME, exact: true })).toBeVisible()
+  }
   for (const mode of ['thumbnails', 'list', 'details']) {
     const button = recent.getByRole('button', {
       name: label(locale, `recent.views.${mode}`),
@@ -118,7 +124,7 @@ async function captureRecentViews(page, shoot, locale) {
     })
     await button.click()
     await expect(button).toHaveAttribute('aria-pressed', 'true')
-    await shoot(`recent-${mode}`)
+    await shoot(`${surface}-recent-${mode}`)
   }
 }
 
@@ -132,7 +138,7 @@ async function captureNormalGlass(page, context, browserType, colorScheme, shoot
         { name: 'prefers-reduced-transparency', value: 'no-preference' },
       ],
     })
-    await shoot('dashboard-normal-glass')
+    await shoot('workspace-normal-glass')
   } finally {
     await session.send('Emulation.setEmulatedMedia', {
       features: [{ name: 'prefers-color-scheme', value: colorScheme }],
@@ -142,21 +148,44 @@ async function captureNormalGlass(page, context, browserType, colorScheme, shoot
 }
 
 /** Reaches a destination the way a user of this layout would: sidebar, tab bar, or the menu sheet. */
-async function navigateTo(page, label) {
-  for (const navigation of ['Primary', 'Tools']) {
+async function navigateTo(page, destinationLabel) {
+  for (const navigation of ['Primary', 'Administration sections', 'Tools']) {
     const link = page
       .getByRole('navigation', { name: navigation, exact: true })
-      .getByRole('link', { name: label, exact: true })
+      .getByRole('link', { name: destinationLabel, exact: true })
     if (await link.isVisible()) {
       await link.click()
       return
     }
   }
-  await page.getByRole('button', { name: 'Menu', exact: true }).click()
-  await page
-    .getByRole('navigation', { name: 'Primary (menu)' })
-    .getByRole('link', { name: label, exact: true })
+  const accountMenu = page.locator('header button[aria-haspopup="menu"]').last()
+  await accountMenu.click()
+  const accountDestination = page.getByRole('menuitem', { name: destinationLabel, exact: true })
+  if ((await accountDestination.count()) > 0) {
+    await accountDestination.click()
+    return
+  }
+  await page.keyboard.press('Escape')
+  const locale = await page.locator('html').getAttribute('lang')
+  if (!LOCALES.includes(locale)) throw new Error('Unsupported navigation locale')
+  const menuLabel = label(locale, 'shell.menu')
+  const menu = page.getByRole('button', { name: menuLabel, exact: true })
+  if (await menu.isVisible()) {
+    await menu.click()
+    const dialog = page.getByRole('dialog', { name: menuLabel, exact: true })
+    await dialog.getByRole('link', { name: destinationLabel, exact: true }).click()
+    await expect(dialog).toHaveCount(0)
+    return
+  }
+  const primary = page.getByRole('navigation', { name: 'Primary', exact: true })
+  await primary
+    .getByRole('link', { name: label(locale, 'shell.nav.dashboard'), exact: true })
     .click()
+  const workspaceTarget = page
+    .getByRole('navigation', { name: 'Primary', exact: true })
+    .getByRole('link', { name: destinationLabel, exact: true })
+  await expect(workspaceTarget).toBeVisible()
+  await workspaceTarget.click()
 }
 
 function createCapture(page, outputDir, profileName, colorScheme) {
@@ -268,10 +297,11 @@ async function captureProfile(profileName) {
         '/api/auth/verify-email',
       )
       await page.goto(link)
-      await page.getByRole('heading', { level: 1, name: 'My workspace' }).waitFor()
+      await page.waitForURL('**/app/editor')
+      await page.getByRole('heading', { level: 1, name: 'Editor' }).waitFor()
       for (const locale of LOCALES) {
         await chooseLocale(page, locale)
-        await shoot('private-dashboard-empty', { locale })
+        await shoot('private-editor-empty', { locale })
       }
       await chooseLocale(page, 'en')
       // Unique per run: the local database keeps earlier runs' organizations.
@@ -279,7 +309,7 @@ async function captureProfile(profileName) {
       await page.goto(`${BASE_URL}/app/organizations/new`)
       await page.getByLabel('Name').fill(organizationName)
       await page.getByRole('button', { name: 'Create organization' }).click()
-      await page.getByRole('heading', { level: 1, name: organizationName }).waitFor()
+      await page.waitForURL('**/app/editor')
 
       await navigateTo(page, 'Members')
       await page.getByRole('heading', { level: 1, name: 'Members' }).waitFor()
@@ -303,9 +333,12 @@ async function captureProfile(profileName) {
       // A saved preset so the library has content, then the designer with a live preview.
       await page.goto(`${BASE_URL}/app/library/new`)
       await page.getByRole('textbox', { name: 'Text' }).fill(`© ${organizationName}`)
+      const fontPicker = page.getByRole('combobox', { name: 'Font', exact: true })
+      await fontPicker.click()
       await page
-        .getByLabel('Font', { exact: true })
-        .selectOption({ label: 'Playfair Display Variable' })
+        .getByRole('searchbox', { name: 'Search fonts', exact: true })
+        .fill('Playfair Display Variable')
+      await page.getByRole('option', { name: 'Playfair Display Variable', exact: true }).click()
       await page.getByLabel('Preset name').fill('Studio signature')
       await page.getByRole('img', { name: 'Watermark preview on the subject photo' }).waitFor()
       await page.waitForLoadState('networkidle')
@@ -389,7 +422,8 @@ async function captureProfile(profileName) {
           }
           await shoot(name)
         }
-        await captureRecentViews(page, shoot, locale)
+        await captureRecentViews(page, shoot, locale, 'preset')
+        await captureRecentViews(page, shoot, locale, 'photo')
         await captureNormalGlass(page, context, browserType, colorScheme, shoot)
         await page.goto(new URL(presetPath, BASE_URL).href, { waitUntil: 'networkidle' })
         await shoot('designer-edit')
@@ -494,22 +528,43 @@ async function captureProfile(profileName) {
       })
       if (!signedIn.ok())
         throw new Error(`Screenshot administrator sign-in failed: ${signedIn.status()}`)
-      await page.goto(`${BASE_URL}/app/admin`, { waitUntil: 'networkidle' })
+      for (const locale of LOCALES) {
+        await page.goto(`${BASE_URL}/app`, { waitUntil: 'networkidle' })
+        await chooseLocale(page, locale)
+        await page
+          .getByRole('heading', {
+            level: 1,
+            name: label(locale, 'dashboard.overviewHeading'),
+            exact: true,
+          })
+          .waitFor()
+        await shoot('dashboard', { locale })
+      }
+      await chooseLocale(page, 'en')
+      await page.goto(`${BASE_URL}/app/admin?section=users`, { waitUntil: 'networkidle' })
       await page.getByRole('heading', { level: 1, name: 'Administration' }).waitFor()
       await page.getByText(/\d+ users?[,.]/).waitFor()
-      await page.getByRole('tab', { name: 'Organizations' }).click()
+      await navigateTo(page, 'Organizations')
       // The local database keeps every earlier run's organizations and audit
       // entries; these tables run to thousands of pixels, so only the viewport.
       await page.getByRole('table', { name: /Organizations/ }).waitFor()
-      await page.getByRole('tab', { name: 'Audit trail' }).click()
+      await navigateTo(page, 'Audit trail')
       await page.getByRole('table', { name: /Audit entries/ }).waitFor()
+      const adminSections = [
+        ['users', 'users'],
+        ['organizations', 'organizations'],
+        ['audit', 'audit'],
+        ['health', 'health'],
+        ['clientErrors', 'client-errors'],
+      ]
       for (const locale of LOCALES) {
         await chooseLocale(page, locale)
-        for (const tab of ['users', 'organizations', 'audit', 'health', 'clientErrors']) {
-          await page
-            .getByRole('tab', { name: label(locale, `admin.tabs.${tab}`), exact: true })
-            .click()
-          await shoot(`admin-${tab}`, { isFullPage: false })
+        for (const [labelKey, section] of adminSections) {
+          const sectionLabel = label(locale, `admin.tabs.${labelKey}`)
+          await navigateTo(page, sectionLabel)
+          await expect(page).toHaveURL(new RegExp(`[?&]section=${section}(?:&|$)`))
+          await page.getByRole('heading', { level: 2, name: sectionLabel, exact: true }).waitFor()
+          await shoot(`admin-${labelKey}`, { isFullPage: false })
         }
       }
       await chooseLocale(page, 'en')

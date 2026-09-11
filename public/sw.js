@@ -21,6 +21,7 @@ const FONT_PREFIX = '/fonts/'
 const STICKER_PREFIX = '/stickers/'
 const PRODUCT_PREFIX = '/product/'
 const API_PREFIX = '/api/'
+const OAUTH_PREFIX = '/oauth/'
 const OFFLINE_FALLBACK = '/offline-shell'
 const STATIC_ASSETS = new Set([
   '/sample-scene.jpg',
@@ -66,7 +67,8 @@ addEventListener('install', (event) => {
             typeof asset !== 'string' ||
             !asset.startsWith('/') ||
             asset.startsWith('//') ||
-            asset.startsWith(API_PREFIX),
+            asset.startsWith(API_PREFIX) ||
+            asset.startsWith(OAUTH_PREFIX),
         )
       ) {
         throw new Error('Invalid offline asset inventory')
@@ -169,7 +171,11 @@ addEventListener('fetch', (event) => {
   }
   const url = new URL(request.url)
   // Only same-origin requests, and never the API (dynamic, authenticated).
-  if (url.origin !== location.origin || url.pathname.startsWith(API_PREFIX)) {
+  if (
+    url.origin !== location.origin ||
+    url.pathname.startsWith(API_PREFIX) ||
+    url.pathname.startsWith(OAUTH_PREFIX)
+  ) {
     return
   }
   if (

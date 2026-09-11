@@ -1,10 +1,9 @@
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { DocumentsTool } from '../../components/documents/documents-tool'
 import { Alert } from '../../components/ui/alert'
-
-const appRoute = getRouteApi('/app')
+import { useActiveOrganization } from '../../lib/active-organization'
 
 export const Route = createFileRoute('/app/documents')({
   component: DocumentsPage,
@@ -12,7 +11,7 @@ export const Route = createFileRoute('/app/documents')({
 
 function DocumentsPage() {
   const { t } = useTranslation()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   if (organization === null) {
     return <Alert tone="info">{t('documents.orgRequired')}</Alert>
   }

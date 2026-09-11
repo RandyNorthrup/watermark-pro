@@ -140,12 +140,23 @@ export async function navigateTo(page: Page, label: string) {
     return
   }
   await page.keyboard.press('Escape')
-  await page.getByRole('button', { name: 'Menu', exact: true }).click()
-  await page
-    .getByRole('dialog', { name: 'Menu' })
+  const menu = page.getByRole('button', { name: 'Menu', exact: true })
+  if (await menu.isVisible()) {
+    await menu.click()
+    const dialog = page.getByRole('dialog', { name: 'Menu' })
+    await dialog.getByRole('link', { name: label, exact: true }).click()
+    await expect(dialog).toHaveCount(0)
+    return
+  }
+  // Desktop account routes intentionally replace workspace tools with a
+  // contextual rail. Return through the role-appropriate workspace link, then
+  // use the fresh workspace rail for the requested tool.
+  await sidebar.getByRole('link', { name: /^(Editor|Overview)$/ }).click()
+  const workspaceTarget = page
+    .getByRole('navigation', { name: 'Primary', exact: true })
     .getByRole('link', { name: label, exact: true })
-    .click()
-  await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+  await expect(workspaceTarget).toBeVisible()
+  await workspaceTarget.click()
 }
 
 /** Asserts a destination is absent from the navigation, opening the phone menu when needed. */
@@ -196,8 +207,8 @@ export async function signUpAndVerify(page: Page, request: APIRequestContext, pe
   const verifyPath = await latestLinkFor(request, person.email, '/api/auth/verify-email')
   await page.goto(verifyPath)
   // Every verified account starts in a separate personal workspace.
-  await expect(page).toHaveURL(/\/app\/?$/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('My workspace')
+  await expect(page).toHaveURL(/\/app\/editor\/?$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
 }
 
 async function organizationSwitcher(page: Page) {
@@ -252,13 +263,20 @@ export async function expectActiveWorkspace(page: Page, person: Person, expected
 }
 
 /** Fresh login starts privately; collaboration is selected explicitly through the rendered switcher. */
-export async function signIn(page: Page, person: Person, expectedWorkspace: string) {
+export async function signIn(
+  page: Page,
+  person: Person,
+  expectedWorkspace: string,
+  { expectsSiteOverview = false }: { expectsSiteOverview?: boolean } = {},
+) {
   await page.goto('/login')
   await page.getByLabel('Email').fill(person.email)
   await page.getByLabel('Password').fill(person.password)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/app\/?$/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('My workspace')
+  await expect(page).toHaveURL(expectsSiteOverview ? /\/app\/?$/ : /\/app\/editor\/?$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    expectsSiteOverview ? 'Overview' : 'Editor',
+  )
   const personal = await expectActiveWorkspace(page, person, 'My workspace')
   expect(personal.organization.members).toHaveLength(1)
   expect(personal.member.role).toBe('owner')
@@ -268,12 +286,12 @@ export async function signIn(page: Page, person: Person, expectedWorkspace: stri
   await page.getByRole('menuitem', { name: expectedWorkspace, exact: true }).click()
   await expect(switcher).toHaveText(expectedWorkspace)
   await closeMobileMenu(page)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(expectedWorkspace)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
   const selected = await expectActiveWorkspace(page, person, expectedWorkspace)
   expect(selected.organization.id).not.toBe(personal.organization.id)
 }
 
-/** Sign up, verify, and create an organization; lands on the dashboard. */
+/** Sign up, verify, and create an organization; standard users return to the editor. */
 export async function createWorkspace(
   page: Page,
   request: APIRequestContext,
@@ -285,7 +303,8 @@ export async function createWorkspace(
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('New organization')
   await page.getByLabel('Name').fill(organizationName)
   await page.getByRole('button', { name: 'Create organization' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(organizationName)
+  await expect(page).toHaveURL(/\/app\/editor\/?$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
   const workspace = await expectActiveWorkspace(page, person, organizationName)
   expect(workspace.member.role).toBe('owner')
 }

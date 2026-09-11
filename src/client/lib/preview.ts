@@ -30,6 +30,8 @@ export interface PreviewResult {
   height: number
   /** One entry per rendered mark, in order; empty when nothing was drawn. */
   marks: MarkOutcome[]
+  /** Snapshot used for this frame, so live controls need not wait for worker geometry. */
+  specs?: readonly WatermarkSpec[]
 }
 
 /** One spec or several, in drawing order. */
@@ -110,6 +112,8 @@ export class PreviewRenderer {
   #metadata: PhotoMetadata | null = null
   #sourceSize: Size | null = null
   #sequence = 0
+  #subjectRequest = 0
+  #disposed = false
 
   constructor(
     loadLogo: LogoLoader,
@@ -161,7 +165,14 @@ export class PreviewRenderer {
 
   /** Replaces the subject photo; `null` restores the built-in sample. Metadata fills tokens and export policy. */
   async setSubject(file: File | null, metadata: PhotoMetadata | null = null): Promise<void> {
+    this.#subjectRequest += 1
+    const request = this.#subjectRequest
+    this.#sequence += 1
     const bitmap = await this.#decode(file)
+    if (this.#disposed || request !== this.#subjectRequest) {
+      bitmap.close()
+      return
+    }
     const size = { width: bitmap.width, height: bitmap.height }
     this.#subject = drawScaled(bitmap, fitWithin(size, PREVIEW_MAX_SIDE), this.#backend)
     bitmap.close()
@@ -201,7 +212,7 @@ export class PreviewRenderer {
       output: PREVIEW_OUTPUT,
       ...(transform !== undefined && { transform }),
     })
-    if (ticket !== this.#sequence) {
+    if (this.#disposed || ticket !== this.#sequence) {
       return null
     }
     return {
@@ -209,6 +220,7 @@ export class PreviewRenderer {
       width: output.width,
       height: output.height,
       marks: output.marks,
+      specs: specList(input),
     }
   }
 
@@ -239,6 +251,9 @@ export class PreviewRenderer {
   }
 
   dispose(): void {
+    this.#disposed = true
+    this.#sequence += 1
+    this.#subjectRequest += 1
     this.#engine.terminate()
     this.#resources.clear()
   }

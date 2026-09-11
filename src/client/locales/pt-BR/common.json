@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "Painel",
       "library": "Biblioteca",
       "editor": "Editor",
       "bulk": "Lote",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "Conectado como {{email}}",
-    "yourWorkspace": "Seu espaço de trabalho",
     "yourRole": "Sua função neste espaço:",
-    "toolsHeading": "Ferramentas",
-    "tools": {
-      "library": {
-        "label": "Biblioteca",
-        "body": "Crie marcas d'água de texto, símbolo e logotipo uma vez e guarde-as como predefinições."
-      },
-      "editor": {
-        "label": "Editor",
-        "body": "Aplique marca d'água em uma foto manualmente: posicione, corte, redimensione e exporte."
-      },
-      "bulk": {
-        "label": "Lote",
-        "body": "Aplique uma predefinição a um ensaio inteiro e baixe os resultados como ZIP."
-      },
-      "gallery": {
-        "label": "Galeria",
-        "body": "Veja as fotos salvas e escolha quais compartilhar por link."
-      }
-    },
     "overviewHeading": "Visão geral",
     "members": "Membros",
     "noPendingInvitations": "Nenhum convite pendente.",
@@ -230,6 +209,8 @@
       "specimen": "A rápida raposa marrom",
       "search": "Buscar fontes",
       "resultCount": "{{count}} famílias de fontes",
+      "recent": "Usadas recentemente",
+      "all": "Todas as fontes",
       "license": "Licença da fonte"
     },
     "symbol": {
@@ -452,10 +433,7 @@
       "removeLayer": "Remover {{name}} desta foto",
       "adjusted": "Ajustada para esta foto; a predefinição da biblioteca não muda.",
       "revert": "Reverter",
-      "placement": "Posicionamento",
-      "create": "Criar marca-d’água",
       "createHint": "Crie sua marca-d’água aqui. Salve para usar nesta foto e manter na sua biblioteca.",
-      "cancelCreate": "Cancelar",
       "saveAndUse": "Salvar e usar",
       "emptyReadOnly": "Ainda não há marcas-d’água nesta biblioteca.",
       "firstUseHint": "Adicione uma marca-d’água e abra Exportar para baixar sua foto."

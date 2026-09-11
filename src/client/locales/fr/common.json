@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "Tableau de bord",
       "library": "Bibliothèque",
       "editor": "Éditeur",
       "bulk": "En lot",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "Connecté en tant que {{email}}",
-    "yourWorkspace": "Votre espace de travail",
     "yourRole": "Votre rôle dans cet espace :",
-    "toolsHeading": "Outils",
-    "tools": {
-      "library": {
-        "label": "Bibliothèque",
-        "body": "Concevez une fois des filigranes texte, symbole et logo, puis conservez-les comme préréglages."
-      },
-      "editor": {
-        "label": "Éditeur",
-        "body": "Filigranez une photo à la main : placez, recadrez, redimensionnez et exportez."
-      },
-      "bulk": {
-        "label": "En lot",
-        "body": "Appliquez un préréglage à toute une séance et téléchargez les résultats au format ZIP."
-      },
-      "gallery": {
-        "label": "Galerie",
-        "body": "Parcourez les photos enregistrées, puis choisissez celles à partager par lien."
-      }
-    },
     "overviewHeading": "Vue d'ensemble",
     "members": "Membres",
     "noPendingInvitations": "Aucune invitation en attente.",
@@ -230,6 +209,8 @@
       "specimen": "Portez ce vieux whisky au juge blond qui fume",
       "search": "Rechercher des polices",
       "resultCount": "{{count}} familles de polices",
+      "recent": "Récemment utilisées",
+      "all": "Toutes les polices",
       "license": "Licence de la police"
     },
     "symbol": {
@@ -452,10 +433,7 @@
       "removeLayer": "Retirer {{name}} de cette photo",
       "adjusted": "Ajusté pour cette photo ; le préréglage de la bibliothèque reste inchangé.",
       "revert": "Réinitialiser",
-      "placement": "Placement",
-      "create": "Créer un filigrane",
       "createHint": "Créez votre filigrane ici. Enregistrez-le pour cette photo et conservez-le dans votre bibliothèque.",
-      "cancelCreate": "Annuler",
       "saveAndUse": "Enregistrer et utiliser",
       "emptyReadOnly": "Aucun filigrane n’est encore disponible dans cette bibliothèque.",
       "firstUseHint": "Ajoutez un filigrane, puis ouvrez Exporter pour télécharger la photo."

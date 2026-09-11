@@ -55,13 +55,29 @@ afterEach(async () => {
   vi.unstubAllGlobals()
 })
 
-function showPanel() {
-  const panel = createElement(OfflinePanel, { userId: OFFLINE_USER })
+function showPanel(shouldManageSync = true) {
+  const panel = createElement(OfflinePanel, { userId: OFFLINE_USER, shouldManageSync })
   const queryProvider = createElement(QueryClientProvider, { client: queryClient }, panel)
   render(createElement(I18nextProvider, { i18n }, queryProvider))
 }
 
 describe('offline recovery panel', () => {
+  it('shares pending recovery controls without installing another sync loop for the phone menu', async () => {
+    const listen = vi.spyOn(window, 'addEventListener')
+    const syncListeners = () =>
+      listen.mock.calls.filter(([event]) => event === 'watermark-pro:offline-change')
+    await commitOfflineChange(offlineOperation({ kind: 'preset-create', preset: offlinePreset() }))
+    showPanel()
+    await screen.findByText('Review saved work (1)')
+    expect(syncListeners()).toHaveLength(1)
+    showPanel(false)
+    expect(syncListeners()).toHaveLength(1)
+    expect(await screen.findAllByText('Review saved work (1)')).toHaveLength(2)
+    const buttons = screen.getAllByRole('button', { name: 'Sync now' })
+    for (const button of buttons) {
+      expect(button.hasAttribute('disabled')).toBe(true)
+    }
+  })
   it('keeps a save on cancel and removes it only after confirming discard', async () => {
     const user = userEvent.setup()
     await commitOfflineChange(offlineOperation({ kind: 'preset-create', preset: offlinePreset() }))

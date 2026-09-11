@@ -59,7 +59,7 @@ test('site invitations create separate private workspaces and protect account to
   await page.getByRole('button', { name: 'Create account', exact: true }).click()
   await expect(page).toHaveURL(/\/check-email/)
   await page.goto(await latestLinkFor(request, recipient.email, '/api/auth/verify-email'))
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('My workspace')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
   const recipientSession = await page.request.get('/api/auth/get-session')
   const recipientWorkspace = workspaceSessionSchema.parse(await recipientSession.json()).session
     .activeOrganizationId

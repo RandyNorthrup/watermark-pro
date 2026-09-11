@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Check, Copy, Share2, XCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -11,6 +11,7 @@ import { Button } from '../../components/ui/button'
 import { buttonVariants } from '../../components/ui/button-variants'
 import { Card } from '../../components/ui/card'
 import { Spinner } from '../../components/ui/spinner'
+import { useActiveOrganization } from '../../lib/active-organization'
 import { describeError } from '../../lib/errors'
 import { dateTimeFormatter } from '../../lib/format-date'
 import { readActiveMemberRole } from '../../lib/queries'
@@ -22,8 +23,6 @@ import {
   sharesQueryKey,
   sharesQueryOptions,
 } from '../../lib/shares'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/shares')({
   loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
@@ -51,7 +50,7 @@ function statusOf(share: ShareDto, now: number): ShareStatus {
 
 function SharesPage() {
   const { t } = useTranslation()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
   const organizationId = organization?.id ?? ''
   const shares = useQuery({ ...sharesQueryOptions(organizationId), enabled: organizationId !== '' })

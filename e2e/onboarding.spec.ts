@@ -40,7 +40,7 @@ test('owner starts in a private workspace and explicitly creates a collaboration
   request,
 }) => {
   await signUpAndVerify(page, request, owner)
-  await expect(page).toHaveURL(/\/app\/?$/)
+  await expect(page).toHaveURL(/\/app\/editor\/?$/)
   const personal = await expectActiveWorkspace(page, owner, 'My workspace')
   expect(personal.organization.members).toHaveLength(1)
   expect(personal.member.role).toBe('owner')
@@ -51,11 +51,10 @@ test('owner starts in a private workspace and explicitly creates a collaboration
   await expectAccessible(page)
   await page.getByLabel('Name').fill(organizationName)
   await page.getByRole('button', { name: 'Create organization' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(organizationName)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
   const collaboration = await expectActiveWorkspace(page, owner, organizationName)
   expect(collaboration.organization.id).not.toBe(personal.organization.id)
   expect(collaboration.member.role).toBe('owner')
-  await expect(page.getByText('Your workspace role: owner')).toBeVisible()
   await expectAccessible(page)
 
   await navigateTo(page, 'Audit log')

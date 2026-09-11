@@ -77,6 +77,24 @@ function harness() {
 }
 
 describe('offline service worker', () => {
+  it('never caches or substitutes an application shell for OAuth callbacks', async () => {
+    const worker = harness()
+    const cache = await worker.open(CACHE_NAME)
+    await cache.put('/offline-shell', new Response('private cached application'))
+    worker.network.mockRejectedValue(new TypeError('Offline'))
+    for (const path of [
+      '/oauth/microsoft?code=private-code',
+      '/oauth/microsoft-bridge.js',
+      '/oauth/dropbox?code=private-code',
+    ]) {
+      const response = await worker.dispatch('fetch', {
+        request: { method: 'GET', mode: 'navigate', url: `${ORIGIN}${path}` },
+      })
+      expect(response).toBeUndefined()
+    }
+    expect(worker.network).not.toHaveBeenCalled()
+    expect(worker.buckets.get(CACHE_NAME)?.size).toBe(1)
+  })
   it('prepares the complete inventory and waits for an explicit update request', async () => {
     const worker = harness()
     const inventory = [
@@ -168,7 +186,13 @@ describe('offline service worker', () => {
   })
 
   it('refuses incomplete or private offline inventories', async () => {
-    for (const inventory of [[], ['/api/private'], ['//other.example/asset'], ['relative.js']]) {
+    for (const inventory of [
+      [],
+      ['/api/private'],
+      ['/oauth/microsoft'],
+      ['//other.example/asset'],
+      ['relative.js'],
+    ]) {
       const worker = harness()
       worker.network.mockResolvedValue(Response.json(inventory))
       await expect(worker.dispatch('install')).rejects.toThrow('Invalid offline asset inventory')

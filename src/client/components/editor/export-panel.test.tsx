@@ -43,6 +43,7 @@ function renderPanel(onExportBlob: () => Promise<CloudUpload | null>) {
       onExport={vi.fn()}
       onShare={vi.fn()}
       isSharing={false}
+      onSave={vi.fn()}
       organizationName="Acme"
       cloudConfig={ALL_CLOUD_CONFIG}
       onExportBlob={onExportBlob}
@@ -59,6 +60,19 @@ describe('ExportPanel cloud save', () => {
     expect(screen.getByRole('button', { name: 'Save to Google Drive' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save to Dropbox' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save to OneDrive' })).toBeInTheDocument()
+  })
+
+  it('renders every destination as one uniform full-width action', () => {
+    renderPanel(() => Promise.resolve(UPLOAD))
+    for (const name of [
+      'Download',
+      'Save to gallery',
+      'Save to Google Drive',
+      'Save to Dropbox',
+      'Save to OneDrive',
+    ]) {
+      expect(screen.getByRole('button', { name })).toHaveClass('h-11', 'w-full', 'justify-start')
+    }
   })
 
   it('renders the current photo and confirms a successful save', async () => {

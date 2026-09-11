@@ -93,6 +93,24 @@ role) before rendering.
 - Apply the supplied MIT Liquid Glass UI Kit style to the app in the current rose palette. The landing layout is approved; replace its product screenshots after app UI changes. Preserve the supplied kit notice.
 - The owner explicitly made the complete production launch an active goal; continue implementation, verification and cutover autonomously within the accepted boundaries.
 
+### Additional owner decisions — 2026-09-10
+
+- Standard users open directly in the Editor. They do not need a dashboard;
+  Owners and Admins retain a compact operational Overview.
+- Preset recents belong in Library and photo recents belong in Gallery, with
+  thumbnail, list and details views. Synchronization status, counts and the
+  manual Sync now action belong at the bottom of the desktop rail and phone menu.
+- The Editor side panel contains the complete watermark designer. No separate
+  Create watermark popup remains. Both the designer and editor expose undo and
+  redo, and a continuous canvas gesture is one history step.
+- Canvas input and rendering must stay responsive for mouse, touch, pen,
+  keyboard, sliders and form controls. Preview rendering is frame-scheduled with
+  a single in-flight render and a latest-only pending request.
+- The 551-family picker is one clipped, wheel/touch/keyboard-scrollable dropdown
+  with account-scoped recent fonts and each family name rendered in its face.
+- Export destinations use a uniform action layout. Imported images preserve
+  their intrinsic aspect ratio under simultaneous viewport width/height limits.
+
 ## Targets (`PLAN.md` §5.5 after M19)
 
 | Metric                                      | Budget                                     |
@@ -338,11 +356,12 @@ M19 re-reviews it.
 This ledger tracks the current takeover scope. Historical milestone certification
 checklists above and in the root roadmap are retained under the project rules.
 
-Implementation statuses were reconciled on 2026-09-09 against the current code,
+Implementation statuses were reconciled on 2026-09-10 against the current code,
 provider configuration and the [integrated quality checkpoint](../verification/m19/quality.md).
 The implemented state does not certify hosted behavior or the final device
-matrix. Startup performance, final release gates and domain cutover remain
-active; no task has been promoted to verified from a partial result. The
+matrix. Startup performance, final release gates and provider consent remain
+active; the domain cutover is complete. No task has been promoted to verified
+from a partial result. The
 [real D1 restore rehearsal](../verification/m19/d1-restore-rehearsal.md) and
 [live logging remediation](../verification/m19/platform-observability-privacy.md)
 provide bounded operator evidence, while final migration and hosted checks

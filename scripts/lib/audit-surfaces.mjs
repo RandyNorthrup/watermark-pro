@@ -9,7 +9,7 @@ export const PUBLIC_SURFACES = [
 ]
 
 export const WORKSPACE_SURFACES = [
-  { id: 'dashboard', route: '/app', heading: null },
+  { id: 'dashboard', route: '/app', heading: 'dashboard.overviewHeading' },
   { id: 'members', route: '/app/members', heading: 'members.heading' },
   { id: 'audit', route: '/app/audit', heading: 'audit.heading' },
   { id: 'new-organization', route: '/app/organizations/new', heading: 'organizations.newTitle' },
@@ -35,11 +35,17 @@ export const PREPARED_SURFACES = [
   { id: 'designer-edit', route: '/app/library/$watermarkId', heading: null },
   { id: 'editor-watermark', route: '/app/editor', heading: 'editor.heading' },
   { id: 'admin-users', route: '/app/admin', heading: 'admin.heading' },
-  { id: 'private-dashboard-empty', route: '/app', heading: null },
+  { id: 'private-editor-empty', route: '/app/editor', heading: 'editor.heading' },
   ...['thumbnails', 'list', 'details'].map((view) => ({
-    id: `recent-${view}`,
-    route: '/app',
-    heading: null,
+    id: `library-recent-${view}`,
+    route: '/app/library',
+    heading: 'library.heading',
+    view,
+  })),
+  ...['thumbnails', 'list', 'details'].map((view) => ({
+    id: `gallery-recent-${view}`,
+    route: '/app/gallery',
+    heading: 'gallery.heading',
     view,
   })),
 ]

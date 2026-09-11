@@ -1,11 +1,36 @@
 /** Real offline saves survive document reload and synchronize without duplicate uploads after a lost acknowledgement. */
-import type { Page } from '@playwright/test'
+import type { Locator, Page } from '@playwright/test'
 
 import { test } from './offline-network'
 import { createWorkspace, expect, expectAccessible, navigateTo } from './support'
 import { photoListResponseSchema } from '../src/shared/api'
 import { watermarkListResponseSchema } from '../src/shared/api-watermark'
 import { shellOrganizationsSchema } from '../src/shared/shell-cache'
+
+async function openOfflinePanel(page: Page): Promise<{
+  panel: Locator
+  close: () => Promise<void>
+}> {
+  const menu = page.getByRole('button', { name: 'Menu', exact: true })
+  const isPhoneMenu = await menu.isVisible()
+  if (isPhoneMenu) await menu.click()
+  const panel = page.getByRole('region', { name: 'Offline work', exact: true })
+  await expect(panel).toBeVisible()
+  return {
+    panel,
+    close: async () => {
+      if (!isPhoneMenu) return
+      await page.getByRole('button', { name: 'Close menu' }).click()
+      await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+    },
+  }
+}
+
+async function expectOfflineStatus(page: Page, text: string): Promise<void> {
+  const view = await openOfflinePanel(page)
+  await expect(view.panel.getByText(text, { exact: true })).toBeVisible()
+  await view.close()
+}
 
 async function waitForOfflineReadiness(page: Page): Promise<void> {
   // Installation fetches the complete compiled inventory. Await its actual
@@ -19,9 +44,7 @@ async function waitForOfflineReadiness(page: Page): Promise<void> {
         ),
     )
     .toBe(true)
-  await expect(
-    page.getByText('App files are ready for offline use.', { exact: true }),
-  ).toBeVisible()
+  await expectOfflineStatus(page, 'App files are ready for offline use.')
 }
 
 test('keeps offline presets and photo saves across reload and reconnect', async ({
@@ -123,8 +146,10 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
   await expect.poll(() => acknowledgement.didDrop).toBe(true)
   expect(acknowledgement.responseStatus).toBe(201)
   await acknowledgement.clear()
-  await page.getByRole('button', { name: 'Sync now' }).click()
-  await expect(page.getByText('Saved work is synchronized.', { exact: true })).toBeVisible()
+  const sync = await openOfflinePanel(page)
+  await sync.panel.getByRole('button', { name: 'Sync now' }).click()
+  await expect(sync.panel.getByText('Saved work is synchronized.', { exact: true })).toBeVisible()
+  await sync.close()
   const savedPhotosResponse = await page.request.get(`${apiRoot}/photos`)
   const savedPhotos = photoListResponseSchema.parse(await savedPhotosResponse.json()).photos
   expect(savedPhotos).toHaveLength(1)
@@ -183,7 +208,7 @@ test('preserves both versions of a conflicting offline preset edit', async ({
       return watermarkListResponseSchema.parse(await response.json()).watermarks.length
     })
     .toBe(1)
-  await expect(page.getByText('Saved work is synchronized.', { exact: true })).toBeVisible()
+  await expectOfflineStatus(page, 'Saved work is synchronized.')
   const originalResponse = await page.request.get(path)
   const original = watermarkListResponseSchema.parse(await originalResponse.json()).watermarks[0]
   if (original === undefined) {
@@ -204,11 +229,15 @@ test('preserves both versions of a conflicting offline preset edit', async ({
   await page.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByRole('link', { name: 'Local version', exact: true })).toBeVisible()
   await offlineNetwork.setOffline(false)
-  await page.getByText('Review saved work (1)', { exact: true }).click()
-  await expect(page.getByText(/This preset changed elsewhere/)).toBeVisible()
+  const conflict = await openOfflinePanel(page)
+  await conflict.panel.getByText('Review saved work (1)', { exact: true }).click()
+  await expect(conflict.panel.getByText(/This preset changed elsewhere/)).toBeVisible()
   await expectAccessible(page)
-  await page.getByRole('button', { name: 'Keep both versions' }).click()
-  await expect(page.getByText('Saved work is synchronized.', { exact: true })).toBeVisible()
+  await conflict.panel.getByRole('button', { name: 'Keep both versions' }).click()
+  await expect(
+    conflict.panel.getByText('Saved work is synchronized.', { exact: true }),
+  ).toBeVisible()
+  await conflict.close()
   const savedResponse = await page.request.get(path)
   const saved = watermarkListResponseSchema.parse(await savedResponse.json()).watermarks
   expect(saved).toHaveLength(2)

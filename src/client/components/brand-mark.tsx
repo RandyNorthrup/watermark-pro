@@ -5,8 +5,8 @@ import { cn } from '../lib/cn'
 
 interface BrandMarkProps {
   className?: string
-  /** Where the mark links to; authenticated areas point at the dashboard. */
-  to?: '/' | '/app'
+  /** Authenticated areas choose the workspace destination allowed for this account. */
+  to?: '/' | '/app' | '/app/editor'
 }
 
 export function BrandMark({ className, to = '/' }: BrandMarkProps) {

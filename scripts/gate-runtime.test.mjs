@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readFile, readdir, realpath, rm, writeFile } from 'node
 import path from 'node:path'
 import { test } from 'node:test'
 
+import { GATE_WORKER_PATTERNS } from './lib/gate-routing.mjs'
 import { startGateServer } from './lib/gate-runtime.mjs'
 
 const FIXTURE_WORKER = `export default {
@@ -65,7 +66,7 @@ async function fixture(context, { invalidMigration = false } = {}) {
     assets: {
       directory: '../client',
       binding: 'ASSETS',
-      run_worker_first: ['/api/*', '/', '/privacy', '/terms'],
+      run_worker_first: GATE_WORKER_PATTERNS,
       not_found_handling: 'single-page-application',
     },
     d1_databases: [
@@ -109,12 +110,29 @@ test('SDK gate uses real migrations, R2 and rate bindings with test-only configu
     const asset = await fetch(gate.origin + '/application-route')
     assert.equal(asset.status, 200)
     assert.equal(await asset.text(), '<!doctype html><title>Built fixture asset</title>')
-    for (const pathname of ['/', '/privacy', '/terms', '/api/', '/api/missing']) {
+    for (const pathname of [
+      '/',
+      '/privacy',
+      '/terms',
+      '/api/',
+      '/api/missing',
+      '/oauth/microsoft',
+      '/oauth/microsoft/',
+      '/oauth/microsoft.html',
+      '/oauth/microsoft-bridge.js',
+    ]) {
       const routed = await fetch(gate.origin + pathname)
       assert.equal(routed.status, 404, `${pathname} must reach the actual Worker`)
       assert.equal(await routed.text(), 'fixture Worker rejection')
     }
-    for (const pathname of ['/app/editor', '/privacy/', '/terms/', '/api']) {
+    for (const pathname of [
+      '/app/editor',
+      '/privacy/',
+      '/terms/',
+      '/api',
+      '/oauth/microsoft-other',
+      '/oauth/dropbox',
+    ]) {
       const routed = await fetch(gate.origin + pathname, {
         headers: { origin: 'https://foreign.example' },
       })
@@ -156,9 +174,9 @@ test('malformed or escaping build configuration fails before a gate can start', 
   await writeFile(configPath, JSON.stringify({ ...config, assets: {} }))
   await assert.rejects(startGateServer({ root, port: 0 }), { name: 'ZodError' })
   for (const patterns of [
-    ['/api/*', '/', '/privacy', '!/terms'],
-    ['/api/*', '/', '/privacy', '/terms', '/new/*'],
-    ['/api/*', '/', '/privacy', '/privacy'],
+    GATE_WORKER_PATTERNS.slice(0, -1),
+    [...GATE_WORKER_PATTERNS, '/new/*'],
+    [...GATE_WORKER_PATTERNS.slice(0, -1), GATE_WORKER_PATTERNS[0]],
   ]) {
     await writeFile(
       configPath,

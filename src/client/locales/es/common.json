@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "Panel",
       "library": "Biblioteca",
       "editor": "Editor",
       "bulk": "Lotes",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "Sesión iniciada como {{email}}",
-    "yourWorkspace": "Tu espacio de trabajo",
     "yourRole": "Tu rol en este espacio:",
-    "toolsHeading": "Herramientas",
-    "tools": {
-      "library": {
-        "label": "Biblioteca",
-        "body": "Diseña marcas de agua de texto, símbolo y logotipo una vez y guárdalas como preajustes."
-      },
-      "editor": {
-        "label": "Editor",
-        "body": "Aplica una marca de agua a una foto a mano: coloca, recorta, redimensiona y exporta."
-      },
-      "bulk": {
-        "label": "Lotes",
-        "body": "Aplica un preajuste a toda una sesión y descarga los resultados en un ZIP."
-      },
-      "gallery": {
-        "label": "Galería",
-        "body": "Explora las fotos guardadas y elige cuáles compartir con un enlace."
-      }
-    },
     "overviewHeading": "Resumen",
     "members": "Miembros",
     "noPendingInvitations": "No hay invitaciones pendientes.",
@@ -230,6 +209,8 @@
       "specimen": "El veloz murciélago hindú",
       "search": "Buscar fuentes",
       "resultCount": "{{count}} familias tipográficas",
+      "recent": "Fuentes recientes",
+      "all": "Todas las fuentes",
       "license": "Licencia de la fuente"
     },
     "symbol": {
@@ -452,10 +433,7 @@
       "removeLayer": "Quitar {{name}} de esta foto",
       "adjusted": "Ajustada para esta foto; el preajuste de la biblioteca no cambia.",
       "revert": "Revertir",
-      "placement": "Colocación",
-      "create": "Crear marca de agua",
       "createHint": "Diseña aquí tu marca de agua. Guárdala para usarla en esta foto y conservarla en tu biblioteca.",
-      "cancelCreate": "Cancelar",
       "saveAndUse": "Guardar y usar",
       "emptyReadOnly": "Aún no hay marcas de agua en esta biblioteca.",
       "firstUseHint": "Añade una marca de agua y abre Exportar para descargar tu foto."

@@ -1,4 +1,4 @@
-import { type KeyboardEvent, type PointerEvent, useRef } from 'react'
+import { type KeyboardEvent, type PointerEvent, useEffect, useLayoutEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { GesturePhase } from './mark-overlay'
@@ -63,6 +63,21 @@ const HANDLE_POSITIONS: Record<CropHandle, string> = {
 export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: CropOverlayProps) {
   const { t } = useTranslation()
   const dragRef = useRef<DragState | null>(null)
+  const gestureCallback = useRef(onGesture)
+  useLayoutEffect(() => {
+    gestureCallback.current = onGesture
+  }, [onGesture])
+  const frameRef = useRef<number | null>(null)
+  const pending = useRef<CropRect | null>(null)
+  const latest = useRef<CropRect | null>(null)
+  useEffect(
+    () => () => {
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
+      pending.current = null
+      dragRef.current = null
+    },
+    [],
+  )
   const k = displaySize.width / source.width
   if (!(k > 0) || !Number.isFinite(k)) {
     return null
@@ -72,6 +87,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
     event.preventDefault()
     event.stopPropagation()
     event.currentTarget.setPointerCapture(event.pointerId)
+    latest.current = null
     dragRef.current = {
       pointerId: event.pointerId,
       handle,
@@ -79,7 +95,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
       startY: event.clientY,
       crop,
     }
-    onGesture({ phase: 'start' })
+    gestureCallback.current({ phase: 'start' })
   }
 
   function move(event: PointerEvent<HTMLElement>) {
@@ -93,15 +109,36 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
       drag.handle === 'move'
         ? moveCrop(drag.crop, dx, dy, source)
         : resizeCrop(drag.crop, drag.handle, dx, dy, ratio, source)
-    onGesture({ phase: 'move', crop: next })
+    if (
+      latest.current !== null &&
+      next.x === latest.current.x &&
+      next.y === latest.current.y &&
+      next.width === latest.current.width &&
+      next.height === latest.current.height
+    )
+      return
+    latest.current = next
+    pending.current = next
+    frameRef.current ??= requestAnimationFrame(flush)
+  }
+
+  function flush() {
+    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
+    frameRef.current = null
+    const next = pending.current
+    pending.current = null
+    if (next !== null && dragRef.current !== null)
+      gestureCallback.current({ phase: 'move', crop: next })
   }
 
   function end(event: PointerEvent<HTMLElement>) {
     if (dragRef.current?.pointerId !== event.pointerId) {
       return
     }
+    if (event.type === 'pointerup') move(event)
+    flush()
     dragRef.current = null
-    onGesture({ phase: 'end' })
+    gestureCallback.current({ phase: 'end' })
   }
 
   function keyboard(event: KeyboardEvent<HTMLDivElement>) {
@@ -119,7 +156,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
       return
     }
     event.preventDefault()
-    onGesture({ phase: 'commit', crop: moveCrop(crop, delta[0], delta[1], source) })
+    gestureCallback.current({ phase: 'commit', crop: moveCrop(crop, delta[0], delta[1], source) })
   }
 
   const left = crop.x * k
@@ -147,6 +184,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
         onPointerMove={move}
         onPointerUp={end}
         onPointerCancel={end}
+        onLostPointerCapture={end}
         onKeyDown={keyboard}
         className="pointer-events-auto absolute cursor-move touch-none outline-1 outline-white focus-visible:outline-2 focus-visible:outline-brand-400"
         style={{ left, top, width, height }}
@@ -166,6 +204,7 @@ export function CropOverlay({ crop, source, displaySize, ratio, onGesture }: Cro
             onPointerMove={move}
             onPointerUp={end}
             onPointerCancel={end}
+            onLostPointerCapture={end}
             className={`absolute size-3.5 touch-none rounded-sm border-2 border-brand-600 bg-white shadow after:absolute after:-inset-3 after:content-[""] pointer-coarse:size-5 ${HANDLE_POSITIONS[handle]}`}
           />
         ))}

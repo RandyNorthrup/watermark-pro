@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "Dashboard",
       "library": "Bibliotheek",
       "editor": "Editor",
       "bulk": "Bulk",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "Aangemeld als {{email}}",
-    "yourWorkspace": "Je werkruimte",
     "yourRole": "Je rol in deze werkruimte:",
-    "toolsHeading": "Tools",
-    "tools": {
-      "library": {
-        "label": "Bibliotheek",
-        "body": "Ontwerp tekst-, symbool- en logowatermerken één keer en bewaar ze als presets."
-      },
-      "editor": {
-        "label": "Editor",
-        "body": "Watermerk één foto met de hand: plaatsen, bijsnijden, formaat wijzigen en exporteren."
-      },
-      "bulk": {
-        "label": "Bulk",
-        "body": "Pas een preset toe op een hele shoot en download de resultaten als ZIP."
-      },
-      "gallery": {
-        "label": "Galerie",
-        "body": "Bekijk opgeslagen foto’s en kies welke je met een link deelt."
-      }
-    },
     "overviewHeading": "Overzicht",
     "members": "Leden",
     "noPendingInvitations": "Geen openstaande uitnodigingen.",
@@ -229,6 +208,8 @@
       "specimen": "Pa's wijze lynx bezag vroom het fikse aquaduct",
       "search": "Lettertypen zoeken",
       "resultCount": "{{count}} lettertypefamilies",
+      "recent": "Recent gebruikt",
+      "all": "Alle lettertypen",
       "license": "Lettertypelicentie"
     },
     "symbol": {
@@ -451,10 +432,7 @@
       "removeLayer": "{{name}} van deze foto verwijderen",
       "adjusted": "Aangepast voor deze foto; de preset in de bibliotheek blijft ongewijzigd.",
       "revert": "Terugzetten",
-      "placement": "Plaatsing",
-      "create": "Watermerk maken",
       "createHint": "Ontwerp hier je watermerk. Sla het op voor deze foto en bewaar het in je bibliotheek.",
-      "cancelCreate": "Annuleren",
       "saveAndUse": "Opslaan en gebruiken",
       "emptyReadOnly": "Deze bibliotheek bevat nog geen watermerken.",
       "firstUseHint": "Voeg een watermerk toe en open Exporteren om je foto te downloaden."

@@ -172,29 +172,31 @@ export function ExportPanel({
           share: isShareable ? t('editor.export.shareClause') : '',
         })}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex w-full flex-col gap-2">
         <Button
           type="button"
+          className="w-full justify-start"
           isPending={isExporting}
           disabled={!isReady || isBlocked || (isBusy && !isExporting)}
           onClick={() => {
             onExport(options())
           }}
         >
-          {isExporting ? null : <Download aria-hidden="true" className="size-4" />}
+          {isExporting ? null : <Download aria-hidden="true" className="size-5" />}
           {t('editor.export.download')}
         </Button>
         {isShareable ? (
           <Button
             type="button"
             variant="secondary"
+            className="w-full justify-start"
             isPending={isSharing}
             disabled={!isReady || isBlocked || (isBusy && !isSharing)}
             onClick={() => {
               onShare(options())
             }}
           >
-            {isSharing ? null : <Share2 aria-hidden="true" className="size-4" />}
+            {isSharing ? null : <Share2 aria-hidden="true" className="size-5" />}
             {t('editor.export.share')}
           </Button>
         ) : null}
@@ -202,19 +204,22 @@ export function ExportPanel({
           <Button
             type="button"
             variant="secondary"
+            className="w-full justify-start"
             isPending={isSaving}
             disabled={!isReady || isBlocked || (isBusy && !isSaving)}
             onClick={() => {
               onSave(options())
             }}
           >
-            {isSaving ? null : <Images aria-hidden="true" className="size-4" />}
+            {isSaving ? null : <Images aria-hidden="true" className="size-5" />}
             {t('editor.export.saveToGallery')}
           </Button>
         )}
         {cloudConfig === undefined || onExportBlob === undefined ? null : (
           <CloudSaveButtons
             config={cloudConfig}
+            buttonClassName="w-full justify-start"
+            buttonSize="md"
             disabled={!isReady || isBlocked || isBusy}
             getUploads={async () => {
               const upload = await onExportBlob(options())

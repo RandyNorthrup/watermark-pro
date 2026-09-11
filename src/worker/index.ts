@@ -28,6 +28,7 @@ import { importRoutes } from './routes/imports'
 import { serveLanding } from './routes/landing'
 import { libraryRoutes } from './routes/library'
 import { meRoutes } from './routes/me'
+import { serveMicrosoftBridge } from './routes/microsoft-bridge'
 import { photoRoutes } from './routes/photos'
 import { recentWorkRoutes } from './routes/recent-work'
 import { referralRoutes } from './routes/referrals'
@@ -201,6 +202,8 @@ export async function runHealthCheck(env: Env): Promise<void> {
  */
 export default {
   async fetch(request, env, ctx) {
+    const bridge = await serveMicrosoftBridge(request, env)
+    if (bridge !== null) return bridge
     const landing = await serveLanding(request, env)
     return landing ?? (await app.fetch(request, env, ctx))
   },

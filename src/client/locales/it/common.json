@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "Dashboard",
       "library": "Libreria",
       "editor": "Editor",
       "bulk": "In blocco",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "Accesso effettuato come {{email}}",
-    "yourWorkspace": "Il tuo spazio di lavoro",
     "yourRole": "Il tuo ruolo in questo spazio:",
-    "toolsHeading": "Strumenti",
-    "tools": {
-      "library": {
-        "label": "Libreria",
-        "body": "Progetta filigrane di testo, simbolo e logo una volta sola e conservale come preset."
-      },
-      "editor": {
-        "label": "Editor",
-        "body": "Applica la filigrana a una foto a mano: posiziona, ritaglia, ridimensiona ed esporta."
-      },
-      "bulk": {
-        "label": "In blocco",
-        "body": "Applica un preset a un intero servizio fotografico e scarica i risultati in un ZIP."
-      },
-      "gallery": {
-        "label": "Galleria",
-        "body": "Sfoglia le foto salvate, poi scegli quali condividere tramite link."
-      }
-    },
     "overviewHeading": "Panoramica",
     "members": "Membri",
     "noPendingInvitations": "Nessun invito in sospeso.",
@@ -230,6 +209,8 @@
       "specimen": "Ma la volpe col suo balzo raggiunse il quieto Fido",
       "search": "Cerca caratteri",
       "resultCount": "{{count}} famiglie di caratteri",
+      "recent": "Usati di recente",
+      "all": "Tutti i caratteri",
       "license": "Licenza del carattere"
     },
     "symbol": {
@@ -452,10 +433,7 @@
       "removeLayer": "Rimuovi {{name}} da questa foto",
       "adjusted": "Adattato a questa foto; il preset nella libreria resta invariato.",
       "revert": "Ripristina",
-      "placement": "Posizionamento",
-      "create": "Crea filigrana",
       "createHint": "Crea qui la tua filigrana. Salvala per usarla su questa foto e conservarla nella libreria.",
-      "cancelCreate": "Annulla",
       "saveAndUse": "Salva e usa",
       "emptyReadOnly": "Non sono ancora disponibili filigrane in questa libreria.",
       "firstUseHint": "Aggiungi una filigrana, poi apri Esporta per scaricare la foto."
