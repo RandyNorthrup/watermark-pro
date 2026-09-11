@@ -1,11 +1,19 @@
-import { focusManager, onlineManager } from '@tanstack/react-query'
-import { act, screen, waitFor, within } from '@testing-library/react'
+import { focusManager, onlineManager, QueryClientProvider } from '@tanstack/react-query'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterProvider,
+} from '@tanstack/react-router'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HTTP_STATUS } from '../../../shared/constants'
 import { shellOrganizationSchema } from '../../../shared/shell-cache'
+import { AppShell } from '../../components/app-shell'
 import { activeOrganizationQueryOptions, sessionQueryOptions } from '../../lib/queries'
+import { createQueryClient } from '../../lib/query-client'
 import {
   makeMember,
   makeOrganization,
@@ -13,16 +21,25 @@ import {
   seedOwnerWorkspace,
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
+import { installLibraryApi } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
+vi.mock('../../components/offline-panel', () => ({
+  OfflinePanel: ({ shouldManageSync }: { shouldManageSync: boolean }) => (
+    <section aria-label="Offline work" data-sync-owner={String(shouldManageSync)}>
+      <button>Sync now</button>
+    </section>
+  ),
+}))
 
 const client = fakeAuth
-/** Dashboard plus the seven workspace tools. Account destinations live under the user. */
-const WORKSPACE_NAV_ITEM_COUNT = 8
+/** Seven workspace tools; Overview is reserved for site managers. Account destinations live under the user. */
+const WORKSPACE_NAV_ITEM_COUNT = 7
 
 beforeEach(() => {
   installFakeAuth()
+  installLibraryApi()
   window.localStorage.clear()
   delete document.documentElement.dataset['theme']
 })
@@ -34,6 +51,44 @@ afterEach(() => {
 })
 
 describe('application shell', () => {
+  it('places one sync owner in the sidebar and shared controls at the bottom of the phone menu', async () => {
+    seedOwnerWorkspace(client())
+    const { data: session } = await client().getSession()
+    if (session === null) throw new Error('Expected signed-in session')
+    // This test admits storage only to exercise shell placement; recovery controls
+    // and the single synchronization lifecycle have real IndexedDB browser tests.
+    vi.stubGlobal('indexedDB', {})
+    const root = createRootRoute({
+      component: () => (
+        <AppShell session={session} organization={null} organizations={[]}>
+          <h1>Actual tool content</h1>
+        </AppShell>
+      ),
+    })
+    const router = createRouter({
+      routeTree: root,
+      history: createMemoryHistory({ initialEntries: ['/'] }),
+    })
+    render(
+      <QueryClientProvider client={createQueryClient()}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    )
+    const sidebar = await screen.findByRole('complementary')
+    expect(await within(sidebar).findByRole('region', { name: 'Offline work' })).toHaveAttribute(
+      'data-sync-owner',
+      'true',
+    )
+    expect(
+      within(screen.getByRole('main')).queryByRole('button', { name: 'Sync now' }),
+    ).not.toBeInTheDocument()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Menu' }))
+    const menu = await screen.findByRole('dialog', { name: 'Menu' })
+    const mobileSync = await within(menu).findByRole('region', { name: 'Offline work' })
+    expect(mobileSync).toHaveAttribute('data-sync-owner', 'false')
+    expect(mobileSync.parentElement).toBe(menu.lastElementChild)
+    expect(within(mobileSync).getByRole('button', { name: 'Sync now' })).toBeInTheDocument()
+  })
   it('withholds child content for an unusable workspace and recovers through the existing chooser', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
@@ -51,8 +106,8 @@ describe('application shell', () => {
     expect(client().organization.getFullOrganization).not.toHaveBeenCalled()
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
     await user.click(await screen.findByRole('menuitem', { name: 'My workspace' }))
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('My workspace')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
     expect(client().state.activeOrganizationId).toBe(`personal-${OWNER.id}`)
   })
 
@@ -103,7 +158,7 @@ describe('application shell', () => {
       screen.getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
     )
     await user.click(await screen.findByRole('menuitem', { name: 'Side Project' }))
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
     expect(client().organization.setActive).toHaveBeenCalledWith({ organizationId: 'org-2' })
 
     await user.click(

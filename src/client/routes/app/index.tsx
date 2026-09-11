@@ -1,42 +1,19 @@
-import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
-import { Images, Layers, PencilRuler, ScrollText, Stamp, Users } from 'lucide-react'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { ScrollText, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { RecentWork } from '../../components/recent-work/recent-work'
+import { canManageSite } from '../../../shared/site-role-values'
+import { AccountStatistics } from '../../components/account-statistics'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
+import { useActiveOrganization } from '../../lib/active-organization'
 import { readActiveMemberRole } from '../../lib/queries'
 
-const appRoute = getRouteApi('/app')
-
-const TOOLS = [
-  {
-    to: '/app/library',
-    labelKey: 'dashboard.tools.library.label',
-    bodyKey: 'dashboard.tools.library.body',
-    icon: Stamp,
-  },
-  {
-    to: '/app/editor',
-    labelKey: 'dashboard.tools.editor.label',
-    bodyKey: 'dashboard.tools.editor.body',
-    icon: PencilRuler,
-  },
-  {
-    to: '/app/bulk',
-    labelKey: 'dashboard.tools.bulk.label',
-    bodyKey: 'dashboard.tools.bulk.body',
-    icon: Layers,
-  },
-  {
-    to: '/app/gallery',
-    labelKey: 'dashboard.tools.gallery.label',
-    bodyKey: 'dashboard.tools.gallery.body',
-    icon: Images,
-  },
-] as const
-
 export const Route = createFileRoute('/app/')({
+  beforeLoad: ({ context }) => {
+    if (!canManageSite(context.session.user.role))
+      throw redirect({ to: '/app/editor', replace: true })
+  },
   loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: DashboardPage,
 })
@@ -44,7 +21,7 @@ export const Route = createFileRoute('/app/')({
 function DashboardPage() {
   const { t } = useTranslation()
   const { session } = Route.useRouteContext()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
   const memberCount = organization?.members.length ?? 0
   const pendingCount =
@@ -56,45 +33,14 @@ function DashboardPage() {
         <p className="text-sm text-ink-muted">
           {t('dashboard.signedInAs', { email: session.user.email })}
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {organization?.name ?? t('dashboard.yourWorkspace')}
-        </h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('dashboard.overviewHeading')}</h1>
         {membership === null ? null : (
           <p className="text-sm">
             {t('dashboard.yourRole')} <Badge>{membership.role}</Badge>
           </p>
         )}
       </header>
-      {organization === null ? null : (
-        <RecentWork
-          organizationId={organization.id}
-          organizationName={organization.name}
-          role={membership?.role}
-        />
-      )}
-      <section aria-labelledby="tools-heading" className="flex flex-col gap-3">
-        <h2 id="tools-heading" className="text-xl font-semibold tracking-tight">
-          {t('dashboard.toolsHeading')}
-        </h2>
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {TOOLS.map(({ to, labelKey, bodyKey, icon: Icon }) => (
-            <li key={to}>
-              <Link
-                to={to}
-                className="flex h-full items-start gap-3 rounded-card border border-line bg-surface-raised p-4 shadow-card transition-colors hover:border-brand-300 hover:bg-brand-50/40 dark:hover:bg-brand-900/20"
-              >
-                <span className="rounded-lg bg-brand-50 p-2 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
-                  <Icon aria-hidden="true" className="size-5" />
-                </span>
-                <span className="flex flex-col gap-1">
-                  <span className="font-semibold">{t(labelKey)}</span>
-                  <span className="text-sm text-ink-muted">{t(bodyKey)}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <AccountStatistics />
       <section aria-labelledby="overview-heading" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <h2 id="overview-heading" className="sr-only">
           {t('dashboard.overviewHeading')}

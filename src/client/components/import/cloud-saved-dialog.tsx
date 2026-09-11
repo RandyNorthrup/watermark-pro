@@ -1,3 +1,4 @@
+import { Cloud } from 'lucide-react'
 import { Dialog } from 'radix-ui'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,15 +21,23 @@ import { Button } from '../ui/button'
 interface SavedDialogProps {
   config: PublicConfig
   files: readonly CloudSavedFile[]
+  triggerClassName?: string | undefined
+  triggerSize?: 'sm' | 'md' | undefined
 }
 
 /** Confirmed provider files and explicit, reversible native link controls. */
-export function CloudSavedDialog({ config, files }: SavedDialogProps) {
+export function CloudSavedDialog({
+  config,
+  files,
+  triggerClassName,
+  triggerSize = 'sm',
+}: SavedDialogProps) {
   const { t } = useTranslation()
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <Button type="button" variant="secondary" size="sm">
+        <Button type="button" variant="secondary" size={triggerSize} className={triggerClassName}>
+          <Cloud aria-hidden="true" className="size-5" />
           {t('import.cloudSaved', { total: files.length })}
         </Button>
       </Dialog.Trigger>

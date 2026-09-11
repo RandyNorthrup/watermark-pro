@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "Dashboard",
       "library": "Bibliothek",
       "editor": "Editor",
       "bulk": "Stapel",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "Angemeldet als {{email}}",
-    "yourWorkspace": "Ihr Workspace",
     "yourRole": "Deine Rolle in diesem Arbeitsbereich:",
-    "toolsHeading": "Tools",
-    "tools": {
-      "library": {
-        "label": "Bibliothek",
-        "body": "Text-, Symbol- und Logo-Wasserzeichen einmal gestalten und als Presets speichern."
-      },
-      "editor": {
-        "label": "Editor",
-        "body": "Ein Foto von Hand mit einem Wasserzeichen versehen: platzieren, zuschneiden, skalieren und exportieren."
-      },
-      "bulk": {
-        "label": "Stapel",
-        "body": "Ein Preset auf ein ganzes Shooting anwenden und die Ergebnisse als ZIP herunterladen."
-      },
-      "gallery": {
-        "label": "Galerie",
-        "body": "Durchsuche gespeicherte Fotos und wähle aus, welche du per Link teilst."
-      }
-    },
     "overviewHeading": "Übersicht",
     "members": "Mitglieder",
     "noPendingInvitations": "Keine ausstehenden Einladungen.",
@@ -229,6 +208,8 @@
       "specimen": "Zwölf Boxkämpfer jagen Viktor",
       "search": "Schriften suchen",
       "resultCount": "{{count}} Schriftfamilien",
+      "recent": "Zuletzt verwendet",
+      "all": "Alle Schriftarten",
       "license": "Schriftlizenz"
     },
     "symbol": {
@@ -451,10 +432,7 @@
       "removeLayer": "{{name}} von diesem Foto entfernen",
       "adjusted": "Für dieses Foto angepasst; das Preset in der Bibliothek bleibt unverändert.",
       "revert": "Zurücksetzen",
-      "placement": "Platzierung",
-      "create": "Wasserzeichen erstellen",
       "createHint": "Gestalte dein Wasserzeichen hier. Speichere es für dieses Foto und zur Wiederverwendung in der Bibliothek.",
-      "cancelCreate": "Abbrechen",
       "saveAndUse": "Speichern und verwenden",
       "emptyReadOnly": "In dieser Bibliothek sind noch keine Wasserzeichen verfügbar.",
       "firstUseHint": "Füge ein Wasserzeichen hinzu und öffne Exportieren, um dein Foto herunterzuladen."

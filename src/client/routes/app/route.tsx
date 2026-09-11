@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 
 import { AppShell } from '../../components/app-shell'
 import { Alert } from '../../components/ui/alert'
+import { ActiveOrganizationContext } from '../../lib/active-organization'
 import { describeError } from '../../lib/errors'
 import { OfflineAccessError } from '../../lib/offline-access'
 import { ACCOUNT_CHANGED_EVENT, lockOfflineAccount } from '../../lib/offline-account'
@@ -111,8 +112,18 @@ function AppLayout() {
       ? null
       : organization
   return (
-    <AppShell session={session} organization={displayedOrganization} organizations={organizations}>
-      {selectionRequired ? <Alert tone="info">{t('shell.chooseOrganization')}</Alert> : <Outlet />}
-    </AppShell>
+    <ActiveOrganizationContext.Provider value={displayedOrganization}>
+      <AppShell
+        session={session}
+        organization={displayedOrganization}
+        organizations={organizations}
+      >
+        {selectionRequired ? (
+          <Alert tone="info">{t('shell.chooseOrganization')}</Alert>
+        ) : (
+          <Outlet />
+        )}
+      </AppShell>
+    </ActiveOrganizationContext.Provider>
   )
 }

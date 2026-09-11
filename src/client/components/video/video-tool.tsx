@@ -576,18 +576,27 @@ interface PreviewProps {
 /** Renders the chosen layers on the video's first frame through the editor preview path. */
 function VideoPreview({ organizationId, file, specs, size }: PreviewProps) {
   const { t } = useTranslation()
-  const { result, setSubject } = useRenderer(organizationId, specs, undefined, size)
+  const [subjectReady, setSubjectReady] = useState(false)
+  const {
+    error: renderError,
+    result,
+    setSubject,
+  } = useRenderer(organizationId, specs, undefined, size, subjectReady)
   const [frameError, setFrameError] = useState<string | null>(null)
 
   useEffect(() => {
     // Read through a property so a stale async result is dropped without
     // TypeScript narrowing the flag to a constant across the await.
     const live = { current: true }
+    const showSubject = () => {
+      if (live.current) setSubjectReady(true)
+    }
     void (async () => {
       try {
         const png = await sampleFrame(file, PREVIEW_TIMESTAMP_SECONDS)
         if (live.current) {
           await setSubject(new File([png], 'frame.png', { type: 'image/png' }))
+          showSubject()
         }
       } catch (error) {
         if (live.current) {
@@ -600,14 +609,15 @@ function VideoPreview({ organizationId, file, specs, size }: PreviewProps) {
     }
   }, [file, setSubject])
 
-  if (frameError !== null) {
+  const previewError = frameError ?? renderError
+  if (previewError !== null) {
     return (
       <Alert tone="error" className="m-3">
-        {frameError}
+        {previewError}
       </Alert>
     )
   }
-  if (result === null) {
+  if (!subjectReady || result === null) {
     return (
       <div className="flex items-center justify-center p-6">
         <Spinner className="size-6" label={t('video.renderingPreview')} />
@@ -620,7 +630,7 @@ function VideoPreview({ organizationId, file, specs, size }: PreviewProps) {
       alt={t('video.previewAlt')}
       width={result.width}
       height={result.height}
-      className="mx-auto block max-h-[42svh] max-w-full lg:max-h-[60vh]"
+      className="mx-auto block h-auto max-h-[42svh] w-auto max-w-full lg:max-h-[60vh]"
     />
   )
 }

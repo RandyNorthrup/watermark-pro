@@ -34,19 +34,19 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
     const page = await browser.newPage()
     const catalogue = { recent: { heading: 'Recent work', details: 'Details' } }
     const surface = {
-      id: 'recent-details',
-      headingText: 'My workspace',
+      ...requireSurface('library-recent-details'),
+      headingText: 'Watermark library',
       checks: [
         { role: 'region', nameKey: 'recent.heading', contains: 'Studio signature' },
         { role: 'button', nameKey: 'recent.details', pressed: true },
       ],
     }
     const good =
-      '<h1>My workspace</h1><section aria-label="Recent work">Studio signature<button aria-pressed="true">Details</button></section>'
+      '<h1>Watermark library</h1><section aria-label="Recent work">Studio signature<button aria-pressed="true">Details</button></section>'
     await page.setContent(good)
     await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
     for (const [html, failure] of [
-      [good.replace('My workspace', 'Something went wrong'), /expected heading/],
+      [good.replace('Watermark library', 'Something went wrong'), /expected heading/],
       [good.replace('Studio signature', 'No saved work'), /fixture content/],
       [good.replace('aria-pressed="true"', 'aria-pressed="false"'), /expected view/],
       [good.replace('<section', '<section hidden'), /required state/],

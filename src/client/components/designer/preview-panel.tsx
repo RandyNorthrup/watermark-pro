@@ -11,6 +11,7 @@ import { PreviewRenderer, type PreviewResult } from '../../lib/preview'
 import { withPlacement, withStyle } from '../../lib/spec-edit'
 import { useElementSize } from '../../lib/use-element-size'
 import { MarkOverlay, type MarkGesture } from '../editor/mark-overlay'
+import { usePreviewFrames } from '../editor/use-preview-frames'
 import { SampleScene } from '../sample-scene'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -21,10 +22,9 @@ interface PreviewPanelProps {
   spec: WatermarkSpec
   initialPhoto?: File | undefined
   onSpecChange?: ((spec: WatermarkSpec) => void) | undefined
+  onGesturePhase?: ((phase: MarkGesture['phase']) => void) | undefined
 }
 
-/** Slider drags fire continuously; one render per pause keeps the worker responsive. */
-const RENDER_DEBOUNCE_MS = 120
 const ACCEPTED_PHOTO_TYPES = 'image/png,image/jpeg,image/webp,image/avif,image/gif'
 
 function isRenderable(spec: WatermarkSpec): boolean {
@@ -73,15 +73,15 @@ export function PreviewPanel({
   spec,
   initialPhoto,
   onSpecChange,
+  onGesturePhase,
 }: PreviewPanelProps) {
   const { t } = useTranslation()
   const rendererRef = useRef<PreviewRenderer | null>(null)
+  const subjectRequest = useRef(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
   const displaySize = useElementSize(imageElement)
-  const [result, setResult] = useState<PreviewResult | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isRendering, setIsRendering] = useState(false)
   const [hasOwnPhoto, setHasOwnPhoto] = useState(initialPhoto !== undefined)
   const [preparedPhoto, setPreparedPhoto] = useState<File | undefined>(undefined)
   const isSubjectReady = initialPhoto === undefined || preparedPhoto === initialPhoto
@@ -115,45 +115,16 @@ export function PreviewPanel({
     }
   }, [organizationId, initialPhoto])
 
-  useEffect(() => {
-    if (!isSubjectReady || !isRenderable(spec)) {
-      return
-    }
-    async function renderFrame(renderer: PreviewRenderer) {
-      try {
-        const next = await renderer.render(spec)
-        if (next === null) {
-          return
-        }
-        setResult(next)
-        setError(null)
-        setIsRendering(false)
-      } catch (error_) {
-        setError(describeError(error_))
-        setIsRendering(false)
-      }
-    }
-    const timer = setTimeout(() => {
-      const renderer = rendererRef.current
-      if (renderer === null) {
-        return
-      }
-      setIsRendering(true)
-      void renderFrame(renderer)
-    }, RENDER_DEBOUNCE_MS)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [spec, subjectVersion, isSubjectReady])
-
-  // Each object URL lives until the next result replaces it or the panel unmounts.
-  useEffect(
-    () => () => {
-      if (result !== null) {
-        URL.revokeObjectURL(result.url)
-      }
-    },
-    [result],
+  const {
+    result,
+    isRendering,
+    error: renderError,
+  } = usePreviewFrames(
+    rendererRef,
+    spec,
+    {},
+    `${organizationId}:${String(subjectVersion)}`,
+    isSubjectReady && isRenderable(spec),
   )
 
   // A logo mark without a logo has nothing to show; a frame left over from
@@ -165,11 +136,15 @@ export function PreviewPanel({
     if (renderer === null) {
       return
     }
+    subjectRequest.current += 1
+    const request = subjectRequest.current
     try {
       await renderer.setSubject(file)
+      if (rendererRef.current !== renderer || request !== subjectRequest.current) return
       setHasOwnPhoto(file !== null)
       setSubjectVersion((version) => version + 1)
     } catch (error_) {
+      if (rendererRef.current !== renderer || request !== subjectRequest.current) return
       setError(describeError(error_))
     }
   }
@@ -183,6 +158,7 @@ export function PreviewPanel({
 
   function changePlacement(gesture: MarkGesture) {
     if (onSpecChange === undefined) return
+    onGesturePhase?.(gesture.phase)
     let next = spec
     if (gesture.patch.x !== undefined && gesture.patch.y !== undefined) {
       next = withPlacement(next, {
@@ -290,7 +266,7 @@ export function PreviewPanel({
               alt={t('designer.preview.alt')}
               width={shownResult.width}
               height={shownResult.height}
-              className="block max-h-[70vh] max-w-full object-contain"
+              className="block h-auto max-h-[70vh] w-auto max-w-full object-contain"
             />
             {onSpecChange === undefined || spec.style.tiling.enabled
               ? null
@@ -299,7 +275,10 @@ export function PreviewPanel({
                   if (outcome === undefined) return null
                   return (
                     <MarkOverlay
+                      key={`${organizationId}:${String(subjectVersion)}:${spec.kind}`}
                       placement={outcome.placement}
+                      position={spec.placement}
+                      renderedScale={shownResult.specs?.[0]?.style.scale}
                       previewSize={{ width: shownResult.width, height: shownResult.height }}
                       displaySize={displaySize}
                       scale={spec.style.scale}
@@ -320,9 +299,9 @@ export function PreviewPanel({
           )}
         </div>
       )}
-      {error === null ? null : (
+      {error === null && renderError === null ? null : (
         <Alert tone="error" title={t('designer.preview.failed')}>
-          {error}
+          {error ?? renderError}
         </Alert>
       )}
     </section>

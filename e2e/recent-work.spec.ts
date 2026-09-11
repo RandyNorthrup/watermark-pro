@@ -40,6 +40,8 @@ test('recent work opens real content in three accessible views, survives offline
     password: 'correct horse battery',
   }
   await signUpAndVerify(page, request, owner)
+  await expect(page).toHaveURL(/\/app\/editor$/)
+  await navigateTo(page, 'Library')
   const recents = page.getByRole('region', { name: 'Recent work', exact: true })
   await expect(recents.getByText(/Your recent work appears here/)).toBeVisible()
   await expectAccessible(page)
@@ -49,6 +51,8 @@ test('recent work opens real content in three accessible views, survives offline
   await page.getByLabel('Preset name').fill('Private recent signature')
   await page.getByRole('textbox', { name: 'Text' }).fill('© Recent studio')
   await page.getByRole('button', { name: 'Save preset' }).click()
+  const preset = recents.getByRole('link', { name: 'Private recent signature', exact: true })
+  await expectImage(preset)
   await page.getByRole('link', { name: 'Open Private recent signature in the editor' }).click()
   await page.getByLabel('Open a photo').setInputFiles({
     name: 'private-recent.png',
@@ -60,12 +64,11 @@ test('recent work opens real content in three accessible views, survives offline
   await page.getByRole('option', { name: 'PNG' }).click()
   await page.getByRole('button', { name: 'Save to gallery' }).click()
   await expect(page.getByText(/Saved private-recent-watermarked\.png to the/)).toBeVisible()
-  await navigateTo(page, 'Dashboard')
+  await navigateTo(page, 'Gallery')
   const photo = recents.getByRole('button', { name: 'private-recent-watermarked.png', exact: true })
-  const preset = recents.getByRole('link', { name: 'Private recent signature', exact: true })
+  await expect(preset).toHaveCount(0)
   await expect(photo).toBeVisible()
   await expectImage(photo)
-  await expectImage(preset)
   const firstThumbnail = await photo.locator('img').boundingBox()
   const viewport = page.viewportSize()
   expect(firstThumbnail).not.toBeNull()
@@ -102,13 +105,21 @@ test('recent work opens real content in three accessible views, survives offline
   )
   await recents.getByRole('searchbox').fill('signature')
   await expect(photo).toHaveCount(0)
+  await expect(recents.getByText('No recent work matches your search.')).toBeVisible()
+  await navigateTo(page, 'Library')
+  await expect(recents.getByRole('button', { name: 'Details', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await expect(photo).toHaveCount(0)
   await expect(preset).toBeVisible()
   await recents.getByRole('searchbox').fill('')
   await preset.click()
   await expect(page.getByLabel('Preset name')).toHaveValue('Private recent signature')
-  await navigateTo(page, 'Dashboard')
+  await navigateTo(page, 'Library')
   await expect(recents.getByRole('row').nth(1)).toContainText('Private recent signature')
 
+  await navigateTo(page, 'Gallery')
   await photo.click()
   const viewer = page.getByRole('dialog', { name: 'private-recent-watermarked.png' })
   await expectImage(viewer)
@@ -144,7 +155,12 @@ test('recent work opens real content in three accessible views, survives offline
   await viewer.getByRole('button', { name: 'Delete' }).click()
   await expect(viewer).toHaveCount(0)
   await expect(photo).toHaveCount(0)
+  await navigateTo(page, 'Library')
   await expect(preset).toBeVisible()
+  await expect(recents.getByRole('button', { name: 'List', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
   await signOut(page, owner.name)
 
   await signUpAndVerify(page, request, {
@@ -152,12 +168,16 @@ test('recent work opens real content in three accessible views, survives offline
     email: `other-recent-${suffix}@example.test`,
     password: 'another private passphrase',
   })
+  await navigateTo(page, 'Library')
   await expect(recents.getByText(/Your recent work appears here/)).toBeVisible()
   await expect(recents.getByRole('button', { name: 'Thumbnails', exact: true })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
   await expect(page.getByText('Private recent signature')).toHaveCount(0)
+  await expect(page.getByText('private-recent-watermarked.png')).toHaveCount(0)
+  await navigateTo(page, 'Gallery')
+  await expect(recents.getByText(/Your recent work appears here/)).toBeVisible()
   await expect(page.getByText('private-recent-watermarked.png')).toHaveCount(0)
   await expectAccessible(page)
 })

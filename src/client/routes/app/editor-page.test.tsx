@@ -22,6 +22,7 @@ import {
   resetFakePreview,
   previewSubjects,
 } from '../../test-support/fake-preview'
+import { mockElementBounds } from '../../test-support/mock-element-bounds'
 import { renderApp } from '../../test-support/render-app'
 
 vi.mock('../../lib/imports/google-drive-save', () => ({ saveToGoogleDrive: vi.fn() }))
@@ -79,17 +80,7 @@ beforeEach(() => {
   googleSave.mockReset()
   Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:unused'), revokeObjectURL: vi.fn() })
   // jsdom has no layout; give the preview image a size so the overlays render.
-  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
-    x: 0,
-    y: 0,
-    left: 0,
-    top: 0,
-    right: 480,
-    bottom: 320,
-    width: 480,
-    height: 320,
-    toJSON: () => ({}),
-  })
+  mockElementBounds()
 })
 
 afterEach(() => {
@@ -202,9 +193,9 @@ describe('editor page', () => {
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'custom', x: 0.79, y: 0.9 }))
     expect(screen.getByText(/Adjusted for this photo/)).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Undo' }))
+    await user.click(screen.getAllByRole('button', { name: 'Undo' })[0]!)
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'smart' }))
-    await user.click(screen.getByRole('button', { name: 'Redo' }))
+    await user.click(screen.getAllByRole('button', { name: 'Redo' })[0]!)
     await waitFor(() => expect(lastSpec()?.placement.mode).toBe('custom'))
 
     await user.click(screen.getByRole('button', { name: 'Revert' }))
@@ -292,7 +283,7 @@ describe('editor page', () => {
     await user.click(screen.getByRole('button', { name: 'Rotate right' }))
     await waitFor(() => expect(renderedTransforms.at(-1)?.orientation?.turns).toBe(1))
 
-    await user.click(screen.getByRole('button', { name: 'Undo' }))
+    await user.click(screen.getAllByRole('button', { name: 'Undo' })[0]!)
     await waitFor(() => expect(renderedTransforms.at(-1)?.orientation).toBeUndefined())
   })
 
@@ -301,7 +292,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor')
-    await screen.findByLabelText('Preset')
+    await screen.findByRole('combobox', { name: 'Preset' })
     expect(
       screen.getByText('Add a watermark, then open Export to download your photo.'),
     ).toBeInTheDocument()
@@ -356,7 +347,7 @@ describe('editor page', () => {
     fireEvent.pointerMove(frame, { pointerId: 1, clientX: 250, clientY: 200 })
     fireEvent.pointerUp(frame, { pointerId: 1, clientX: 250, clientY: 200 })
     await waitFor(() => expect(lastSpec()?.placement.mode).toBe('custom'))
-    await user.click(screen.getByRole('button', { name: 'Undo' }))
+    await user.click(screen.getAllByRole('button', { name: 'Undo' })[0]!)
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'smart' }))
 
     const canvas = screen.getByRole('img', { name: /Photo with the watermark/ }).parentElement
@@ -389,7 +380,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
-    await screen.findByLabelText('Preset')
+    await screen.findByRole('combobox', { name: 'Add another preset' })
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
     expect(
@@ -433,7 +424,7 @@ describe('editor page', () => {
     seedViewerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
-    await screen.findByLabelText('Preset')
+    await screen.findByRole('combobox', { name: 'Add another preset' })
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled()
     expect(screen.queryByRole('button', { name: 'Save to gallery' })).not.toBeInTheDocument()
@@ -444,21 +435,21 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     const api = installLibraryApi()
     const { router } = renderApp('/app/editor')
-    await screen.findByRole('button', { name: 'Create watermark' })
+    await screen.findByRole('textbox', { name: 'Text' })
     const photo = new File(['photo fixture'], 'first-photo.png', { type: 'image/png' })
     await user.upload(screen.getByLabelText('Open a photo'), photo)
-    await user.click(screen.getByRole('button', { name: 'Create watermark' }))
-    const dialog = await screen.findByRole('dialog', { name: 'Create watermark' })
-    await within(dialog).findByLabelText('Preset name')
-    await user.type(within(dialog).getByLabelText('Preset name'), 'First signature')
-    await user.clear(within(dialog).getByRole('textbox', { name: 'Text' }))
-    await user.type(within(dialog).getByRole('textbox', { name: 'Text' }), '© My first photo')
-    await user.click(within(dialog).getByRole('button', { name: 'Save and use' }))
+    expect(screen.queryByRole('button', { name: 'Create watermark' })).not.toBeInTheDocument()
+    const designer = screen.getByRole('tabpanel', { name: 'Watermark' })
+    await within(designer).findByLabelText('Preset name')
+    await user.type(within(designer).getByLabelText('Preset name'), 'First signature')
+    await user.clear(within(designer).getByRole('textbox', { name: 'Text' }))
+    await user.type(within(designer).getByRole('textbox', { name: 'Text' }), '© My first photo')
+    await user.click(within(designer).getByRole('button', { name: 'Save and use' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(router.state.location.pathname).toBe('/app/editor')
     expect(api.watermarks).toHaveLength(1)
     expect(api.watermarks[0]?.spec).toMatchObject({ kind: 'text', text: '© My first photo' })
-    expect(previewSubjects.filter((subject) => subject === photo).length).toBeGreaterThanOrEqual(2)
+    expect(previewSubjects.filter((subject) => subject === photo)).toHaveLength(1)
     expect(await screen.findByRole('list', { name: 'Layers, bottom to top' })).toHaveTextContent(
       'First signature',
     )

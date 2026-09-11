@@ -42,9 +42,12 @@ Online startup validates the live session before showing private data; sign-out,
 server access denial, or an account change cannot authorize a cached fallback.
 Administration, account management and cloud connections require a network.
 
-The [competitor audit](docs/competitor-research.md) distinguishes working
-capabilities, vendor claims, limitations and untested comparisons. Earlier
-claims of superiority on every feature axis were withdrawn. See
+**Capability comparison (2026-09-10):** the [side-by-side matrix](docs/competitor-research.md#side-by-side-feature-matrix--2026-09-10)
+records shared feature categories including text/logo/QR marks, saved presets,
+crop/resize and batch processing. Lumafoil's video, PDF, offline and cloud
+workflows have documented limits. HEIC/RAW/TIFF/PSD input, retained GIF animation,
+custom-font imports, advanced PDF controls and app-native MFA/passkeys remain
+missing. No overall parity or superiority claim is made. See
 [PLAN.md](PLAN.md) and [CHANGELOG.md](CHANGELOG.md) for the roadmap and release history.
 
 ## Stack

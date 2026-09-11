@@ -57,7 +57,6 @@ const OfflinePanel = lazy(async () => {
 // `label` holds the catalogue key, not the visible word; each list translates
 // it at render. The two rails keep their literal keys for the typed catalogue.
 const WORKSPACE_NAV_ITEMS = [
-  { to: '/app', label: 'shell.nav.dashboard', icon: LayoutDashboard, exact: true },
   { to: '/app/library', label: 'shell.nav.library', icon: Stamp, exact: false },
   { to: '/app/editor', label: 'shell.nav.editor', icon: PencilRuler, exact: false },
   { to: '/app/bulk', label: 'shell.nav.bulk', icon: Layers, exact: false },
@@ -67,6 +66,13 @@ const WORKSPACE_NAV_ITEMS = [
   { to: '/app/shares', label: 'shell.nav.shares', icon: Share2, exact: false },
 ] as const
 
+const OVERVIEW_NAV_ITEM = {
+  to: '/app',
+  label: 'dashboard.overviewHeading',
+  icon: LayoutDashboard,
+  exact: true,
+} as const
+
 const SETTINGS_NAV_ITEMS = [
   { to: '/app/account', label: 'accountAuth.heading', icon: Users, exact: false },
   { to: '/app/invitations', label: 'siteInvites.heading', icon: UserPlus, exact: false },
@@ -75,8 +81,8 @@ const SETTINGS_NAV_ITEMS = [
 ] as const
 
 const BACK_TO_WORKSPACE_NAV_ITEM = {
-  to: '/app',
-  label: 'shell.nav.dashboard',
+  to: '/app/editor',
+  label: 'shell.nav.editor',
   icon: ArrowLeft,
   exact: true,
 } as const
@@ -106,6 +112,7 @@ type NavItem =
   | (typeof SETTINGS_NAV_ITEMS)[number]
   | typeof ADMIN_NAV_ITEM
   | typeof BACK_TO_WORKSPACE_NAV_ITEM
+  | typeof OVERVIEW_NAV_ITEM
 
 /**
  * The tools a phone user reaches for most sit in the bottom tab bar; the
@@ -129,9 +136,14 @@ function currentAdminSection(search: unknown): AdminSection {
 
 /** Tool routes keep a focused workspace rail; account routes switch to their own section. */
 function navItemsFor(session: SessionData, pathname: string): readonly NavItem[] {
-  if (!isSettingsArea(pathname)) return WORKSPACE_NAV_ITEMS
-  const settings: readonly NavItem[] = [BACK_TO_WORKSPACE_NAV_ITEM, ...SETTINGS_NAV_ITEMS]
-  return isPlatformAdmin(session.user) ? [...settings, ADMIN_NAV_ITEM] : settings
+  const canManageSite = isPlatformAdmin(session.user)
+  if (!isSettingsArea(pathname))
+    return canManageSite ? [OVERVIEW_NAV_ITEM, ...WORKSPACE_NAV_ITEMS] : WORKSPACE_NAV_ITEMS
+  const back = canManageSite
+    ? { ...OVERVIEW_NAV_ITEM, icon: ArrowLeft }
+    : BACK_TO_WORKSPACE_NAV_ITEM
+  const settings: readonly NavItem[] = [back, ...SETTINGS_NAV_ITEMS]
+  return canManageSite ? [...settings, ADMIN_NAV_ITEM] : settings
 }
 
 interface AppShellProps {
@@ -154,6 +166,7 @@ export function AppShell({ session, organization, organizations, children }: App
   const isAdminArea = pathname.startsWith(ADMIN_NAV_ITEM.to) && isPlatformAdmin(session.user)
   const adminSection = currentAdminSection(search)
   const isSettingsAreaActive = isSettingsArea(pathname)
+  const home = isPlatformAdmin(session.user) ? '/app' : '/app/editor'
   const navItems = navItemsFor(session, pathname)
   const currentItem = navItems.find((item) =>
     item.exact ? pathname === item.to : pathname.startsWith(item.to),
@@ -171,7 +184,7 @@ export function AppShell({ session, organization, organizations, children }: App
         {t('shell.skipToContent')}
       </a>
       <aside className="glass-chrome sticky top-4 my-4 ms-4 hidden h-[calc(100svh-2rem)] w-60 shrink-0 flex-col overflow-y-auto rounded-3xl border border-line px-4 py-6 md:flex">
-        <BrandMark to="/app" className="px-2 py-1" />
+        <BrandMark to={home} className="px-2 py-1" />
         {isSettingsAreaActive ? (
           <Link
             to="/app/account"
@@ -185,24 +198,33 @@ export function AppShell({ session, organization, organizations, children }: App
           </Link>
         ) : null}
         <div className={isSettingsAreaActive ? 'mt-4' : 'mt-6'}>
-          <OrganizationSwitcher organization={organization} organizations={organizations} />
+          <OrganizationSwitcher
+            organization={organization}
+            organizations={organizations}
+            home={home}
+          />
         </div>
         {isAdminArea ? (
           <AdminNavList currentSection={adminSection} className="mt-7" />
         ) : (
           <NavList items={navItems} label={t('shell.primaryNav')} className="mt-7" />
         )}
+        <div className="mt-auto pt-6">
+          <WorkspaceSync userId={session.user.id} organizationId={organization?.id} />
+        </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="glass-chrome sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:top-4 md:mx-4 md:mt-4 md:rounded-2xl md:border md:px-6 md:pt-3">
           <div className="flex min-w-0 items-center gap-1 md:hidden">
             <MobileMenu
+              userId={session.user.id}
+              home={home}
               items={navItems}
               adminSection={isAdminArea ? adminSection : null}
               organization={organization}
               organizations={organizations}
             />
-            <BrandMark to="/app" />
+            <BrandMark to={home} />
           </div>
           <div className="hidden min-w-0 items-center gap-3 text-sm md:flex">
             <span className="truncate text-ink-muted">
@@ -224,21 +246,32 @@ export function AppShell({ session, organization, organizations, children }: App
           tabIndex={-1}
           className="flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:pt-6 md:pb-8"
         >
-          <div className="mx-auto w-full max-w-7xl">
-            {hasOfflineDatabase() ? (
-              <div className="mb-5 min-h-18">
-                <Suspense fallback={null}>
-                  <OfflinePanel userId={session.user.id} organizationId={organization?.id} />
-                </Suspense>
-              </div>
-            ) : null}
-            {children}
-          </div>
+          <div className="mx-auto w-full max-w-7xl">{children}</div>
         </main>
         <TabBar items={TAB_BAR_ITEMS} />
       </div>
     </div>
   )
+}
+
+function WorkspaceSync({
+  userId,
+  organizationId,
+  shouldManageSync = true,
+}: {
+  userId: string
+  organizationId: string | undefined
+  shouldManageSync?: boolean
+}) {
+  return hasOfflineDatabase() ? (
+    <Suspense fallback={null}>
+      <OfflinePanel
+        userId={userId}
+        organizationId={organizationId}
+        shouldManageSync={shouldManageSync}
+      />
+    </Suspense>
+  ) : null
 }
 
 interface NavListProps {
@@ -337,11 +370,15 @@ function TabBar({ items }: { items: readonly NavItem[] }) {
 }
 
 function MobileMenu({
+  userId,
+  home,
   items,
   adminSection,
   organization,
   organizations,
 }: Pick<AppShellProps, 'organization' | 'organizations'> & {
+  userId: string
+  home: '/app' | '/app/editor'
   items: readonly NavItem[]
   adminSection: AdminSection | null
 }) {
@@ -368,7 +405,11 @@ function MobileMenu({
         description={t('shell.menuDescription')}
         isDescriptionHidden
       >
-        <OrganizationSwitcher organization={organization} organizations={organizations} />
+        <OrganizationSwitcher
+          organization={organization}
+          organizations={organizations}
+          home={home}
+        />
         {adminSection === null ? (
           <NavList
             items={items}
@@ -385,6 +426,13 @@ function MobileMenu({
             }}
           />
         )}
+        <div className="mt-auto pt-2">
+          <WorkspaceSync
+            userId={userId}
+            organizationId={organization?.id}
+            shouldManageSync={false}
+          />
+        </div>
       </SheetContent>
     </Sheet>
   )
@@ -393,7 +441,8 @@ function MobileMenu({
 function OrganizationSwitcher({
   organization,
   organizations,
-}: Pick<AppShellProps, 'organization' | 'organizations'>) {
+  home,
+}: Pick<AppShellProps, 'organization' | 'organizations'> & { home: '/app' | '/app/editor' }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const router = useRouter()
@@ -411,7 +460,7 @@ function OrganizationSwitcher({
     await queryClient.invalidateQueries()
     resetShellQueries(queryClient)
     await router.invalidate()
-    await navigate({ to: '/app' })
+    await navigate({ to: home })
   }
 
   return (

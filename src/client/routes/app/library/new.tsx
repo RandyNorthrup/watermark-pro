@@ -1,15 +1,14 @@
-import { createFileRoute, getRouteApi, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { newPresetSearchSchema } from '../../../../shared/client-search'
 import { SAMPLE_SCENE_PATH } from '../../../../shared/constants'
 import { WatermarkDesigner } from '../../../components/designer/watermark-designer'
 import { Alert } from '../../../components/ui/alert'
+import { useActiveOrganization } from '../../../lib/active-organization'
 import { readActiveMemberRole } from '../../../lib/queries'
 import { canRole } from '../../../lib/roles'
 import { blankSpec, defaultSpecFor } from '../../../lib/spec-edit'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/library/new')({
   validateSearch: newPresetSearchSchema,
@@ -21,7 +20,7 @@ export const Route = createFileRoute('/app/library/new')({
 function NewPresetPage() {
   const { t } = useTranslation()
   const { kind } = Route.useSearch()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
   const navigate = useNavigate()
   if (organization === null) {

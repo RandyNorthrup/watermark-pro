@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "ダッシュボード",
       "library": "ライブラリ",
       "editor": "エディター",
       "bulk": "一括",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "{{email}}でサインイン中",
-    "yourWorkspace": "あなたのワークスペース",
     "yourRole": "このワークスペースでの役割：",
-    "toolsHeading": "ツール",
-    "tools": {
-      "library": {
-        "label": "ライブラリ",
-        "body": "テキスト・シンボル・ロゴのウォーターマークを一度デザインし、プリセットとして保存できます。"
-      },
-      "editor": {
-        "label": "エディター",
-        "body": "写真1枚を手作業でウォーターマーク。配置・切り抜き・リサイズ・エクスポートができます。"
-      },
-      "bulk": {
-        "label": "一括",
-        "body": "撮影全体にプリセットを適用し、結果をZIPでダウンロードできます。"
-      },
-      "gallery": {
-        "label": "ギャラリー",
-        "body": "保存した写真を確認し、リンクで共有する写真を選べます。"
-      }
-    },
     "overviewHeading": "概要",
     "members": "メンバー",
     "noPendingInvitations": "保留中の招待はありません。",
@@ -228,6 +207,8 @@
       "specimen": "The quick brown fox",
       "search": "フォントを検索",
       "resultCount": "{{count}}種類のフォントファミリー",
+      "recent": "最近使用したフォント",
+      "all": "すべてのフォント",
       "license": "フォントのライセンス"
     },
     "symbol": {
@@ -450,10 +431,7 @@
       "removeLayer": "{{name}}をこの写真から削除",
       "adjusted": "この写真用に調整済み。ライブラリのプリセットは変更されません。",
       "revert": "プリセットに戻す",
-      "placement": "配置",
-      "create": "透かしを作成",
       "createHint": "ここで透かしを作成できます。保存すると、この写真に適用され、ライブラリでも再利用できます。",
-      "cancelCreate": "キャンセル",
       "saveAndUse": "保存して使用",
       "emptyReadOnly": "このライブラリにはまだ透かしがありません。",
       "firstUseHint": "透かしを追加し、「書き出し」から写真をダウンロードします。"

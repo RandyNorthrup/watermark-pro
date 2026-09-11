@@ -2,7 +2,7 @@
  * Runs in Chromium: the preview renderer drives the real engine worker with
  * real fonts from the bundled catalogue, the sample photo, and a logo blob.
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { domBackend } from './canvas-backend'
 import { PreviewRenderer, scaleTransform } from './preview'
@@ -131,6 +131,45 @@ describe('sample photo', () => {
 })
 
 describe('PreviewRenderer', () => {
+  it('keeps the latest decoded subject when older file reads finish later', async () => {
+    const originalDecode = globalThis.createImageBitmap.bind(globalThis)
+    const first = new File(['first'], 'first.png', { type: 'image/png' })
+    const second = new File(['second'], 'second.png', { type: 'image/png' })
+    const slow = Promise.withResolvers<ImageBitmap>()
+    const fast = Promise.withResolvers<ImageBitmap>()
+    const firstCanvas = offscreenBackend.createCanvas(80, 160)
+    firstCanvas.context.fillRect(0, 0, 80, 160)
+    const secondCanvas = offscreenBackend.createCanvas(160, 80)
+    secondCanvas.context.fillRect(0, 0, 160, 80)
+    const firstBitmap = await firstCanvas.toBitmap()
+    const secondBitmap = await secondCanvas.toBitmap()
+    vi.stubGlobal(
+      'createImageBitmap',
+      (source: ImageBitmapSource, options?: ImageBitmapOptions) => {
+        if (source === first) return slow.promise
+        if (source === second) return fast.promise
+        return originalDecode(source, options)
+      },
+    )
+    const renderer = new PreviewRenderer(() => Promise.reject(new Error('no logos')))
+    try {
+      const oldRead = renderer.setSubject(first)
+      const latestRead = renderer.setSubject(second)
+      fast.resolve(secondBitmap)
+      await latestRead
+      expect(renderer.sourceSize).toEqual({ width: 160, height: 80 })
+      slow.resolve(firstBitmap)
+      await oldRead
+      expect(renderer.sourceSize).toEqual({ width: 160, height: 80 })
+      const frame = await renderer.render([])
+      expect(await decodedSize(frame?.url ?? '')).toEqual({ width: 160, height: 80 })
+      expect(firstBitmap.width).toBe(0)
+    } finally {
+      renderer.dispose()
+      vi.unstubAllGlobals()
+    }
+  })
+
   it(
     'renders text, symbol and logo marks and reports placement',
     async () => {

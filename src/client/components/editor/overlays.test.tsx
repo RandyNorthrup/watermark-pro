@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CropOverlay, type CropGesture } from './crop-overlay'
 import { MarkOverlay, type MarkGesture } from './mark-overlay'
@@ -18,14 +18,32 @@ const placement = {
   rotation: 0,
 }
 
+const animationFrames = new Map<number, FrameRequestCallback>()
+let frameSequence = 0
+function advanceFrame() {
+  act(() => {
+    const callbacks = animationFrames.values().toArray()
+    animationFrames.clear()
+    for (const callback of callbacks) callback(0)
+  })
+}
+
 function pointer(type: string, target: Element, x: number, y: number, pointerId = 1) {
   fireEvent(
     target,
     new PointerEvent(type, { clientX: x, clientY: y, pointerId, bubbles: true, cancelable: true }),
   )
+  if (type === 'pointermove') advanceFrame()
 }
 
 beforeEach(() => {
+  animationFrames.clear()
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    frameSequence += 1
+    animationFrames.set(frameSequence, callback)
+    return frameSequence
+  })
+  vi.stubGlobal('cancelAnimationFrame', (id: number) => animationFrames.delete(id))
   // jsdom has no layout: the overlay root sits at the viewport origin.
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
     x: 0,
@@ -39,6 +57,8 @@ beforeEach(() => {
     toJSON: () => ({}),
   })
 })
+
+afterEach(() => vi.unstubAllGlobals())
 
 function renderOverlay(onGesture: (gesture: MarkGesture) => void, rotation = 0, scale = 0.2) {
   render(
@@ -55,6 +75,58 @@ function renderOverlay(onGesture: (gesture: MarkGesture) => void, rotation = 0, 
 }
 
 describe('MarkOverlay', () => {
+  it('coalesces raw events to one frame and flushes the actual final pointer before ending', () => {
+    const onGesture = vi.fn<(gesture: MarkGesture) => void>()
+    renderOverlay(onGesture)
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    pointer('pointerdown', frame, 400, 200)
+    for (let x = 300; x <= 390; x += 1)
+      fireEvent.pointerMove(frame, { pointerId: 1, clientX: x, clientY: 150, altKey: true })
+    expect(onGesture).toHaveBeenCalledTimes(1)
+    advanceFrame()
+    expect(onGesture).toHaveBeenCalledTimes(2)
+    expect(onGesture.mock.calls[1]?.[0].patch.x).toBeCloseTo(0.78)
+    fireEvent.pointerMove(frame, { pointerId: 1, clientX: 310, clientY: 150, altKey: true })
+    fireEvent.pointerUp(frame, { pointerId: 1, clientX: 320, clientY: 150, altKey: true })
+    expect(onGesture.mock.calls.at(-2)?.[0]).toEqual({ phase: 'move', patch: { x: 0.64, y: 0.6 } })
+    expect(onGesture.mock.calls.at(-1)?.[0]).toEqual({ phase: 'end', patch: { x: 0.64, y: 0.6 } })
+    const count = onGesture.mock.calls.length
+    advanceFrame()
+    expect(onGesture).toHaveBeenCalledTimes(count)
+  })
+
+  it('drops a queued gesture when its object unmounts', () => {
+    const onGesture = vi.fn<(gesture: MarkGesture) => void>()
+    const view = render(
+      <MarkOverlay
+        placement={placement}
+        previewSize={previewSize}
+        displaySize={displaySize}
+        margin={MARGIN}
+        scale={0.2}
+        rotation={0}
+        onGesture={onGesture}
+      />,
+    )
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    pointer('pointerdown', frame, 400, 200)
+    fireEvent.pointerMove(frame, { pointerId: 1, clientX: 310, clientY: 150 })
+    view.unmount()
+    advanceFrame()
+    expect(onGesture).toHaveBeenCalledExactlyOnceWith({ phase: 'start', patch: {} })
+  })
+
+  it('keeps moved position when a second finger begins a pinch', () => {
+    const onGesture = vi.fn<(gesture: MarkGesture) => void>()
+    renderOverlay(onGesture)
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    pointer('pointerdown', frame, 400, 200, 1)
+    pointer('pointermove', frame, 300, 150, 1)
+    pointer('pointerdown', frame, 400, 150, 2)
+    pointer('pointermove', frame, 410, 150, 2)
+    expect(onGesture.mock.calls.at(-1)?.[0].patch.x).toBeCloseTo(305 / 500)
+  })
+
   it('positions the frame from the placement at display scale', () => {
     renderOverlay(vi.fn())
     const frame = screen.getByRole('group', { name: /Watermark position/ })
@@ -128,6 +200,7 @@ describe('MarkOverlay', () => {
         bubbles: true,
       }),
     )
+    advanceFrame()
     expect(gestures.at(-1)?.patch.x).toBeCloseTo(254 / 500)
     expect(gestures.at(-1)?.patch.y).toBeCloseTo(210 / 250)
     expect(document.querySelector('[data-snap-guide]')).toBeNull()

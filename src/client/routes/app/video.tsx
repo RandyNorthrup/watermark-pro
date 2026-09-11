@@ -1,12 +1,11 @@
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Alert } from '../../components/ui/alert'
 import { VideoTool } from '../../components/video/video-tool'
+import { useActiveOrganization } from '../../lib/active-organization'
 import { readActiveMemberRole } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/video')({
   loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
@@ -15,7 +14,7 @@ export const Route = createFileRoute('/app/video')({
 
 function VideoPage() {
   const { t } = useTranslation()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
   if (organization === null) {
     return <Alert tone="info">{t('video.orgRequired')}</Alert>

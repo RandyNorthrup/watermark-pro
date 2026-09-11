@@ -37,15 +37,15 @@ test('first photo goes from an empty library to a real watermarked export in the
   await page
     .getByLabel('Open a photo')
     .setInputFiles({ name: 'first-photo.png', mimeType: 'image/png', buffer: photo })
-  await page.getByRole('button', { name: 'Create watermark' }).click()
-  const dialog = page.getByRole('dialog', { name: 'Create watermark' })
-  await dialog.getByLabel('Preset name').fill('First signature')
-  await dialog.getByRole('textbox', { name: 'Text' }).fill('© My first photo')
-  await expectRendered(page, /Watermark preview on the subject photo/)
+  await expect(page.getByRole('button', { name: 'Create watermark' })).toHaveCount(0)
+  const designer = page.getByRole('tabpanel', { name: 'Watermark', exact: true })
+  await designer.getByLabel('Preset name').fill('First signature')
+  await designer.getByRole('textbox', { name: 'Text' }).fill('© My first photo')
+  await expectRendered(page, /Photo with the watermark applied/)
   await expectAccessible(page)
   await page.screenshot({ path: testInfo.outputPath('first-watermark-designer.png') })
-  await dialog.getByRole('button', { name: 'Save and use' }).click()
-  await expect(dialog).toHaveCount(0)
+  await designer.getByRole('button', { name: 'Save and use' }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page).toHaveURL(/\/app\/editor$/)
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(
     'First signature',
@@ -144,7 +144,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
     await page.mouse.move(box.x + box.width / 2 - 80, box.y + box.height / 2 - 40, { steps: 5 })
     await page.mouse.up()
   }
-  await expect(page.getByRole('button', { name: 'Undo' })).toBeEnabled()
+  await expect(page.getByRole('button', { name: 'Undo', exact: true }).first()).toBeEnabled()
 
   await page.getByRole('tab', { name: 'Crop' }).click()
   await expectRendered(page, /Photo with the crop frame/)

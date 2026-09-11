@@ -1,9 +1,13 @@
 import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FontPicker } from './font-picker'
 import { StickerPicker } from './sticker-picker'
+import { setOfflineUser } from '../../lib/offline-context'
+
+beforeEach(() => setOfflineUser('creative-picker-owner'))
+afterEach(() => setOfflineUser(null))
 
 describe('creative catalogue pickers', () => {
   it('searches fonts without losing selection and carries a supported weight atomically', async () => {

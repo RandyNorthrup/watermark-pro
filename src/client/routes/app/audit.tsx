@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { HTTP_STATUS } from '../../../shared/constants'
@@ -7,11 +7,10 @@ import { AuditTable } from '../../components/audit-table'
 import { Alert } from '../../components/ui/alert'
 import { Card } from '../../components/ui/card'
 import { Spinner } from '../../components/ui/spinner'
+import { useActiveOrganization } from '../../lib/active-organization'
 import { ApiRequestError } from '../../lib/api'
 import { describeError } from '../../lib/errors'
 import { auditQueryOptions } from '../../lib/queries'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/audit')({
   component: AuditPage,
@@ -23,7 +22,7 @@ function useAuditQuery(organizationId: string) {
 
 function AuditPage() {
   const { t } = useTranslation()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const query = useAuditQuery(organization?.id ?? '')
 
   return (

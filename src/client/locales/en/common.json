@@ -4,7 +4,6 @@
   },
   "shell": {
     "nav": {
-      "dashboard": "Dashboard",
       "library": "Library",
       "editor": "Editor",
       "bulk": "Bulk",
@@ -96,27 +95,7 @@
   },
   "dashboard": {
     "signedInAs": "Signed in as {{email}}",
-    "yourWorkspace": "Your workspace",
     "yourRole": "Your workspace role:",
-    "toolsHeading": "Tools",
-    "tools": {
-      "library": {
-        "label": "Library",
-        "body": "Design text, symbol and logo watermarks once and keep them as presets."
-      },
-      "editor": {
-        "label": "Editor",
-        "body": "Watermark one photo by hand: place, crop, resize and export."
-      },
-      "bulk": {
-        "label": "Bulk",
-        "body": "Apply a preset to a whole shoot and download the results as a ZIP."
-      },
-      "gallery": {
-        "label": "Gallery",
-        "body": "Browse saved photos, then choose which to share with a link."
-      }
-    },
     "overviewHeading": "Overview",
     "members": "Members",
     "noPendingInvitations": "No pending invitations.",
@@ -229,6 +208,8 @@
       "specimen": "The quick brown fox",
       "search": "Search fonts",
       "resultCount": "{{count}} font families",
+      "recent": "Recently used",
+      "all": "All Fonts",
       "license": "Font licence"
     },
     "symbol": {
@@ -451,10 +432,7 @@
       "removeLayer": "Remove {{name}} from this photo",
       "adjusted": "Adjusted for this photo; the library preset is unchanged.",
       "revert": "Revert",
-      "placement": "Placement",
-      "create": "Create watermark",
       "createHint": "Design your watermark here. Save it once to use on this photo and keep it in your library.",
-      "cancelCreate": "Cancel",
       "saveAndUse": "Save and use",
       "emptyReadOnly": "No watermarks are available in this library yet.",
       "firstUseHint": "Add a watermark, then open Export to download your photo."

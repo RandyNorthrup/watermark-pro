@@ -66,6 +66,8 @@ interface RecentWorkProps {
   organizationId: string
   organizationName: string
   role: string | null | undefined
+  /** Filter the shared account history without creating a separate preference or store. */
+  kind?: RecentWorkItem['kind']
 }
 
 function itemName(item: RecentWorkItem): string {
@@ -73,7 +75,7 @@ function itemName(item: RecentWorkItem): string {
 }
 
 /** Office-style quick access shows only this account's actual resource activity. */
-export function RecentWork({ organizationId, organizationName, role }: RecentWorkProps) {
+export function RecentWork({ organizationId, organizationName, role, kind }: RecentWorkProps) {
   const { t, i18n } = useTranslation()
   const client = useQueryClient()
   const userId = currentOfflineUser()
@@ -171,10 +173,12 @@ export function RecentWork({ organizationId, organizationName, role }: RecentWor
     }
   }
 
-  const items = (history.isError ? [] : (history.data?.items ?? [])).filter((item) =>
-    (item.kind === 'photo' ? item.photo.name : item.preset.name)
-      .toLocaleLowerCase()
-      .includes(search.trim().toLocaleLowerCase()),
+  const items = (history.isError ? [] : (history.data?.items ?? [])).filter(
+    (item) =>
+      (kind === undefined || item.kind === kind) &&
+      (item.kind === 'photo' ? item.photo.name : item.preset.name)
+        .toLocaleLowerCase()
+        .includes(search.trim().toLocaleLowerCase()),
   )
   const pending = new Set(history.data?.pendingKeys)
   function openLink(item: RecentWorkItem, content?: ReactNode, className?: string) {

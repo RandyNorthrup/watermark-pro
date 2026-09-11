@@ -66,6 +66,7 @@ function stubAuditApi(status: number) {
 
 beforeEach(() => {
   installFakeAuth()
+  installLibraryApi()
 })
 
 afterEach(() => {
@@ -84,8 +85,14 @@ describe('authenticated layout', () => {
     const privateId = `personal-${OWNER.id}`
     installLibraryApi()
     const { router } = renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('My workspace')
-    expect(router.state.location.pathname).toBe('/app')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(router.state.location.pathname).toBe('/app/editor')
+    expect(screen.queryByRole('link', { name: /Dashboard|Overview/ })).not.toBeInTheDocument()
+    expect(
+      screen
+        .getAllByRole('link', { name: 'Lumafoil' })
+        .every((link) => link.getAttribute('href') === '/app/editor'),
+    ).toBe(true)
     expect(client().state.organizations).toHaveLength(1)
     expect(client().state.activeOrganizationId).toBe(privateId)
   })
@@ -94,7 +101,7 @@ describe('authenticated layout', () => {
     seedOwnerWorkspace(client())
     client().state.activeOrganizationId = null
     renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('My workspace')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
     expect(client().organization.setActive).toHaveBeenCalledWith({
       organizationId: `personal-${OWNER.id}`,
     })
@@ -107,25 +114,36 @@ describe('authenticated layout', () => {
     queryClient.setQueryData(activeOrganizationQueryOptions.queryKey, null)
     renderApp('/app', queryClient)
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Acme Studio'),
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Editor'),
     )
     expect(screen.queryByRole('heading', { name: 'Your workspace' })).toBeNull()
   })
 
-  it('shows the dashboard with membership numbers and the user menu', async () => {
-    seedOwnerWorkspace(client())
-    renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Acme Studio')
-    expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText('1 pending invitation.')).toBeInTheDocument()
-    expect(screen.getByText('owner')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
-    ).toBeInTheDocument()
-  })
+  it.each(['owner', 'admin'] as const)(
+    'shows operational Overview only for a site %s',
+    async (role) => {
+      seedOwnerWorkspace(client())
+      client().state.user = { ...OWNER, role }
+      renderApp('/app')
+      expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Overview')
+      expect(screen.queryByRole('region', { name: 'Recent work' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: 'Tools' })).not.toBeInTheDocument()
+      expect(
+        within(screen.getByRole('navigation', { name: 'Primary' })).getByRole('link', {
+          name: 'Overview',
+        }),
+      ).toHaveAttribute('href', '/app')
+      expect(screen.getByText('2')).toBeInTheDocument()
+      expect(screen.getByText('1 pending invitation.')).toBeInTheDocument()
+      expect(screen.getByText('owner')).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
+      ).toBeInTheDocument()
+    },
+  )
 })
 
 describe('members page', () => {
@@ -246,8 +264,11 @@ describe('new organization', () => {
     await user.type(await screen.findByLabelText('Name'), 'Northrup Photo')
     expect(screen.getByLabelText('URL identifier')).toHaveValue('northrup-photo')
     await user.click(screen.getByRole('button', { name: 'Create organization' }))
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Northrup Photo')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(
+      screen.getByRole('button', { name: 'Organization: Northrup Photo. Switch organization' }),
+    ).toBeInTheDocument()
     expect(client().organization.create).toHaveBeenCalledWith({
       name: 'Northrup Photo',
       slug: 'northrup-photo',

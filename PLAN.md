@@ -266,6 +266,31 @@ watermark-pro/
 
 ---
 
+### 4.1 Competitive capability gaps — 2026-09-10
+
+The dated [side-by-side comparison](docs/competitor-research.md#side-by-side-feature-matrix--2026-09-10)
+records Lumafoil alongside the reviewed products. Vendor evidence was reviewed
+on 2026-09-08; the Lumafoil column and this gap list were reconciled on
+2026-09-10. This list records unfinished implementation and verification. An
+unknown competitor capability is not treated as absent; the existing invite-only
+access decision remains in effect.
+
+| Area                    | Missing capability or unresolved proof                                                                                                                   | Status                                                                                       |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Photo formats           | HEIC, camera RAW, TIFF and PSD input; retained animated-GIF output                                                                                       | Missing; codec implementation, license review and target-browser output proof remain.        |
+| Presets and type        | Curated starter-preset gallery, custom-font import and dedicated exact numeric placement controls                                                        | Missing; saved/imported presets, bundled fonts and direct canvas manipulation already exist. |
+| Metadata and fidelity   | Complete IPTC editing, an equivalent ICC/color-managed workflow and WebP metadata preservation                                                           | Missing; existing EXIF/GPS/density handling has narrower scope.                              |
+| Advanced PDF            | Encrypted/password-protected PDF processing, page ranges and document/page macros                                                                        | Missing; current processing applies supported marks within the documented file/page limits.  |
+| Stronger authentication | App-native MFA/passkeys                                                                                                                                  | Missing; provider policies do not establish an application-wide second-factor guarantee.     |
+| Scale and integration   | Final 500-photo throughput/peak-memory proof, codec/device and audio/video-sync evidence, current offline/cloud-provider and populated-recovery matrices | Partial or unverified; existing focused tests do not establish market-wide equivalence.      |
+
+The README's dated capability statement records shared feature categories and
+these limits. Complete implementation of a narrow feature does not imply full
+release certification or matched competitor performance/output quality. The
+owner-excluded public guest editor remains outside this invite-only launch.
+
+---
+
 ## 5. Architecture notes
 
 ### 5.1 Request flow
@@ -685,10 +710,11 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
 - **Certification checklist:**
   - [ ] every raised §5.5 budget met on every page (`docs/lighthouse/m19/`); bundle report under `docs/bundle/m19.md`
   - [ ] offline journey green; update flow checked across two deploys (§8)
-  - [x] competitor re-check done (2026-09-08; corrected 2026-09-10 in
-        `docs/competitor-research.md`). No unsupported overall winner or parity
-        score is assigned; the matrix records verified, partial, missing and
-        untested capabilities and their practical limits.
+  - [x] competitor review and documentation reconciled: vendor review dated
+        2026-09-08; side-by-side matrix with a Lumafoil column, §4.1 gap list and
+        README capability statement dated 2026-09-10. Complete, partial, missing
+        and unknown cells retain their evidence limits; no overall parity,
+        superiority or release-certification claim is assigned.
   - [ ] full gates, drills, device matrix, screenshots in `en` and `ar`
   - [ ] 2.0.0 tagged, deployed, released
 - **Owner launch decision (2026-09-10):** deploy the verified functional and
@@ -708,8 +734,12 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   redesigned import panels, grouped preset actions, and direct mouse/touch/
   keyboard canvas manipulation in the designer and editor.
 - **Navigation and account organization (implemented, 2026-09-10):** the workspace
-  primary rail contains only Dashboard, Library, Editor, Bulk, Video, Documents,
-  Gallery and Shares. The account menu opens profile/account, invitations,
+  primary rail contains Library, Editor, Bulk, Video, Documents, Gallery and
+  Shares. Standard Users enter the Editor directly and have no dashboard;
+  Owners and Admins retain a compact Overview for aggregate account and service
+  information. Preset recents live in Library, photo recents live in Gallery,
+  and offline synchronization state/actions live at the bottom of the desktop
+  rail or phone menu. The account menu opens profile/account, invitations,
   members and audit; site Owners and Admins also receive its Administration
   entry. Account routes switch to a contextual account rail with account
   identity and a return to the workspace. Administration has its own contextual
@@ -719,6 +749,16 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   reloads and browser history. The account page groups the user's identity and
   global role separately from connected sign-in methods and provider-linking
   actions.
+- **Editor interaction correction (implemented, 2026-09-10):** watermark design
+  now lives directly in the Editor side panel, with visible undo/redo and one
+  history entry per complete canvas gesture. Preview work is frame-scheduled,
+  limits rendering to one in-flight request, keeps only the latest pending
+  state and rejects stale subject results; pointer movement is coalesced before
+  React updates. The same path covers mouse, touch, pen, pinch, twist, keyboard,
+  sliders and form controls. The 551-family picker has account-scoped recents,
+  styled family previews and one clipped wheel/touch/keyboard scroll region.
+  Export destinations use uniform actions, and constrained photo previews retain
+  their intrinsic aspect ratio.
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
   (not relaxed budgets) for the perf work; landing it in small green increments.
   - **§3 diet, first pass (done).** Dropped the `ui` chunk group (it forced all

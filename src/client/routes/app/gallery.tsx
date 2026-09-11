@@ -1,11 +1,11 @@
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Gallery } from '../../components/gallery/gallery'
+import { RecentWork } from '../../components/recent-work/recent-work'
 import { Alert } from '../../components/ui/alert'
+import { useActiveOrganization } from '../../lib/active-organization'
 import { readActiveMemberRole } from '../../lib/queries'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/gallery')({
   loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/app/gallery')({
 
 function GalleryPage() {
   const { t } = useTranslation()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
   if (organization === null) {
     return <Alert tone="info">{t('gallery.orgRequired')}</Alert>
@@ -27,7 +27,15 @@ function GalleryPage() {
           {t('gallery.description', { name: organization.name })}
         </p>
       </header>
-      <Gallery organizationId={organization.id} role={membership?.role} />
+      <RecentWork
+        organizationId={organization.id}
+        organizationName={organization.name}
+        role={membership?.role}
+        kind="photo"
+      />
+      <section aria-label={t('gallery.heading')}>
+        <Gallery organizationId={organization.id} role={membership?.role} />
+      </section>
     </div>
   )
 }

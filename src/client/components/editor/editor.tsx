@@ -74,9 +74,10 @@ import { publicConfigQueryOptions } from '../../lib/queries'
 import { noteRecentWork } from '../../lib/recent-work-events'
 import { SAMPLE_PHOTO_HEIGHT, SAMPLE_PHOTO_WIDTH } from '../../lib/sample-photo'
 import { shareFile } from '../../lib/share-file'
-import { withPlacement, withStyle } from '../../lib/spec-edit'
+import { blankSpec, withPlacement, withStyle } from '../../lib/spec-edit'
 import { baseName, SAMPLE_FILE_NAME } from '../../lib/spec-tokens'
 import { useElementSize } from '../../lib/use-element-size'
+import { useDesignHistory } from '../designer/use-design-history'
 import { CloudImportButtons } from '../import/cloud-import-buttons'
 import { TakePhotoButton } from '../import/take-photo-button'
 import { UrlImportDialog } from '../import/url-import-dialog'
@@ -191,7 +192,11 @@ function PendingPreview({ hasPhoto }: { hasPhoto: boolean }) {
  * preset, adjust its placement and style for this photo, crop, resize, and
  * download. Every step is undoable.
  */
-export function Editor({
+export function Editor(props: EditorProps) {
+  return <EditorSession key={props.organizationId} {...props} />
+}
+
+function EditorSession({
   organizationId,
   organizationName,
   initialPresetId,
@@ -204,11 +209,16 @@ export function Editor({
     createHistory(embedded?.document),
   )
   const document = history.present
+  const draft = useDesignHistory(blankSpec())
   const [tool, setTool] = useState<Tool>('watermark')
   const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
   // The active layer: the chosen one while it exists, else the topmost.
   const activeLayer: Layer | null =
-    document.layers.find((layer) => layer.id === activeLayerId) ?? document.layers.at(-1) ?? null
+    activeLayerId === 'draft'
+      ? null
+      : (document.layers.find((layer) => layer.id === activeLayerId) ??
+        document.layers.at(-1) ??
+        null)
   const [aspectId, setAspectId] = useState('free')
   const [photo, setPhoto] = useState<Photo | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
@@ -260,6 +270,7 @@ export function Editor({
     },
     [],
   )
+  const subjectIdentity = photoRequest.current
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
   const displaySize = useElementSize(imageElement)
   const presets = useQuery(watermarksQueryOptions(organizationId))
@@ -268,7 +279,11 @@ export function Editor({
   const sourceSize = photo?.size ?? SAMPLE_SIZE
   const isCropping = tool === 'crop'
   const cropBaseSize = cropSpace(sourceSize, document.orientation)
-  const renderSpecs = isCropping ? [] : layerSpecs(document)
+  const canvasLayers =
+    canCreatePresets && (activeLayerId === 'draft' || document.layers.length === 0)
+      ? [...document.layers, { id: 'draft', presetId: '', spec: draft.value }]
+      : document.layers
+  const renderSpecs = isCropping ? [] : canvasLayers.map((layer) => layer.spec)
   const renderTransform = previewTransform(document, isCropping)
   const cropBase = croppedSize(cropBaseSize, document.crop)
   const outputSize = framedSize(document.resize ?? cropBase, document.border)
@@ -330,20 +345,20 @@ export function Editor({
       const key = event.key.toLowerCase()
       if (key === 'z' && event.shiftKey) {
         event.preventDefault()
-        dispatch({ type: 'redo' })
+        redo()
       } else if (key === 'z') {
         event.preventDefault()
-        dispatch({ type: 'undo' })
+        undo()
       } else if (key === 'y') {
         event.preventDefault()
-        dispatch({ type: 'redo' })
+        redo()
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => {
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [])
+  })
 
   const choosePhoto = useCallback(
     async (file: File) => {
@@ -415,7 +430,37 @@ export function Editor({
     dispatch({ type: 'commit', document: { ...document, ...patch } })
   }
 
+  function undo() {
+    if (activeLayer === null && draft.canUndo) draft.undo()
+    else dispatch({ type: 'undo' })
+  }
+  function redo() {
+    if (activeLayer === null && draft.canRedo) draft.redo()
+    else dispatch({ type: 'redo' })
+  }
+
   function markGesture(layerId: string, gesture: MarkGesture) {
+    if (layerId === 'draft') {
+      switch (gesture.phase) {
+        case 'start': {
+          draft.begin()
+          break
+        }
+        case 'move':
+        case 'commit': {
+          draft.change(applyMarkPatch(draft.value, gesture.patch))
+          break
+        }
+        case 'end': {
+          {
+            draft.end()
+            // No default
+          }
+          break
+        }
+      }
+      return
+    }
     const layer = document.layers.find((candidate) => candidate.id === layerId)
     if (layer === undefined) {
       return
@@ -470,7 +515,9 @@ export function Editor({
   }
 
   function changeActiveSpec(spec: WatermarkSpec) {
-    if (activeLayer !== null) {
+    if (activeLayer === null) {
+      draft.change(spec)
+    } else {
       commit(withLayer(document, { ...activeLayer, spec }))
     }
   }
@@ -657,9 +704,9 @@ export function Editor({
               size="icon"
               aria-label={t('editor.undo')}
               aria-keyshortcuts="Control+Z"
-              disabled={!canUndo(history)}
+              disabled={!((activeLayer === null && draft.canUndo) || canUndo(history))}
               onClick={() => {
-                dispatch({ type: 'undo' })
+                undo()
               }}
             >
               <Undo2 aria-hidden="true" className="size-4 rtl:-scale-x-100" />
@@ -670,9 +717,9 @@ export function Editor({
               size="icon"
               aria-label={t('editor.redo')}
               aria-keyshortcuts="Control+Shift+Z Control+Y"
-              disabled={!canRedo(history)}
+              disabled={!((activeLayer === null && draft.canRedo) || canRedo(history))}
               onClick={() => {
-                dispatch({ type: 'redo' })
+                redo()
               }}
             >
               <Redo2 aria-hidden="true" className="size-4 rtl:-scale-x-100" />
@@ -696,22 +743,24 @@ export function Editor({
                 alt={t(isCropping ? 'editor.altCrop' : 'editor.altWatermark')}
                 width={result.width}
                 height={result.height}
-                className="block max-h-[42svh] max-w-full lg:max-h-[70vh]"
+                className="block h-auto max-h-[42svh] w-auto max-w-full lg:max-h-[70vh]"
               />
               {tool === 'watermark' && previewSize !== null
-                ? document.layers.map((layer, index) => {
+                ? canvasLayers.map((layer, index) => {
                     const outcome = result.marks[index]
                     if (outcome === undefined || layer.spec.style.tiling.enabled) return null
                     return (
                       <MarkOverlay
-                        key={layer.id}
+                        key={`${organizationId}:${String(subjectIdentity)}:${layer.id}:${layer.spec.kind}`}
                         placement={outcome.placement}
+                        position={layer.spec.placement}
+                        renderedScale={result.specs?.[index]?.style.scale}
                         previewSize={previewSize}
                         displaySize={displaySize}
                         scale={layer.spec.style.scale}
                         rotation={layer.spec.style.rotation}
                         margin={layer.spec.style.margin}
-                        active={layer.id === activeLayer?.id}
+                        active={layer.id === (activeLayer?.id ?? 'draft')}
                         onSelect={() => {
                           setActiveLayerId(layer.id)
                         }}
@@ -724,6 +773,7 @@ export function Editor({
                 : null}
               {isCropping ? (
                 <CropOverlay
+                  key={`${organizationId}:${String(subjectIdentity)}`}
                   crop={crop}
                   source={cropBaseSize}
                   displaySize={displaySize}
@@ -754,7 +804,7 @@ export function Editor({
         )}
       </Card>
 
-      <Card className="flex flex-col gap-4">
+      <Card className="flex max-h-[75svh] min-w-0 flex-col gap-4 overflow-y-auto overscroll-contain lg:max-h-[calc(100svh-8rem)]">
         <Tabs.Root
           value={tool}
           onValueChange={(value) => {
@@ -783,10 +833,17 @@ export function Editor({
             <WatermarkPanel
               organizationId={organizationId}
               canCreate={canCreatePresets}
-              photo={photo?.file ?? embedded?.file}
+              draftSpec={draft.value}
+              undo={undo}
+              redo={redo}
+              canUndo={(activeLayer === null && draft.canUndo) || canUndo(history)}
+              canRedo={(activeLayer === null && draft.canRedo) || canRedo(history)}
               layers={document.layers}
               activeLayerId={activeLayer?.id ?? null}
               onAddPreset={addPreset}
+              onNewPreset={() => {
+                setActiveLayerId('draft')
+              }}
               onSelectLayer={setActiveLayerId}
               onRemoveLayer={removeLayer}
               onSpecChange={changeActiveSpec}

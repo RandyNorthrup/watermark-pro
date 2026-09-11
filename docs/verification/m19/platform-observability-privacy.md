@@ -158,6 +158,25 @@ logging or tracing without new hosted evidence that bearer paths are excluded
 before storage, or an architecture that removes that bearer data from the
 logged request context.
 
+## Web Analytics injection remediation — 2026-09-10
+
+The final production audit found a separate Cloudflare Web Analytics site for
+`lumafoil.com` with **Enable** selected. Its automatic setup injected the
+Cloudflare browser beacon even though the application CSP did not allow that
+origin. This account-level RUM setting is independent of the Worker Logs and
+Traces controls above.
+
+The authenticated **Manage site** form was changed to **Disable** and saved. A
+fresh dashboard readback showed Disable selected and stated that the JavaScript
+snippet would not be injected. After edge propagation, three independent HTTPS
+requests across the LAX and SJC Cloudflare locations returned HTTP 200 and zero
+matches for the beacon script URL or its marker attributes. The production
+health endpoint remained HTTP 200.
+
+No application analytics replacement was added. Sanitized D1 health checks,
+client-error reports, application audit records and private live diagnostics
+remain available under their existing retention and authorization controls.
+
 ## Sources
 
 - [Cloudflare Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/)

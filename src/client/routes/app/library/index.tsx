@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import type { TFunction } from 'i18next'
 import {
   Download,
@@ -21,12 +21,14 @@ import type { WatermarkDto } from '../../../../shared/api-watermark'
 import { LOGO_CONTENT_TYPES } from '../../../../shared/constants'
 import type { Shape, WatermarkSpec } from '../../../../shared/watermark'
 import { ImportDialog } from '../../../components/presets/import-dialog'
+import { RecentWork } from '../../../components/recent-work/recent-work'
 import { Alert } from '../../../components/ui/alert'
 import { Badge } from '../../../components/ui/badge'
 import { Button } from '../../../components/ui/button'
 import { buttonVariants } from '../../../components/ui/button-variants'
 import { Card } from '../../../components/ui/card'
 import { Spinner } from '../../../components/ui/spinner'
+import { useActiveOrganization } from '../../../lib/active-organization'
 import { downloadBlob } from '../../../lib/download'
 import { describeError } from '../../../lib/errors'
 import {
@@ -40,8 +42,6 @@ import { loadWorkspaceMedia } from '../../../lib/offline-media'
 import { buildPresetFile, type ExportLogo } from '../../../lib/preset-file'
 import { readActiveMemberRole } from '../../../lib/queries'
 import { canRole } from '../../../lib/roles'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/library/')({
   loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
@@ -163,7 +163,7 @@ async function buildExportBlob(
 
 function LibraryPage() {
   const { t } = useTranslation()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
   const organizationId = organization?.id ?? ''
   const queryClient = useQueryClient()
@@ -242,19 +242,27 @@ function LibraryPage() {
           ) : null}
         </div>
       </header>
+      <RecentWork
+        organizationId={organization.id}
+        organizationName={organization.name}
+        role={membership?.role}
+        kind="preset"
+      />
       {exportPresets.isError ? (
         <Alert tone="error" title={t('library.exportErrorTitle')}>
           {describeError(exportPresets.error)}
         </Alert>
       ) : null}
-      <PresetList
-        query={presets}
-        organizationId={organization.id}
-        canManage={canManage}
-        onExport={(preset) => {
-          exportPresets.mutate([preset])
-        }}
-      />
+      <section aria-label={t('library.heading')}>
+        <PresetList
+          query={presets}
+          organizationId={organization.id}
+          canManage={canManage}
+          onExport={(preset) => {
+            exportPresets.mutate([preset])
+          }}
+        />
+      </section>
     </div>
   )
 }
@@ -344,12 +352,12 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
   return (
     <li>
       <Card className="flex h-full flex-col gap-3">
-        <div className="flex min-w-0 items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
           <Link
             to="/app/library/$watermarkId"
             params={{ watermarkId: preset.id }}
             aria-label={preset.name}
-            className="flex min-w-0 flex-1 items-start gap-3 rounded-xl focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
+            className="flex min-w-0 flex-[1_1_12rem] items-start gap-3 rounded-xl focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
           >
             <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
               <Icon aria-hidden="true" className="size-5" />

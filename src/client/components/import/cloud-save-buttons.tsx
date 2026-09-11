@@ -43,6 +43,9 @@ interface CloudSaveButtonsProps {
   /** Surfaces a failure so the host page can show it in its own alert. */
   onError: (message: string) => void
   disabled?: boolean
+  /** Lets the host align provider actions with its surrounding action group. */
+  buttonClassName?: string
+  buttonSize?: 'sm' | 'md'
 }
 
 /**
@@ -58,6 +61,8 @@ export function CloudSaveButtons({
   onSaved,
   onError,
   disabled = false,
+  buttonClassName,
+  buttonSize = 'sm',
 }: CloudSaveButtonsProps) {
   const { t } = useTranslation()
   const [pending, setPending] = useState<CloudProviderId | null>(null)
@@ -106,18 +111,26 @@ export function CloudSaveButtons({
           key={provider}
           type="button"
           variant="secondary"
-          size="sm"
+          size={buttonSize}
+          className={buttonClassName}
           disabled={disabled || pending !== null}
           isPending={pending === provider}
           onClick={() => {
             void save(provider)
           }}
         >
-          <ProviderLogo provider={cloudProviderLogo(provider)} />
+          <ProviderLogo provider={cloudProviderLogo(provider)} className="size-5" />
           {t('import.saveToProvider', { provider: PROVIDER_LABELS[provider] })}
         </Button>
       ))}
-      {saved.length === 0 ? null : <CloudSavedDialog config={config} files={saved} />}
+      {saved.length === 0 ? null : (
+        <CloudSavedDialog
+          config={config}
+          files={saved}
+          triggerClassName={buttonClassName}
+          triggerSize={buttonSize}
+        />
+      )}
     </>
   )
 }

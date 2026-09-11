@@ -63,7 +63,7 @@ try {
     '/api/auth/verify-email',
   )
   await page.goto(link)
-  await page.waitForURL('**/app')
+  await page.waitForURL('**/app/editor')
   const workspace = await post('/api/me/workspace', {})
   const organization = { id: workspace.organizationId }
   const preset = await post(`/api/orgs/${organization.id}/watermarks`, {

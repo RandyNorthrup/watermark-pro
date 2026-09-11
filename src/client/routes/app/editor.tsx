@@ -1,14 +1,13 @@
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { editorSearchSchema } from '../../../shared/client-search'
 import { SAMPLE_SCENE_PATH } from '../../../shared/constants'
 import { Editor } from '../../components/editor/editor'
 import { Alert } from '../../components/ui/alert'
+import { useActiveOrganization } from '../../lib/active-organization'
 import { readActiveMemberRole } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
-
-const appRoute = getRouteApi('/app')
 
 export const Route = createFileRoute('/app/editor')({
   validateSearch: editorSearchSchema,
@@ -19,7 +18,7 @@ export const Route = createFileRoute('/app/editor')({
 
 function EditorPage() {
   const { t } = useTranslation()
-  const organization = appRoute.useLoaderData()
+  const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
   const { preset } = Route.useSearch()
   if (organization === null) {

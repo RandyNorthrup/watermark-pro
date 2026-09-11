@@ -7,6 +7,7 @@ import { binOf, runNode } from './lib/cli.mjs'
 const vite = binOf('vite', 'vite')
 runNode('scripts/build-open-source.mjs')
 runNode(vite, ['build'])
+runNode('scripts/build-microsoft-bridge.mjs')
 runNode(vite, ['build', '--config', 'vite.prerender.config.ts'])
 runNode('scripts/prerender.mjs')
 const artifactEnvironment = { LUMAFOIL_CLIENT_DIR: path.resolve('dist/client') }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { usePreviewFrames } from './use-preview-frames'
 import type { PhotoMetadata } from '../../../shared/metadata'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import type { Size } from '../../engine/layout'
@@ -8,14 +9,6 @@ import { describeError } from '../../lib/errors'
 import { assetFileUrl } from '../../lib/library'
 import { loadWorkspaceMedia } from '../../lib/offline-media'
 import { PreviewRenderer, type PreviewResult } from '../../lib/preview'
-
-/** Slider drags fire continuously; one render per pause keeps the worker responsive. */
-export const RENDER_DEBOUNCE_MS = 120
-
-function parseTransform(key: string): Transform | undefined {
-  const parsed: unknown = JSON.parse(key)
-  return parsed === null ? undefined : parsed
-}
 
 export interface RendererState {
   result: PreviewResult | null
@@ -34,6 +27,7 @@ export function useRenderer(
   specs: readonly WatermarkSpec[],
   transform: Transform | undefined,
   outputSize: Size,
+  isEnabled = true,
 ) {
   const rendererRef = useRef<PreviewRenderer | null>(null)
   const [state, setState] = useState<RendererState>({
@@ -41,6 +35,7 @@ export function useRenderer(
     isRendering: false,
     error: null,
   })
+  const subjectRequest = useRef(0)
   const [subjectVersion, setSubjectVersion] = useState(0)
 
   useEffect(() => {
@@ -54,56 +49,12 @@ export function useRenderer(
     }
   }, [organizationId])
 
-  // Serialised so structurally equal marks or transforms do not trigger a re-render.
-  const transformKey = JSON.stringify(transform ?? null)
-  const specsKey = JSON.stringify(specs)
-  const outputKey = JSON.stringify(outputSize)
-  const specsRef = useRef(specs)
-  specsRef.current = specs
-  const outputRef = useRef(outputSize)
-  outputRef.current = outputSize
-  useEffect(() => {
-    const currentTransform = parseTransform(transformKey)
-    async function renderFrame(renderer: PreviewRenderer, current: readonly WatermarkSpec[]) {
-      try {
-        const next = await renderer.render(current, {
-          transform: currentTransform,
-          output: outputRef.current,
-        })
-        if (next === null) {
-          return
-        }
-        setState({ result: next, isRendering: false, error: null })
-      } catch (error_) {
-        setState((previous) => ({
-          ...previous,
-          isRendering: false,
-          error: describeError(error_),
-        }))
-      }
-    }
-    const timer = setTimeout(() => {
-      const renderer = rendererRef.current
-      if (renderer === null) {
-        return
-      }
-      setState((previous) => ({ ...previous, isRendering: true }))
-      void renderFrame(renderer, specsRef.current)
-    }, RENDER_DEBOUNCE_MS)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [specsKey, transformKey, outputKey, subjectVersion])
-
-  // Each object URL lives until the next result replaces it or the component unmounts.
-  const url = state.result?.url
-  useEffect(
-    () => () => {
-      if (url !== undefined) {
-        URL.revokeObjectURL(url)
-      }
-    },
-    [url],
+  const frames = usePreviewFrames(
+    rendererRef,
+    specs,
+    { transform, output: outputSize },
+    `${organizationId}:${String(subjectVersion)}`,
+    isEnabled,
   )
 
   const setSubject = useCallback(
@@ -112,15 +63,19 @@ export function useRenderer(
       if (renderer === null) {
         return
       }
+      subjectRequest.current += 1
+      const request = subjectRequest.current
       try {
         await renderer.setSubject(file, metadata)
-        setSubjectVersion((version) => version + 1)
+        if (rendererRef.current === renderer && request === subjectRequest.current)
+          setSubjectVersion((version) => version + 1)
       } catch (error_) {
+        if (rendererRef.current !== renderer || request !== subjectRequest.current) return
         setState((previous) => ({ ...previous, error: describeError(error_) }))
       }
     },
     [],
   )
 
-  return { ...state, renderer: rendererRef, setSubject }
+  return { ...frames, error: state.error ?? frames.error, renderer: rendererRef, setSubject }
 }

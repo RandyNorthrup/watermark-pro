@@ -1,4 +1,11 @@
-import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
+import {
+  type KeyboardEvent,
+  type PointerEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { MAX_ROTATION_DEGREES, MAX_SCALE, MIN_SCALE } from '../../../shared/watermark'
@@ -22,6 +29,9 @@ export interface MarkGesture {
 
 interface MarkOverlayProps {
   placement: MarkPlacement
+  /** Latest authoritative placement; the worker result may be an older frame. */
+  position?: { mode: string; x?: number; y?: number } | undefined
+  renderedScale?: number | undefined
   /** Pixel size of the rendered preview the placement refers to. */
   previewSize: Size
   /** On-screen size of the preview image. */
@@ -172,6 +182,8 @@ const HANDLE_CLASS =
  */
 export function MarkOverlay({
   placement,
+  position,
+  renderedScale,
   previewSize,
   displaySize,
   scale,
@@ -183,16 +195,53 @@ export function MarkOverlay({
 }: MarkOverlayProps) {
   const { t } = useTranslation()
   const dragRef = useRef<DragState | null>(null)
+  const gestureCallback = useRef(onGesture)
+  useLayoutEffect(() => {
+    gestureCallback.current = onGesture
+  }, [onGesture])
   /** Every pointer currently down on the frame, for the pinch gesture. */
   const pointersRef = useRef(new Map<number, Point>())
   const [guides, setGuides] = useState<Guides>({ x: null, y: null })
+  const frameRef = useRef<number | null>(null)
+  const pendingRef = useRef<{ point: Point; pointerId: number; isFree: boolean } | null>(null)
+  const lastPoint = useRef<{ x: number; y: number; pointerId: number; isFree: boolean } | null>(
+    null,
+  )
+  const patchRef = useRef<MarkPatch>({})
+  const originRef = useRef<Point>({ x: 0, y: 0 })
+  useEffect(
+    () => () => {
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
+      pendingRef.current = null
+      dragRef.current = null
+    },
+    [],
+  )
   const k = displaySize.width / previewSize.width
   if (!(k > 0) || !Number.isFinite(k)) {
     return null
   }
-  const width = placement.width * k
-  const height = placement.height * k
-  const centre: Point = { x: placement.centreX * k, y: placement.centreY * k }
+  const livePatch = dragRef.current === null ? {} : patchRef.current
+  const currentScale = livePatch.scale ?? scale
+  const currentRotation = livePatch.rotation ?? rotation
+  const ratio = currentScale / (renderedScale ?? scale)
+  const width = placement.width * k * ratio
+  const height = placement.height * k * ratio
+  const centre: Point = {
+    x:
+      (livePatch.x ??
+        (position?.mode === 'custom' ? position.x : undefined) ??
+        placement.centreX / previewSize.width) * displaySize.width,
+    y:
+      (livePatch.y ??
+        (position?.mode === 'custom' ? position.y : undefined) ??
+        placement.centreY / previewSize.height) * displaySize.height,
+  }
+
+  function emitMove(patch: MarkPatch) {
+    patchRef.current = { ...patchRef.current, ...patch }
+    gestureCallback.current({ phase: 'move', patch: patchRef.current })
+  }
   const marginPx = margin * Math.min(displaySize.width, displaySize.height)
 
   /**
@@ -215,7 +264,10 @@ export function MarkOverlay({
     event.preventDefault()
     event.stopPropagation()
     event.currentTarget.setPointerCapture(event.pointerId)
+    originRef.current = origin(event.currentTarget)
     const start = localPoint(event)
+    patchRef.current = {}
+    lastPoint.current = null
     dragRef.current = {
       kind,
       pointerId: event.pointerId,
@@ -226,7 +278,7 @@ export function MarkOverlay({
       scale,
       rotation,
     }
-    onGesture({ phase: 'start', patch: {} })
+    gestureCallback.current({ phase: 'start', patch: {} })
   }
 
   /** A second finger on the frame turns the move into a pinch; the checkpoint from the move stands. */
@@ -238,6 +290,7 @@ export function MarkOverlay({
     if (a === undefined) {
       return
     }
+    flush()
     const b = localPoint(event)
     dragRef.current = {
       kind: 'pinch',
@@ -245,9 +298,12 @@ export function MarkOverlay({
       startDistance: distance(a, b),
       startAngle: angle(a, b),
       startMidpoint: midpoint(a, b),
-      centre: first.centre,
-      scale: first.scale,
-      rotation: first.rotation,
+      centre: {
+        x: (patchRef.current.x ?? first.centre.x / displaySize.width) * displaySize.width,
+        y: (patchRef.current.y ?? first.centre.y / displaySize.height) * displaySize.height,
+      },
+      scale: patchRef.current.scale ?? first.scale,
+      rotation: patchRef.current.rotation ?? first.rotation,
     }
   }
 
@@ -268,19 +324,18 @@ export function MarkOverlay({
         { x: drag.centre.x + point.x - drag.start.x, y: drag.centre.y + point.y - drag.start.y },
         isFree,
       )
-      onGesture({
-        phase: 'move',
-        patch: {
-          x: clamp(next.x / displaySize.width, 0, 1),
-          y: clamp(next.y / displaySize.height, 0, 1),
-        },
+      emitMove({
+        x: clamp(next.x / displaySize.width, 0, 1),
+        y: clamp(next.y / displaySize.height, 0, 1),
       })
     } else if (drag.kind === 'scale') {
       const factor = drag.startDistance > 0 ? distance(point, drag.centre) / drag.startDistance : 1
-      onGesture({ phase: 'move', patch: { scale: clampScale(drag.scale * factor) } })
+      emitMove({ scale: clampScale(drag.scale * factor) })
+      setGuides({ x: null, y: null })
     } else {
       const delta = (angle(drag.centre, point) - drag.startAngle) * RADIANS_TO_DEGREES
-      onGesture({ phase: 'move', patch: { rotation: normaliseRotation(drag.rotation - delta) } })
+      emitMove({ rotation: normaliseRotation(drag.rotation - delta) })
+      setGuides({ x: null, y: null })
     }
   }
 
@@ -300,37 +355,49 @@ export function MarkOverlay({
       },
       isFree,
     )
-    onGesture({
-      phase: 'move',
-      patch: {
-        x: clamp(next.x / displaySize.width, 0, 1),
-        y: clamp(next.y / displaySize.height, 0, 1),
-        scale: clampScale(drag.scale * factor),
-        rotation: normaliseRotation(drag.rotation - twist),
-      },
+    emitMove({
+      x: clamp(next.x / displaySize.width, 0, 1),
+      y: clamp(next.y / displaySize.height, 0, 1),
+      scale: clampScale(drag.scale * factor),
+      rotation: normaliseRotation(drag.rotation - twist),
     })
   }
 
-  function move(event: PointerEvent<HTMLElement>) {
-    const point = localPoint(event)
-    if (pointersRef.current.has(event.pointerId)) {
-      pointersRef.current.set(event.pointerId, point)
-    }
+  function flush() {
+    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
+    frameRef.current = null
+    const pending = pendingRef.current
+    pendingRef.current = null
     const drag = dragRef.current
-    if (drag === null) {
+    if (pending === null || drag === null) return
+    if (drag.kind === 'pinch') movePinch(drag, pending.isFree)
+    else moveSingle(drag, pending.point, pending.isFree)
+  }
+
+  function move(event: PointerEvent<HTMLElement>) {
+    const drag = dragRef.current
+    if (drag === null) return
+    const isOwner =
+      drag.kind === 'pinch'
+        ? drag.pointerIds.includes(event.pointerId)
+        : drag.pointerId === event.pointerId
+    if (!isOwner) return
+    const point = { x: event.clientX - originRef.current.x, y: event.clientY - originRef.current.y }
+    const last = lastPoint.current
+    if (
+      last?.x === point.x &&
+      last.y === point.y &&
+      last.pointerId === event.pointerId &&
+      last.isFree === event.altKey
+    )
       return
-    }
-    if (drag.kind === 'pinch') {
-      if (drag.pointerIds.includes(event.pointerId)) {
-        movePinch(drag, event.altKey)
-      }
-    } else if (drag.pointerId === event.pointerId) {
-      moveSingle(drag, point, event.altKey)
-    }
+    lastPoint.current = { ...point, pointerId: event.pointerId, isFree: event.altKey }
+    if (pointersRef.current.has(event.pointerId)) pointersRef.current.set(event.pointerId, point)
+    pendingRef.current = { point, pointerId: event.pointerId, isFree: event.altKey }
+    frameRef.current ??= requestAnimationFrame(flush)
   }
 
   function end(event: PointerEvent<HTMLElement>) {
-    pointersRef.current.delete(event.pointerId)
     const drag = dragRef.current
     if (drag === null) {
       return
@@ -342,9 +409,12 @@ export function MarkOverlay({
     if (!isOwner) {
       return
     }
+    if (event.type === 'pointerup') move(event)
+    flush()
+    pointersRef.current.clear()
     dragRef.current = null
     setGuides({ x: null, y: null })
-    onGesture({ phase: 'end', patch: {} })
+    gestureCallback.current({ phase: 'end', patch: patchRef.current })
   }
 
   /** Handle events must not reach the frame's own handlers as well. */
@@ -360,8 +430,8 @@ export function MarkOverlay({
 
   function keyboard(event: KeyboardEvent<HTMLDivElement>) {
     const step = event.shiftKey ? NUDGE_FRACTION_LARGE : NUDGE_FRACTION
-    const x = placement.centreX / previewSize.width
-    const y = placement.centreY / previewSize.height
+    const x = centre.x / displaySize.width
+    const y = centre.y / displaySize.height
     const patches: Record<string, MarkPatch> = {
       ArrowLeft: { x: clamp(x - step, 0, 1), y },
       ArrowRight: { x: clamp(x + step, 0, 1), y },
@@ -378,7 +448,7 @@ export function MarkOverlay({
       return
     }
     event.preventDefault()
-    onGesture({ phase: 'commit', patch })
+    gestureCallback.current({ phase: 'commit', patch })
   }
 
   return (
@@ -410,6 +480,7 @@ export function MarkOverlay({
         onPointerMove={move}
         onPointerUp={end}
         onPointerCancel={end}
+        onLostPointerCapture={end}
         onKeyDown={keyboard}
         className={`pointer-events-auto absolute cursor-move touch-none rounded-sm outline-2 outline-offset-2 focus-visible:outline-brand-400 ${active ? 'outline-white/90' : 'outline-transparent hover:outline-brand-300/80'}`}
         style={{
@@ -417,7 +488,7 @@ export function MarkOverlay({
           top: centre.y - height / 2,
           width,
           height,
-          transform: `rotate(${String(-rotation)}deg)`,
+          transform: `rotate(${String(-currentRotation)}deg)`,
           boxShadow: '0 0 0 1px rgb(0 0 0 / 0.6)',
         }}
       >
@@ -432,6 +503,7 @@ export function MarkOverlay({
               onPointerMove={handleMove}
               onPointerUp={handleEnd}
               onPointerCancel={handleEnd}
+              onLostPointerCapture={handleEnd}
               className={`${HANDLE_CLASS} left-1/2 size-4 -translate-x-1/2 cursor-grab rounded-full`}
               style={{ top: -ROTATE_HANDLE_OFFSET_PX }}
             />
@@ -452,6 +524,7 @@ export function MarkOverlay({
               onPointerMove={handleMove}
               onPointerUp={handleEnd}
               onPointerCancel={handleEnd}
+              onLostPointerCapture={handleEnd}
               className={`${HANDLE_CLASS} -right-2 -bottom-2 size-4 cursor-nwse-resize rounded-sm pointer-coarse:-right-3 pointer-coarse:-bottom-3`}
             />
           </>
