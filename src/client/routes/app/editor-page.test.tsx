@@ -33,6 +33,11 @@ vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
 vi.mock('../../lib/image-size', () => import('../../test-support/fake-image-size'))
 vi.mock('../../lib/thumbnail', () => import('../../test-support/fake-thumbnail'))
 vi.mock('../../lib/download', () => import('../../test-support/fake-download'))
+vi.mock('../../editor/session', () => ({
+  EDITOR_SESSION_SAVE_DELAY_MS: 0,
+  loadEditorSession: vi.fn().mockResolvedValue(null),
+  saveEditorSession: vi.fn().mockResolvedValue(undefined),
+}))
 
 const client = fakeAuth
 
@@ -40,8 +45,9 @@ function lastSpec() {
   return renderedSpecs.at(-1)
 }
 
-/** The preset picker, which adds a layer; its label changes once one exists. */
-function presetSelect() {
+/** Opens the dedicated Presets tool and returns its layer-adding picker. */
+async function presetSelect(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('tab', { name: 'Presets' }))
   return screen.getByRole('combobox', { name: /^(Preset|Add another preset)$/ })
 }
 
@@ -50,9 +56,7 @@ async function openSquareCrop(user: ReturnType<typeof userEvent.setup>) {
   seedOwnerWorkspace(client())
   installLibraryApi({ watermarks: [makeWatermark()] })
   renderApp('/app/editor?preset=wm-1')
-  // URL selection replaces the empty picker's label; wait for the selected
-  // state rather than racing a transient label before the preset is applied.
-  await screen.findByRole('combobox', { name: 'Add another preset' })
+  await screen.findByRole('textbox', { name: 'Text' })
   await user.click(screen.getByRole('tab', { name: 'Crop' }))
   await user.click(screen.getByRole('button', { name: '1:1' }))
   expect(screen.getByLabelText('Width (px)')).toHaveValue(640)
@@ -184,10 +188,12 @@ describe('editor page', () => {
     ).toBeInTheDocument()
     expect(screen.queryByText(/Nothing leaves your browser/)).not.toBeInTheDocument()
     // The preset from the URL is the first (and active) layer.
-    const layers = within(await screen.findByRole('list', { name: 'Layers, bottom to top' }))
+    await user.click(await screen.findByRole('tab', { name: 'Presets' }))
+    let layers = within(await screen.findByRole('list', { name: 'Layers, bottom to top' }))
     expect(layers.getByRole('button', { pressed: true })).toHaveTextContent('Studio signature')
     await waitFor(() => expect(lastSpec()?.style.opacity).toBe(0.85))
 
+    await user.click(screen.getByRole('tab', { name: 'Watermark' }))
     const frame = await screen.findByRole('group', { name: /Watermark position/ })
     fireEvent.keyDown(frame, { key: 'ArrowLeft' })
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'custom', x: 0.79, y: 0.9 }))
@@ -202,7 +208,9 @@ describe('editor page', () => {
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'smart' }))
 
     // A second preset becomes a second, active layer; removing it leaves the first.
-    await user.selectOptions(presetSelect(), 'wm-2')
+    await user.selectOptions(await presetSelect(user), 'wm-2')
+    await user.click(screen.getByRole('tab', { name: 'Presets' }))
+    layers = within(await screen.findByRole('list', { name: 'Layers, bottom to top' }))
     expect(layers.getAllByRole('button', { pressed: true })).toHaveLength(1)
     expect(layers.getByRole('button', { pressed: true })).toHaveTextContent('Two')
     await waitFor(() => expect(renderedBatches.at(-1)).toHaveLength(2))
@@ -257,7 +265,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
-    await screen.findByRole('combobox', { name: 'Add another preset' })
+    await screen.findByRole('textbox', { name: 'Text' })
 
     await user.click(screen.getByRole('tab', { name: 'Adjust' }))
     await user.click(screen.getByRole('radio', { name: 'Vivid' }))
@@ -292,6 +300,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor')
+    await user.click(await screen.findByRole('tab', { name: 'Presets' }))
     await screen.findByRole('combobox', { name: 'Preset' })
     expect(
       screen.getByText('Add a watermark, then open Export to download your photo.'),
@@ -357,7 +366,7 @@ describe('editor page', () => {
     fireEvent.drop(canvas!, { dataTransfer: { files: [dropped] } })
     expect(await screen.findByText(/dropped\.jpg/)).toBeInTheDocument()
 
-    await user.selectOptions(presetSelect(), 'wm-tiled')
+    await user.selectOptions(await presetSelect(user), 'wm-tiled')
     const selectableMark = await screen.findByRole('group', { name: /Watermark position/ })
     expect(selectableMark).not.toHaveAttribute('aria-current')
     expect(screen.queryByRole('button', { name: 'Resize watermark' })).not.toBeInTheDocument()
@@ -380,7 +389,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
-    await screen.findByRole('combobox', { name: 'Add another preset' })
+    await screen.findByRole('textbox', { name: 'Text' })
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
     expect(
@@ -424,7 +433,7 @@ describe('editor page', () => {
     seedViewerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
-    await screen.findByRole('combobox', { name: 'Add another preset' })
+    await screen.findByRole('textbox', { name: 'Text' })
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled()
     expect(screen.queryByRole('button', { name: 'Save to gallery' })).not.toBeInTheDocument()
@@ -450,6 +459,7 @@ describe('editor page', () => {
     expect(api.watermarks).toHaveLength(1)
     expect(api.watermarks[0]?.spec).toMatchObject({ kind: 'text', text: '© My first photo' })
     expect(previewSubjects.filter((subject) => subject === photo)).toHaveLength(1)
+    await user.click(screen.getByRole('tab', { name: 'Presets' }))
     expect(await screen.findByRole('list', { name: 'Layers, bottom to top' })).toHaveTextContent(
       'First signature',
     )

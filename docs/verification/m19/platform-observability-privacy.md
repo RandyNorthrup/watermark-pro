@@ -177,6 +177,19 @@ No application analytics replacement was added. Sanitized D1 health checks,
 client-error reports, application audit records and private live diagnostics
 remain available under their existing retention and authorization controls.
 
+## Canonical HTTPS enforcement — 2026-09-10
+
+The post-deployment transport audit found that the canonical hostname accepted
+plain HTTP without redirecting a first-time visitor. HSTS on the HTTPS response
+does not protect that first cleartext request.
+
+Cloudflare **Always Use HTTPS** was enabled for the `lumafoil.com` zone and the
+minimum edge TLS version was raised from 1.0 to 1.2. Dashboard readback showed
+both settings active. A fresh request to `http://lumafoil.com/` returned one
+HTTP 301 with `Location: https://lumafoil.com/`; following it reached the
+canonical HTTPS page with HTTP 200. The retired hostnames remain without DNS and
+do not redirect into Lumafoil.
+
 ## Sources
 
 - [Cloudflare Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/)

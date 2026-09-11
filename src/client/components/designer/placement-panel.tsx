@@ -65,6 +65,7 @@ function percent(value: number): string {
 
 export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
   const { t } = useTranslation()
+  const resetLabel = (label: string) => t('editor.adjust.reset', { name: label })
   const modeChoices = MODE_CHOICES.map((choice) => ({
     ...choice,
     label: t(choice.label),
@@ -109,6 +110,8 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
             max={MAX_JITTER}
             step={JITTER_STEP}
             format={percent}
+            resetValue={DEFAULT_JITTER}
+            resetLabel={resetLabel(t('designer.placement.jitter'))}
             onChange={(jitter) => {
               onChange({ mode: 'random', jitter })
             }}
@@ -145,6 +148,8 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
             max={1}
             step={FRACTION_STEP}
             format={percent}
+            resetValue={CENTRE}
+            resetLabel={resetLabel(t('designer.placement.horizontal'))}
             onChange={(x) => {
               onChange({ ...placement, x })
             }}
@@ -156,6 +161,8 @@ export function PlacementPanel({ placement, onChange }: PlacementPanelProps) {
             max={1}
             step={FRACTION_STEP}
             format={percent}
+            resetValue={CENTRE}
+            resetLabel={resetLabel(t('designer.placement.vertical'))}
             onChange={(y) => {
               onChange({ ...placement, y })
             }}

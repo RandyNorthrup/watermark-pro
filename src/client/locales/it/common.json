@@ -385,6 +385,7 @@
     "heading": "Editor",
     "description": "Scegli un preset, posizionalo, ritaglia e ridimensiona sul tuo dispositivo. Scarica il risultato o scegli di salvarlo nella galleria o nel cloud.",
     "tabs": {
+      "presets": "Preimpostazioni",
       "watermark": "Filigrana",
       "crop": "Ritaglia",
       "adjust": "Regola",

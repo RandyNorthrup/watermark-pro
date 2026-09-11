@@ -385,6 +385,7 @@
     "heading": "Editor",
     "description": "Escolha uma predefinição, ajuste a posição, recorte e redimensione no seu dispositivo. Baixe o resultado ou escolha salvar na galeria ou na nuvem.",
     "tabs": {
+      "presets": "Predefinições",
       "watermark": "Marca d'água",
       "crop": "Cortar",
       "adjust": "Ajustar",

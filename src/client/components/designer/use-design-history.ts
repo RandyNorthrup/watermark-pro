@@ -54,6 +54,10 @@ export function useDesignHistory<Value>(initial: Value) {
     },
     [replace],
   )
+  const reset = useCallback(
+    (value: Value) => replace({ past: [], present: value, future: [], start: null }),
+    [replace],
+  )
   const undo = useCallback(() => {
     end()
     const previous = current.current
@@ -76,6 +80,7 @@ export function useDesignHistory<Value>(initial: Value) {
   return {
     value: history.present,
     change,
+    reset,
     begin,
     end,
     undo,

@@ -385,6 +385,7 @@
     "heading": "Éditeur",
     "description": "Choisissez un préréglage, placez le filigrane, recadrez et redimensionnez sur votre appareil. Téléchargez le résultat ou choisissez la galerie ou le cloud.",
     "tabs": {
+      "presets": "Préréglages",
       "watermark": "Filigrane",
       "crop": "Recadrer",
       "adjust": "Ajuster",

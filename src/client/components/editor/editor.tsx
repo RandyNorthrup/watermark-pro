@@ -4,6 +4,7 @@ import {
   Crop,
   Download,
   ImagePlus,
+  LibraryBig,
   Link2,
   Redo2,
   RotateCcw,
@@ -24,6 +25,7 @@ import { FORMAT_EXTENSIONS } from './formats'
 import { FrameControls } from './frame-controls'
 import { MarkOverlay, type MarkGesture, type MarkPatch } from './mark-overlay'
 import { OrientationControls } from './orientation-controls'
+import { PresetPanel } from './preset-panel'
 import { ResizePanel } from './resize-panel'
 import { useRenderer } from './use-renderer'
 import { WatermarkPanel } from './watermark-panel'
@@ -42,6 +44,11 @@ import {
   fullCrop,
   resolveRatio,
 } from '../../editor/geometry'
+import {
+  EDITOR_SESSION_SAVE_DELAY_MS,
+  loadEditorSession,
+  saveEditorSession,
+} from '../../editor/session'
 import {
   canRedo,
   canUndo,
@@ -111,9 +118,10 @@ interface EditorProps {
   embedded?: EmbeddedEditing | undefined
 }
 
-type Tool = 'watermark' | 'crop' | 'adjust' | 'resize' | 'export'
+type Tool = 'presets' | 'watermark' | 'crop' | 'adjust' | 'resize' | 'export'
 
 const TOOLS = [
+  { value: 'presets', label: 'editor.tabs.presets', icon: LibraryBig },
   { value: 'watermark', label: 'editor.tabs.watermark', icon: Stamp },
   { value: 'crop', label: 'editor.tabs.crop', icon: Crop },
   { value: 'adjust', label: 'editor.tabs.adjust', icon: SlidersHorizontal },
@@ -210,6 +218,7 @@ function EditorSession({
   )
   const document = history.present
   const draft = useDesignHistory(blankSpec())
+  const resetDraft = draft.reset
   const [tool, setTool] = useState<Tool>('watermark')
   const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
   // The active layer: the chosen one while it exists, else the topmost.
@@ -222,6 +231,10 @@ function EditorSession({
   const [aspectId, setAspectId] = useState('free')
   const [photo, setPhoto] = useState<Photo | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
+  const [sessionError, setSessionError] = useState<string | null>(null)
+  const [sessionRestored, setSessionRestored] = useState(
+    embedded !== undefined || (initialPresetId !== null && initialPresetId !== undefined),
+  )
   const [isExporting, setIsExporting] = useState(false)
   const [isSharing, setIsSharing] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
@@ -283,7 +296,10 @@ function EditorSession({
     canCreatePresets && (activeLayerId === 'draft' || document.layers.length === 0)
       ? [...document.layers, { id: 'draft', presetId: '', spec: draft.value }]
       : document.layers
-  const renderSpecs = isCropping ? [] : canvasLayers.map((layer) => layer.spec)
+  const renderLayers = isCropping
+    ? []
+    : canvasLayers.filter((layer) => layer.spec.kind !== 'image' || layer.spec.assetId !== '')
+  const renderSpecs = renderLayers.map((layer) => layer.spec)
   const renderTransform = previewTransform(document, isCropping)
   const cropBase = croppedSize(cropBaseSize, document.crop)
   const outputSize = framedSize(document.resize ?? cropBase, document.border)
@@ -293,6 +309,74 @@ function EditorSession({
     renderTransform,
     outputSize,
   )
+
+  useEffect(() => {
+    if (sessionRestored || embedded !== undefined) return
+    const controller = new AbortController()
+    const isCurrent = () => !controller.signal.aborted
+    void (async () => {
+      try {
+        const restored = await loadEditorSession(organizationId)
+        if (!isCurrent()) return
+        if (restored !== null) {
+          dispatch({ type: 'reset', document: restored.document })
+          resetDraft(restored.draftSpec)
+          const activeLayerId =
+            restored.activeLayerId === 'draft' ||
+            restored.document.layers.some((layer) => layer.id === restored.activeLayerId)
+              ? restored.activeLayerId
+              : null
+          setActiveLayerId(activeLayerId)
+          if (restored.photo !== null) {
+            const restoredPhoto = {
+              file: restored.photo.file,
+              size: restored.photo.dimensions,
+            }
+            setPhoto(restoredPhoto)
+            const metadata = await readPhotoMetadata(restoredPhoto.file)
+            if (!isCurrent()) return
+            await setSubject(restoredPhoto.file, metadata)
+          }
+        }
+        if (isCurrent()) setSessionRestored(true)
+      } catch (restoreError) {
+        if (isCurrent()) {
+          setSessionError(describeError(restoreError))
+          setSessionRestored(true)
+        }
+      }
+    })()
+    return () => controller.abort()
+  }, [embedded, organizationId, resetDraft, sessionRestored, setSubject])
+
+  useEffect(() => {
+    if (
+      !sessionRestored ||
+      embedded !== undefined ||
+      (initialPresetId !== null && initialPresetId !== undefined)
+    )
+      return
+    const timer = window.setTimeout(() => {
+      void saveEditorSession(
+        organizationId,
+        document,
+        draft.value,
+        activeLayer?.id ?? (activeLayerId === 'draft' ? 'draft' : null),
+        photo === null ? null : { file: photo.file, dimensions: photo.size },
+      ).catch((saveError: unknown) => setSessionError(describeError(saveError)))
+    }, EDITOR_SESSION_SAVE_DELAY_MS)
+    return () => window.clearTimeout(timer)
+  }, [
+    activeLayer?.id,
+    activeLayerId,
+    document,
+    draft.value,
+    embedded,
+    initialPresetId,
+    organizationId,
+    photo,
+    sessionRestored,
+  ])
 
   const visibleTools =
     embedded === undefined ? TOOLS : TOOLS.filter((entry) => entry.value !== 'export')
@@ -508,6 +592,7 @@ function EditorSession({
     const layer = createLayer(preset.id, preset.spec)
     commit({ layers: [...document.layers, layer] })
     setActiveLayerId(layer.id)
+    setTool('watermark')
   }
 
   function removeLayer(layerId: string) {
@@ -599,6 +684,8 @@ function EditorSession({
 
   function onDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault()
+    const dragTypes: unknown = Reflect.get(event.dataTransfer, 'types')
+    if (Array.isArray(dragTypes) && dragTypes.length > 0 && !dragTypes.includes('Files')) return
     const file = event.dataTransfer.files[0]
     if (file !== undefined) {
       void choosePhoto(file)
@@ -739,6 +826,8 @@ function EditorSession({
             <div className="relative">
               <img
                 ref={setImageElement}
+                draggable={false}
+                onDragStart={(event) => event.preventDefault()}
                 src={result.url}
                 alt={t(isCropping ? 'editor.altCrop' : 'editor.altWatermark')}
                 width={result.width}
@@ -746,7 +835,7 @@ function EditorSession({
                 className="block h-auto max-h-[42svh] w-auto max-w-full lg:max-h-[70vh]"
               />
               {tool === 'watermark' && previewSize !== null
-                ? canvasLayers.map((layer, index) => {
+                ? renderLayers.map((layer, index) => {
                     const outcome = result.marks[index]
                     if (outcome === undefined || layer.spec.style.tiling.enabled) return null
                     return (
@@ -797,6 +886,7 @@ function EditorSession({
           ) : null}
         </div>
         {photoError === null ? null : <Alert tone="error">{photoError}</Alert>}
+        {sessionError === null ? null : <Alert tone="error">{sessionError}</Alert>}
         {error === null ? null : (
           <Alert tone="error" title={t('editor.previewFailed')}>
             {error}
@@ -804,166 +894,181 @@ function EditorSession({
         )}
       </Card>
 
-      <Card className="flex max-h-[75svh] min-w-0 flex-col gap-4 overflow-y-auto overscroll-contain lg:max-h-[calc(100svh-8rem)]">
-        <Tabs.Root
-          value={tool}
-          onValueChange={(value) => {
-            if (isTool(value)) {
-              setTool(value)
-            }
-          }}
-          className="flex flex-col gap-4"
-        >
-          <Tabs.List
-            aria-label={t('editor.toolsLabel')}
-            className="flex flex-wrap gap-1 rounded-lg border border-line bg-surface-raised p-1"
+      <Card className="min-w-0 overflow-hidden p-0">
+        <div className="app-scroll-region flex max-h-[75svh] min-w-0 flex-col gap-4 overflow-y-auto overscroll-contain p-6 lg:max-h-[calc(100svh-8rem)]">
+          <Tabs.Root
+            value={tool}
+            onValueChange={(value) => {
+              if (isTool(value)) {
+                setTool(value)
+              }
+            }}
+            className="flex flex-col gap-4"
           >
-            {visibleTools.map(({ value, label, icon: Icon }) => (
-              <Tabs.Trigger
-                key={value}
-                value={value}
-                className="flex min-w-16 flex-1 flex-col items-center gap-1 rounded-md px-2 py-2 text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
-              >
-                <Icon aria-hidden="true" className="size-4" />
-                {t(label)}
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
-          <Tabs.Content value="watermark" className="outline-none">
-            <WatermarkPanel
-              organizationId={organizationId}
-              canCreate={canCreatePresets}
-              draftSpec={draft.value}
-              undo={undo}
-              redo={redo}
-              canUndo={(activeLayer === null && draft.canUndo) || canUndo(history)}
-              canRedo={(activeLayer === null && draft.canRedo) || canRedo(history)}
-              layers={document.layers}
-              activeLayerId={activeLayer?.id ?? null}
-              onAddPreset={addPreset}
-              onNewPreset={() => {
-                setActiveLayerId('draft')
-              }}
-              onSelectLayer={setActiveLayerId}
-              onRemoveLayer={removeLayer}
-              onSpecChange={changeActiveSpec}
-            />
-          </Tabs.Content>
-          <Tabs.Content value="crop" className="flex flex-col gap-4 outline-none">
-            <OrientationControls
-              orientation={document.orientation}
-              onChange={changeOrientation}
-              showStraighten
-            />
-            <CropPanel
-              source={cropBaseSize}
-              crop={document.crop}
-              aspectId={aspectId}
-              onAspectChange={setAspectId}
-              onCropChange={(next) => {
-                commit({ crop: next })
-              }}
-            />
-          </Tabs.Content>
-          <Tabs.Content value="adjust" className="flex flex-col gap-4 outline-none">
-            <AdjustPanel
-              adjust={document.adjust}
-              onChange={changeAdjust}
-              photoFile={photo?.file ?? null}
-            />
-            <FrameControls border={document.border} onChange={changeBorder} />
-          </Tabs.Content>
-          <Tabs.Content value="resize" className="outline-none">
-            <ResizePanel
-              base={cropBase}
-              resize={document.resize}
-              onResizeChange={(next) => {
-                commit({ resize: next })
-              }}
-            />
-          </Tabs.Content>
-          {embedded === undefined ? (
-            <Tabs.Content value="export" className="outline-none">
-              <ExportPanel
-                organizationName={organizationName}
-                outputSize={outputSize}
-                isReady={document.layers.length > 0}
-                isExporting={isExporting}
-                onExport={(options) => {
-                  void exportPhoto(options)
+            <Tabs.List
+              aria-label={t('editor.toolsLabel')}
+              className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised p-1"
+            >
+              {visibleTools.map(({ value, label, icon: Icon }) => (
+                <Tabs.Trigger
+                  key={value}
+                  value={value}
+                  className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
+                >
+                  <Icon aria-hidden="true" className="size-4" />
+                  {t(label)}
+                </Tabs.Trigger>
+              ))}
+            </Tabs.List>
+            <Tabs.Content value="presets" className="outline-none">
+              <PresetPanel
+                organizationId={organizationId}
+                canCreate={canCreatePresets}
+                layers={document.layers}
+                activeLayerId={activeLayer?.id ?? null}
+                onAddPreset={addPreset}
+                onNewPreset={() => {
+                  setActiveLayerId('draft')
+                  setTool('watermark')
                 }}
-                onShare={(options) => {
-                  void sharePhoto(options)
+                onSelectLayer={(layerId) => {
+                  setActiveLayerId(layerId)
+                  setTool('watermark')
                 }}
-                isSharing={isSharing}
-                onSave={canSave ? save.mutate : undefined}
-                isSaving={save.isPending}
-                cloudConfig={publicConfig.data}
-                onExportBlob={exportBlob}
-                onCloudSaved={(message) => {
-                  setExportError(null)
-                  setCloudSaved(message)
-                }}
-                onCloudError={(message) => {
-                  setCloudSaved(null)
-                  setExportError(message)
+                onRemoveLayer={removeLayer}
+              />
+            </Tabs.Content>
+            <Tabs.Content value="watermark" className="outline-none">
+              <WatermarkPanel
+                organizationId={organizationId}
+                canCreate={canCreatePresets}
+                draftSpec={draft.value}
+                undo={undo}
+                redo={redo}
+                canUndo={(activeLayer === null && draft.canUndo) || canUndo(history)}
+                canRedo={(activeLayer === null && draft.canRedo) || canRedo(history)}
+                layers={document.layers}
+                activeLayerId={activeLayer?.id ?? null}
+                onAddPreset={addPreset}
+                onSpecChange={changeActiveSpec}
+              />
+            </Tabs.Content>
+            <Tabs.Content value="crop" className="flex flex-col gap-4 outline-none">
+              <OrientationControls
+                orientation={document.orientation}
+                onChange={changeOrientation}
+                showStraighten
+              />
+              <CropPanel
+                source={cropBaseSize}
+                crop={document.crop}
+                aspectId={aspectId}
+                onAspectChange={setAspectId}
+                onCropChange={(next) => {
+                  commit({ crop: next })
                 }}
               />
-              {exportError === null ? null : (
-                <Alert tone="error" title={t('editor.exportFailed')} className="mt-3">
-                  {exportError}
-                </Alert>
-              )}
-              {saved === null ? null : (
-                <Alert tone="success" className="mt-3">
-                  <Trans
-                    i18nKey="editor.savedToGallery"
-                    values={{ name: saved }}
-                    components={{
-                      galleryLink: <Link to="/app/gallery" className="font-medium underline" />,
-                    }}
-                  />
-                </Alert>
-              )}
-              {cloudSaved === null ? null : (
-                <Alert tone="success" className="mt-3">
-                  {cloudSaved}
-                </Alert>
-              )}
             </Tabs.Content>
-          ) : null}
-        </Tabs.Root>
-        {embedded === undefined ? null : (
-          <div className="flex flex-wrap gap-2 border-t border-line pt-4">
-            <Button
-              type="button"
-              disabled={document.layers.length === 0}
-              onClick={() => {
-                embedded.onApply(document)
-              }}
-            >
-              {t('editor.applyToPhoto')}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={document.layers.length === 0}
-              onClick={() => {
-                embedded.onApplyToAll(document)
-              }}
-            >
-              {t('editor.applyToAll')}
-            </Button>
-            {embedded.hasOverride ? (
-              <Button type="button" variant="secondary" onClick={embedded.onRemove}>
-                {t('editor.removeOverride')}
-              </Button>
+            <Tabs.Content value="adjust" className="flex flex-col gap-4 outline-none">
+              <AdjustPanel
+                adjust={document.adjust}
+                onChange={changeAdjust}
+                photoFile={photo?.file ?? null}
+              />
+              <FrameControls border={document.border} onChange={changeBorder} />
+            </Tabs.Content>
+            <Tabs.Content value="resize" className="outline-none">
+              <ResizePanel
+                base={cropBase}
+                resize={document.resize}
+                onResizeChange={(next) => {
+                  commit({ resize: next })
+                }}
+              />
+            </Tabs.Content>
+            {embedded === undefined ? (
+              <Tabs.Content value="export" className="outline-none">
+                <ExportPanel
+                  organizationName={organizationName}
+                  outputSize={outputSize}
+                  isReady={document.layers.length > 0}
+                  isExporting={isExporting}
+                  onExport={(options) => {
+                    void exportPhoto(options)
+                  }}
+                  onShare={(options) => {
+                    void sharePhoto(options)
+                  }}
+                  isSharing={isSharing}
+                  onSave={canSave ? save.mutate : undefined}
+                  isSaving={save.isPending}
+                  cloudConfig={publicConfig.data}
+                  onExportBlob={exportBlob}
+                  onCloudSaved={(message) => {
+                    setExportError(null)
+                    setCloudSaved(message)
+                  }}
+                  onCloudError={(message) => {
+                    setCloudSaved(null)
+                    setExportError(message)
+                  }}
+                />
+                {exportError === null ? null : (
+                  <Alert tone="error" title={t('editor.exportFailed')} className="mt-3">
+                    {exportError}
+                  </Alert>
+                )}
+                {saved === null ? null : (
+                  <Alert tone="success" className="mt-3">
+                    <Trans
+                      i18nKey="editor.savedToGallery"
+                      values={{ name: saved }}
+                      components={{
+                        galleryLink: <Link to="/app/gallery" className="font-medium underline" />,
+                      }}
+                    />
+                  </Alert>
+                )}
+                {cloudSaved === null ? null : (
+                  <Alert tone="success" className="mt-3">
+                    {cloudSaved}
+                  </Alert>
+                )}
+              </Tabs.Content>
             ) : null}
-            <Button type="button" variant="ghost" onClick={embedded.onCancel}>
-              {t('editor.cancel')}
-            </Button>
-          </div>
-        )}
+          </Tabs.Root>
+          {embedded === undefined ? null : (
+            <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+              <Button
+                type="button"
+                disabled={document.layers.length === 0}
+                onClick={() => {
+                  embedded.onApply(document)
+                }}
+              >
+                {t('editor.applyToPhoto')}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={document.layers.length === 0}
+                onClick={() => {
+                  embedded.onApplyToAll(document)
+                }}
+              >
+                {t('editor.applyToAll')}
+              </Button>
+              {embedded.hasOverride ? (
+                <Button type="button" variant="secondary" onClick={embedded.onRemove}>
+                  {t('editor.removeOverride')}
+                </Button>
+              ) : null}
+              <Button type="button" variant="ghost" onClick={embedded.onCancel}>
+                {t('editor.cancel')}
+              </Button>
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   )

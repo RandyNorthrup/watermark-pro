@@ -218,16 +218,10 @@ function WatermarkDesignerSession({
       className={
         inline === undefined
           ? 'grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]'
-          : 'min-w-0'
+          : 'flex min-w-0 flex-col gap-5'
       }
     >
-      <Card
-        className={
-          inline === undefined
-            ? 'flex flex-col gap-5'
-            : 'flex min-w-0 flex-col gap-5 border-0 bg-transparent p-0 shadow-none'
-        }
-      >
+      <Card className={inline === undefined ? 'flex flex-col gap-5' : 'contents'}>
         <Field label={t('designer.presetName')} error={nameError ?? undefined}>
           {(controlProps) => (
             <Input

@@ -112,6 +112,22 @@ export async function cacheOfflineRecord(record: CachedRecord): Promise<void> {
   })
 }
 
+/** Delete one record only inside the currently admitted account and workspace scope. */
+export async function removeOfflineRecord(
+  userId: string,
+  organizationId: string,
+  name: string,
+): Promise<void> {
+  const owner = captureOfflineOwner()
+  if (owner.userId !== userId) throw new Error('The signed-in account changed before cleanup.')
+  const key = offlineRecordKey(userId, organizationId, name)
+  owner.assertCurrent()
+  await write((transaction) => {
+    owner.assertCurrent()
+    transaction.objectStore(RECORDS).delete(key)
+  })
+}
+
 /** Atomically update scoped metadata; binary saves prepare their buffers through cacheOfflineRecord. */
 export async function updateOfflineRecord(
   key: string,
