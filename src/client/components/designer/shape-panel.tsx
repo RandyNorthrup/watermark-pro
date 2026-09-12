@@ -7,10 +7,9 @@ import {
   MIN_LINE_ASPECT,
   MIN_SHAPE_ASPECT,
   type Shape,
-  SHAPES,
   type WatermarkSpec,
 } from '../../../shared/watermark'
-import { Select, type SelectOption } from '../ui/select'
+import { cn } from '../../lib/cn'
 import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
 
@@ -27,40 +26,71 @@ const STROKE_STEP = 0.005
 const DEFAULT_SHAPE_COLOUR = '#c86b82'
 
 const SHAPE_OPTIONS = [
-  { value: 'rectangle', label: 'designer.shape.rectangle' },
-  { value: 'rounded-rectangle', label: 'designer.shape.roundedRectangle' },
-  { value: 'ellipse', label: 'designer.shape.ellipse' },
-  { value: 'line', label: 'designer.shape.line' },
-] as const satisfies readonly SelectOption<Shape>[]
-
-function isShape(value: string): value is Shape {
-  return (SHAPES as readonly string[]).includes(value)
-}
+  { value: 'rectangle', label: 'designer.shape.rectangle', previewClassName: 'h-6 w-10' },
+  {
+    value: 'rounded-rectangle',
+    label: 'designer.shape.roundedRectangle',
+    previewClassName: 'h-6 w-10 rounded-md',
+  },
+  { value: 'ellipse', label: 'designer.shape.ellipse', previewClassName: 'h-7 w-10 rounded-full' },
+  {
+    value: 'line',
+    label: 'designer.shape.line',
+    previewClassName: 'h-0 w-11 border-x-0 border-b-0',
+  },
+] as const satisfies readonly {
+  value: Shape
+  label: string
+  previewClassName: string
+}[]
 
 /** Shape kind, proportions, fill and stroke for a shape mark. */
 export function ShapePanel({ spec, onChange }: ShapePanelProps) {
   const { t } = useTranslation()
   const isLine = spec.shape === 'line'
-  const shapeOptions = SHAPE_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium">{t('designer.shape.label')}</span>
-        <Select
+      <fieldset className="flex flex-col gap-2">
+        <legend className="text-sm font-medium">{t('designer.shape.label')}</legend>
+        <div
+          role="radiogroup"
           aria-label={t('designer.shape.label')}
-          value={spec.shape}
-          options={shapeOptions}
-          onChange={(shape) => {
-            if (!isShape(shape)) {
-              return
-            }
-
-            const aspect =
-              shape === 'line' ? MIN_LINE_ASPECT : Math.min(spec.aspect, MAX_SHAPE_ASPECT)
-            onChange({ ...spec, shape, aspect })
-          }}
-        />
-      </div>
+          className="grid grid-cols-2 gap-2"
+        >
+          {SHAPE_OPTIONS.map((option) => {
+            const isSelected = spec.shape === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={cn(
+                  'glass-control group flex min-h-24 flex-col items-center justify-center gap-3 rounded-xl border p-3 text-sm font-medium text-ink-muted transition-colors outline-none',
+                  'hover:border-brand-500/60 hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 dark:hover:bg-brand-900/40',
+                  isSelected && 'border-brand-500 bg-brand-50 text-ink dark:bg-brand-900/45',
+                )}
+                onClick={() => {
+                  const aspect =
+                    option.value === 'line'
+                      ? MIN_LINE_ASPECT
+                      : Math.min(spec.aspect, MAX_SHAPE_ASPECT)
+                  onChange({ ...spec, shape: option.value, aspect })
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'border-2 border-current transition-transform group-hover:scale-105',
+                    option.previewClassName,
+                  )}
+                />
+                <span>{t(option.label)}</span>
+              </button>
+            )
+          })}
+        </div>
+      </fieldset>
       <SliderField
         label={t(isLine ? 'designer.shape.length' : 'designer.shape.proportions')}
         value={spec.aspect}

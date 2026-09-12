@@ -106,6 +106,9 @@ what was planned; superseded entries stay.
   it removes canvas edits and layers while retaining the loaded photo, and saved
   document changes can be restored with Undo. Logo upload and signature actions
   now share one uniform centered layout.
+- Moved the active photo name and pixel dimensions into the canvas status bar
+  beside fit, zoom and grid controls. Replaced the Shape dropdown with a direct,
+  accessible two-column shape palette inspired by professional visual editors.
 - Replaced the synthetic editor sample with the same licensed coast photograph
   used on the landing page and included it in offline preparation. Versioned
   the sample and offline cache so existing installations receive the new photo.

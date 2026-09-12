@@ -761,6 +761,11 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   styled family previews and one clipped wheel/touch/keyboard scroll region.
   Export destinations use uniform actions, and constrained photo previews retain
   their intrinsic aspect ratio.
+- **Editor sidebar refinement (implemented, 2026-09-12):** the canvas remains the
+  stable centre of the workspace. The right inspector takes focused inspiration
+  from GrapesJS: compact icon-led watermark type navigation and direct visual
+  shape tiles replace the long wrapping type row and Shape dropdown. Photo name,
+  dimensions, zoom and grid controls share the canvas status bar.
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
   (not relaxed budgets) for the perf work; landing it in small green increments.
   - **§3 diet, first pass (done).** Dropped the `ui` chunk group (it forced all

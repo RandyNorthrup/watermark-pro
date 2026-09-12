@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Redo2, Undo2 } from 'lucide-react'
+import { ImageIcon, QrCode, Redo2, Shapes, Sparkles, Type, Undo2 } from 'lucide-react'
 import { Tabs } from 'radix-ui'
 import { type SubmitEvent, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -78,6 +78,14 @@ const SECTION_TABS = [
   { value: 'placement', label: 'designer.sections.placement' },
   { value: 'style', label: 'designer.sections.style' },
 ] as const
+
+const MARK_KIND_ICONS = {
+  text: Type,
+  symbol: Sparkles,
+  shape: Shapes,
+  image: ImageIcon,
+  qr: QrCode,
+} as const satisfies Record<MarkKind, typeof Type>
 
 /** Keeps a typed or pasted value within the line limit; extra line breaks join the last line. */
 function limitLines(text: string): string {
@@ -270,17 +278,21 @@ function WatermarkDesignerSession({
             >
               <Tabs.List
                 aria-label={t('designer.markType')}
-                className="flex flex-wrap gap-1 border-b border-line"
+                className="grid grid-cols-5 gap-1 rounded-xl border border-line bg-surface-raised p-1"
               >
-                {MARK_KINDS.map((kind) => (
-                  <Tabs.Trigger
-                    key={kind.value}
-                    value={kind.value}
-                    className="-mb-px border-b-2 border-transparent px-3 py-2 text-sm font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:border-brand-600 data-[state=active]:text-ink"
-                  >
-                    {kind.label}
-                  </Tabs.Trigger>
-                ))}
+                {MARK_KINDS.map((kind) => {
+                  const Icon = MARK_KIND_ICONS[kind.value]
+                  return (
+                    <Tabs.Trigger
+                      key={kind.value}
+                      value={kind.value}
+                      className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-1 py-2 text-center text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
+                    >
+                      <Icon aria-hidden="true" className="size-4" />
+                      <span className="max-w-full truncate">{kind.label}</span>
+                    </Tabs.Trigger>
+                  )
+                })}
               </Tabs.List>
               <Tabs.Content value="text" className="flex flex-col gap-4 outline-none">
                 {spec.kind === 'text' ? (

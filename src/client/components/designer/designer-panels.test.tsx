@@ -20,15 +20,15 @@ describe('ShapePanel', () => {
     const user = userEvent.setup()
     const onChange = vi.fn<(spec: ShapeSpec) => void>()
     const { rerender } = render(<ShapePanel spec={shapeSpec} onChange={onChange} />)
+    expect(screen.queryByRole('combobox', { name: 'Shape' })).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Rectangle' })).toBeChecked()
 
     // From a rectangle, choosing another closed shape clamps the aspect.
-    await user.click(screen.getByRole('combobox', { name: 'Shape' }))
-    await user.click(await screen.findByRole('option', { name: 'Ellipse' }))
+    await user.click(screen.getByRole('radio', { name: 'Ellipse' }))
     expect(onChange.mock.calls.at(-1)?.[0].shape).toBe('ellipse')
 
     // A line resets to its own minimum length.
-    await user.click(screen.getByRole('combobox', { name: 'Shape' }))
-    await user.click(await screen.findByRole('option', { name: 'Line' }))
+    await user.click(screen.getByRole('radio', { name: 'Line' }))
     expect(onChange.mock.calls.at(-1)?.[0].shape).toBe('line')
 
     fireEvent.change(screen.getByRole('slider', { name: 'Proportions' }), {
