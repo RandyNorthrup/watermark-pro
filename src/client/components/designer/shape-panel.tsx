@@ -12,6 +12,7 @@ import {
 } from '../../../shared/watermark'
 import { Select, type SelectOption } from '../ui/select'
 import { SliderField } from '../ui/slider-field'
+import { Switch } from '../ui/switch'
 
 type ShapeSpec = Extract<WatermarkSpec, { kind: 'shape' }>
 
@@ -23,7 +24,7 @@ interface ShapePanelProps {
 const PERCENT = 100
 const ASPECT_STEP = 0.05
 const STROKE_STEP = 0.005
-const DEFAULT_FILL_COLOUR = '#6d4de6'
+const DEFAULT_SHAPE_COLOUR = '#c86b82'
 
 const SHAPE_OPTIONS = [
   { value: 'rectangle', label: 'designer.shape.rectangle' },
@@ -35,9 +36,6 @@ const SHAPE_OPTIONS = [
 function isShape(value: string): value is Shape {
   return (SHAPES as readonly string[]).includes(value)
 }
-
-const SWITCH_CLASS =
-  'relative inline-flex h-6 w-10 shrink-0 items-center rounded-full bg-line transition-colors data-[state=checked]:bg-brand-600'
 
 /** Shape kind, proportions, fill and stroke for a shape mark. */
 export function ShapePanel({ spec, onChange }: ShapePanelProps) {
@@ -75,20 +73,17 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
         }}
       />
 
-      <fieldset className="flex flex-col gap-2">
-        <label className="flex items-center justify-between text-sm font-medium">
-          {t('designer.shape.fill')}
-          <input
-            type="checkbox"
-            className={SWITCH_CLASS}
-            role="switch"
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between text-sm font-medium">
+          <span>{t('designer.shape.fill')}</span>
+          <Switch
             aria-label={t('designer.shape.fillToggle')}
-            checked={spec.fill.enabled}
-            onChange={(event) => {
-              onChange({ ...spec, fill: { ...spec.fill, enabled: event.currentTarget.checked } })
+            isChecked={spec.fill.enabled}
+            onCheckedChange={(isEnabled) => {
+              onChange({ ...spec, fill: { ...spec.fill, enabled: isEnabled } })
             }}
           />
-        </label>
+        </div>
         {spec.fill.enabled ? (
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm">
@@ -115,7 +110,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
             />
           </div>
         ) : null}
-      </fieldset>
+      </div>
 
       <fieldset className="flex flex-col gap-2">
         <SliderField
@@ -129,23 +124,22 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
             onChange({ ...spec, stroke: { ...spec.stroke, width } })
           }}
         />
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={spec.stroke.colour !== null}
-            onChange={(event) => {
+        <div className="flex items-center justify-between gap-2 text-sm">
+          <span>{t('designer.shape.customStrokeColour')}</span>
+          <Switch
+            aria-label={t('designer.shape.customStrokeColour')}
+            isChecked={spec.stroke.colour !== null}
+            onCheckedChange={(isEnabled) => {
               onChange({
                 ...spec,
                 stroke: {
                   ...spec.stroke,
-                  colour: event.currentTarget.checked ? DEFAULT_FILL_COLOUR : null,
+                  colour: isEnabled ? DEFAULT_SHAPE_COLOUR : null,
                 },
               })
             }}
-            className="size-4 accent-brand-600"
           />
-          {t('designer.shape.customStrokeColour')}
-        </label>
+        </div>
         {spec.stroke.colour === null ? null : (
           <input
             type="color"

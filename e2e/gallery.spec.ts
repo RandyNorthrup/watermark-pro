@@ -40,6 +40,7 @@ test('saves from the editor, browses, searches, downloads and deletes', async ({
   await page.getByRole('button', { name: 'Save preset' }).click()
   await page.getByRole('link', { name: 'Open Gallery preset in the editor' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await page.getByRole('tab', { name: 'Presets' }).click()
   await expect(
     page
       .getByRole('list', { name: 'Layers, bottom to top' })

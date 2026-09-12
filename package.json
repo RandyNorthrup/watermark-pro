@@ -54,7 +54,7 @@
     "bootstrap:owner": "node scripts/bootstrap-owner.mjs",
     "test:bootstrap": "node --test scripts/bootstrap-owner.test.mjs scripts/site-role-migration.test.mjs scripts/test-site-owner.test.mjs",
     "test:gate": "node --test scripts/gate-http-bridge.test.mjs scripts/gate-runtime.test.mjs scripts/offline-proxy.test.mjs",
-    "test:performance": "node --test --test-concurrency=2 scripts/lighthouse-budget.test.mjs scripts/lighthouse-navigation.test.mjs scripts/lighthouse-page.test.mjs scripts/lighthouse-diagnostics.test.mjs scripts/audit-chrome.test.mjs scripts/audit-surfaces.test.mjs scripts/audit-content.browser.test.mjs scripts/bundle-budget.test.mjs scripts/compressing-proxy.test.mjs scripts/route-preloads.test.mjs scripts/audit-certificate.browser.test.mjs scripts/microsoft-bridge.browser.test.mjs",
+    "test:performance": "node --test --test-concurrency=2 scripts/lighthouse-budget.test.mjs scripts/lighthouse-navigation.test.mjs scripts/lighthouse-page.test.mjs scripts/lighthouse-diagnostics.test.mjs scripts/audit-chrome.test.mjs scripts/audit-surfaces.test.mjs scripts/audit-content.browser.test.mjs scripts/bundle-budget.test.mjs scripts/compressing-proxy.test.mjs scripts/route-preloads.test.mjs scripts/audit-certificate.browser.test.mjs scripts/microsoft-bridge.browser.test.mjs scripts/ui-primitives.test.mjs",
     "security:publication:build": "node scripts/publication-scan.mjs --built",
     "test:publication": "node --test scripts/publication.test.mjs",
     "test:assets": "python scripts/test-vendor-downloads.py && python scripts/test-prepare-d1-restore.py"

@@ -405,6 +405,16 @@
     "redo": "Rehacer",
     "clearCanvas": "Limpiar lienzo",
     "canvas": "Lienzo",
+    "view": {
+      "label": "Vista del lienzo",
+      "zoom": "Zoom",
+      "zoomOut": "Alejar",
+      "zoomIn": "Acercar",
+      "fit": "Ajustar",
+      "actualSize": "100%",
+      "grid": "Cuadrícula",
+      "gridSpacing": "Espaciado de cuadrícula"
+    },
     "altCrop": "Foto con el marco de recorte",
     "altWatermark": "Foto con la marca de agua aplicada",
     "choosePresetHint": "Elige un preajuste para colocar una marca de agua. Suelta una foto en cualquier parte del lienzo.",

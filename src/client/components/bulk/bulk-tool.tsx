@@ -83,6 +83,7 @@ import { Card } from '../ui/card'
 import { Input } from '../ui/input'
 import { Select, type SelectOption } from '../ui/select'
 import { SliderField } from '../ui/slider-field'
+import { Switch } from '../ui/switch'
 
 interface BulkToolProps {
   organizationId: string
@@ -873,18 +874,15 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
             />
             <MetadataPolicyField policy={policy} format={format} onChange={setPolicy} />
             <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-2 text-sm font-medium">
-                <input
-                  type="checkbox"
-                  className="size-4 accent-brand-600"
-                  checked={wantsInvisible}
+              <div className="flex items-center justify-between gap-2 text-sm font-medium">
+                <span>{t('bulk.invisibleMark')}</span>
+                <Switch
+                  aria-label={t('bulk.invisibleMark')}
+                  isChecked={wantsInvisible}
                   disabled={format !== 'image/png' || snapshot.isRunning}
-                  onChange={(event) => {
-                    setWantsInvisible(event.currentTarget.checked)
-                  }}
+                  onCheckedChange={setWantsInvisible}
                 />
-                {t('bulk.invisibleMark')}
-              </label>
+              </div>
               {format === 'image/png' ? (
                 wantsInvisible ? (
                   <Input

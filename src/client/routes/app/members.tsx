@@ -54,7 +54,7 @@ function MembersPage() {
 
   if (organization.id === `personal-${session.user.id}`) {
     return (
-      <div className="flex max-w-2xl flex-col gap-4">
+      <div className="flex w-full flex-col gap-4">
         <h1 className="text-3xl font-semibold">{t('siteInvites.privateHeading')}</h1>
         <p className="text-ink-muted">{t('siteInvites.privateBody')}</p>
         <Link

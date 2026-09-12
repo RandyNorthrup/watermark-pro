@@ -76,6 +76,16 @@ export const SENSITIVE_AUTH_PATHS = [
 /** Editor-sized derivative of the licensed coast photograph used on the landing page. */
 export const SAMPLE_SCENE_PATH = '/sample-scene-v2.jpg'
 
+export const MIN_CANVAS_ZOOM_PERCENT = 10
+export const MAX_CANVAS_ZOOM_PERCENT = 400
+export const CANVAS_ZOOM_STEP_PERCENT = 5
+export const DEFAULT_CANVAS_ZOOM_PERCENT = 100
+export const CANVAS_FIT_PADDING_PX = 24
+export const MIN_CANVAS_GRID_SPACING_PX = 8
+export const MAX_CANVAS_GRID_SPACING_PX = 256
+export const CANVAS_GRID_SPACING_STEP_PX = 8
+export const DEFAULT_CANVAS_GRID_SPACING_PX = 64
+
 /** Standard sepia colour matrix, row-major 3×3 (R, G, B output rows). */
 export const SEPIA_MATRIX = [
   [0.393, 0.769, 0.189],

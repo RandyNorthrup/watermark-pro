@@ -58,8 +58,8 @@ describe('ShapePanel', () => {
     })
     expect(onChange.mock.calls.at(-1)?.[0].stroke.width).toBe(0.05)
 
-    await user.click(screen.getByRole('checkbox', { name: 'Custom stroke colour' }))
-    expect(onChange.mock.calls.at(-1)?.[0].stroke.colour).not.toBeNull()
+    await user.click(screen.getByRole('switch', { name: 'Custom stroke colour' }))
+    expect(onChange.mock.calls.at(-1)?.[0].stroke.colour).toBe('#c86b82')
 
     // With a custom stroke colour set, its picker appears and edits the colour.
     rerender(

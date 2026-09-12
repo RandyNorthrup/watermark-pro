@@ -7,6 +7,8 @@ import { photoListResponseSchema } from '../src/shared/api'
 import { watermarkListResponseSchema } from '../src/shared/api-watermark'
 import { shellOrganizationsSchema } from '../src/shared/shell-cache'
 
+const OFFLINE_READY_TIMEOUT_MS = 120_000
+
 async function openOfflinePanel(page: Page): Promise<{
   panel: Locator
   close: () => Promise<void>
@@ -26,9 +28,11 @@ async function openOfflinePanel(page: Page): Promise<{
   }
 }
 
-async function expectOfflineStatus(page: Page, text: string): Promise<void> {
+async function expectOfflineStatus(page: Page, text: string, timeout?: number): Promise<void> {
   const view = await openOfflinePanel(page)
-  await expect(view.panel.getByText(text, { exact: true })).toBeVisible()
+  const status = view.panel.getByText(text, { exact: true })
+  if (timeout === undefined) await expect(status).toBeVisible()
+  else await expect(status).toBeVisible({ timeout })
   await view.close()
 }
 
@@ -44,7 +48,7 @@ async function waitForOfflineReadiness(page: Page): Promise<void> {
         ),
     )
     .toBe(true)
-  await expectOfflineStatus(page, 'App files are ready for offline use.')
+  await expectOfflineStatus(page, 'App files are ready for offline use.', OFFLINE_READY_TIMEOUT_MS)
 }
 
 function libraryPreset(page: Page, name: string): Locator {

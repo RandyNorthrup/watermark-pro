@@ -405,6 +405,16 @@
     "redo": "Refazer",
     "clearCanvas": "Limpar tela",
     "canvas": "Tela",
+    "view": {
+      "label": "Visualização da tela",
+      "zoom": "Zoom",
+      "zoomOut": "Afastar",
+      "zoomIn": "Aproximar",
+      "fit": "Ajustar",
+      "actualSize": "100%",
+      "grid": "Grade",
+      "gridSpacing": "Espaçamento da grade"
+    },
     "altCrop": "Foto com o quadro de recorte",
     "altWatermark": "Foto com a marca d'água aplicada",
     "choosePresetHint": "Escolha uma predefinição para posicionar uma marca d'água. Solte uma foto em qualquer parte da tela.",

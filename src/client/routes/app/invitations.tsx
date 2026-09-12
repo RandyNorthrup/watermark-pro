@@ -67,7 +67,7 @@ function InvitationsPage() {
     if (parsed.success) invite.mutate(parsed.data)
   }
   return (
-    <div className="flex max-w-3xl flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       <header>
         <h1 className="text-3xl font-semibold tracking-tight">{t('siteInvites.heading')}</h1>
         <p className="mt-2 text-ink-muted">{t('siteInvites.description')}</p>

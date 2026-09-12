@@ -1,4 +1,3 @@
-import { Switch } from 'radix-ui'
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -15,6 +14,7 @@ import {
 import type { Size } from '../../engine/layout'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
+import { Switch } from '../ui/switch'
 
 interface ResizePanelProps {
   /** Size after cropping, before any resize. */
@@ -74,17 +74,12 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
         ))}
       </div>
       <div className="flex items-center justify-between">
-        <label htmlFor={`${id}-lock`} className="text-sm font-medium">
-          {t('editor.resize.keepProportions')}
-        </label>
-        <Switch.Root
-          id={`${id}-lock`}
-          checked={isLocked}
+        <span className="text-sm font-medium">{t('editor.resize.keepProportions')}</span>
+        <Switch
+          aria-label={t('editor.resize.keepProportions')}
+          isChecked={isLocked}
           onCheckedChange={setIsLocked}
-          className="relative h-6 w-11 rounded-full bg-line focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none data-[state=checked]:bg-brand-600"
-        >
-          <Switch.Thumb className="block size-5 translate-x-0.5 rounded-full bg-white shadow transition-transform data-[state=checked]:translate-x-[22px]" />
-        </Switch.Root>
+        />
       </div>
       <fieldset className="flex flex-col gap-2">
         <legend className="text-xs font-medium text-ink-muted">

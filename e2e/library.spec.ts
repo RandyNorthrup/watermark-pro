@@ -127,7 +127,7 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await page.getByRole('tab', { name: 'Placement' }).click()
   await page.getByRole('radio', { name: 'Corner' }).click()
   await page.getByRole('button', { name: 'Bottom left' }).click()
-  await expect(page.getByText('Placed bottom left, dark ink.')).toBeVisible()
+  await expect(page.getByText('Placed bottom left, light ink.')).toBeVisible()
   await page.getByRole('tab', { name: 'Style' }).click()
   await expectAccessible(page)
   await page.getByLabel('Preset name').fill('Script signature')

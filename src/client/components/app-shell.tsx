@@ -246,7 +246,7 @@ export function AppShell({ session, organization, organizations, children }: App
           tabIndex={-1}
           className="flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:pt-6 md:pb-8"
         >
-          <div className="mx-auto w-full max-w-7xl">{children}</div>
+          <div className="w-full">{children}</div>
         </main>
         <TabBar items={TAB_BAR_ITEMS} />
       </div>

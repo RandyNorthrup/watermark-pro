@@ -139,6 +139,7 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
     .getByRole('link', { name: 'Open Camera metadata stamp in the editor', exact: true })
     .click()
   await page.reload()
+  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(stamp.name)
   await page
     .getByLabel('Open a photo')

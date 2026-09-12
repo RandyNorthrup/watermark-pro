@@ -15,10 +15,19 @@ import {
   Undo2,
 } from 'lucide-react'
 import { Tabs } from 'radix-ui'
-import { type DragEvent, useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  type CSSProperties,
+  type DragEvent,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { AdjustPanel } from './adjust-panel'
+import { CanvasViewControls } from './canvas-view-controls'
 import { CropOverlay, type CropGesture } from './crop-overlay'
 import { CropPanel } from './crop-panel'
 import { ExportPanel } from './export-panel'
@@ -37,6 +46,13 @@ import {
   type Orientation,
 } from '../../../shared/adjustments'
 import type { WatermarkDto } from '../../../shared/api-watermark'
+import {
+  CANVAS_FIT_PADDING_PX,
+  DEFAULT_CANVAS_GRID_SPACING_PX,
+  DEFAULT_CANVAS_ZOOM_PERCENT,
+  MAX_CANVAS_ZOOM_PERCENT,
+  MIN_CANVAS_ZOOM_PERCENT,
+} from '../../../shared/constants'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import {
   ASPECT_PRESETS,
@@ -122,6 +138,8 @@ interface EditorProps {
 }
 
 type Tool = 'presets' | 'watermark' | 'crop' | 'adjust' | 'resize' | 'export'
+type CanvasZoomMode = 'fit' | 'custom'
+type CanvasGridStyle = CSSProperties & { '--canvas-grid-spacing': string }
 
 const TOOLS = [
   { value: 'presets', label: 'editor.tabs.presets', icon: LibraryBig },
@@ -134,6 +152,22 @@ const TOOLS = [
 
 const ACCEPTED_PHOTO_TYPES = 'image/png,image/jpeg,image/webp,image/avif,image/gif'
 const SAMPLE_SIZE: Size = { width: SAMPLE_PHOTO_WIDTH, height: SAMPLE_PHOTO_HEIGHT }
+
+function clampCanvasZoom(zoom: number): number {
+  return Math.max(MIN_CANVAS_ZOOM_PERCENT, Math.min(MAX_CANVAS_ZOOM_PERCENT, zoom))
+}
+
+/** Fit the rendered image inside the measured viewport without changing output pixels. */
+function fitCanvasZoom(viewport: Size, content: Size | null): number {
+  if (content === null || viewport.width <= 0 || viewport.height <= 0) {
+    return DEFAULT_CANVAS_ZOOM_PERCENT
+  }
+  const availableWidth = Math.max(1, viewport.width - CANVAS_FIT_PADDING_PX * 2)
+  const availableHeight = Math.max(1, viewport.height - CANVAS_FIT_PADDING_PX * 2)
+  return clampCanvasZoom(
+    Math.floor(Math.min(availableWidth / content.width, availableHeight / content.height) * 100),
+  )
+}
 
 interface Photo {
   file: File
@@ -292,6 +326,12 @@ function EditorSession({
   const subjectIdentity = photoRequest.current
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
   const displaySize = useElementSize(imageElement)
+  const [canvasViewportElement, setCanvasViewportElement] = useState<HTMLDivElement | null>(null)
+  const canvasViewportSize = useElementSize(canvasViewportElement)
+  const [canvasZoomMode, setCanvasZoomMode] = useState<CanvasZoomMode>('fit')
+  const [customCanvasZoom, setCustomCanvasZoom] = useState(DEFAULT_CANVAS_ZOOM_PERCENT)
+  const [isCanvasGridVisible, setIsCanvasGridVisible] = useState(false)
+  const [canvasGridSpacing, setCanvasGridSpacing] = useState(DEFAULT_CANVAS_GRID_SPACING_PX)
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const publicConfig = useQuery(publicConfigQueryOptions)
 
@@ -728,6 +768,18 @@ function EditorSession({
   const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, cropBaseSize)
   const previewSize: Size | null =
     result === null ? null : { width: result.width, height: result.height }
+  const fittedCanvasZoom = fitCanvasZoom(canvasViewportSize, previewSize)
+  const canvasZoom = canvasZoomMode === 'fit' ? fittedCanvasZoom : clampCanvasZoom(customCanvasZoom)
+  const canvasFrameStyle: CSSProperties | undefined =
+    previewSize === null
+      ? undefined
+      : {
+          width: (previewSize.width * canvasZoom) / 100,
+          height: (previewSize.height * canvasZoom) / 100,
+        }
+  const canvasGridStyle: CanvasGridStyle = {
+    '--canvas-grid-spacing': `${String((canvasGridSpacing * canvasZoom) / 100)}px`,
+  }
   const canUndoCurrent = activeLayerId === 'draft' ? draft.canUndo : canUndo(history)
   const canRedoCurrent = activeLayerId === 'draft' ? draft.canRedo : canRedo(history)
   const canClearCanvas = activeLayerId === 'draft' || !isEmptyDocument(document)
@@ -810,13 +862,6 @@ function EditorSession({
               {t('editor.samplePhoto')}
             </Button>
           )}
-          <span className="truncate text-sm text-ink-muted">
-            {t('editor.photoMeta', {
-              name: photo === null ? t('editor.sampleScene') : photo.file.name,
-              width: sourceSize.width,
-              height: sourceSize.height,
-            })}
-          </span>
           <div className="ms-auto flex items-center gap-1">
             {isRendering ? <Spinner className="size-4" label={t('editor.rendering')} /> : null}
             <Button
@@ -859,6 +904,7 @@ function EditorSession({
           </div>
         </div>
         <div
+          ref={setCanvasViewportElement}
           role="region"
           aria-label={t('editor.canvas')}
           tabIndex={0}
@@ -866,61 +912,93 @@ function EditorSession({
             event.preventDefault()
           }}
           onDrop={onDrop}
-          className="app-scroll-region relative flex min-h-48 items-center justify-center overflow-auto rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:min-h-72"
+          className="app-scroll-region relative h-[50svh] min-h-64 overflow-auto rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:h-[calc(100svh-18rem)] lg:min-h-96"
         >
-          {result === null ? (
-            <PendingPreview hasPhoto={photo !== null} />
-          ) : (
-            <div className="relative">
-              <img
-                ref={setImageElement}
-                draggable={false}
-                onDragStart={(event) => event.preventDefault()}
-                src={result.url}
-                alt={t(isCropping ? 'editor.altCrop' : 'editor.altWatermark')}
-                width={result.width}
-                height={result.height}
-                className="block h-auto max-h-[42svh] w-auto max-w-full lg:max-h-[70vh] lg:max-w-none"
-              />
-              {tool === 'watermark' && previewSize !== null
-                ? renderLayers.map((layer, index) => {
-                    const outcome = result.marks[index]
-                    if (outcome === undefined || layer.spec.style.tiling.enabled) return null
-                    return (
-                      <MarkOverlay
-                        key={`${organizationId}:${String(subjectIdentity)}:${layer.id}:${layer.spec.kind}`}
-                        placement={outcome.placement}
-                        position={layer.spec.placement}
-                        renderedScale={result.specs?.[index]?.style.scale}
-                        previewSize={previewSize}
-                        displaySize={displaySize}
-                        scale={layer.spec.style.scale}
-                        rotation={layer.spec.style.rotation}
-                        margin={layer.spec.style.margin}
-                        active={layer.id === (activeLayer?.id ?? 'draft')}
-                        onSelect={() => {
-                          setActiveLayerId(layer.id)
-                        }}
-                        onGesture={(gesture) => {
-                          markGesture(layer.id, gesture)
-                        }}
-                      />
-                    )
-                  })
-                : null}
-              {isCropping ? (
-                <CropOverlay
-                  key={`${organizationId}:${String(subjectIdentity)}`}
-                  crop={crop}
-                  source={cropBaseSize}
-                  displaySize={displaySize}
-                  ratio={cropRatio}
-                  onGesture={cropGesture}
+          <div className="grid h-max min-h-full w-max min-w-full place-items-center p-3">
+            {result === null ? (
+              <PendingPreview hasPhoto={photo !== null} />
+            ) : (
+              <div className="relative shrink-0" style={canvasFrameStyle}>
+                <img
+                  ref={setImageElement}
+                  draggable={false}
+                  onDragStart={(event) => event.preventDefault()}
+                  src={result.url}
+                  alt={t(isCropping ? 'editor.altCrop' : 'editor.altWatermark')}
+                  width={result.width}
+                  height={result.height}
+                  className="block h-full w-full max-w-none"
                 />
-              ) : null}
-            </div>
-          )}
+                {isCanvasGridVisible ? (
+                  <div
+                    data-canvas-grid=""
+                    aria-hidden="true"
+                    className="canvas-grid-overlay pointer-events-none absolute inset-0"
+                    style={canvasGridStyle}
+                  />
+                ) : null}
+                {tool === 'watermark' && previewSize !== null
+                  ? renderLayers.map((layer, index) => {
+                      const outcome = result.marks[index]
+                      if (outcome === undefined || layer.spec.style.tiling.enabled) return null
+                      return (
+                        <MarkOverlay
+                          key={`${organizationId}:${String(subjectIdentity)}:${layer.id}:${layer.spec.kind}`}
+                          placement={outcome.placement}
+                          position={layer.spec.placement}
+                          renderedScale={result.specs?.[index]?.style.scale}
+                          previewSize={previewSize}
+                          displaySize={displaySize}
+                          scale={layer.spec.style.scale}
+                          rotation={layer.spec.style.rotation}
+                          margin={layer.spec.style.margin}
+                          active={layer.id === (activeLayer?.id ?? 'draft')}
+                          onSelect={() => {
+                            setActiveLayerId(layer.id)
+                          }}
+                          onGesture={(gesture) => {
+                            markGesture(layer.id, gesture)
+                          }}
+                        />
+                      )
+                    })
+                  : null}
+                {isCropping ? (
+                  <CropOverlay
+                    key={`${organizationId}:${String(subjectIdentity)}`}
+                    crop={crop}
+                    source={cropBaseSize}
+                    displaySize={displaySize}
+                    ratio={cropRatio}
+                    onGesture={cropGesture}
+                  />
+                ) : null}
+              </div>
+            )}
+          </div>
         </div>
+        <CanvasViewControls
+          status={t('editor.photoMeta', {
+            name: photo === null ? t('editor.sampleScene') : photo.file.name,
+            width: sourceSize.width,
+            height: sourceSize.height,
+          })}
+          zoom={canvasZoom}
+          isFit={canvasZoomMode === 'fit'}
+          isGridVisible={isCanvasGridVisible}
+          gridSpacing={canvasGridSpacing}
+          onZoomChange={(zoom) => {
+            setCanvasZoomMode('custom')
+            setCustomCanvasZoom(zoom)
+          }}
+          onFit={() => setCanvasZoomMode('fit')}
+          onActualSize={() => {
+            setCanvasZoomMode('custom')
+            setCustomCanvasZoom(DEFAULT_CANVAS_ZOOM_PERCENT)
+          }}
+          onGridVisibilityChange={setIsCanvasGridVisible}
+          onGridSpacingChange={setCanvasGridSpacing}
+        />
         <div className="flex flex-col gap-1 text-xs text-ink-muted" aria-live="polite">
           <p>
             {document.layers.length === 0

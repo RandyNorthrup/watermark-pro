@@ -241,6 +241,21 @@
   scrollbar-gutter: stable;
 }
 
+.canvas-grid-overlay {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-brand-500) 70%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-brand-500) 70%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: var(--canvas-grid-spacing) var(--canvas-grid-spacing);
+}
+
 /* Adapted glass-surface treatment: Margarita's MIT Liquid Glass UI Kit.
  * Notice: public/brand/UI-KIT-LICENSE.txt. The rose palette, geometry and
  * existing controls remain Lumafoil's; no filtering is applied to photo pixels.

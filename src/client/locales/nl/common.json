@@ -404,6 +404,16 @@
     "redo": "Opnieuw",
     "clearCanvas": "Canvas wissen",
     "canvas": "Canvas",
+    "view": {
+      "label": "Canvasweergave",
+      "zoom": "Zoomen",
+      "zoomOut": "Uitzoomen",
+      "zoomIn": "Inzoomen",
+      "fit": "Passend",
+      "actualSize": "100%",
+      "grid": "Raster",
+      "gridSpacing": "Rasterafstand"
+    },
     "altCrop": "Foto met het uitsnedekader",
     "altWatermark": "Foto met het toegepaste watermerk",
     "choosePresetHint": "Kies een preset om een watermerk te plaatsen. Sleep een foto naar een willekeurige plek op het canvas.",

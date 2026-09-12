@@ -397,8 +397,8 @@ describe('preset designer', () => {
       new File([new Uint8Array([0x89, 0x50])], 'mark.png', { type: 'image/png' }),
     )
     const panel = await screen.findByRole('region', { name: 'Prepare logo' })
-    const remove = await within(panel).findByRole('checkbox', { name: 'Remove background' })
-    const trim = within(panel).getByRole('checkbox', { name: 'Trim transparent edges' })
+    const remove = await within(panel).findByRole('switch', { name: 'Remove background' })
+    const trim = within(panel).getByRole('switch', { name: 'Trim transparent edges' })
     expect(remove).not.toBeChecked()
     await user.click(remove)
     expect(remove).toBeChecked()

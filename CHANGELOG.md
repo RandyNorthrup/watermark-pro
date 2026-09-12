@@ -110,6 +110,14 @@ what was planned; superseded entries stay.
   used on the landing page and included it in offline preparation. Versioned
   the sample and offline cache so existing installations receive the new photo.
 - Made the independently scrolling canvas a named keyboard-focusable region.
+- Removed the authenticated shell width cap so app pages expand with wide
+  browser windows. The editor canvas now defaults to measured Fit zoom, supports
+  10–400% zoom with Fit and 100% actions, and provides an optional adjustable
+  image-pixel grid overlay without changing exported pixels. Photo name and
+  dimensions now live in the canvas status bar instead of the top action row.
+- Unified all boolean controls on the themed Switch primitive: editor and bulk
+  invisible marks, frames, grid, shape fill/stroke colour, aspect lock, text
+  backdrop, tiling, logo background removal and transparent-edge trimming.
 - Centered Reset crop, Reset size and Reset all inside their tool panels.
 - Disabled automatic GitHub Actions runs and removed the hosted dependency-review
   job. CI, UI audits and deployment remain available only by manual dispatch;

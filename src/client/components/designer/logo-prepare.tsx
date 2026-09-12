@@ -10,6 +10,7 @@ import { describeSize, hasAlpha, runCleanup, toPngName } from '../../lib/logo-pr
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { SliderField } from '../ui/slider-field'
+import { Switch } from '../ui/switch'
 
 /** The tolerance slider moves in whole colour-distance units. */
 const TOLERANCE_STEP = 1
@@ -208,17 +209,14 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
             </figure>
           </div>
 
-          <label className="flex items-center gap-3 text-sm">
-            <input
-              type="checkbox"
-              checked={remove}
-              onChange={(event) => {
-                setRemove(event.currentTarget.checked)
-              }}
-              className="size-4 accent-brand-600"
-            />
+          <div className="flex items-center justify-between gap-3 text-sm">
             <span className="font-medium">{t('designer.logo.prepare.removeBackground')}</span>
-          </label>
+            <Switch
+              aria-label={t('designer.logo.prepare.removeBackground')}
+              isChecked={remove}
+              onCheckedChange={setRemove}
+            />
+          </div>
           <SliderField
             label={t('designer.logo.prepare.backgroundTolerance')}
             value={tolerance}
@@ -228,17 +226,14 @@ export function LogoPrepare({ file, onPrepared, onCancel, isSaving }: LogoPrepar
             disabled={!remove}
             onChange={setTolerance}
           />
-          <label className="flex items-center gap-3 text-sm">
-            <input
-              type="checkbox"
-              checked={trim}
-              onChange={(event) => {
-                setTrim(event.currentTarget.checked)
-              }}
-              className="size-4 accent-brand-600"
-            />
+          <div className="flex items-center justify-between gap-3 text-sm">
             <span className="font-medium">{t('designer.logo.prepare.trim')}</span>
-          </label>
+            <Switch
+              aria-label={t('designer.logo.prepare.trim')}
+              isChecked={trim}
+              onCheckedChange={setTrim}
+            />
+          </div>
 
           {outputSize === null ? null : (
             <p className="text-xs text-ink-muted">

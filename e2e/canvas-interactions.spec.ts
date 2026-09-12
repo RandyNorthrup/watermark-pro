@@ -136,6 +136,38 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Create watermark' })).toHaveCount(0)
   await exerciseCanvas(page, /Photo with the watermark applied/)
+  const image = page.getByRole('img', { name: /Photo with the watermark applied/ })
+  await page.getByRole('button', { name: '100%' }).click()
+  const actualWidth = await image.evaluate(
+    (element: { getBoundingClientRect: () => { width: number } }) =>
+      element.getBoundingClientRect().width,
+  )
+  await page.getByRole('slider', { name: 'Zoom' }).fill('150')
+  await expect
+    .poll(
+      async () =>
+        await image.evaluate(
+          (element: { getBoundingClientRect: () => { width: number } }) =>
+            element.getBoundingClientRect().width,
+        ),
+    )
+    .toBeGreaterThan(actualWidth)
+  await page.getByRole('switch', { name: 'Grid' }).click()
+  await page.getByRole('slider', { name: 'Grid spacing' }).fill('80')
+  await expect(page.locator('[data-canvas-grid]')).toHaveCSS('--canvas-grid-spacing', '120px')
+  await page.getByRole('button', { name: 'Fit' }).click()
+  await expect
+    .poll(async () => {
+      const [canvas, fitted] = await Promise.all([
+        page.getByRole('region', { name: 'Canvas' }).boundingBox(),
+        image.boundingBox(),
+      ])
+      return {
+        width: canvas !== null && fitted !== null && fitted.width <= canvas.width,
+        height: canvas !== null && fitted !== null && fitted.height <= canvas.height,
+      }
+    })
+    .toEqual({ width: true, height: true })
   const savedPreset = page.waitForResponse(
     (response) => response.request().method() === 'POST' && response.url().endsWith('/watermarks'),
   )

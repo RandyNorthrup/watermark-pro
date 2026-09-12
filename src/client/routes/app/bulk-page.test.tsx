@@ -429,7 +429,7 @@ describe('bulk page', () => {
     const user = await addTwoPhotoBatch()
     await user.click(screen.getByRole('combobox', { name: 'Format' }))
     await user.click(await screen.findByRole('option', { name: 'PNG' }))
-    await user.click(screen.getByRole('checkbox', { name: 'Invisible mark' }))
+    await user.click(screen.getByRole('switch', { name: 'Invisible mark' }))
     await user.click(screen.getByRole('button', { name: 'Start' }))
     await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
     expect(runs[0]?.settings.output.invisible?.message).toBeTruthy()

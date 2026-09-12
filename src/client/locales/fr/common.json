@@ -405,6 +405,16 @@
     "redo": "Rétablir",
     "clearCanvas": "Effacer la zone de travail",
     "canvas": "Zone de travail",
+    "view": {
+      "label": "Affichage de la zone de travail",
+      "zoom": "Zoom",
+      "zoomOut": "Réduire",
+      "zoomIn": "Agrandir",
+      "fit": "Ajuster",
+      "actualSize": "100%",
+      "grid": "Grille",
+      "gridSpacing": "Espacement de la grille"
+    },
     "altCrop": "Photo avec le cadre de recadrage",
     "altWatermark": "Photo avec le filigrane appliqué",
     "choosePresetHint": "Choisissez un préréglage pour placer un filigrane. Déposez une photo n'importe où sur la zone de travail.",

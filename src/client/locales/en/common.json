@@ -404,6 +404,16 @@
     "redo": "Redo",
     "clearCanvas": "Clear canvas",
     "canvas": "Canvas",
+    "view": {
+      "label": "Canvas view",
+      "zoom": "Zoom",
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "fit": "Fit",
+      "actualSize": "100%",
+      "grid": "Grid",
+      "gridSpacing": "Grid spacing"
+    },
     "altCrop": "Photo with the crop frame",
     "altWatermark": "Photo with the watermark applied",
     "choosePresetHint": "Choose a preset to place a watermark. Drop a photo anywhere on the canvas.",

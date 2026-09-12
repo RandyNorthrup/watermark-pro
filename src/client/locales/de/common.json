@@ -404,6 +404,16 @@
     "redo": "Wiederholen",
     "clearCanvas": "Arbeitsfläche leeren",
     "canvas": "Arbeitsfläche",
+    "view": {
+      "label": "Arbeitsflächenansicht",
+      "zoom": "Zoom",
+      "zoomOut": "Verkleinern",
+      "zoomIn": "Vergrößern",
+      "fit": "Einpassen",
+      "actualSize": "100%",
+      "grid": "Raster",
+      "gridSpacing": "Rasterabstand"
+    },
     "altCrop": "Foto mit dem Zuschnittrahmen",
     "altWatermark": "Foto mit angewendetem Wasserzeichen",
     "choosePresetHint": "Wählen Sie ein Preset, um ein Wasserzeichen zu platzieren. Ziehen Sie ein Foto an eine beliebige Stelle der Arbeitsfläche.",

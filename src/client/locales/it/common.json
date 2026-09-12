@@ -405,6 +405,16 @@
     "redo": "Ripeti",
     "clearCanvas": "Cancella area di lavoro",
     "canvas": "Area di lavoro",
+    "view": {
+      "label": "Vista area di lavoro",
+      "zoom": "Zoom",
+      "zoomOut": "Riduci zoom",
+      "zoomIn": "Aumenta zoom",
+      "fit": "Adatta",
+      "actualSize": "100%",
+      "grid": "Griglia",
+      "gridSpacing": "Spaziatura griglia"
+    },
     "altCrop": "Foto con il riquadro di ritaglio",
     "altWatermark": "Foto con la filigrana applicata",
     "choosePresetHint": "Scegli un preset per applicare una filigrana. Trascina una foto in un punto qualsiasi dell'area di lavoro.",

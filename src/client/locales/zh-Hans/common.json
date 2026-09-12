@@ -403,6 +403,16 @@
     "redo": "重做",
     "clearCanvas": "清空画布",
     "canvas": "画布",
+    "view": {
+      "label": "画布视图",
+      "zoom": "缩放",
+      "zoomOut": "缩小",
+      "zoomIn": "放大",
+      "fit": "适合窗口",
+      "actualSize": "100%",
+      "grid": "网格",
+      "gridSpacing": "网格间距"
+    },
     "altCrop": "带裁剪框的照片",
     "altWatermark": "已应用水印的照片",
     "choosePresetHint": "选择一个预设以放置水印。将照片拖放到画布上的任意位置。",

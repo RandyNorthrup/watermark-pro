@@ -1,5 +1,3 @@
-import { Switch } from 'radix-ui'
-import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -16,6 +14,7 @@ import {
 import { blankSpec, defaultSpecFor, withContrast, withStyle } from '../../lib/spec-edit'
 import { ChoiceGroup } from '../ui/choice-group'
 import { SliderField } from '../ui/slider-field'
+import { Switch } from '../ui/switch'
 
 interface StylePanelProps {
   spec: WatermarkSpec
@@ -49,10 +48,6 @@ const VARIANT_CHOICES: readonly { value: ContrastVariant; label: InkKey }[] = CO
 )
 
 const DEFAULT_MANUAL_OUTLINE = 0.5
-const SWITCH_CLASS =
-  'relative h-6 w-11 rounded-full bg-line transition-colors focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none data-[state=checked]:bg-brand-600'
-const SWITCH_THUMB_CLASS =
-  'block size-5 translate-x-0.5 rounded-full bg-white shadow transition-transform data-[state=checked]:translate-x-[22px]'
 const PERCENT = 100
 const FRACTION_STEP = 0.01
 const ROTATION_STEP = 1
@@ -91,8 +86,6 @@ function contrastFor(
 
 export function StylePanel({ spec, onChange }: StylePanelProps) {
   const { t } = useTranslation()
-  const tilingId = useId()
-  const backdropId = useId()
   const { style, contrast } = spec
   const defaultStyle = defaultSpecFor(spec.kind, blankSpec()).style
   const resetLabel = (label: string) => t('editor.adjust.reset', { name: label })
@@ -226,18 +219,15 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
         <section aria-labelledby="backdrop-heading" className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 id="backdrop-heading" className="text-sm font-semibold">
-              <label htmlFor={backdropId}>{t('designer.style.backdrop')}</label>
+              {t('designer.style.backdrop')}
             </h2>
-            <Switch.Root
-              id={backdropId}
-              checked={style.backdrop.enabled}
-              onCheckedChange={(enabled) => {
-                onChange(withStyle(spec, { backdrop: { enabled } }))
+            <Switch
+              aria-label={t('designer.style.backdrop')}
+              isChecked={style.backdrop.enabled}
+              onCheckedChange={(isEnabled) => {
+                onChange(withStyle(spec, { backdrop: { enabled: isEnabled } }))
               }}
-              className={SWITCH_CLASS}
-            >
-              <Switch.Thumb className={SWITCH_THUMB_CLASS} />
-            </Switch.Root>
+            />
           </div>
           <SliderField
             label={t('designer.style.boxOpacity')}
@@ -259,18 +249,15 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
       <section aria-labelledby="tiling-heading" className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 id="tiling-heading" className="text-sm font-semibold">
-            <label htmlFor={tilingId}>{t('designer.style.tiling')}</label>
+            {t('designer.style.tiling')}
           </h2>
-          <Switch.Root
-            id={tilingId}
-            checked={style.tiling.enabled}
-            onCheckedChange={(enabled) => {
-              onChange(withStyle(spec, { tiling: { enabled } }))
+          <Switch
+            aria-label={t('designer.style.tiling')}
+            isChecked={style.tiling.enabled}
+            onCheckedChange={(isEnabled) => {
+              onChange(withStyle(spec, { tiling: { enabled: isEnabled } }))
             }}
-            className={SWITCH_CLASS}
-          >
-            <Switch.Thumb className={SWITCH_THUMB_CLASS} />
-          </Switch.Root>
+          />
         </div>
         <SliderField
           label={t('designer.style.spacing')}
