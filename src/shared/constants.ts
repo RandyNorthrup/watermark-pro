@@ -74,7 +74,7 @@ export const SENSITIVE_AUTH_PATHS = [
 ] as const
 
 /** Editor-sized derivative of the licensed coast photograph used on the landing page. */
-export const SAMPLE_SCENE_PATH = '/sample-scene.jpg'
+export const SAMPLE_SCENE_PATH = '/sample-scene-v2.jpg'
 
 /** Standard sepia colour matrix, row-major 3×3 (R, G, B output rows). */
 export const SEPIA_MATRIX = [

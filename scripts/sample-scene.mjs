@@ -7,7 +7,7 @@
 import sharpProcessor from 'sharp'
 
 const SOURCE = 'public/photography/coast-1400.webp'
-const OUTPUT = 'public/sample-scene.jpg'
+const OUTPUT = 'public/sample-scene-v2.jpg'
 const WIDTH = 960
 const HEIGHT = 640
 const JPEG_QUALITY = 82

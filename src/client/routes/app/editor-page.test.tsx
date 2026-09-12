@@ -275,7 +275,7 @@ describe('editor page', () => {
     await screen.findByRole('textbox', { name: 'Text' })
     const preview = await screen.findByRole('img', { name: /Photo with the watermark/ })
     expect(preview).toHaveClass('lg:max-w-none')
-    expect(preview.closest('.app-scroll-region')).toHaveClass('overflow-x-auto')
+    expect(preview.closest('.app-scroll-region')).toHaveClass('overflow-auto')
     await user.click(screen.getByRole('tab', { name: 'Symbol' }))
     expect(screen.queryByRole('combobox', { name: 'Font' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Text' }))

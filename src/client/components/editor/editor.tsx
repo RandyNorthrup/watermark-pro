@@ -733,8 +733,8 @@ function EditorSession({
   const canClearCanvas = activeLayerId === 'draft' || !isEmptyDocument(document)
 
   return (
-    <div className="app-scroll-region grid max-w-full gap-4 overflow-x-auto pb-2 lg:grid-cols-[max-content_22rem] lg:gap-6">
-      <Card className="flex flex-col gap-3 p-3 lg:w-max lg:p-4">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6">
+      <Card className="flex min-w-0 flex-col gap-3 p-3 lg:p-4">
         <div className="flex flex-wrap items-center gap-2">
           <input
             ref={inputRef}
@@ -863,7 +863,7 @@ function EditorSession({
             event.preventDefault()
           }}
           onDrop={onDrop}
-          className="relative flex min-h-48 items-center justify-center overflow-hidden rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:min-h-72"
+          className="app-scroll-region relative flex min-h-48 items-center justify-center overflow-auto rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:min-h-72"
         >
           {result === null ? (
             <PendingPreview hasPhoto={photo !== null} />

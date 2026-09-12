@@ -37,7 +37,7 @@ function offlineAssetsPlugin(): Plugin {
       completeSoftwareNotices(outDir)
       const assets = [
         '/offline-shell',
-        '/sample-scene.jpg',
+        '/sample-scene-v2.jpg',
         '/manifest.webmanifest',
         '/favicon.svg',
         '/apple-touch-icon.png',

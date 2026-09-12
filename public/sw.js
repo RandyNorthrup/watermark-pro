@@ -15,7 +15,7 @@
  * Not bundled, so the few
  * constants below are literals rather than imports.
  */
-const CACHE_NAME = 'watermark-pro-offline-v2'
+const CACHE_NAME = 'watermark-pro-offline-v3'
 const ASSET_PREFIX = '/assets/'
 const FONT_PREFIX = '/fonts/'
 const STICKER_PREFIX = '/stickers/'
@@ -25,7 +25,7 @@ const API_PREFIX = '/api/'
 const OAUTH_PREFIX = '/oauth/'
 const OFFLINE_FALLBACK = '/offline-shell'
 const STATIC_ASSETS = new Set([
-  '/sample-scene.jpg',
+  '/sample-scene-v2.jpg',
   '/manifest.webmanifest',
   '/favicon.svg',
   '/apple-touch-icon.png',

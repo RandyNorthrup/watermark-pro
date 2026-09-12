@@ -107,7 +107,8 @@ what was planned; superseded entries stay.
   document changes can be restored with Undo. Logo upload and signature actions
   now share one uniform centered layout.
 - Replaced the synthetic editor sample with the same licensed coast photograph
-  used on the landing page and included it in offline preparation.
+  used on the landing page and included it in offline preparation. Versioned
+  the sample and offline cache so existing installations receive the new photo.
 - Centered Reset crop, Reset size and Reset all inside their tool panels.
 - Disabled automatic GitHub Actions runs and removed the hosted dependency-review
   job. CI, UI audits and deployment remain available only by manual dispatch;
