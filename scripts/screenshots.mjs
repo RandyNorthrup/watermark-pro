@@ -231,7 +231,10 @@ function createCapture(page, outputDir, profileName, colorScheme) {
 async function expectSeededSurface(page, locale, name) {
   switch (name) {
     case 'library': {
-      await page.getByRole('link', { name: 'Studio signature', exact: true }).waitFor()
+      await page
+        .getByRole('region', { name: label(locale, 'library.heading'), exact: true })
+        .getByRole('link', { name: 'Studio signature', exact: true })
+        .waitFor()
       break
     }
     case 'gallery': {
@@ -348,10 +351,11 @@ async function captureProfile(profileName) {
       }
       await chooseLocale(page, 'en')
       await page.getByRole('button', { name: 'Save preset' }).click()
-      await page.getByRole('link', { name: 'Studio signature', exact: true }).waitFor()
-      const presetPath = await page
+      const savedPresetLink = page
+        .getByRole('region', { name: label('en', 'library.heading'), exact: true })
         .getByRole('link', { name: 'Studio signature', exact: true })
-        .getAttribute('href')
+      await savedPresetLink.waitFor()
+      const presetPath = await savedPresetLink.getAttribute('href')
       if (presetPath === null) throw new Error('Saved preset link is missing')
 
       // The editor with the preset loaded, then with the crop tool open.

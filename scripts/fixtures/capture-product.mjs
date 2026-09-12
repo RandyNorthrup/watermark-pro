@@ -140,7 +140,10 @@ try {
     .toFile(`${OUTPUT}/qr.webp`)
   await page.goto(`${ORIGIN}/app/library`)
   await page.getByRole('heading', { name: 'Watermark library', exact: true }).waitFor()
-  await page.getByText('Website QR', { exact: true }).waitFor()
+  await page
+    .getByRole('region', { name: 'Watermark library', exact: true })
+    .getByRole('link', { name: 'Website QR', exact: true })
+    .waitFor()
   await page.waitForLoadState('networkidle')
   await rasterize(await page.getByRole('main').screenshot())
     .resize(960, 720, { fit: 'contain', background: '#fbf9f7' })

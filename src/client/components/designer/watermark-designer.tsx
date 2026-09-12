@@ -289,7 +289,7 @@ function WatermarkDesignerSession({
                       className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-1 py-2 text-center text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
                     >
                       <Icon aria-hidden="true" className="size-4" />
-                      <span className="max-w-full truncate">{kind.label}</span>
+                      <span className="max-w-full whitespace-normal">{kind.label}</span>
                     </Tabs.Trigger>
                   )
                 })}

@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
+import { runInNewContext } from 'node:vm'
 
 import { unzipSync } from 'fflate'
 import { JSDOM } from 'jsdom'
@@ -13,6 +14,31 @@ import { SUPPORTED_LOCALES } from '../src/shared/locales.ts'
 const client = path.resolve(process.env.LUMAFOIL_CLIENT_DIR ?? 'dist/client')
 const headers = readFileSync(path.join(client, '_headers'), 'utf8')
 const controls = readFileSync(path.join(client, 'landing-controls.js'), 'utf8')
+
+test('installed offline worker reports the exact build of both application shells', () => {
+  const listeners = new Map()
+  runInNewContext(readFileSync(path.join(client, 'sw.js'), 'utf8'), {
+    addEventListener: (type, listener) => listeners.set(type, listener),
+  })
+  const reports = []
+  listeners.get('message')({
+    data: { type: 'get-build' },
+    source: {
+      postMessage: (message) => {
+        reports.push(message)
+      },
+    },
+  })
+  assert.equal(reports.length, 1)
+  assert.equal(reports[0].type, 'offline-build')
+  assert.match(reports[0].build, /^watermark-pro-offline-[a-f0-9]{64}$/)
+  for (const file of ['index.html', 'offline-shell.html']) {
+    const dom = new JSDOM(readFileSync(path.join(client, file), 'utf8'))
+    const expected = dom.window.document.querySelector('meta[name="offline-build"]')?.content
+    assert.equal(reports[0].build, expected, `${file} and installed worker must agree`)
+    dom.window.close()
+  }
+})
 
 test('built app theme resolver preserves saved choices and system fallback when storage is denied', () => {
   const html = readFileSync(path.join(client, 'index.html'), 'utf8')

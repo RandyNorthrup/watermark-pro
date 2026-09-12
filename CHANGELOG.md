@@ -78,6 +78,10 @@ what was planned; superseded entries stay.
 
 ### Fixed
 
+- Repaired offline build identity after the service-worker source version changed.
+  The builder now replaces the cache declaration itself and refuses a missing or
+  duplicate declaration. A built-output check executes the worker's message
+  handler and requires its reported identity to match both application shells.
 - Corrected earlier documentation and UI that conflated the single site owner
   with an `admin` role and failed to distinguish global roles from workspace
   ownership.
@@ -109,6 +113,9 @@ what was planned; superseded entries stay.
 - Moved the active photo name and pixel dimensions into the canvas status bar
   beside fit, zoom and grid controls. Replaced the Shape dropdown with a direct,
   accessible two-column shape palette inspired by professional visual editors.
+- Unified shape tiles with the shared choice control so arrow keys select shapes
+  and the active tile has a visible rose highlight. Watermark type labels wrap
+  within their buttons instead of clipping the QR code label.
 - Replaced the synthetic editor sample with the same licensed coast photograph
   used on the landing page and included it in offline preparation. Versioned
   the sample and offline cache so existing installations receive the new photo.

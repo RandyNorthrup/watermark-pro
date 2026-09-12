@@ -10,6 +10,7 @@ import {
   type WatermarkSpec,
 } from '../../../shared/watermark'
 import { cn } from '../../lib/cn'
+import { ChoiceGroup } from '../ui/choice-group'
 import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
 
@@ -52,44 +53,26 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
     <div className="flex flex-col gap-4">
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">{t('designer.shape.label')}</legend>
-        <div
-          role="radiogroup"
-          aria-label={t('designer.shape.label')}
-          className="grid grid-cols-2 gap-2"
-        >
-          {SHAPE_OPTIONS.map((option) => {
-            const isSelected = spec.shape === option.value
-            return (
-              <button
-                key={option.value}
-                type="button"
-                role="radio"
-                aria-checked={isSelected}
-                className={cn(
-                  'glass-control group flex min-h-24 flex-col items-center justify-center gap-3 rounded-xl border p-3 text-sm font-medium text-ink-muted transition-colors outline-none',
-                  'hover:border-brand-500/60 hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 dark:hover:bg-brand-900/40',
-                  isSelected && 'border-brand-500 bg-brand-50 text-ink dark:bg-brand-900/45',
-                )}
-                onClick={() => {
-                  const aspect =
-                    option.value === 'line'
-                      ? MIN_LINE_ASPECT
-                      : Math.min(spec.aspect, MAX_SHAPE_ASPECT)
-                  onChange({ ...spec, shape: option.value, aspect })
-                }}
-              >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    'border-2 border-current transition-transform group-hover:scale-105',
-                    option.previewClassName,
-                  )}
-                />
-                <span>{t(option.label)}</span>
-              </button>
-            )
-          })}
-        </div>
+        <ChoiceGroup
+          label={t('designer.shape.label')}
+          value={spec.shape}
+          presentation="tiles"
+          choices={SHAPE_OPTIONS.map((option) => ({
+            value: option.value,
+            label: t(option.label),
+            preview: (
+              <span
+                aria-hidden="true"
+                className={cn('border-2 border-current', option.previewClassName)}
+              />
+            ),
+          }))}
+          onChange={(shape) => {
+            const aspect =
+              shape === 'line' ? MIN_LINE_ASPECT : Math.min(spec.aspect, MAX_SHAPE_ASPECT)
+            onChange({ ...spec, shape, aspect })
+          }}
+        />
       </fieldset>
       <SliderField
         label={t(isLine ? 'designer.shape.length' : 'designer.shape.proportions')}

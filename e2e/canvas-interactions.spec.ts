@@ -132,6 +132,19 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
     mimeType: 'image/png',
     buffer: pngFixture(900, 1600, [48, 93, 104]),
   })
+  // Intake reads metadata asynchronously; never capture undo geometry from the
+  // previous sample while waiting for the selected portrait to replace it.
+  await expect
+    .poll(
+      async () =>
+        await page
+          .getByRole('img', { name: /Photo with the watermark applied/ })
+          .evaluate(
+            (image: { naturalWidth: number; naturalHeight: number }) =>
+              image.naturalWidth / image.naturalHeight,
+          ),
+    )
+    .toBeCloseTo(900 / 1600, 3)
   await page.getByRole('textbox', { name: 'Text', exact: true }).fill('Canvas live')
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Create watermark' })).toHaveCount(0)
@@ -195,7 +208,28 @@ test('preset designer moves smoothly and keeps one gesture per undo step', async
   await page.getByRole('link', { name: 'New preset' }).click()
   await page.getByLabel('Preset name').fill('Designer signature')
   await page.getByRole('textbox', { name: 'Text', exact: true }).fill('Designer live')
+  await page.getByRole('tab', { name: 'Shape', exact: true }).click()
+  await expect(page.getByRole('combobox', { name: 'Shape' })).toHaveCount(0)
+  await page.getByRole('radio', { name: 'Ellipse' }).click()
+  await expect(page.getByRole('radio', { name: 'Ellipse' })).toBeChecked()
+  await page.keyboard.down('ArrowRight')
+  try {
+    await expect(page.getByRole('radio', { name: 'Line', exact: true })).toBeFocused()
+  } finally {
+    await page.keyboard.up('ArrowRight')
+  }
+  await expect(page.getByRole('radio', { name: 'Line', exact: true })).toBeChecked()
+  await expect(page.getByRole('slider', { name: 'Length', exact: true })).toBeVisible()
+  await expectAccessible(page)
+  await page.getByRole('tab', { name: 'Text', exact: true }).click()
+  await expect(page.getByRole('textbox', { name: 'Text', exact: true })).toHaveValue(
+    'Designer live',
+  )
   await exerciseCanvas(page, /Watermark preview on the subject photo/)
   await page.getByRole('button', { name: 'Save preset' }).click()
-  await expect(page.getByRole('link', { name: 'Designer signature', exact: true })).toBeVisible()
+  await expect(
+    page
+      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('link', { name: 'Designer signature', exact: true }),
+  ).toBeVisible()
 })

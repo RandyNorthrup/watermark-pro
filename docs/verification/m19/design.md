@@ -1,6 +1,6 @@
 # M19 design direction and verification
 
-Owner decisions, updated 2026-09-09. This is a working design record, not a claim that
+Owner decisions, updated 2026-09-12. This is a working design record, not a claim that
 the final release has passed every device, accessibility and performance gate.
 
 ## Approved direction
@@ -28,8 +28,13 @@ the final release has passed every device, accessibility and performance gate.
   floating chrome and stronger depth, retaining the rose palette. The reference is Margarita's
   MIT-licensed [CSS UI kit](https://codepen.io/Margarita-the-solid/pen/NPRPBjd);
   its required notice is retained in `public/brand/UI-KIT-LICENSE.txt`.
-- The standard dashboard presents actual recent work in thumbnail, list and
-  details views. History and the selected view belong to the signed-in account.
+- Standard users open directly in Editor. Preset recents live in Library and
+  photo recents live in Gallery, each with thumbnail, list and details views.
+  History and the selected view belong to the signed-in account.
+- The tools sidebar takes limited inspiration from GrapesJS's visual tool
+  palette: compact type icons, visible shape tiles and shared rose controls.
+  The owner explicitly retained the current canvas and limited this refinement
+  to the tools sidebar; it does not introduce a new editor framework.
 
 ## Canonical implementation and assets
 

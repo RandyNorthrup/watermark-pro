@@ -766,6 +766,18 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   from GrapesJS: compact icon-led watermark type navigation and direct visual
   shape tiles replace the long wrapping type row and Shape dropdown. Photo name,
   dimensions, zoom and grid controls share the canvas status bar.
+  Shape tiles use the canonical `ChoiceGroup` primitive, including its Radix
+  arrow-key navigation and visible checked state. Labels wrap on narrow tools
+  panels. This refinement does not redesign the canvas or add an editor framework.
+- **Offline build repair (2026-09-12):** the full browser run exposed a stale
+  `v2` string replacement after the service-worker source had moved to `v3`.
+  The installed worker therefore reported a literal version while both shells
+  expected a content digest, leaving offline readiness permanently false. Build
+  generation now replaces exactly one cache declaration regardless of its source
+  version and fails closed if that declaration is missing or ambiguous. The new
+  built-output check invokes the actual worker message handler and compares its
+  response with both emitted shells; it failed on the old artifact and passed on
+  the repaired build. Both desktop offline journeys passed after the repair.
 - **Progress (2026-09-08):** Randy chose the full prerender + boot-split path
   (not relaxed budgets) for the perf work; landing it in small green increments.
   - **§3 diet, first pass (done).** Dropped the `ui` chunk group (it forced all

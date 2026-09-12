@@ -340,3 +340,34 @@ the same bounded readiness interval used for headings, then independently
 requires complete nonzero dimensions. A delayed decode passes; a broken image
 and a decode beyond the deadline remain red. Lighthouse scoring and budgets are
 unchanged.
+
+## Sidebar and offline build verification — 2026-09-12
+
+The focused tools-sidebar refinement uses the shared `ChoiceGroup` for visual
+shape tiles and its existing keyboard semantics. The first full quality command
+passed formatting, lint, styles, types, dead-code, localization, cycles,
+duplication, publication and dependency checks, then exposed an instantaneous
+synthetic key-release race in the added shape test. After retaining the key until
+the actual focus/selection event, the complete `npm run test` passed 2,551
+application tests across 229 files and 44 real-Workers tests across 12 files.
+Coverage was 92.34% statements, 85.06% branches, 92.30% functions and 92.89% lines.
+Supporting suites passed 30 bootstrap, 12 transport, 40 performance/primitive,
+15 publication and 24 Python asset/recovery checks. SAST ran 509 rules over
+1,979 tracked files with zero findings. Logs remain in ignored `temp/`.
+
+The new 124-case device run was interrupted after its desktop portion exposed a
+real offline-build mismatch and stale canvas/metadata fixture prerequisites.
+It is not a passing device certificate. The built page expected a content-derived
+cache ID while `sw.js` retained the literal `watermark-pro-offline-v3`, because
+the build still replaced the old `v2` string. The new artifact check executes the
+worker's `get-build` handler; the old artifact failed with that exact literal ID.
+The repaired builder substitutes exactly one cache declaration and the rebuilt
+worker reports the same digest as both shells.
+
+A fresh five-case desktop diagnostic then passed portrait canvas editing/history
+and both offline journeys, including lost-acknowledgement recovery and preserving
+both conflict versions. Its remaining two failures were selectors aimed at a
+duplicate Recents link and a Layers list hidden after preset selection switched
+to Watermark. Those fixtures now use the library region and explicitly reopen
+Presets. The full final device, screenshot and performance matrices remain open;
+the diagnostic is not substituted for them.

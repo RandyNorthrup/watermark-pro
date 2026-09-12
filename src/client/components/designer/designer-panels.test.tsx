@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -74,6 +74,12 @@ describe('ShapePanel', () => {
     // A line spec renders the length control instead of proportions.
     rerender(<ShapePanel spec={{ ...shapeSpec, shape: 'line' }} onChange={onChange} />)
     expect(screen.getByRole('slider', { name: 'Length' })).toBeInTheDocument()
+    screen.getByRole('radio', { name: 'Line' }).focus()
+    // Radix moves focus on the next task while the physical arrow key is held.
+    await user.keyboard('{ArrowLeft>}')
+    await waitFor(() => expect(onChange.mock.calls.at(-1)?.[0].shape).toBe('ellipse'))
+    expect(screen.getByRole('radio', { name: 'Ellipse' })).toHaveFocus()
+    await user.keyboard('{/ArrowLeft}')
   })
 })
 

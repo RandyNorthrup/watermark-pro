@@ -174,12 +174,13 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
   expect(strippedFields.longitude).toBeUndefined()
   await expectAccessible(page)
 
-  await page.getByRole('tab', { name: 'Watermark', exact: true }).click()
+  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
   // Keep one layer present while switching the comparison: an empty document
   // re-applies the preset named in this route's URL.
   await page
     .getByRole('combobox', { name: 'Add another preset', exact: true })
     .selectOption(literal.id)
+  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
   await expect(
     page.getByRole('list', { name: 'Layers, bottom to top' }).getByRole('listitem'),
   ).toHaveCount(2)

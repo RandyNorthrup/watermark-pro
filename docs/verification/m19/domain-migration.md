@@ -1,6 +1,6 @@
 # Domain and provider migration verification
 
-Updated 2026-09-10. Live deployment evidence with explicit post-launch gaps.
+Updated 2026-09-12. Live deployment evidence with explicit post-launch gaps.
 The public repository records configuration shape and outcomes; live account
 identifiers, user records, credentials and private operational logs remain in
 ignored operator records.
@@ -31,9 +31,10 @@ Login, Signup and Privacy with zero axe findings or horizontal overflow. The
 retired app hostname has no DNS record and no redirect; its Turnstile allowance
 was removed. Do not modify unrelated sites or tenant-wide policies.
 
-Cloudflare's zone-level Web Analytics setting still injects a beacon that the
-application CSP blocks. The app has no other observed browser errors. Disable
-Web Analytics completely in the Lumafoil zone, then repeat the console check.
+Cloudflare Web Analytics injection was disabled on 2026-09-10, as documented in
+[the platform privacy record](platform-observability-privacy.md). A fresh
+2026-09-12 production page response returned HTTP 200, retained the GitHub footer,
+and contained neither the beacon script nor its injection marker.
 
 ## Email
 
@@ -77,13 +78,14 @@ attempt exceeded the signed-state-cookie window; the retry succeeded. Source now
 uses an app-specific cookie namespace and aligned state/cookie expiry, retaining
 state validation. Final hosted proof is still required.
 
-Google branding verification must be resubmitted once the new homepage and
-privacy page are reachable. The current console displays the previous attempt's
-unreachable-page and domain-ownership errors; it no longer lists a logo error.
-Ownership has since been verified and the owner-approved rounded icon is in
-place. The console explicitly reports that data-access verification is not
-required for the configured scopes. This does not constitute branding approval;
-do not mark issues fixed until the hosted pages are reachable.
+On 2026-09-12, the live console reported approved branding awaiting publication.
+After the owner's explicit approval, Publish branding completed and the console
+confirmed: "Your branding has been verified and is being shown to users."
+The saved name, approved rounded logo, homepage, privacy/terms URLs and authorized
+domain all use Lumafoil/lumafoil.com. The earlier unreachable-page and
+domain-ownership findings are superseded by this approval. The console previously
+confirmed that data-access verification is not required for the configured scopes;
+live Drive read/write/sharing remains a separate verification obligation.
 
 ## Dropbox
 
@@ -96,6 +98,10 @@ Additional development users are enabled, subject to Dropbox's 500-user
 development limit. Both approved rounded icon sizes, name, description, publisher
 and policy URLs are configured. Actual read/write/link/revocation checks remain
 open; obtain provider production approval before exceeding its limit.
+Fresh 2026-09-12 readback confirmed the saved 64- and 256-pixel Lumafoil icons,
+canonical URLs, App Folder access, public-client PKCE setting and both callbacks.
+The registration was still in Development with zero connected development users;
+branding configuration is complete, while real provider operations remain unproven.
 
 ## Microsoft
 

@@ -1,20 +1,22 @@
-# Version-tag deployment gates
+# Manual deployment gates
 
-Updated 2026-09-09. This records local configuration verification; it does not
-claim that GitHub Actions or a production deployment ran.
+Updated 2026-09-12. The owner disabled automatic GitHub Actions to control usage.
+Local quality, security and browser checks are the default; hosted workflows run
+only through an explicit manual dispatch or a reusable call from that dispatch.
+Pushes, pull requests, version tags and dependency updates do not start workflows.
 
-The deployment job now requires both `gates` and `sast`. The tag's gates run the
+The manually dispatched deployment job requires both `gates` and `ui`. Its gates run the
 shared generated-Worker-types check, repository quality, generated route-tree
 drift check, and Playwright/axe. Static analysis uses the same reusable workflow
-as branch/pull-request CI. Its original Semgrep image digest, four rulesets,
+as the manually dispatched CI workflow. Its original Semgrep image digest, four rulesets,
 `--error`, and disabled metrics remain unchanged. No failure-swallowing or
 unconditional deployment condition was added.
 
-The local reusable-workflow reference selects the caller's commit, so a version
-tag scans its own source rather than a moving default branch.
+The local reusable-workflow reference selects the caller's commit, so a manual
+release scans its selected source rather than a moving default branch.
 [GitHub reusable-workflow reference](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#calling-a-reusable-workflow).
 
-Verification performed:
+Original gate verification (2026-09-09):
 
 - Parsed the four changed/new workflow/action YAML documents and checked the
   job dependency graph, scanner pin/rules/failure behavior, external action SHA
@@ -25,5 +27,8 @@ Verification performed:
 - Prettier validation passed for the CI/deployment/SAST workflows, shared type
   action and runbook. The focused `.github` duplication scan found no clones.
 
-Remote Actions execution and the remaining full-release gates still need their
-own passing evidence before deployment.
+The 2026-09-12 source review confirms that CI and UI audits expose only
+`workflow_dispatch`/`workflow_call`, and Deploy exposes only `workflow_dispatch`.
+The local deployment path remains `npm run deploy`. Local results do not imply
+that hosted Actions ran; current release evidence is recorded in `quality.md`
+and the relevant device, screenshot and hosted verification records.

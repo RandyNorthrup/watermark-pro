@@ -23,6 +23,7 @@ import { completeSoftwareNotices } from './scripts/lib/software-notices'
  */
 const SCRIPT_SRC_MARKER = "script-src 'self'"
 const INLINE_SCRIPT_PATTERN = /<script(?![^>]*\ssrc=)[^>]*>([\S\s]*?)<\/script>/g
+const OFFLINE_CACHE_DECLARATION = /^const CACHE_NAME = '[^'\r\n]+'$/gm
 
 /** Each build gets a complete offline asset inventory and a changed service-worker version. */
 function offlineAssetsPlugin(): Plugin {
@@ -68,6 +69,9 @@ function offlineAssetsPlugin(): Plugin {
       const source =
         typeof html.source === 'string' ? html.source : Buffer.from(html.source).toString('utf8')
       const worker = readFileSync(path.join('public', 'sw.js'), 'utf8')
+      if (worker.matchAll(OFFLINE_CACHE_DECLARATION).toArray().length !== 1) {
+        throw new Error('Offline worker must declare exactly one cache identity')
+      }
       const hash = createHash('sha256').update(JSON.stringify(assets)).update(source).update(worker)
       // Unhashed public assets can change without changing their URL. Cache
       // identity must include their bytes as well as Vite's hashed chunk names.
@@ -88,7 +92,10 @@ function offlineAssetsPlugin(): Plugin {
       writeFileSync(path.join(outDir, 'offline-manifest.json'), JSON.stringify(assets))
       writeFileSync(
         path.join(outDir, 'sw.js'),
-        worker.replace('watermark-pro-offline-v2', () => `watermark-pro-offline-${digest}`),
+        worker.replaceAll(
+          OFFLINE_CACHE_DECLARATION,
+          () => `const CACHE_NAME = 'watermark-pro-offline-${digest}'`,
+        ),
       )
     },
   }
