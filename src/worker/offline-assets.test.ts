@@ -5,7 +5,7 @@ import { runInNewContext } from 'node:vm'
 import { describe, expect, it, vi } from 'vitest'
 
 const ORIGIN = 'https://lumafoil.example'
-const CACHE_NAME = 'watermark-pro-offline-v2'
+const CACHE_NAME = 'watermark-pro-offline-v3'
 const script = readFileSync(new URL('../../public/sw.js', import.meta.url), 'utf8')
 
 interface ScriptEvent {
@@ -153,13 +153,18 @@ describe('offline service worker', () => {
     expect(worker.network).toHaveBeenCalledOnce()
   })
 
-  it('serves static icons, fonts and stickers from the prepared cache while offline', async () => {
+  it('serves static icons, fonts, stickers and photography from the prepared cache while offline', async () => {
     const worker = harness()
     const cache = await worker.open(CACHE_NAME)
-    for (const path of ['/favicon.svg', '/fonts/sample.woff2', '/stickers/flower.svg'])
-      await cache.put(path, new Response(path))
+    const paths = [
+      '/favicon.svg',
+      '/fonts/sample.woff2',
+      '/stickers/flower.svg',
+      '/photography/coast-480.webp',
+    ]
+    for (const path of paths) await cache.put(path, new Response(path))
     worker.network.mockRejectedValue(new TypeError('Offline'))
-    for (const path of ['/favicon.svg', '/fonts/sample.woff2', '/stickers/flower.svg']) {
+    for (const path of paths) {
       const response = await worker.dispatch('fetch', {
         request: { method: 'GET', mode: 'cors', url: `${ORIGIN}${path}` },
       })

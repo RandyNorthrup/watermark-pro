@@ -493,6 +493,28 @@ describe('editor page', () => {
     )
   })
 
+  it('clears an unsaved draft and generates a safe name for a non-text preset', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi()
+    renderApp('/app/editor')
+    await screen.findByRole('textbox', { name: 'Text' })
+
+    await user.click(screen.getByRole('button', { name: 'Clear canvas' }))
+    expect(screen.getByRole('button', { name: 'Clear canvas' })).toBeDisabled()
+    await user.click(screen.getByRole('tab', { name: 'Shape' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(api.watermarks).toHaveLength(1))
+    expect(api.watermarks[0]?.name).toBe('New preset')
+
+    await user.selectOptions(await presetSelect(user), 'draft')
+    await user.click(screen.getByRole('tab', { name: 'QR code' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(api.watermarks).toHaveLength(2))
+    expect(api.watermarks[1]?.name).toBe('https://')
+  })
+
   it('does not offer creation to a read-only member with an empty library', async () => {
     seedViewerWorkspace(client())
     installLibraryApi()

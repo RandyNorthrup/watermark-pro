@@ -112,7 +112,7 @@ describe('sample photo', () => {
     expect([shipped.width, shipped.height]).toEqual([drawn.width, drawn.height])
     const shippedPixels = pixelsOf(shipped)
     const drawnPixels = pixelsOf(drawn)
-    // Sky, sun, hills and ground: the mean colour of each region within JPEG tolerance.
+    // Sky, coast, water and foreground: mean colours remain identical.
     const regions = [
       { x: 40, y: 40, width: 200, height: 100 },
       { x: 660, y: 150, width: 60, height: 60 },
@@ -127,6 +127,17 @@ describe('sample photo', () => {
     }
     shipped.close()
     drawn.close()
+  })
+
+  it('reports an unavailable bundled sample instead of returning an empty image', async () => {
+    const fetcher = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(null, { status: 503 }))
+    try {
+      await expect(createSamplePhoto()).rejects.toThrow('could not be loaded')
+    } finally {
+      fetcher.mockRestore()
+    }
   })
 })
 
