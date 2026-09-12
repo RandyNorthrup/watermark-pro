@@ -403,6 +403,7 @@
     "undo": "Rückgängig",
     "redo": "Wiederholen",
     "clearCanvas": "Arbeitsfläche leeren",
+    "canvas": "Arbeitsfläche",
     "altCrop": "Foto mit dem Zuschnittrahmen",
     "altWatermark": "Foto mit angewendetem Wasserzeichen",
     "choosePresetHint": "Wählen Sie ein Preset, um ein Wasserzeichen zu platzieren. Ziehen Sie ein Foto an eine beliebige Stelle der Arbeitsfläche.",

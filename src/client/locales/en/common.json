@@ -403,6 +403,7 @@
     "undo": "Undo",
     "redo": "Redo",
     "clearCanvas": "Clear canvas",
+    "canvas": "Canvas",
     "altCrop": "Photo with the crop frame",
     "altWatermark": "Photo with the watermark applied",
     "choosePresetHint": "Choose a preset to place a watermark. Drop a photo anywhere on the canvas.",

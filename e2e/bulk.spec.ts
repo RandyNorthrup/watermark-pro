@@ -53,6 +53,9 @@ test('preserves folder paths, names outputs by size, and reports a one-photo ove
     data: { name: 'Folder stamp', spec: DEFAULT_TEXT_SPEC },
   })
   expect(response.status()).toBe(201)
+  // API fixture writes bypass TanStack Query. Reload so tool sees server state
+  // instead of shell's already-cached empty preset list.
+  await page.reload()
   await navigateTo(page, 'Bulk')
   const wide = pngFixture(640, 400, [40, 90, 120])
   const tall = pngFixture(400, 640, [120, 80, 40])
@@ -226,9 +229,11 @@ test('watermarks twenty photos and downloads them as a ZIP', async ({ page, requ
     expect(response.status()).toBe(201)
     expect(watermarkDtoSchema.parse(await response.json())).toMatchObject(preset)
   }
+  await page.reload()
   await navigateTo(page, 'Library')
+  const library = page.getByRole('region', { name: 'Watermark library', exact: true })
   for (const preset of presets)
-    await expect(page.getByRole('link', { name: preset.name, exact: true })).toBeVisible()
+    await expect(library.getByRole('link', { name: preset.name, exact: true })).toBeVisible()
   // Two cards with long descriptions must still fit a phone's width.
   await expectAccessible(page)
 

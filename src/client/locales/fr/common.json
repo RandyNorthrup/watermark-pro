@@ -404,6 +404,7 @@
     "undo": "Annuler",
     "redo": "Rétablir",
     "clearCanvas": "Effacer la zone de travail",
+    "canvas": "Zone de travail",
     "altCrop": "Photo avec le cadre de recadrage",
     "altWatermark": "Photo avec le filigrane appliqué",
     "choosePresetHint": "Choisissez un préréglage pour placer un filigrane. Déposez une photo n'importe où sur la zone de travail.",

@@ -39,16 +39,21 @@ test('first photo goes from an empty library to a real watermarked export in the
     .setInputFiles({ name: 'first-photo.png', mimeType: 'image/png', buffer: photo })
   await expect(page.getByRole('button', { name: 'Create watermark' })).toHaveCount(0)
   const designer = page.getByRole('tabpanel', { name: 'Watermark', exact: true })
-  await designer.getByLabel('Preset name').fill('First signature')
   await designer.getByRole('textbox', { name: 'Text' }).fill('© My first photo')
   await expectRendered(page, /Photo with the watermark applied/)
   await expectAccessible(page)
   await page.screenshot({ path: testInfo.outputPath('first-watermark-designer.png') })
-  await designer.getByRole('button', { name: 'Save and use' }).click()
+  const savedPreset = page.waitForResponse(
+    (response) => response.request().method() === 'POST' && response.url().endsWith('/watermarks'),
+  )
+  await designer.getByRole('button', { name: 'Save' }).click()
+  const response = await savedPreset
+  expect(response.status()).toBe(201)
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page).toHaveURL(/\/app\/editor$/)
+  await page.getByRole('tab', { name: 'Presets' }).click()
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(
-    'First signature',
+    '© My first photo',
   )
   await page.getByRole('tab', { name: 'Export' }).click()
   await page.getByRole('combobox', { name: 'Format' }).click()
@@ -69,7 +74,11 @@ test('first photo goes from an empty library to a real watermarked export in the
       changed += 1
   expect(changed).toBeGreaterThan(100)
   await navigateTo(page, 'Library')
-  await expect(page.getByRole('link', { name: 'First signature', exact: true })).toBeVisible()
+  await expect(
+    page
+      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('link', { name: '© My first photo', exact: true }),
+  ).toBeVisible()
 })
 
 async function expectRendered(page: Page, name: RegExp) {
@@ -81,6 +90,7 @@ async function expectRendered(page: Page, name: RegExp) {
 }
 
 test('edits a photo end to end and downloads the result', async ({ page, request }) => {
+  test.slow()
   await createWorkspace(page, request, owner, organizationName)
 
   await navigateTo(page, 'Library')
@@ -110,8 +120,9 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
   await expect(page.locator('head link[rel="preload"][as="image"]')).toHaveAttribute(
     'href',
-    '/sample-scene.jpg',
+    '/sample-scene-v2.jpg',
   )
+  await page.getByRole('tab', { name: 'Presets' }).click()
   const layers = page.getByRole('list', { name: 'Layers, bottom to top' })
   await expect(layers.getByRole('button', { pressed: true })).toHaveText(/Editor preset/)
   await expectRendered(page, /Photo with the watermark/)
@@ -121,6 +132,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   await page
     .getByRole('combobox', { name: 'Add another preset' })
     .selectOption({ label: 'QR link' })
+  await page.getByRole('tab', { name: 'Presets' }).click()
   await expect(layers.getByRole('listitem')).toHaveCount(2)
   await expect(layers.getByRole('button', { pressed: true })).toHaveText(/QR link/)
   await expectRendered(page, /Photo with the watermark/)
@@ -128,6 +140,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   await layers.getByRole('button', { name: 'Remove QR link from this photo' }).click()
   await expect(layers.getByRole('listitem')).toHaveCount(1)
 
+  await page.getByRole('tab', { name: 'Watermark' }).click()
   const frame = page.getByRole('group', { name: /Watermark position/ })
   await expect(frame).toBeVisible()
   await frame.focus()
@@ -144,7 +157,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
     await page.mouse.move(box.x + box.width / 2 - 80, box.y + box.height / 2 - 40, { steps: 5 })
     await page.mouse.up()
   }
-  await expect(page.getByRole('button', { name: 'Undo', exact: true }).first()).toBeEnabled()
+  await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeEnabled()
 
   await page.getByRole('tab', { name: 'Crop' }).click()
   await expectRendered(page, /Photo with the crop frame/)
@@ -178,6 +191,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
 })
 
 test('filters and rotates a photo, and exports the turned result', async ({ page, request }) => {
+  test.slow()
   const adjuster = {
     name: 'Ada Adjust',
     email: `ada-${runId}@example.test`,

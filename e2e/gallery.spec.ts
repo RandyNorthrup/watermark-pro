@@ -59,9 +59,10 @@ test('saves from the editor, browses, searches, downloads and deletes', async ({
   await expect(page.getByTestId('usage-summary')).toContainText('1 photo ·')
   await expectAccessible(page)
 
-  await page.getByLabel('Search').fill('nothing')
+  const search = page.getByRole('searchbox', { name: 'Search', exact: true })
+  await search.fill('nothing')
   await expect(page.getByText('No photos match these filters.')).toBeVisible()
-  await page.getByLabel('Search').fill('sample')
+  await search.fill('sample')
   await expect(card).toBeVisible()
   await page.getByLabel('Preset', { exact: true }).selectOption({ label: 'Gallery preset' })
   await expect(card).toBeVisible()

@@ -47,6 +47,12 @@ async function waitForOfflineReadiness(page: Page): Promise<void> {
   await expectOfflineStatus(page, 'App files are ready for offline use.')
 }
 
+function libraryPreset(page: Page, name: string): Locator {
+  return page
+    .getByRole('region', { name: 'Watermark library', exact: true })
+    .getByRole('link', { name, exact: true })
+}
+
 test('keeps offline presets and photo saves across reload and reconnect', async ({
   page,
   request,
@@ -125,9 +131,9 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
   await page.getByRole('textbox', { name: 'Text' }).fill('Made without a network')
   await page.getByLabel('Preset name').fill('Created offline')
   await page.getByRole('button', { name: 'Save preset' }).click()
-  await expect(page.getByRole('link', { name: 'Created offline', exact: true })).toBeVisible()
+  await expect(libraryPreset(page, 'Created offline')).toBeVisible()
   await page.reload()
-  await expect(page.getByRole('link', { name: 'Created offline', exact: true })).toBeVisible()
+  await expect(libraryPreset(page, 'Created offline')).toBeVisible()
   await expectAccessible(page)
   await navigateTo(page, 'Gallery')
   const photo = page.getByRole('button', { name: 'Open sample-photo-watermarked.png' })
@@ -214,7 +220,7 @@ test('preserves both versions of a conflicting offline preset edit', async ({
   if (original === undefined) {
     throw new Error('Expected the saved preset')
   }
-  await page.getByRole('link', { name: 'Original preset', exact: true }).click()
+  await libraryPreset(page, 'Original preset').click()
   await expect(page.getByLabel('Preset name')).toHaveValue('Original preset')
   await waitForOfflineReadiness(page)
   const observer = await offlineNetwork.createObserver()
@@ -227,7 +233,7 @@ test('preserves both versions of a conflicting offline preset edit', async ({
   })
   expect(remote).toBe(200)
   await page.getByRole('button', { name: 'Save changes' }).click()
-  await expect(page.getByRole('link', { name: 'Local version', exact: true })).toBeVisible()
+  await expect(libraryPreset(page, 'Local version')).toBeVisible()
   await offlineNetwork.setOffline(false)
   const conflict = await openOfflinePanel(page)
   await conflict.panel.getByText('Review saved work (1)', { exact: true }).click()
@@ -243,11 +249,11 @@ test('preserves both versions of a conflicting offline preset edit', async ({
   expect(saved).toHaveLength(2)
   expect(saved.find((preset) => preset.id === original.id)?.name).toBe('Remote version')
   expect(saved.find((preset) => preset.name === 'Local version')?.id).not.toBe(original.id)
-  await expect(page.getByRole('link', { name: 'Remote version', exact: true })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Local version', exact: true })).toBeVisible()
+  await expect(libraryPreset(page, 'Remote version')).toBeVisible()
+  await expect(libraryPreset(page, 'Local version')).toBeVisible()
   await page.evaluate('navigator.serviceWorker.ready.then(() => true)')
   await offlineNetwork.setOffline(true)
   await page.reload()
-  await expect(page.getByRole('link', { name: 'Remote version', exact: true })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Local version', exact: true })).toBeVisible()
+  await expect(libraryPreset(page, 'Remote version')).toBeVisible()
+  await expect(libraryPreset(page, 'Local version')).toBeVisible()
 })

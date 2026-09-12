@@ -404,6 +404,7 @@
     "undo": "Deshacer",
     "redo": "Rehacer",
     "clearCanvas": "Limpiar lienzo",
+    "canvas": "Lienzo",
     "altCrop": "Foto con el marco de recorte",
     "altWatermark": "Foto con la marca de agua aplicada",
     "choosePresetHint": "Elige un preajuste para colocar una marca de agua. Suelta una foto en cualquier parte del lienzo.",

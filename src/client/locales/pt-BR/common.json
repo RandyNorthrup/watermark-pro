@@ -404,6 +404,7 @@
     "undo": "Desfazer",
     "redo": "Refazer",
     "clearCanvas": "Limpar tela",
+    "canvas": "Tela",
     "altCrop": "Foto com o quadro de recorte",
     "altWatermark": "Foto com a marca d'água aplicada",
     "choosePresetHint": "Escolha uma predefinição para posicionar uma marca d'água. Solte uma foto em qualquer parte da tela.",

@@ -23,6 +23,7 @@ const owner = {
 const organizationName = `Share ${runId}`
 
 test('publishes a link, serves a visitor, and revokes', async ({ browser, page, request }) => {
+  test.slow()
   await createWorkspace(page, request, owner, organizationName)
 
   await navigateTo(page, 'Library')

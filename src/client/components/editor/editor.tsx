@@ -859,6 +859,9 @@ function EditorSession({
           </div>
         </div>
         <div
+          role="region"
+          aria-label={t('editor.canvas')}
+          tabIndex={0}
           onDragOver={(event) => {
             event.preventDefault()
           }}

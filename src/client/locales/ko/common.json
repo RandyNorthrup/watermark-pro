@@ -402,6 +402,7 @@
     "undo": "실행 취소",
     "redo": "다시 실행",
     "clearCanvas": "캔버스 지우기",
+    "canvas": "캔버스",
     "altCrop": "자르기 프레임이 있는 사진",
     "altWatermark": "워터마크가 적용된 사진",
     "choosePresetHint": "워터마크를 배치하려면 프리셋을 선택하세요. 캔버스 아무 곳에나 사진을 놓으세요.",

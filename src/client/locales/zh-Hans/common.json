@@ -402,6 +402,7 @@
     "undo": "撤销",
     "redo": "重做",
     "clearCanvas": "清空画布",
+    "canvas": "画布",
     "altCrop": "带裁剪框的照片",
     "altWatermark": "已应用水印的照片",
     "choosePresetHint": "选择一个预设以放置水印。将照片拖放到画布上的任意位置。",

@@ -112,6 +112,8 @@ test('stamps every PDF page, preserves original content, and isolates refused fi
     },
   })
   expect(preset.status()).toBe(201)
+  // API fixture writes bypass TanStack Query. Reload cached shell queries.
+  await page.reload()
   await navigateTo(page, 'Documents')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Documents')
   await expect(

@@ -53,7 +53,8 @@ async function openVideo(page: Page, request: APIRequestContext) {
   await page.getByRole('textbox', { name: 'Text' }).fill('© Reel')
   await page.getByLabel('Preset name').fill('Video preset')
   await page.getByRole('button', { name: 'Save preset' }).click()
-  await expect(page.getByRole('link', { name: 'Video preset', exact: true })).toBeVisible()
+  const library = page.getByRole('region', { name: 'Watermark library', exact: true })
+  await expect(library.getByRole('link', { name: 'Video preset', exact: true })).toBeVisible()
   await navigateTo(page, 'Video')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Video watermarking')
 }
@@ -70,7 +71,11 @@ async function expectUnsupported(page: Page) {
   await expect(page.getByRole('button', { name: /^Download / })).toHaveCount(0)
   await expectAccessible(page)
   await navigateTo(page, 'Library')
-  await expect(page.getByRole('link', { name: 'Video preset', exact: true })).toBeVisible()
+  await expect(
+    page
+      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('link', { name: 'Video preset', exact: true }),
+  ).toBeVisible()
 }
 
 async function clipInfo(bytes: Buffer) {

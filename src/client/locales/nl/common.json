@@ -403,6 +403,7 @@
     "undo": "Ongedaan maken",
     "redo": "Opnieuw",
     "clearCanvas": "Canvas wissen",
+    "canvas": "Canvas",
     "altCrop": "Foto met het uitsnedekader",
     "altWatermark": "Foto met het toegepaste watermerk",
     "choosePresetHint": "Kies een preset om een watermerk te plaatsen. Sleep een foto naar een willekeurige plek op het canvas.",

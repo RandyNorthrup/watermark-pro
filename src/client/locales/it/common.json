@@ -404,6 +404,7 @@
     "undo": "Annulla",
     "redo": "Ripeti",
     "clearCanvas": "Cancella area di lavoro",
+    "canvas": "Area di lavoro",
     "altCrop": "Foto con il riquadro di ritaglio",
     "altWatermark": "Foto con la filigrana applicata",
     "choosePresetHint": "Scegli un preset per applicare una filigrana. Trascina una foto in un punto qualsiasi dell'area di lavoro.",

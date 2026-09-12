@@ -7,6 +7,8 @@ interface FramePosition {
   top: string
 }
 
+const LIVE_RENDER_TIMEOUT_MS = 5000
+
 async function framePosition(frame: Locator): Promise<FramePosition> {
   return await frame.evaluate((element: { style: { left: string; top: string } }) => ({
     left: element.style.left,
@@ -18,15 +20,46 @@ async function expectFramePosition(frame: Locator, expected: FramePosition) {
   await expect.poll(async () => await framePosition(frame)).toEqual(expected)
 }
 
-/** Native pointer traffic keeps flowing while the renderer must make progress. */
-async function exerciseCanvas(page: Page, imageName: RegExp) {
-  const image = page.getByRole('img', { name: imageName })
+/** Let React schedule the requested frame, then wait for its real bitmap and layout. */
+async function expectCanvasReady(page: Page, image: Locator) {
+  await page.evaluate(
+    'new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))',
+  )
+  await expect(page.getByRole('status', { name: 'Rendering preview' })).toHaveCount(0)
   await expect(image).toBeVisible()
   await expect
     .poll(
-      async () => await image.evaluate((element: { naturalWidth: number }) => element.naturalWidth),
+      async () =>
+        await image.evaluate(
+          (element: {
+            complete: boolean
+            naturalWidth: number
+            naturalHeight: number
+            getBoundingClientRect: () => { width: number; height: number }
+          }) => {
+            const rect = element.getBoundingClientRect()
+            return element.complete &&
+              element.naturalWidth > 0 &&
+              element.naturalHeight > 0 &&
+              rect.width > 0 &&
+              rect.height > 0
+              ? {
+                  naturalWidth: element.naturalWidth,
+                  naturalHeight: element.naturalHeight,
+                  width: rect.width,
+                  height: rect.height,
+                }
+              : null
+          },
+        ),
     )
-    .toBeGreaterThan(0)
+    .not.toBeNull()
+}
+
+/** Native pointer traffic keeps flowing while the renderer must make progress. */
+async function exerciseCanvas(page: Page, imageName: RegExp) {
+  const image = page.getByRole('img', { name: imageName })
+  await expectCanvasReady(page, image)
   const dimensions = await image.evaluate(
     (element: {
       naturalWidth: number
@@ -53,8 +86,10 @@ async function exerciseCanvas(page: Page, imageName: RegExp) {
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await page.mouse.down()
   await page.mouse.move(box.x + box.width / 2 - 60, box.y + box.height / 2 - 40, { steps: 40 })
-  // Before pointerup: live bitmap and frame have both changed during continuous motion.
-  expect(await image.getAttribute('src')).not.toBe(source)
+  // Pointer stays down while the slower WebKit main-thread renderer proves live progress.
+  await expect
+    .poll(async () => await image.getAttribute('src'), { timeout: LIVE_RENDER_TIMEOUT_MS })
+    .not.toBe(source)
   const moved = await framePosition(frame)
   expect(moved).not.toEqual(initial)
   await page.mouse.up()
@@ -97,14 +132,19 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
     mimeType: 'image/png',
     buffer: pngFixture(900, 1600, [48, 93, 104]),
   })
-  await page.getByLabel('Preset name').fill('Live signature')
   await page.getByRole('textbox', { name: 'Text', exact: true }).fill('Canvas live')
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Create watermark' })).toHaveCount(0)
   await exerciseCanvas(page, /Photo with the watermark applied/)
-  await page.getByRole('button', { name: 'Save and use' }).click()
+  const savedPreset = page.waitForResponse(
+    (response) => response.request().method() === 'POST' && response.url().endsWith('/watermarks'),
+  )
+  await page.getByRole('button', { name: 'Save' }).click()
+  const response = await savedPreset
+  expect(response.status()).toBe(201)
+  await page.getByRole('tab', { name: 'Presets' }).click()
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(
-    'Live signature',
+    'Canvas live',
   )
   await expect(page.getByRole('img', { name: /Photo with the watermark applied/ })).toHaveCount(1)
 })
