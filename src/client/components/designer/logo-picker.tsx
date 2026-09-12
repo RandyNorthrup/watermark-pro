@@ -182,10 +182,11 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
               event.currentTarget.value = ''
             }}
           />
-          <div className="flex flex-wrap gap-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             <Button
               type="button"
               variant="secondary"
+              className="w-full justify-center"
               isPending={upload.isPending}
               onClick={() => {
                 inputRef.current?.click()
@@ -195,6 +196,7 @@ export function LogoPicker({ organizationId, assetId, onChange, canManage }: Log
               {t('designer.logo.uploadButton')}
             </Button>
             <SignaturePad
+              className="w-full justify-center"
               isSaving={signature.isPending}
               onSave={async (file, size) => {
                 await signature.mutateAsync({ file, size })

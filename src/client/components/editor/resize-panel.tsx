@@ -134,7 +134,7 @@ export function ResizePanel({ base, resize, onResizeChange }: ResizePanelProps) 
         type="button"
         variant="secondary"
         size="sm"
-        className="self-start"
+        className="self-center"
         disabled={resize === null}
         onClick={() => {
           onResizeChange(null)

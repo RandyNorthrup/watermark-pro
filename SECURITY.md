@@ -196,10 +196,9 @@ Only the `main` branch and the latest tagged release receive fixes.
   reason), unbans, role changes and forced sign-outs are written to the audit
   trail with the administrator as the actor. Banned users cannot sign in and
   lose their sessions.
-- Supply chain (M8): GitHub dependency review blocks pull requests that add a
-  dependency with a high or critical advisory or a licence outside the
-  allow-list; production deploys run only from version tags after the full
-  gate chain and the end-to-end suite pass on that commit.
+- Supply chain: dependencies and licences are checked by local quality and
+  release gates. GitHub Actions, UI audits and deployment workflows require
+  manual dispatch; Dependabot and automated security fixes are disabled.
 - The threat model in [docs/threat-model.md](docs/threat-model.md) lists the
   assets, trust boundaries, mitigations and accepted residual risks; the
   operational playbook (rollback, secret rotation, Time Travel restores,

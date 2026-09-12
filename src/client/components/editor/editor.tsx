@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import {
   Crop,
   Download,
+  Eraser,
   ImagePlus,
   LibraryBig,
   Link2,
@@ -56,6 +57,8 @@ import {
   createLayer,
   type EditorDocument,
   editorReducer,
+  EMPTY_DOCUMENT,
+  isEmptyDocument,
   type Layer,
   MAX_LAYERS,
   withAdjustments,
@@ -191,7 +194,7 @@ function PendingPreview({ hasPhoto }: { hasPhoto: boolean }) {
   return hasPhoto ? (
     <Spinner className="size-6" label={t('editor.renderingPreview')} />
   ) : (
-    <SampleScene className="max-h-[42svh] lg:max-h-[70vh]" />
+    <SampleScene className="max-h-[42svh] lg:max-h-[70vh] lg:max-w-none" />
   )
 }
 
@@ -220,7 +223,9 @@ function EditorSession({
   const draft = useDesignHistory(blankSpec())
   const resetDraft = draft.reset
   const [tool, setTool] = useState<Tool>('watermark')
-  const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
+  const [activeLayerId, setActiveLayerId] = useState<string | null>(() =>
+    canCreatePresets && embedded === undefined && initialPresetId == null ? 'draft' : null,
+  )
   // The active layer: the chosen one while it exists, else the topmost.
   const activeLayer: Layer | null =
     activeLayerId === 'draft'
@@ -277,6 +282,7 @@ function EditorSession({
   })
   const inputRef = useRef<HTMLInputElement>(null)
   const photoRequest = useRef(0)
+  const appliedInitialPreset = useRef<string | null>(null)
   useEffect(
     () => () => {
       photoRequest.current += 1
@@ -293,7 +299,7 @@ function EditorSession({
   const isCropping = tool === 'crop'
   const cropBaseSize = cropSpace(sourceSize, document.orientation)
   const canvasLayers =
-    canCreatePresets && (activeLayerId === 'draft' || document.layers.length === 0)
+    canCreatePresets && activeLayerId === 'draft'
       ? [...document.layers, { id: 'draft', presetId: '', spec: draft.value }]
       : document.layers
   const renderLayers = isCropping
@@ -356,6 +362,7 @@ function EditorSession({
       (initialPresetId !== null && initialPresetId !== undefined)
     )
       return
+    let isActive = true
     const timer = window.setTimeout(() => {
       void saveEditorSession(
         organizationId,
@@ -363,9 +370,18 @@ function EditorSession({
         draft.value,
         activeLayer?.id ?? (activeLayerId === 'draft' ? 'draft' : null),
         photo === null ? null : { file: photo.file, dimensions: photo.size },
-      ).catch((saveError: unknown) => setSessionError(describeError(saveError)))
+      )
+        .then(() => {
+          if (isActive) setSessionError(null)
+        })
+        .catch((saveError: unknown) => {
+          if (isActive) setSessionError(describeError(saveError))
+        })
     }, EDITOR_SESSION_SAVE_DELAY_MS)
-    return () => window.clearTimeout(timer)
+    return () => {
+      isActive = false
+      window.clearTimeout(timer)
+    }
   }, [
     activeLayer?.id,
     activeLayerId,
@@ -384,12 +400,18 @@ function EditorSession({
   // Load the preset named in the URL once the library has arrived (not embedded).
   const initialPreset = presets.data?.find((candidate) => candidate.id === initialPresetId)
   useEffect(() => {
-    if (embedded === undefined && initialPreset !== undefined && document.layers.length === 0) {
-      dispatch({
-        type: 'reset',
-        document: { ...document, layers: [createLayer(initialPreset.id, initialPreset.spec)] },
-      })
-    }
+    if (
+      embedded !== undefined ||
+      initialPreset === undefined ||
+      document.layers.length > 0 ||
+      appliedInitialPreset.current === initialPreset.id
+    )
+      return
+    appliedInitialPreset.current = initialPreset.id
+    dispatch({
+      type: 'reset',
+      document: { ...document, layers: [createLayer(initialPreset.id, initialPreset.spec)] },
+    })
   }, [embedded, initialPreset, document])
 
   // Embedded mode edits one batch photo: load it without resetting the document.
@@ -515,12 +537,20 @@ function EditorSession({
   }
 
   function undo() {
-    if (activeLayer === null && draft.canUndo) draft.undo()
+    if (activeLayerId === 'draft' && draft.canUndo) draft.undo()
     else dispatch({ type: 'undo' })
   }
   function redo() {
-    if (activeLayer === null && draft.canRedo) draft.redo()
+    if (activeLayerId === 'draft' && draft.canRedo) draft.redo()
     else dispatch({ type: 'redo' })
+  }
+
+  function clearCanvas() {
+    if (activeLayerId === 'draft') resetDraft(blankSpec())
+    else if (!isEmptyDocument(document)) dispatch({ type: 'commit', document: EMPTY_DOCUMENT })
+    setActiveLayerId(null)
+    setAspectId('free')
+    setTool('watermark')
   }
 
   function markGesture(layerId: string, gesture: MarkGesture) {
@@ -601,6 +631,7 @@ function EditorSession({
 
   function changeActiveSpec(spec: WatermarkSpec) {
     if (activeLayer === null) {
+      setActiveLayerId('draft')
       draft.change(spec)
     } else {
       commit(withLayer(document, { ...activeLayer, spec }))
@@ -697,10 +728,13 @@ function EditorSession({
   const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, cropBaseSize)
   const previewSize: Size | null =
     result === null ? null : { width: result.width, height: result.height }
+  const canUndoCurrent = activeLayerId === 'draft' ? draft.canUndo : canUndo(history)
+  const canRedoCurrent = activeLayerId === 'draft' ? draft.canRedo : canRedo(history)
+  const canClearCanvas = activeLayerId === 'draft' || !isEmptyDocument(document)
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:gap-6">
-      <Card className="flex flex-col gap-3 p-3 lg:p-4">
+    <div className="app-scroll-region grid max-w-full gap-4 overflow-x-auto pb-2 lg:grid-cols-[max-content_22rem] lg:gap-6">
+      <Card className="flex flex-col gap-3 p-3 lg:w-max lg:p-4">
         <div className="flex flex-wrap items-center gap-2">
           <input
             ref={inputRef}
@@ -791,7 +825,7 @@ function EditorSession({
               size="icon"
               aria-label={t('editor.undo')}
               aria-keyshortcuts="Control+Z"
-              disabled={!((activeLayer === null && draft.canUndo) || canUndo(history))}
+              disabled={!canUndoCurrent}
               onClick={() => {
                 undo()
               }}
@@ -804,12 +838,23 @@ function EditorSession({
               size="icon"
               aria-label={t('editor.redo')}
               aria-keyshortcuts="Control+Shift+Z Control+Y"
-              disabled={!((activeLayer === null && draft.canRedo) || canRedo(history))}
+              disabled={!canRedoCurrent}
               onClick={() => {
                 redo()
               }}
             >
               <Redo2 aria-hidden="true" className="size-4 rtl:-scale-x-100" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t('editor.clearCanvas')}
+              title={t('editor.clearCanvas')}
+              disabled={!canClearCanvas}
+              onClick={clearCanvas}
+            >
+              <Eraser aria-hidden="true" className="size-4" />
             </Button>
           </div>
         </div>
@@ -832,7 +877,7 @@ function EditorSession({
                 alt={t(isCropping ? 'editor.altCrop' : 'editor.altWatermark')}
                 width={result.width}
                 height={result.height}
-                className="block h-auto max-h-[42svh] w-auto max-w-full lg:max-h-[70vh]"
+                className="block h-auto max-h-[42svh] w-auto max-w-full lg:max-h-[70vh] lg:max-w-none"
               />
               {tool === 'watermark' && previewSize !== null
                 ? renderLayers.map((layer, index) => {
@@ -945,8 +990,8 @@ function EditorSession({
                 draftSpec={draft.value}
                 undo={undo}
                 redo={redo}
-                canUndo={(activeLayer === null && draft.canUndo) || canUndo(history)}
-                canRedo={(activeLayer === null && draft.canRedo) || canRedo(history)}
+                canUndo={canUndoCurrent}
+                canRedo={canRedoCurrent}
                 layers={document.layers}
                 activeLayerId={activeLayer?.id ?? null}
                 onAddPreset={addPreset}

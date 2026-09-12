@@ -164,7 +164,7 @@
     "nameError": "Give the preset a name of up to 60 characters.",
     "sections": {
       "label": "Designer sections",
-      "mark": "Mark",
+      "type": "Type",
       "placement": "Placement",
       "style": "Style"
     },
@@ -402,6 +402,7 @@
     "renderingPreview": "Rendering preview",
     "undo": "Undo",
     "redo": "Redo",
+    "clearCanvas": "Clear canvas",
     "altCrop": "Photo with the crop frame",
     "altWatermark": "Photo with the watermark applied",
     "choosePresetHint": "Choose a preset to place a watermark. Drop a photo anywhere on the canvas.",
@@ -434,7 +435,7 @@
       "adjusted": "Adjusted for this photo; the library preset is unchanged.",
       "revert": "Revert",
       "createHint": "Design your watermark here. Save it once to use on this photo and keep it in your library.",
-      "saveAndUse": "Save and use",
+      "save": "Save",
       "emptyReadOnly": "No watermarks are available in this library yet.",
       "firstUseHint": "Add a watermark, then open Export to download your photo."
     },

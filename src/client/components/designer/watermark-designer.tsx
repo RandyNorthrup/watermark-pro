@@ -16,6 +16,7 @@ import { TokenMenu } from './token-menu'
 import { useDesignHistory } from './use-design-history'
 import { presetNameSchema } from '../../../shared/api'
 import type { WatermarkDto } from '../../../shared/api-watermark'
+import { MAX_PRESET_NAME_LENGTH } from '../../../shared/constants'
 import {
   MAX_QR_CONTENT_LENGTH,
   MAX_TEXT_LENGTH,
@@ -73,7 +74,7 @@ const tabTriggerClassName =
   'rounded-md px-3 py-1.5 text-sm font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white'
 
 const SECTION_TABS = [
-  { value: 'mark', label: 'designer.sections.mark' },
+  { value: 'mark', label: 'designer.sections.type' },
   { value: 'placement', label: 'designer.sections.placement' },
   { value: 'style', label: 'designer.sections.style' },
 ] as const
@@ -192,7 +193,13 @@ function WatermarkDesignerSession({
   function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!canSave) return
-    const parsedName = presetNameSchema.safeParse(name)
+    let markContent = ''
+    if (spec.kind === 'text') markContent = spec.text
+    else if (spec.kind === 'qr') markContent = spec.content
+    const firstLine = markContent.trim().split('\n', 1)[0] ?? ''
+    const generatedName = firstLine === '' ? t('library.newPreset') : firstLine
+    const submittedName = inline !== undefined && initial === undefined ? generatedName : name
+    const parsedName = presetNameSchema.safeParse(submittedName.slice(0, MAX_PRESET_NAME_LENGTH))
     if (!parsedName.success) {
       setNameError(t('designer.nameError'))
       return
@@ -222,25 +229,27 @@ function WatermarkDesignerSession({
       }
     >
       <Card className={inline === undefined ? 'flex flex-col gap-5' : 'contents'}>
-        <Field label={t('designer.presetName')} error={nameError ?? undefined}>
-          {(controlProps) => (
-            <Input
-              {...controlProps}
-              value={name}
-              maxLength={60}
-              placeholder={t('designer.presetNamePlaceholder')}
-              readOnly={!canManage}
-              onChange={(event) => {
-                setName(event.currentTarget.value)
-              }}
-            />
-          )}
-        </Field>
+        {inline === undefined ? (
+          <Field label={t('designer.presetName')} error={nameError ?? undefined}>
+            {(controlProps) => (
+              <Input
+                {...controlProps}
+                value={name}
+                maxLength={MAX_PRESET_NAME_LENGTH}
+                placeholder={t('designer.presetNamePlaceholder')}
+                readOnly={!canManage}
+                onChange={(event) => {
+                  setName(event.currentTarget.value)
+                }}
+              />
+            )}
+          </Field>
+        ) : null}
 
         <Tabs.Root defaultValue="mark" className="flex flex-col gap-4">
           <Tabs.List
             aria-label={t('designer.sections.label')}
-            className="inline-flex self-start rounded-lg border border-line bg-surface-raised p-1"
+            className="inline-flex self-center rounded-lg border border-line bg-surface-raised p-1"
           >
             {SECTION_TABS.map((tab) => (
               <Tabs.Trigger key={tab.value} value={tab.value} className={tabTriggerClassName}>
@@ -380,35 +389,41 @@ function WatermarkDesignerSession({
           </Alert>
         ) : null}
         {canManage ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              disabled={!(inline?.canUndo ?? history.canUndo)}
-              onClick={undo}
-              aria-keyshortcuts="Control+Z Meta+Z"
-            >
-              <Undo2 aria-hidden="true" className="size-4" />
-              {t('editor.undo')}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              disabled={!(inline?.canRedo ?? history.canRedo)}
-              onClick={redo}
-              aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y Meta+Y"
-            >
-              <Redo2 aria-hidden="true" className="size-4" />
-              {t('editor.redo')}
-            </Button>
+          <div
+            className={`flex flex-wrap items-center gap-2 ${inline === undefined ? '' : 'justify-center'}`}
+          >
+            {inline === undefined ? (
+              <>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={!history.canUndo}
+                  onClick={undo}
+                  aria-keyshortcuts="Control+Z Meta+Z"
+                >
+                  <Undo2 aria-hidden="true" className="size-4" />
+                  {t('editor.undo')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={!history.canRedo}
+                  onClick={redo}
+                  aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y Meta+Y"
+                >
+                  <Redo2 aria-hidden="true" className="size-4" />
+                  {t('editor.redo')}
+                </Button>
+              </>
+            ) : null}
             {canSave ? (
               <Button
                 type="submit"
                 isPending={save.isPending}
                 disabled={isIncomplete}
-                className="self-start"
+                className={inline === undefined ? 'self-start' : undefined}
               >
                 {submitLabel ??
                   t(initial === undefined ? 'designer.savePreset' : 'designer.saveChanges')}

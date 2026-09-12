@@ -164,7 +164,7 @@
     "nameError": "Geben Sie dem Preset einen Namen mit bis zu 60 Zeichen.",
     "sections": {
       "label": "Designer-Abschnitte",
-      "mark": "Markierung",
+      "type": "Typ",
       "placement": "Platzierung",
       "style": "Stil"
     },
@@ -402,6 +402,7 @@
     "renderingPreview": "Vorschau wird gerendert",
     "undo": "Rückgängig",
     "redo": "Wiederholen",
+    "clearCanvas": "Arbeitsfläche leeren",
     "altCrop": "Foto mit dem Zuschnittrahmen",
     "altWatermark": "Foto mit angewendetem Wasserzeichen",
     "choosePresetHint": "Wählen Sie ein Preset, um ein Wasserzeichen zu platzieren. Ziehen Sie ein Foto an eine beliebige Stelle der Arbeitsfläche.",
@@ -434,7 +435,7 @@
       "adjusted": "Für dieses Foto angepasst; das Preset in der Bibliothek bleibt unverändert.",
       "revert": "Zurücksetzen",
       "createHint": "Gestalte dein Wasserzeichen hier. Speichere es für dieses Foto und zur Wiederverwendung in der Bibliothek.",
-      "saveAndUse": "Speichern und verwenden",
+      "save": "Speichern",
       "emptyReadOnly": "In dieser Bibliothek sind noch keine Wasserzeichen verfügbar.",
       "firstUseHint": "Füge ein Wasserzeichen hinzu und öffne Exportieren, um dein Foto herunterzuladen."
     },

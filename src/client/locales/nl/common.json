@@ -164,7 +164,7 @@
     "nameError": "Geef de preset een naam van maximaal 60 tekens.",
     "sections": {
       "label": "Ontwerpersecties",
-      "mark": "Markering",
+      "type": "Type",
       "placement": "Plaatsing",
       "style": "Stijl"
     },
@@ -402,6 +402,7 @@
     "renderingPreview": "Voorbeeld wordt gerenderd",
     "undo": "Ongedaan maken",
     "redo": "Opnieuw",
+    "clearCanvas": "Canvas wissen",
     "altCrop": "Foto met het uitsnedekader",
     "altWatermark": "Foto met het toegepaste watermerk",
     "choosePresetHint": "Kies een preset om een watermerk te plaatsen. Sleep een foto naar een willekeurige plek op het canvas.",
@@ -434,7 +435,7 @@
       "adjusted": "Aangepast voor deze foto; de preset in de bibliotheek blijft ongewijzigd.",
       "revert": "Terugzetten",
       "createHint": "Ontwerp hier je watermerk. Sla het op voor deze foto en bewaar het in je bibliotheek.",
-      "saveAndUse": "Opslaan en gebruiken",
+      "save": "Opslaan",
       "emptyReadOnly": "Deze bibliotheek bevat nog geen watermerken.",
       "firstUseHint": "Voeg een watermerk toe en open Exporteren om je foto te downloaden."
     },

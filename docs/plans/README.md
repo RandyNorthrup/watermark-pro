@@ -155,10 +155,10 @@ peerDependencies license`, confirm the peer range against what is
    6. UX pass (see "Simple by default"): open every changed screen at 390 px
       and 1440 px with a quick manual check (e2e and screenshots are deferred
       to M19) and write one sentence per screen into §8.
-8. Commit (from PowerShell or Bash; the pre-commit hook runs gitleaks and
-   lint-staged), push `main`, wait for CI, tag `vX.Y.Z` (minor bump per
-   milestone), and create the GitHub release from the CHANGELOG entry. The
-   tag runs the deploy workflow.
+8. Run required gates locally, commit (the pre-commit hook runs gitleaks and
+   lint-staged), push `main`, tag `vX.Y.Z`, and create the GitHub release from
+   the CHANGELOG entry. GitHub workflows are manual-only; deploy with
+   `npm run deploy` or explicitly dispatch the hosted deployment workflow.
 
 ## Repository facts you will need
 

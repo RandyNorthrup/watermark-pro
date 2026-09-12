@@ -19,6 +19,7 @@ interface SignaturePadProps {
   /** Receives the drawing as a transparent PNG with its pixel size. */
   onSave: (file: File, size: { width: number; height: number }) => Promise<void>
   isSaving: boolean
+  className?: string | undefined
 }
 
 /** The pad's drawing surface in CSS pixels; strokes are stored in this space. */
@@ -62,7 +63,7 @@ async function exportSignature(strokes: readonly Stroke[]): Promise<{
  * pad keeps strokes as data and redraws them, so undo is exact and the
  * saved image is rendered at full resolution rather than from the screen.
  */
-export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
+export function SignaturePad({ onSave, isSaving, className }: SignaturePadProps) {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [strokes, setStrokes] = useState<Stroke[]>([])
@@ -142,7 +143,7 @@ export function SignaturePad({ onSave, isSaving }: SignaturePadProps) {
       }}
     >
       <Dialog.Trigger asChild>
-        <Button type="button" variant="secondary">
+        <Button type="button" variant="secondary" className={className}>
           <PenLine aria-hidden="true" className="size-4" />
           {t('designer.logo.signature.draw')}
         </Button>

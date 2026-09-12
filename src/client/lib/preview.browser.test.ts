@@ -98,17 +98,17 @@ describe('font loading', () => {
 
 describe('sample photo', () => {
   it('draws a scene at the documented size', async () => {
-    const bitmap = await createSamplePhoto(offscreenBackend)
+    const bitmap = await createSamplePhoto()
     expect(bitmap.width).toBe(SAMPLE_PHOTO_WIDTH)
     expect(bitmap.height).toBe(SAMPLE_PHOTO_HEIGHT)
     bitmap.close()
   })
 
-  it('ships public/sample-scene.jpg as the same scene (rerun scripts/sample-scene.mjs otherwise)', async () => {
+  it('decodes the same coast photograph used by the landing page', async () => {
     const response = await fetch(SAMPLE_SCENE_PATH)
     expect(response.ok).toBe(true)
     const shipped = await createImageBitmap(await response.blob())
-    const drawn = await createSamplePhoto(offscreenBackend)
+    const drawn = await createSamplePhoto()
     expect([shipped.width, shipped.height]).toEqual([drawn.width, drawn.height])
     const shippedPixels = pixelsOf(shipped)
     const drawnPixels = pixelsOf(drawn)

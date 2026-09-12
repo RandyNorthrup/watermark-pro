@@ -46,7 +46,7 @@ function offlineAssetsPlugin(): Plugin {
         '/icon-maskable-512.png',
         '/third-party-licenses.md',
         '/open-source.md',
-        ...['fonts', 'stickers', 'product']
+        ...['fonts', 'stickers', 'product', 'photography']
           .flatMap((directory) =>
             existsSync(path.join('public', directory))
               ? readdirSync(path.join('public', directory), {

@@ -16,7 +16,7 @@ export async function renderFilterThumbnails(
   source: ImageBitmap | null,
   backend: CanvasBackend,
 ): Promise<Map<FilterId, string>> {
-  const bitmap = source ?? (await createSamplePhoto(backend))
+  const bitmap = source ?? (await createSamplePhoto())
   const scale = Math.min(1, FILTER_THUMBNAIL_SIDE / Math.max(bitmap.width, bitmap.height))
   const width = Math.max(1, Math.round(bitmap.width * scale))
   const height = Math.max(1, Math.round(bitmap.height * scale))

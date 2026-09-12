@@ -165,7 +165,7 @@
     "nameError": "Donnez au préréglage un nom d'au plus 60 caractères.",
     "sections": {
       "label": "Sections du concepteur",
-      "mark": "Marque",
+      "type": "Type",
       "placement": "Placement",
       "style": "Style"
     },
@@ -403,6 +403,7 @@
     "renderingPreview": "Génération de l'aperçu",
     "undo": "Annuler",
     "redo": "Rétablir",
+    "clearCanvas": "Effacer la zone de travail",
     "altCrop": "Photo avec le cadre de recadrage",
     "altWatermark": "Photo avec le filigrane appliqué",
     "choosePresetHint": "Choisissez un préréglage pour placer un filigrane. Déposez une photo n'importe où sur la zone de travail.",
@@ -435,7 +436,7 @@
       "adjusted": "Ajusté pour cette photo ; le préréglage de la bibliothèque reste inchangé.",
       "revert": "Réinitialiser",
       "createHint": "Créez votre filigrane ici. Enregistrez-le pour cette photo et conservez-le dans votre bibliothèque.",
-      "saveAndUse": "Enregistrer et utiliser",
+      "save": "Enregistrer",
       "emptyReadOnly": "Aucun filigrane n’est encore disponible dans cette bibliothèque.",
       "firstUseHint": "Ajoutez un filigrane, puis ouvrez Exporter pour télécharger la photo."
     },

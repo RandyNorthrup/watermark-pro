@@ -71,7 +71,7 @@ describe('ExportPanel cloud save', () => {
       'Save to Dropbox',
       'Save to OneDrive',
     ]) {
-      expect(screen.getByRole('button', { name })).toHaveClass('h-11', 'w-full', 'justify-start')
+      expect(screen.getByRole('button', { name })).toHaveClass('h-11', 'w-full', 'justify-center')
     }
   })
 
@@ -117,12 +117,15 @@ describe('ExportPanel cloud save', () => {
 
   it('offers an invisible mark on PNG and blocks an over-long message', async () => {
     const { user } = renderPanel(() => Promise.resolve(UPLOAD))
-    // Default JPEG shows the "choose PNG" hint; the invisible checkbox is disabled.
+    // Default JPEG shows the "choose PNG" hint; the invisible switch is disabled.
     expect(screen.getByText(/Choose PNG to hide a message/)).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: 'Invisible mark' })).toBeDisabled()
 
     await user.click(screen.getByRole('combobox', { name: 'Format' }))
     await user.click(await screen.findByRole('option', { name: 'PNG' }))
-    await user.click(screen.getByRole('checkbox', { name: 'Invisible mark' }))
+    const invisible = screen.getByRole('switch', { name: 'Invisible mark' })
+    await user.click(invisible)
+    expect(invisible).toBeChecked()
 
     // Seeded from the organization name; a message that fits keeps Download enabled.
     const message = screen.getByLabelText('Invisible message')

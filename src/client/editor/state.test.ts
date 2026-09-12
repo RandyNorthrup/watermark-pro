@@ -9,6 +9,7 @@ import {
   editorReducer,
   EMPTY_DOCUMENT,
   HISTORY_LIMIT,
+  isEmptyDocument,
   withAdjustments,
   withLayer,
   withoutLayer,
@@ -42,6 +43,12 @@ describe('editor history', () => {
     history = editorReducer(history, { type: 'redo' })
     expect(history.present.crop?.width).toBe(200)
     expect(editorReducer(history, { type: 'redo' })).toBe(history)
+  })
+
+  it('distinguishes a clear canvas from one with edits', () => {
+    expect(isEmptyDocument(EMPTY_DOCUMENT)).toBe(true)
+    expect(isEmptyDocument({ ...EMPTY_DOCUMENT })).toBe(true)
+    expect(isEmptyDocument(withCrop(100))).toBe(false)
   })
 
   it('treats a checkpoint plus many sets as one undoable gesture', () => {

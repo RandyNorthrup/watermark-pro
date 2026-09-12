@@ -20,6 +20,7 @@ const ASSET_PREFIX = '/assets/'
 const FONT_PREFIX = '/fonts/'
 const STICKER_PREFIX = '/stickers/'
 const PRODUCT_PREFIX = '/product/'
+const PHOTOGRAPHY_PREFIX = '/photography/'
 const API_PREFIX = '/api/'
 const OAUTH_PREFIX = '/oauth/'
 const OFFLINE_FALLBACK = '/offline-shell'
@@ -183,6 +184,7 @@ addEventListener('fetch', (event) => {
     url.pathname.startsWith(FONT_PREFIX) ||
     url.pathname.startsWith(STICKER_PREFIX) ||
     url.pathname.startsWith(PRODUCT_PREFIX) ||
+    url.pathname.startsWith(PHOTOGRAPHY_PREFIX) ||
     STATIC_ASSETS.has(url.pathname)
   ) {
     event.respondWith(cacheFirst(request))

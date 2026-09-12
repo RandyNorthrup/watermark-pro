@@ -1,10 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-import { FontPicker } from './font-picker'
 import { StickerPicker } from './sticker-picker'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import { DEFAULT_FONT_FAMILY } from '../../fonts/catalogue'
-import { cn } from '../../lib/cn'
 import { EMOJI_FONT_STACK, GLYPH_GROUPS, ICON_CATALOGUE, iconToPath } from '../../symbols/catalogue'
 
 type SymbolSource = Extract<WatermarkSpec, { kind: 'symbol' }>['symbol']
@@ -104,15 +102,6 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
           ))}
         </div>
       </fieldset>
-      {symbol.type === 'glyph' && symbol.fontFamily !== EMOJI_FONT_STACK ? (
-        <FontPicker
-          family={symbol.fontFamily}
-          onFamilyChange={(fontFamily) => {
-            onChange({ ...symbol, fontFamily })
-          }}
-          className={cn('mt-1')}
-        />
-      ) : null}
     </div>
   )
 }

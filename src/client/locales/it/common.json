@@ -165,7 +165,7 @@
     "nameError": "Assegna al preset un nome di massimo 60 caratteri.",
     "sections": {
       "label": "Sezioni del designer",
-      "mark": "Elemento",
+      "type": "Tipo",
       "placement": "Posizionamento",
       "style": "Stile"
     },
@@ -403,6 +403,7 @@
     "renderingPreview": "Generazione dell'anteprima",
     "undo": "Annulla",
     "redo": "Ripeti",
+    "clearCanvas": "Cancella area di lavoro",
     "altCrop": "Foto con il riquadro di ritaglio",
     "altWatermark": "Foto con la filigrana applicata",
     "choosePresetHint": "Scegli un preset per applicare una filigrana. Trascina una foto in un punto qualsiasi dell'area di lavoro.",
@@ -435,7 +436,7 @@
       "adjusted": "Adattato a questa foto; il preset nella libreria resta invariato.",
       "revert": "Ripristina",
       "createHint": "Crea qui la tua filigrana. Salvala per usarla su questa foto e conservarla nella libreria.",
-      "saveAndUse": "Salva e usa",
+      "save": "Salva",
       "emptyReadOnly": "Non sono ancora disponibili filigrane in questa libreria.",
       "firstUseHint": "Aggiungi una filigrana, poi apri Esporta per scaricare la foto."
     },

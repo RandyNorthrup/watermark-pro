@@ -22,6 +22,7 @@ import { CloudSaveButtons } from '../import/cloud-save-buttons'
 import { Button } from '../ui/button'
 import { Select } from '../ui/select'
 import { SliderField } from '../ui/slider-field'
+import { Switch } from '../ui/switch'
 
 interface ExportPanelProps {
   outputSize: Size
@@ -127,18 +128,15 @@ export function ExportPanel({
       />
       <MetadataPolicyField policy={policy} format={format} onChange={setPolicy} />
       <div className="flex flex-col gap-1.5">
-        <label className="flex items-center gap-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            className="size-4 accent-brand-600"
-            checked={wantsInvisible}
+        <div className="flex items-center justify-between gap-3 text-sm font-medium">
+          <span>{t('editor.export.invisibleMark')}</span>
+          <Switch
+            aria-label={t('editor.export.invisibleMark')}
+            isChecked={wantsInvisible}
             disabled={isLossy}
-            onChange={(event) => {
-              setWantsInvisible(event.currentTarget.checked)
-            }}
+            onCheckedChange={setWantsInvisible}
           />
-          {t('editor.export.invisibleMark')}
-        </label>
+        </div>
         {isLossy ? <p className="text-xs text-ink-muted">{t('editor.export.choosePng')}</p> : null}
         {!isLossy && wantsInvisible ? (
           <>
@@ -175,7 +173,7 @@ export function ExportPanel({
       <div className="flex w-full flex-col gap-2">
         <Button
           type="button"
-          className="w-full justify-start"
+          className="w-full justify-center"
           isPending={isExporting}
           disabled={!isReady || isBlocked || (isBusy && !isExporting)}
           onClick={() => {
@@ -189,7 +187,7 @@ export function ExportPanel({
           <Button
             type="button"
             variant="secondary"
-            className="w-full justify-start"
+            className="w-full justify-center"
             isPending={isSharing}
             disabled={!isReady || isBlocked || (isBusy && !isSharing)}
             onClick={() => {
@@ -204,7 +202,7 @@ export function ExportPanel({
           <Button
             type="button"
             variant="secondary"
-            className="w-full justify-start"
+            className="w-full justify-center"
             isPending={isSaving}
             disabled={!isReady || isBlocked || (isBusy && !isSaving)}
             onClick={() => {
@@ -218,7 +216,7 @@ export function ExportPanel({
         {cloudConfig === undefined || onExportBlob === undefined ? null : (
           <CloudSaveButtons
             config={cloudConfig}
-            buttonClassName="w-full justify-start"
+            buttonClassName="w-full justify-center"
             buttonSize="md"
             disabled={!isReady || isBlocked || isBusy}
             getUploads={async () => {

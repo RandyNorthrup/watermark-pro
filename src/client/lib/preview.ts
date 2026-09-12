@@ -111,6 +111,7 @@ export class PreviewRenderer {
   #original: File | null = null
   #metadata: PhotoMetadata | null = null
   #sourceSize: Size | null = null
+  #sampleSubject: Promise<void> | null = null
   #sequence = 0
   #subjectRequest = 0
   #disposed = false
@@ -147,7 +148,19 @@ export class PreviewRenderer {
 
   /** The photo itself, or the sample scene when there is none. */
   #decode(file: File | null): Promise<ImageBitmap> {
-    return file === null ? createSamplePhoto(this.#backend) : createImageBitmap(file)
+    return file === null ? createSamplePhoto() : createImageBitmap(file)
+  }
+
+  /** Share the first sample decode so concurrent renders keep latest-frame ordering. */
+  async #ensureSampleSubject(): Promise<void> {
+    if (this.#subject !== null) return
+    const pending = this.#sampleSubject ?? this.setSubject(null)
+    this.#sampleSubject = pending
+    try {
+      await pending
+    } finally {
+      if (this.#sampleSubject === pending) this.#sampleSubject = null
+    }
   }
 
   /** Pixel size of the photo the preview stands for (the sample scene by default). */
@@ -193,11 +206,13 @@ export class PreviewRenderer {
    */
   async render(input: SpecInput, options: RenderOptions = {}): Promise<PreviewResult | null> {
     if (this.#subject === null) {
-      await this.setSubject(null)
+      await this.#ensureSampleSubject()
     }
     const subject = this.#subject
     if (subject === null) {
-      throw new Error('preview subject missing after initialisation')
+      // A newer subject request superseded this sample decode. Its render will
+      // publish the next frame, so this stale frame has no result to expose.
+      return null
     }
     this.#sequence += 1
     const ticket = this.#sequence

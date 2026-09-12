@@ -74,9 +74,7 @@ export function WatermarkPanel({
         canManage
         canSave={canCreate}
         canManageLogos={canCreate}
-        submitLabel={t(
-          initial === undefined ? 'editor.watermark.saveAndUse' : 'designer.saveChanges',
-        )}
+        submitLabel={t('editor.watermark.save')}
         inline={{
           spec: active?.spec ?? draftSpec,
           onChange: onSpecChange,

@@ -5,6 +5,7 @@ import { EMPTY_DOCUMENT, type EditorDocument } from './state'
 import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
 import { setOfflineUser } from '../lib/offline-context'
 import { clearOfflineDatabase } from '../lib/offline-database'
+import { defaultSpecFor } from '../lib/spec-edit'
 
 const ORGANIZATION = 'editor-session-workspace'
 const USER_A = 'editor-session-user-a'
@@ -62,5 +63,24 @@ describe('durable editor sessions', () => {
       activeLayerId: null,
       photo: null,
     })
+  })
+
+  it('restores an unfinished Logo draft but refuses it as a saved canvas layer', async () => {
+    const incompleteLogo = defaultSpecFor('image', DEFAULT_TEXT_SPEC)
+    await saveEditorSession(ORGANIZATION, EMPTY_DOCUMENT, incompleteLogo, 'draft', null)
+
+    expect(await loadEditorSession(ORGANIZATION)).toMatchObject({
+      document: EMPTY_DOCUMENT,
+      draftSpec: incompleteLogo,
+      activeLayerId: 'draft',
+    })
+
+    const invalidDocument: EditorDocument = {
+      ...EMPTY_DOCUMENT,
+      layers: [{ id: 'layer-1', presetId: 'preset-1', spec: incompleteLogo }],
+    }
+    await expect(
+      saveEditorSession(ORGANIZATION, invalidDocument, incompleteLogo, 'layer-1', null),
+    ).rejects.toThrow()
   })
 })

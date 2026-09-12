@@ -165,7 +165,7 @@
     "nameError": "Ponle al preajuste un nombre de hasta 60 caracteres.",
     "sections": {
       "label": "Secciones del diseñador",
-      "mark": "Marca",
+      "type": "Tipo",
       "placement": "Colocación",
       "style": "Estilo"
     },
@@ -403,6 +403,7 @@
     "renderingPreview": "Generando la vista previa",
     "undo": "Deshacer",
     "redo": "Rehacer",
+    "clearCanvas": "Limpiar lienzo",
     "altCrop": "Foto con el marco de recorte",
     "altWatermark": "Foto con la marca de agua aplicada",
     "choosePresetHint": "Elige un preajuste para colocar una marca de agua. Suelta una foto en cualquier parte del lienzo.",
@@ -435,7 +436,7 @@
       "adjusted": "Ajustada para esta foto; el preajuste de la biblioteca no cambia.",
       "revert": "Revertir",
       "createHint": "Diseña aquí tu marca de agua. Guárdala para usarla en esta foto y conservarla en tu biblioteca.",
-      "saveAndUse": "Guardar y usar",
+      "save": "Guardar",
       "emptyReadOnly": "Aún no hay marcas de agua en esta biblioteca.",
       "firstUseHint": "Añade una marca de agua y abre Exportar para descargar tu foto."
     },

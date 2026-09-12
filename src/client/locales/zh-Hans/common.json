@@ -163,7 +163,7 @@
     "nameError": "为预设取一个不超过 60 个字符的名称。",
     "sections": {
       "label": "设计器分区",
-      "mark": "标记",
+      "type": "类型",
       "placement": "放置",
       "style": "样式"
     },
@@ -401,6 +401,7 @@
     "renderingPreview": "正在渲染预览",
     "undo": "撤销",
     "redo": "重做",
+    "clearCanvas": "清空画布",
     "altCrop": "带裁剪框的照片",
     "altWatermark": "已应用水印的照片",
     "choosePresetHint": "选择一个预设以放置水印。将照片拖放到画布上的任意位置。",
@@ -433,7 +434,7 @@
       "adjusted": "已针对这张照片调整；水印库中的预设保持不变。",
       "revert": "还原",
       "createHint": "在这里设计水印。保存后即可用于当前照片，并保留在素材库中以便重复使用。",
-      "saveAndUse": "保存并使用",
+      "save": "保存",
       "emptyReadOnly": "此素材库中尚无水印。",
       "firstUseHint": "添加水印后，打开“导出”即可下载照片。"
     },

@@ -49,13 +49,13 @@ added (a new binding, a new public route, a new third-party origin).
 
 ### Tampering
 
-| Threat                                         | Mitigation                                                                                                                                                          | Evidence                                               |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| Cross-site request forgery                     | `requireSameOrigin` on every state-changing request plus Hono's CSRF check and Better Auth's own origin checks                                                      | `auth-flow.test.ts` CSRF negatives                     |
-| Malicious uploads (polyglots, oversized files) | Type from file signature only; size checked from `Content-Length` and the body; count and byte quotas; R2 keys are server-generated and organization-scoped         | `photos.test.ts`, `library.test.ts`, `uploads.test.ts` |
-| Preset referencing another organization's logo | `assertAssetOwned` on create and update                                                                                                                             | `library.test.ts`                                      |
-| Share listing photos outside the organization  | Photo ids validated against the organization before the share is created; public routes only serve listed ids                                                       | `shares.test.ts`                                       |
-| Supply-chain tampering                         | Exact pins, `min-release-age=7`, `npm audit` at high, semgrep, gitleaks, dependency review on pull requests, actions pinned to SHAs, semgrep image pinned by digest | CI workflow                                            |
+| Threat                                         | Mitigation                                                                                                                                                                      | Evidence                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Cross-site request forgery                     | `requireSameOrigin` on every state-changing request plus Hono's CSRF check and Better Auth's own origin checks                                                                  | `auth-flow.test.ts` CSRF negatives                     |
+| Malicious uploads (polyglots, oversized files) | Type from file signature only; size checked from `Content-Length` and the body; count and byte quotas; R2 keys are server-generated and organization-scoped                     | `photos.test.ts`, `library.test.ts`, `uploads.test.ts` |
+| Preset referencing another organization's logo | `assertAssetOwned` on create and update                                                                                                                                         | `library.test.ts`                                      |
+| Share listing photos outside the organization  | Photo ids validated against the organization before the share is created; public routes only serve listed ids                                                                   | `shares.test.ts`                                       |
+| Supply-chain tampering                         | Exact pins, `min-release-age=7`, local `npm audit` at high, semgrep, gitleaks, actions pinned to SHAs, semgrep image pinned by digest; hosted workflows require manual dispatch | Local release gate and manual CI workflow              |
 
 ### Repudiation
 

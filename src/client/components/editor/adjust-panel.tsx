@@ -161,7 +161,7 @@ export function AdjustPanel({ adjust, onChange, photoFile }: AdjustPanelProps) {
         type="button"
         variant="secondary"
         size="sm"
-        className="self-start"
+        className="self-center"
         disabled={activeFilter === 'original'}
         onClick={() => {
           onChange(IDENTITY_ADJUSTMENTS)

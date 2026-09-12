@@ -35,7 +35,7 @@ export function PresetPanel({ organizationId, canCreate, ...props }: PresetPanel
       query={presets}
       emptyHint={t('editor.watermark.emptyHint')}
       emptyContent={
-        <div className="flex flex-col items-start gap-3">
+        <div className="flex flex-col items-center gap-3 text-center">
           <p className="text-sm text-ink-muted">
             {t(canCreate ? 'editor.watermark.createHint' : 'editor.watermark.emptyReadOnly')}
           </p>

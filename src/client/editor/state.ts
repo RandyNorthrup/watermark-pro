@@ -193,3 +193,8 @@ export function canUndo(history: EditorHistory): boolean {
 export function canRedo(history: EditorHistory): boolean {
   return history.future.length > 0
 }
+
+/** Whether the canvas has no transforms, frame, resize or saved watermark layers. */
+export function isEmptyDocument(document: EditorDocument): boolean {
+  return isSameDocument(document, EMPTY_DOCUMENT)
+}

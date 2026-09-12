@@ -165,7 +165,7 @@
     "nameError": "Dê à predefinição um nome de até 60 caracteres.",
     "sections": {
       "label": "Seções do designer",
-      "mark": "Marca",
+      "type": "Tipo",
       "placement": "Posicionamento",
       "style": "Estilo"
     },
@@ -403,6 +403,7 @@
     "renderingPreview": "Gerando a prévia",
     "undo": "Desfazer",
     "redo": "Refazer",
+    "clearCanvas": "Limpar tela",
     "altCrop": "Foto com o quadro de recorte",
     "altWatermark": "Foto com a marca d'água aplicada",
     "choosePresetHint": "Escolha uma predefinição para posicionar uma marca d'água. Solte uma foto em qualquer parte da tela.",
@@ -435,7 +436,7 @@
       "adjusted": "Ajustada para esta foto; a predefinição da biblioteca não muda.",
       "revert": "Reverter",
       "createHint": "Crie sua marca-d’água aqui. Salve para usar nesta foto e manter na sua biblioteca.",
-      "saveAndUse": "Salvar e usar",
+      "save": "Salvar",
       "emptyReadOnly": "Ainda não há marcas-d’água nesta biblioteca.",
       "firstUseHint": "Adicione uma marca-d’água e abra Exportar para baixar sua foto."
     },

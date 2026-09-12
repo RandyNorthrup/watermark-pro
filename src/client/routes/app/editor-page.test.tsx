@@ -199,9 +199,16 @@ describe('editor page', () => {
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'custom', x: 0.79, y: 0.9 }))
     expect(screen.getByText(/Adjusted for this photo/)).toBeInTheDocument()
 
-    await user.click(screen.getAllByRole('button', { name: 'Undo' })[0]!)
+    expect(screen.getAllByRole('button', { name: 'Undo' })).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Redo' })).toHaveLength(1)
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'smart' }))
-    await user.click(screen.getAllByRole('button', { name: 'Redo' })[0]!)
+    await user.click(screen.getByRole('button', { name: 'Redo' }))
+    await waitFor(() => expect(lastSpec()?.placement.mode).toBe('custom'))
+
+    await user.click(screen.getByRole('button', { name: 'Clear canvas' }))
+    await waitFor(() => expect(renderedBatches.at(-1)).toEqual([]))
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
     await waitFor(() => expect(lastSpec()?.placement.mode).toBe('custom'))
 
     await user.click(screen.getByRole('button', { name: 'Revert' }))
@@ -266,6 +273,12 @@ describe('editor page', () => {
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
     await screen.findByRole('textbox', { name: 'Text' })
+    const preview = await screen.findByRole('img', { name: /Photo with the watermark/ })
+    expect(preview).toHaveClass('lg:max-w-none')
+    expect(preview.closest('.app-scroll-region')).toHaveClass('overflow-x-auto')
+    await user.click(screen.getByRole('tab', { name: 'Symbol' }))
+    expect(screen.queryByRole('combobox', { name: 'Font' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('tab', { name: 'Text' }))
 
     await user.click(screen.getByRole('tab', { name: 'Adjust' }))
     await user.click(screen.getByRole('radio', { name: 'Vivid' }))
@@ -291,7 +304,7 @@ describe('editor page', () => {
     await user.click(screen.getByRole('button', { name: 'Rotate right' }))
     await waitFor(() => expect(renderedTransforms.at(-1)?.orientation?.turns).toBe(1))
 
-    await user.click(screen.getAllByRole('button', { name: 'Undo' })[0]!)
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
     await waitFor(() => expect(renderedTransforms.at(-1)?.orientation).toBeUndefined())
   })
 
@@ -356,7 +369,7 @@ describe('editor page', () => {
     fireEvent.pointerMove(frame, { pointerId: 1, clientX: 250, clientY: 200 })
     fireEvent.pointerUp(frame, { pointerId: 1, clientX: 250, clientY: 200 })
     await waitFor(() => expect(lastSpec()?.placement.mode).toBe('custom'))
-    await user.click(screen.getAllByRole('button', { name: 'Undo' })[0]!)
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
     await waitFor(() => expect(lastSpec()?.placement).toEqual({ mode: 'smart' }))
 
     const canvas = screen.getByRole('img', { name: /Photo with the watermark/ }).parentElement
@@ -445,23 +458,29 @@ describe('editor page', () => {
     const api = installLibraryApi()
     const { router } = renderApp('/app/editor')
     await screen.findByRole('textbox', { name: 'Text' })
+    await user.click(screen.getByRole('tab', { name: 'Presets' }))
+    const newPreset = screen.getByRole('button', { name: 'New preset' })
+    expect(newPreset.parentElement).toHaveClass('items-center', 'text-center')
+    await user.click(newPreset)
     const photo = new File(['photo fixture'], 'first-photo.png', { type: 'image/png' })
     await user.upload(screen.getByLabelText('Open a photo'), photo)
     expect(screen.queryByRole('button', { name: 'Create watermark' })).not.toBeInTheDocument()
     const designer = screen.getByRole('tabpanel', { name: 'Watermark' })
-    await within(designer).findByLabelText('Preset name')
-    await user.type(within(designer).getByLabelText('Preset name'), 'First signature')
+    expect(within(designer).queryByLabelText('Preset name')).not.toBeInTheDocument()
     await user.clear(within(designer).getByRole('textbox', { name: 'Text' }))
     await user.type(within(designer).getByRole('textbox', { name: 'Text' }), '© My first photo')
-    await user.click(within(designer).getByRole('button', { name: 'Save and use' }))
+    const save = within(designer).getByRole('button', { name: 'Save' })
+    expect(save.parentElement).toHaveClass('justify-center')
+    await user.click(save)
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(router.state.location.pathname).toBe('/app/editor')
     expect(api.watermarks).toHaveLength(1)
+    expect(api.watermarks[0]?.name).toBe('© My first photo')
     expect(api.watermarks[0]?.spec).toMatchObject({ kind: 'text', text: '© My first photo' })
     expect(previewSubjects.filter((subject) => subject === photo)).toHaveLength(1)
     await user.click(screen.getByRole('tab', { name: 'Presets' }))
     expect(await screen.findByRole('list', { name: 'Layers, bottom to top' })).toHaveTextContent(
-      'First signature',
+      '© My first photo',
     )
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     await user.click(await screen.findByRole('button', { name: 'Download' }))

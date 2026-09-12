@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import type { EditorDocument } from './state'
 import { adjustmentsSchema, orientationSchema } from '../../shared/adjustments'
-import { watermarkSpecSchema } from '../../shared/watermark'
+import { type WatermarkSpec, watermarkSpecSchema } from '../../shared/watermark'
 import { MAX_BORDER_RATIO } from '../engine/pipeline'
 import { captureOfflineOwner } from '../lib/offline-context'
 import {
@@ -14,6 +14,7 @@ import {
 
 const SESSION_RECORD = 'editor-session'
 const PHOTO_RECORD = 'editor-session-photo'
+const INCOMPLETE_LOGO_DRAFT_ASSET_ID = 'local-draft:no-logo'
 export const EDITOR_SESSION_SAVE_DELAY_MS = 300
 
 const sizeSchema = z
@@ -72,6 +73,18 @@ interface SessionPhoto {
   dimensions: { width: number; height: number }
 }
 
+function draftSpecForStorage(spec: WatermarkSpec): WatermarkSpec {
+  return spec.kind === 'image' && spec.assetId === ''
+    ? { ...spec, assetId: INCOMPLETE_LOGO_DRAFT_ASSET_ID }
+    : spec
+}
+
+function draftSpecForEditor(spec: WatermarkSpec): WatermarkSpec {
+  return spec.kind === 'image' && spec.assetId === INCOMPLETE_LOGO_DRAFT_ASSET_ID
+    ? { ...spec, assetId: '' }
+    : spec
+}
+
 export interface RestoredEditorSession {
   document: EditorDocument
   draftSpec: z.infer<typeof watermarkSpecSchema>
@@ -90,7 +103,8 @@ export async function loadEditorSession(
   if (record === null) return null
   if (record.userId !== owner.userId || record.organizationId !== organizationId)
     throw new Error('Stored editor work belongs to another workspace.')
-  const session = editorSessionSchema.parse(record.value)
+  const parsed = editorSessionSchema.parse(record.value)
+  const session = { ...parsed, draftSpec: draftSpecForEditor(parsed.draftSpec) }
   if (session.photo === null) return { ...session, photo: null }
 
   const photoKey = offlineRecordKey(owner.userId, organizationId, PHOTO_RECORD)
@@ -142,7 +156,7 @@ export async function saveEditorSession(
     organizationId,
     value: editorSessionSchema.parse({
       document,
-      draftSpec,
+      draftSpec: draftSpecForStorage(draftSpec),
       activeLayerId,
       photo:
         photo === null

@@ -101,7 +101,7 @@ export function CropPanel({
         type="button"
         variant="secondary"
         size="sm"
-        className="self-start"
+        className="self-center"
         disabled={crop === null}
         onClick={() => {
           onAspectChange('free')

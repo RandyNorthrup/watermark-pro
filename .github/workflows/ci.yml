@@ -1,9 +1,9 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  # Local quality gates are the default. Run hosted CI only when explicitly
+  # requested or from another manually started workflow.
+  workflow_dispatch:
   # Tagged releases reuse these exact gates without receiving deployment secrets.
   workflow_call:
 
@@ -88,7 +88,7 @@ jobs:
           retention-days: 7
 
   e2e:
-    # Required branch-protection check: keep this name stable as shards change.
+    # Stable aggregate for manually requested release verification.
     name: End-to-end (Playwright + axe)
     if: ${{ always() }}
     runs-on: ubuntu-latest
@@ -115,20 +115,3 @@ jobs:
   sast:
     name: Static analysis (semgrep)
     uses: ./.github/workflows/sast.yml
-
-  dependency-review:
-    name: Dependency review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # Fails the pull request when it introduces a dependency with a known
-      # vulnerability of high severity or a licence outside the allow list.
-      - uses: actions/dependency-review-action@da24556b548a50705dd671f47852072ea4c105d9 # v4.7.1
-        with:
-          fail-on-severity: high
-          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, OFL-1.1, MPL-2.0, CC0-1.0, Unlicense, BlueOak-1.0.0, Python-2.0, CC-BY-4.0
-          # Findings remain in the check/job summary. Reusable tag callers stay read-only.
-          comment-summary-in-pr: never

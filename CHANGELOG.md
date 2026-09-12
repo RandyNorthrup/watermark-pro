@@ -92,6 +92,26 @@ what was planned; superseded entries stay.
   file. Empty Logo drafts stay off the renderer until a workspace logo is
   selected, avoiding a false cross-workspace image error.
 - Centered the navigation's Sync now action.
+- Removed duplicate undo and redo buttons from the embedded watermark controls.
+  The Editor canvas toolbar remains the single visible history control, while
+  keyboard shortcuts still use the same document history. Renamed and centered
+  the embedded preset Save action because its changes already appear on canvas.
+- Kept the desktop canvas at its height-derived display size so workspace and
+  tool sidebars cannot shrink it; narrower viewports scroll the editor workspace.
+  Removed the unrelated font selector from the Symbol picker. Unfinished Logo
+  drafts now persist locally without entering the renderer or saved canvas layers.
+  Centered the empty-library New preset action and every Export destination label.
+  Centered the watermark section selector. Replaced the Invisible mark checkbox
+  and Frame checkbox with themed accessible slide switches. Added Clear canvas beside Undo and Redo;
+  it removes canvas edits and layers while retaining the loaded photo, and saved
+  document changes can be restored with Undo. Logo upload and signature actions
+  now share one uniform centered layout.
+- Replaced the synthetic editor sample with the same licensed coast photograph
+  used on the landing page and included it in offline preparation.
+- Centered Reset crop, Reset size and Reset all inside their tool panels.
+- Disabled automatic GitHub Actions runs and removed the hosted dependency-review
+  job. CI, UI audits and deployment remain available only by manual dispatch;
+  Dependabot security updates were already disabled and no Dependabot config exists.
 - Enabled Cloudflare Always Use HTTPS for the canonical domain and raised its
   minimum edge protocol to TLS 1.2.
 - Kept every workspace tool bound to the live, account-checked organization

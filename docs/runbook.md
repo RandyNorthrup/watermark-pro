@@ -96,12 +96,10 @@ expose the new application before the required data split is complete.
 
 ### Deploy
 
-Version tags matching `v*` trigger `.github/workflows/deploy.yml`. Deployment
-requires its quality/generated-source/E2E gates and the shared pinned Semgrep
-workflow to succeed on that tag. Branch/PR CI calls the same SAST workflow and
-generated-Worker-types action. Review the tagged commit, workflow
-origin, GitHub environment and remaining release gates before publishing a tag.
-A workstation release uses:
+GitHub workflows do not run automatically. Run `npm run quality`, the applicable
+UI audits and hosted checks locally, then deploy from the workstation. The owner
+may manually dispatch `.github/workflows/ci.yml`, `audit-ui.yml` or `deploy.yml`
+for an additional hosted receipt. A workstation release uses:
 
 ```powershell
 npm run deploy
@@ -113,7 +111,8 @@ resolved build configuration. These steps are not a transaction across Worker
 code, D1, R2, DNS and secrets. If a later step fails, inspect which earlier steps
 completed before retrying.
 
-CI requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in GitHub secrets.
+Manual hosted deployment requires `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` in GitHub secrets.
 Scope credentials to the account, zone and Worker/D1/R2/email/DNS actions actually
 needed. Never publish their values or raw configuration output.
 

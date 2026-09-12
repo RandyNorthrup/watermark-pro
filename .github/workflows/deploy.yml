@@ -1,9 +1,8 @@
 name: Deploy
 
-# Production deploys happen from version tags only (v1.0.0, v1.0.1, …). The
-# quality, generated-source, end-to-end and pinned Semgrep gates run on the
-# tagged commit. The production job requires all of them. Migrations are applied
-# to the production D1 database before the Worker that needs them ships.
+# Production deploys run only when the owner manually dispatches this workflow.
+# Quality, generated-source, end-to-end and pinned Semgrep gates run on the
+# selected commit before migration and deployment.
 #
 # Required repository secrets:
 #   CLOUDFLARE_API_TOKEN   token with Workers Scripts, D1, R2 and Email edit rights
@@ -12,8 +11,7 @@ name: Deploy
 # `wrangler secret put … --env production` (see docs/runbook.md).
 
 on:
-  push:
-    tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: read
