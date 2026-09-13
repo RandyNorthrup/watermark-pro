@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-09-13T04:46:41.858Z",
+  "origin": "https://lumafoil.com",
+  "checks": [
+    {
+      "check": "Production Health",
+      "passed": true
+    },
+    {
+      "check": "Sign-In And Cloud Client Configuration",
+      "passed": true
+    },
+    {
+      "check": "Anonymous Denied",
+      "path": "/api/me/cloud/connections",
+      "passed": true
+    },
+    {
+      "check": "Anonymous Denied",
+      "path": "/api/admin/organizations",
+      "passed": true
+    },
+    {
+      "check": "Anonymous Denied",
+      "path": "/api/cloud/google/callback",
+      "passed": true
+    },
+    {
+      "check": "Exact Deployed Asset",
+      "path": "/sw.js",
+      "sha256": "6e0d0c7c7b2e5de7c21c1ddfa61e4a5d6f5b709711140f3a175b280a428dd212",
+      "passed": true
+    },
+    {
+      "check": "Exact Deployed Asset",
+      "path": "/product/templates.webp",
+      "sha256": "09f444895df57c61f1bb7e937d6ffee19b3ee358f34b2a9c5c8895e3aeda1892",
+      "passed": true
+    },
+    {
+      "check": "Exact Deployed Asset",
+      "path": "/product/fonts.webp",
+      "sha256": "74a5540dfb60fcbef286a27f5269d2fe930032654bc1b8a2feaf5a181539a196",
+      "passed": true
+    },
+    {
+      "check": "Exact Deployed Asset",
+      "path": "/offline-manifest.json",
+      "sha256": "414f38ebe7bde97e90c519ceba3fda79dd6d7d3e72574491ae3e9e168b31992a",
+      "passed": true
+    },
+    {
+      "check": "Exact Deployed Asset",
+      "path": "/product/editor-light-1440.webp",
+      "sha256": "9a83a75a2637f6cb2652aa4d3f6dbfe249fd479e19bd12de1ad10499d2397578",
+      "passed": true
+    },
+    {
+      "check": "Exact Deployed Asset",
+      "path": "/product/editor-dark-1440.webp",
+      "sha256": "7e9a62ab3d59055fb657c742c5fb547752a7d27f50efa3305bb93d124555b7aa",
+      "passed": true
+    },
+    {
+      "check": "Exact Deployed Asset",
+      "path": "/assets/pdfjs/6.3.289/pdf.worker.min.mjs",
+      "sha256": "8ab0e5e30031b4a06ecfddd5ae9562f0227f830ee7ec9ed1a968b134243d2386",
+      "passed": true
+    }
+  ]
+}

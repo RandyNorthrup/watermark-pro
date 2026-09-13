@@ -57,8 +57,9 @@ editor, tablet Arabic Designer/Image screens, and Android dark Account. Panels,
 controls and images fit their widths without an obvious additional layout fault.
 Fixed mobile navigation appearing partway down a full-page PNG reflects its
 viewport-fixed capture position. This closes screenshot/axe inventory evidence;
-live provider journeys, deployment/hosted verification and owner-deferred
-Lighthouse/performance remain separate.
+the subsequent [production deployment and hosted checks](deployment-2026-09-12.md)
+are recorded separately. Live provider journeys and owner-deferred
+Lighthouse/performance remain unverified.
 
 ## Historical failed screenshot attempts
 

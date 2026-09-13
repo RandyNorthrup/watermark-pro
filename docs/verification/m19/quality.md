@@ -1,12 +1,36 @@
 # Integrated quality verification
 
-## Current staged-release checkpoint — 2026-09-12
+## Production deployment checkpoint — 2026-09-12
+
+Source commit `0d764ecf9c88a002ac41fde24ca0cc02fba7a188` is deployed at
+`https://lumafoil.com` as Worker version
+`fbbf320b-9041-4801-8373-f8d7fb022191`. The canonical protected deploy completed
+with exit 0 after all 42 build checks, bundle budgets and an eight-value protected
+publication scan passed. Migrations 0013–0017 applied, and the remote database was
+confirmed current before upload. All four new cloud secret bindings were accepted.
+
+Twelve hosted public checks passed, including production health/configuration,
+anonymous access refusal, callback no-referrer and exact deployed asset hashes.
+A fresh authenticated browser restored the existing photo and showed the new
+Image tools, Manage Access and all three available cloud connection controls.
+Read-only post-deployment checks preserved the sole Owner, absence of Admins and
+existing accounts/content. Microsoft Cloud Storage now retains only its Web
+server callback; the separate sign-in registration was unchanged.
+
+See the [deployment receipt](deployment-2026-09-12.md) and
+[public hosted results](hosted-release-public.json) for exact scope and hashes.
+The receipt accompanies publication of the deployed source; remote-HEAD
+verification is separate. Real cloud
+grants and provider round trips remain unverified; local fixture coverage and
+enabled Connect buttons do not establish those results.
+
+## Local staged-release checkpoint — 2026-09-12
 
 The canonical `npm run quality` completed with **exit code 0** on the integrated
 release candidate. The successful record is `temp/quality-staged-release.log`,
 SHA-256 `316f1fa62ea419120522bc8cea09e0c754827f47bc044c20d7b77225739720ae`.
-This establishes the current local quality/build checkpoint; it does not certify
-the still-open live provider journeys or deployment.
+This establishes the local quality/build checkpoint; deployment is evidenced
+separately above, while live provider journeys remain unverified.
 This checkpoint also predates the subsequent Account overflow correction and
 named Dropbox credential-format adjustment identified during final release
 checks. Their follow-up verification must be recorded separately; the completed
@@ -197,17 +221,18 @@ The following remain separate, open release evidence at this checkpoint:
 - Real Google Drive, Dropbox and OneDrive connection, folder, load/save,
   sharing/revocation and refresh-reuse verification. Local provider fixtures do
   not establish live consent or tenant-policy behavior.
-- Final release configuration, migration/deployment and hosted verification.
-  A successful local build and staged-source scan do not prove production was
-  changed or that hosted journeys passed.
+- The owner requested stopping for the night. The pending Google attempt was
+  cancelled without granting access; live provider checks and performance work
+  are reserved for the next session. Repository remote-HEAD verification is
+  separate from this deployment receipt.
 
 ## Historical verification record
 
 The sections below preserve earlier dated checkpoints and failures. Their
 "final," "latest," and open-gate statements describe their historical snapshots.
 For current canonical quality and staged SAST status, use the checkpoint above;
-no historical pass certifies uninspected later source or closes the open provider
-and deployment evidence.
+no historical pass certifies uninspected later source or closes live provider
+verification. The production checkpoint above owns current deployment status.
 
 On 2026-09-09 (America/Los_Angeles), `npm run quality` completed with exit 0
 after the bootstrap, diagnostic-privacy, publication and logging-configuration

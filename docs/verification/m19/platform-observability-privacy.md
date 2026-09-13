@@ -12,8 +12,10 @@ historical evidence from before this compatibility correction.
 The release owner's read-only inspection of the production Worker overview
 reported **Workers Logs Disabled** and **Workers Traces Disabled**. The canonical
 custom domain remains `lumafoil.com`, and the `workers.dev` endpoint is disabled.
-This readback describes the existing deployment before the pending combined
-release; the release owner will verify it again after deployment.
+That readback described the pre-cutover deployment. After deployment, the release
+owner again observed Worker version `fbbf320b-9041-4801-8373-f8d7fb022191` receiving
+100% of traffic with Logs/Traces and `workers.dev` still disabled. See the
+[deployment receipt](deployment-2026-09-12.md).
 
 The account's Investigate → Logpush dashboard displayed no configured jobs and
 0 GB. Selecting the canonical zone showed the Free plan and an unavailable

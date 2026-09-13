@@ -1,11 +1,15 @@
 # Cloud Storage and Native Sharing — 2026-09-12
 
-This document describes the current source implementation and focused local
-evidence. The durable-connection changes are not yet deployed. Live consent,
-provider storage round trips and the combined release remain separate gates.
+The durable-connection changes are deployed at `https://lumafoil.com` from source
+commit `0d764ec`, Worker version `fbbf320b-9041-4801-8373-f8d7fb022191`.
+All four cloud secret bindings were accepted and migrations 0013–0017 applied.
+The [deployment receipt](deployment-2026-09-12.md) records twelve passing hosted
+public checks and a fresh browser showing all three Connect controls enabled.
+No provider was connected during that observation. Live consent and provider
+storage/refresh round trips remain separate, unverified acceptance evidence.
 The complete screenshot/axe inventory is recorded in [audit verification](audit-inventory.md).
-Provider registration preparation below is now complete;
-production bindings still await the combined release.
+Provider registration preparation and production binding are complete; Microsoft
+Cloud Storage's two retired SPA callbacks were removed after the server deployment.
 
 ## Connections and Account Boundaries
 
@@ -110,8 +114,8 @@ the UI links separately to personal-account and work/school permission settings.
 
 Migration 0016 creates encrypted connections and exact-session attempts.
 Migration 0017 adds first-party workspace folders and their independent content
-placement revisions. These migrations have local D1 evidence; they have not been
-applied to production by this subtask.
+placement revisions. Both are applied in production, together with migrations
+0013–0015; the canonical deploy confirmed the remote database current.
 
 Use distinct confidential Web callbacks:
 
@@ -157,8 +161,8 @@ SPA refresh model.
   Lumafoil publisher, website, privacy URL and description. Additional users are
   enabled; the console reports Development with a 500-user allowance. This is
   not Dropbox production approval. A fresh Branding page visually confirms both
-  the 64-pixel and 256-pixel rose Lumafoil icons. The former App Folder
-  registration is retained until the combined cutover.
+  the 64-pixel and 256-pixel rose Lumafoil icons. Production now uses the Full
+  registration. Removal of the former App Folder registration is not claimed.
 - Saved the Google **Lumafoil Web** server callback and created a cloud client
   secret with the owner's approval. The existing account sign-in client was
   not changed. Google Audience is In production, independently of branding
@@ -166,11 +170,13 @@ SPA refresh model.
 - Saved a Web callback on **Lumafoil Cloud Storage** for OneDrive and created
   the approved 180-day client secret. The console gives an expiration date of
   **2027-03-11**; replace this secret before expiry to preserve refresh and new
-  connections. Existing SPA callbacks remain until the combined cutover.
+  connections. After deploying the server flow, the two retired SPA callbacks
+  were removed and the saved authentication table showed only the Web callback
+  `https://lumafoil.com/api/cloud/onedrive/callback`. No separate sign-in app changed.
 - Captured each new credential through encrypted transfer and protected local
   staging. Generated an independent cryptographically random cloud-token
   encryption key. None of these values is in the repository or documentation;
-  final binding to Cloudflare Worker secrets is still pending.
+  all four were subsequently accepted as production Worker secret bindings.
 
 Microsoft's console reports that this application lacks a verified publisher.
 The owner confirmed on 2026-09-12 that no verified Microsoft Partner Center
@@ -205,9 +211,10 @@ user back to the existing Lumafoil window.
 
 The release owner's read-only production Worker overview check on 2026-09-12
 explicitly showed Workers Logs and Workers Traces disabled. The canonical custom
-domain remains configured, and the `workers.dev` endpoint is disabled. This describes the
-existing deployment; verify those controls again after the combined release,
-and verify that no external Tail Worker retains raw request metadata.
+domain remains configured, and the `workers.dev` endpoint is disabled. The
+release owner repeated this readback after deployment: the new version received
+100% of traffic with Logs/Traces and `workers.dev` still disabled. External Tail
+Workers remain a separate request-metadata boundary.
 Do not use live tail while processing real OAuth callbacks. Zone-level HTTP
 request logs are separate controls: remove URL queries and bearer-link paths
 from any such external export or disable that job for this application.

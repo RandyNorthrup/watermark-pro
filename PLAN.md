@@ -14,7 +14,8 @@ Lumafoil is an MIT-licensed web application for watermarking photos, videos and
 PDF documents. The hosted service is invitation-only; each admitted user gets
 a private workspace and a unique invitation link. The source is available free
 on GitHub for self-hosting. Cloudflare Workers at `lumafoil.com` is the target
-production origin; cutover and full release certification remain open in M19.
+production origin; full release certification retains the explicit M19 provider
+verification and owner-deferred performance boundaries.
 
 ### Active goal — revised 2026-09-12
 
@@ -128,9 +129,8 @@ nonintersecting curved glyph sectors and separated multiline bounds. Letter
 Spacing and Curve each reset to zero through the shared reset control. Focused
 verification: 29 rendering tests and four designer/segmentation tests passed.
 The original renderer failed all five new transformed-pixel containment cases;
-restoring the fix passed all eight layout/curve checks. This is local evidence,
-not deployed behavior or full release certification. These corrections remain
-inside the combined final delivery below.
+restoring the fix passed all eight layout/curve checks. This was local evidence
+at implementation; the corrections are now included in the deployment below.
 
 Earlier media integration evidence (2026-09-12): inline document/video tools and eighteen
 common templates are implemented locally. Native PDF checks retain searchable
@@ -143,15 +143,16 @@ visibility/designer controls: 19 tests. These were focused checks, not full UI o
 release certification; the combined source, translation, guidance and E2E evidence
 below supersedes this intermediate checkpoint. The new PDF reader adds an exact pdfjs-dist dependency, versioned local
 worker/font/decoder assets and narrowly scoped WASM compilation in CSP; it does not
-execute PDF actions or XFA. No part of this bundle has been pushed or deployed.
+execute PDF actions or XFA. This intermediate checkpoint preceded deployment;
+the production receipt below records the completed cutover.
 
 Provider preparation (2026-09-12): all three server callbacks are saved. The
 owner-approved Full Dropbox registration has file/sharing scopes and both rose
 brand icons. Google Audience independently reports In production. Google and
 Microsoft cloud credentials were generated with specific owner approval, and an
-independent cloud-token encryption key was generated. Credentials remain in
-protected local staging for the combined release; no production binding has
-changed. The Microsoft secret expires on 2027-03-11. External work/school consent
+independent cloud-token encryption key was generated. Credentials were protected
+in local staging before the combined release; all four new production secret
+bindings are now accepted. The Microsoft secret expires on 2027-03-11. External work/school consent
 may require tenant-admin approval because Microsoft publisher verification is
 still incomplete. The owner confirmed no verified Partner Center/MPN account is
 available, so publisher verification is deferred; disclose tenant-admin consent
@@ -169,8 +170,8 @@ bulk, folder and cloud workflows. The final built-browser guidance proof passed
 on desktop, Android and iPhone for one visible tip, conflicting-menu/modal
 suppression, permanent cross-device claims and account isolation, with native
 Android swipe also verified (`temp/guidance-qa/report.json`). The thirteen topic
-identities remain stable. This is verified local behavior, still awaiting the
-single combined deployment.
+identities remain stable. This verified implementation is now included in the
+single combined deployment below.
 
 Delivery correction (2026-09-12): the owner requested completing all remaining
 work before shipping, to avoid repeated release overhead. Do not deploy or push
@@ -184,6 +185,23 @@ Maintain accurate implemented, deployed and verified distinctions in M19 and the
 changelog. The active goal remains unfinished until the full scope is satisfied.
 
 ### Current Release Evidence — 2026-09-12
+
+The combined changes are deployed at `https://lumafoil.com` from source commit
+`0d764ecf9c88a002ac41fde24ca0cc02fba7a188`, Worker version
+`fbbf320b-9041-4801-8373-f8d7fb022191`. The protected canonical deploy exited 0,
+applied migrations 0013–0017, verified the remote database current and uploaded
+the artifact only after its build and eight-value publication checks passed.
+All four new cloud secret bindings were accepted. Twelve hosted public checks
+passed, and a fresh authenticated browser restored the original photo with the
+new Image controls and available cloud Connect actions. Read-only post-deployment
+checks preserved the sole Owner, no Admins and existing accounts/content.
+Microsoft's cloud app now retains only the new Web callback; its separate
+account sign-in registration was unchanged. See the
+[production receipt](docs/verification/m19/deployment-2026-09-12.md).
+This record accompanies publication of the deployed source; remote-HEAD
+verification is separate. The owner requested stopping for the night; the
+pending Google attempt was cancelled without a grant. Live provider round trips
+and performance work remain for the next session.
 
 The canonical `npm run quality` passed with exit 0 in
 `temp/quality-staged-release.log`: 2,742 unit/browser tests, 61 real workerd tests,
@@ -237,12 +255,13 @@ contains the compact [audit receipt](docs/verification/m19/audit-inventory.md) a
 [per-file inventory](docs/verification/m19/screenshot-inventory.json), preserving
 the publication byte budget. Account overflow and harness navigation corrections
 retain their original failed-run evidence. Live provider
-connect/load/save/share/revoke/refresh journeys, final production configuration,
-migrations/deployment and hosted checks remain open. Microsoft publisher
+connect/load/save/share/revoke/refresh journeys remain unverified; deployment,
+migrations and the scoped hosted checks are completed above. Microsoft publisher
 verification remains explicitly deferred because no verified Partner Center/MPN
 account is available; some work/school tenants require their administrator's
 approval. Performance/Lighthouse work remains after launch as already authorized.
-No part of the pending bundle is declared shipped by these local results.
+The deployment receipt establishes shipped behavior independently of these
+earlier local results; it does not close the remaining provider/performance scope.
 
 ### Required capabilities (from the product brief)
 
@@ -944,7 +963,7 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   workspace. Owners must be able to grant View/Edit through a share invitation
   link, an invite email, or a silent addition of an existing user. These grants
   must never apply to another workspace or expose an account's unrelated content.
-- **Unified media workflow request (2026-09-12, pending implementation):** rename
+- **Unified media workflow request (2026-09-12, implemented and deployed):** rename
   the visible Editor tool to Image; preserve working image editing and existing
   links. Documents needs the same inline watermark controls beside a document
   reader/page preview. Video needs inline watermark editing beside a scrubbable

@@ -7,6 +7,23 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Production Deployment — 2026-09-12
+
+- Deployed source commit `0d764ec` to `lumafoil.com` as Worker version
+  `fbbf320b-9041-4801-8373-f8d7fb022191`. The protected deployment applied
+  migrations 0013–0017, confirmed the remote database current, accepted all four
+  cloud secret bindings and passed the build/publication checks.
+- Twelve hosted public checks passed. A fresh browser restored the original
+  photo and showed the new Image controls and available cloud Connect actions.
+  Read-only checks preserved the sole Owner, no Admins and existing content.
+  Post-deployment readback confirmed the new version serving traffic with
+  Workers Logs/Traces disabled. Microsoft Cloud Storage now retains only the Web
+  server callback; its separate sign-in registration was unchanged.
+- This receipt accompanies publication of the deployed source; remote-HEAD
+  verification is separate. At the owner's request to stop for the night, the
+  pending Google attempt was cancelled without granting access. All providers
+  remained Not Connected; live provider and performance checks resume next session.
+
 ### Local Release Verification
 
 - The canonical quality command passed with 2,742 unit/browser tests, 61 real
@@ -28,9 +45,8 @@ what was planned; superseded entries stay.
   invocations; original failures remain preserved. Every selected file was
   hashed and matched before/after archiving; raw evidence stays in ignored
   local storage and a compact per-file inventory keeps the publication budget.
-- This bundle remains unreleased. Live cloud-provider journeys,
-  final production configuration and hosted deployment
-  verification remain separate evidence. Performance work stays deferred until
+- Production deployment and scoped hosted checks are recorded above.
+  Live cloud-provider journeys remain unverified. Performance work stays deferred until
   after launch. Microsoft publisher verification is deferred because the owner
   has no verified Partner Center/MPN account; work/school tenants may require
   administrator approval, as disclosed in the cloud UI and landing copy.
@@ -50,7 +66,7 @@ what was planned; superseded entries stay.
   light/dark Image editors, a font dropdown with recent choices and rendered
   typefaces, sticker tiles, a generated QR watermark, and fitted template tiles.
   Responsive image variants are regenerated from those captures. The approved
-  rose-glass layout remains in place; these assets await the combined deployment.
+  rose-glass layout remains in place; these assets are included in the combined deployment.
 
 - Reconciled the first-use guide after the media, folder and canvas layout work:
   instructions now explain templates, named saves with folders, selection handles,

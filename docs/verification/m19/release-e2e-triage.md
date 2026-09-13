@@ -94,7 +94,8 @@ The complete canonical quality command and staged-source SAST also passed, as
 recorded in [quality verification](quality.md). The separate consolidated
 screenshot/axe inventory also closes all 752 required combinations with 800 PNGs;
 its run distinctions are retained in [audit verification](audit-inventory.md).
-Live provider journeys and hosted migration/deployment verification remain open.
+The [production deployment](deployment-2026-09-12.md), migrations and twelve hosted
+public checks subsequently passed. Live provider journeys remain unverified.
 Lighthouse/performance work remains deferred
 until after launch under the owner's existing direction. This record does not
-claim the pending bundle has shipped.
+substitute local evidence for the separately recorded production deployment.
