@@ -16,6 +16,7 @@ function stubMatchMedia(isMatch: boolean): void {
 
 describe('isCaptureSupported', () => {
   it('is false when matchMedia is unavailable', () => {
+    vi.stubGlobal('matchMedia', undefined)
     expect(typeof window.matchMedia).toBe('undefined')
     expect(isCaptureSupported()).toBe(false)
   })

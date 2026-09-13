@@ -16,7 +16,8 @@ import {
 } from './test-support/fixtures'
 import { WatermarkWorker } from './worker-client'
 import { IDENTITY_ORIENTATION, type Orientation } from '../../shared/adjustments'
-import { DEFAULT_STYLE, type TextEffect, type WatermarkSpec } from '../../shared/watermark'
+import { DEFAULT_STYLE, SHAPES, type TextEffect, type WatermarkSpec } from '../../shared/watermark'
+import { SHAPE_CATALOGUE } from '../shapes/catalogue'
 
 const WHITE: [number, number, number] = [255, 255, 255]
 const BLACK: [number, number, number] = [0, 0, 0]
@@ -496,6 +497,27 @@ async function centreInk(effect: TextEffect): Promise<number> {
 }
 
 describe('applyWatermark M12', () => {
+  it('renders all twenty shape silhouettes distinctly without painting outside the mark', async () => {
+    const silhouettes = new Set<string>()
+    expect(SHAPES).toHaveLength(20)
+    for (const shape of SHAPES) {
+      const result = await applyWatermark(
+        {
+          source: await splitBitmap(180, 180, '#ffffff', '#ffffff'),
+          marks: [{ spec: { ...shapeSpec, shape, aspect: SHAPE_CATALOGUE[shape].aspect } }],
+          output: { format: 'image/png', quality: 1 },
+        },
+        offscreenBackend,
+      )
+      const pixels = await pixelsOf(result.blob)
+      expect(countRed(pixels), shape).toBeGreaterThan(100)
+      expect(isRed(colourAt(pixels, 90, 90)), shape).toBe(true)
+      expect(isRed(colourAt(pixels, 5, 5)), shape).toBe(false)
+      silhouettes.add(pixels.data.join(','))
+    }
+    expect(silhouettes.size).toBe(20)
+  })
+
   it('draws an ellipse that leaves its bounding-box corners clear', async () => {
     const result = await applyWatermark(
       {

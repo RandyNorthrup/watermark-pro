@@ -18,6 +18,10 @@ not imply sponsorship or endorsement.
 - `github-dark-on-light.svg` and `github-light-on-dark.svg` are the unmodified
   Invertocat variants from GitHub's official
   [logo download](https://brand.github.com/foundations/logo).
+- `paypal.svg` is the unmodified colour monogram served by PayPal's
+  [official asset CDN](https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-mark-color.svg).
+  It identifies the owner's hosted donation link. The app serves this static
+  image locally and loads no PayPal script or frame before the user follows it.
 
 Google, Microsoft, OneDrive, and Dropbox marks remain the property of their
 respective owners.

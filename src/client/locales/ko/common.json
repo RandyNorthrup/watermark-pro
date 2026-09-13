@@ -5,7 +5,7 @@
   "shell": {
     "nav": {
       "library": "라이브러리",
-      "editor": "편집기",
+      "editor": "이미지",
       "bulk": "일괄",
       "video": "동영상",
       "documents": "문서",
@@ -22,18 +22,22 @@
     "toolsNav": "도구",
     "signOut": "로그아웃",
     "accountMenu": "{{name}}의 계정 메뉴",
-    "menuDescription": "조직을 전환하거나 Lumafoil의 어느 부분으로든 이동하세요.",
-    "switchOrganizationFor": "조직: {{name}}. 조직 전환",
-    "chooseOrganization": "조직 선택",
-    "chooseOrganizationShort": "조직 선택",
-    "organizations": "조직",
-    "newOrganization": "새 조직",
+    "menuDescription": "워크스페이스를 전환하거나 Lumafoil의 어느 부분으로든 이동하세요.",
+    "switchOrganizationFor": "워크스페이스: {{name}}. 워크스페이스 전환",
+    "chooseOrganization": "워크스페이스 선택",
+    "chooseOrganizationShort": "워크스페이스 선택",
+    "organizations": "워크스페이스",
+    "newOrganization": "새 워크스페이스",
     "theme": {
       "system": "테마: 시스템 설정에 따름. 밝게로 전환",
       "light": "테마: 밝게. 어둡게로 전환",
       "dark": "테마: 어둡게. 시스템 설정으로 전환"
     },
-    "closeMenu": "메뉴 닫기"
+    "closeMenu": "메뉴 닫기",
+    "manageAccess": "액세스 관리",
+    "supportPrompt": "Lumafoil이 도움이 된다면 후원을 고려해 주세요.",
+    "donate": "후원",
+    "supportPayPal": "PayPal로 후원 (새 탭)"
   },
   "auth": {
     "backToSignIn": "로그인으로 돌아가기",
@@ -102,11 +106,11 @@
     "pendingInvitations_other": "대기 중인 초대 {{count}}건.",
     "manageMembers": "멤버 관리",
     "auditLog": "감사 로그",
-    "auditDescription": "모든 멤버십 및 조직 변경 사항이 수행한 사람과 시각과 함께 기록됩니다.",
+    "auditDescription": "모든 멤버십 및 워크스페이스 변경 사항이 수행한 사람과 시각과 함께 기록됩니다.",
     "viewAuditLog": "감사 로그 보기"
   },
   "library": {
-    "orgRequired": "워터마크 라이브러리를 만들려면 조직을 만들거나 참여하세요.",
+    "orgRequired": "워터마크 라이브러리를 만들려면 워크스페이스를 만들거나 참여하세요.",
     "heading": "워터마크 라이브러리",
     "description": "{{name}}에 저장된 워터마크입니다. 한 파일 또는 전체 묶음에 적용하세요.",
     "export": "내보내기",
@@ -118,7 +122,7 @@
     "loadErrorTitle": "라이브러리를 불러올 수 없습니다",
     "empty": "아직 프리셋이 없습니다. 프리셋은 마크(텍스트, 심볼 또는 로고)와 배치, 대비, 스타일 설정을 결합한 것입니다.",
     "createFirst": "첫 프리셋 만들기",
-    "orgRequiredShort": "먼저 조직을 만들거나 참여하세요.",
+    "orgRequiredShort": "먼저 워크스페이스를 만들거나 참여하세요.",
     "loadingPreset": "프리셋 불러오는 중",
     "loadPresetErrorTitle": "프리셋을 불러올 수 없습니다",
     "presetGone": "해당 프리셋이 더 이상 존재하지 않습니다.",
@@ -141,12 +145,6 @@
       "logo": "로고",
       "qr": "{{content}}에 대한 QR 코드",
       "sticker": "스티커 {{name}}"
-    },
-    "shape": {
-      "rectangle": "사각형",
-      "roundedRectangle": "둥근 사각형",
-      "ellipse": "타원",
-      "line": "선"
     },
     "placement": {
       "smart": "스마트 배치",
@@ -175,12 +173,16 @@
     "notAnImage": "이 파일은 브라우저에서 읽을 수 있는 이미지가 아닙니다.",
     "text": {
       "label": "텍스트",
-      "hint": "최대 {{lines}}줄에 걸쳐 최대 {{max}}자까지. 날짜나 카메라처럼 사진마다 채워지는 토큰은 \"세부정보 삽입\"을 사용하세요. {location}은(는) 사진의 GPS 위치를 사진 위에 표시합니다."
+      "hint": "최대 {{lines}}줄에 걸쳐 최대 {{max}}자까지. 날짜나 카메라처럼 사진마다 채워지는 토큰은 \"세부정보 삽입\"을 사용하세요. {location}은(는) 사진의 GPS 위치를 사진 위에 표시합니다.",
+      "symbols": "텍스트 기호",
+      "insertSymbol": "{{symbol}} 삽입",
+      "insertLimit": "글자 수 한도에 도달했습니다. 바꿀 텍스트를 선택하거나 일부 문자를 지워 주세요."
     },
     "qr": {
       "content": "QR 코드 내용",
       "hint": "보통은 링크입니다. 최대 {{max}}자까지 가능하며, 스캔이 되도록 코드는 항상 밝은 바탕에 어둡게 표시됩니다.",
-      "savedHint": "각 QR 코드에 이름을 지정하고 따로 저장하세요. 라이브러리에서 다시 사용하거나 서로 다른 링크의 코드를 여러 개 보관할 수 있습니다. 공유하기 전에 실제 사용 크기로 내보낸 이미지를 테스트하세요."
+      "savedHint": "각 QR 코드에 이름을 지정하고 따로 저장하세요. 라이브러리에서 다시 사용하거나 서로 다른 링크의 코드를 여러 개 보관할 수 있습니다. 공유하기 전에 실제 사용 크기로 내보낸 이미지를 테스트하세요.",
+      "shortLabel": "QR"
     },
     "tokens": {
       "menu": "세부정보 삽입",
@@ -204,12 +206,11 @@
     "font": {
       "family": "글꼴",
       "weight": "굵기",
-      "specimen": "다람쥐 헌 쳇바퀴에 타고파",
       "search": "글꼴 검색",
-      "resultCount": "글꼴 {{count}}개",
       "recent": "최근 사용",
-      "all": "모든 글꼴",
-      "license": "글꼴 라이선스"
+      "license": "글꼴 라이선스",
+      "previewError": "일부 글꼴 미리보기를 불러오지 못했습니다. 연결된 상태에서 목록을 다시 열어 주세요.",
+      "empty": "일치하는 글꼴 없음"
     },
     "symbol": {
       "icons": "아이콘",
@@ -231,7 +232,23 @@
       "fillOpacity": "채우기 불투명도",
       "strokeWidth": "획 두께",
       "customStrokeColour": "사용자 지정 획 색상",
-      "strokeColour": "획 색상"
+      "strokeColour": "획 색상",
+      "triangle": "삼각형",
+      "diamond": "마름모",
+      "pentagon": "오각형",
+      "hexagon": "육각형",
+      "octagon": "팔각형",
+      "star": "별",
+      "starburst": "광채",
+      "heart": "하트",
+      "shield": "방패",
+      "speechBubble": "말풍선",
+      "arrowLeft": "왼쪽 화살표",
+      "arrowRight": "오른쪽 화살표",
+      "arrowUp": "위쪽 화살표",
+      "arrowDown": "아래쪽 화살표",
+      "doubleArrow": "양방향 화살표",
+      "plus": "십자"
     },
     "effects": {
       "letterSpacing": "자간",
@@ -376,11 +393,12 @@
       "license": "Fluent Emoji · MIT 라이선스",
       "usage": "상업적 사용이 허용됩니다. 재배포할 때 포함된 아트워크 라이선스 고지를 유지하세요.",
       "guide": "아트워크 라이선스 안내"
-    }
+    },
+    "saveNameHint": "이 프리셋의 이름을 정하세요."
   },
   "editor": {
-    "orgRequired": "편집기를 사용하려면 조직을 만들거나 참여하세요.",
-    "heading": "편집기",
+    "orgRequired": "이미지를 편집하려면 워크스페이스를 만들거나 참여하세요.",
+    "heading": "이미지",
     "description": "기기에서 프리셋을 선택하고 위치, 자르기, 크기를 조정하세요. 결과를 다운로드하거나 갤러리 또는 클라우드 저장을 선택할 수 있습니다.",
     "tabs": {
       "presets": "프리셋",
@@ -411,7 +429,8 @@
       "fit": "맞춤",
       "actualSize": "100%",
       "grid": "그리드",
-      "gridSpacing": "그리드 간격"
+      "gridSpacing": "그리드 간격",
+      "snapToGrid": "격자에 맞춤"
     },
     "altCrop": "자르기 프레임이 있는 사진",
     "altWatermark": "워터마크가 적용된 사진",
@@ -531,27 +550,28 @@
       "download": "다운로드",
       "share": "공유",
       "saveToGallery": "갤러리에 저장",
-      "savedToFolder": "{{provider}}의 “{{folder}}” 폴더에 저장되었습니다."
+      "savedToFolder": "{{provider}}에 저장했습니다."
     },
     "mark": {
       "position": "워터마크 위치. 드래그하여 이동(여백, 3등분선, 가운데에 스냅됨; Alt을 누르면 자유롭게 배치), 손가락을 오므려 크기 조정, 비틀어 회전; 화살표 키로 미세 조정, 플러스와 마이너스로 크기 조정, 대괄호로 회전.",
       "rotate": "워터마크 회전",
       "resize": "워터마크 크기 조정"
-    }
+    },
+    "newWorkspace": "새로 만들기"
   },
   "bulk": {
-    "orgRequired": "일괄로 워터마킹하려면 조직을 만들거나 참여하세요.",
+    "orgRequired": "일괄로 워터마킹하려면 워크스페이스를 만들거나 참여하세요.",
     "heading": "일괄 워터마킹",
-    "description": "촬영본 전체에 프리셋 하나를 적용하세요. 사진은 브라우저에서 병렬로 처리되어 ZIP으로 또는 하나씩 다운로드됩니다.",
+    "description": "이미지, PDF, 동영상에 한 번에 워터마크를 적용하세요. 결과를 개별 다운로드하거나 ZIP으로 모아 받을 수 있습니다.",
     "emptyHint": "일괄 작업에 적용하세요.",
-    "addPhotos": "사진 추가",
+    "addPhotos": "파일 추가",
     "addFolder": "폴더 추가",
-    "dropHint": "여기에 사진이나 폴더를 놓거나,",
+    "dropHint": "파일이나 폴더를 여기에 끌어다 놓거나",
     "fromLink": "링크에서",
-    "capacity_other": "일괄 작업당 최대 {{max}}장. 처리는 브라우저에서 워커 {{count}}개를 사용해 이루어집니다.",
-    "skipped_other": "{{count}}개 파일 건너뜀: 이미지가 아님",
+    "capacity_other": "한 번에 최대 {{max}}개 파일. 이미지, PDF, 동영상은 기기에서 처리됩니다.",
+    "skipped_other": "건너뛴 파일: {{count}}. 지원하지 않는 형식입니다.",
     "importErrorTitle": "클라우드에서 가져올 수 없습니다",
-    "photoCount_other": "사진 {{count}}장",
+    "photoCount_other": "파일 {{count}}개",
     "clearList": "목록 지우기",
     "batchProgress": "일괄 작업 진행 상황",
     "progress": {
@@ -561,7 +581,7 @@
       "rate": " · {{seconds}}초 만에 초당 {{rate}}장",
       "end": "."
     },
-    "photosList": "이 일괄 작업의 사진",
+    "photosList": "이 배치의 파일",
     "custom": "사용자 지정",
     "selected": "선택됨",
     "status": {
@@ -605,7 +625,7 @@
     "savedProgress": "{{total}}개 중 {{done}}개 저장됨",
     "allSaved": "모두 <galleryLink>갤러리</galleryLink>에 저장되었습니다.",
     "someSaved": "{{failed}}개는 저장할 수 없었습니다(저장 공간 할당량 또는 제한). 나머지는 <galleryLink>갤러리</galleryLink>에 있습니다.",
-    "savedToCloud_other": "{{count}}장을 {{provider}}의 “{{folder}}” 폴더에 저장했습니다.",
+    "savedToCloud_other": "파일 {{count}}개를 {{provider}}에 저장했습니다.",
     "privacyNote": "스마트 배치와 자동 대비는 사진마다 개별적으로 계산됩니다. 아무것도 업로드되지 않습니다.",
     "watch": {
       "label": "폴더 감시",
@@ -614,14 +634,19 @@
       "hint": "입력 폴더와 출력 폴더를 선택하세요; 입력 폴더에 새로 놓인 사진은 선택한 프리셋으로 워터마킹되어 출력 폴더에 기록됩니다. 이 페이지가 열려 있는 동안에만 작동합니다.",
       "wrote": "{{name}} 기록됨",
       "failed": "{{name}} 실패: {{error}}"
+    },
+    "media": {
+      "imageSettingsHint": "이미지 형식, 크기, 조정 및 보이지 않는 워터마크는 사진에만 적용됩니다. PDF는 원본 페이지를 유지합니다.",
+      "videoOutput": "동영상 출력",
+      "galleryHint": "갤러리에는 이미지만 저장됩니다. 문서와 동영상은 다운로드하거나 클라우드 저장소에 저장하세요."
     }
   },
   "gallery": {
-    "orgRequired": "갤러리를 유지하려면 조직을 만들거나 참여하세요.",
+    "orgRequired": "갤러리를 유지하려면 워크스페이스를 만들거나 참여하세요.",
     "heading": "갤러리",
     "description": "{{name}}에 저장된 워터마크 사진입니다. 검색, 필터, 다운로드 또는 삭제하세요.",
     "usage_other": "사진 {{count}}장 · {{max}} 중 {{used}}",
-    "maxCount": "조직당 최대 {{count}}장",
+    "maxCount": "워크스페이스당 최대 {{count}}장",
     "storageUsed": "사용된 저장 공간",
     "storagePercent": "저장 공간 {{percent}}% 사용됨",
     "checkPhoto": "사진 선택",
@@ -670,10 +695,12 @@
     "manageLinks": "공유에서 링크를 관리하세요.",
     "linkCopied": "링크가 클립보드에 복사되었습니다.",
     "linkShared": "링크가 공유되었습니다.",
-    "copyLink": "링크 복사"
+    "copyLink": "링크 복사",
+    "shareSyncPending": "선택한 사진의 동기화가 완료된 후 링크를 만드세요.",
+    "shareSyncBlocked": "선택한 사진의 동기화 문제를 해결한 후 링크를 만드세요."
   },
   "shares": {
-    "orgRequired": "사진을 공유하려면 조직을 만들거나 참여하세요.",
+    "orgRequired": "사진을 공유하려면 워크스페이스를 만들거나 참여하세요.",
     "noPermission": "역할에 공유 권한이 포함되어 있지 않습니다.",
     "heading": "공유",
     "description": "{{name}} 외부 사람들이 선택된 사진을 보고 다운로드할 수 있게 하는 링크입니다. 링크를 해제하면 즉시 중단됩니다.",
@@ -703,7 +730,7 @@
     "sectionsLabel": "관리 섹션",
     "tabs": {
       "users": "사용자",
-      "organizations": "조직",
+      "organizations": "워크스페이스",
       "audit": "감사 기록",
       "health": "상태 점검",
       "clientErrors": "클라이언트 오류"
@@ -754,11 +781,11 @@
     "reasonLabel": "사유",
     "cancel": "취소",
     "banConfirm": "사용자 차단",
-    "loadingOrganizations": "조직 불러오는 중",
-    "organizationsErrorTitle": "조직을 불러올 수 없습니다",
-    "organizationsTable": "조직, 최신순",
+    "loadingOrganizations": "워크스페이스 불러오는 중",
+    "organizationsErrorTitle": "워크스페이스를 불러올 수 없습니다",
+    "organizationsTable": "워크스페이스, 최신순",
     "th": {
-      "organization": "조직",
+      "organization": "워크스페이스",
       "members": "멤버",
       "photos": "사진",
       "storage": "저장 공간",
@@ -766,36 +793,25 @@
     },
     "loadingAudit": "감사 기록 불러오는 중",
     "auditErrorTitle": "감사 기록을 불러올 수 없습니다",
-    "auditCaption": "모든 조직의 감사 항목, 최신순",
-    "auditDetailHeading": "조직",
+    "auditCaption": "모든 워크스페이스의 감사 항목, 최신순",
+    "auditDetailHeading": "워크스페이스",
     "platform": "플랫폼",
     "siteRole": "사이트 역할: {{role}}",
     "roleFor": "{{email}}의 사이트 역할",
     "ownerProtected": "소유자 계정은 보호됩니다."
   },
   "members": {
-    "orgRequired": "멤버를 관리하려면 조직을 만들거나 참여하세요.",
-    "heading": "멤버",
-    "description": "{{name}}의 사람들과 각자가 할 수 있는 일입니다.",
-    "count_other": "멤버 {{count}}명",
+    "orgRequired": "멤버를 관리하려면 워크스페이스를 만들거나 참여하세요.",
     "pendingInvitations": "대기 중인 초대",
-    "inviteHeading": "사람 초대",
     "emailLabel": "이메일",
-    "roleLabel": "역할",
-    "sendInvitation": "초대 보내기",
-    "invitationSent": "{{email}}에 초대를 보냈습니다.",
     "you": "(나)",
     "roleFor": "{{name}}의 역할",
-    "remove": "제거",
-    "removeMember": "{{name}} 제거",
-    "invitedAs": "초대된 역할",
-    "cancel": "취소",
     "cancelInvitation": "{{email}}에 대한 초대 취소"
   },
   "audit": {
     "heading": "감사 로그",
     "description": "{{name}}의 가장 최근 변경 사항입니다. 소유자와 관리자가 이 페이지를 볼 수 있습니다.",
-    "thisOrganization": "이 조직",
+    "thisOrganization": "이 워크스페이스",
     "loading": "감사 로그 불러오는 중",
     "loadErrorTitle": "감사 로그를 불러올 수 없습니다",
     "noAccess": "역할에 감사 접근 권한이 포함되어 있지 않습니다.",
@@ -807,14 +823,14 @@
     "action": "작업"
   },
   "organizations": {
-    "firstTitle": "첫 조직 만들기",
-    "newTitle": "새 조직",
+    "firstTitle": "첫 워크스페이스 만들기",
+    "newTitle": "새 워크스페이스",
     "description": "워터마크와 사진을 위한 별도 작업 공간을 만드세요. 명시적으로 멤버를 초대하기 전까지 비공개입니다.",
-    "createFailed": "조직을 만들 수 없습니다.",
+    "createFailed": "워크스페이스를 만들 수 없습니다.",
     "nameLabel": "이름",
     "slugLabel": "URL 식별자",
     "slugHint": "소문자, 숫자, 하이픈. 링크에 사용되며 고유해야 합니다.",
-    "submit": "조직 만들기"
+    "submit": "워크스페이스 만들기"
   },
   "import": {
     "takePhoto": "사진 촬영",
@@ -827,19 +843,6 @@
       "errorTitle": "해당 링크를 가져올 수 없습니다",
       "fetch": "가져오기"
     },
-    "onedrive": {
-      "title": "OneDrive에서 가져오기",
-      "name": "OneDrive",
-      "description": "Microsoft에 로그인한 다음 추가할 사진을 선택하세요.",
-      "loading": "OneDrive 불러오는 중",
-      "empty": "여기에 폴더나 이미지가 없습니다.",
-      "folderPath": "폴더 경로",
-      "errorTitle": "OneDrive 가져오기 실패",
-      "tryAgain": "다시 시도",
-      "noneSelected": "선택된 사진 없음",
-      "selectedCount": "{{count}}개 선택됨",
-      "addSelected": "선택 항목 추가"
-    },
     "cloudSaved": "클라우드에 저장된 파일 ({{total}}개)",
     "cloudSavedTitle": "클라우드에 저장된 파일",
     "cloudSharingHint": "저장만으로 공개 링크가 만들어지지는 않습니다. 링크를 가진 누구나 파일을 볼 수 있게 하려는 경우에만 만드세요. 기존 폴더 권한은 계속 적용됩니다. 다른 접근 권한은 제공업체에서 관리하세요.",
@@ -850,39 +853,18 @@
     "copyLink": "링크 복사"
   },
   "video": {
-    "orgRequired": "동영상을 워터마킹하려면 조직을 만들거나 참여하세요.",
+    "orgRequired": "동영상을 워터마킹하려면 워크스페이스를 만들거나 참여하세요.",
     "heading": "동영상 워터마킹",
-    "description": "동영상 전체에 프리셋을 적용하세요. 모든 프레임이 브라우저에서 워터마킹되고 오디오는 유지되며, 아무것도 업로드되지 않습니다.",
+    "description": "동영상을 미리 보고 다양한 시점에 워터마크를 배치하고 페이드 효과를 추가한 다음 오디오와 함께 내보내세요.",
     "checkingSupport": "동영상 지원 확인 중",
     "unsupportedTitle": "이 브라우저에서는 동영상이 지원되지 않습니다",
     "unsupportedBody": "이 브라우저는 동영상을 인코딩할 수 없습니다. Chrome, Edge 또는 Safari 17 이상에서 가능합니다.",
-    "emptyHint": "동영상에 적용하세요.",
     "addVideo": "동영상 추가",
     "dropHint": "여기에 동영상 하나를 놓거나,",
-    "formatsHint": "MP4, WebM 또는 MOV. 모든 작업은 브라우저에서 이루어지며 아무것도 업로드되지 않습니다. 갤러리는 아직 동영상을 지원하지 않습니다.",
-    "fileMeta": "{{width}} × {{height}} px · {{duration}}초 · {{size}} · {{audio}}",
-    "choosePresetPreview": "프레임에서 워터마크를 미리 보려면 프리셋을 선택하세요.",
-    "outputSize": "출력 {{width}} × {{height}} px.",
     "transcodingProgress": "트랜스코딩 진행 상황",
-    "progress": {
-      "noEta": "프레임 {{frame}} · {{percent}}%",
-      "withEta": "프레임 {{frame}} · {{percent}}% · 약 {{seconds}}초 남음"
-    },
+    "progress": {},
     "cancel": "취소",
-    "cancelled": "트랜스코딩이 취소되었습니다.",
-    "runErrorTitle": "동영상을 워터마킹할 수 없습니다",
-    "download": "{{fileName}} 다운로드",
     "share": "공유",
-    "presets": "프리셋",
-    "placement": "배치",
-    "placementOptions": {
-      "smart": "스마트",
-      "bottomRight": "오른쪽 아래",
-      "bottomLeft": "왼쪽 아래",
-      "topRight": "오른쪽 위",
-      "topLeft": "왼쪽 위",
-      "center": "가운데"
-    },
     "quality": "품질",
     "qualityOptions": {
       "low": "낮음",
@@ -895,37 +877,50 @@
       "fit1080p": "1080p에 맞춤",
       "fit720p": "720p에 맞춤"
     },
-    "watermarking": "워터마킹 중…",
-    "watermarkVideo": "동영상 워터마킹",
-    "fixedPlacementNote": "워터마크는 동영상 전체에 하나의 고정된 배치를 유지합니다. 오디오는 출력에 맞으면 그대로 복사되고, 그렇지 않으면 다시 인코딩됩니다.",
-    "renderingPreview": "미리보기 렌더링 중",
-    "previewAlt": "동영상 한 프레임에 적용된 워터마크"
+    "previewAlt": "동영상 한 프레임에 적용된 워터마크",
+    "timeline": {
+      "heading": "타이밍과 움직임",
+      "play": "재생",
+      "pause": "일시 정지",
+      "playhead": "재생 위치",
+      "start": "시작",
+      "end": "끝",
+      "fadeIn": "페이드 인",
+      "fadeOut": "페이드 아웃",
+      "keyframes": "키프레임",
+      "addKeyframe": "여기에 키프레임 추가",
+      "updateKeyframe": "여기 키프레임 업데이트",
+      "removeKeyframe": "{{time}}의 키프레임 제거",
+      "hint": "키프레임을 추가하고 다른 시점으로 이동한 다음 워터마크를 끌거나 크기를 조절하거나 회전하세요. Lumafoil이 키프레임 사이의 움직임을 만듭니다.",
+      "playbackFailed": "이 브라우저에서 선택한 동영상을 재생하지 못했습니다.",
+      "chooseVideo": "먼저 동영상을 열고 유효한 워터마크를 추가하세요.",
+      "waitPreview": "워터마크 미리 보기가 표시된 후 키프레임을 추가하세요.",
+      "changed": "내보내는 동안 동영상 또는 워터마크가 변경되었습니다. 현재 편집 내용을 반영하려면 다시 내보내세요.",
+      "download": "동영상 다운로드",
+      "cloudSaved": "워터마크가 적용된 동영상을 클라우드 저장소에 저장했습니다."
+    }
   },
   "documents": {
-    "orgRequired": "문서를 워터마킹하려면 조직을 만들거나 참여하세요.",
+    "orgRequired": "문서를 워터마킹하려면 워크스페이스를 만들거나 참여하세요.",
     "heading": "문서",
-    "description": "PDF의 모든 페이지에 프리셋을 찍으세요. 파일은 브라우저에서 처리되어 하나씩 또는 ZIP으로 다운로드됩니다.",
-    "emptyHint": "문서에 워터마크를 적용하세요.",
-    "addPdfs": "PDF 추가",
-    "dropHint": "여기에 PDF를 놓거나,",
-    "filesHint": "최대 {{max}}개 파일, 각 {{size}}. 모든 페이지가 브라우저에서 워터마킹되며 아무것도 업로드되지 않습니다.",
-    "skipped_other": "{{count}}개 파일 건너뜀: PDF가 아니거나 {{max}} 초과.",
-    "fileCount_other": "문서 {{count}}개",
-    "clearList": "목록 지우기",
-    "watermarkingProgress": "워터마킹 진행 상황",
-    "progressFinished": "{{total}}개 중 {{done}}개 완료",
-    "progressFailed": ", {{count}}개 실패",
-    "progressEnd": ".",
-    "listLabel": "워터마킹할 문서",
-    "downloadFile": "{{fileName}} 다운로드",
-    "removeFile": "{{fileName}} 제거",
-    "presetHint": "하나 이상 선택하세요; 선택한 순서대로 그려지며 나중 것이 먼저 것 위에 놓입니다.",
-    "placement": "배치",
-    "smartPlacementHint": "스마트 배치는 사진용입니다; 문서에는 모서리나 사용자 지정 위치를 선택하세요.",
-    "watermarkEmpty": "문서 워터마킹",
-    "watermarkCount": "{{count}}개 워터마킹",
-    "downloadZip": "{{count}}개를 ZIP으로 다운로드",
-    "savedAsHint": "각 문서는 {name}-watermarked.pdf로 저장됩니다. 암호화된 PDF는 거부됩니다."
+    "description": "PDF의 각 페이지를 미리 보고 그 자리에서 워터마크를 편집한 뒤 원본 문서에 워터마크를 추가하여 내보내세요. 여러 파일은 일괄 처리를 사용하세요.",
+    "reader": {
+      "previous": "이전 페이지",
+      "next": "다음 페이지",
+      "page": "페이지",
+      "ofPages": "/ {{total}}",
+      "pageStatus": "{{name}} · {{page}} / {{total}}페이지",
+      "preview": "PDF {{page}}페이지",
+      "pageText": "페이지 텍스트",
+      "open": "PDF 열기",
+      "empty": "PDF를 열거나 끌어다 놓아 페이지를 미리 보고 워터마크를 배치하세요.",
+      "invalidFile": "문서 크기 제한 이내의 PDF를 선택하세요.",
+      "chooseMark": "이 문서를 내보내기 전에 유효한 워터마크를 추가하세요.",
+      "changed": "내보내는 동안 문서 또는 워터마크가 변경되었습니다. 현재 편집 내용을 반영하려면 다시 내보내세요.",
+      "download": "PDF 다운로드",
+      "cloudSaved": "워터마크가 적용된 PDF를 클라우드 저장소에 저장했습니다.",
+      "originalHint": "원본 텍스트, 벡터 그래픽, 페이지 크기 및 포함된 이미지는 유지됩니다. 워터마크만 래스터화됩니다. 암호로 보호된 PDF는 먼저 잠금을 해제해야 합니다."
+    }
   },
   "verify": {
     "checkEmail": {
@@ -964,98 +959,102 @@
   "landing": {
     "nav": "계정",
     "signIn": "로그인",
-    "heroBody": "텍스트, 로고, 서명을 추가하세요. 파일이나 일괄 작업에서 프리셋을 재사용하고, 오프라인으로 편집한 뒤 연결 시 동기화하세요.",
-    "featuresHeading": "작업 전체를 위한 기능",
-    "footer": "Lumafoil는 MIT 라이선스로 배포되는 오픈 소스입니다.",
+    "heroBody": "텍스트, 로고, 서명, 도형, 스티커 또는 QR 코드를 추가하세요. 사진 위에서 조정하고, PDF 페이지를 미리 보거나 동영상 타임라인에 따라 워터마크를 이동할 수 있습니다. 스타일을 저장해 여러 파일에 다시 사용하세요.",
+    "featuresHeading": "모든 워터마크를 위한 도구",
+    "footer": "Lumafoil은 MIT 라이선스로 제공되는 오픈 소스입니다.",
     "privacy": "개인정보처리방침",
     "terms": "이용약관",
     "heroTitleStart": "사진, 동영상, PDF에",
     "heroTitleEnd": "워터마크를 추가하세요.",
     "heroAlt": "배치 및 내보내기 설정이 있는 Lumafoil 사진 편집기",
-    "previewLabel": "Lumafoil 편집기",
-    "privacyNote": "파일은 기기에서 처리됩니다. 클라우드 저장은 선택 사항입니다.",
+    "previewLabel": "이미지 편집기 살펴보기",
+    "privacyNote": "편집은 기기에서 처리됩니다. 저장하거나 공유할 내용은 직접 선택합니다.",
     "formatsLabel": "사진 · PDF · 동영상",
     "workflowHeading": "열기. 조정. 내보내기.",
-    "workflowNote": "작업 공간에서 프리셋과 저장한 파일을 함께 관리하세요.",
+    "workflowNote": "재사용할 프리셋은 라이브러리에, 저장한 사진은 갤러리에 보관하세요. 작업 공간 안에서 둘 다 폴더로 정리할 수 있습니다.",
     "steps": {
-      "openTitle": "사진 가져오기",
-      "openBody": "이미지 한 장이나 여러 장을 여세요. 원본은 그대로 유지됩니다.",
-      "markTitle": "나만의 워터마크 만들기",
-      "markBody": "저장한 프리셋을 선택하거나 나만의 특별한 워터마크를 만드세요.",
-      "exportTitle": "내보내고 마무리",
-      "exportBody": "완성 파일을 다운로드하거나 갤러리에 저장해 동기화하세요."
+      "openTitle": "파일 열기",
+      "openBody": "기기나 연결된 저장소에서 사진, PDF 또는 지원되는 동영상을 선택하세요. 여러 파일은 일괄 처리할 수 있습니다. 원본 파일은 변경되지 않습니다.",
+      "markTitle": "선택하고 조정하기",
+      "markBody": "템플릿이나 저장한 프리셋으로 시작해 미리 보기 옆에서 텍스트, 이미지, 크기, 위치와 모양을 편집하세요.",
+      "exportTitle": "저장 또는 공유",
+      "exportBody": "결과를 다운로드하거나 클라우드 폴더를 선택하세요. 완성한 사진을 갤러리에 저장하고 공유할 사진의 링크를 만들 수 있습니다."
     },
     "github": "GitHub",
     "featuresIntro": "워터마크를 만들고 파일에 적용한 뒤 결과를 저장하거나 공유할 방법을 선택하세요.",
-    "moreHeading": "마무리에 필요한 도구",
+    "moreHeading": "편집, 저장 및 공유",
     "capabilities": {
       "marks": {
-        "title": "텍스트, 로고, 나만의 서명",
-        "body": "이름이나 저작권 문구를 입력하고, 로고를 업로드하거나 서명을 그리세요. 크기, 각도, 불투명도, 색상을 조절하고 여러 워터마크를 조합할 수 있습니다."
+        "title": "텍스트, 로고, 도형 및 서명",
+        "body": "저작권 문구를 입력하거나 로고를 업로드하고, 서명을 그리거나 20가지 도형 중에서 선택하세요. 크기, 회전, 채우기, 윤곽선과 불투명도를 조정할 수 있습니다. 레이어를 결합하고 워터마크를 드래그해 배치하며 작업 중 변경 사항을 되돌릴 수 있습니다."
       },
       "batch": {
-        "title": "사진에 워터마크 일괄 적용",
-        "body": "저장한 워터마크를 여러 사진에 적용하세요. 결과를 확인하고 사진별 위치를 조절한 뒤 완성된 사진을 ZIP으로 다운로드할 수 있습니다."
+        "title": "사진, PDF, 동영상을 함께 일괄 처리",
+        "body": "저장한 워터마크를 사진, PDF, 지원되는 동영상이 섞인 파일 모음에 적용하세요. 결과를 하나씩 확인하고 사진을 개별적으로 조정한 뒤 파일을 따로 또는 ZIP으로 함께 다운로드할 수 있습니다. 실패한 파일은 검토할 수 있도록 계속 표시됩니다."
       },
       "fonts": {
         "title": "서로 다른 551개 글꼴 패밀리",
-        "body": "세리프, 산세리프, 손글씨, 장식용, 고정폭 글꼴을 검색하세요. 텍스트를 미리 보고 스타일을 저장할 수 있습니다. 글꼴은 오픈 라이선스로 로컬에 포함됩니다."
+        "body": "글꼴 이름으로 검색하고 각 글꼴의 실제 모양을 보며 선택하세요. 최근 글꼴을 다시 사용하고 글자 간격과 곡률을 조정한 뒤 스타일을 프리셋에 저장할 수 있습니다. 글꼴 파일과 오픈 라이선스 고지는 Lumafoil에 포함되어 있습니다."
       },
       "stickers": {
         "title": "컬러 벡터 스티커 400개",
-        "body": "동물, 꽃, 음식, 여행, 기념일, 일상 사물 등을 살펴보세요. 디자인을 검색해 워터마크에 넣고 흐릿한 테두리 없이 크기를 조절할 수 있습니다."
+        "body": "동물, 꽃, 음식, 여행, 기념일과 일상 사물을 검색하세요. 벡터 이미지를 워터마크에 맞는 크기로 조정할 수 있습니다. 포함된 이미지의 라이선스 고지는 내보낸 콘텐츠와 함께 유지됩니다."
       },
       "qr": {
-        "title": "QR 워터마크 만들기와 저장",
+        "title": "QR 워터마크 만들기 및 저장",
         "body": "웹 주소나 텍스트를 QR 코드로 바꾸세요. 포트폴리오, 연락처, 프로젝트별 코드를 따로 저장하고 파일에 재사용할 수 있습니다."
       },
       "templates": {
-        "title": "워터마크를 템플릿으로 저장",
-        "body": "텍스트, 이미지, 스타일, 위치를 보관하세요. 편집기나 일괄 작업에 프리셋을 적용하고 가져오기와 내보내기로 기기 간에 옮길 수 있습니다."
+        "title": "템플릿 18개와 나만의 프리셋",
+        "body": "초안, 기밀, 복사 금지, 교정본, 검토 도장 또는 사진 출처 표기로 시작하세요. 템플릿을 편집하고 이름을 지정해 라이브러리에 저장할 수 있습니다. 프리셋을 폴더로 정리하고 이미지, 문서, 동영상, 일괄 처리에서 재사용하세요."
       },
       "editing": {
-        "title": "자르기, 크기 변경, 보정",
-        "body": "사진을 자르고 출력 크기를 정한 뒤 밝기, 대비, 채도를 조절해 워터마크를 마무리하세요."
+        "title": "자르기, 크기 변경 및 조정",
+        "body": "사진을 자르거나 회전하고 밝기, 대비와 채도를 조정하세요. 확대해서 배치하고 간격을 조정할 수 있는 격자를 표시하거나 맞춤 기능을 켤 수 있습니다. 자르기나 더 작은 출력 크기를 선택하지 않으면 원본 해상도가 유지됩니다."
       },
       "smart": {
-        "title": "스마트 배치와 대비",
+        "title": "스마트 배치 및 대비",
         "body": "사진에 맞춰 위치와 밝거나 어두운 워터마크를 제안합니다. 결과를 확인하고 위치나 스타일을 직접 바꿀 수 있습니다."
       },
       "video": {
-        "title": "동영상 워터마크",
-        "body": "브라우저에서 지원되는 동영상에 워터마크를 넣으세요. 위치와 표시 시간을 조절하고 내보내기 전에 미리 볼 수 있습니다."
+        "title": "동영상 위치와 페이드 효과",
+        "body": "통합된 워터마크 도구 옆에서 동영상 재생 위치를 이동하세요. 시점별 위치와 각 워터마크의 표시 시간을 정하고 페이드 효과를 추가할 수 있습니다. 내보낼 때 다시 인코딩되며, 사용 가능한 형식과 오디오 지원은 브라우저와 원본 파일에 따라 달라집니다."
       },
       "pdf": {
-        "title": "PDF 문서 워터마크",
-        "body": "선택한 PDF 페이지에 저장된 워터마크를 적용하세요. 문서 하나 또는 여러 개를 처리해 다운로드할 수 있습니다."
+        "title": "PDF 페이지 미리 보기 및 워터마크",
+        "body": "PDF를 읽으며 페이지 옆의 도구로 워터마크를 배치하세요. 문서 전체에 적용하거나 여러 PDF를 일괄 처리할 수 있습니다. 워터마크는 원본 PDF 페이지에 추가되며 기존 텍스트, 이미지와 벡터 그래픽은 유지됩니다."
       },
       "export": {
         "title": "내보내기 형식 선택",
-        "body": "사진을 JPEG, PNG, WebP로 내보내세요. 크기와 품질을 설정하거나 처리한 사진을 ZIP으로 다운로드할 수 있습니다."
+        "body": "사진을 PNG, JPEG 또는 WebP로 내보내세요. 기본 형식인 PNG는 무손실이며, JPEG와 WebP는 선택한 품질을 사용합니다. 내보내기는 작은 편집 미리 보기가 아닌 원본 이미지에서 생성됩니다."
       },
       "gallery": {
-        "title": "나만의 비공개 갤러리",
-        "body": "완성된 이미지를 계정에 저장하고 나중에 찾으세요. 파일을 다운로드하거나 공유할 사진을 선택할 수 있습니다."
+        "title": "폴더와 최근 작업",
+        "body": "라이브러리의 프리셋과 갤러리의 저장한 사진을 폴더, 최근 항목, 썸네일·목록·상세 보기로 정리하세요. 명시적으로 접근 권한을 공유하거나 갤러리 링크를 만들지 않으면 작업 공간은 비공개로 유지됩니다."
       },
       "sharing": {
-        "title": "선택한 사진 공유",
-        "body": "선택한 사진의 Lumafoil 갤러리 링크를 만드세요. 만료 시간을 정하거나 링크를 취소할 수 있습니다."
+        "title": "사진 또는 작업 공간 공유",
+        "body": "선택한 사진의 갤러리 링크를 만료 기한과 함께 만들고 취소할 수 있습니다. 소유자는 링크, 이메일 초대 또는 기존 사용자 직접 추가로 보기나 편집 권한을 줄 수 있습니다. 작업 공간 권한은 Lumafoil 가입 초대와 별개입니다."
       },
       "offline": {
-        "title": "오프라인 작업, 나중에 동기화",
-        "body": "오프라인 사용을 준비한 뒤 연결 없이 프리셋을 편집하고 사진을 저장하세요. 다시 연결되면 동기화되며 오류와 충돌을 확인하고 복구할 수 있습니다."
+        "title": "오프라인 작업 후 동기화",
+        "body": "로그인한 상태에서 앱의 오프라인 사용을 준비하세요. 연결 없이 사진과 프리셋을 편집하고 갤러리 저장을 대기열에 넣을 수 있습니다. 같은 계정으로 다시 연결하면 동기화됩니다. 클라우드 전송, 초대와 공유 변경에는 연결이 필요합니다."
       },
       "privacy": {
         "title": "내 계정, 내 작업 공간",
-        "body": "새 사용자는 초대가 필요하며 각자 비공개 작업 공간을 받습니다. 누군가를 초대해도 내 사진이나 프리셋에 접근할 수 없습니다."
+        "body": "신규 사용자는 사이트 초대가 필요하며 각자 별도의 비공개 작업 공간을 받습니다. 사이트 초대로 사진이나 프리셋이 공유되는 일은 없습니다. 작업 공간을 공유하려면 소유자가 명시적으로 접근 권한을 부여해야 합니다."
       },
       "languages": {
-        "title": "12개 인터페이스 언어",
+        "title": "인터페이스 언어 12개",
         "body": "아랍어의 오른쪽에서 왼쪽 레이아웃을 포함한 12개 언어 중 선택하세요."
       },
       "theme": {
-        "title": "라이트 및 다크 모드",
+        "title": "라이트 모드 및 다크 모드",
         "body": "테마를 선택하거나 기기 설정을 따르세요. 휴대전화, 태블릿, 큰 화면에 맞게 인터페이스가 조정됩니다."
+      },
+      "cloud": {
+        "title": "연결된 클라우드 폴더",
+        "body": "Google Drive, Dropbox 또는 OneDrive를 연결해 파일을 열고 내보낼 폴더를 선택하며 제공업체의 공유 링크를 만들 수 있습니다. 직접 연결을 해제하거나 제공업체가 다시 승인을 요구할 때까지 연결이 저장됩니다. Google Drive 접근은 Lumafoil에서 선택하거나 만든 파일과 폴더로 제한됩니다. 회사 또는 학교 계정은 Microsoft 관리자의 승인이 필요할 수 있습니다."
       }
     },
     "inviteHosting": "Lumafoil은 초대 전용입니다. 직접 호스팅하고 싶으신가요?",
@@ -1135,12 +1134,12 @@
       },
       "acceptableUse": {
         "heading": "허용되는 사용",
-        "p1": "법을 어기거나, 사용할 권리가 없는 콘텐츠를 업로드하거나 공유하는 데 서비스를 사용하지 마세요. 보안 제어나 요청 속도 제한을 우회하거나, 회원이 아닌 조직에 속한 데이터에 접근하려 하지 마세요.",
-        "p2": "조직 내 접근은 회원님의 역할에 따르며, 이러한 역할은 서버에서 적용됩니다."
+        "p1": "법을 어기거나, 사용할 권리가 없는 콘텐츠를 업로드하거나 공유하는 데 서비스를 사용하지 마세요. 보안 제어나 요청 속도 제한을 우회하거나, 회원이 아닌 워크스페이스에 속한 데이터에 접근하려 하지 마세요.",
+        "p2": "워크스페이스 내 접근은 회원님의 역할에 따르며, 이러한 역할은 서버에서 적용됩니다."
       },
       "teams": {
         "heading": "비공개 워크스페이스와 협업",
-        "p1": "각 계정에는 비공개 워크스페이스가 있습니다. 사이트 초대는 이를 공유하지 않습니다. 별도 협업 공간에서는 소유자, 관리자, 편집자, 뷰어를 명시적으로 추가할 수 있으며 서버가 권한을 확인합니다. 이 역할로 사이트 관리 권한을 얻지는 않습니다."
+        "p1": "각 계정은 비공개 워크스페이스로 시작합니다. 사이트 초대는 초대자의 콘텐츠를 공유하지 않습니다. 워크스페이스 소유자는 해당 워크스페이스의 보기 또는 편집 권한을 명시적으로 부여할 수 있습니다. 이 권한으로 다른 워크스페이스가 공유되거나 사이트 관리 권한이 부여되지는 않습니다."
       },
       "availability": {
         "heading": "가용성, 보증, 변경",
@@ -1221,16 +1220,12 @@
     "revoke": "취소",
     "revokeEmail": "{{email}} 초대 취소",
     "invalidEmail": "유효한 이메일 주소를 입력하세요.",
-    "privateHeading": "내 개인 작업 공간",
-    "privateBody": "나만 접근할 수 있습니다. 이 공간을 공유하지 않고 Lumafoil에 초대하거나 협업용 공간을 따로 만드세요.",
-    "collaborate": "협업 공간 만들기",
     "status": {
       "pending": "대기 중",
       "accepted": "수락됨",
       "revoked": "취소됨",
       "expired": "만료됨"
     },
-    "collaborationNotice": "이 작업 공간에 초대하면 사진과 프리셋에 접근할 수 있습니다. 받는 사람은 Lumafoil 계정이 있어야 합니다. 계정이 없다면 먼저 사용자 초대를 이용하세요.",
     "role": "사이트 역할",
     "roleHelp": "관리자는 사이트 계정을 관리합니다. 워크스페이스 멤버십은 별개입니다."
   },
@@ -1304,5 +1299,218 @@
     "owner": "소유자",
     "admin": "관리자",
     "user": "사용자"
+  },
+  "guidance": {
+    "dismiss": "도움말 닫기",
+    "back": "이전",
+    "next": "다음",
+    "done": "확인",
+    "page": "{{current}} / {{total}}",
+    "image": {
+      "title": "이미지",
+      "first": "사진을 열어 시작하세요. 원본 파일은 그대로 유지됩니다.",
+      "second": "캔버스 확대는 보기만 바꿉니다. 다운로드는 원본 이미지에서 생성되며 기본 PNG는 무손실 형식입니다."
+    },
+    "watermark": {
+      "title": "워터마크 도구",
+      "first": "텍스트, 기호, 도형, 로고 또는 QR 코드를 선택하세요.",
+      "second": "워터마크를 탭하면 핸들이 표시됩니다. 드래그로 이동하고 두 손가락으로 크기를 조절하거나 비틀어 회전하세요. 다른 곳을 탭하면 핸들이 숨겨집니다."
+    },
+    "presets": {
+      "title": "저장된 프리셋",
+      "first": "초안, 기밀 또는 다른 템플릿으로 시작하거나 저장한 워터마크를 선택하세요.",
+      "second": "저장할 때 이름과 폴더를 선택합니다. 새로 만들기는 파일을 열어 둔 채 새 워터마크를 시작합니다."
+    },
+    "crop": {
+      "title": "사진 자르기",
+      "first": "가장자리를 드래그하거나 가로세로 비율을 선택하세요.",
+      "second": "자르기 초기화는 전체 사진으로 복원합니다. 원본은 덮어쓰지 않습니다."
+    },
+    "adjust": {
+      "title": "사진 조정",
+      "first": "슬라이더로 사진의 모양을 조정하세요.",
+      "second": "초기화는 기본값으로 되돌립니다. 실행 취소는 마지막 편집을 되돌립니다."
+    },
+    "resize": {
+      "title": "출력 크기",
+      "first": "원본 크기를 유지하거나 새 크기를 선택하세요.",
+      "second": "크기 조정은 내보내기에 반영됩니다. 확대는 보기만 변경합니다."
+    },
+    "export": {
+      "title": "결과 저장",
+      "first": "다운로드하거나 갤러리 또는 클라우드에 저장하세요.",
+      "second": "형식, 크기와 품질을 확인하세요. 클라우드 저장만으로 파일이 공유되지는 않습니다. 링크는 저장된 클라우드 파일에서 별도로 만드세요."
+    },
+    "library": {
+      "title": "내 라이브러리",
+      "first": "최근 프리셋과 워터마크 템플릿을 찾고 저장한 디자인을 폴더로 정리하세요.",
+      "second": "검색하거나 보기를 바꿔 프리셋을 찾으세요. 열어서 편집하거나 이미지, 문서, 동영상, 일괄 처리에 적용할 수 있습니다."
+    },
+    "gallery": {
+      "title": "내 갤러리",
+      "first": "최근 사진을 찾고 이 작업 공간에 저장한 이미지를 폴더로 정리하세요.",
+      "second": "썸네일, 목록 또는 상세 보기를 선택하세요. 사진 확인은 보이지 않는 Lumafoil 표시를 찾지만 소유권을 증명하지는 않습니다."
+    },
+    "bulk": {
+      "title": "일괄 처리",
+      "first": "사진, PDF와 지원되는 동영상을 추가하고 저장한 워터마크를 선택한 뒤 출력 설정을 확인하세요.",
+      "second": "각 결과나 오류를 확인하세요. ZIP을 다운로드하거나 클라우드에 저장할 수 있으며, 사진 결과만 갤러리에 저장할 수 있습니다."
+    },
+    "documents": {
+      "title": "문서 워터마크",
+      "first": "PDF를 열고 페이지를 넘기며 미리 보기 옆의 도구로 워터마크를 조정하세요.",
+      "second": "워터마크는 문서 전체에 적용됩니다. 내보내기는 원본 페이지와 기존 텍스트, 이미지, 벡터 그래픽을 유지합니다."
+    },
+    "video": {
+      "title": "비디오 워터마크",
+      "first": "지원되는 동영상을 열어 미리 보기를 탐색하거나 재생하면서 워터마크를 조정하세요.",
+      "second": "키프레임을 추가해 시간에 따라 워터마크를 이동하세요. 시작, 종료와 페이드를 설정하고 내보내기 전에 출력 및 오디오 옵션을 확인하세요."
+    },
+    "workspace": {
+      "title": "작업 공간 접근",
+      "first": "사용자 메뉴의 접근 관리에서 공유를 확인하세요.",
+      "second": "소유자는 보기 또는 편집 권한을 부여할 수 있습니다. 이 작업 공간을 공유해도 다른 작업 공간이나 다른 사람의 연결된 클라우드 계정은 공유되지 않습니다."
+    }
+  },
+  "workspaceAccess": {
+    "loading": "액세스 불러오는 중…",
+    "ownerOnly": "워크스페이스 소유자만 액세스 권한을 변경할 수 있습니다.",
+    "people": "액세스 권한이 있는 사용자",
+    "general": "일반 액세스",
+    "restricted": "제한됨",
+    "restrictedHint": "권한이 있는 사용자만 이 워크스페이스를 열 수 있습니다. 다른 워크스페이스는 비공개로 유지됩니다.",
+    "addPeople": "사용자 추가",
+    "permission": "권한",
+    "notify": "이메일로 알림",
+    "send": "초대 보내기",
+    "add": "사용자 추가",
+    "notifyHint": "워크스페이스를 보거나 편집할 수 있는 이메일 초대를 보냅니다. 신규 사용자는 별도의 계정 초대도 받습니다.",
+    "silentHint": "인증된 기존 Lumafoil 사용자를 즉시 추가합니다. 이메일이나 알림을 보내지 않습니다.",
+    "sent": "워크스페이스 초대를 보냈습니다.",
+    "added": "알림 없이 액세스를 추가했습니다.",
+    "view": "보기",
+    "edit": "편집",
+    "owner": "소유자",
+    "admin": "관리자",
+    "removeFor": "{{name}}의 액세스 제거",
+    "inviteLink": "초대 링크",
+    "linkPermission": "링크 권한",
+    "expires": "링크 만료",
+    "days_one": "{{count}}일",
+    "days_other": "{{count}}일",
+    "createLink": "링크 만들기",
+    "linkHint": "로그인한 Lumafoil 사용자는 링크가 만료되거나 취소될 때까지 참여할 수 있습니다. 취소하면 새로운 참여가 중지됩니다. 기존 액세스를 종료하려면 사용자를 별도로 제거하세요.",
+    "copyLink": "링크 복사",
+    "copied": "링크를 복사했습니다.",
+    "copyFailed": "복사하지 못했습니다. 링크를 선택한 후 직접 복사하세요.",
+    "revoke": "취소",
+    "revokeFor": "{{name}}의 초대 취소",
+    "joinTitle": "{{name}}에 참여",
+    "joinDescription": "이 초대는 이 워크스페이스에만 {{permission}} 권한을 부여합니다.",
+    "join": "워크스페이스 참여",
+    "open": "워크스페이스 열기",
+    "unavailable": "초대를 사용할 수 없음",
+    "unavailableHint": "초대가 만료되었거나 취소되었거나 다른 계정용입니다. 초대받은 이메일로 로그인하거나 소유자에게 새 링크를 요청하세요.",
+    "cancel": "취소"
+  },
+  "cloudStorage": {
+    "heading": "클라우드 저장소",
+    "description": "계정을 한 번 연결한 뒤 파일 열기, 저장, 공유에 연결을 다시 사용하세요.",
+    "chooseDestination": "파일을 저장할 폴더를 선택하세요.",
+    "chooseFiles": "Lumafoil에서 열 파일을 선택하세요.",
+    "loading": "클라우드 저장소 불러오는 중",
+    "unavailable": "이 서버에서는 이 공급자를 사용할 수 없습니다.",
+    "connectHint": "계정을 연결하여 파일과 폴더를 탐색하세요. 다음 방문에도 연결이 유지됩니다.",
+    "connect": "{{provider}} 연결",
+    "dropboxScope": "Dropbox 접근은 Lumafoil 앱 폴더로 제한됩니다.",
+    "googleScope": "여기에는 Lumafoil에 허용된 항목만 표시됩니다. 다른 항목은 Drive 찾아보기로 선택하세요.",
+    "location": "폴더 위치",
+    "appFolder": "Lumafoil 앱 폴더",
+    "root": "내 파일",
+    "empty": "일치하는 파일이나 폴더가 없습니다.",
+    "folderName": "새 폴더 이름",
+    "createFolder": "폴더 만들기",
+    "useFolder": "이 폴더 사용",
+    "openSelected": "선택 항목 열기",
+    "browseGoogle": "Drive 찾아보기",
+    "connected": "연결됨",
+    "notConnected": "연결 안 됨",
+    "reconnect": "다시 연결",
+    "disconnect": "연결 해제",
+    "managePermissions": "권한 관리",
+    "revocationHint": "Lumafoil 연결이 해제되었습니다. 남아 있는 승인은 공급자의 권한 설정에서 제거하세요.",
+    "retry": "다시 시도",
+    "waiting": "공급자에서 로그인을 완료하세요. 여기에서 취소할 수 있습니다.",
+    "personalAccount": "개인 계정",
+    "workAccount": "회사 또는 학교 계정",
+    "microsoftConsent": "회사 또는 학교 계정은 Microsoft 관리자의 승인이 필요할 수 있습니다."
+  },
+  "folders": {
+    "heading": "폴더",
+    "rootPhoto": "갤러리",
+    "rootPreset": "라이브러리",
+    "path": "폴더 경로",
+    "new": "새 폴더",
+    "name": "폴더 이름",
+    "rename": "폴더 이름 바꾸기",
+    "moveFolder": "폴더 이동",
+    "moveItems": "항목 이동",
+    "moveNamed": "{{name}} 이동",
+    "destination": "대상 폴더",
+    "saveLocation": "저장 위치",
+    "choose": "폴더 선택",
+    "expand": "{{name}} 펼치기",
+    "collapse": "{{name}} 접기",
+    "open": "{{name}} 열기",
+    "loading": "폴더 불러오는 중…",
+    "unavailable": "이 폴더를 사용할 수 없습니다. 기본 컬렉션을 열거나 다른 폴더를 선택하세요.",
+    "loadError": "폴더를 불러오지 못했습니다. 기본 컬렉션은 계속 사용할 수 있습니다.",
+    "delete": "폴더 삭제",
+    "deleteTitle": "{{name}} 폴더를 삭제할까요?",
+    "deleteHint": "빈 폴더만 삭제할 수 있습니다. 폴더를 삭제해도 파일이나 하위 폴더가 함께 삭제되지 않습니다.",
+    "save": "저장",
+    "cancel": "취소",
+    "moveHere": "여기로 이동",
+    "newHint": "선택한 위치에 폴더를 만드세요.",
+    "renameHint": "이 폴더의 이름과 위치를 선택하세요.",
+    "moving": "항목 이동 ({{count}})",
+    "invalidName": "슬래시나 제어 문자가 없는 이름을 사용하세요.",
+    "nameTaken": "여기에 같은 이름의 폴더가 이미 있습니다.",
+    "selection": "선택한 항목: {{count}}"
+  },
+  "templates": {
+    "heading": "워터마크 템플릿",
+    "hint": "미리 만든 레이아웃을 적용하고 원하는 대로 수정한 뒤 나만의 프리셋으로 저장하세요.",
+    "search": "템플릿 검색",
+    "category": "템플릿 카테고리",
+    "use": "{{name}} 사용",
+    "empty": "일치하는 템플릿이 없습니다.",
+    "unavailable": "이 템플릿을 사용할 수 없습니다. 라이브러리에서 템플릿을 선택하세요.",
+    "categories": {
+      "all": "전체",
+      "documents": "문서",
+      "review": "검토",
+      "photography": "사진"
+    },
+    "names": {
+      "draft": "초안",
+      "confidential": "기밀",
+      "strictlyConfidential": "극비",
+      "internalUseOnly": "내부 전용",
+      "doNotCopy": "복사 금지",
+      "doNotDistribute": "배포 금지",
+      "copy": "사본",
+      "void": "무효",
+      "forReview": "검토용",
+      "proof": "교정본",
+      "sample": "샘플",
+      "preview": "미리 보기",
+      "approved": "승인됨",
+      "final": "최종본",
+      "unpaid": "미결제",
+      "copyright": "저작권",
+      "photoCredit": "사진 출처",
+      "repeatingProof": "반복 교정본"
+    }
   }
 }

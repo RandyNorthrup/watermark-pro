@@ -10,7 +10,7 @@ import {
 } from './cloud-transfer'
 import type { CloudUpload } from './source'
 import { CLOUD_SAVE_FOLDER, HTTP_STATUS, MICROSOFT_GRAPH_ROOT } from '../../../shared/constants'
-import { captureOfflineOwner } from '../offline-context'
+import { captureCloudOwner } from '../cloud-connection-context'
 
 const CONFLICT_BEHAVIOR = '@microsoft.graph.conflictBehavior'
 /** Sixteen 320KiB blocks; Graph requires aligned fragments below 60MiB. */
@@ -38,7 +38,7 @@ async function findFolder(token: string): Promise<string | null> {
 
 /** Create the actual folder before addressing its children; tolerate only a concurrent folder creation. */
 export async function ensureOneDriveFolder(token: string): Promise<string> {
-  const owner = captureOfflineOwner()
+  const owner = captureCloudOwner()
   const existing = await findFolder(token)
   owner.assertCurrent()
   if (existing !== null) return existing
@@ -65,7 +65,11 @@ export async function ensureOneDriveFolder(token: string): Promise<string> {
 
 /** Only a validated filename may be appended to a parent ID. */
 export function oneDriveUploadUrl(name: string, folderId: string): string {
-  return `${MICROSOFT_GRAPH_ROOT}/me/drive/items/${encodeURIComponent(folderId)}:/${encodeURIComponent(cloudFileName(name))}:/createUploadSession`
+  const parent =
+    folderId === 'root'
+      ? `${MICROSOFT_GRAPH_ROOT}/me/drive/root`
+      : `${MICROSOFT_GRAPH_ROOT}/me/drive/items/${encodeURIComponent(folderId)}`
+  return `${parent}:/${encodeURIComponent(cloudFileName(name))}:/createUploadSession`
 }
 
 /** Require a final driveItem acknowledgement; an incomplete session is never a saved file. */
@@ -74,7 +78,7 @@ export async function uploadOneDriveImage(
   upload: CloudUpload,
   folderId: string,
 ): Promise<CloudSavedFile> {
-  const owner = captureOfflineOwner()
+  const owner = captureCloudOwner()
   const name = cloudFileName(upload.name)
   if (upload.blob.size === 0) throw new Error(`"${name}" is empty and cannot be saved.`)
   const uploadUrl = await cloudRequest(

@@ -268,8 +268,29 @@ export const MIN_LETTER_SPACING = -0.1
 export const MAX_LETTER_SPACING = 1
 export const MAX_CURVE = 1
 
-/** Shape marks: a rectangle, rounded rectangle, ellipse or line. */
-export const SHAPES = ['rectangle', 'rounded-rectangle', 'ellipse', 'line'] as const
+/** Geometric watermark shapes; their original vector paths live in the client catalogue. */
+export const SHAPES = [
+  'rectangle',
+  'rounded-rectangle',
+  'ellipse',
+  'line',
+  'triangle',
+  'diamond',
+  'pentagon',
+  'hexagon',
+  'octagon',
+  'star',
+  'starburst',
+  'heart',
+  'shield',
+  'speech-bubble',
+  'arrow-left',
+  'arrow-right',
+  'arrow-up',
+  'arrow-down',
+  'double-arrow',
+  'plus',
+] as const
 export type Shape = (typeof SHAPES)[number]
 export const MIN_SHAPE_ASPECT = 0.25
 export const MAX_SHAPE_ASPECT = 4

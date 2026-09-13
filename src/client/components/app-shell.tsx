@@ -28,13 +28,15 @@ import { useTranslation } from 'react-i18next'
 
 import { BrandMark } from './brand-mark'
 import { LanguageMenu } from './language-menu'
+import { SupportPrompt } from './support-prompt'
 import { ThemeToggle } from './theme-toggle'
 import { ADMIN_SECTIONS, adminSearchSchema, type AdminSection } from '../../shared/admin-sections'
 import { isPlatformAdmin } from '../lib/admin'
 import { type ActiveOrganization, authClient, type SessionData } from '../lib/auth-client'
 import { cn } from '../lib/cn'
+import { describeError } from '../lib/errors'
 import { clearOfflineAccount } from '../lib/offline-account'
-import { currentOfflineUser, hasOfflineDatabase } from '../lib/offline-context'
+import { captureOfflineOwner, currentOfflineUser, hasOfflineDatabase } from '../lib/offline-context'
 import { offlineStatus, subscribeOfflineStatus } from '../lib/offline-status'
 import { resetShellQueries } from '../lib/queries'
 import { Avatar } from './ui/avatar'
@@ -52,6 +54,14 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 const OfflinePanel = lazy(async () => {
   const module = await import('./offline-panel')
   return { default: module.OfflinePanel }
+})
+const WorkspaceAccessDialog = lazy(async () => {
+  const module = await import('./workspace-access-dialog')
+  return { default: module.WorkspaceAccessDialog }
+})
+const FirstUseGuidance = lazy(async () => {
+  const module = await import('./guidance/first-use-guidance')
+  return { default: module.FirstUseGuidance }
 })
 
 // `label` holds the catalogue key, not the visible word; each list translates
@@ -176,7 +186,7 @@ export function AppShell({ session, organization, organizations, children }: App
       'shell.nav.admin')
     : currentItem?.label
   return (
-    <div className="workspace-scene flex min-h-svh">
+    <div className="workspace-scene flex min-h-svh md:h-svh md:overflow-hidden">
       <a
         href="#main"
         className="sr-only z-50 rounded-md bg-brand-600 px-3 py-2 text-white focus:not-sr-only focus:absolute focus:start-2 focus:top-2"
@@ -213,8 +223,8 @@ export function AppShell({ session, organization, organizations, children }: App
           <WorkspaceSync userId={session.user.id} organizationId={organization?.id} />
         </div>
       </aside>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="glass-chrome sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:top-4 md:mx-4 md:mt-4 md:rounded-2xl md:border md:px-6 md:pt-3">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="glass-chrome relative z-10 grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 border-b border-line px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:mx-4 md:mt-4 md:rounded-2xl md:border md:px-6 md:pt-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <div className="flex min-w-0 items-center gap-1 md:hidden">
             <MobileMenu
               userId={session.user.id}
@@ -235,20 +245,28 @@ export function AppShell({ session, organization, organizations, children }: App
               {currentLabel === undefined ? null : t(currentLabel)}
             </span>
           </div>
-          <div className="ms-auto flex items-center gap-2">
+          <SupportPrompt />
+          <div className="col-start-2 row-start-1 ms-auto flex items-center gap-2 lg:col-start-3">
             <LanguageMenu />
             <ThemeToggle />
-            <UserMenu session={session} />
+            <UserMenu
+              key={`${session.user.id}:${organization?.id ?? ''}`}
+              session={session}
+              organization={organization}
+            />
           </div>
         </header>
         <main
           id="main"
           tabIndex={-1}
-          className="flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:pt-6 md:pb-8"
+          className="min-h-0 flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:overflow-y-auto md:overscroll-contain md:px-8 md:pt-6 md:pb-8"
         >
           <div className="w-full">{children}</div>
         </main>
         <TabBar items={TAB_BAR_ITEMS} />
+        <Suspense fallback={null}>
+          <FirstUseGuidance key={session.user.id} userId={session.user.id} pathname={pathname} />
+        </Suspense>
       </div>
     </div>
   )
@@ -449,18 +467,35 @@ function OrganizationSwitcher({
   const queryClient = useQueryClient()
   const { isOnline } = useSyncExternalStore(subscribeOfflineStatus, offlineStatus)
   const [switchError, setSwitchError] = useState<string | null>(null)
+  const [isSwitching, setIsSwitching] = useState(false)
 
   async function switchTo(organizationId: string) {
     setSwitchError(null)
-    const result = await authClient.organization.setActive({ organizationId })
-    if (result.error !== null) {
-      setSwitchError(result.error.message ?? t('offline.connectionRequired'))
-      return
+    setIsSwitching(true)
+    let owner: ReturnType<typeof captureOfflineOwner> | undefined
+    try {
+      owner = captureOfflineOwner()
+      const result = await authClient.organization.setActive({ organizationId })
+      owner.assertCurrent()
+      if (result.error !== null) {
+        setSwitchError(result.error.message ?? t('offline.connectionRequired'))
+        return
+      }
+      // Switching changes shell membership context, not every active media query.
+      resetShellQueries(queryClient)
+      await router.invalidate()
+      owner.assertCurrent()
+      await navigate({ to: home })
+    } catch (error) {
+      try {
+        owner?.assertCurrent()
+      } catch {
+        return
+      }
+      setSwitchError(describeError(error))
+    } finally {
+      setIsSwitching(false)
     }
-    await queryClient.invalidateQueries()
-    resetShellQueries(queryClient)
-    await router.invalidate()
-    await navigate({ to: home })
   }
 
   return (
@@ -470,7 +505,7 @@ function OrganizationSwitcher({
           <Button
             variant="secondary"
             className="w-full justify-between"
-            disabled={!isOnline}
+            disabled={!isOnline || isSwitching}
             aria-label={
               organization === null
                 ? t('shell.chooseOrganization')
@@ -516,12 +551,19 @@ function OrganizationSwitcher({
   )
 }
 
-function UserMenu({ session }: { session: SessionData }) {
+function UserMenu({
+  session,
+  organization,
+}: {
+  session: SessionData
+  organization: ActiveOrganization | null
+}) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
   const [signOutError, setSignOutError] = useState<string | null>(null)
+  const [isAccessOpen, setIsAccessOpen] = useState(false)
 
   async function signOut() {
     const exitingUserId = session.user.id
@@ -549,63 +591,82 @@ function UserMenu({ session }: { session: SessionData }) {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="rounded-full focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
-          aria-label={t('shell.accountMenu', { name: session.user.name })}
-        >
-          <Avatar name={session.user.name} image={session.user.image} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>
-          <span className="block font-medium text-ink">{session.user.name}</span>
-          <span className="block truncate">{session.user.email}</span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/account' })}>
-          <CircleUserRound aria-hidden="true" className="size-4" />
-          {t('accountAuth.heading')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/invitations' })}>
-          <UserPlus aria-hidden="true" className="size-4" />
-          {t('siteInvites.heading')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/members' })}>
-          <Users aria-hidden="true" className="size-4" />
-          {t('shell.nav.members')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => void navigate({ to: '/app/audit' })}>
-          <ScrollText aria-hidden="true" className="size-4" />
-          {t('shell.nav.audit')}
-        </DropdownMenuItem>
-        {isPlatformAdmin(session.user) ? (
-          <DropdownMenuItem onSelect={() => void navigate({ to: '/app/admin' })}>
-            <ShieldCheck aria-hidden="true" className="size-4" />
-            {t('shell.nav.admin')}
-          </DropdownMenuItem>
-        ) : null}
-        <DropdownMenuSeparator />
-        {signOutError === null ? null : (
-          <p
-            role="alert"
-            className="max-w-xs px-2 py-2 text-sm whitespace-normal text-rose-700 dark:text-rose-300"
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="rounded-full focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:outline-none"
+            aria-label={t('shell.accountMenu', { name: session.user.name })}
           >
-            {signOutError}
-          </p>
-        )}
-        <DropdownMenuItem
-          onSelect={(event) => {
-            event.preventDefault()
-            void signOut()
-          }}
-        >
-          <LogOut aria-hidden="true" className="size-4" />
-          {t('shell.signOut')}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <Avatar name={session.user.name} image={session.user.image} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>
+            <span className="block font-medium text-ink">{session.user.name}</span>
+            <span className="block truncate">{session.user.email}</span>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => void navigate({ to: '/app/account' })}>
+            <CircleUserRound aria-hidden="true" className="size-4" />
+            {t('accountAuth.heading')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => void navigate({ to: '/app/invitations' })}>
+            <UserPlus aria-hidden="true" className="size-4" />
+            {t('siteInvites.heading')}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {organization === null ? null : (
+            <DropdownMenuLabel>{organization.name}</DropdownMenuLabel>
+          )}
+          <DropdownMenuItem
+            data-guidance-topic="workspace"
+            disabled={organization === null}
+            onSelect={() => setIsAccessOpen(true)}
+          >
+            <Users aria-hidden="true" className="size-4" />
+            {t('shell.manageAccess')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => void navigate({ to: '/app/audit' })}>
+            <ScrollText aria-hidden="true" className="size-4" />
+            {t('shell.nav.audit')}
+          </DropdownMenuItem>
+          {isPlatformAdmin(session.user) ? (
+            <DropdownMenuItem onSelect={() => void navigate({ to: '/app/admin' })}>
+              <ShieldCheck aria-hidden="true" className="size-4" />
+              {t('shell.nav.admin')}
+            </DropdownMenuItem>
+          ) : null}
+          <DropdownMenuSeparator />
+          {signOutError === null ? null : (
+            <p
+              role="alert"
+              className="max-w-xs px-2 py-2 text-sm whitespace-normal text-rose-700 dark:text-rose-300"
+            >
+              {signOutError}
+            </p>
+          )}
+          <DropdownMenuItem
+            onSelect={(event) => {
+              event.preventDefault()
+              void signOut()
+            }}
+          >
+            <LogOut aria-hidden="true" className="size-4" />
+            {t('shell.signOut')}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {isAccessOpen && organization !== null ? (
+        <Suspense fallback={null}>
+          <WorkspaceAccessDialog
+            organization={organization}
+            userId={session.user.id}
+            onClose={() => setIsAccessOpen(false)}
+          />
+        </Suspense>
+      ) : null}
+    </>
   )
 }

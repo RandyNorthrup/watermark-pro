@@ -16,8 +16,8 @@ Start with [the self-hosting guide](docs/self-hosting.md). Bundled fonts and
 stickers retain their included open-source licenses; hosting and provider
 services have their own costs.
 
-- **Creative tools:** 551 distinct font families, 400 colour vector stickers,
-  drawn signatures, text effects, shapes, tiling, multiple marks and saved QR codes.
+- **Creative tools:** 551 distinct font families, 400 color vector stickers,
+  drawn signatures, text effects, 20 geometric shapes, tiling, multiple marks and saved QR codes.
 - **Photo workflow:** single-image editing, batch processing, crop/resize,
   brightness/contrast/saturation controls, and JPEG/PNG/WebP export.
 - **Save and share:** reusable preset import/export, gallery storage,
@@ -25,14 +25,16 @@ services have their own costs.
 - **Offline work:** prepare the app, edit presets and save photos without a
   connection, then synchronize with visible retry and conflict recovery.
 - **Accounts:** invite-only email registration and optional Google/Microsoft
-  sign-in, explicit provider linking, private workspaces, and separate deliberate
-  collaboration workspaces.
+  sign-in, explicit provider linking, and workspaces kept private until their
+  owner deliberately grants access.
 - **Interface:** twelve languages, Arabic right-to-left layout, light/dark
   themes and responsive phone/tablet/desktop controls.
 
-**Release status:** Lumafoil 2.0 is deployed on `lumafoil.com`. Local quality,
-coverage, security, publication and bundle gates pass; the complete four-device
-Playwright/axe matrix passes on GitHub. The owner chose to launch on 2026-09-10
+**Release status:** Lumafoil 2.0 is deployed on `lumafoil.com`. The latest complete
+local quality run passed on the preceding sidebar/offline-build revision. Its
+four-device Playwright run passed 118 of 124 cases; current editor changes still
+require fresh complete verification. Earlier GitHub device evidence does not
+certify these later revisions. The owner chose to launch on 2026-09-10
 with remaining mobile Lighthouse timing work tracked after launch. Interactive
 hosted OAuth/cloud-provider journeys and the final version tag remain open and
 are not represented as certified by the deployment alone.
@@ -273,13 +275,13 @@ preset is a mark plus placement, contrast and style settings
   with `{date}`, `{time}` and `{filename}` tokens filled in per photo from
   capture metadata or the file's last-modified time and name; a Unicode glyph
   from nine groups (including Emoji); one of 70 lucide icons or 400 bundled
-  colour stickers; an uploaded logo; a signature drawn with a finger or mouse
+  color stickers; an uploaded logo; a signature drawn with a finger or mouse
   on the designer's pad (saved as a transparent PNG logo); or a QR code
   (up to 512 characters, always dark on a light field so it scans).
 - **Placement:** smart (the engine scores each corner and edge of every
   photo), a fixed corner, or a custom position.
 - **Contrast:** automatic light or dark ink with an outline that only appears
-  on mid-tone backgrounds; a manual light or dark variant; or any colour,
+  on mid-tone backgrounds; a manual light or dark variant; or any color,
   with the outline in the opposite tone and an adjustable strength.
 - **Style:** opacity, size relative to the photo width, rotation, margin,
   tiling with adjustable spacing, and for text and symbols an optional box
@@ -300,9 +302,9 @@ Presets **export** to a portable `.wmp.json` file (logos embedded) and
 preset against the same schema the app uses and renames a name clash rather
 than overwriting, so a file from another workspace lands safely.
 
-The designer previews every change through the same Web Worker that will
-process real photos, on a bundled sample scene or on a photo you pick; the
-photo never leaves the browser.
+The designer previews changes through the shared image engine, on the bundled
+sample scene or a photo you choose. Previewing does not upload the source photo;
+Gallery and cloud transfers are explicit save actions.
 
 ## Editor
 
@@ -312,9 +314,10 @@ this photo only: drag the mark,
 scale it from the corner handle, rotate it from the top handle, pinch and
 twist on a touch screen, or use the keyboard (arrow keys nudge, Shift for
 larger steps, `+`/`-` resize, `[`/`]` rotate). While dragging, the mark's
-centre snaps to the margin lines, the thirds and the centre, with guides
+center snaps to the margin lines, the thirds and the center, with guides
 drawn while it is snapped; hold Alt (Option on a Mac) to place it freely.
-The library preset is never changed; "Revert" restores it.
+Changes affect the current mark until you explicitly save its named preset;
+"Revert" restores the saved preset's style.
 
 Add up to eight presets to one photo. Each is a layer with its own
 placement and style; the list under the preset picker selects the layer the
@@ -336,32 +339,38 @@ appears only where the browser can share files). Every step is undoable
 Worker in your browser, or on the main thread where the browser has no
 `OffscreenCanvas`; nothing is uploaded.
 
+## Built-in templates
+
+The Library and the Image, Documents and Video Presets panels provide eighteen
+searchable starter layouts: Draft, Confidential, Strictly Confidential, Internal
+Use Only, Do Not Copy, Do Not Distribute, Copy, Void, For Review, Proof, Sample,
+Preview, Approved, Final, Unpaid, Copyright, Photo Credit and Repeating Proof.
+These are original project-licensed layouts using ordinary editable watermark
+specs. Applying one makes an unsaved draft; saving creates the user's own preset
+in the chosen workspace folder. A visual label does not change access permissions.
+
 ## Bulk watermarking
 
-`/app/bulk` applies one or more presets to a whole shoot (up to 500 photos).
-Drop the photos in or pick them — or drop a **folder**, or use "Add a folder"
-where the browser supports it, and the sub-folder tree is preserved in the
-ZIP. Non-image files are skipped and counted. Tick the presets (they are
-applied in the order ticked, later ones over earlier ones), choose the output
-format, quality, metadata policy and optionally a maximum long edge. A **File
-names** field sets the output naming with a live example and the tokens
-`{name}`, `{index}`, `{count}`, `{date}`, `{preset}`, `{width}` and `{height}`.
-A "Photo adjustments" section applies one rotation, flip, filter and frame to
-every photo.
+`/app/bulk` accepts images, PDFs and MP4/WebM/MOV videos in one batch of up to
+500 files. Folder inputs and folder drops preserve the subfolder tree in the ZIP.
+Unsupported files are counted, and malformed supported files produce individual
+errors without discarding successful outputs. Images keep their existing parallel
+worker path; mixed batches run one file at a time to bound document/video memory.
+Pause, resume, cancel and retry remain available.
 
-Press Start; the browser decodes each photo and a pool of engine workers (one
-per core, up to eight) renders them in parallel with smart placement and auto
-contrast worked out per photo and per mark. A running batch can be **paused**
-and resumed. The list shows the first 60 photos with a "Show all" control so a
-large batch avoids rendering every row at once. When it settles, download everything as one ZIP
-(tree preserved), save to the gallery, share or download file by file, and
-download a **CSV report** of every job. Nothing is uploaded unless you save the
-results to the gallery or explicitly send them to a configured cloud provider.
+Image format, compression, metadata, orientation, resizing and frame controls
+apply only to photos. PNG at original resolution remains the image default. PDFs
+retain their original pages and gain a transparent watermark layer. Video has
+separate quality and resolution choices, defaulting to High and Original; codec
+support and audio handling follow the Video tool below. Video and PDF decoding
+limits still apply to each file.
 
-One photo can be **adjusted on its own**: "Adjust" opens it in the full editor
-(embedded, no export step); "Apply to this photo" re-runs just that job with
-the edits, "Apply to all photos" reuses them across the batch, and "Remove
-override" restores the batch settings. An adjusted row is marked **Custom**.
+Output names support `{name}`, `{index}`, `{count}`, `{date}`, `{preset}`, `{width}`
+and `{height}`. Pixel-size name tokens are refused for PDFs, which have page
+geometry rather than one pixel resolution. Download individual results, a ZIP,
+or a CSV report; cloud saves accept every output type. Gallery saves explicitly
+include only image outputs and allow a chosen Gallery folder. Per-photo adjustment
+overrides remain available for images.
 
 **Watch a folder** (desktop browsers with the File System Access API): pick an
 input and an output folder and any new photo dropped into the input is
@@ -369,6 +378,13 @@ watermarked with the ticked presets and written to the output while the page
 stays open.
 
 ## Video
+
+The inline video viewer supports playback and scrubbing, editable watermark
+layers, timestamp keyframes, shortest-path rotation and fade-in/out intervals.
+Click a watermark to show its transform handles. After adding a keyframe, moving,
+resizing or rotating the mark at another time records another pose. Toolbar and
+timeline edits share undo/redo. Preview and the encoder use the same interpolation;
+the display-only mark canvas is bounded separately from the encoded resolution.
 
 Watermark MP4, WebM and MOV in the browser with WebCodecs — the same presets,
 placement and contrast as photos, on every frame. Audio preservation depends on
@@ -383,25 +399,32 @@ or 720p. The container follows whichever codec the browser can encode — MP4
 (AAC→MP4, Opus→WebM), otherwise re-encoded at 128 kbit/s when the target audio
 encoder is available. Otherwise output has no audio track, as shown before
 processing. Everything runs in a
-dedicated Web Worker; nothing is uploaded and the gallery does not store videos.
+dedicated Web Worker. Nothing is uploaded unless a cloud save is chosen; the
+gallery does not store videos.
 Browsers without `VideoEncoder` or an encodable supported codec see an
 unsupported message. Support is detected at runtime; a browser name or version
 alone does not guarantee encoding on a particular device.
 
 ## Documents
 
-Watermark every page of a PDF with the same presets as photos. Drop or pick up
-to 50 PDFs (≤ 50 MiB, ≤ 200 pages each); the ticked layers are rasterised once
-per distinct page size at 150 dpi and drawn on every page with `pdf-lib`. Smart
-placement reads a photo, so on a blank page it falls back to a bottom-right
-anchor (the tool says so); choose a corner or a custom position instead. Output
-is `<name>-watermarked.pdf`, one per input or a ZIP for several, with the Info
-dictionary kept, `Producer` set to "Lumafoil" and `ModDate` refreshed.
-Encrypted PDFs are refused. Everything runs in the browser; nothing is uploaded.
+Open a PDF in the inline Documents editor (up to 50 MiB and 200 pages), navigate
+its actual pages, read extracted page text, and position marks with the same
+watermark tools and touch controls as Image. PDF.js and its fonts, CMaps, color
+profiles and decoders are served locally and included in offline preparation.
+Document actions and XFA are not executed.
+
+Each exported page retains its original searchable text, vector content and
+embedded images. Only the added watermark is rasterized. The exporter analyzes
+the real page for contrast/placement and respects its visible CropBox and page
+rotation. Its full-quality watermark raster uses the existing 150 dpi setting;
+a page requiring a raster side above 8192 pixels is refused instead of silently
+downsampling. Source information fields are preserved except Producer and ModDate.
+Password-protected PDFs must be unlocked first. Download the PDF, use supported
+platform sharing, or choose a cloud destination. Use Bulk for multiple documents.
 
 ## Exports and metadata
 
-Every export, from the editor or the bulk tool, is re-encoded from pixels by
+Image exports, from Image or Bulk, are re-encoded from full-resolution pixels by
 the browser's canvas. A **Metadata** setting under the format chooses what of
 the source's EXIF/XMP travels with the file:
 
@@ -477,7 +500,9 @@ under a link that expires after 1, 7 or 30 days, or never. The link can be
 copied or handed to the device's share sheet. Anyone with it sees the album
 at `/share/<token>` and can download the photos; nothing else in the
 organization is reachable from it. `/app/shares` lists every link with its
-status and revokes it instantly. Editors and above can share; viewers cannot.
+status and lets you revoke access. Revocation blocks subsequent server requests;
+it cannot recall copies already downloaded. Editors and above can share;
+viewers cannot.
 
 Tokens are signed (HMAC-SHA-256 with a key derived from the application
 secret) and carry their expiry. The database stores share metadata and

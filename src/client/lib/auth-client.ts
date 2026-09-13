@@ -21,5 +21,3 @@ export const authClient = withAuthAccountBoundary(
 
 export type { ShellSession as SessionData } from '../../shared/shell-cache'
 export type ActiveOrganization = ShellOrganization
-export type OrganizationMember = ActiveOrganization['members'][number]
-export type OrganizationInvitation = ActiveOrganization['invitations'][number]

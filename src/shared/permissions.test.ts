@@ -1,15 +1,40 @@
 import { describe, expect, it } from 'vitest'
 
-import { ASSIGNABLE_ROLES } from './constants'
 import { isOrganizationRole, ORGANIZATION_ROLES, roles } from './permissions'
 
 describe('organization roles', () => {
-  it('gives owners and admins the audit trail and member management', () => {
+  it('keeps audit access for owners and legacy workspace admins', () => {
     for (const role of [roles.owner, roles.admin]) {
       expect(role.authorize({ audit: ['read'] }).success).toBe(true)
-      expect(role.authorize({ member: ['create', 'update', 'delete'] }).success).toBe(true)
-      expect(role.authorize({ invitation: ['create'] }).success).toBe(true)
     }
+  })
+
+  it.each(['create', 'update', 'delete'] as const)('reserves member %s for the owner', (action) => {
+    expect(roles.owner.authorize({ member: [action] }).success).toBe(true)
+    for (const role of [roles.admin, roles.editor, roles.viewer]) {
+      expect(role.authorize({ member: [action] }).success).toBe(false)
+    }
+  })
+
+  it.each(['create', 'cancel'] as const)('reserves invitation %s for the owner', (action) => {
+    expect(roles.owner.authorize({ invitation: [action] }).success).toBe(true)
+    for (const role of [roles.admin, roles.editor, roles.viewer]) {
+      expect(role.authorize({ invitation: [action] }).success).toBe(false)
+    }
+  })
+
+  it('does not provide legacy admins an alternate grant path through teams or access policy', () => {
+    expect(roles.owner.authorize({ team: ['create', 'update', 'delete'] }).success).toBe(true)
+    expect(roles.owner.authorize({ ac: ['create', 'update', 'delete'] }).success).toBe(true)
+    expect(roles.admin.authorize({ team: ['create', 'update', 'delete'] }).success).toBe(false)
+    expect(roles.admin.authorize({ ac: ['create', 'update', 'delete'] }).success).toBe(false)
+    expect(
+      roles.admin.authorize({ watermark: ['create', 'read', 'update', 'delete'] }).success,
+    ).toBe(true)
+    expect(roles.admin.authorize({ photo: ['upload', 'read', 'delete', 'export'] }).success).toBe(
+      true,
+    )
+    expect(roles.admin.authorize({ job: ['run'], share: ['create', 'revoke'] }).success).toBe(true)
   })
 
   it('reserves organization deletion for owners', () => {
@@ -36,7 +61,6 @@ describe('organization roles', () => {
 
   it('exposes the role catalogue consistently', () => {
     expect(ORGANIZATION_ROLES).toEqual(['owner', 'admin', 'editor', 'viewer'])
-    expect(ASSIGNABLE_ROLES).not.toContain('owner')
     expect(isOrganizationRole('editor')).toBe(true)
     expect(isOrganizationRole('superuser')).toBe(false)
   })

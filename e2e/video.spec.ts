@@ -67,7 +67,7 @@ async function expectUnsupported(page: Page) {
     }),
   ).toBeVisible()
   await expect(page.getByLabel('Add a video', { exact: true })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Watermark video', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Download Video', exact: true })).toHaveCount(0)
   await expect(page.getByRole('button', { name: /^Download / })).toHaveCount(0)
   await expectAccessible(page)
   await navigateTo(page, 'Library')
@@ -123,7 +123,7 @@ test('matches real encoding capability and produces a complete video when suppor
   const label = await supported.innerText()
   const container = label.includes('MP4') ? 'mp4' : 'webm'
   const outputName = `sample-video-watermarked.${container}`
-  const watermark = page.getByRole('button', { name: 'Watermark video', exact: true })
+  const watermark = page.getByRole('button', { name: 'Download Video', exact: true })
   await expect(watermark).toBeDisabled()
   await page.getByLabel('Add a video').setInputFiles({
     name: 'broken.mp4',
@@ -133,17 +133,54 @@ test('matches real encoding capability and produces a complete video when suppor
   await expect(page.getByRole('alert')).toBeVisible()
   await expect(watermark).toBeDisabled()
   await page.getByLabel('Add a video').setInputFiles(FIXTURE_PATH)
-  await expect(page.getByRole('heading', { level: 2, name: 'sample-video.mp4' })).toBeVisible()
+  const native = page.locator('video')
+  await expect(native).toBeVisible()
+  await expect
+    .poll(() =>
+      native.evaluate((element: unknown) => {
+        if (typeof element !== 'object' || element === null)
+          throw new Error('Expected native video')
+        const value: unknown = Reflect.get(element, 'readyState')
+        if (typeof value !== 'number') throw new Error('Expected native video state')
+        return value
+      }),
+    )
+    .toBeGreaterThanOrEqual(2)
   await expect(page.getByRole('alert')).toHaveCount(0)
-  await expect(watermark).toBeDisabled()
-  await page.getByRole('checkbox', { name: 'Video preset' }).check()
-  await expect(watermark).toBeEnabled()
-  await watermark.click()
-  const downloadButton = page.getByRole('button', { name: `Download ${outputName}`, exact: true })
-  await expect(downloadButton).toBeVisible({ timeout: TRANSCODE_TIMEOUT_MS })
+  await page.getByRole('button', { name: 'Play', exact: true }).click()
+  await expect
+    .poll(() =>
+      native.evaluate((element: unknown) => {
+        if (typeof element !== 'object' || element === null)
+          throw new Error('Expected native video')
+        const value: unknown = Reflect.get(element, 'currentTime')
+        if (typeof value !== 'number') throw new Error('Expected native video state')
+        return value
+      }),
+    )
+    .toBeGreaterThan(0)
+  await page.getByRole('button', { name: 'Pause', exact: true }).click()
+  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
+  await page
+    .getByRole('combobox', { name: 'Preset', exact: true })
+    .selectOption({ label: 'Video preset' })
+  const playhead = page.getByRole('slider', { name: 'Playhead', exact: true })
+  await playhead.fill('0')
+  await page.getByRole('button', { name: 'Add Keyframe Here', exact: true }).click()
+  await playhead.fill('1')
+  await page.getByRole('button', { name: 'Add Keyframe Here', exact: true }).click()
+  await expect(page.getByRole('list', { name: 'Keyframes' }).getByRole('listitem')).toHaveCount(2)
+  await page.getByRole('tab', { name: 'Style', exact: true }).click()
+  await page.getByRole('slider', { name: 'Rotation', exact: true }).fill('25')
+  await page.getByRole('slider', { name: 'Fade In', exact: true }).fill('0.2')
+  await page.getByRole('slider', { name: 'Fade Out', exact: true }).fill('0.2')
+  await playhead.fill('0')
+  await expect(page.getByRole('slider', { name: 'Rotation', exact: true })).toHaveValue('0')
+  await playhead.fill('1')
+  await expect(page.getByRole('slider', { name: 'Rotation', exact: true })).toHaveValue('25')
   await expectAccessible(page)
-  const downloadPending = page.waitForEvent('download')
-  await downloadButton.click()
+  const downloadPending = page.waitForEvent('download', { timeout: TRANSCODE_TIMEOUT_MS })
+  await watermark.click()
   const download = await downloadPending
   expect(download.suggestedFilename()).toBe(outputName)
   const bytes = await downloadBytes(download)

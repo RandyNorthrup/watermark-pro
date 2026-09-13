@@ -14,7 +14,7 @@ vi.mock('../lib/auth-client', () => ({
   authClient: { signIn: { social: auth.social }, linkSocial: auth.linkSocial },
 }))
 
-function show(mode: 'sign-in' | 'link' = 'sign-in', isEnabled = true) {
+function show(mode: 'sign-in' | 'link' = 'sign-in', isEnabled = true, callbackURL?: string) {
   const queryClient = createQueryClient()
   queryClient.setQueryData(publicConfigQueryOptions.queryKey, {
     ...NO_CLOUD_CONFIG,
@@ -23,7 +23,7 @@ function show(mode: 'sign-in' | 'link' = 'sign-in', isEnabled = true) {
   })
   render(
     <QueryClientProvider client={queryClient}>
-      <SocialAuth mode={mode} invitation="fixture-invitation" />
+      <SocialAuth mode={mode} invitation="fixture-invitation" callbackURL={callbackURL} />
     </QueryClientProvider>,
   )
 }
@@ -39,6 +39,33 @@ beforeEach(() => {
 })
 
 describe('account OAuth controls', () => {
+  it.each(['Google', 'Microsoft'])(
+    'returns %s sign-in to the requested workspace invitation',
+    async (provider) => {
+      show('sign-in', true, '/workspace-invitation/fixture-return-path')
+      await userEvent
+        .setup()
+        .click(screen.getByRole('button', { name: `Continue with ${provider}` }))
+      expect(auth.social).toHaveBeenCalledWith(
+        expect.objectContaining({
+          callbackURL: '/workspace-invitation/fixture-return-path',
+          errorCallbackURL: '/login',
+        }),
+        expect.any(Object),
+      )
+    },
+  )
+  it.each([
+    'https://outside.example/',
+    '//outside.example/',
+    String.raw`/\outside.example/`,
+    '/\n/outside.example/',
+  ])('refuses unsafe return path %j before starting OAuth', async (callbackURL) => {
+    show('sign-in', true, callbackURL)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Continue with Google' }))
+    expect(auth.social).not.toHaveBeenCalled()
+    expect(await screen.findByRole('alert')).toBeVisible()
+  })
   it.each(['Google', 'Microsoft'])(
     'passes the invitation through a header for %s account signup',
     async (provider) => {

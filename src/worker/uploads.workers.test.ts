@@ -4,7 +4,14 @@ import { eq, sql } from 'drizzle-orm'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import type { AuditEntry } from './audit'
-import { organization, uploadReservation, user } from './db/schema'
+import {
+  auditLog,
+  member,
+  organization,
+  uploadReservation,
+  user,
+  workspaceFolder,
+} from './db/schema'
 import { getServices } from './services'
 import { cleanupUploads, persistUpload } from './upload-lifecycle'
 import { UPLOAD_POLICY, type UploadRecord, type UploadReservation } from './upload-store'
@@ -35,6 +42,13 @@ beforeEach(async () => {
     id: organizationId,
     name: 'Upload workspace',
     slug: organizationId,
+    createdAt: new Date(),
+  })
+  await services.db.insert(member).values({
+    id: crypto.randomUUID(),
+    organizationId,
+    userId: actorId,
+    role: 'owner',
     createdAt: new Date(),
   })
 })
@@ -117,6 +131,47 @@ async function seedCount(kind: 'photo' | 'logo', count: number) {
 }
 
 describe('atomic D1 upload admission and R2 recovery', () => {
+  it('rejects a folder removed after reservation without committing photo metadata or audit', async () => {
+    const folderId = crypto.randomUUID()
+    await services.db.insert(workspaceFolder).values({
+      id: folderId,
+      organizationId,
+      kind: 'photo',
+      name: 'Destination',
+      nameKey: 'destination',
+      versionId: crypto.randomUUID(),
+    })
+    const item = upload()
+    if (item.record.kind !== 'photo') throw new Error('Expected a photo upload')
+    item.record.value.folderId = folderId
+    expect(await services.uploads.reserve(item.reservation)).toBe('reserved')
+    await services.db.delete(workspaceFolder).where(eq(workspaceFolder.id, folderId))
+    await expect(
+      services.uploads.commit(item.reservation, item.record, item.audit),
+    ).rejects.toMatchObject({ status: 409 })
+    expect(await services.photos.find(organizationId, item.record.value.id)).toBeNull()
+    const audit = await services.db
+      .select()
+      .from(auditLog)
+      .where(eq(auditLog.targetId, item.record.value.id))
+    expect(audit).toEqual([])
+  })
+  it.each(['photo', 'logo'] as const)(
+    'rechecks membership at %s commit after the upload began',
+    async (kind) => {
+      const item = upload(kind)
+      expect(await services.uploads.reserve(item.reservation)).toBe('reserved')
+      await services.db.delete(member).where(eq(member.organizationId, organizationId))
+      await expect(
+        services.uploads.commit(item.reservation, item.record, item.audit),
+      ).rejects.toMatchObject({ status: 403 })
+      const audit = await services.db
+        .select()
+        .from(auditLog)
+        .where(eq(auditLog.targetId, item.record.value.id))
+      expect(audit).toEqual([])
+    },
+  )
   it.each(['photo', 'logo'] as const)(
     'admits only the final available %s slot under concurrent requests',
     async (kind) => {

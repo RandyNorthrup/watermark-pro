@@ -7,6 +7,7 @@
  * `raster.browser.test.ts` tests exercise this drawing code with V8 coverage.
  */
 import { documentSpec, type PageSize, pixelDimensions } from './raster-layout'
+import { MAX_PHOTO_SIDE } from '../../shared/constants'
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { LuminanceMap } from '../engine/analysis'
 import { FontLoader } from '../engine/fonts'
@@ -41,17 +42,20 @@ export class DocumentRasteriser {
   async prepare(specs: readonly WatermarkSpec[]): Promise<void> {
     const resolved = await this.#resources.resolve(specs)
     await this.#fonts.ensure(resolved.fonts)
+    for (const mark of this.#marks) mark.image?.close()
     this.#marks = resolved.marks
   }
 
   /** Transparent PNG bytes of the prepared marks drawn at `page`'s size. */
-  async rasterise(page: PageSize): Promise<Uint8Array> {
+  async rasterise(page: PageSize, map?: LuminanceMap): Promise<Uint8Array> {
     const pixels = pixelDimensions(page)
+    if (pixels.width > MAX_PHOTO_SIDE || pixels.height > MAX_PHOTO_SIDE)
+      throw new RangeError('The PDF page is too large for a full-quality watermark raster.')
     const canvas = mainThreadBackend().createCanvas(pixels.width, pixels.height)
     for (const mark of this.#marks) {
-      composeMark(canvas.context, pixels, WHITE_PAGE_MAP, {
+      composeMark(canvas.context, pixels, map ?? WHITE_PAGE_MAP, {
         ...mark,
-        spec: documentSpec(mark.spec),
+        spec: map === undefined ? documentSpec(mark.spec) : mark.spec,
       })
     }
     const blob = await canvas.encode({ format: 'image/png', quality: 1, metadata: 'strip' })

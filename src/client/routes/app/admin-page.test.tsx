@@ -209,9 +209,9 @@ describe('administration page', () => {
     expect(screen.getByText('Thea Third')).toBeInTheDocument()
   })
 
-  it('shows organizations and the global audit trail', async () => {
+  it('shows workspaces and the global audit trail', async () => {
     const { router } = await renderAsAdmin('organizations')
-    const table = await screen.findByRole('table', { name: /Organizations/ })
+    const table = await screen.findByRole('table', { name: /Workspaces/ })
     expect(within(table).getByText('Acme Studio')).toBeInTheDocument()
     expect(within(table).getByText('5.0 MB')).toBeInTheDocument()
     expect(screen.queryByLabelText('Search by email')).not.toBeInTheDocument()
@@ -223,9 +223,9 @@ describe('administration page', () => {
     expect(within(audit).getByText('admin.user_banned')).toBeInTheDocument()
     expect(within(audit).getByText('platform')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: 'Audit trail' })).toBeInTheDocument()
-    expect(screen.queryByRole('table', { name: /Organizations/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('table', { name: /Workspaces/ })).not.toBeInTheDocument()
     act(() => router.history.back())
-    expect(await screen.findByRole('table', { name: /Organizations/ })).toBeInTheDocument()
+    expect(await screen.findByRole('table', { name: /Workspaces/ })).toBeInTheDocument()
     expect(screen.queryByRole('table', { name: /Audit entries/ })).not.toBeInTheDocument()
   })
 

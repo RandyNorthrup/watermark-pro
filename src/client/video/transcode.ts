@@ -30,6 +30,7 @@ import type { InputAudioTrack, InputVideoTrack, OutputFormat } from 'mediabunny'
 
 import { CancelledError } from './errors'
 import { context2d } from './frame'
+import { videoMotionSchema, videoSpecAt, type VideoMotion } from './motion'
 import type { AudioPlan, TranscodePlan, VideoContainer } from './plan'
 import { artworkLicenseNotice } from '../../shared/asset-licenses'
 import type { LuminanceMap } from '../engine/analysis'
@@ -43,6 +44,8 @@ export interface TranscodeRequest {
   marks: RenderableMark[]
   plan: TranscodePlan
   signal: AbortSignal
+  /** Optional per-layer poses/fades, indexed in the same order as marks. */
+  motions?: readonly (VideoMotion | null)[] | undefined
 }
 
 export interface TranscodeProgress {
@@ -134,6 +137,7 @@ async function encodeFrames(
   videoSource: CanvasSource,
   signal: AbortSignal,
   progress: TranscodeProgress,
+  motions: readonly (VideoMotion | null)[],
 ): Promise<void> {
   const sink = new VideoSampleSink(track)
   let map: LuminanceMap | null = null
@@ -148,8 +152,11 @@ async function encodeFrames(
     sample.draw(ctx, 0, 0, size.width, size.height)
     sample.close()
     map ??= analysePixels(ctx.getImageData(0, 0, size.width, size.height))
-    for (const mark of marks) {
-      composeMark(ctx, size, map, mark)
+    for (const [markIndex, mark] of marks.entries()) {
+      composeMark(ctx, size, map, {
+        ...mark,
+        spec: videoSpecAt(mark.spec, motions[markIndex], timestamp),
+      })
     }
     await videoSource.add(timestamp, duration > 0 ? duration : undefined)
     index += 1
@@ -163,6 +170,11 @@ export async function transcodeVideo(
   progress: TranscodeProgress = {},
 ): Promise<Blob> {
   const { source, marks, plan, signal } = request
+  const motions = (request.motions ?? []).map((motion) =>
+    motion === null ? null : videoMotionSchema.parse(motion),
+  )
+  if (motions.length > marks.length)
+    throw new RangeError('Video motion must belong to an existing watermark layer.')
   const input = new Input({ source: new BlobSource(source), formats: ALL_FORMATS })
   const videoTrack = await input.getPrimaryVideoTrack()
   if (videoTrack === null) {
@@ -183,7 +195,16 @@ export async function transcodeVideo(
 
   await output.start()
   try {
-    await encodeFrames(videoTrack, ctx, { width, height }, marks, videoSource, signal, progress)
+    await encodeFrames(
+      videoTrack,
+      ctx,
+      { width, height },
+      marks,
+      videoSource,
+      signal,
+      progress,
+      motions,
+    )
     videoSource.close()
     await drainAudio(audioPipe, signal)
     await output.finalize()

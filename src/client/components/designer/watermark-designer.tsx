@@ -7,25 +7,26 @@ import { useTranslation } from 'react-i18next'
 import { FontPicker } from './font-picker'
 import { LogoPicker } from './logo-picker'
 import { PlacementPanel } from './placement-panel'
+import { PresetNameDialog } from './preset-name-dialog'
 import { PreviewPanel } from './preview-panel'
 import { ShapePanel } from './shape-panel'
 import { StylePanel } from './style-panel'
 import { SymbolPicker } from './symbol-picker'
 import { TextEffects } from './text-effects'
-import { TokenMenu } from './token-menu'
+import { TextSymbolBar } from './text-symbol-bar'
 import { useDesignHistory } from './use-design-history'
 import { presetNameSchema } from '../../../shared/api'
-import type { WatermarkDto } from '../../../shared/api-watermark'
+import type { SaveWatermarkRequest, WatermarkDto } from '../../../shared/api-watermark'
 import { MAX_PRESET_NAME_LENGTH } from '../../../shared/constants'
 import {
   MAX_QR_CONTENT_LENGTH,
   MAX_TEXT_LENGTH,
   MAX_TEXT_LINES,
-  type TextToken,
   type WatermarkSpec,
 } from '../../../shared/watermark'
 import { describeError } from '../../lib/errors'
-import { createWatermark, libraryQueryKey, updateWatermark } from '../../lib/library'
+import { createWatermark, updateWatermark } from '../../lib/library'
+import { captureOfflineOwner } from '../../lib/offline-context'
 import {
   blankSpec,
   defaultSpecFor,
@@ -33,6 +34,7 @@ import {
   type MarkKind,
   withPlacement,
 } from '../../lib/spec-edit'
+import { FolderPicker } from '../folders/folder-picker'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
@@ -45,6 +47,8 @@ interface WatermarkDesignerProps {
   /** Existing preset to edit; omitted for a new one. */
   initial?: WatermarkDto | undefined
   initialSpec?: WatermarkSpec | undefined
+  initialFolderId?: string | null | undefined
+  initialName?: string | undefined
   previewPhoto?: File | undefined
   submitLabel?: string | undefined
   canManage: boolean
@@ -120,6 +124,8 @@ function WatermarkDesignerSession({
   organizationId,
   initial,
   initialSpec,
+  initialFolderId,
+  initialName,
   previewPhoto,
   submitLabel,
   canManage,
@@ -130,8 +136,11 @@ function WatermarkDesignerSession({
 }: WatermarkDesignerProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const [account] = useState(captureOfflineOwner)
+  const [baseline, setBaseline] = useState(initial)
+  const [folderId, setFolderId] = useState(initial?.folderId ?? initialFolderId ?? null)
   const history = useDesignHistory<DesignerDraft>({
-    name: initial?.name ?? '',
+    name: initial?.name ?? initialName ?? '',
     spec: initial?.spec ?? initialSpec ?? blankSpec(),
     drafts: {},
   })
@@ -153,16 +162,23 @@ function WatermarkDesignerSession({
     else inline.redo()
   }
   const [nameError, setNameError] = useState<string | null>(null)
+  const [isNameDialogOpen, setIsNameDialogOpen] = useState(false)
+  const [hasTextInsertionError, setHasTextInsertionError] = useState(false)
   const textRef = useRef<HTMLTextAreaElement>(null)
 
-  /** Inserts a token at the caret (or the end) of the text mark and keeps focus after it. */
-  function insertToken(token: TextToken) {
+  /** Symbols and metadata tokens share cursor insertion and document history. */
+  function insertText(token: string) {
     if (spec.kind !== 'text') {
       return
     }
     const field = textRef.current
     const start = field?.selectionStart ?? spec.text.length
     const end = field?.selectionEnd ?? spec.text.length
+    if (spec.text.length - (end - start) + token.length > MAX_TEXT_LENGTH) {
+      setHasTextInsertionError(true)
+      return
+    }
+    setHasTextInsertionError(false)
     const next = limitLines(spec.text.slice(0, start) + token + spec.text.slice(end))
     setSpec({ ...spec, text: next })
     const caret = start + token.length
@@ -174,15 +190,23 @@ function WatermarkDesignerSession({
 
   const save = useMutation({
     networkMode: 'always',
-    mutationFn: (body: { name: string; spec: WatermarkSpec }) =>
-      initial === undefined
-        ? createWatermark(organizationId, body)
-        : updateWatermark(organizationId, initial.id, {
-            ...body,
-            expectedUpdatedAt: initial.updatedAt,
-          }),
+    mutationFn: async (body: SaveWatermarkRequest) => {
+      account.assertCurrent()
+      const saved =
+        baseline === undefined
+          ? await createWatermark(organizationId, body)
+          : await updateWatermark(organizationId, baseline.id, {
+              ...body,
+              expectedUpdatedAt: baseline.updatedAt,
+            })
+      account.assertCurrent()
+      return saved
+    },
     onSuccess: async (saved) => {
-      await queryClient.invalidateQueries({ queryKey: libraryQueryKey(organizationId) })
+      await queryClient.invalidateQueries({ queryKey: ['organization', organizationId] })
+      account.assertCurrent()
+      setBaseline(saved)
+      setIsNameDialogOpen(false)
       onSaved(saved)
     },
   })
@@ -198,22 +222,42 @@ function WatermarkDesignerSession({
     inline?.onChange(next)
   }
 
-  function submit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault()
+  function saveNamedPreset(submittedName: string) {
     if (!canSave) return
-    let markContent = ''
-    if (spec.kind === 'text') markContent = spec.text
-    else if (spec.kind === 'qr') markContent = spec.content
-    const firstLine = markContent.trim().split('\n', 1)[0] ?? ''
-    const generatedName = firstLine === '' ? t('library.newPreset') : firstLine
-    const submittedName = inline !== undefined && initial === undefined ? generatedName : name
-    const parsedName = presetNameSchema.safeParse(submittedName.slice(0, MAX_PRESET_NAME_LENGTH))
+    const parsedName = presetNameSchema.safeParse(submittedName)
     if (!parsedName.success) {
       setNameError(t('designer.nameError'))
       return
     }
     setNameError(null)
-    save.mutate({ name: parsedName.data, spec })
+    save.mutate({
+      name: parsedName.data,
+      spec,
+      ...(folderId !== baseline?.folderId && { folderId }),
+      ...(baseline !== undefined &&
+        folderId !== baseline.folderId && {
+          expectedFolderRevision: baseline.folderRevision,
+          expectedFolderVersionId: baseline.folderVersionId,
+        }),
+    })
+  }
+
+  function submit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!canSave) return
+    if (inline === undefined) {
+      saveNamedPreset(name)
+      return
+    }
+    let markContent = ''
+    if (spec.kind === 'text') markContent = spec.text
+    else if (spec.kind === 'qr') markContent = spec.content
+    const firstLine = markContent.trim().split('\n', 1)[0] ?? ''
+    const suggestedName = firstLine === '' ? t('library.newPreset') : firstLine
+    const newName = name === '' ? (initialName ?? suggestedName) : name
+    setName((baseline === undefined ? newName : name).slice(0, MAX_PRESET_NAME_LENGTH))
+    setNameError(null)
+    setIsNameDialogOpen(true)
   }
 
   const isIncomplete = spec.kind === 'image' && spec.assetId === ''
@@ -253,6 +297,17 @@ function WatermarkDesignerSession({
             )}
           </Field>
         ) : null}
+        {inline === undefined && canSave ? (
+          <FolderPicker
+            key={organizationId}
+            organizationId={organizationId}
+            kind="preset"
+            value={folderId}
+            onChange={setFolderId}
+            label={t('folders.saveLocation')}
+            canCreate
+          />
+        ) : null}
 
         <Tabs.Root defaultValue="mark" className="flex flex-col gap-4">
           <Tabs.List
@@ -286,10 +341,13 @@ function WatermarkDesignerSession({
                     <Tabs.Trigger
                       key={kind.value}
                       value={kind.value}
-                      className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-1 py-2 text-center text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
+                      aria-label={kind.label}
+                      className="flex h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-1 text-center text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
                     >
                       <Icon aria-hidden="true" className="size-4" />
-                      <span className="max-w-full whitespace-normal">{kind.label}</span>
+                      <span className="max-w-full whitespace-nowrap">
+                        {kind.value === 'qr' ? t('designer.qr.shortLabel') : kind.label}
+                      </span>
                     </Tabs.Trigger>
                   )
                 })}
@@ -312,12 +370,18 @@ function WatermarkDesignerSession({
                           maxLength={MAX_TEXT_LENGTH}
                           rows={2}
                           onChange={(event) => {
+                            setHasTextInsertionError(false)
                             setSpec({ ...spec, text: limitLines(event.currentTarget.value) })
                           }}
                         />
                       )}
                     </Field>
-                    <TokenMenu onInsert={insertToken} />
+                    <TextSymbolBar onInsert={insertText} />
+                    {hasTextInsertionError ? (
+                      <p role="status" className="text-xs text-ink-muted">
+                        {t('designer.text.insertLimit')}
+                      </p>
+                    ) : null}
                     <FontPicker
                       family={spec.fontFamily}
                       weight={spec.fontWeight}
@@ -402,7 +466,7 @@ function WatermarkDesignerSession({
         ) : null}
         {canManage ? (
           <div
-            className={`flex flex-wrap items-center gap-2 ${inline === undefined ? '' : 'justify-center'}`}
+            className={`tool-section flex flex-wrap items-center gap-2 ${inline === undefined ? '' : 'justify-center'}`}
           >
             {inline === undefined ? (
               <>
@@ -458,6 +522,19 @@ function WatermarkDesignerSession({
           }}
         />
       ) : null}
+      <PresetNameDialog
+        organizationId={organizationId}
+        folderId={folderId}
+        onFolderChange={setFolderId}
+        isOpen={isNameDialogOpen}
+        name={name}
+        error={nameError}
+        saveError={save.error === null ? null : describeError(save.error)}
+        isSaving={save.isPending}
+        onOpenChange={setIsNameDialogOpen}
+        onNameChange={setName}
+        onSave={() => saveNamedPreset(name)}
+      />
     </form>
   )
 }

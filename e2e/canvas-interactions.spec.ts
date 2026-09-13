@@ -126,7 +126,7 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
     email: `canvas-${id}@example.test`,
     password: 'correct horse battery',
   })
-  await navigateTo(page, 'Editor')
+  await navigateTo(page, 'Image')
   await page.getByLabel('Open a photo').setInputFiles({
     name: 'portrait.png',
     mimeType: 'image/png',
@@ -165,7 +165,7 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
         ),
     )
     .toBeGreaterThan(actualWidth)
-  await page.getByRole('switch', { name: 'Grid' }).click()
+  await page.getByRole('switch', { name: 'Grid', exact: true }).click()
   await page.getByRole('slider', { name: 'Grid spacing' }).fill('80')
   await expect(page.locator('[data-canvas-grid]')).toHaveCSS('--canvas-grid-spacing', '120px')
   await page.getByRole('button', { name: 'Fit' }).click()
@@ -184,7 +184,11 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
   const savedPreset = page.waitForResponse(
     (response) => response.request().method() === 'POST' && response.url().endsWith('/watermarks'),
   )
-  await page.getByRole('button', { name: 'Save' }).click()
+  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  await page
+    .getByRole('dialog', { name: 'Save preset' })
+    .getByRole('button', { name: 'Save', exact: true })
+    .click()
   const response = await savedPreset
   expect(response.status()).toBe(201)
   await page.getByRole('tab', { name: 'Presets' }).click()

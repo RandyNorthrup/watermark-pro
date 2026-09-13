@@ -74,6 +74,8 @@ async function sourcePhoto() {
 }
 
 async function exportJpeg(page: Page, policy: RegExp) {
+  await page.getByRole('combobox', { name: 'Format', exact: true }).click()
+  await page.getByRole('option', { name: 'JPEG', exact: true }).click()
   await page.getByRole('radio', { name: policy }).check()
   const pending = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Download', exact: true }).click()

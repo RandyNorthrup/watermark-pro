@@ -4,6 +4,7 @@
  * with a `CancelledError`. Models `engine/worker-client.ts`.
  */
 import { CancelledError } from './errors'
+import type { VideoMotion } from './motion'
 import type { TranscodePlan } from './plan'
 import type { CancelRequestMessage, TranscodeStartMessage, VideoWorkerResponse } from './protocol'
 import type { FontResource, MarkInput } from '../engine/protocol'
@@ -18,6 +19,7 @@ export interface VideoTranscodeInput {
   marks: MarkInput[]
   fonts: FontResource[]
   plan: TranscodePlan
+  motions?: readonly (VideoMotion | null)[] | undefined
 }
 
 export interface VideoTranscodeCallbacks {

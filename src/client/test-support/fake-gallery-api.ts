@@ -24,6 +24,9 @@ export function makePhoto(overrides: Partial<PhotoDto> = {}): PhotoDto {
     height: 3000,
     presetId: 'wm-1',
     presetName: 'Studio signature',
+    folderId: null,
+    folderRevision: 0,
+    folderVersionId: null,
     createdBy: 'user-1',
     createdAt: '2026-09-05T10:00:00.000Z',
     ...overrides,
@@ -71,6 +74,9 @@ export function handleGallery(
   }
   if (method === 'GET' && id === undefined) {
     let rows = sortNewest(state.photos)
+    const folderId = parsed.searchParams.get('folderId')
+    if (folderId !== null)
+      rows = rows.filter((photo) => photo.folderId === (folderId === 'root' ? null : folderId))
     const presetId = parsed.searchParams.get('presetId')
     const search = parsed.searchParams.get('search')?.toLowerCase()
     const cursor = parsed.searchParams.get('cursor')
@@ -116,6 +122,7 @@ export function handleGallery(
     }
     const file = form.get('file')
     const presetId = form.get('presetId')
+    const folderId = form.get('folderId')
     nextId += 1
     const created = makePhoto({
       id: `photo-${String(nextId)}`,
@@ -124,6 +131,7 @@ export function handleGallery(
       width: Number(text(form, 'width')),
       height: Number(text(form, 'height')),
       presetId: typeof presetId === 'string' ? presetId : null,
+      folderId: typeof folderId === 'string' ? folderId : null,
       createdAt: new Date(Date.now() + nextId).toISOString(),
     })
     state.photos.push(created)

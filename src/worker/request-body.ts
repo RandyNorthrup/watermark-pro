@@ -1,7 +1,10 @@
 /** Bounded JSON parsing counts received bytes even when Content-Length is absent or false. */
 import { apiErrors } from './errors'
 
-export async function readJsonBody(request: Request, maxBytes: number): Promise<unknown> {
+export async function readJsonBody(
+  request: Request | Response,
+  maxBytes: number,
+): Promise<unknown> {
   if (Number(request.headers.get('content-length')) > maxBytes) {
     throw apiErrors.payloadTooLarge()
   }

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { FORMAT_OPTIONS } from './formats'
 import { MetadataPolicyField } from './metadata-policy'
 import type { PublicConfig } from '../../../shared/api'
-import { CLOUD_SAVE_FOLDER, MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
+import { IMAGE_EXPORT_DEFAULTS, MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
 import {
   DEFAULT_METADATA_POLICY,
   effectivePolicy,
@@ -18,6 +18,7 @@ import { invisibleCapacity } from '../../engine/invisible'
 import type { Size } from '../../engine/layout'
 import { PROVIDER_LABELS, type CloudUpload } from '../../lib/imports/source'
 import { canShareFiles } from '../../lib/share-file'
+import { FolderPicker } from '../folders/folder-picker'
 import { CloudSaveButtons } from '../import/cloud-save-buttons'
 import { Button } from '../ui/button'
 import { Select } from '../ui/select'
@@ -25,6 +26,7 @@ import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
 
 interface ExportPanelProps {
+  organizationId?: string | undefined
   outputSize: Size
   isReady: boolean
   isExporting: boolean
@@ -33,7 +35,7 @@ interface ExportPanelProps {
   onShare: (options: EncodeOptions) => void
   isSharing: boolean
   /** Present when the user may store photos in the gallery. */
-  onSave?: ((options: EncodeOptions) => void) | undefined
+  onSave?: ((options: EncodeOptions, folderId?: string | null) => void) | undefined
   isSaving?: boolean | undefined
   /** Seeds the default hidden-mark message; the workspace name identifies the owner. */
   organizationName: string
@@ -47,7 +49,6 @@ interface ExportPanelProps {
   onCloudError?: ((message: string) => void) | undefined
 }
 
-const DEFAULT_QUALITY = 0.9
 const QUALITY_STEP = 0.01
 const MIN_QUALITY = 0.3
 const PERCENT = 100
@@ -63,6 +64,7 @@ function isOutputFormat(value: string): value is OutputFormat {
 
 /** Format and quality for the download. */
 export function ExportPanel({
+  organizationId,
   outputSize,
   isReady,
   isExporting,
@@ -78,8 +80,14 @@ export function ExportPanel({
   onCloudError,
 }: ExportPanelProps) {
   const { t } = useTranslation()
-  const [format, setFormat] = useState<OutputFormat>('image/jpeg')
-  const [quality, setQuality] = useState(DEFAULT_QUALITY)
+  const [saveDestination, setSaveDestination] = useState<{
+    organizationId: string | undefined
+    folderId: string | null
+  }>({ organizationId, folderId: null })
+  const folderId =
+    saveDestination.organizationId === organizationId ? saveDestination.folderId : null
+  const [format, setFormat] = useState<OutputFormat>(IMAGE_EXPORT_DEFAULTS.format)
+  const [quality, setQuality] = useState<number>(IMAGE_EXPORT_DEFAULTS.quality)
   const [policy, setPolicy] = useState<MetadataPolicy>(DEFAULT_METADATA_POLICY)
   const [wantsInvisible, setWantsInvisible] = useState(false)
   const [message, setMessage] = useState(organizationName)
@@ -198,6 +206,18 @@ export function ExportPanel({
             {t('editor.export.share')}
           </Button>
         ) : null}
+        {onSave !== undefined && organizationId !== undefined ? (
+          <FolderPicker
+            key={organizationId}
+            organizationId={organizationId}
+            kind="photo"
+            value={folderId}
+            onChange={(next) => setSaveDestination({ organizationId, folderId: next })}
+            label={t('folders.saveLocation')}
+            disabled={isBusy}
+            canCreate
+          />
+        ) : null}
         {onSave === undefined ? null : (
           <Button
             type="button"
@@ -206,7 +226,7 @@ export function ExportPanel({
             isPending={isSaving}
             disabled={!isReady || isBlocked || (isBusy && !isSaving)}
             onClick={() => {
-              onSave(options())
+              onSave(options(), folderId)
             }}
           >
             {isSaving ? null : <Images aria-hidden="true" className="size-5" />}
@@ -227,7 +247,6 @@ export function ExportPanel({
               onCloudSaved?.(
                 t('editor.export.savedToFolder', {
                   provider: PROVIDER_LABELS[provider],
-                  folder: CLOUD_SAVE_FOLDER,
                 }),
               )
             }}

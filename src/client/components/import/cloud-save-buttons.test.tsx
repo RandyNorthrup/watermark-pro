@@ -13,6 +13,12 @@ import { ACCOUNT_CHANGED_EVENT } from '../../lib/offline-account'
 import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG as ALL, NO_CLOUD_CONFIG as NONE } from '../../test-support/cloud-config'
 import { fakeCloudSaver } from '../../test-support/fake-cloud-save'
+import {
+  FAKE_CLOUD_TARGET,
+  chooseCloudSaveDestination,
+} from '../../test-support/fake-cloud-selection'
+
+vi.mock('./cloud-browser-dialog', () => import('../../test-support/fake-cloud-browser-module'))
 
 beforeEach(() => {
   setOfflineUser('user-1')
@@ -65,7 +71,7 @@ describe('CloudSaveButtons', () => {
     }
     googleMock.mockRejectedValue(new CloudBatchError([file], 2, 3, new Error('quota')))
     const { user, onSaved, onError } = setup(ALL)
-    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await chooseCloudSaveDestination(user, 'Google Drive')
     await screen.findByRole('button', { name: 'Saved cloud files (1)' })
     expect(onSaved).toHaveBeenCalledWith('google', 1)
     expect(onError).toHaveBeenCalledWith(expect.stringContaining('1 of 3 files confirmed saved'))
@@ -75,7 +81,7 @@ describe('CloudSaveButtons', () => {
     const pending = Promise.withResolvers<CloudSavedFile[]>()
     googleMock.mockImplementation(() => pending.promise)
     const { user, onSaved, onError } = setup(ALL)
-    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await chooseCloudSaveDestination(user, 'Google Drive')
     await act(async () => {
       setOfflineUser('other')
       window.dispatchEvent(new Event(ACCOUNT_CHANGED_EVENT))
@@ -113,9 +119,11 @@ describe('CloudSaveButtons', () => {
     oneDriveMock.mockImplementation(fakeCloudSaver('onedrive'))
     const { user, onSaved, onError } = setup(ALL)
 
-    await user.click(screen.getByRole('button', { name: 'Save to OneDrive' }))
+    await chooseCloudSaveDestination(user, 'OneDrive')
 
-    await waitFor(() => expect(oneDriveMock).toHaveBeenCalledWith(ALL, expect.any(Function)))
+    await waitFor(() =>
+      expect(oneDriveMock).toHaveBeenCalledWith(ALL, expect.any(Function), FAKE_CLOUD_TARGET),
+    )
     expect(onSaved).toHaveBeenCalledWith('onedrive', 1)
     expect(onError).not.toHaveBeenCalled()
   })
@@ -123,12 +131,12 @@ describe('CloudSaveButtons', () => {
   it('does nothing when there is nothing to save', async () => {
     const { user, onSaved, onError } = setup(ALL, () => [])
 
-    await user.click(screen.getByRole('button', { name: 'Save to Dropbox' }))
+    await chooseCloudSaveDestination(user, 'Dropbox')
 
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Save to Dropbox' })).toBeEnabled(),
     )
-    expect(dropboxMock).toHaveBeenCalledWith(ALL, expect.any(Function))
+    expect(dropboxMock).toHaveBeenCalledWith(ALL, expect.any(Function), FAKE_CLOUD_TARGET)
     expect(onSaved).not.toHaveBeenCalled()
     expect(onError).not.toHaveBeenCalled()
   })
@@ -137,7 +145,7 @@ describe('CloudSaveButtons', () => {
     googleMock.mockRejectedValue(new Error('Drive said no'))
     const { user, onSaved, onError } = setup(ALL)
 
-    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await chooseCloudSaveDestination(user, 'Google Drive')
 
     await waitFor(() => expect(onError).toHaveBeenCalledWith('Drive said no'))
     expect(onSaved).not.toHaveBeenCalled()

@@ -7,6 +7,9 @@ import { MILLISECONDS_PER_SECOND } from '../shared/constants'
 export function watermarkToDto(record: WatermarkRecord) {
   return {
     ...record,
+    folderId: record.folderId ?? null,
+    folderRevision: record.folderRevision ?? 0,
+    folderVersionId: record.folderVersionId ?? null,
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
   }
@@ -19,7 +22,13 @@ export function assetToDto(record: AssetRecord) {
 
 export function photoToDto(record: PhotoRecord) {
   const { key: _key, thumbnailKey: _thumbnailKey, ...rest } = record
-  return { ...rest, createdAt: record.createdAt.toISOString() }
+  return {
+    ...rest,
+    folderId: record.folderId ?? null,
+    folderRevision: record.folderRevision ?? 0,
+    folderVersionId: record.folderVersionId ?? null,
+    createdAt: record.createdAt.toISOString(),
+  }
 }
 
 export function shareToDto(record: ShareRecord, url: string) {

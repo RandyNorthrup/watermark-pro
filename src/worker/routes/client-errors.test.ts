@@ -56,7 +56,7 @@ describe('POST /api/client-errors', () => {
           route: '/app/editor',
         }),
         {
-          'x-request-id': 'req-1',
+          'x-request-id': '/api/cloud/google/callback?code=CODE_CANARY&state=STATE_CANARY',
           'user-agent': 'test-agent',
         },
       ),
@@ -71,9 +71,11 @@ describe('POST /api/client-errors', () => {
       source: '/assets/app-abc123.js:1:2',
       route: '/app/editor',
       userAgent: null,
-      requestId: 'req-1',
+      requestId: response.headers.get('x-request-id'),
       userId: null,
     })
+    expect(response.headers.get('x-request-id')).toMatch(/^[0-9a-f-]{36}$/)
+    expect(JSON.stringify(stored)).not.toContain('CANARY')
   })
 
   it('rejects a report that is missing its message', async () => {

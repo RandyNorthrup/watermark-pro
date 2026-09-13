@@ -10,6 +10,7 @@ import {
   offlineUserId,
 } from './offline-context'
 import { pendingOperations, updatePendingOperation } from './offline-database'
+import { replayFolderChange } from './offline-folder-replay'
 import type { OfflineChange, PendingOperation } from './offline-model'
 import { updateOfflineStatus } from './offline-status'
 import { assetDtoSchema, photoDeleteResponseSchema, photoDtoSchema } from '../../shared/api'
@@ -38,7 +39,7 @@ async function replay(
       const path = isCreate ? `${root}/watermarks` : `${root}/watermarks/${change.preset.id}`
       const body =
         change.kind === 'preset-create'
-          ? { name: change.preset.name, spec: change.preset.spec }
+          ? { name: change.preset.name, spec: change.preset.spec, folderId: change.preset.folderId }
           : change.body
       const saved = await fetchJson(path, watermarkDtoSchema, {
         method: isCreate ? 'POST' : 'PUT',
@@ -90,6 +91,7 @@ async function replay(
       if (change.photo.presetId !== null) {
         form.append('presetId', change.photo.presetId)
       }
+      if (change.photo.folderId !== null) form.append('folderId', change.photo.folderId)
       const photo = await fetchJson(`${root}/photos`, photoDtoSchema, {
         method: 'POST',
         headers: { [SYNC_OPERATION_HEADER]: operation.id },
@@ -106,6 +108,13 @@ async function replay(
         body: JSON.stringify({ ids: change.photoIds }),
       })
       return change
+    }
+    case 'folder-create':
+    case 'folder-update':
+    case 'folder-delete':
+    case 'photo-move':
+    case 'preset-move': {
+      return await replayFolderChange({ ...operation, change }, assertCurrent)
     }
   }
 }

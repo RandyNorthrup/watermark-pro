@@ -36,7 +36,8 @@ async function openOwnerGallery() {
     gallery: { photos: photos(), maxBytes: 1024, uploadFailsWith: null },
   })
   renderApp('/app/gallery')
-  await screen.findByRole('list')
+  const gallery = await screen.findByRole('region', { name: 'Gallery' })
+  await within(gallery).findByRole('list')
   return api
 }
 
@@ -107,7 +108,8 @@ describe('sharing from the gallery', () => {
       gallery: { photos: photos(), maxBytes: 1024, uploadFailsWith: null },
     })
     renderApp('/app/gallery')
-    await screen.findByRole('list')
+    const gallery = await screen.findByRole('region', { name: 'Gallery' })
+    await within(gallery).findByRole('list')
     expect(screen.queryByRole('button', { name: /^Share/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
   })

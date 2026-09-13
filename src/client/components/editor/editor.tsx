@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   Crop,
   Download,
   Eraser,
+  FilePlus2,
   ImagePlus,
   LibraryBig,
   Link2,
@@ -37,6 +38,7 @@ import { MarkOverlay, type MarkGesture, type MarkPatch } from './mark-overlay'
 import { OrientationControls } from './orientation-controls'
 import { PresetPanel } from './preset-panel'
 import { ResizePanel } from './resize-panel'
+import { useCanvasGestures } from './use-canvas-gestures'
 import { useRenderer } from './use-renderer'
 import { WatermarkPanel } from './watermark-panel'
 import {
@@ -53,7 +55,7 @@ import {
   MAX_CANVAS_ZOOM_PERCENT,
   MIN_CANVAS_ZOOM_PERCENT,
 } from '../../../shared/constants'
-import type { WatermarkSpec } from '../../../shared/watermark'
+import { type WatermarkSpec, watermarkSpecSchema } from '../../../shared/watermark'
 import {
   ASPECT_PRESETS,
   type CropRect,
@@ -89,7 +91,7 @@ import { orientedFrame } from '../../engine/orient'
 import type { Border } from '../../engine/pipeline'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
-import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
+import { uploadPhoto } from '../../lib/gallery'
 import { readImageSize } from '../../lib/image-size'
 import type { CloudUpload } from '../../lib/imports/source'
 import { subscribeLaunchFiles } from '../../lib/launch-consumer'
@@ -192,10 +194,6 @@ function applyMarkPatch(spec: WatermarkSpec, patch: MarkPatch): WatermarkSpec {
   return next
 }
 
-function layerSpecs(document: EditorDocument): WatermarkSpec[] {
-  return document.layers.map((layer) => layer.spec)
-}
-
 /** The output size after an optional matte frame is added around the photo. */
 function framedSize(photo: Size, border: Border | null): Size {
   if (border === null || border.width <= 0) {
@@ -250,6 +248,8 @@ function EditorSession({
   embedded,
 }: EditorProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const [designerSession, setDesignerSession] = useState(0)
   const [history, dispatch] = useReducer(editorReducer, undefined, () =>
     createHistory(embedded?.document),
   )
@@ -269,6 +269,7 @@ function EditorSession({
         null)
   const [aspectId, setAspectId] = useState('free')
   const [photo, setPhoto] = useState<Photo | null>(null)
+  const [isChoosingPhoto, setIsChoosingPhoto] = useState(false)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [sessionRestored, setSessionRestored] = useState(
@@ -282,24 +283,31 @@ function EditorSession({
   const queryClient = useQueryClient()
   const save = useMutation({
     networkMode: 'always',
-    mutationFn: async (options: EncodeOptions) => {
+    mutationFn: async ({
+      options,
+      folderId,
+    }: {
+      options: EncodeOptions
+      folderId: string | null
+    }) => {
       const current = renderer.current
-      const first = document.layers[0]
-      if (current === null || first === undefined) {
+      const first = outputLayers[0]
+      if (current === null || first === undefined || outputSpecs.length === 0) {
         throw new Error('choose a preset first')
       }
       const blob = await current.exportFull(
-        layerSpecs(document),
+        outputSpecs,
         options,
         documentTransform(document),
         outputSize,
       )
       return await uploadPhoto(organizationId, {
         blob,
+        folderId,
         name: exportFileName(options.format),
         width: outputSize.width,
         height: outputSize.height,
-        presetId: first.presetId,
+        presetId: first.presetId === '' ? null : first.presetId,
       })
     },
     onMutate: () => {
@@ -308,7 +316,7 @@ function EditorSession({
     },
     onSuccess: async (stored) => {
       setSaved(stored.name)
-      await queryClient.invalidateQueries({ queryKey: galleryQueryKey(organizationId) })
+      await queryClient.invalidateQueries({ queryKey: ['organization', organizationId] })
     },
     onError: (error) => {
       setExportError(describeError(error))
@@ -324,13 +332,12 @@ function EditorSession({
     [],
   )
   const subjectIdentity = photoRequest.current
-  const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null)
-  const displaySize = useElementSize(imageElement)
   const [canvasViewportElement, setCanvasViewportElement] = useState<HTMLDivElement | null>(null)
   const canvasViewportSize = useElementSize(canvasViewportElement)
   const [canvasZoomMode, setCanvasZoomMode] = useState<CanvasZoomMode>('fit')
   const [customCanvasZoom, setCustomCanvasZoom] = useState(DEFAULT_CANVAS_ZOOM_PERCENT)
   const [isCanvasGridVisible, setIsCanvasGridVisible] = useState(false)
+  const [isSnappingToGrid, setIsSnappingToGrid] = useState(false)
   const [canvasGridSpacing, setCanvasGridSpacing] = useState(DEFAULT_CANVAS_GRID_SPACING_PX)
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const publicConfig = useQuery(publicConfigQueryOptions)
@@ -342,6 +349,11 @@ function EditorSession({
     canCreatePresets && activeLayerId === 'draft'
       ? [...document.layers, { id: 'draft', presetId: '', spec: draft.value }]
       : document.layers
+  const outputLayers = canvasLayers.filter(
+    (layer) => watermarkSpecSchema.safeParse(layer.spec).success,
+  )
+  const outputSpecs =
+    outputLayers.length === canvasLayers.length ? outputLayers.map((layer) => layer.spec) : []
   const renderLayers = isCropping
     ? []
     : canvasLayers.filter((layer) => layer.spec.kind !== 'image' || layer.spec.assetId !== '')
@@ -349,7 +361,7 @@ function EditorSession({
   const renderTransform = previewTransform(document, isCropping)
   const cropBase = croppedSize(cropBaseSize, document.crop)
   const outputSize = framedSize(document.resize ?? cropBase, document.border)
-  const { result, isRendering, error, renderer, setSubject } = useRenderer(
+  const { result, isRendering, isSubjectReady, error, renderer, setSubject } = useRenderer(
     organizationId,
     renderSpecs,
     renderTransform,
@@ -511,6 +523,7 @@ function EditorSession({
       const owner = captureOfflineOwner()
       photoRequest.current += 1
       const request = photoRequest.current
+      setIsChoosingPhoto(true)
       const assertCurrent = () => {
         owner.assertCurrent()
         if (request !== photoRequest.current) throw new Error('The photo selection changed.')
@@ -540,6 +553,8 @@ function EditorSession({
           return
         }
         setPhotoError(t('editor.notAnImage'))
+      } finally {
+        if (request === photoRequest.current) setIsChoosingPhoto(false)
       }
     },
     [document, setSubject, t],
@@ -556,6 +571,7 @@ function EditorSession({
 
   async function restoreSample() {
     photoRequest.current += 1
+    setIsChoosingPhoto(false)
     setPhoto(null)
     setAspectId('free')
     dispatch({
@@ -591,6 +607,19 @@ function EditorSession({
     setActiveLayerId(null)
     setAspectId('free')
     setTool('watermark')
+  }
+
+  function newWorkspace() {
+    photoRequest.current += 1
+    setIsChoosingPhoto(false)
+    appliedInitialPreset.current = initialPresetId ?? null
+    dispatch({ type: 'reset', document: EMPTY_DOCUMENT })
+    resetDraft(blankSpec())
+    setActiveLayerId(null)
+    setAspectId('free')
+    setTool('watermark')
+    setDesignerSession((session) => session + 1)
+    if (embedded === undefined) void navigate({ to: '/app/editor', search: {}, replace: true })
   }
 
   function markGesture(layerId: string, gesture: MarkGesture) {
@@ -697,7 +726,7 @@ function EditorSession({
     deliver: (blob: Blob, fileName: string) => Promise<void> | void,
   ) {
     const current = renderer.current
-    if (current === null || document.layers.length === 0) {
+    if (current === null || outputSpecs.length === 0) {
       return
     }
     setIsBusy(true)
@@ -705,7 +734,7 @@ function EditorSession({
     setSaved(null)
     try {
       const blob = await current.exportFull(
-        layerSpecs(document),
+        outputSpecs,
         options,
         documentTransform(document),
         outputSize,
@@ -729,11 +758,11 @@ function EditorSession({
    */
   async function exportBlob(options: EncodeOptions): Promise<CloudUpload | null> {
     const current = renderer.current
-    if (current === null || document.layers.length === 0) {
+    if (current === null || outputSpecs.length === 0) {
       return null
     }
     const blob = await current.exportFull(
-      layerSpecs(document),
+      outputSpecs,
       options,
       documentTransform(document),
       outputSize,
@@ -768,21 +797,46 @@ function EditorSession({
   const cropRatio = aspectPreset === undefined ? null : resolveRatio(aspectPreset, cropBaseSize)
   const previewSize: Size | null =
     result === null ? null : { width: result.width, height: result.height }
-  const fittedCanvasZoom = fitCanvasZoom(canvasViewportSize, previewSize)
-  const canvasZoom = canvasZoomMode === 'fit' ? fittedCanvasZoom : clampCanvasZoom(customCanvasZoom)
-  const canvasFrameStyle: CSSProperties | undefined =
+  const fullViewSize = isCropping ? cropBaseSize : outputSize
+  const viewSize =
     previewSize === null
-      ? undefined
+      ? fullViewSize
       : {
-          width: (previewSize.width * canvasZoom) / 100,
-          height: (previewSize.height * canvasZoom) / 100,
+          width: fullViewSize.width,
+          height: (fullViewSize.width * previewSize.height) / previewSize.width,
         }
+  const fittedCanvasZoom = fitCanvasZoom(canvasViewportSize, viewSize)
+  const canvasZoom = canvasZoomMode === 'fit' ? fittedCanvasZoom : clampCanvasZoom(customCanvasZoom)
+  const canvasGestures = useCanvasGestures(canvasViewportElement, canvasZoom, (zoom) => {
+    setCanvasZoomMode('custom')
+    setCustomCanvasZoom(zoom)
+  })
+  // Photo pixels and overlays share one CSS rectangle, including the render
+  // immediately after zoom/crop. A second ResizeObserver could retain old bounds.
+  const displaySize: Size = {
+    width: (viewSize.width * canvasZoom) / 100,
+    height: (viewSize.height * canvasZoom) / 100,
+  }
+  const canvasFrameStyle: CSSProperties | undefined = previewSize === null ? undefined : displaySize
   const canvasGridStyle: CanvasGridStyle = {
     '--canvas-grid-spacing': `${String((canvasGridSpacing * canvasZoom) / 100)}px`,
   }
   const canUndoCurrent = activeLayerId === 'draft' ? draft.canUndo : canUndo(history)
   const canRedoCurrent = activeLayerId === 'draft' ? draft.canRedo : canRedo(history)
   const canClearCanvas = activeLayerId === 'draft' || !isEmptyDocument(document)
+  const canvasStatus =
+    outputSpecs.length === 0
+      ? t(canCreatePresets ? 'editor.watermark.firstUseHint' : 'editor.choosePresetHint')
+      : t('editor.outputSize', { width: outputSize.width, height: outputSize.height })
+  const canvasInstructions =
+    tool === 'watermark' && activeLayer !== null && !activeLayer.spec.style.tiling.enabled
+      ? t('editor.mark.position')
+      : null
+  const photoLabel = t('editor.photoMeta', {
+    name: photo === null ? t('editor.sampleScene') : photo.file.name,
+    width: sourceSize.width,
+    height: sourceSize.height,
+  })
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6">
@@ -863,6 +917,12 @@ function EditorSession({
             </Button>
           )}
           <div className="ms-auto flex items-center gap-1">
+            {canCreatePresets ? (
+              <Button variant="secondary" size="sm" onClick={newWorkspace}>
+                <FilePlus2 aria-hidden="true" className="size-4" />
+                {t('editor.newWorkspace')}
+              </Button>
+            ) : null}
             {isRendering ? <Spinner className="size-4" label={t('editor.rendering')} /> : null}
             <Button
               type="button"
@@ -905,6 +965,7 @@ function EditorSession({
         </div>
         <div
           ref={setCanvasViewportElement}
+          {...canvasGestures}
           role="region"
           aria-label={t('editor.canvas')}
           tabIndex={0}
@@ -912,7 +973,7 @@ function EditorSession({
             event.preventDefault()
           }}
           onDrop={onDrop}
-          className="app-scroll-region relative h-[50svh] min-h-64 overflow-auto rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:h-[calc(100svh-18rem)] lg:min-h-96"
+          className="app-scroll-region relative h-[50svh] min-h-64 touch-none overflow-auto rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:h-[calc(100svh-18rem)] lg:min-h-96"
         >
           <div className="grid h-max min-h-full w-max min-w-full place-items-center p-3">
             {result === null ? (
@@ -920,7 +981,6 @@ function EditorSession({
             ) : (
               <div className="relative shrink-0" style={canvasFrameStyle}>
                 <img
-                  ref={setImageElement}
                   draggable={false}
                   onDragStart={(event) => event.preventDefault()}
                   src={result.url}
@@ -946,7 +1006,9 @@ function EditorSession({
                           key={`${organizationId}:${String(subjectIdentity)}:${layer.id}:${layer.spec.kind}`}
                           placement={outcome.placement}
                           position={layer.spec.placement}
-                          renderedScale={result.specs?.[index]?.style.scale}
+                          gridSpacing={
+                            isSnappingToGrid ? (canvasGridSpacing * canvasZoom) / 100 : undefined
+                          }
                           previewSize={previewSize}
                           displaySize={displaySize}
                           scale={layer.spec.style.scale}
@@ -978,14 +1040,14 @@ function EditorSession({
           </div>
         </div>
         <CanvasViewControls
-          status={t('editor.photoMeta', {
-            name: photo === null ? t('editor.sampleScene') : photo.file.name,
-            width: sourceSize.width,
-            height: sourceSize.height,
-          })}
           zoom={canvasZoom}
           isFit={canvasZoomMode === 'fit'}
           isGridVisible={isCanvasGridVisible}
+          isSnappingToGrid={isSnappingToGrid}
+          onGridSnapChange={(isEnabled) => {
+            setIsSnappingToGrid(isEnabled)
+            if (isEnabled) setIsCanvasGridVisible(true)
+          }}
           gridSpacing={canvasGridSpacing}
           onZoomChange={(zoom) => {
             setCanvasZoomMode('custom')
@@ -999,17 +1061,20 @@ function EditorSession({
           onGridVisibilityChange={setIsCanvasGridVisible}
           onGridSpacingChange={setCanvasGridSpacing}
         />
-        <div className="flex flex-col gap-1 text-xs text-ink-muted" aria-live="polite">
-          <p>
-            {document.layers.length === 0
-              ? t(canCreatePresets ? 'editor.watermark.firstUseHint' : 'editor.choosePresetHint')
-              : t('editor.outputSize', { width: outputSize.width, height: outputSize.height })}
+        <div
+          className="flex min-w-0 items-center gap-3 overflow-hidden text-xs whitespace-nowrap text-ink-muted"
+          aria-live="polite"
+        >
+          <p
+            className="min-w-0 flex-1 truncate"
+            title={[canvasStatus, canvasInstructions].filter(Boolean).join(' ')}
+          >
+            {canvasStatus}
+            {canvasInstructions === null ? null : <span> · {canvasInstructions}</span>}
           </p>
-          {tool === 'watermark' &&
-          activeLayer !== null &&
-          !activeLayer.spec.style.tiling.enabled ? (
-            <p>{t('editor.mark.position')}</p>
-          ) : null}
+          <p className="ms-auto max-w-[45%] min-w-0 truncate text-end" title={photoLabel}>
+            {photoLabel}
+          </p>
         </div>
         {photoError === null ? null : <Alert tone="error">{photoError}</Alert>}
         {sessionError === null ? null : <Alert tone="error">{sessionError}</Alert>}
@@ -1021,7 +1086,10 @@ function EditorSession({
       </Card>
 
       <Card className="min-w-0 overflow-hidden p-0">
-        <div className="app-scroll-region flex max-h-[75svh] min-w-0 flex-col gap-4 overflow-y-auto overscroll-contain p-6 lg:max-h-[calc(100svh-8rem)]">
+        <div
+          data-toolbox-scroll=""
+          className="app-scroll-region flex max-h-[75svh] min-w-0 flex-col gap-4 overflow-y-auto overscroll-y-auto p-4 lg:max-h-[calc(100svh-8rem)]"
+        >
           <Tabs.Root
             value={tool}
             onValueChange={(value) => {
@@ -1039,6 +1107,7 @@ function EditorSession({
                 <Tabs.Trigger
                   key={value}
                   value={value}
+                  data-guidance-topic={value}
                   className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=active]:bg-brand-600 data-[state=active]:text-white"
                 >
                   <Icon aria-hidden="true" className="size-4" />
@@ -1053,6 +1122,11 @@ function EditorSession({
                 layers={document.layers}
                 activeLayerId={activeLayer?.id ?? null}
                 onAddPreset={addPreset}
+                onUseTemplate={(spec) => {
+                  draft.change(spec)
+                  setActiveLayerId('draft')
+                  setTool('watermark')
+                }}
                 onNewPreset={() => {
                   setActiveLayerId('draft')
                   setTool('watermark')
@@ -1066,6 +1140,7 @@ function EditorSession({
             </Tabs.Content>
             <Tabs.Content value="watermark" className="outline-none">
               <WatermarkPanel
+                key={designerSession}
                 organizationId={organizationId}
                 canCreate={canCreatePresets}
                 draftSpec={draft.value}
@@ -1115,9 +1190,12 @@ function EditorSession({
             {embedded === undefined ? (
               <Tabs.Content value="export" className="outline-none">
                 <ExportPanel
+                  organizationId={organizationId}
                   organizationName={organizationName}
                   outputSize={outputSize}
-                  isReady={document.layers.length > 0}
+                  isReady={
+                    outputSpecs.length > 0 && sessionRestored && !isChoosingPhoto && isSubjectReady
+                  }
                   isExporting={isExporting}
                   onExport={(options) => {
                     void exportPhoto(options)
@@ -1126,7 +1204,11 @@ function EditorSession({
                     void sharePhoto(options)
                   }}
                   isSharing={isSharing}
-                  onSave={canSave ? save.mutate : undefined}
+                  onSave={
+                    canSave
+                      ? (options, folderId) => save.mutate({ options, folderId: folderId ?? null })
+                      : undefined
+                  }
                   isSaving={save.isPending}
                   cloudConfig={publicConfig.data}
                   onExportBlob={exportBlob}
@@ -1164,7 +1246,7 @@ function EditorSession({
             ) : null}
           </Tabs.Root>
           {embedded === undefined ? null : (
-            <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+            <div className="tool-section flex flex-wrap gap-2">
               <Button
                 type="button"
                 disabled={document.layers.length === 0}

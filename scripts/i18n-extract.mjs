@@ -18,7 +18,7 @@
 import { globSync, readFileSync } from 'node:fs'
 
 const CATALOGUE = 'src/client/locales/en/common.json'
-const SOURCE_GLOB = 'src/client/**/*.{ts,tsx}'
+const SOURCE_GLOB = ['src/client/**/*.{ts,tsx}', 'src/shared/**/*.{ts,tsx}']
 const PLURAL_SUFFIXES = ['_zero', '_one', '_two', '_few', '_many', '_other']
 
 /** Leaf key paths whose keys are assembled at runtime and cannot be seen as a

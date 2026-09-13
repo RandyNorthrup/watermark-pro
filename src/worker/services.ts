@@ -9,9 +9,13 @@ import type { AccountStore } from './account-store'
 import type { AuditStore } from './audit'
 import { type Auth, createAuth } from './auth/auth'
 import { createBindingRateLimitStorage, type RateLimitStorage } from './auth/rate-limit'
+import type { CloudStore } from './cloud-store'
 import { createDrizzleAccountStore } from './db/account-store'
 import { createDrizzleAuditStore } from './db/audit-store'
 import { createDatabase, type Database } from './db/client'
+import { createDrizzleCloudStore } from './db/cloud-store'
+import { createDrizzleFolderStore } from './db/folder-store'
+import { createDrizzleGuidanceStore } from './db/guidance-store'
 import {
   createDrizzleAssetStore,
   createDrizzlePhotoStore,
@@ -25,10 +29,13 @@ import { createDrizzleRecentStore } from './db/recent-store'
 import * as schema from './db/schema'
 import { createDrizzleUploadStore } from './db/upload-store'
 import { createDrizzleUserStore } from './db/user-store'
+import { createDrizzleWorkspaceAccessStore } from './db/workspace-access-store'
 import { createCloudflareEmailSender } from './email/cloudflare'
 import { createConsoleEmailSender, type DevMailbox } from './email/console'
 import type { EmailSender } from './email/sender'
 import { validateEnv, type ValidatedEnv } from './env'
+import type { FolderStore } from './folder-store'
+import type { GuidanceStore } from './guidance-store'
 import type { RecentStore } from './recent-store'
 import type {
   AssetStore,
@@ -41,6 +48,7 @@ import type {
   WatermarkStore,
 } from './stores'
 import type { UploadStore } from './upload-store'
+import type { WorkspaceAccessStore } from './workspace-access-store'
 
 export interface Services {
   uploads: UploadStore
@@ -48,6 +56,10 @@ export interface Services {
   db: Database
   auth: Auth
   accounts: AccountStore
+  workspaceAccess: WorkspaceAccessStore
+  cloud: CloudStore
+  folders: FolderStore
+  guidance: GuidanceStore
   recents: RecentStore
   email: EmailSender
   audit: AuditStore
@@ -98,6 +110,7 @@ export function buildServices(config: ValidatedEnv): Services {
   const db = createDatabase(config.DB)
   const audit = createDrizzleAuditStore(db)
   const accounts = createDrizzleAccountStore(db)
+  const workspaceAccess = createDrizzleWorkspaceAccessStore(db)
   const uploads = createDrizzleUploadStore(db)
   const { email, devMailbox } = createEmailSender(config)
   const rateLimit = createBindingRateLimitStorage(config.AUTH_RATE_LIMITER, config.API_RATE_LIMITER)
@@ -107,6 +120,8 @@ export function buildServices(config: ValidatedEnv): Services {
     appUrl: config.APP_URL,
     email,
     accounts,
+    reserveWorkspaceInvitation: async (organizationId, actorId, invitationId) =>
+      await workspaceAccess.reserveInvitationEmail(organizationId, actorId, invitationId),
     hasWorkspaceContent: async (organizationId) => await uploads.hasContent(organizationId),
     accountOAuth: {
       ...(config.GOOGLE_AUTH_CLIENT_ID !== undefined &&
@@ -141,6 +156,10 @@ export function buildServices(config: ValidatedEnv): Services {
     auth,
     email,
     accounts,
+    workspaceAccess,
+    cloud: createDrizzleCloudStore(db),
+    folders: createDrizzleFolderStore(db),
+    guidance: createDrizzleGuidanceStore(db),
     recents: createDrizzleRecentStore(db),
     uploads,
     audit,

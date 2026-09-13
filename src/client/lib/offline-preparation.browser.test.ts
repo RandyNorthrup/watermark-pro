@@ -25,6 +25,7 @@ afterEach(() => {
 function transport() {
   const asset = offlineAsset()
   return vi.fn((path: string) => {
+    if (path.includes('/folders?kind=')) return Promise.resolve(Response.json({ folders: [] }))
     if (path.endsWith('/watermarks')) return Promise.resolve(Response.json({ watermarks: [] }))
     if (path.endsWith('/assets')) return Promise.resolve(Response.json({ assets: [asset] }))
     if (path.endsWith('/photos'))
@@ -63,11 +64,11 @@ describe('workspace offline readiness', () => {
     })
     vi.stubGlobal('fetch', fetcher)
     await prepareWorkspaceOffline(OFFLINE_ORG)
-    expect(fetcher).toHaveBeenCalledTimes(6)
+    expect(fetcher).toHaveBeenCalledTimes(8)
     expect(await offlineOperations(OFFLINE_USER)).toEqual([])
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
     await prepareWorkspaceOffline(OFFLINE_ORG)
-    expect(fetcher).toHaveBeenCalledTimes(6)
+    expect(fetcher).toHaveBeenCalledTimes(8)
   })
 
   it('refuses a repeated gallery cursor rather than reporting partial data ready', async () => {
@@ -86,10 +87,10 @@ describe('workspace offline readiness', () => {
     const fetcher = transport()
     vi.stubGlobal('fetch', fetcher)
     await prepareWorkspaceOffline(OFFLINE_ORG)
-    expect(fetcher).toHaveBeenCalledTimes(5)
+    expect(fetcher).toHaveBeenCalledTimes(7)
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
     await prepareWorkspaceOffline(OFFLINE_ORG)
-    expect(fetcher).toHaveBeenCalledTimes(5)
+    expect(fetcher).toHaveBeenCalledTimes(7)
   })
   it('does not promise readiness when storage could not commit a successful download', async () => {
     vi.stubGlobal('fetch', transport())

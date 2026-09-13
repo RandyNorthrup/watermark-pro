@@ -117,6 +117,9 @@ export function OfflinePanel({
     if (change.kind === 'logo-upload') {
       return change.asset.name
     }
+    if ('folder' in change) return change.folder.name
+    if (change.kind === 'photo-move' || change.kind === 'preset-move')
+      return t('folders.moving', { count: change.placements.length })
     return t('offline.deletion')
   }
 

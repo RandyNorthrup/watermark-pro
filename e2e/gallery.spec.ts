@@ -26,6 +26,8 @@ test('saves from the editor, browses, searches, downloads and deletes', async ({
   page,
   request,
 }) => {
+  // Real upload, four accessibility scans, download and deletion share one mobile journey.
+  test.slow()
   await createWorkspace(page, request, owner, organizationName)
 
   await navigateTo(page, 'Gallery')
@@ -39,7 +41,7 @@ test('saves from the editor, browses, searches, downloads and deletes', async ({
   await page.getByLabel('Preset name').fill('Gallery preset')
   await page.getByRole('button', { name: 'Save preset' }).click()
   await page.getByRole('link', { name: 'Open Gallery preset in the editor' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
   await page.getByRole('tab', { name: 'Presets' }).click()
   await expect(
     page

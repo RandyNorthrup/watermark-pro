@@ -39,10 +39,12 @@ export function TextEffects({ spec, onChange }: TextEffectsProps) {
   const { t } = useTranslation()
   const effectChoices = EFFECT_CHOICES.map((choice) => ({ ...choice, label: t(choice.label) }))
   return (
-    <div className="flex flex-col gap-4">
+    <div className="tool-section flex flex-col gap-4">
       <SliderField
         label={t('designer.effects.letterSpacing')}
         value={spec.letterSpacing}
+        resetValue={0}
+        resetLabel={t('editor.adjust.reset', { name: t('designer.effects.letterSpacing') })}
         min={MIN_LETTER_SPACING}
         max={MAX_LETTER_SPACING}
         step={SPACING_STEP}
@@ -54,6 +56,8 @@ export function TextEffects({ spec, onChange }: TextEffectsProps) {
       <SliderField
         label={t('designer.effects.curve')}
         value={spec.curve}
+        resetValue={0}
+        resetLabel={t('editor.adjust.reset', { name: t('designer.effects.curve') })}
         min={-MAX_CURVE}
         max={MAX_CURVE}
         step={CURVE_STEP}

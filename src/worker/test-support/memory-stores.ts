@@ -4,6 +4,7 @@ import {
   HEALTH_CHECK_PAGE_SIZE,
 } from '../../shared/constants'
 import { SITE_ROLE } from '../../shared/site-roles'
+import type { AuditStore } from '../audit'
 import type {
   AssetRecord,
   AssetStore,
@@ -36,7 +37,7 @@ function deleteScoped<T extends { id: string; organizationId: string }>(
 }
 
 /** In-memory preset store for Node tests. */
-export function createMemoryWatermarkStore(): WatermarkStore {
+export function createMemoryWatermarkStore(audit?: AuditStore): WatermarkStore {
   const records = new Map<string, WatermarkRecord>()
   const scoped = (organizationId: string) =>
     records
@@ -49,29 +50,55 @@ export function createMemoryWatermarkStore(): WatermarkStore {
       Promise.resolve(scoped(organizationId).filter((record) => ids.includes(record.id))),
     find: (organizationId, id) =>
       Promise.resolve(scoped(organizationId).find((record) => record.id === id) ?? null),
-    create(input) {
+    async create(input, entry) {
+      if (entry !== undefined) {
+        if (audit === undefined) throw new Error('Preset audit fixture is not configured')
+        await audit.append(entry)
+      }
       const now = new Date()
-      const record: WatermarkRecord = { ...input, createdAt: now, updatedAt: now }
+      const record: WatermarkRecord = {
+        ...input,
+        folderId: input.folderId ?? null,
+        folderRevision: 0,
+        folderVersionId: null,
+        createdAt: now,
+        updatedAt: now,
+      }
       records.set(record.id, record)
-      return Promise.resolve(record)
+      return record
     },
-    update(organizationId, id, patch) {
+    async update(organizationId, id, patch, entry) {
       const existing = scoped(organizationId).find((record) => record.id === id)
       if (
         existing === undefined ||
         (patch.expectedUpdatedAt !== undefined &&
-          existing.updatedAt.toISOString() !== patch.expectedUpdatedAt)
+          existing.updatedAt.toISOString() !== patch.expectedUpdatedAt) ||
+        (patch.folderId !== undefined &&
+          ((existing.folderRevision ?? 0) !== patch.expectedFolderRevision ||
+            (existing.folderVersionId ?? null) !== (patch.expectedFolderVersionId ?? null)))
       ) {
-        return Promise.resolve(null)
+        return null
       }
+      if (entry !== undefined) {
+        if (audit === undefined) throw new Error('Preset audit fixture is not configured')
+        await audit.append(entry)
+      }
+      const nextFolder = patch.folderId === undefined ? (existing.folderId ?? null) : patch.folderId
       const updated: WatermarkRecord = {
         ...existing,
         name: patch.name,
         spec: patch.spec,
+        folderId: nextFolder,
+        folderVersionId:
+          nextFolder === (existing.folderId ?? null)
+            ? (existing.folderVersionId ?? null)
+            : (patch.nextFolderVersionId ?? crypto.randomUUID()),
+        folderRevision:
+          (existing.folderRevision ?? 0) + (nextFolder === (existing.folderId ?? null) ? 0 : 1),
         updatedAt: new Date(Math.max(Date.now(), existing.updatedAt.getTime() + 1)),
       }
       records.set(id, updated)
-      return Promise.resolve(updated)
+      return updated
     },
     delete: (organizationId, id) => deleteScoped(records, organizationId, id),
     countReferencingAsset: (organizationId, assetId) =>
@@ -156,6 +183,8 @@ export function createMemoryPhotoStore(): PhotoStore {
   return {
     list(organizationId, query) {
       let rows = scoped(organizationId)
+      if (query.folderId !== undefined)
+        rows = rows.filter((record) => (record.folderId ?? null) === query.folderId)
       if (query.presetId !== undefined) {
         rows = rows.filter((record) => record.presetId === query.presetId)
       }

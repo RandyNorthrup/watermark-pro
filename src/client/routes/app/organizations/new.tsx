@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { type SubmitEvent, useState } from 'react'
+import { type SubmitEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
@@ -11,7 +11,8 @@ import { Card } from '../../../components/ui/card'
 import { Field } from '../../../components/ui/field'
 import { Input } from '../../../components/ui/input'
 import { authClient } from '../../../lib/auth-client'
-import { describeAuthError } from '../../../lib/errors'
+import { describeAuthError, describeError } from '../../../lib/errors'
+import { captureOfflineOwner } from '../../../lib/offline-context'
 import { resetShellQueries } from '../../../lib/queries'
 import { useFormErrors } from '../../../lib/use-form-errors'
 
@@ -26,7 +27,14 @@ function NewOrganizationPage() {
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { organizations } = Route.useRouteContext()
+  const { organizations, session } = Route.useRouteContext()
+  const account = useMemo(() => {
+    const owner = captureOfflineOwner()
+    if (owner.userId !== session.user.id) throw new Error('The signed-in account changed.')
+    return owner
+  }, [session.user.id])
+  const submission = useRef<AbortController | null>(null)
+  useEffect(() => () => submission.current?.abort(), [])
   const [values, setValues] = useState<FormValues>({ name: '', slug: '' })
   const [hasEditedSlug, setHasEditedSlug] = useState(false)
   const [isPending, setIsPending] = useState(false)
@@ -39,23 +47,43 @@ function NewOrganizationPage() {
     if (parsed === null) {
       return
     }
+    submission.current?.abort()
+    const controller = new AbortController()
+    submission.current = controller
+    const assertCurrent = () => {
+      account.assertCurrent()
+      if (controller.signal.aborted) throw new Error('The workspace form closed.')
+    }
     setIsPending(true)
     setServerError(null)
-    const result = await authClient.organization.create({ name: parsed.name, slug: parsed.slug })
-    const failure = describeAuthError(result.error)
-    if (failure !== null || result.data === null) {
-      setIsPending(false)
-      setServerError(failure ?? t('organizations.createFailed'))
-      return
+    try {
+      assertCurrent()
+      const result = await authClient.organization.create({ name: parsed.name, slug: parsed.slug })
+      assertCurrent()
+      const failure = describeAuthError(result.error)
+      if (failure !== null || result.data === null)
+        throw new Error(failure ?? t('organizations.createFailed'))
+      const active = await authClient.organization.setActive({ organizationId: result.data.id })
+      assertCurrent()
+      const activeFailure = describeAuthError(active.error)
+      if (activeFailure !== null || active.data === null)
+        throw new Error(activeFailure ?? t('organizations.createFailed'))
+      // Only the shell changed. Unrelated media/preparation requests must not
+      // hold this completed creation hostage or refetch the previous workspace.
+      resetShellQueries(queryClient)
+      await router.invalidate()
+      assertCurrent()
+      await navigate({ to: '/app' })
+    } catch (error) {
+      try {
+        assertCurrent()
+      } catch {
+        return
+      }
+      setServerError(describeError(error))
+    } finally {
+      if (!controller.signal.aborted) setIsPending(false)
     }
-    await authClient.organization.setActive({ organizationId: result.data.id })
-    await queryClient.invalidateQueries()
-    // Force the shell queries fresh before leaving, so the /app boot reads the
-    // new organization from cache rather than a stale empty list (PLAN §2).
-    resetShellQueries(queryClient)
-    await router.invalidate()
-    setIsPending(false)
-    await navigate({ to: '/app' })
   }
 
   return (

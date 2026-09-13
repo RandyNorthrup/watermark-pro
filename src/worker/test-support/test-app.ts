@@ -2,6 +2,9 @@ import { memoryAdapter } from 'better-auth/adapters/memory'
 
 import { createMemoryAccountStore } from './memory-account-store'
 import { createMemoryAuditStore } from './memory-audit-store'
+import { createMemoryCloudStore } from './memory-cloud-store'
+import { createMemoryFolderStore } from './memory-folder-store'
+import { createMemoryGuidanceStore } from './memory-guidance-store'
 import { createMemoryRecentStore } from './memory-recent-store'
 import {
   createMemoryAssetStore,
@@ -14,6 +17,7 @@ import {
   createMemoryWatermarkStore,
 } from './memory-stores'
 import { createMemoryUploadStore } from './memory-upload-store'
+import { createMemoryWorkspaceAccessStore } from './memory-workspace-access-store'
 import { createAuth } from '../auth/auth'
 import { type RateLimitStorage, unlimitedRateLimitStorage } from '../auth/rate-limit'
 import type { AccountOAuthConfiguration } from '../auth/social-providers'
@@ -44,6 +48,10 @@ export type TestEnv = Env & {
   GOOGLE_PICKER_API_KEY?: string
   TURNSTILE_SITE_KEY?: string
   TURNSTILE_SECRET_KEY?: string
+  CLOUD_TOKEN_SECRET?: string
+  GOOGLE_CLOUD_CLIENT_SECRET?: string
+  MICROSOFT_CLOUD_CLIENT_SECRET?: string
+  DROPBOX_APP_SECRET?: string
 }
 
 export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
@@ -74,6 +82,20 @@ export interface TestHarness {
 }
 
 export interface TestHarnessOptions {
+  cloudConnections?:
+    | Partial<
+        Pick<
+          TestEnv,
+          | 'CLOUD_TOKEN_SECRET'
+          | 'GOOGLE_CLOUD_CLIENT_SECRET'
+          | 'MICROSOFT_CLOUD_CLIENT_SECRET'
+          | 'DROPBOX_APP_SECRET'
+          | 'GOOGLE_OAUTH_CLIENT_ID'
+          | 'MICROSOFT_CLIENT_ID'
+          | 'DROPBOX_APP_KEY'
+        >
+      >
+    | undefined
   accountOAuth?: AccountOAuthConfiguration | undefined
   /** Exercise real production signup admission rather than the fixture bootstrap. */
   invitationOnly?: boolean | undefined
@@ -105,6 +127,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
       TURNSTILE_SECRET_KEY: options.captcha.secretKey,
     }),
     ...options.cloudImport,
+    ...options.cloudConnections,
   })
   const config = validateEnv(env)
   const mailbox = createConsoleEmailSender()
@@ -119,10 +142,11 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     invitation: [],
   }
   const accounts = createMemoryAccountStore(tables)
+  const workspaceAccess = createMemoryWorkspaceAccessStore(tables, audit)
   const assets = createMemoryAssetStore()
   const photos = createMemoryPhotoStore()
   const organizations = createMemoryOrganizationStore(tables)
-  const watermarks = createMemoryWatermarkStore()
+  const watermarks = createMemoryWatermarkStore(audit)
   const uploads = createMemoryUploadStore({ assets, photos, organizations, audit, watermarks })
   const auth = createAuth({
     database: memoryAdapter(tables),
@@ -130,6 +154,8 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     appUrl: config.APP_URL,
     email: mailbox,
     accounts,
+    reserveWorkspaceInvitation: async (organizationId, actorId, invitationId) =>
+      await workspaceAccess.reserveInvitationEmail(organizationId, actorId, invitationId),
     accountOAuth: options.accountOAuth,
     hasWorkspaceContent: async (organizationId) => await uploads.hasContent(organizationId),
     audit,
@@ -151,6 +177,10 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     email: mailbox,
     accounts,
     audit,
+    workspaceAccess,
+    cloud: createMemoryCloudStore(),
+    folders: createMemoryFolderStore(tables, photos, watermarks, audit),
+    guidance: createMemoryGuidanceStore(),
     recents: createMemoryRecentStore(),
     watermarks,
     assets,

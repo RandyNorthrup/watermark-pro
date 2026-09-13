@@ -1,5 +1,28 @@
 # Platform observability privacy — 2026-09-09
 
+## Current candidate and operator readback — 2026-09-12
+
+The current candidate disables platform observability, invocation logs, log
+persistence and trace persistence using supported Wrangler fields. The earlier
+`redact_query_string` field was removed because the pinned Workers test Wrangler
+does not support it. Privacy depends on the disabled logging/tracing controls,
+not an ignored redaction flag. The configuration and hosted probe below are
+historical evidence from before this compatibility correction.
+
+The release owner's read-only inspection of the production Worker overview
+reported **Workers Logs Disabled** and **Workers Traces Disabled**. The canonical
+custom domain remains `lumafoil.com`, and the `workers.dev` endpoint is disabled.
+This readback describes the existing deployment before the pending combined
+release; the release owner will verify it again after deployment.
+
+The account's Investigate → Logpush dashboard displayed no configured jobs and
+0 GB. Selecting the canonical zone showed the Free plan and an unavailable
+Logpush feature with a Contact Sales offer. This closes the earlier API 403
+inspection gap through direct dashboard evidence; it is not a claim that the API
+returned 200 or an empty list. No dashboard setting changed during these checks.
+External Tail Workers remain a separate configuration boundary; these observations
+do not claim that all possible platform exports were exhaustively inspected.
+
 ## Finding and decision
 
 Cloudflare adds request metadata to persisted custom `console.log` records.
@@ -16,9 +39,10 @@ as well as a separate automatic request record. Application message sanitization
 and disabling automatic invocation records therefore do not establish a safe
 persistent platform-log boundary for share, invitation and password-reset URLs.
 
-The default and production Wrangler environments now disable platform logs and
-traces, including their persistence, and retain query redaction as a defense if
-observability is later reconsidered:
+At the 2026-09-09 probe checkpoint, the default and production Wrangler
+environments disabled platform logs and traces, including persistence, and also
+retained query redaction. The current candidate supersedes that last field as
+recorded above; this historical configuration is preserved to explain the probe:
 
 ```json
 {
@@ -198,5 +222,6 @@ do not redirect into Lumafoil.
   documents observability, persistence and query-redaction settings.
 - The installed `wrangler@4.129.0` `config-schema.json` accepts
   `redact_query_string`, log/tracing enablement and their `persist` settings.
-  Hosted readback and dashboard evidence above verify this installed toolchain's
-  disabled configuration against the provider.
+  The pinned Workers test Wrangler does not support the redaction field, so the
+  current candidate omits it. Hosted readback and dashboard evidence above verify
+  disabled production Logs and Traces independently of that field.

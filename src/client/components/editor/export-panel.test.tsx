@@ -9,6 +9,15 @@ import type { CloudUpload, CloudUploadSource } from '../../lib/imports/source'
 import { setOfflineUser } from '../../lib/offline-context'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { fakeCloudSaver } from '../../test-support/fake-cloud-save'
+import {
+  FAKE_CLOUD_TARGET,
+  chooseCloudSaveDestination,
+} from '../../test-support/fake-cloud-selection'
+
+vi.mock(
+  '../import/cloud-browser-dialog',
+  () => import('../../test-support/fake-cloud-browser-module'),
+)
 
 beforeEach(() => {
   setOfflineUser('user-1')
@@ -71,7 +80,7 @@ describe('ExportPanel cloud save', () => {
       'Save to Dropbox',
       'Save to OneDrive',
     ]) {
-      expect(screen.getByRole('button', { name })).toHaveClass('h-11', 'w-full', 'justify-center')
+      expect(screen.getByRole('button', { name })).toHaveClass('h-10', 'w-full', 'justify-center')
     }
   })
 
@@ -80,22 +89,28 @@ describe('ExportPanel cloud save', () => {
     const onExportBlob = vi.fn(() => Promise.resolve(UPLOAD))
     const { user, onCloudSaved, onCloudError } = renderPanel(onExportBlob)
 
-    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await chooseCloudSaveDestination(user, 'Google Drive')
 
     await waitFor(() =>
-      expect(googleSaveMock).toHaveBeenCalledWith(ALL_CLOUD_CONFIG, expect.any(Function)),
+      expect(googleSaveMock).toHaveBeenCalledWith(
+        ALL_CLOUD_CONFIG,
+        expect.any(Function),
+        FAKE_CLOUD_TARGET,
+      ),
     )
-    expect(onExportBlob).toHaveBeenCalledTimes(1)
-    await waitFor(() =>
-      expect(onCloudSaved).toHaveBeenCalledWith('Saved to your Google Drive “Lumafoil” folder.'),
-    )
+    expect(onExportBlob).toHaveBeenCalledWith({
+      format: 'image/png',
+      quality: 1,
+      metadata: 'strip',
+    })
+    await waitFor(() => expect(onCloudSaved).toHaveBeenCalledWith('Saved to Google Drive.'))
     expect(onCloudError).not.toHaveBeenCalled()
   })
 
   it('saves nothing when the photo cannot be rendered', async () => {
     const { user, onCloudSaved, onCloudError } = renderPanel(() => Promise.resolve(null))
 
-    await user.click(screen.getByRole('button', { name: 'Save to Dropbox' }))
+    await chooseCloudSaveDestination(user, 'Dropbox')
 
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Save to Dropbox' })).toBeEnabled(),
@@ -109,7 +124,7 @@ describe('ExportPanel cloud save', () => {
     googleSaveMock.mockRejectedValue(new Error('Drive rejected the upload'))
     const { user, onCloudSaved, onCloudError } = renderPanel(() => Promise.resolve(UPLOAD))
 
-    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await chooseCloudSaveDestination(user, 'Google Drive')
 
     await waitFor(() => expect(onCloudError).toHaveBeenCalledWith('Drive rejected the upload'))
     expect(onCloudSaved).not.toHaveBeenCalled()
@@ -117,7 +132,10 @@ describe('ExportPanel cloud save', () => {
 
   it('offers an invisible mark on PNG and blocks an over-long message', async () => {
     const { user } = renderPanel(() => Promise.resolve(UPLOAD))
-    // Default JPEG shows the "choose PNG" hint; the invisible switch is disabled.
+    // Lossless PNG is the default; only an explicit lossy choice disables the mark.
+    expect(screen.getByRole('switch', { name: 'Invisible mark' })).toBeEnabled()
+    await user.click(screen.getByRole('combobox', { name: 'Format' }))
+    await user.click(await screen.findByRole('option', { name: 'JPEG' }))
     expect(screen.getByText(/Choose PNG to hide a message/)).toBeInTheDocument()
     expect(screen.getByRole('switch', { name: 'Invisible mark' })).toBeDisabled()
 

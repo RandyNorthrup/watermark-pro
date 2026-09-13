@@ -3,6 +3,7 @@
  * tests can swap in a fake: the worker pool, resource resolution, and the
  * per-file processor.
  */
+import { bulkMediaKind } from './media-kind'
 import {
   type BatchPosition,
   type BulkJobInput,
@@ -42,11 +43,19 @@ export function createBulkRuntime(loadLogo: LogoLoader, workers = runtimePoolSiz
   const resources = new MarkResources(loadLogo)
   let processor: BulkProcessor | null = null
   let isDisposed = false
+  function assertRunning(signal: AbortSignal) {
+    if (isDisposed) throw new Error('bulk runtime disposed')
+    if (signal.aborted) throw new CancelledError()
+  }
   return {
     workers,
     run: async (input, specs, settings, position, signal) => {
-      if (isDisposed) throw new Error('bulk runtime disposed')
-      if (signal.aborted) throw new CancelledError()
+      assertRunning(signal)
+      if (bulkMediaKind(input.file) !== 'image') {
+        const { processBulkMedia } = await import('./media-processor')
+        assertRunning(signal)
+        return await processBulkMedia(input, specs, settings, position, signal, loadLogo)
+      }
       // Browsing the empty tool needs its queue, but no rendering engines.
       // The first job creates the shared pool synchronously before yielding.
       if (processor === null) {

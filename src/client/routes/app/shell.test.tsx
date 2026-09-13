@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { HTTP_STATUS } from '../../../shared/constants'
 import { shellOrganizationSchema } from '../../../shared/shell-cache'
 import { AppShell } from '../../components/app-shell'
+import { setOfflineUser } from '../../lib/offline-context'
 import { activeOrganizationQueryOptions, sessionQueryOptions } from '../../lib/queries'
 import { createQueryClient } from '../../lib/query-client'
 import {
@@ -22,6 +23,7 @@ import {
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { installLibraryApi } from '../../test-support/fake-library-api'
+import { pendingBackgroundQuery } from '../../test-support/pending-background-query'
 import { renderApp } from '../../test-support/render-app'
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
@@ -36,6 +38,18 @@ vi.mock('../../components/offline-panel', () => ({
 const client = fakeAuth
 /** Seven workspace tools; Overview is reserved for site managers. Account destinations live under the user. */
 const WORKSPACE_NAV_ITEM_COUNT = 7
+
+async function openWorkspaceSwitcher() {
+  const user = userEvent.setup()
+  seedOwnerWorkspace(client())
+  const second = makeOrganization('org-2', 'Side Project', 'side-project')
+  second.members.push(makeMember(second.id, OWNER, 'owner'))
+  client().state.organizations.push(second)
+  const view = renderApp('/app/members')
+  await screen.findByRole('heading', { level: 1 })
+  await user.click(screen.getByRole('button', { name: 'Workspace: Acme Studio. Switch workspace' }))
+  return { ...view, user }
+}
 
 beforeEach(() => {
   installFakeAuth()
@@ -96,18 +110,18 @@ describe('application shell', () => {
     const previous = client().state.organizations[0]
     if (previous === undefined) throw new Error('Expected previous workspace fixture')
     const { router, queryClient } = renderApp('/app/library')
-    await screen.findByRole('button', { name: 'Choose an organization' })
+    await screen.findByRole('button', { name: 'Choose a workspace' })
     const stale = shellOrganizationSchema.parse({ ...previous, name: 'STALE_WORKSPACE_CANARY' })
     act(() => {
       queryClient.setQueryData(activeOrganizationQueryOptions.queryKey, stale)
     })
     expect(screen.queryByText('STALE_WORKSPACE_CANARY')).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Choose an organization' }))
+    await user.click(screen.getByRole('button', { name: 'Choose a workspace' }))
     expect(client().organization.getFullOrganization).not.toHaveBeenCalled()
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
     await user.click(await screen.findByRole('menuitem', { name: 'My workspace' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
     expect(client().state.activeOrganizationId).toBe(`personal-${OWNER.id}`)
   })
 
@@ -146,29 +160,68 @@ describe('application shell', () => {
   })
 
   it('switches organizations and offers to create a new one', async () => {
-    const user = userEvent.setup()
-    seedOwnerWorkspace(client())
-    const second = makeOrganization('org-2', 'Side Project', 'side-project')
-    second.members.push(makeMember(second.id, OWNER, 'owner'))
-    client().state.organizations.push(second)
-
-    const { router } = renderApp('/app/members')
-    await screen.findByRole('heading', { level: 1 })
-    await user.click(
-      screen.getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
-    )
-    await user.click(await screen.findByRole('menuitem', { name: 'Side Project' }))
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
+    const { user, router, queryClient } = await openWorkspaceSwitcher()
+    const background = pendingBackgroundQuery(queryClient)
+    try {
+      await user.click(await screen.findByRole('menuitem', { name: 'Side Project' }))
+      await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
+      expect(background.isPending()).toBe(true)
+    } finally {
+      background.complete()
+    }
     expect(client().organization.setActive).toHaveBeenCalledWith({ organizationId: 'org-2' })
+
+    await user.click(screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }))
+    const accountMenu = await screen.findByRole('menu')
+    expect(within(accountMenu).getByText('Side Project')).toBeVisible()
+    expect(within(accountMenu).queryByText('Acme Studio')).not.toBeInTheDocument()
+    await user.click(within(accountMenu).getByRole('menuitem', { name: 'Manage Access' }))
+    const accessDialog = await screen.findByRole('dialog', { name: 'Manage Access' })
+    expect(within(accessDialog).getByText('Side Project')).toBeVisible()
+    expect(router.state.location.pathname).toBe('/app/editor')
+    await user.click(within(accessDialog).getByRole('button', { name: 'Close' }))
 
     await user.click(
       await screen.findByRole('button', {
-        name: 'Organization: Side Project. Switch organization',
+        name: 'Workspace: Side Project. Switch workspace',
       }),
     )
-    await user.click(await screen.findByRole('menuitem', { name: 'New organization' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'New workspace' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/organizations/new'))
   })
+
+  it.each(['transport', 'refusal', 'account'] as const)(
+    'does not navigate to a workspace after %s failure',
+    async (failure) => {
+      const { user, router } = await openWorkspaceSwitcher()
+      const activation = client().organization.setActive
+      if (failure === 'transport') activation.mockRejectedValueOnce(new Error('Switch interrupted'))
+      else if (failure === 'refusal')
+        activation.mockResolvedValueOnce({
+          data: null,
+          error: { message: 'Switch refused', code: 'FORBIDDEN', status: 403 },
+        })
+      else {
+        const original = activation.getMockImplementation()
+        if (original === undefined) throw new Error('Missing activation fixture')
+        activation.mockImplementationOnce(async (input) => {
+          const result = await original(input)
+          setOfflineUser('other-account')
+          return result
+        })
+      }
+      await user.click(await screen.findByRole('menuitem', { name: 'Side Project' }))
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: /Workspace: Acme Studio/ })).toBeEnabled(),
+      )
+      expect(router.state.location.pathname).toBe('/app/members')
+      if (failure === 'account') expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      else
+        expect(await screen.findByRole('alert')).toHaveTextContent(
+          failure === 'transport' ? 'Switch interrupted' : 'Switch refused',
+        )
+    },
+  )
 
   it('cycles the theme from the header toggle and remembers it', async () => {
     const user = userEvent.setup()
@@ -198,13 +251,13 @@ describe('application shell', () => {
       within(tabBar)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Editor', 'Library', 'Bulk', 'Gallery'])
+    ).toEqual(['Image', 'Library', 'Bulk', 'Gallery'])
     expect(screen.queryByRole('dialog')).toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Menu' }))
     const sheet = await screen.findByRole('dialog', { name: 'Menu' })
     expect(
-      within(sheet).getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
+      within(sheet).getByRole('button', { name: 'Workspace: Acme Studio. Switch workspace' }),
     ).toBeInTheDocument()
     const menuNav = within(sheet).getByRole('navigation', { name: 'Primary (menu)' })
     expect(within(menuNav).getAllByRole('link')).toHaveLength(WORKSPACE_NAV_ITEM_COUNT)
@@ -212,9 +265,13 @@ describe('application shell', () => {
     expect(within(menuNav).queryByRole('link', { name: 'Members' })).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Close menu' }))
     await user.click(screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }))
-    await user.click(await screen.findByRole('menuitem', { name: 'Members' }))
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app/members'))
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    await user.click(await screen.findByRole('menuitem', { name: 'Manage Access' }))
+    const accessDialog = await screen.findByRole('dialog', { name: 'Manage Access' })
+    expect(router.state.location.pathname).toBe('/app/editor')
+    await user.click(within(accessDialog).getByRole('button', { name: 'Close' }))
+    await user.click(screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Account settings' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/account'))
     const settingsNav = screen.getByRole('navigation', { name: 'Primary' })
     expect(within(settingsNav).getByRole('link', { name: 'Account settings' })).toBeInTheDocument()
     expect(within(settingsNav).getByRole('link', { name: 'Invite people' })).toBeInTheDocument()
@@ -238,7 +295,7 @@ describe('application shell', () => {
       'aria-current',
       'page',
     )
-    expect(within(adminNav).getByRole('link', { name: 'Organizations' })).toBeInTheDocument()
+    expect(within(adminNav).getByRole('link', { name: 'Workspaces' })).toBeInTheDocument()
     expect(within(adminNav).getByRole('link', { name: 'Audit trail' })).toBeInTheDocument()
     expect(within(adminNav).getByRole('link', { name: 'Health' })).toBeInTheDocument()
     expect(within(adminNav).getByRole('link', { name: 'Client errors' })).toBeInTheDocument()

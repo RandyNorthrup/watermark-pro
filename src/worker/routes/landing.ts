@@ -93,7 +93,7 @@ function landingResponse(response: Response, isHead = false): Response {
     'strict-transport-security': `max-age=${String(HSTS_MAX_AGE_SECONDS)}; includeSubDomains`,
     'x-content-type-options': 'nosniff',
     'x-frame-options': 'DENY',
-    'referrer-policy': 'strict-origin-when-cross-origin',
+    'referrer-policy': 'strict-origin',
     'permissions-policy': 'camera=(), microphone=(), geolocation=()',
     'cross-origin-opener-policy': 'same-origin-allow-popups',
     ...(response.status === HTTP_STATUS.found && {

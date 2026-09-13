@@ -74,7 +74,87 @@ function renderOverlay(onGesture: (gesture: MarkGesture) => void, rotation = 0, 
   )
 }
 
+function pixelValue(value: string): number {
+  expect(value).toMatch(/px$/)
+  return Number(value.slice(0, -2))
+}
+
 describe('MarkOverlay', () => {
+  it.each([
+    { x: 0, y: 0, rotation: 0 },
+    { x: 1, y: 1, rotation: 0 },
+    { x: 0, y: 1, rotation: 45 },
+    { x: 1, y: 0, rotation: -45 },
+    { x: 1, y: 1, rotation: 90 },
+    { x: 0, y: 0, rotation: -90 },
+  ])(
+    'keeps both visible controls inside the photo at $x/$y with $rotation degrees',
+    ({ x, y, rotation }) => {
+      render(
+        <MarkOverlay
+          placement={placement}
+          position={{ mode: 'custom', x, y }}
+          previewSize={previewSize}
+          displaySize={displaySize}
+          margin={MARGIN}
+          scale={0.3}
+          rotation={rotation}
+          onGesture={vi.fn()}
+        />,
+      )
+      const frame = screen.getByRole('group', { name: /Watermark position/ })
+      act(() => frame.focus())
+      const style = frame.style
+      const frameWidth = pixelValue(style.width)
+      const frameHeight = pixelValue(style.height)
+      const frameCenter = {
+        x: pixelValue(style.left) + frameWidth / 2,
+        y: pixelValue(style.top) + frameHeight / 2,
+      }
+      const angle = (-rotation * Math.PI) / 180
+      for (const name of ['Rotate watermark', 'Resize watermark']) {
+        const button = screen.getByRole('button', { name })
+        const width = pixelValue(button.style.width)
+        const height = pixelValue(button.style.height)
+        const dx = pixelValue(button.style.left) + width / 2 - frameWidth / 2
+        const dy = pixelValue(button.style.top) + height / 2 - frameHeight / 2
+        const center = {
+          x: frameCenter.x + dx * Math.cos(angle) - dy * Math.sin(angle),
+          y: frameCenter.y + dx * Math.sin(angle) + dy * Math.cos(angle),
+        }
+        const horizontal =
+          (width * Math.abs(Math.cos(angle)) + height * Math.abs(Math.sin(angle))) / 2
+        const vertical =
+          (width * Math.abs(Math.sin(angle)) + height * Math.abs(Math.cos(angle))) / 2
+        expect(center.x - horizontal).toBeGreaterThanOrEqual(-0.001)
+        expect(center.y - vertical).toBeGreaterThanOrEqual(-0.001)
+        expect(center.x + horizontal).toBeLessThanOrEqual(displaySize.width + 0.001)
+        expect(center.y + vertical).toBeLessThanOrEqual(displaySize.height + 0.001)
+      }
+    },
+  )
+
+  it('shows selection on interaction and hides it on outside clicks, blur and Escape', () => {
+    renderOverlay(vi.fn())
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    expect(frame).toHaveAttribute('data-selection-visible', 'false')
+    expect(screen.queryByRole('button', { name: 'Resize watermark' })).not.toBeInTheDocument()
+    pointer('pointerdown', frame, 400, 200)
+    pointer('pointerup', frame, 400, 200)
+    expect(frame).toHaveAttribute('data-selection-visible', 'true')
+    expect(screen.getByRole('button', { name: 'Resize watermark' })).toBeInTheDocument()
+    fireEvent.pointerDown(document.body)
+    expect(frame).toHaveAttribute('data-selection-visible', 'false')
+    act(() => frame.blur())
+    act(() => frame.focus())
+    expect(frame).toHaveAttribute('data-selection-visible', 'true')
+    fireEvent.keyDown(frame, { key: 'Escape' })
+    expect(frame).toHaveAttribute('data-selection-visible', 'false')
+    act(() => frame.focus())
+    fireEvent.blur(frame, { relatedTarget: document.body })
+    expect(frame).toHaveAttribute('data-selection-visible', 'false')
+  })
+
   it('coalesces raw events to one frame and flushes the actual final pointer before ending', () => {
     const onGesture = vi.fn<(gesture: MarkGesture) => void>()
     renderOverlay(onGesture)
@@ -82,7 +162,7 @@ describe('MarkOverlay', () => {
     pointer('pointerdown', frame, 400, 200)
     for (let x = 300; x <= 390; x += 1)
       fireEvent.pointerMove(frame, { pointerId: 1, clientX: x, clientY: 150, altKey: true })
-    expect(onGesture).toHaveBeenCalledTimes(1)
+    expect(onGesture).not.toHaveBeenCalled()
     advanceFrame()
     expect(onGesture).toHaveBeenCalledTimes(2)
     expect(onGesture.mock.calls[1]?.[0].patch.x).toBeCloseTo(0.78)
@@ -113,7 +193,7 @@ describe('MarkOverlay', () => {
     fireEvent.pointerMove(frame, { pointerId: 1, clientX: 310, clientY: 150 })
     view.unmount()
     advanceFrame()
-    expect(onGesture).toHaveBeenCalledExactlyOnceWith({ phase: 'start', patch: {} })
+    expect(onGesture).not.toHaveBeenCalled()
   })
 
   it('keeps moved position when a second finger begins a pinch', () => {
@@ -157,6 +237,7 @@ describe('MarkOverlay', () => {
       10,
       0.2,
     )
+    act(() => screen.getByRole('group', { name: /Watermark position/ }).focus())
     const resize = screen.getByRole('button', { name: 'Resize watermark' })
     // Centre is at (400, 200) on screen; start 100px away, end 150px away.
     pointer('pointerdown', resize, 500, 200)
@@ -223,7 +304,7 @@ describe('MarkOverlay', () => {
     expect(gestures.map((gesture) => gesture.phase)).toEqual(['start', 'move'])
     expect(gestures[1]?.patch).toEqual({
       x: expect.closeTo(0.75, 5) as number,
-      y: expect.closeTo(0.8, 5) as number,
+      y: expect.closeTo(0.81, 5) as number,
       scale: expect.closeTo(0.3, 5) as number,
       rotation: expect.closeTo(0, 5) as number,
     })
@@ -236,25 +317,43 @@ describe('MarkOverlay', () => {
     pointer('pointerup', frame, 10, 10, 3)
     expect(gestures).toHaveLength(3)
     pointer('pointerup', frame, 450, 350, 2)
-    expect(gestures.at(-1)?.phase).toBe('end')
-    // The lingering first finger starts nothing new until it lifts and presses again.
+    expect(gestures.at(-1)?.phase).toBe('move')
+    // Continue dragging with the remaining finger without making another history step.
     pointer('pointermove', frame, 320, 200, 1)
+    // Rotated width is 225px: its rightmost legal centre is 387.5 / 500.
+    expect(gestures.at(-1)?.patch.x).toBeCloseTo(0.775)
     expect(gestures).toHaveLength(4)
+    pointer('pointerup', frame, 320, 200, 1)
+    expect(gestures.at(-1)?.phase).toBe('end')
+    expect(gestures.filter((gesture) => gesture.phase === 'start')).toHaveLength(1)
   })
 
-  it('ignores a second finger while a handle is being dragged', () => {
+  it('selects on a tap without moving, snapping or recording a gesture', () => {
     const gestures: MarkGesture[] = []
     renderOverlay((gesture) => {
       gestures.push(gesture)
     })
     const frame = screen.getByRole('group', { name: /Watermark position/ })
+    pointer('pointerdown', frame, 400, 200, 1)
+    pointer('pointermove', frame, 401, 201, 1)
+    pointer('pointerup', frame, 401, 201, 1)
+    expect(gestures).toEqual([])
+  })
+
+  it('allows a second finger to turn a handle gesture into the same continuous pinch', () => {
+    const gestures: MarkGesture[] = []
+    renderOverlay((gesture) => {
+      gestures.push(gesture)
+    })
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    act(() => screen.getByRole('group', { name: /Watermark position/ }).focus())
     const resize = screen.getByRole('button', { name: 'Resize watermark' })
     pointer('pointerdown', resize, 500, 200, 1)
     pointer('pointerdown', frame, 350, 200, 2)
     pointer('pointermove', frame, 300, 200, 2)
     pointer('pointermove', resize, 550, 200, 1)
-    expect(gestures.map((gesture) => gesture.phase)).toEqual(['start', 'move'])
-    expect(gestures[1]?.patch).toEqual({ scale: expect.closeTo(0.3, 5) as number })
+    expect(gestures.map((gesture) => gesture.phase)).toEqual(['start', 'move', 'move'])
+    expect(gestures.at(-1)?.patch.scale).toBeCloseTo(1 / 3)
   })
 
   it('nudges, resizes and rotates from the keyboard as discrete commits', () => {

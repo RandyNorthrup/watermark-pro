@@ -2,16 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createCloudShare, revokeCloudShare } from './cloud-sharing'
 import type { CloudSavedFile } from './cloud-transfer'
-import { acquireDropboxToken } from './dropbox-save'
-import { acquireGoogleDriveToken } from './google-picker'
-import { acquireGraphToken } from './onedrive'
+import { cloudToken } from '../cloud-connections'
 import type { CloudProviderId } from './source'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { setOfflineUser } from '../offline-context'
 
-vi.mock('./google-picker', () => ({ acquireGoogleDriveToken: vi.fn() }))
-vi.mock('./dropbox-save', () => ({ acquireDropboxToken: vi.fn() }))
-vi.mock('./onedrive', () => ({ acquireGraphToken: vi.fn() }))
+vi.mock('../cloud-connections', () => ({ cloudToken: vi.fn() }))
 
 function file(provider: CloudProviderId): CloudSavedFile {
   return {
@@ -20,13 +16,19 @@ function file(provider: CloudProviderId): CloudSavedFile {
     name: 'photo.png',
     manageUrl: 'https://drive.google.com/file/d/file-one/view',
     userId: 'owner',
+    providerAccountId: 'cloud-account',
   }
 }
 beforeEach(() => {
   setOfflineUser('owner')
-  vi.mocked(acquireGoogleDriveToken).mockResolvedValue('google-token')
-  vi.mocked(acquireDropboxToken).mockResolvedValue('dropbox-token')
-  vi.mocked(acquireGraphToken).mockResolvedValue('microsoft-token')
+  vi.mocked(cloudToken).mockImplementation((provider) =>
+    Promise.resolve({
+      accessToken: provider === 'onedrive' ? 'microsoft-token' : `${provider}-token`,
+      expiresAt: '2030-01-01T00:00:00.000Z',
+      providerAccountId: 'cloud-account',
+      generation: 1,
+    }),
+  )
 })
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -51,7 +53,7 @@ describe('explicit native cloud links', () => {
     await expect(
       createCloudShare({ ...ALL_CLOUD_CONFIG, googleOAuthClientId: null }, file('google')),
     ).rejects.toThrow('not configured')
-    expect(acquireGoogleDriveToken).not.toHaveBeenCalled()
+    expect(cloudToken).not.toHaveBeenCalled()
   })
   it('creates a non-discoverable Google view link and revokes only its permission', async () => {
     const fetcher = vi
@@ -140,7 +142,7 @@ describe('explicit native cloud links', () => {
     await expect(
       createCloudShare(ALL_CLOUD_CONFIG, { ...file('google'), userId: 'someone-else' }),
     ).rejects.toThrow('another app account')
-    expect(acquireGoogleDriveToken).not.toHaveBeenCalled()
+    expect(cloudToken).not.toHaveBeenCalled()
     vi.stubGlobal(
       'fetch',
       vi.fn(() =>
@@ -158,9 +160,14 @@ describe('explicit native cloud links', () => {
     await expect(createCloudShare(ALL_CLOUD_CONFIG, file('onedrive'))).rejects.toThrow(
       'restrict anonymous sharing',
     )
-    vi.mocked(acquireGoogleDriveToken).mockImplementationOnce(() => {
+    vi.mocked(cloudToken).mockImplementationOnce(() => {
       setOfflineUser('other')
-      return Promise.resolve('old-token')
+      return Promise.resolve({
+        accessToken: 'old-token',
+        expiresAt: '2030-01-01T00:00:00.000Z',
+        providerAccountId: 'cloud-account',
+        generation: 1,
+      })
     })
     await expect(createCloudShare(ALL_CLOUD_CONFIG, file('google'))).rejects.toThrow(
       'account changed',

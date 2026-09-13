@@ -33,6 +33,7 @@ import { Route as AppSharesRouteImport } from './routes/app/shares'
 import { Route as AppVerifyRouteImport } from './routes/app/verify'
 import { Route as AppVideoRouteImport } from './routes/app/video'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as WorkspaceInvitationTokenRouteImport } from './routes/workspace-invitation.$token'
 import { Route as AppLibraryIndexRouteImport } from './routes/app/library/index'
 import { Route as AppLibraryWatermarkIdRouteImport } from './routes/app/library/$watermarkId'
 import { Route as AppLibraryNewRouteImport } from './routes/app/library/new'
@@ -159,6 +160,12 @@ const ShareTokenRoute = ShareTokenRouteImport.update({
   path: '/share/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceInvitationTokenRoute =
+  WorkspaceInvitationTokenRouteImport.update({
+    id: '/workspace-invitation/$token',
+    path: '/workspace-invitation/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AppLibraryIndexRoute = AppLibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
@@ -204,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/app/verify': typeof AppVerifyRoute
   '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
+  '/workspace-invitation/$token': typeof WorkspaceInvitationTokenRoute
   '/app/': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
   '/app/library/new': typeof AppLibraryNewRoute
@@ -233,6 +241,7 @@ export interface FileRoutesByTo {
   '/app/verify': typeof AppVerifyRoute
   '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
+  '/workspace-invitation/$token': typeof WorkspaceInvitationTokenRoute
   '/app': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
   '/app/library/new': typeof AppLibraryNewRoute
@@ -264,6 +273,7 @@ export interface FileRoutesById {
   '/app/verify': typeof AppVerifyRoute
   '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
+  '/workspace-invitation/$token': typeof WorkspaceInvitationTokenRoute
   '/app/': typeof AppIndexRoute
   '/app/library/$watermarkId': typeof AppLibraryWatermarkIdRoute
   '/app/library/new': typeof AppLibraryNewRoute
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/app/verify'
     | '/app/video'
     | '/share/$token'
+    | '/workspace-invitation/$token'
     | '/app/'
     | '/app/library/$watermarkId'
     | '/app/library/new'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/app/verify'
     | '/app/video'
     | '/share/$token'
+    | '/workspace-invitation/$token'
     | '/app'
     | '/app/library/$watermarkId'
     | '/app/library/new'
@@ -355,6 +367,7 @@ export interface FileRouteTypes {
     | '/app/verify'
     | '/app/video'
     | '/share/$token'
+    | '/workspace-invitation/$token'
     | '/app/'
     | '/app/library/$watermarkId'
     | '/app/library/new'
@@ -374,6 +387,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   AcceptInvitationInvitationIdRoute: typeof AcceptInvitationInvitationIdRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  WorkspaceInvitationTokenRoute: typeof WorkspaceInvitationTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -546,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workspace-invitation/$token': {
+      id: '/workspace-invitation/$token'
+      path: '/workspace-invitation/$token'
+      fullPath: '/workspace-invitation/$token'
+      preLoaderRoute: typeof WorkspaceInvitationTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/library/': {
       id: '/app/library/'
       path: '/library'
@@ -633,6 +654,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   AcceptInvitationInvitationIdRoute: AcceptInvitationInvitationIdRoute,
   ShareTokenRoute: ShareTokenRoute,
+  WorkspaceInvitationTokenRoute: WorkspaceInvitationTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

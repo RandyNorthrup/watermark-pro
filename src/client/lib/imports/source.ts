@@ -2,21 +2,21 @@
  * Cloud import sources (M16). Each provider (Google Drive, Dropbox, OneDrive)
  * is offered only when the deployment has configured its keys — the public
  * config carries them, and `configuredProviders` reports which are usable. The
- * actual pickers load their vendor SDK on demand and live in the per-provider
- * modules (`google-picker`, `dropbox-chooser`, `onedrive`); this file is the
+ * shared folder browser reuses account-owned server grants and loads Google's
+ * native Picker only when additional file authorization is needed; this is the
  * shared, DOM-free contract that decides which providers to show.
  */
 import type { PublicConfig } from '../../../shared/api'
 
 export type CloudProviderId = 'google' | 'dropbox' | 'onedrive'
 
-/** A watermarked photo to write back to a cloud provider (M16 save-to-cloud). */
+/** Original export bytes to write back to a cloud provider without conversion. */
 export interface CloudUpload {
   readonly name: string
   readonly blob: Blob
 }
 
-/** Lazy export generation lets authorization open directly from the user's click. */
+/** Generate exports only after a destination is chosen and its grant is available. */
 export type CloudUploadSource =
   readonly CloudUpload[] | (() => Promise<readonly CloudUpload[]> | readonly CloudUpload[])
 

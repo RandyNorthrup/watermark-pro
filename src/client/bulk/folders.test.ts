@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  collectImages,
+  collectMedia,
   type FileSystemEntryLike,
   MAX_BULK_FILES,
   readEntries,
@@ -103,9 +103,9 @@ describe('zipPath', () => {
   })
 })
 
-describe('collectImages', () => {
+describe('collectMedia', () => {
   it('keeps images with their relative path and skips others', () => {
-    const scan = collectImages([
+    const scan = collectMedia([
       fileWithPath('a.png', 'trip/a.png'),
       fileWithPath('notes.txt', 'trip/notes.txt', 'text/plain'),
       new File([new Uint8Array([1])], 'loose.jpg', { type: 'image/jpeg' }),

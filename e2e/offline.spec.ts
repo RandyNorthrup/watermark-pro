@@ -2,54 +2,11 @@
 import type { Locator, Page } from '@playwright/test'
 
 import { test } from './offline-network'
+import { expectOfflineStatus, openOfflinePanel, waitForOfflineReadiness } from './offline-support'
 import { createWorkspace, expect, expectAccessible, navigateTo } from './support'
 import { photoListResponseSchema } from '../src/shared/api'
 import { watermarkListResponseSchema } from '../src/shared/api-watermark'
 import { shellOrganizationsSchema } from '../src/shared/shell-cache'
-
-const OFFLINE_READY_TIMEOUT_MS = 120_000
-
-async function openOfflinePanel(page: Page): Promise<{
-  panel: Locator
-  close: () => Promise<void>
-}> {
-  const menu = page.getByRole('button', { name: 'Menu', exact: true })
-  const isPhoneMenu = await menu.isVisible()
-  if (isPhoneMenu) await menu.click()
-  const panel = page.getByRole('region', { name: 'Offline work', exact: true })
-  await expect(panel).toBeVisible()
-  return {
-    panel,
-    close: async () => {
-      if (!isPhoneMenu) return
-      await page.getByRole('button', { name: 'Close menu' }).click()
-      await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
-    },
-  }
-}
-
-async function expectOfflineStatus(page: Page, text: string, timeout?: number): Promise<void> {
-  const view = await openOfflinePanel(page)
-  const status = view.panel.getByText(text, { exact: true })
-  if (timeout === undefined) await expect(status).toBeVisible()
-  else await expect(status).toBeVisible({ timeout })
-  await view.close()
-}
-
-async function waitForOfflineReadiness(page: Page): Promise<void> {
-  // Installation fetches the complete compiled inventory. Await its actual
-  // lifecycle under the journey's existing timeout before checking UI readiness.
-  await page.evaluate('navigator.serviceWorker.ready.then(() => true)')
-  await expect
-    .poll(
-      async () =>
-        await page.evaluate<boolean>(
-          'navigator.serviceWorker.controller?.scriptURL.endsWith("/sw.js") ?? false',
-        ),
-    )
-    .toBe(true)
-  await expectOfflineStatus(page, 'App files are ready for offline use.', OFFLINE_READY_TIMEOUT_MS)
-}
 
 function libraryPreset(page: Page, name: string): Locator {
   return page
@@ -101,7 +58,7 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
     })
     .toBe(1)
   await page.getByRole('link', { name: 'Open Offline base in the editor' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
   await waitForOfflineReadiness(page)
   await expect
     .poll(
@@ -118,7 +75,7 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
 
   await offlineNetwork.setOffline(true)
   await page.reload()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
   const image = page.getByRole('img', { name: /Photo with the watermark/ })
   await expect
     .poll(
@@ -142,6 +99,8 @@ test('keeps offline presets and photo saves across reload and reconnect', async 
   await navigateTo(page, 'Gallery')
   const photo = page.getByRole('button', { name: 'Open sample-photo-watermarked.png' })
   await expect(photo).toBeVisible()
+  // WebKit defers a lazy thumbnail below Recents and the folder toolbar until it is on screen.
+  await photo.scrollIntoViewIfNeeded()
   await expect
     .poll(
       async () =>

@@ -14,29 +14,31 @@ import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
 
 interface CanvasViewControlsProps {
-  status: string
   zoom: number
   isFit: boolean
   isGridVisible: boolean
+  isSnappingToGrid: boolean
   gridSpacing: number
   onZoomChange: (zoom: number) => void
   onFit: () => void
   onActualSize: () => void
   onGridVisibilityChange: (isVisible: boolean) => void
+  onGridSnapChange: (isEnabled: boolean) => void
   onGridSpacingChange: (spacing: number) => void
 }
 
 /** Photoshop-style canvas view controls. They affect only the editor view, never exported pixels. */
 export function CanvasViewControls({
-  status,
   zoom,
   isFit,
   isGridVisible,
+  isSnappingToGrid,
   gridSpacing,
   onZoomChange,
   onFit,
   onActualSize,
   onGridVisibilityChange,
+  onGridSnapChange,
   onGridSpacingChange,
 }: CanvasViewControlsProps) {
   const { t } = useTranslation()
@@ -47,31 +49,26 @@ export function CanvasViewControls({
     <div
       role="group"
       aria-label={t('editor.view.label')}
-      className="glass-control flex flex-wrap items-end gap-3 rounded-xl border p-3"
+      className="glass-control grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border px-3 py-2 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"
     >
-      <p
-        className="min-w-[min(100%,14rem)] flex-1 self-center truncate text-sm text-ink-muted"
-        aria-live="polite"
-      >
-        {status}
-      </p>
-      <div className="flex min-w-[min(100%,22rem)] flex-1 items-end gap-2">
+      <div className="flex min-w-0 items-end gap-1">
         <Button
           type="button"
           variant="ghost"
           size="icon"
           aria-label={t('editor.view.zoomOut')}
+          className="hidden xl:inline-flex"
           onClick={() => changeZoom(zoom - CANVAS_ZOOM_STEP_PERCENT)}
         >
           <ZoomOut aria-hidden="true" className="size-4" />
         </Button>
         <SliderField
-          className="min-w-32 flex-1"
+          className="min-w-0 flex-1"
           label={t('editor.view.zoom')}
-          value={zoom}
+          value={Math.round(zoom)}
           min={MIN_CANVAS_ZOOM_PERCENT}
           max={MAX_CANVAS_ZOOM_PERCENT}
-          step={CANVAS_ZOOM_STEP_PERCENT}
+          step={1}
           format={(value) => `${String(Math.round(value))}%`}
           onChange={changeZoom}
         />
@@ -80,6 +77,7 @@ export function CanvasViewControls({
           variant="ghost"
           size="icon"
           aria-label={t('editor.view.zoomIn')}
+          className="hidden xl:inline-flex"
           onClick={() => changeZoom(zoom + CANVAS_ZOOM_STEP_PERCENT)}
         >
           <ZoomIn aria-hidden="true" className="size-4" />
@@ -100,23 +98,33 @@ export function CanvasViewControls({
           {t('editor.view.actualSize')}
         </Button>
       </div>
-      <div className="flex min-w-[min(100%,18rem)] flex-1 items-end gap-3">
-        <div className="flex min-h-11 items-center gap-2">
-          <span className="text-sm font-medium">{t('editor.view.grid')}</span>
-          <Switch
-            aria-label={t('editor.view.grid')}
-            isChecked={isGridVisible}
-            onCheckedChange={onGridVisibilityChange}
-          />
+      <div className="col-span-2 grid min-w-0 grid-cols-2 items-center gap-3 xl:col-span-1">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between gap-2 text-xs font-medium">
+            <span>{t('editor.view.grid')}</span>
+            <Switch
+              aria-label={t('editor.view.grid')}
+              isChecked={isGridVisible}
+              onCheckedChange={onGridVisibilityChange}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-2 text-xs font-medium">
+            <span>{t('editor.view.snapToGrid')}</span>
+            <Switch
+              aria-label={t('editor.view.snapToGrid')}
+              isChecked={isSnappingToGrid}
+              onCheckedChange={onGridSnapChange}
+            />
+          </div>
         </div>
         <SliderField
-          className="min-w-32 flex-1"
+          className="min-w-0"
           label={t('editor.view.gridSpacing')}
           value={gridSpacing}
           min={MIN_CANVAS_GRID_SPACING_PX}
           max={MAX_CANVAS_GRID_SPACING_PX}
           step={CANVAS_GRID_SPACING_STEP_PX}
-          disabled={!isGridVisible}
+          disabled={!isGridVisible && !isSnappingToGrid}
           format={(value) => `${String(Math.round(value))} px`}
           onChange={onGridSpacingChange}
         />

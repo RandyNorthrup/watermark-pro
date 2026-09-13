@@ -5,7 +5,7 @@
   "shell": {
     "nav": {
       "library": "Biblioteca",
-      "editor": "Editor",
+      "editor": "Imagem",
       "bulk": "Lote",
       "video": "Vídeo",
       "documents": "Documentos",
@@ -22,18 +22,22 @@
     "toolsNav": "Ferramentas",
     "signOut": "Sair",
     "accountMenu": "Menu da conta de {{name}}",
-    "menuDescription": "Troque de organização ou vá a qualquer parte do Lumafoil.",
-    "switchOrganizationFor": "Organização: {{name}}. Trocar de organização",
-    "chooseOrganization": "Escolha uma organização",
-    "chooseOrganizationShort": "Escolher organização",
-    "organizations": "Organizações",
-    "newOrganization": "Nova organização",
+    "menuDescription": "Troque de espaço de trabalho ou vá a qualquer parte do Lumafoil.",
+    "switchOrganizationFor": "Espaço de trabalho: {{name}}. Trocar de espaço de trabalho",
+    "chooseOrganization": "Escolha um espaço de trabalho",
+    "chooseOrganizationShort": "Escolher espaço de trabalho",
+    "organizations": "Espaços de trabalho",
+    "newOrganization": "Novo espaço de trabalho",
     "theme": {
       "system": "Tema: segue o sistema. Mudar para claro",
       "light": "Tema: claro. Mudar para escuro",
       "dark": "Tema: escuro. Mudar para o sistema"
     },
-    "closeMenu": "Fechar menu"
+    "closeMenu": "Fechar menu",
+    "manageAccess": "Gerenciar acesso",
+    "supportPrompt": "Se o Lumafoil ajuda, considere fazer uma doação.",
+    "donate": "Doar",
+    "supportPayPal": "Doar com PayPal (nova aba)"
   },
   "auth": {
     "backToSignIn": "Voltar para entrar",
@@ -103,12 +107,12 @@
     "pendingInvitations_other": "{{count}} convites pendentes.",
     "manageMembers": "Gerenciar membros",
     "auditLog": "Registro de auditoria",
-    "auditDescription": "Cada mudança de membros e de organização é registrada com quem a fez e quando.",
+    "auditDescription": "Cada mudança de membros e de espaço de trabalho é registrada com quem a fez e quando.",
     "viewAuditLog": "Ver registro de auditoria",
     "pendingInvitations_many": "{{count}} convites pendentes."
   },
   "library": {
-    "orgRequired": "Crie uma organização ou entre em uma para montar uma biblioteca de marcas d'água.",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para montar uma biblioteca de marcas d'água.",
     "heading": "Biblioteca de marcas d'água",
     "description": "Marcas d’água salvas em {{name}}. Aplique a um arquivo ou a um lote inteiro.",
     "export": "Exportar",
@@ -120,7 +124,7 @@
     "loadErrorTitle": "Não foi possível carregar a biblioteca",
     "empty": "Nenhuma predefinição ainda. Uma predefinição combina uma marca (texto, símbolo ou logotipo) com configurações de posicionamento, contraste e estilo.",
     "createFirst": "Criar a primeira predefinição",
-    "orgRequiredShort": "Primeiro crie uma organização ou entre em uma.",
+    "orgRequiredShort": "Primeiro crie um espaço de trabalho ou entre em um.",
     "loadingPreset": "Carregando predefinição",
     "loadPresetErrorTitle": "Não foi possível carregar a predefinição",
     "presetGone": "Essa predefinição não existe mais.",
@@ -143,12 +147,6 @@
       "logo": "Logotipo",
       "qr": "Código QR de {{content}}",
       "sticker": "Adesivo {{name}}"
-    },
-    "shape": {
-      "rectangle": "Retângulo",
-      "roundedRectangle": "Retângulo arredondado",
-      "ellipse": "Elipse",
-      "line": "Linha"
     },
     "placement": {
       "smart": "Posicionamento inteligente",
@@ -177,12 +175,16 @@
     "notAnImage": "Esse arquivo não é uma imagem que o navegador possa ler.",
     "text": {
       "label": "Texto",
-      "hint": "Até {{max}} caracteres em até {{lines}} linhas. Use \"Inserir detalhe\" para tokens como a data ou a câmera, preenchidos em cada foto. {location} imprime a posição GPS da foto na imagem."
+      "hint": "Até {{max}} caracteres em até {{lines}} linhas. Use \"Inserir detalhe\" para tokens como a data ou a câmera, preenchidos em cada foto. {location} imprime a posição GPS da foto na imagem.",
+      "symbols": "Símbolos de texto",
+      "insertSymbol": "Inserir {{symbol}}",
+      "insertLimit": "O texto está cheio. Selecione texto para substituir ou remova caracteres."
     },
     "qr": {
       "content": "Conteúdo do código QR",
       "hint": "Geralmente um link. Até {{max}} caracteres; o código é sempre escuro sobre um fundo claro para poder ser lido.",
-      "savedHint": "Dê um nome e salve cada código QR separadamente. Reutilize-o na biblioteca ou mantenha vários para links diferentes. Teste a exportação no tamanho desejado antes de compartilhar."
+      "savedHint": "Dê um nome e salve cada código QR separadamente. Reutilize-o na biblioteca ou mantenha vários para links diferentes. Teste a exportação no tamanho desejado antes de compartilhar.",
+      "shortLabel": "QR"
     },
     "tokens": {
       "menu": "Inserir detalhe",
@@ -206,12 +208,11 @@
     "font": {
       "family": "Fonte",
       "weight": "Peso",
-      "specimen": "A rápida raposa marrom",
       "search": "Buscar fontes",
-      "resultCount": "{{count}} famílias de fontes",
       "recent": "Usadas recentemente",
-      "all": "Todas as fontes",
-      "license": "Licença da fonte"
+      "license": "Licença da fonte",
+      "previewError": "Algumas prévias de fontes não carregaram. Reabra a lista quando estiver conectado para tentar novamente.",
+      "empty": "Nenhuma Fonte Correspondente"
     },
     "symbol": {
       "icons": "Ícones",
@@ -233,7 +234,23 @@
       "fillOpacity": "Opacidade do preenchimento",
       "strokeWidth": "Espessura do traço",
       "customStrokeColour": "Cor de traço personalizada",
-      "strokeColour": "Cor do traço"
+      "strokeColour": "Cor do traço",
+      "triangle": "Triângulo",
+      "diamond": "Losango",
+      "pentagon": "Pentágono",
+      "hexagon": "Hexágono",
+      "octagon": "Octógono",
+      "star": "Estrela",
+      "starburst": "Estrela radiante",
+      "heart": "Coração",
+      "shield": "Escudo",
+      "speechBubble": "Balão de fala",
+      "arrowLeft": "Seta esquerda",
+      "arrowRight": "Seta direita",
+      "arrowUp": "Seta para cima",
+      "arrowDown": "Seta para baixo",
+      "doubleArrow": "Seta dupla",
+      "plus": "Cruz"
     },
     "effects": {
       "letterSpacing": "Espaçamento entre letras",
@@ -378,11 +395,12 @@
       "license": "Fluent Emoji · licença MIT",
       "usage": "Uso comercial permitido; mantenha o aviso de licença da arte ao redistribuí-la.",
       "guide": "Guia de licenças da arte"
-    }
+    },
+    "saveNameHint": "Escolha um nome para este modelo."
   },
   "editor": {
-    "orgRequired": "Crie uma organização ou entre em uma para usar o editor.",
-    "heading": "Editor",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para editar imagens.",
+    "heading": "Imagem",
     "description": "Escolha uma predefinição, ajuste a posição, recorte e redimensione no seu dispositivo. Baixe o resultado ou escolha salvar na galeria ou na nuvem.",
     "tabs": {
       "presets": "Predefinições",
@@ -413,7 +431,8 @@
       "fit": "Ajustar",
       "actualSize": "100%",
       "grid": "Grade",
-      "gridSpacing": "Espaçamento da grade"
+      "gridSpacing": "Espaçamento da grade",
+      "snapToGrid": "Ajustar à grade"
     },
     "altCrop": "Foto com o quadro de recorte",
     "altWatermark": "Foto com a marca d'água aplicada",
@@ -533,30 +552,31 @@
       "download": "Baixar",
       "share": "Compartilhar",
       "saveToGallery": "Salvar na galeria",
-      "savedToFolder": "Salvo na sua pasta “{{folder}}” do {{provider}}."
+      "savedToFolder": "Salvo no {{provider}}."
     },
     "mark": {
       "position": "Posição da marca d'água. Arraste para mover (ela se ajusta às margens, aos terços e ao centro; segure Alt para posicioná-la livremente), pince para redimensionar, gire para rotacionar; as setas ajustam, mais e menos redimensionam, e os colchetes rotacionam.",
       "rotate": "Rotacionar a marca d'água",
       "resize": "Redimensionar a marca d'água"
-    }
+    },
+    "newWorkspace": "Novo"
   },
   "bulk": {
-    "orgRequired": "Crie uma organização ou entre em uma para aplicar marca d'água em lote.",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para aplicar marca d'água em lote.",
     "heading": "Marca d'água em lote",
-    "description": "Aplique uma predefinição a um ensaio inteiro. As fotos são processadas em paralelo no seu navegador e baixadas como ZIP ou uma a uma.",
+    "description": "Aplique marcas d’água a imagens, PDFs e vídeos em um só lote. Baixe cada resultado ou reúna todos em um ZIP.",
     "emptyHint": "para aplicá-la a um lote.",
-    "addPhotos": "Adicionar fotos",
+    "addPhotos": "Adicionar Arquivos",
     "addFolder": "Adicionar uma pasta",
-    "dropHint": "Solte fotos ou uma pasta aqui, ou",
+    "dropHint": "Arraste arquivos ou uma pasta para cá, ou",
     "fromLink": "De um link",
-    "capacity_one": "Até {{max}} fotos por lote. O processamento acontece no seu navegador usando {{count}} processo.",
-    "capacity_other": "Até {{max}} fotos por lote. O processamento acontece no seu navegador usando {{count}} processos.",
-    "skipped_one": "{{count}} arquivo ignorado: não é imagem",
-    "skipped_other": "{{count}} arquivos ignorados: não são imagens",
+    "capacity_one": "Até {{max}} arquivos por lote. Imagens, PDFs e vídeos são processados no seu dispositivo.",
+    "capacity_other": "Até {{max}} arquivos por lote. Imagens, PDFs e vídeos são processados no seu dispositivo.",
+    "skipped_one": "Arquivos ignorados: {{count}}. Formato não compatível.",
+    "skipped_other": "Arquivos ignorados: {{count}}. Formato não compatível.",
     "importErrorTitle": "Não foi possível importar da nuvem",
-    "photoCount_one": "{{count}} foto",
-    "photoCount_other": "{{count}} fotos",
+    "photoCount_one": "{{count}} arquivo",
+    "photoCount_other": "{{count}} arquivos",
     "clearList": "Limpar lista",
     "batchProgress": "Progresso do lote",
     "progress": {
@@ -566,7 +586,7 @@
       "rate": " em {{seconds}} s ({{rate}} fotos/s)",
       "end": "."
     },
-    "photosList": "Fotos neste lote",
+    "photosList": "Arquivos Neste Lote",
     "custom": "Personalizado",
     "selected": "Selecionada",
     "status": {
@@ -610,8 +630,8 @@
     "savedProgress": "{{done}} de {{total}} salvas",
     "allSaved": "Todas salvas na <galleryLink>galeria</galleryLink>.",
     "someSaved": "Não foi possível salvar {{failed}} (cota ou limites de armazenamento). O restante está na <galleryLink>galeria</galleryLink>.",
-    "savedToCloud_one": "{{count}} foto salva na sua pasta “{{folder}}” do {{provider}}.",
-    "savedToCloud_other": "{{count}} fotos salvas na sua pasta “{{folder}}” do {{provider}}.",
+    "savedToCloud_one": "{{count}} arquivo salvo no {{provider}}.",
+    "savedToCloud_other": "{{count}} arquivos salvos no {{provider}}.",
     "privacyNote": "O posicionamento inteligente e o contraste automático são calculados para cada foto separadamente. Nada é enviado.",
     "watch": {
       "label": "Monitorar uma pasta",
@@ -621,18 +641,23 @@
       "wrote": "{{name}} gravada",
       "failed": "Falha em {{name}}: {{error}}"
     },
-    "capacity_many": "Até {{max}} fotos por lote. O processamento acontece no seu navegador usando {{count}} processos.",
-    "skipped_many": "{{count}} arquivos ignorados: não são imagens",
-    "photoCount_many": "{{count}} fotos",
-    "savedToCloud_many": "{{count}} fotos salvas na sua pasta “{{folder}}” do {{provider}}."
+    "capacity_many": "Até {{max}} arquivos por lote. Imagens, PDFs e vídeos são processados no seu dispositivo.",
+    "skipped_many": "Arquivos ignorados: {{count}}. Formato não compatível.",
+    "photoCount_many": "{{count}} arquivos",
+    "savedToCloud_many": "{{count}} arquivos salvos no {{provider}}.",
+    "media": {
+      "imageSettingsHint": "Formato, tamanho, ajustes e marcas invisíveis se aplicam apenas às fotos. Os PDFs mantêm as páginas originais.",
+      "videoOutput": "Saída De Vídeo",
+      "galleryHint": "A Galeria salva apenas imagens. Baixe documentos e vídeos ou salve-os na nuvem."
+    }
   },
   "gallery": {
-    "orgRequired": "Crie uma organização ou entre em uma para ter uma galeria.",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para ter uma galeria.",
     "heading": "Galeria",
     "description": "Fotos com marca d’água salvas em {{name}}. Pesquise, filtre, baixe ou exclua.",
     "usage_one": "{{count}} foto · {{used}} de {{max}}",
     "usage_other": "{{count}} fotos · {{used}} de {{max}}",
-    "maxCount": "Até {{count}} fotos por organização",
+    "maxCount": "Até {{count}} fotos por espaço de trabalho",
     "storageUsed": "Armazenamento usado",
     "storagePercent": "{{percent}}% do armazenamento usado",
     "checkPhoto": "Verificar uma foto",
@@ -690,10 +715,12 @@
     "usage_many": "{{count}} fotos · {{used}} de {{max}}",
     "photoCount_many": "{{count}} fotos",
     "deleteConfirmTitle_many": "Excluir {{count}} fotos?",
-    "shareTitle_many": "Compartilhar {{count}} fotos"
+    "shareTitle_many": "Compartilhar {{count}} fotos",
+    "shareSyncPending": "Aguarde a sincronização das fotos selecionadas antes de criar um link.",
+    "shareSyncBlocked": "Resolva os problemas de sincronização das fotos selecionadas antes de criar um link."
   },
   "shares": {
-    "orgRequired": "Crie uma organização ou entre em uma para compartilhar fotos.",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para compartilhar fotos.",
     "noPermission": "Sua função não inclui compartilhamento.",
     "heading": "Compartilhamentos",
     "description": "Links que permitem que pessoas de fora de {{name}} vejam e baixem fotos selecionadas. Revogar um link o desativa imediatamente.",
@@ -725,7 +752,7 @@
     "sectionsLabel": "Seções de administração",
     "tabs": {
       "users": "Usuários",
-      "organizations": "Organizações",
+      "organizations": "Espaços de trabalho",
       "audit": "Trilha de auditoria",
       "health": "Integridade",
       "clientErrors": "Erros do cliente"
@@ -777,11 +804,11 @@
     "reasonLabel": "Motivo",
     "cancel": "Cancelar",
     "banConfirm": "Banir usuário",
-    "loadingOrganizations": "Carregando organizações",
-    "organizationsErrorTitle": "Não foi possível carregar as organizações",
-    "organizationsTable": "Organizações, das mais recentes às mais antigas",
+    "loadingOrganizations": "Carregando espaços de trabalho",
+    "organizationsErrorTitle": "Não foi possível carregar os espaços de trabalho",
+    "organizationsTable": "Espaços de trabalho, dos mais recentes aos mais antigos",
     "th": {
-      "organization": "Organização",
+      "organization": "Espaço de trabalho",
       "members": "Membros",
       "photos": "Fotos",
       "storage": "Armazenamento",
@@ -789,8 +816,8 @@
     },
     "loadingAudit": "Carregando a trilha de auditoria",
     "auditErrorTitle": "Não foi possível carregar a trilha de auditoria",
-    "auditCaption": "Entradas de auditoria de todas as organizações, das mais recentes às mais antigas",
-    "auditDetailHeading": "Organização",
+    "auditCaption": "Entradas de auditoria de todos os espaços de trabalho, das mais recentes às mais antigas",
+    "auditDetailHeading": "Espaço de trabalho",
     "platform": "plataforma",
     "userSummary_many": "{{count}} usuários{{extra}}.",
     "siteRole": "Função no site: {{role}}",
@@ -798,30 +825,17 @@
     "ownerProtected": "A conta do proprietário está protegida."
   },
   "members": {
-    "orgRequired": "Crie uma organização ou entre em uma para gerenciar membros.",
-    "heading": "Membros",
-    "description": "Pessoas em {{name}} e o que elas podem fazer.",
-    "count_one": "{{count}} membro",
-    "count_other": "{{count}} membros",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para gerenciar membros.",
     "pendingInvitations": "Convites pendentes",
-    "inviteHeading": "Convidar alguém",
     "emailLabel": "E-mail",
-    "roleLabel": "Função",
-    "sendInvitation": "Enviar convite",
-    "invitationSent": "Convite enviado para {{email}}.",
     "you": "(você)",
     "roleFor": "Função de {{name}}",
-    "remove": "Remover",
-    "removeMember": "Remover {{name}}",
-    "invitedAs": "Convidado como",
-    "cancel": "Cancelar",
-    "cancelInvitation": "Cancelar convite de {{email}}",
-    "count_many": "{{count}} membros"
+    "cancelInvitation": "Cancelar convite de {{email}}"
   },
   "audit": {
     "heading": "Registro de auditoria",
-    "description": "As alterações mais recentes em {{name}}. Proprietários e admins podem ver esta página.",
-    "thisOrganization": "esta organização",
+    "description": "Alterações mais recentes: {{name}}. Proprietários e administradores podem ver esta página.",
+    "thisOrganization": "espaço de trabalho atual",
     "loading": "Carregando o registro de auditoria",
     "loadErrorTitle": "Não foi possível carregar o registro de auditoria",
     "noAccess": "Sua função não inclui acesso à auditoria.",
@@ -833,14 +847,14 @@
     "action": "Ação"
   },
   "organizations": {
-    "firstTitle": "Crie sua primeira organização",
-    "newTitle": "Nova organização",
+    "firstTitle": "Crie seu primeiro espaço de trabalho",
+    "newTitle": "Novo espaço de trabalho",
     "description": "Crie um espaço separado para marcas d’água e fotos. Ele permanece privado até você convidar membros explicitamente.",
-    "createFailed": "Não foi possível criar a organização.",
+    "createFailed": "Não foi possível criar o espaço de trabalho.",
     "nameLabel": "Nome",
     "slugLabel": "Identificador de URL",
     "slugHint": "Letras minúsculas, números e hifens. Usado em links e deve ser único.",
-    "submit": "Criar organização"
+    "submit": "Criar espaço de trabalho"
   },
   "import": {
     "takePhoto": "Tirar uma foto",
@@ -853,19 +867,6 @@
       "errorTitle": "Não foi possível importar esse link",
       "fetch": "Buscar"
     },
-    "onedrive": {
-      "title": "Importar do OneDrive",
-      "name": "OneDrive",
-      "description": "Entre na Microsoft e escolha as fotos para adicionar.",
-      "loading": "Carregando o OneDrive",
-      "empty": "Nenhuma pasta ou imagem aqui.",
-      "folderPath": "Caminho da pasta",
-      "errorTitle": "A importação do OneDrive falhou",
-      "tryAgain": "Tentar novamente",
-      "noneSelected": "Nenhuma foto selecionada",
-      "selectedCount": "{{count}} selecionadas",
-      "addSelected": "Adicionar selecionadas"
-    },
     "cloudSaved": "Arquivos salvos na nuvem ({{total}})",
     "cloudSavedTitle": "Arquivos salvos na nuvem",
     "cloudSharingHint": "Salvar não cria um link público. Crie um apenas se quiser que qualquer pessoa com o link veja o arquivo. As permissões existentes da pasta continuam válidas. Gerencie outros acessos no provedor.",
@@ -876,39 +877,18 @@
     "copyLink": "Copiar link"
   },
   "video": {
-    "orgRequired": "Crie uma organização ou entre em uma para aplicar marca d'água em vídeo.",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para aplicar marca d'água em vídeo.",
     "heading": "Marca d'água em vídeo",
-    "description": "Aplique uma predefinição a um vídeo inteiro. Cada quadro recebe marca d'água no seu navegador e o áudio é mantido; nada é enviado.",
+    "description": "Visualize seu vídeo, posicione marcas d’água em momentos diferentes, adicione transições graduais e exporte com áudio.",
     "checkingSupport": "Verificando o suporte a vídeo",
     "unsupportedTitle": "Vídeo não é compatível com este navegador",
     "unsupportedBody": "Seu navegador não consegue codificar vídeo. Chrome, Edge ou Safari 17 e posteriores conseguem.",
-    "emptyHint": "para aplicá-la a um vídeo.",
     "addVideo": "Adicionar um vídeo",
     "dropHint": "Solte um vídeo aqui, ou",
-    "formatsHint": "MP4, WebM ou MOV. Tudo acontece no seu navegador; nada é enviado, e a galeria ainda não aceita vídeos.",
-    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
-    "choosePresetPreview": "Escolha uma predefinição para pré-visualizar a marca d'água em um quadro.",
-    "outputSize": "Saída de {{width}} × {{height}} px.",
     "transcodingProgress": "Progresso da transcodificação",
-    "progress": {
-      "noEta": "Quadro {{frame}} · {{percent}}%",
-      "withEta": "Quadro {{frame}} · {{percent}}% · faltam cerca de {{seconds}} s"
-    },
+    "progress": {},
     "cancel": "Cancelar",
-    "cancelled": "Transcodificação cancelada.",
-    "runErrorTitle": "Não foi possível aplicar marca d'água ao vídeo",
-    "download": "Baixar {{fileName}}",
     "share": "Compartilhar",
-    "presets": "Predefinições",
-    "placement": "Posicionamento",
-    "placementOptions": {
-      "smart": "Inteligente",
-      "bottomRight": "Inferior direito",
-      "bottomLeft": "Inferior esquerdo",
-      "topRight": "Superior direito",
-      "topLeft": "Superior esquerdo",
-      "center": "Centro"
-    },
     "quality": "Qualidade",
     "qualityOptions": {
       "low": "Baixa",
@@ -921,41 +901,50 @@
       "fit1080p": "Ajustar a 1080p",
       "fit720p": "Ajustar a 720p"
     },
-    "watermarking": "Aplicando marca d'água…",
-    "watermarkVideo": "Aplicar marca d'água ao vídeo",
-    "fixedPlacementNote": "A marca d'água mantém um único posicionamento fixo durante todo o vídeo. O áudio é copiado diretamente quando cabe na saída; caso contrário, é recodificado.",
-    "renderingPreview": "Gerando a prévia",
-    "previewAlt": "A marca d'água em um quadro do vídeo"
+    "previewAlt": "A marca d'água em um quadro do vídeo",
+    "timeline": {
+      "heading": "Tempo E Movimento",
+      "play": "Reproduzir",
+      "pause": "Pausar",
+      "playhead": "Posição De Reprodução",
+      "start": "Início",
+      "end": "Fim",
+      "fadeIn": "Aparecimento Gradual",
+      "fadeOut": "Desaparecimento Gradual",
+      "keyframes": "Quadros-Chave",
+      "addKeyframe": "Adicionar Quadro-Chave Aqui",
+      "updateKeyframe": "Atualizar Quadro-Chave Aqui",
+      "removeKeyframe": "Remover Quadro-Chave Em {{time}}",
+      "hint": "Adicione um quadro-chave, avance para outro momento e arraste, redimensione ou gire a marca. O Lumafoil cria o movimento entre os quadros-chave.",
+      "playbackFailed": "Este navegador não conseguiu reproduzir o vídeo selecionado.",
+      "chooseVideo": "Abra um vídeo e adicione uma marca d’água válida primeiro.",
+      "waitPreview": "Aguarde a prévia da marca d’água antes de adicionar um quadro-chave.",
+      "changed": "O vídeo ou a marca d’água mudou durante a exportação. Exporte novamente para usar as alterações atuais.",
+      "download": "Baixar Vídeo",
+      "cloudSaved": "O vídeo com marca d’água foi salvo no seu armazenamento em nuvem."
+    }
   },
   "documents": {
-    "orgRequired": "Crie uma organização ou entre em uma para aplicar marca d'água em documentos.",
+    "orgRequired": "Crie um espaço de trabalho ou entre em um para aplicar marca d'água em documentos.",
     "heading": "Documentos",
-    "description": "Carimbe uma predefinição em cada página de um PDF. Os arquivos são processados no seu navegador e baixados um a um ou como ZIP.",
-    "emptyHint": "para aplicá-la aos documentos.",
-    "addPdfs": "Adicionar PDFs",
-    "dropHint": "Solte PDFs aqui, ou",
-    "filesHint": "Até {{max}} arquivos, {{size}} cada. Cada página recebe marca d'água no seu navegador; nada é enviado.",
-    "skipped_one": "{{count}} arquivo ignorado: não é PDF ou excede {{max}}.",
-    "skipped_other": "{{count}} arquivos ignorados: não são PDF ou excedem {{max}}.",
-    "fileCount_one": "{{count}} documento",
-    "fileCount_other": "{{count}} documentos",
-    "clearList": "Limpar lista",
-    "watermarkingProgress": "Progresso da marca d'água",
-    "progressFinished": "{{done}} de {{total}} concluídos",
-    "progressFailed": ", {{count}} com falha",
-    "progressEnd": ".",
-    "listLabel": "Documentos para marcar",
-    "downloadFile": "Baixar {{fileName}}",
-    "removeFile": "Remover {{fileName}}",
-    "presetHint": "Marque uma ou mais; elas são desenhadas na ordem marcada, as últimas sobre as primeiras.",
-    "placement": "Posicionamento",
-    "smartPlacementHint": "O posicionamento inteligente é para fotos; escolha um canto ou uma posição personalizada para documentos.",
-    "watermarkEmpty": "Aplicar marca d'água aos documentos",
-    "watermarkCount": "Aplicar marca d'água a {{count}}",
-    "downloadZip": "Baixar {{count}} como ZIP",
-    "savedAsHint": "Cada documento é salvo como {name}-watermarked.pdf. PDFs criptografados são recusados.",
-    "skipped_many": "{{count}} arquivos ignorados: não são PDF ou excedem {{max}}.",
-    "fileCount_many": "{{count}} documentos"
+    "description": "Visualize cada página do PDF, edite as marcas d’água na própria página e exporte o documento original com suas marcas. Use Lotes para vários arquivos.",
+    "reader": {
+      "previous": "Página Anterior",
+      "next": "Próxima Página",
+      "page": "Página",
+      "ofPages": "de {{total}}",
+      "pageStatus": "{{name}} · Página {{page}} de {{total}}",
+      "preview": "Página PDF {{page}}",
+      "pageText": "Texto Da Página",
+      "open": "Abrir PDF",
+      "empty": "Abra ou arraste um PDF para visualizar suas páginas e posicionar a marca d’água.",
+      "invalidFile": "Escolha um PDF dentro do limite de tamanho do documento.",
+      "chooseMark": "Adicione uma marca d’água válida antes de exportar este documento.",
+      "changed": "O documento ou a marca d’água mudou durante a exportação. Exporte novamente para usar as alterações atuais.",
+      "download": "Baixar PDF",
+      "cloudSaved": "O PDF com marca d’água foi salvo no seu armazenamento em nuvem.",
+      "originalHint": "O texto original, as ilustrações vetoriais, as dimensões das páginas e as imagens incorporadas são preservados. Só a marca d’água é rasterizada. PDFs protegidos por senha precisam ser desbloqueados primeiro."
+    }
   },
   "verify": {
     "checkEmail": {
@@ -998,98 +987,102 @@
   "landing": {
     "nav": "Conta",
     "signIn": "Entrar",
-    "heroBody": "Adicione texto, logotipos ou assinaturas. Reutilize predefinições em arquivos ou lotes, edite offline e sincronize ao reconectar.",
-    "featuresHeading": "Ferramentas para todo o trabalho",
-    "footer": "O Lumafoil é de código aberto sob a licença MIT.",
+    "heroBody": "Adicione texto, logotipos, assinaturas, formas, adesivos ou códigos QR. Ajuste-os sobre a foto, visualize páginas PDF ou mova uma marca d’água pela linha do tempo de um vídeo. Salve seu estilo e reutilize-o em um lote.",
+    "featuresHeading": "Ferramentas para cada marca d’água",
+    "footer": "Lumafoil é código aberto sob a licença MIT.",
     "privacy": "Privacidade",
     "terms": "Termos",
     "heroTitleStart": "Marcas d’água para fotos,",
     "heroTitleEnd": "vídeos e PDFs.",
     "heroAlt": "Editor de fotos Lumafoil com controles de posição e exportação",
-    "previewLabel": "O editor Lumafoil",
-    "privacyNote": "Os arquivos são processados no dispositivo. Salvar na nuvem é opcional.",
+    "previewLabel": "Dentro do editor de imagens",
+    "privacyNote": "A edição acontece no seu dispositivo. Você escolhe o que salvar ou compartilhar.",
     "formatsLabel": "Fotos · PDFs · Vídeo",
     "workflowHeading": "Abra. Ajuste. Exporte.",
-    "workflowNote": "Seu espaço de trabalho reúne predefinições e arquivos salvos.",
+    "workflowNote": "Guarde predefinições reutilizáveis na Biblioteca e fotos salvas na Galeria. Organize ambas em pastas dentro do seu espaço de trabalho.",
     "steps": {
-      "openTitle": "Traga suas fotos",
-      "openBody": "Abra uma imagem ou um lote inteiro. Seus originais permanecem intactos.",
-      "markTitle": "Crie sua marca",
-      "markBody": "Escolha uma predefinição salva ou crie algo inconfundivelmente seu.",
-      "exportTitle": "Exporte e pronto",
-      "exportBody": "Baixe os arquivos prontos ou salve na galeria e sincronize."
+      "openTitle": "Abra seus arquivos",
+      "openBody": "Escolha uma foto, um PDF ou um vídeo compatível no dispositivo ou armazenamento conectado. Use Lotes para vários arquivos. Os arquivos originais permanecem inalterados.",
+      "markTitle": "Escolha e ajuste",
+      "markBody": "Comece com um modelo ou uma predefinição salva e edite texto, arte, tamanho, posição e aparência ao lado da prévia.",
+      "exportTitle": "Salve ou compartilhe",
+      "exportBody": "Baixe o resultado ou escolha uma pasta na nuvem. Salve fotos prontas na Galeria e crie links para as que deseja compartilhar."
     },
     "github": "GitHub",
     "featuresIntro": "Crie uma marca d’água, aplique aos arquivos e escolha como salvar ou compartilhar os resultados.",
-    "moreHeading": "Mais ferramentas para concluir o trabalho",
+    "moreHeading": "Edição, armazenamento e compartilhamento",
     "capabilities": {
       "marks": {
-        "title": "Texto, logotipos e sua assinatura",
-        "body": "Digite seu nome ou aviso de direitos autorais, envie um logotipo ou desenhe uma assinatura. Ajuste tamanho, ângulo, opacidade e cor e combine várias marcas."
+        "title": "Texto, logotipos, formas e assinaturas",
+        "body": "Digite um aviso de direitos autorais, envie um logotipo, desenhe uma assinatura ou escolha entre 20 formas. Ajuste tamanho, rotação, preenchimento, contorno e opacidade. Combine camadas, arraste as marcas para a posição desejada e desfaça alterações durante o trabalho."
       },
       "batch": {
-        "title": "Marcas d’água em lote",
-        "body": "Aplique uma marca salva a várias fotos. Confira os resultados, ajuste a posição em cada imagem e baixe o lote pronto em um ZIP."
+        "title": "Fotos, PDFs e vídeos no mesmo lote",
+        "body": "Aplique uma marca d’água salva a um lote misto de fotos, PDFs e vídeos compatíveis. Confira cada resultado, ajuste fotos individualmente e baixe os arquivos separadamente ou juntos em um ZIP. Arquivos com falha continuam visíveis para revisão."
       },
       "fonts": {
-        "title": "551 famílias de fontes diferentes",
-        "body": "Busque fontes com serifa, sem serifa, manuscritas, decorativas ou monoespaçadas. Veja seu texto e salve o estilo. As fontes estão incluídas localmente com licenças abertas."
+        "title": "551 famílias de fontes distintas",
+        "body": "Pesquise fontes pelo nome e veja cada opção em sua própria tipografia. Volte às fontes recentes, ajuste o espaçamento e a curvatura e salve o estilo em uma predefinição. Os arquivos das fontes e seus avisos de licença aberta acompanham o Lumafoil."
       },
       "stickers": {
         "title": "400 adesivos vetoriais coloridos",
-        "body": "Explore animais, flores, comidas, viagens, festas e objetos do dia a dia. Busque um desenho, adicione à marca e redimensione sem bordas borradas."
+        "body": "Pesquise animais, flores, comida, viagens, comemorações e objetos do dia a dia. Redimensione a arte vetorial para sua marca d’água. Os avisos de licença das artes incluídas acompanham o conteúdo exportado."
       },
       "qr": {
-        "title": "Crie e salve marcas QR",
+        "title": "Crie e salve marcas d’água QR",
         "body": "Transforme um endereço da web ou texto em código QR. Guarde códigos diferentes para portfólio, contato ou projetos e reutilize nos arquivos."
       },
       "templates": {
-        "title": "Salve suas marcas como modelos",
-        "body": "Guarde texto, imagens, estilo e posição. Aplique modelos no editor ou em lotes e importe ou exporte entre dispositivos."
+        "title": "18 modelos e suas próprias predefinições",
+        "body": "Comece com Rascunho, Confidencial, Não copiar, Prova, carimbos de revisão ou créditos de fotos. Edite qualquer modelo, dê um nome e salve na Biblioteca. Organize predefinições em pastas e reutilize-as em Imagem, Documentos, Vídeo ou Lotes."
       },
       "editing": {
         "title": "Recorte, redimensione e ajuste",
-        "body": "Recorte a foto, escolha as dimensões e ajuste brilho, contraste e saturação antes da marca final."
+        "body": "Recorte ou gire uma foto e ajuste brilho, contraste e saturação. Amplie para posicionar a marca, exiba uma grade ajustável e ative o encaixe. A resolução original é mantida, a menos que você escolha um recorte ou uma saída menor."
       },
       "smart": {
-        "title": "Posição e contraste inteligentes",
+        "title": "Posicionamento e contraste inteligentes",
         "body": "Lumafoil sugere uma posição e uma marca clara ou escura de acordo com a imagem. Confira e ajuste o resultado."
       },
       "video": {
-        "title": "Marcas d’água em vídeos",
-        "body": "Aplique marcas a vídeos compatíveis no navegador. Ajuste posição e tempo de exibição e veja a prévia antes de exportar."
+        "title": "Posições no vídeo e efeitos de transição",
+        "body": "Percorra o vídeo ao lado das ferramentas integradas de marca d’água. Defina posições em momentos diferentes, escolha quando cada marca aparece e adicione transições de entrada e saída. As exportações são recodificadas; formatos e suporte a áudio dependem do navegador e do arquivo original."
       },
       "pdf": {
-        "title": "Marcas d’água em PDFs",
-        "body": "Aplique uma marca salva às páginas escolhidas de um PDF. Processe um documento ou um lote e baixe os PDFs marcados."
+        "title": "Visualize e marque páginas PDF",
+        "body": "Leia um PDF e posicione marcas d’água com as ferramentas ao lado da página. Aplique-as ao documento inteiro ou processe vários PDFs em Lotes. As marcas são adicionadas às páginas PDF originais, preservando texto, imagens e arte vetorial existentes."
       },
       "export": {
         "title": "Escolha o formato de exportação",
-        "body": "Exporte fotos em JPEG, PNG ou WebP. Defina tamanho e qualidade ou baixe um lote processado em ZIP."
+        "body": "Exporte fotos em PNG, JPEG ou WebP. PNG é a opção sem perdas padrão; JPEG e WebP usam a qualidade escolhida. As exportações são geradas a partir da imagem original, não da prévia reduzida de edição."
       },
       "gallery": {
-        "title": "Sua galeria privada",
-        "body": "Salve imagens prontas na sua conta e encontre depois. Baixe arquivos ou selecione fotos para compartilhar."
+        "title": "Pastas e trabalhos recentes",
+        "body": "Organize predefinições na Biblioteca e fotos salvas na Galeria com pastas, itens recentes e visualizações em miniaturas, lista ou detalhes. Seu espaço é privado, a menos que você compartilhe o acesso explicitamente ou crie um link de galeria."
       },
       "sharing": {
-        "title": "Compartilhe as fotos que escolher",
-        "body": "Crie um link de galeria do Lumafoil para fotos selecionadas. Defina uma validade ou revogue o link quando quiser."
+        "title": "Compartilhe fotos ou um espaço de trabalho",
+        "body": "Crie links de galeria revogáveis e com validade para fotos selecionadas. Proprietários podem conceder acesso de visualização ou edição por link, convite por email ou adição direta de um usuário existente. O acesso ao espaço é separado do convite para entrar no Lumafoil."
       },
       "offline": {
-        "title": "Trabalhe offline, sincronize depois",
-        "body": "Prepare Lumafoil para uso offline e edite modelos e salve fotos sem conexão. As alterações sincronizam ao reconectar, com erros e conflitos visíveis."
+        "title": "Trabalhe offline e sincronize depois",
+        "body": "Prepare o aplicativo para uso offline enquanto estiver conectado à conta. Edite fotos e predefinições e coloque salvamentos na Galeria em fila sem conexão. Reconecte-se com a mesma conta para sincronizar. Transferências na nuvem, convites e alterações de compartilhamento exigem conexão."
       },
       "privacy": {
-        "title": "Sua conta, seu espaço",
-        "body": "Novos usuários precisam de convite e recebem um espaço privado. Convidar alguém não dá acesso às suas fotos ou modelos."
+        "title": "Sua conta, seu espaço de trabalho",
+        "body": "Novos usuários precisam de um convite para o site e recebem um espaço privado separado. Um convite para o site nunca compartilha suas fotos ou predefinições. Compartilhar um espaço exige uma concessão explícita de acesso pelo proprietário."
       },
       "languages": {
-        "title": "Interface em 12 idiomas",
+        "title": "12 idiomas de interface",
         "body": "Escolha entre os 12 idiomas do Lumafoil, incluindo árabe com layout da direita para a esquerda."
       },
       "theme": {
         "title": "Modos claro e escuro",
         "body": "Escolha um tema ou siga o ajuste do dispositivo. A interface se adapta a celulares, tablets e telas maiores."
+      },
+      "cloud": {
+        "title": "Pastas na nuvem conectadas",
+        "body": "Conecte Google Drive, Dropbox ou OneDrive para abrir arquivos, escolher pastas de exportação e criar links de compartilhamento do provedor. As conexões ficam salvas até você desconectá-las ou o provedor exigir nova autorização. O acesso ao Google Drive se limita aos arquivos e pastas que você seleciona ou cria com Lumafoil. Contas corporativas ou escolares podem exigir aprovação do administrador da Microsoft."
       }
     },
     "inviteHosting": "Lumafoil é acessível apenas por convite. Prefere hospedar sua própria versão?",
@@ -1169,12 +1162,12 @@
       },
       "acceptableUse": {
         "heading": "Uso aceitável",
-        "p1": "Não use o serviço para infringir a lei nem para enviar ou compartilhar conteúdo que você não tem o direito de usar. Não tente burlar os controles de segurança ou os limites de requisições, nem acessar dados pertencentes a organizações das quais você não é membro.",
-        "p2": "O acesso dentro de uma organização segue a sua função, e essas funções são aplicadas no servidor."
+        "p1": "Não use o serviço para infringir a lei nem para enviar ou compartilhar conteúdo que você não tem o direito de usar. Não tente burlar os controles de segurança ou os limites de requisições, nem acessar dados pertencentes a espaços de trabalho dos quais você não é membro.",
+        "p2": "O acesso dentro de um espaço de trabalho segue a sua função, e essas funções são aplicadas no servidor."
       },
       "teams": {
         "heading": "Espaços privados e colaboração",
-        "p1": "Cada conta tem um espaço privado. Convites ao site não o compartilham. Espaços de colaboração separados podem adicionar explicitamente proprietários, administradores, editores ou leitores; o servidor aplica as permissões. Esses papéis não concedem administração do site."
+        "p1": "Cada conta começa com um espaço de trabalho privado. Os convites ao site não compartilham o conteúdo de quem convida. O proprietário de um espaço pode conceder explicitamente acesso para Visualizar ou Editar esse espaço. Isso não compartilha outros espaços nem concede direitos de administração do site."
       },
       "availability": {
         "heading": "Disponibilidade, garantia e alterações",
@@ -1257,16 +1250,12 @@
     "revoke": "Revogar",
     "revokeEmail": "Revogar convite para {{email}}",
     "invalidEmail": "Insira um e-mail válido.",
-    "privateHeading": "Seu espaço privado",
-    "privateBody": "Só você tem acesso. Convide pessoas para o Lumafoil sem compartilhar este espaço ou crie um espaço separado para colaborar.",
-    "collaborate": "Criar espaço de colaboração",
     "status": {
       "pending": "Pendente",
       "accepted": "Aceito",
       "revoked": "Revogado",
       "expired": "Expirado"
     },
-    "collaborationNotice": "Um convite para este espaço dá acesso às suas fotos e predefinições. A pessoa já deve ter uma conta Lumafoil. Use Convidar pessoas primeiro se ela precisar de uma.",
     "role": "Função no site",
     "roleHelp": "Administradores gerenciam contas do site. A participação nos espaços é independente."
   },
@@ -1340,5 +1329,219 @@
     "owner": "Proprietário",
     "admin": "Administrador",
     "user": "Usuário"
+  },
+  "guidance": {
+    "dismiss": "Fechar dica",
+    "back": "Voltar",
+    "next": "Próximo",
+    "done": "Entendi",
+    "page": "{{current}} de {{total}}",
+    "image": {
+      "title": "Imagem",
+      "first": "Abra uma foto. O arquivo original permanece intacto.",
+      "second": "O zoom da tela muda apenas a visualização. Os downloads são gerados a partir da imagem original; PNG é o padrão sem perdas."
+    },
+    "watermark": {
+      "title": "Ferramentas De Marca",
+      "first": "Escolha texto, símbolo, forma, logo ou código QR.",
+      "second": "Toque na marca para mostrar suas alças. Arraste para mover, use dois dedos para redimensionar ou gire-os para rotacionar. Toque em outro lugar para ocultar as alças."
+    },
+    "presets": {
+      "title": "Predefinições Salvas",
+      "first": "Comece com Rascunho, Confidencial ou outro modelo, ou escolha uma marca d’água salva.",
+      "second": "Salvar solicita um nome e uma pasta. Novo inicia uma nova marca mantendo o arquivo aberto."
+    },
+    "crop": {
+      "title": "Recortar Foto",
+      "first": "Arraste as bordas ou escolha uma proporção.",
+      "second": "Redefinir recorte restaura a foto inteira. O original não é sobrescrito."
+    },
+    "adjust": {
+      "title": "Ajustes Da Foto",
+      "first": "Use os controles para mudar a aparência da foto.",
+      "second": "Cada redefinição restaura o valor padrão. Desfazer reverte a última alteração."
+    },
+    "resize": {
+      "title": "Tamanho De Saída",
+      "first": "Mantenha as dimensões originais ou escolha outro tamanho.",
+      "second": "Redimensionar altera a exportação. O zoom muda apenas a visualização."
+    },
+    "export": {
+      "title": "Salvar Resultado",
+      "first": "Baixe, salve na Galeria ou escolha um destino na nuvem.",
+      "second": "Confira formato, dimensões e qualidade. Salvar na nuvem não compartilha o arquivo; crie links separadamente em Arquivos salvos na nuvem."
+    },
+    "library": {
+      "title": "Sua Biblioteca",
+      "first": "Encontre predefinições recentes, explore modelos e organize os designs salvos em pastas.",
+      "second": "Pesquise ou alterne a visualização para encontrar uma predefinição. Abra para editar ou aplique em Imagem, Documentos, Vídeo ou Lotes."
+    },
+    "gallery": {
+      "title": "Sua Galeria",
+      "first": "Encontre fotos recentes e organize imagens salvas em pastas neste espaço de trabalho.",
+      "second": "Escolha miniaturas, lista ou detalhes. Verificar uma foto procura uma marca Lumafoil invisível; isso não comprova propriedade."
+    },
+    "bulk": {
+      "title": "Processamento Em Lote",
+      "first": "Adicione fotos, PDFs e vídeos compatíveis, escolha uma marca salva e confira as configurações de saída.",
+      "second": "Confira cada resultado ou erro. Baixe um ZIP ou salve na nuvem; somente resultados de fotos podem ser salvos na Galeria."
+    },
+    "documents": {
+      "title": "Marcas Em Documentos",
+      "first": "Abra um PDF, percorra suas páginas e ajuste a marca com as ferramentas ao lado da prévia.",
+      "second": "A marca se aplica ao documento inteiro. A exportação mantém as páginas originais e o texto, as imagens e a arte vetorial existentes."
+    },
+    "video": {
+      "title": "Marcas Em Vídeos",
+      "first": "Abra um vídeo compatível e navegue ou reproduza a prévia enquanto ajusta a marca.",
+      "second": "Adicione quadros-chave para mover a marca ao longo do tempo. Defina Início, Fim e transições; confira saída e áudio antes de exportar."
+    },
+    "workspace": {
+      "title": "Acesso Ao Espaço",
+      "first": "Abra Gerenciar acesso no menu do usuário para revisar o compartilhamento.",
+      "second": "Proprietários podem conceder acesso de visualização ou edição. Compartilhar este espaço não compartilha outros espaços nem as contas na nuvem conectadas de ninguém."
+    }
+  },
+  "workspaceAccess": {
+    "loading": "Carregando Acesso…",
+    "ownerOnly": "Somente o proprietário do espaço de trabalho pode alterar o acesso.",
+    "people": "Pessoas Com Acesso",
+    "general": "Acesso Geral",
+    "restricted": "Restrito",
+    "restrictedHint": "Somente pessoas autorizadas podem abrir este espaço. Os outros espaços continuam privados.",
+    "addPeople": "Adicionar Pessoas",
+    "permission": "Permissão",
+    "notify": "Notificar Por Email",
+    "send": "Enviar Convite",
+    "add": "Adicionar Pessoa",
+    "notifyHint": "Envie um convite por email para visualizar ou editar este espaço. Novos usuários recebem um convite separado para criar a conta.",
+    "silentHint": "Adicione imediatamente um usuário existente e verificado do Lumafoil. Nenhum email ou notificação é enviado.",
+    "sent": "Convite para o espaço enviado.",
+    "added": "Acesso adicionado sem notificação.",
+    "view": "Visualizar",
+    "edit": "Editar",
+    "owner": "Proprietário",
+    "admin": "Administrador",
+    "removeFor": "Remover Acesso De {{name}}",
+    "inviteLink": "Link De Convite",
+    "linkPermission": "Permissão Do Link",
+    "expires": "Validade Do Link",
+    "days_one": "{{count}} Dia",
+    "days_other": "{{count}} Dias",
+    "createLink": "Criar Link",
+    "linkHint": "Usuários conectados ao Lumafoil podem entrar por este link até ele expirar ou ser revogado. Revogar impede novas entradas; remova as pessoas separadamente para encerrar os acessos existentes.",
+    "copyLink": "Copiar Link",
+    "copied": "Link copiado.",
+    "copyFailed": "Não foi possível copiar. Selecione o link e copie manualmente.",
+    "revoke": "Revogar",
+    "revokeFor": "Revogar Convite Para {{name}}",
+    "joinTitle": "Entrar Em {{name}}",
+    "joinDescription": "Este convite concede acesso de {{permission}} somente a este espaço.",
+    "join": "Entrar No Espaço",
+    "open": "Abrir Espaço",
+    "unavailable": "Convite Indisponível",
+    "unavailableHint": "Este convite expirou, foi revogado ou pertence a outra conta. Entre com o email convidado ou peça um novo link ao proprietário.",
+    "cancel": "Cancelar",
+    "days_many": "{{count}} Dias"
+  },
+  "cloudStorage": {
+    "heading": "Armazenamento Na Nuvem",
+    "description": "Conecte as contas uma vez e reutilize a conexão para abrir, salvar ou compartilhar arquivos.",
+    "chooseDestination": "Escolha a pasta onde seus arquivos serão salvos.",
+    "chooseFiles": "Escolha arquivos para abrir no Lumafoil.",
+    "loading": "Carregando Armazenamento",
+    "unavailable": "Este provedor não está disponível neste servidor.",
+    "connectHint": "Conecte sua conta para explorar arquivos e pastas. A conexão fica salva para próximas visitas.",
+    "connect": "Conectar {{provider}}",
+    "dropboxScope": "O acesso ao Dropbox se limita à pasta do aplicativo Lumafoil.",
+    "googleScope": "Aqui aparecem apenas itens autorizados para o Lumafoil. Use Explorar Drive para escolher outros.",
+    "location": "Local Da Pasta",
+    "appFolder": "Pasta Do Lumafoil",
+    "root": "Meus Arquivos",
+    "empty": "Nenhum arquivo ou pasta correspondente aqui.",
+    "folderName": "Nome Da Nova Pasta",
+    "createFolder": "Criar Pasta",
+    "useFolder": "Usar Esta Pasta",
+    "openSelected": "Abrir Selecionados",
+    "browseGoogle": "Explorar Drive",
+    "connected": "Conectado",
+    "notConnected": "Não Conectado",
+    "reconnect": "Reconectar",
+    "disconnect": "Desconectar",
+    "managePermissions": "Gerenciar Permissões",
+    "revocationHint": "Desconectado do Lumafoil. Remova autorizações restantes nas configurações do provedor.",
+    "retry": "Tentar Novamente",
+    "waiting": "Conclua o login no provedor. Você pode cancelar aqui.",
+    "personalAccount": "Conta Pessoal",
+    "workAccount": "Conta Corporativa Ou Escolar",
+    "microsoftConsent": "Contas corporativas ou escolares podem exigir aprovação do administrador da Microsoft."
+  },
+  "folders": {
+    "heading": "Pastas",
+    "rootPhoto": "Galeria",
+    "rootPreset": "Biblioteca",
+    "path": "Caminho Da Pasta",
+    "new": "Nova Pasta",
+    "name": "Nome Da Pasta",
+    "rename": "Renomear Pasta",
+    "moveFolder": "Mover Pasta",
+    "moveItems": "Mover Itens",
+    "moveNamed": "Mover {{name}}",
+    "destination": "Pasta De Destino",
+    "saveLocation": "Local De Salvamento",
+    "choose": "Escolher Pasta",
+    "expand": "Expandir {{name}}",
+    "collapse": "Recolher {{name}}",
+    "open": "Abrir {{name}}",
+    "loading": "Carregando Pastas…",
+    "unavailable": "Esta pasta está indisponível. Abra a coleção principal ou escolha outra pasta.",
+    "loadError": "Não foi possível carregar as pastas. A coleção principal continua disponível.",
+    "delete": "Excluir Pasta",
+    "deleteTitle": "Excluir {{name}}?",
+    "deleteHint": "Só é possível excluir pastas vazias. Arquivos e subpastas nunca são excluídos junto com a pasta.",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "moveHere": "Mover Para Cá",
+    "newHint": "Crie uma pasta no local selecionado.",
+    "renameHint": "Escolha um nome e um local para esta pasta.",
+    "moving": "Mover Itens ({{count}})",
+    "invalidName": "Use um nome sem barras ou caracteres de controle.",
+    "nameTaken": "Já existe uma pasta com esse nome aqui.",
+    "selection": "Itens Selecionados: {{count}}"
+  },
+  "templates": {
+    "heading": "Modelos De Marca D’Água",
+    "hint": "Aplique um layout pronto, personalize-o e salve sua própria predefinição.",
+    "search": "Buscar Modelos",
+    "category": "Categoria De Modelo",
+    "use": "Usar {{name}}",
+    "empty": "Nenhum modelo correspondente.",
+    "unavailable": "Este modelo está indisponível. Escolha um modelo na Biblioteca.",
+    "categories": {
+      "all": "Todos",
+      "documents": "Documentos",
+      "review": "Revisão",
+      "photography": "Fotos"
+    },
+    "names": {
+      "draft": "Rascunho",
+      "confidential": "Confidencial",
+      "strictlyConfidential": "Estritamente Confidencial",
+      "internalUseOnly": "Somente Uso Interno",
+      "doNotCopy": "Não Copiar",
+      "doNotDistribute": "Não Distribuir",
+      "copy": "Cópia",
+      "void": "Anulado",
+      "forReview": "Para Revisão",
+      "proof": "Prova",
+      "sample": "Amostra",
+      "preview": "Prévia",
+      "approved": "Aprovado",
+      "final": "Final",
+      "unpaid": "Não Pago",
+      "copyright": "Direitos Autorais",
+      "photoCredit": "Crédito Da Foto",
+      "repeatingProof": "Prova Repetida"
+    }
   }
 }

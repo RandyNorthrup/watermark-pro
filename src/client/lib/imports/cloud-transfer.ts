@@ -2,8 +2,8 @@
 import { z } from 'zod'
 
 import type { CloudProviderId, CloudUpload } from './source'
+import { captureCloudOwner, CLOUD_CONNECTION_CHANGED_EVENT } from '../cloud-connection-context'
 import { ACCOUNT_CHANGED_EVENT } from '../offline-account'
-import { captureOfflineOwner } from '../offline-context'
 
 const MAX_CLOUD_NAME = 255
 const MAX_CLOUD_ID = 1024
@@ -15,6 +15,8 @@ export interface CloudSavedFile {
   name: string
   manageUrl: string
   userId: string
+  /** Saved identity prevents a later provider-account switch from targeting an older file accidentally. */
+  providerAccountId?: string
 }
 
 /** A complete filename, never a provider path or traversal segment. */
@@ -52,10 +54,11 @@ export async function cloudRequest<T>(
   init: RequestInit,
   read: (response: Response) => Promise<T>,
 ): Promise<T> {
-  const owner = captureOfflineOwner()
+  const owner = captureCloudOwner()
   const controller = new AbortController()
   const abort = () => controller.abort()
   window.addEventListener(ACCOUNT_CHANGED_EVENT, abort)
+  window.addEventListener(CLOUD_CONNECTION_CHANGED_EVENT, abort)
   try {
     owner.assertCurrent()
     const response = await fetch(url, {
@@ -63,7 +66,11 @@ export async function cloudRequest<T>(
       cache: 'no-store',
       credentials: 'omit',
       referrerPolicy: 'no-referrer',
-      signal: controller.signal,
+      redirect: init.redirect ?? 'error',
+      signal:
+        init.signal === undefined || init.signal === null
+          ? controller.signal
+          : AbortSignal.any([controller.signal, init.signal]),
     })
     owner.assertCurrent()
     const result = await read(response)
@@ -71,6 +78,7 @@ export async function cloudRequest<T>(
     return result
   } finally {
     window.removeEventListener(ACCOUNT_CHANGED_EVENT, abort)
+    window.removeEventListener(CLOUD_CONNECTION_CHANGED_EVENT, abort)
   }
 }
 
@@ -92,7 +100,7 @@ export async function uploadCloudBatch(
   uploads: readonly CloudUpload[],
   upload: (file: CloudUpload) => Promise<CloudSavedFile>,
 ): Promise<CloudSavedFile[]> {
-  const owner = captureOfflineOwner()
+  const owner = captureCloudOwner()
   const saved: CloudSavedFile[] = []
   for (const file of uploads) {
     owner.assertCurrent()

@@ -1,4 +1,5 @@
 import {
+  Cloud,
   Crop,
   Download,
   FileText,
@@ -58,6 +59,7 @@ const FEATURE_COPY = {
     body: 'landing.capabilities.languages.body',
   },
   theme: { title: 'landing.capabilities.theme.title', body: 'landing.capabilities.theme.body' },
+  cloud: { title: 'landing.capabilities.cloud.title', body: 'landing.capabilities.cloud.body' },
 } as const
 const EXAMPLE_WIDTHS = { small: 480, medium: 720, full: 960 } as const
 const EXAMPLE_SIZES =
@@ -70,6 +72,7 @@ const MORE_FEATURES = [
   { key: 'export', icon: Download },
   { key: 'gallery', icon: FolderHeart },
   { key: 'sharing', icon: Link2 },
+  { key: 'cloud', icon: Cloud },
   { key: 'offline', icon: WifiOff },
   { key: 'privacy', icon: ShieldCheck },
   { key: 'languages', icon: Languages },

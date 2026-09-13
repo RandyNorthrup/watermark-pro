@@ -7,16 +7,14 @@ import {
   trustedCloudUrl,
   type CloudSavedFile,
 } from './cloud-transfer'
-import { acquireDropboxToken } from './dropbox-save'
-import { acquireGoogleDriveToken } from './google-picker'
-import { acquireGraphToken } from './onedrive'
 import type { PublicConfig } from '../../../shared/api'
 import {
   GOOGLE_DRIVE_FILES_ENDPOINT,
   HTTP_STATUS,
   MICROSOFT_GRAPH_ROOT,
 } from '../../../shared/constants'
-import { captureOfflineOwner } from '../offline-context'
+import { captureCloudOwner } from '../cloud-connection-context'
+import { cloudToken } from '../cloud-connections'
 
 const DROPBOX_SHARING_ROOT = 'https://api.dropboxapi.com/2/sharing'
 const JSON_TYPE = 'application/json'
@@ -30,18 +28,13 @@ export interface CloudShareLink {
 }
 
 function assertFileOwner(file: CloudSavedFile) {
-  const owner = captureOfflineOwner()
+  const owner = captureCloudOwner()
   if (file.userId !== owner.userId)
     throw new Error('These saved cloud files belong to another app account.')
   return owner
 }
 
 async function tokenFor(config: PublicConfig, file: CloudSavedFile): Promise<string> {
-  const tokenAcquirers = {
-    google: acquireGoogleDriveToken,
-    dropbox: acquireDropboxToken,
-    onedrive: acquireGraphToken,
-  }
   const owner = assertFileOwner(file)
   const clientId = {
     google: config.googleOAuthClientId,
@@ -49,9 +42,13 @@ async function tokenFor(config: PublicConfig, file: CloudSavedFile): Promise<str
     onedrive: config.microsoftClientId,
   }[file.provider]
   if (clientId === null) throw new Error('This cloud provider is not configured.')
-  const token = await tokenAcquirers[file.provider](clientId)
+  const token = await cloudToken(file.provider)
   owner.assertCurrent()
-  return token
+  if (file.providerAccountId === undefined || file.providerAccountId !== token.providerAccountId)
+    throw new Error(
+      'This file belongs to a different cloud connection. Open the provider to manage its access.',
+    )
+  return token.accessToken
 }
 
 function headers(token: string) {

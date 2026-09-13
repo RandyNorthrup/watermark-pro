@@ -1,7 +1,7 @@
 /** Post-build proof against actual public artifacts; no application Worker or credentials are required. */
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { runInNewContext } from 'node:vm'
@@ -14,6 +14,35 @@ import { SUPPORTED_LOCALES } from '../src/shared/locales.ts'
 const client = path.resolve(process.env.LUMAFOIL_CLIENT_DIR ?? 'dist/client')
 const headers = readFileSync(path.join(client, '_headers'), 'utf8')
 const controls = readFileSync(path.join(client, 'landing-controls.js'), 'utf8')
+
+test('PDF reader assets are emitted byte-exactly and included in offline preparation', () => {
+  const packageRoot = path.resolve('node_modules/pdfjs-dist')
+  const { version } = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8'))
+  const assetRoot = `assets/pdfjs/${version}`
+  const manifestText = readFileSync(path.join(client, 'offline-manifest.json'), 'utf8')
+  const manifest = new Set(JSON.parse(manifestText))
+  const files = [
+    ['build/pdf.worker.min.mjs', 'pdf.worker.min.mjs'],
+    ['LICENSE', 'LICENSE'],
+    ...['cmaps', 'standard_fonts', 'wasm', 'iccs'].flatMap((directory) =>
+      readdirSync(path.join(packageRoot, directory)).map((name) => [
+        `${directory}/${name}`,
+        `${directory}/${name}`,
+      ]),
+    ),
+  ]
+  for (const [source, target] of files) {
+    const emitted = `${assetRoot}/${target}`
+    assert.deepEqual(
+      readFileSync(path.join(client, emitted)),
+      readFileSync(path.join(packageRoot, source)),
+      emitted,
+    )
+    assert.ok(manifest.has(`/${emitted}`), `${emitted} must work offline`)
+  }
+  assert.match(headers, /media-src 'self' blob:/)
+  assert.ok(!headers.includes('media-src *'), 'Remote media must not be broadly admitted')
+})
 
 test('installed offline worker reports the exact build of both application shells', () => {
   const listeners = new Map()
@@ -133,7 +162,6 @@ test('the resolved deployment disables persistent platform request metadata', ()
   const generated = JSON.parse(readFileSync(generatedPath, 'utf8'))
   assert.deepEqual(generated.observability, {
     enabled: false,
-    redact_query_string: true,
     logs: { enabled: false, invocation_logs: false, persist: false },
     traces: { enabled: false, persist: false },
   })

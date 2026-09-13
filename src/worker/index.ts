@@ -23,16 +23,19 @@ import { accountRoutes } from './routes/accounts'
 import { adminRoutes } from './routes/admin'
 import { auditRoutes } from './routes/audit'
 import { clientErrorRoutes } from './routes/client-errors'
+import { cloudConnectionRoutes } from './routes/cloud-connections'
 import { devRoutes } from './routes/dev'
+import { folderRoutes } from './routes/folders'
+import { guidanceRoutes } from './routes/guidance'
 import { importRoutes } from './routes/imports'
 import { serveLanding } from './routes/landing'
 import { libraryRoutes } from './routes/library'
 import { meRoutes } from './routes/me'
-import { serveMicrosoftBridge } from './routes/microsoft-bridge'
 import { photoRoutes } from './routes/photos'
 import { recentWorkRoutes } from './routes/recent-work'
 import { referralRoutes } from './routes/referrals'
 import { shareRoutes } from './routes/shares'
+import { workspaceAccessRoutes } from './routes/workspace-access'
 import { getServices, type Services } from './services'
 import { cleanupUploads } from './upload-lifecycle'
 
@@ -49,15 +52,21 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   const resolveServices = options.resolveServices ?? getServices
   const app = new Hono<AppContext>()
 
-  // A correlation id for every request: taken from an inbound X-Request-Id when
-  // present (so a value assigned upstream is preserved), otherwise generated.
-  // Echoed on the response and included in error logs so a report from the
-  // client (POST /api/client-errors) can be tied to a Worker log line.
+  // Generate correlation ids at the trusted boundary. Caller-supplied values
+  // can contain credentials or content and must never enter logs or diagnostics.
+  // Return the generated id so support can correlate a response with its log.
   app.use(async (c, next) => {
-    const requestId = c.req.header('x-request-id') ?? crypto.randomUUID()
+    const requestId = crypto.randomUUID()
     c.set('requestId', requestId)
     c.header('x-request-id', requestId)
     await next()
+  })
+
+  // This wrapper unwinds after secureHeaders, which otherwise replaces custom
+  // Response headers. Authorization callbacks must never supply a referrer.
+  app.use(async (c, next) => {
+    await next()
+    if (routePath(c) === '/api/cloud/:provider/callback') c.header('Referrer-Policy', 'no-referrer')
   })
 
   app.use(
@@ -67,12 +76,13 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
       // store serves those responses without invoking this Worker.
       contentSecurityPolicy: {
         defaultSrc: ["'none'"],
+        scriptSrc: ["'self'", "'wasm-unsafe-eval'"],
         frameAncestors: ["'none'"],
         baseUri: ["'none'"],
         formAction: ["'none'"],
       },
       strictTransportSecurity: `max-age=${String(HSTS_MAX_AGE_SECONDS)}; includeSubDomains`,
-      referrerPolicy: 'strict-origin-when-cross-origin',
+      referrerPolicy: 'strict-origin',
       permissionsPolicy: {
         camera: [],
         microphone: [],
@@ -117,6 +127,10 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   })
 
   app.route('/api', referralRoutes)
+  app.route('/api', workspaceAccessRoutes)
+  app.route('/api', cloudConnectionRoutes)
+  app.route('/api', folderRoutes)
+  app.route('/api', guidanceRoutes)
   app.route('/api', recentWorkRoutes)
   app.route('/api', accountRoutes)
   app.route('/api', auditRoutes)
@@ -202,8 +216,6 @@ export async function runHealthCheck(env: Env): Promise<void> {
  */
 export default {
   async fetch(request, env, ctx) {
-    const bridge = await serveMicrosoftBridge(request, env)
-    if (bridge !== null) return bridge
     const landing = await serveLanding(request, env)
     return landing ?? (await app.fetch(request, env, ctx))
   },

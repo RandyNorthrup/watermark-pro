@@ -1,6 +1,7 @@
 import type { Locator, Page } from '@playwright/test'
 
 import { test } from './offline-network'
+import { waitForOfflineReadiness } from './offline-support'
 import {
   downloadBytes,
   expect,
@@ -129,12 +130,7 @@ test('recent work opens real content in three accessible views, survives offline
   const bytes = await downloadBytes(await download)
   expect(pngSize(bytes)).toEqual({ width: 640, height: 480 })
   await viewer.getByRole('button', { name: 'Close' }).click()
-  // The full static inventory must install before the controller can own
-  // this page; the existing slow-journey timeout still bounds that work.
-  await page.evaluate('navigator.serviceWorker.ready.then(() => true)')
-  await expect
-    .poll(async () => await page.evaluate<boolean>('navigator.serviceWorker.controller !== null'))
-    .toBe(true)
+  await waitForOfflineReadiness(page)
   await offlineNetwork.setOffline(true)
   await page.reload()
   await expect(photo).toBeVisible()

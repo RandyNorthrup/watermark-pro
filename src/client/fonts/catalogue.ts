@@ -15,14 +15,6 @@ export const FONT_CATEGORIES = ['sans', 'serif', 'display', 'script', 'mono'] as
 
 export type FontCategory = (typeof FONT_CATEGORIES)[number]
 
-export const FONT_CATEGORY_LABELS: Record<FontCategory, string> = {
-  sans: 'Sans serif',
-  serif: 'Serif',
-  display: 'Display',
-  script: 'Script and handwriting',
-  mono: 'Monospace',
-}
-
 export interface FontFamily {
   id: string
   /** Fontsource package that ships the family. */

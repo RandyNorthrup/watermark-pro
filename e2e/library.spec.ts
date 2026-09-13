@@ -12,13 +12,12 @@ import {
   expectAccessible,
   expectActiveWorkspace,
   gotoRetrying,
-  latestLinkFor,
   navigateTo,
   pngFixture,
   signIn,
-  signUpAndVerify,
   test,
 } from './support'
+import { inviteWorkspaceViewer, signUpFromWorkspaceEmail } from './workspace-access-support'
 import { DEFAULT_TEXT_SPEC } from '../src/shared/watermark'
 
 const runId = Date.now().toString(36)
@@ -48,6 +47,8 @@ async function expectPreviewRendered(page: Page) {
 test.describe.configure({ mode: 'serial' })
 
 test('saves multiple QR codes and a licensed sticker for reuse', async ({ page, request }) => {
+  // Three preset saves, three accessibility scans and a final reopen share this mobile journey.
+  test.slow()
   await createWorkspace(
     page,
     request,
@@ -105,6 +106,8 @@ test('saves multiple QR codes and a licensed sticker for reuse', async ({ page, 
 })
 
 test('owner designs, saves, edits and deletes presets', async ({ page, request }) => {
+  // Text styling, logo upload, two saves, edits, deletion and accessibility scans form one journey.
+  test.slow()
   await createWorkspace(page, request, owner, organizationName)
 
   await navigateTo(page, 'Library')
@@ -205,32 +208,27 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
 
 test('a viewer can browse presets but cannot change them', async ({ browser, page, request }) => {
   await signIn(page, owner, organizationName)
-  await navigateTo(page, 'Members')
-  await page.getByLabel('Email').fill(viewer.email)
-  await page.getByRole('combobox', { name: 'Role' }).click()
-  await page.getByRole('option', { name: 'Viewer' }).click()
-  await page.getByRole('button', { name: 'Send invitation' }).click()
-  await expect(page.getByText(`Invitation sent to ${viewer.email}.`)).toBeVisible()
-  const acceptPath = await latestLinkFor(request, viewer.email, '/accept-invitation/')
+  const acceptPath = await inviteWorkspaceViewer(page, request, viewer)
 
   const viewerContext = await browser.newContext()
   const viewerPage = await viewerContext.newPage()
-  await signUpAndVerify(viewerPage, request, viewer)
+  await signUpFromWorkspaceEmail(viewerPage, request, viewer)
   // WebKit intermittently aborts the client-side load of this route; retry the
   // commit-wait navigation (see gotoRetrying).
   await gotoRetrying(viewerPage, acceptPath)
-  await viewerPage.getByRole('button', { name: 'Accept invitation' }).click()
-  await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Members')
+  await viewerPage.getByRole('button', { name: 'Join Workspace' }).click()
+  await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Image')
   const joined = await expectActiveWorkspace(viewerPage, viewer, organizationName)
   expect(joined.member.role).toBe('viewer')
   await navigateTo(viewerPage, 'Library')
   await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
-  await expect(viewerPage.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
+  const library = viewerPage.getByRole('region', { name: 'Watermark library', exact: true })
+  await expect(library.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
   await expect(viewerPage.getByRole('link', { name: 'New preset' })).toHaveCount(0)
   await expect(viewerPage.getByRole('button', { name: /^Delete / })).toHaveCount(0)
   await expectAccessible(viewerPage)
 
-  await viewerPage.getByRole('link', { name: 'Corner logo', exact: true }).click()
+  await library.getByRole('link', { name: 'Corner logo', exact: true }).click()
   await expect(viewerPage.getByText('Read-only view.')).toBeVisible()
   await expect(viewerPage.getByRole('button', { name: 'Save changes' })).toHaveCount(0)
   await expectPreviewRendered(viewerPage)

@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { ShareDialog } from './share-dialog'
 import type { PhotoDto } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
+import { movePhotos } from '../../lib/folders'
 import { formatBytes } from '../../lib/format-bytes'
 import { dateTimeFormatter } from '../../lib/format-date'
 import {
@@ -32,6 +33,7 @@ import { watermarksQueryOptions } from '../../lib/library'
 import { noteRecentWork } from '../../lib/recent-work-events'
 import { canRole } from '../../lib/roles'
 import { useWorkspaceMedia } from '../../lib/use-workspace-media'
+import { MoveItemsDialog } from '../folders/folder-browser'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { buttonVariants } from '../ui/button-variants'
@@ -42,6 +44,7 @@ import { Spinner } from '../ui/spinner'
 interface GalleryProps {
   organizationId: string
   role: string | null | undefined
+  folderId?: string | null
 }
 
 const PERCENT = 100
@@ -53,7 +56,7 @@ const selectClassName =
  * filter, cursor pagination, multi-select with bulk delete, and a lightbox
  * for the full-size image.
  */
-export function Gallery({ organizationId, role }: GalleryProps) {
+export function Gallery({ organizationId, role, folderId }: GalleryProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const searchId = useId()
@@ -64,8 +67,12 @@ export function Gallery({ organizationId, role }: GalleryProps) {
   const [open, setOpen] = useState<PhotoDto | null>(null)
   const deferredSearch = useDeferredValue(search)
   const filters = useMemo(
-    () => ({ presetId: presetFilter || undefined, search: deferredSearch.trim() || undefined }),
-    [presetFilter, deferredSearch],
+    () => ({
+      presetId: presetFilter || undefined,
+      search: deferredSearch.trim() || undefined,
+      folderId,
+    }),
+    [presetFilter, deferredSearch, folderId],
   )
   const photos = useInfiniteQuery(photosQueryOptions(organizationId, filters))
   const usage = useQuery(storageUsageQueryOptions(organizationId))
@@ -85,7 +92,11 @@ export function Gallery({ organizationId, role }: GalleryProps) {
     },
   })
 
-  const items = photos.data?.pages.flatMap((page) => page.photos) ?? []
+  const items = new Map(
+    (photos.data?.pages.flatMap((page) => page.photos) ?? []).map((photo) => [photo.id, photo]),
+  )
+    .values()
+    .toArray()
   const isFiltering = filters.presetId !== undefined || filters.search !== undefined
   const hasAllSelected = items.length > 0 && selected.size === items.length
   let usageCaption: string
@@ -107,6 +118,16 @@ export function Gallery({ organizationId, role }: GalleryProps) {
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex justify-end">
+        <Link
+          to="/app/verify"
+          className={`${buttonVariants({ variant: 'primary', size: 'md' })} w-full sm:w-auto`}
+        >
+          <FileSearch aria-hidden="true" className="size-4" />
+          {t('gallery.checkPhoto')}
+        </Link>
+      </div>
+
       <Card aria-busy={usage.isPending} className="flex flex-col gap-2 p-4">
         <div className="grid gap-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
           <span data-testid="usage-summary" className="min-h-5">
@@ -139,13 +160,6 @@ export function Gallery({ organizationId, role }: GalleryProps) {
           </p>
         )}
       </Card>
-
-      <div className="flex justify-end">
-        <Link to="/app/verify" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
-          <FileSearch aria-hidden="true" className="size-4" />
-          {t('gallery.checkPhoto')}
-        </Link>
-      </div>
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex w-full min-w-0 flex-col gap-1.5 sm:min-w-56 sm:flex-1">
@@ -223,6 +237,25 @@ export function Gallery({ organizationId, role }: GalleryProps) {
                     {t('gallery.share')} {selected.size === 0 ? '' : String(selected.size)}
                   </Button>
                 }
+              />
+            ) : null}
+            {canDelete ? (
+              <MoveItemsDialog
+                organizationId={organizationId}
+                kind="photo"
+                count={selected.size}
+                initialFolderId={folderId ?? null}
+                onMove={async (destination) => {
+                  await movePhotos(
+                    organizationId,
+                    items.filter((photo) => selected.has(photo.id)),
+                    destination,
+                  )
+                  setSelected(new Set())
+                  await queryClient.invalidateQueries({
+                    queryKey: ['organization', organizationId],
+                  })
+                }}
               />
             ) : null}
             {canDelete ? (

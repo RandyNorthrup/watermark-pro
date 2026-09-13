@@ -40,12 +40,30 @@ function noop(): void {
   // jsdom stand-in; nothing to do.
 }
 
+// jsdom has no media-query API. Baseline fixtures represent a desktop with no
+// preferred scheme; tests for media changes install their own eventful double.
+Object.defineProperty(window, 'matchMedia', {
+  configurable: true,
+  writable: true,
+  value: (media: string): MediaQueryList => ({
+    media,
+    matches: false,
+    onchange: null,
+    addListener: noop,
+    removeListener: noop,
+    addEventListener: noop,
+    removeEventListener: noop,
+    dispatchEvent: () => false,
+  }),
+})
+
 // jsdom lacks the pointer-capture and scrolling APIs Radix primitives call.
 Object.assign(Element.prototype, {
   hasPointerCapture: () => false,
   setPointerCapture: noop,
   releasePointerCapture: noop,
   scrollIntoView: noop,
+  scrollTo: noop,
 })
 
 // Radix measures trigger sizes with ResizeObserver, which jsdom lacks.

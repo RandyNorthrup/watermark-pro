@@ -16,7 +16,7 @@ describe('FrameControls', () => {
 
     rerender(<FrameControls border={{ width: 0.03, colour: '#ffffff' }} onChange={onChange} />)
     expect(screen.getByRole('slider', { name: 'Frame width' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Frame colour')).toBeInTheDocument()
+    expect(screen.getByLabelText('Frame color')).toBeInTheDocument()
 
     await user.click(screen.getByRole('switch', { name: 'Add a frame' }))
     expect(onChange).toHaveBeenLastCalledWith(null)

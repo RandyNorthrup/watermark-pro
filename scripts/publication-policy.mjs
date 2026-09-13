@@ -69,6 +69,9 @@ const LOCAL = { signature: 0x04_03_4b_50, bytes: 30, name: 26, extra: 28 }
 const ASCII_CONTROL_END = 32
 const ASCII_DELETE = 127
 const SECRET_COMPARISON_MIN_LENGTH = 16
+// Dropbox issues 15-character app secrets; the exception admits that exact
+// provider format to private-value comparison, never to a publication allowlist.
+const DROPBOX_APP_SECRET_FORMAT = /^[A-Za-z0-9]{15}$/
 const LOCAL_FLAGS_OFFSET = 6
 const LOCAL_METHOD_OFFSET = 8
 const ZIP_UTF8 = 0x8_00
@@ -144,7 +147,9 @@ export function forbiddenPublicationPath(value) {
 
 export function configuredSecretPatterns(secrets) {
   return secrets.flatMap(({ name, value }) => {
-    if (value.length < SECRET_COMPARISON_MIN_LENGTH)
+    const hasSupportedShortFormat =
+      name === 'DROPBOX_APP_SECRET' && DROPBOX_APP_SECRET_FORMAT.test(value)
+    if (!hasSupportedShortFormat && value.length < SECRET_COMPARISON_MIN_LENGTH)
       throw new Error(`Configured ${name} is too short for reliable private-value comparison`)
     const utf8 = Buffer.from(value)
     const variants = new Set([

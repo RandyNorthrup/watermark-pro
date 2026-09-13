@@ -9,6 +9,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
 
 import { bundleInventoryPlugin } from './scripts/lib/bundle-inventory'
+import { pdfjsAssetsPlugin } from './scripts/lib/pdfjs-assets'
 import { routePreloadPlugin } from './scripts/lib/route-preloads'
 import { completeSoftwareNotices } from './scripts/lib/software-notices'
 
@@ -221,6 +222,7 @@ export default defineConfig({
     // inline theme script's hash in the CSP.
     routePreloadPlugin(),
     inlineScriptCspHashPlugin(),
+    pdfjsAssetsPlugin(),
     offlineAssetsPlugin(),
     bundleInventoryPlugin(),
   ],

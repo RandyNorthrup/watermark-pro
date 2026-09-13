@@ -6,11 +6,12 @@ import {
   MAX_STROKE_RATIO,
   MIN_LINE_ASPECT,
   MIN_SHAPE_ASPECT,
-  type Shape,
+  SHAPES,
   type WatermarkSpec,
 } from '../../../shared/watermark'
-import { cn } from '../../lib/cn'
+import { SHAPE_CATALOGUE, SHAPE_VIEWBOX } from '../../shapes/catalogue'
 import { ChoiceGroup } from '../ui/choice-group'
+import { ColorInput } from '../ui/color-input'
 import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
 
@@ -26,25 +27,6 @@ const ASPECT_STEP = 0.05
 const STROKE_STEP = 0.005
 const DEFAULT_SHAPE_COLOUR = '#c86b82'
 
-const SHAPE_OPTIONS = [
-  { value: 'rectangle', label: 'designer.shape.rectangle', previewClassName: 'h-6 w-10' },
-  {
-    value: 'rounded-rectangle',
-    label: 'designer.shape.roundedRectangle',
-    previewClassName: 'h-6 w-10 rounded-md',
-  },
-  { value: 'ellipse', label: 'designer.shape.ellipse', previewClassName: 'h-7 w-10 rounded-full' },
-  {
-    value: 'line',
-    label: 'designer.shape.line',
-    previewClassName: 'h-0 w-11 border-x-0 border-b-0',
-  },
-] as const satisfies readonly {
-  value: Shape
-  label: string
-  previewClassName: string
-}[]
-
 /** Shape kind, proportions, fill and stroke for a shape mark. */
 export function ShapePanel({ spec, onChange }: ShapePanelProps) {
   const { t } = useTranslation()
@@ -57,24 +39,32 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
           label={t('designer.shape.label')}
           value={spec.shape}
           presentation="tiles"
-          choices={SHAPE_OPTIONS.map((option) => ({
-            value: option.value,
-            label: t(option.label),
+          className="app-scroll-region max-h-72 overflow-y-auto p-1"
+          choices={SHAPES.map((shape) => ({
+            value: shape,
+            label: t(SHAPE_CATALOGUE[shape].label),
             preview: (
-              <span
+              <svg
                 aria-hidden="true"
-                className={cn('border-2 border-current', option.previewClassName)}
-              />
+                viewBox={`0 0 ${String(SHAPE_VIEWBOX)} ${String(SHAPE_VIEWBOX)}`}
+                className="size-6 shrink-0 overflow-visible"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="6"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              >
+                <path d={SHAPE_CATALOGUE[shape].path} />
+              </svg>
             ),
           }))}
           onChange={(shape) => {
-            const aspect =
-              shape === 'line' ? MIN_LINE_ASPECT : Math.min(spec.aspect, MAX_SHAPE_ASPECT)
-            onChange({ ...spec, shape, aspect })
+            onChange({ ...spec, shape, aspect: SHAPE_CATALOGUE[shape].aspect })
           }}
         />
       </fieldset>
       <SliderField
+        className="tool-section"
         label={t(isLine ? 'designer.shape.length' : 'designer.shape.proportions')}
         value={spec.aspect}
         min={isLine ? MIN_LINE_ASPECT : MIN_SHAPE_ASPECT}
@@ -86,7 +76,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
         }}
       />
 
-      <div className="flex flex-col gap-2">
+      <div className="tool-section flex flex-col gap-3">
         <div className="flex items-center justify-between text-sm font-medium">
           <span>{t('designer.shape.fill')}</span>
           <Switch
@@ -101,8 +91,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm">
               <span className="w-24">{t('designer.shape.fillColour')}</span>
-              <input
-                type="color"
+              <ColorInput
                 aria-label={t('designer.shape.fillColour')}
                 value={spec.fill.colour}
                 onChange={(event) => {
@@ -125,7 +114,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
         ) : null}
       </div>
 
-      <fieldset className="flex flex-col gap-2">
+      <fieldset className="tool-section flex flex-col gap-3">
         <SliderField
           label={t('designer.shape.strokeWidth')}
           value={spec.stroke.width}
@@ -154,8 +143,7 @@ export function ShapePanel({ spec, onChange }: ShapePanelProps) {
           />
         </div>
         {spec.stroke.colour === null ? null : (
-          <input
-            type="color"
+          <ColorInput
             aria-label={t('designer.shape.strokeColour')}
             value={spec.stroke.colour}
             onChange={(event) => {

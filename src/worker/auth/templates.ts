@@ -1,6 +1,7 @@
 import { escapeToBuffer, type StringBuffer } from 'hono/utils/html'
 
 import { APP_NAME } from '../../shared/constants'
+import type { WorkspaceGrantRole } from '../../shared/workspace-access'
 import type { EmailMessage } from '../email/sender'
 
 /**
@@ -81,5 +82,35 @@ export function siteInvitationEmail(to: string, inviterName: string, url: string
     subject: `${inviterName} invited you to ${APP_NAME}`,
     text: `${body}\n\n${url}`,
     html: layout(`You're invited to ${APP_NAME}`, body, url, 'Create your account'),
+  }
+}
+
+/** A workspace invitation describes the exact grant and keeps optional site admission separate. */
+export function workspaceInvitationEmail(
+  to: string,
+  workspaceName: string,
+  inviterName: string,
+  url: string,
+  role: WorkspaceGrantRole,
+  signupUrl: string | null,
+): EmailMessage {
+  const permission = role === 'editor' ? 'edit' : 'view'
+  const body = `${inviterName} invited you to ${permission} the ${workspaceName} workspace on ${APP_NAME}. This shares this workspace only; your other workspaces stay private. The invitation expires in seven days.`
+  const admission =
+    signupUrl === null
+      ? ''
+      : `\n\nNew to ${APP_NAME}? Create your invited account first, then return to this email to accept workspace access:\n${signupUrl}`
+  const signupHtml =
+    signupUrl === null
+      ? ''
+      : `<p>New to ${escapeHtml(APP_NAME)}? <a href="${escapeHtml(signupUrl)}">Create Your Account</a>, then return to this email to accept workspace access.</p>`
+  return {
+    to,
+    subject: `${inviterName} shared ${workspaceName} with you on ${APP_NAME}`,
+    text: `${body}\n\n${url}${admission}`,
+    html: layout(`Join ${workspaceName}`, body, url, 'Open Invitation').replace(
+      '</body>',
+      () => `${signupHtml}</body>`,
+    ),
   }
 }

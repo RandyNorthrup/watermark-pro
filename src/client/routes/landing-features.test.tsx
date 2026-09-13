@@ -13,18 +13,19 @@ beforeEach(() => {
 describe('public product explanation', () => {
   it('explains concrete tools and free self-hosting without offering unrestricted signup', async () => {
     renderApp('/')
-    expect(await screen.findByRole('heading', { name: 'Features for the whole job' })).toBeVisible()
+    expect(await screen.findByRole('heading', { name: 'Tools For Every Watermark' })).toBeVisible()
     for (const name of [
-      'Text, logos, and your own signature',
-      'Watermark a whole batch',
-      '551 unique font families',
-      '400 colourful vector stickers',
-      'Create and save QR watermarks',
-      'Save your watermarks as templates',
-      'Watermark videos',
-      'Watermark PDF documents',
-      'Work offline, sync later',
-      'Your account, your workspace',
+      'Text, Logos, Shapes, And Signatures',
+      'Photos, PDFs, And Videos In One Batch',
+      '551 Unique Font Families',
+      '400 Colorful Vector Stickers',
+      'Create And Save QR Watermarks',
+      '18 Templates And Your Own Saved Presets',
+      'Video Placement And Fade Effects',
+      'Preview And Watermark PDF Pages',
+      'Work Offline, Sync Later',
+      'Your Account, Your Workspace',
+      'Connected Cloud Folders',
     ]) {
       expect(screen.getByRole('heading', { name })).toBeVisible()
     }
@@ -38,8 +39,6 @@ describe('public product explanation', () => {
     )
     expect(screen.queryByRole('link', { name: 'Create account' })).toBeNull()
     expect(screen.queryByText('Built to be trusted')).toBeNull()
-    expect(
-      screen.getByText(/Inviting someone does not give them access to your photos or presets/),
-    ).toBeVisible()
+    expect(screen.getByText(/A site invitation never shares your photos or presets/)).toBeVisible()
   })
 })

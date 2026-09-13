@@ -7,6 +7,8 @@
  * cannot hang the browser.
  */
 
+import { bulkMediaKind } from './media-kind'
+
 /** One image to process, with its path within the chosen folder (or its bare name). */
 export interface BulkFile {
   file: File
@@ -22,10 +24,6 @@ export interface FolderScan {
 export const MAX_BULK_FILES = 500
 export const MAX_FOLDER_DEPTH = 32
 
-function isImage(file: File): boolean {
-  return file.type.startsWith('image/')
-}
-
 /** `webkitRelativePath` when a folder input set it, else the bare file name. */
 function relativePathOf(file: File): string {
   // Typed `string` by lib.dom, but empty for a plain file and absent in jsdom.
@@ -34,17 +32,17 @@ function relativePathOf(file: File): string {
 }
 
 /** Images from a plain file list (the "Add photos" or "Add a folder" input). */
-export function collectImages(files: readonly File[]): FolderScan {
+export function collectMedia(files: readonly File[]): FolderScan {
   const kept: BulkFile[] = []
   let skipped = 0
   for (const file of files) {
     if (kept.length >= MAX_BULK_FILES) {
       break
     }
-    if (isImage(file)) {
-      kept.push({ file, relativePath: relativePathOf(file) })
-    } else {
+    if (bulkMediaKind(file) === null) {
       skipped += 1
+    } else {
+      kept.push({ file, relativePath: relativePathOf(file) })
     }
   }
   return { files: kept, skipped }
@@ -122,11 +120,11 @@ export async function readEntries(entries: readonly FileSystemEntryLike[]): Prom
       if (file === null) {
         return
       }
-      if (isImage(file)) {
+      if (bulkMediaKind(file) === null) {
+        skipped += 1
+      } else {
         const path = (entry.fullPath ?? entry.name).replace(/^\/+/, '')
         kept.push({ file, relativePath: path === '' ? entry.name : path })
-      } else {
-        skipped += 1
       }
       return
     }

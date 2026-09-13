@@ -13,6 +13,7 @@ import { Button } from '../ui/button'
 
 interface ImportDialogProps {
   organizationId: string
+  folderId?: string | null
   /** Preset names already in the library, so clashes can be renamed on import. */
   existingNames: readonly string[]
   trigger: ReactNode
@@ -30,7 +31,12 @@ function kindLabel(entry: PresetFileEntry): string {
  * organization. Names that clash with the current library are renamed with a
  * numeric suffix before importing, and the clash is flagged in the list.
  */
-export function ImportDialog({ organizationId, existingNames, trigger }: ImportDialogProps) {
+export function ImportDialog({
+  organizationId,
+  folderId = null,
+  existingNames,
+  trigger,
+}: ImportDialogProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const inputId = useId()
@@ -74,7 +80,7 @@ export function ImportDialog({ organizationId, existingNames, trigger }: ImportD
         taken.push(name)
         selection.push({ ...entry, name })
       }
-      await importPresetFile(organizationId, selection)
+      await importPresetFile(organizationId, selection, folderId)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: libraryQueryKey(organizationId) })

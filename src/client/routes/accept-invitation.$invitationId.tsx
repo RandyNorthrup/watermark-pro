@@ -105,8 +105,6 @@ function AcceptInvitationPage() {
           return
         }
       }
-      await queryClient.invalidateQueries()
-      invitationOwner.assertCurrent()
       resetShellQueries(queryClient)
       await router.invalidate()
       invitationOwner.assertCurrent()

@@ -5,7 +5,7 @@
   "shell": {
     "nav": {
       "library": "Bibliotheek",
-      "editor": "Editor",
+      "editor": "Afbeelding",
       "bulk": "Bulk",
       "video": "Video",
       "documents": "Documenten",
@@ -22,18 +22,22 @@
     "toolsNav": "Tools",
     "signOut": "Afmelden",
     "accountMenu": "Accountmenu voor {{name}}",
-    "menuDescription": "Wissel van organisatie of ga naar een onderdeel van Lumafoil.",
-    "switchOrganizationFor": "Organisatie: {{name}}. Wissel van organisatie",
-    "chooseOrganization": "Kies een organisatie",
-    "chooseOrganizationShort": "Organisatie kiezen",
-    "organizations": "Organisaties",
-    "newOrganization": "Nieuwe organisatie",
+    "menuDescription": "Wissel van werkruimte of ga naar een onderdeel van Lumafoil.",
+    "switchOrganizationFor": "Werkruimte: {{name}}. Wissel van werkruimte",
+    "chooseOrganization": "Kies een werkruimte",
+    "chooseOrganizationShort": "Werkruimte kiezen",
+    "organizations": "Werkruimtes",
+    "newOrganization": "Nieuwe werkruimte",
     "theme": {
       "system": "Thema: volgt systeem. Wissel naar licht",
       "light": "Thema: licht. Wissel naar donker",
       "dark": "Thema: donker. Wissel naar systeem"
     },
-    "closeMenu": "Menu sluiten"
+    "closeMenu": "Menu sluiten",
+    "manageAccess": "Toegang beheren",
+    "supportPrompt": "Helpt Lumafoil je? Overweeg dan een donatie.",
+    "donate": "Doneren",
+    "supportPayPal": "Doneren met PayPal (nieuw tabblad)"
   },
   "auth": {
     "backToSignIn": "Terug naar aanmelden",
@@ -103,11 +107,11 @@
     "pendingInvitations_other": "{{count}} openstaande uitnodigingen.",
     "manageMembers": "Leden beheren",
     "auditLog": "Auditlogboek",
-    "auditDescription": "Elke wijziging in lidmaatschap en organisatie wordt vastgelegd, met wie het deed en wanneer.",
+    "auditDescription": "Elke wijziging in lidmaatschap en werkruimte wordt vastgelegd, met wie het deed en wanneer.",
     "viewAuditLog": "Auditlogboek bekijken"
   },
   "library": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om een watermerkbibliotheek op te bouwen.",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om een watermerkbibliotheek op te bouwen.",
     "heading": "Watermerkbibliotheek",
     "description": "Opgeslagen watermerken in {{name}}. Pas ze toe op één bestand of een hele reeks.",
     "export": "Exporteren",
@@ -119,7 +123,7 @@
     "loadErrorTitle": "Kon de bibliotheek niet laden",
     "empty": "Nog geen presets. Een preset combineert een markering (tekst, symbool of logo) met plaatsing, contrast en stijlinstellingen.",
     "createFirst": "Maak de eerste preset",
-    "orgRequiredShort": "Maak eerst een organisatie aan of word er lid van.",
+    "orgRequiredShort": "Maak eerst een werkruimte aan of word er lid van.",
     "loadingPreset": "Preset wordt geladen",
     "loadPresetErrorTitle": "Kon de preset niet laden",
     "presetGone": "Die preset bestaat niet meer.",
@@ -142,12 +146,6 @@
       "logo": "Logo",
       "qr": "QR-code voor {{content}}",
       "sticker": "Sticker {{name}}"
-    },
-    "shape": {
-      "rectangle": "Rechthoek",
-      "roundedRectangle": "Afgeronde rechthoek",
-      "ellipse": "Ellips",
-      "line": "Lijn"
     },
     "placement": {
       "smart": "Slimme plaatsing",
@@ -176,12 +174,16 @@
     "notAnImage": "Dat bestand is geen afbeelding die de browser kan lezen.",
     "text": {
       "label": "Tekst",
-      "hint": "Tot {{max}} tekens op maximaal {{lines}} regels. Gebruik “Detail invoegen” voor tokens zoals de datum of camera, die per foto worden ingevuld. {location} drukt de GPS-positie van de foto op het beeld af."
+      "hint": "Tot {{max}} tekens op maximaal {{lines}} regels. Gebruik “Detail invoegen” voor tokens zoals de datum of camera, die per foto worden ingevuld. {location} drukt de GPS-positie van de foto op het beeld af.",
+      "symbols": "Tekstsymbolen",
+      "insertSymbol": "{{symbol}} invoegen",
+      "insertLimit": "De tekst is vol. Selecteer tekst om te vervangen of verwijder tekens."
     },
     "qr": {
       "content": "QR-code-inhoud",
       "hint": "Meestal een link. Tot {{max}} tekens; de code is altijd donker op een licht vlak, zodat hij scanbaar is.",
-      "savedHint": "Geef elke QR-code een naam en sla deze apart op. Hergebruik deze vanuit je bibliotheek of bewaar meerdere voor verschillende links. Test het resultaat op de bedoelde grootte voordat je het deelt."
+      "savedHint": "Geef elke QR-code een naam en sla deze apart op. Hergebruik deze vanuit je bibliotheek of bewaar meerdere voor verschillende links. Test het resultaat op de bedoelde grootte voordat je het deelt.",
+      "shortLabel": "QR"
     },
     "tokens": {
       "menu": "Detail invoegen",
@@ -205,12 +207,11 @@
     "font": {
       "family": "Lettertype",
       "weight": "Dikte",
-      "specimen": "Pa's wijze lynx bezag vroom het fikse aquaduct",
       "search": "Lettertypen zoeken",
-      "resultCount": "{{count}} lettertypefamilies",
       "recent": "Recent gebruikt",
-      "all": "Alle lettertypen",
-      "license": "Lettertypelicentie"
+      "license": "Lettertypelicentie",
+      "previewError": "Sommige lettertypevoorbeelden konden niet laden. Open de lijst opnieuw met verbinding om het nogmaals te proberen.",
+      "empty": "Geen Overeenkomende Lettertypen"
     },
     "symbol": {
       "icons": "Iconen",
@@ -232,7 +233,23 @@
       "fillOpacity": "Dekking van vulling",
       "strokeWidth": "Lijndikte",
       "customStrokeColour": "Aangepaste lijnkleur",
-      "strokeColour": "Lijnkleur"
+      "strokeColour": "Lijnkleur",
+      "triangle": "Driehoek",
+      "diamond": "Ruit",
+      "pentagon": "Vijfhoek",
+      "hexagon": "Zeshoek",
+      "octagon": "Achthoek",
+      "star": "Ster",
+      "starburst": "Stralenster",
+      "heart": "Hart",
+      "shield": "Schild",
+      "speechBubble": "Tekstballon",
+      "arrowLeft": "Pijl links",
+      "arrowRight": "Pijl rechts",
+      "arrowUp": "Pijl omhoog",
+      "arrowDown": "Pijl omlaag",
+      "doubleArrow": "Dubbele pijl",
+      "plus": "Plus"
     },
     "effects": {
       "letterSpacing": "Letterafstand",
@@ -377,11 +394,12 @@
       "license": "Fluent Emoji · MIT-licentie",
       "usage": "Commercieel gebruik toegestaan; behoud de licentietekst van de illustraties bij verspreiding.",
       "guide": "Licentiehandleiding voor illustraties"
-    }
+    },
+    "saveNameHint": "Kies een naam voor deze voorinstelling."
   },
   "editor": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om de editor te gebruiken.",
-    "heading": "Editor",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om afbeeldingen te bewerken.",
+    "heading": "Afbeelding",
     "description": "Kies een voorinstelling, pas de positie aan, snijd bij en wijzig het formaat op je apparaat. Download het resultaat of kies voor opslaan in de galerie of cloud.",
     "tabs": {
       "presets": "Voorinstellingen",
@@ -412,7 +430,8 @@
       "fit": "Passend",
       "actualSize": "100%",
       "grid": "Raster",
-      "gridSpacing": "Rasterafstand"
+      "gridSpacing": "Rasterafstand",
+      "snapToGrid": "Uitlijnen op raster"
     },
     "altCrop": "Foto met het uitsnedekader",
     "altWatermark": "Foto met het toegepaste watermerk",
@@ -532,30 +551,31 @@
       "download": "Downloaden",
       "share": "Delen",
       "saveToGallery": "Opslaan in galerie",
-      "savedToFolder": "Opgeslagen in je {{provider}}-map “{{folder}}”."
+      "savedToFolder": "Opgeslagen in {{provider}}."
     },
     "mark": {
       "position": "Watermerkpositie. Sleep om te verplaatsen (klikt vast op de marges, derden en het midden; houd Alt ingedrukt om het vrij te plaatsen), knijp om het formaat te wijzigen, draai om te roteren; pijltjestoetsen verplaatsen, plus en min wijzigen het formaat, blokhaken draaien.",
       "rotate": "Watermerk draaien",
       "resize": "Watermerk schalen"
-    }
+    },
+    "newWorkspace": "Nieuw"
   },
   "bulk": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om in bulk te watermerken.",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om in bulk te watermerken.",
     "heading": "Watermerken in bulk",
-    "description": "Pas één preset toe op een hele shoot. Foto's worden parallel in je browser verwerkt en als ZIP of één voor één gedownload.",
+    "description": "Pas watermerken toe op afbeeldingen, PDF’s en video’s in één batch. Download elk resultaat of verzamel alles in een ZIP.",
     "emptyHint": "om het op een batch toe te passen.",
-    "addPhotos": "Foto's toevoegen",
+    "addPhotos": "Bestanden Toevoegen",
     "addFolder": "Map toevoegen",
-    "dropHint": "Sleep hier foto's of een map, of",
+    "dropHint": "Sleep bestanden of een map hierheen, of",
     "fromLink": "Van een link",
-    "capacity_one": "Tot {{max}} foto's per batch. Verwerking gebeurt in je browser met {{count}} worker.",
-    "capacity_other": "Tot {{max}} foto's per batch. Verwerking gebeurt in je browser met {{count}} workers.",
-    "skipped_one": "{{count}} bestand overgeslagen: geen afbeelding",
-    "skipped_other": "{{count}} bestanden overgeslagen: geen afbeeldingen",
+    "capacity_one": "Maximaal {{max}} bestanden per batch. Afbeeldingen, PDF’s en video’s worden op je apparaat verwerkt.",
+    "capacity_other": "Maximaal {{max}} bestanden per batch. Afbeeldingen, PDF’s en video’s worden op je apparaat verwerkt.",
+    "skipped_one": "Overgeslagen Bestanden: {{count}}. Niet-ondersteund formaat.",
+    "skipped_other": "Overgeslagen Bestanden: {{count}}. Niet-ondersteund formaat.",
     "importErrorTitle": "Kon niet importeren uit de cloud",
-    "photoCount_one": "{{count}} foto",
-    "photoCount_other": "{{count}} foto's",
+    "photoCount_one": "{{count}} bestand",
+    "photoCount_other": "{{count}} bestanden",
     "clearList": "Lijst wissen",
     "batchProgress": "Batchvoortgang",
     "progress": {
@@ -565,7 +585,7 @@
       "rate": " in {{seconds}} s ({{rate}} foto's/s)",
       "end": "."
     },
-    "photosList": "Foto's in deze batch",
+    "photosList": "Bestanden In Deze Batch",
     "custom": "Aangepast",
     "selected": "Geselecteerd",
     "status": {
@@ -609,8 +629,8 @@
     "savedProgress": "{{done}} van {{total}} opgeslagen",
     "allSaved": "Alles opgeslagen in de <galleryLink>galerie</galleryLink>.",
     "someSaved": "{{failed}} kon niet worden opgeslagen (opslagquotum of limieten). De rest staat in de <galleryLink>galerie</galleryLink>.",
-    "savedToCloud_one": "{{count}} foto opgeslagen in je {{provider}}-map “{{folder}}”.",
-    "savedToCloud_other": "{{count}} foto's opgeslagen in je {{provider}}-map “{{folder}}”.",
+    "savedToCloud_one": "{{count}} bestand opgeslagen in {{provider}}.",
+    "savedToCloud_other": "{{count}} bestanden opgeslagen in {{provider}}.",
     "privacyNote": "Slimme plaatsing en automatisch contrast worden voor elke foto apart bepaald. Er wordt niets geüpload.",
     "watch": {
       "label": "Map bewaken",
@@ -619,15 +639,20 @@
       "hint": "Kies een invoer- en een uitvoermap; nieuwe foto's die in de invoermap worden geplaatst, krijgen de aangevinkte presets als watermerk en worden naar de uitvoermap geschreven. Werkt alleen zolang deze pagina open is.",
       "wrote": "{{name}} geschreven",
       "failed": "Mislukt {{name}}: {{error}}"
+    },
+    "media": {
+      "imageSettingsHint": "Afbeeldingsformaat, afmetingen, aanpassingen en onzichtbare watermerken gelden alleen voor foto’s. PDF’s behouden hun oorspronkelijke pagina’s.",
+      "videoOutput": "Video-Uitvoer",
+      "galleryHint": "De Galerij slaat alleen afbeeldingen op. Download documenten en video’s of sla ze op in de cloud."
     }
   },
   "gallery": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om een galerie bij te houden.",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om een galerie bij te houden.",
     "heading": "Galerie",
     "description": "Foto’s met watermerk opgeslagen in {{name}}. Zoek, filter, download of verwijder.",
     "usage_one": "{{count}} foto · {{used}} van {{max}}",
     "usage_other": "{{count}} foto's · {{used}} van {{max}}",
-    "maxCount": "Tot {{count}} foto's per organisatie",
+    "maxCount": "Tot {{count}} foto's per werkruimte",
     "storageUsed": "Gebruikte opslag",
     "storagePercent": "{{percent}}% van de opslag gebruikt",
     "checkPhoto": "Een foto controleren",
@@ -680,10 +705,12 @@
     "manageLinks": "Beheer links onder Gedeelde links.",
     "linkCopied": "Link gekopieerd naar het klembord.",
     "linkShared": "Link gedeeld.",
-    "copyLink": "Link kopiëren"
+    "copyLink": "Link kopiëren",
+    "shareSyncPending": "Wacht tot de geselecteerde foto’s zijn gesynchroniseerd voordat je een link maakt.",
+    "shareSyncBlocked": "Los synchronisatieproblemen met de geselecteerde foto’s op voordat je een link maakt."
   },
   "shares": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om foto's te delen.",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om foto's te delen.",
     "noPermission": "Je rol omvat geen deelrechten.",
     "heading": "Gedeelde links",
     "description": "Links waarmee mensen buiten {{name}} geselecteerde foto's kunnen bekijken en downloaden. Een link intrekken stopt hem meteen.",
@@ -714,7 +741,7 @@
     "sectionsLabel": "Beheersecties",
     "tabs": {
       "users": "Gebruikers",
-      "organizations": "Organisaties",
+      "organizations": "Werkruimtes",
       "audit": "Auditspoor",
       "health": "Status",
       "clientErrors": "Clientfouten"
@@ -766,11 +793,11 @@
     "reasonLabel": "Reden",
     "cancel": "Annuleren",
     "banConfirm": "Gebruiker blokkeren",
-    "loadingOrganizations": "Organisaties worden geladen",
-    "organizationsErrorTitle": "Kon organisaties niet laden",
-    "organizationsTable": "Organisaties, nieuwste eerst",
+    "loadingOrganizations": "Werkruimtes worden geladen",
+    "organizationsErrorTitle": "Kon werkruimtes niet laden",
+    "organizationsTable": "Werkruimtes, nieuwste eerst",
     "th": {
-      "organization": "Organisatie",
+      "organization": "Werkruimte",
       "members": "Leden",
       "photos": "Foto's",
       "storage": "Opslag",
@@ -778,37 +805,25 @@
     },
     "loadingAudit": "Auditspoor wordt geladen",
     "auditErrorTitle": "Kon het auditspoor niet laden",
-    "auditCaption": "Auditvermeldingen over alle organisaties, nieuwste eerst",
-    "auditDetailHeading": "Organisatie",
+    "auditCaption": "Auditvermeldingen over alle werkruimtes, nieuwste eerst",
+    "auditDetailHeading": "Werkruimte",
     "platform": "platform",
     "siteRole": "Siterol: {{role}}",
     "roleFor": "Siterol voor {{email}}",
     "ownerProtected": "Het account van de eigenaar is beschermd."
   },
   "members": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om leden te beheren.",
-    "heading": "Leden",
-    "description": "Personen in {{name}} en wat ze kunnen doen.",
-    "count_one": "{{count}} lid",
-    "count_other": "{{count}} leden",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om leden te beheren.",
     "pendingInvitations": "Openstaande uitnodigingen",
-    "inviteHeading": "Iemand uitnodigen",
     "emailLabel": "E-mail",
-    "roleLabel": "Rol",
-    "sendInvitation": "Uitnodiging versturen",
-    "invitationSent": "Uitnodiging verstuurd naar {{email}}.",
     "you": "(jij)",
     "roleFor": "Rol voor {{name}}",
-    "remove": "Verwijderen",
-    "removeMember": "{{name}} verwijderen",
-    "invitedAs": "Uitgenodigd als",
-    "cancel": "Annuleren",
     "cancelInvitation": "Uitnodiging voor {{email}} intrekken"
   },
   "audit": {
     "heading": "Auditlogboek",
     "description": "De meest recente wijzigingen in {{name}}. Eigenaren en beheerders kunnen deze pagina bekijken.",
-    "thisOrganization": "deze organisatie",
+    "thisOrganization": "deze werkruimte",
     "loading": "Auditlogboek wordt geladen",
     "loadErrorTitle": "Kon het auditlogboek niet laden",
     "noAccess": "Je rol omvat geen toegang tot het auditlogboek.",
@@ -820,14 +835,14 @@
     "action": "Actie"
   },
   "organizations": {
-    "firstTitle": "Maak je eerste organisatie aan",
-    "newTitle": "Nieuwe organisatie",
+    "firstTitle": "Maak je eerste werkruimte aan",
+    "newTitle": "Nieuwe werkruimte",
     "description": "Maak een aparte werkruimte voor watermerken en foto’s. Deze blijft privé totdat je uitdrukkelijk leden uitnodigt.",
-    "createFailed": "De organisatie kon niet worden aangemaakt.",
+    "createFailed": "De werkruimte kon niet worden aangemaakt.",
     "nameLabel": "Naam",
     "slugLabel": "URL-identificatie",
     "slugHint": "Kleine letters, cijfers en koppeltekens. Wordt in links gebruikt en moet uniek zijn.",
-    "submit": "Organisatie aanmaken"
+    "submit": "Werkruimte aanmaken"
   },
   "import": {
     "takePhoto": "Een foto maken",
@@ -840,19 +855,6 @@
       "errorTitle": "Kon die link niet importeren",
       "fetch": "Ophalen"
     },
-    "onedrive": {
-      "title": "Importeren uit OneDrive",
-      "name": "OneDrive",
-      "description": "Meld je aan bij Microsoft en kies daarna foto's om toe te voegen.",
-      "loading": "OneDrive wordt geladen",
-      "empty": "Hier zijn geen mappen of afbeeldingen.",
-      "folderPath": "Mappad",
-      "errorTitle": "OneDrive-import mislukt",
-      "tryAgain": "Opnieuw proberen",
-      "noneSelected": "Geen foto's geselecteerd",
-      "selectedCount": "{{count}} geselecteerd",
-      "addSelected": "Selectie toevoegen"
-    },
     "cloudSaved": "Opgeslagen cloudbestanden ({{total}})",
     "cloudSavedTitle": "Opgeslagen cloudbestanden",
     "cloudSharingHint": "Opslaan maakt geen openbare link. Maak die alleen als iedereen met de link het bestand mag bekijken. Bestaande maprechten blijven gelden. Beheer andere toegang bij de aanbieder.",
@@ -863,39 +865,18 @@
     "copyLink": "Link kopiëren"
   },
   "video": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om video te watermerken.",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om video te watermerken.",
     "heading": "Video watermerken",
-    "description": "Pas een preset toe op een hele video. Elk frame wordt in je browser gewatermerkt en de audio blijft behouden; er wordt niets geüpload.",
+    "description": "Bekijk je video, plaats watermerken op verschillende tijdstippen, voeg fades toe en exporteer met geluid.",
     "checkingSupport": "Videoondersteuning wordt gecontroleerd",
     "unsupportedTitle": "Video wordt niet ondersteund in deze browser",
     "unsupportedBody": "Je browser kan geen video coderen. Chrome, Edge of Safari 17 en nieuwer wel.",
-    "emptyHint": "om het op een video toe te passen.",
     "addVideo": "Video toevoegen",
     "dropHint": "Sleep hier één video, of",
-    "formatsHint": "MP4, WebM of MOV. Alles gebeurt in je browser; er wordt niets geüpload, en de galerie neemt nog geen video's op.",
-    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
-    "choosePresetPreview": "Kies een preset om het watermerk op een frame te bekijken.",
-    "outputSize": "Uitvoer {{width}} × {{height}} px.",
     "transcodingProgress": "Transcoderingsvoortgang",
-    "progress": {
-      "noEta": "Frame {{frame}} · {{percent}}%",
-      "withEta": "Frame {{frame}} · {{percent}}% · nog ongeveer {{seconds}} s"
-    },
+    "progress": {},
     "cancel": "Annuleren",
-    "cancelled": "Transcodering geannuleerd.",
-    "runErrorTitle": "Kon de video niet watermerken",
-    "download": "{{fileName}} downloaden",
     "share": "Delen",
-    "presets": "Presets",
-    "placement": "Plaatsing",
-    "placementOptions": {
-      "smart": "Slim",
-      "bottomRight": "Rechtsonder",
-      "bottomLeft": "Linksonder",
-      "topRight": "Rechtsboven",
-      "topLeft": "Linksboven",
-      "center": "Midden"
-    },
     "quality": "Kwaliteit",
     "qualityOptions": {
       "low": "Laag",
@@ -908,39 +889,50 @@
       "fit1080p": "Passend 1080p",
       "fit720p": "Passend 720p"
     },
-    "watermarking": "Watermerken…",
-    "watermarkVideo": "Video watermerken",
-    "fixedPlacementNote": "Het watermerk behoudt één vaste plaatsing voor de hele video. Audio wordt doorgekopieerd als die bij de uitvoer past, anders opnieuw gecodeerd.",
-    "renderingPreview": "Voorbeeld wordt gerenderd",
-    "previewAlt": "Het watermerk op een frame van de video"
+    "previewAlt": "Het watermerk op een frame van de video",
+    "timeline": {
+      "heading": "Tijd En Beweging",
+      "play": "Afspelen",
+      "pause": "Pauzeren",
+      "playhead": "Afspeelpositie",
+      "start": "Begin",
+      "end": "Einde",
+      "fadeIn": "In Faden",
+      "fadeOut": "Uit Faden",
+      "keyframes": "Sleutelframes",
+      "addKeyframe": "Hier Sleutelframe Toevoegen",
+      "updateKeyframe": "Hier Sleutelframe Bijwerken",
+      "removeKeyframe": "Sleutelframe Op {{time}} Verwijderen",
+      "hint": "Voeg een sleutelframe toe, ga naar een ander tijdstip en sleep, schaal of draai het watermerk. Lumafoil maakt de beweging tussen de sleutelframes.",
+      "playbackFailed": "Deze browser kon de geselecteerde video niet afspelen.",
+      "chooseVideo": "Open eerst een video en voeg een geldig watermerk toe.",
+      "waitPreview": "Wacht op de watermerkvoorvertoning voordat je een sleutelframe toevoegt.",
+      "changed": "De video of het watermerk is tijdens het exporteren gewijzigd. Exporteer opnieuw om de huidige wijzigingen te gebruiken.",
+      "download": "Video Downloaden",
+      "cloudSaved": "De video met watermerk is opgeslagen in je cloudopslag."
+    }
   },
   "documents": {
-    "orgRequired": "Maak een organisatie aan of word er lid van om documenten te watermerken.",
+    "orgRequired": "Maak een werkruimte aan of word er lid van om documenten te watermerken.",
     "heading": "Documenten",
-    "description": "Stempel een preset op elke pagina van een PDF. Bestanden worden in je browser verwerkt en één voor één of als ZIP gedownload.",
-    "emptyHint": "om er documenten mee te watermerken.",
-    "addPdfs": "PDF's toevoegen",
-    "dropHint": "Sleep hier PDF's, of",
-    "filesHint": "Tot {{max}} bestanden, elk {{size}}. Elke pagina wordt in je browser gewatermerkt; er wordt niets geüpload.",
-    "skipped_one": "{{count}} bestand overgeslagen: geen PDF of groter dan {{max}}.",
-    "skipped_other": "{{count}} bestanden overgeslagen: geen PDF of groter dan {{max}}.",
-    "fileCount_one": "{{count}} document",
-    "fileCount_other": "{{count}} documenten",
-    "clearList": "Lijst wissen",
-    "watermarkingProgress": "Watermerkvoortgang",
-    "progressFinished": "{{done}} van {{total}} klaar",
-    "progressFailed": ", {{count}} mislukt",
-    "progressEnd": ".",
-    "listLabel": "Te watermerken documenten",
-    "downloadFile": "{{fileName}} downloaden",
-    "removeFile": "{{fileName}} verwijderen",
-    "presetHint": "Vink er een of meer aan; ze worden getekend in de aangevinkte volgorde, latere over eerdere.",
-    "placement": "Plaatsing",
-    "smartPlacementHint": "Slimme plaatsing is voor foto's; kies voor documenten een hoek of een aangepaste positie.",
-    "watermarkEmpty": "Documenten watermerken",
-    "watermarkCount": "{{count}} watermerken",
-    "downloadZip": "{{count}} downloaden als ZIP",
-    "savedAsHint": "Elk document wordt opgeslagen als {name}-watermarked.pdf. Versleutelde PDF's worden geweigerd."
+    "description": "Bekijk elke PDF-pagina, bewerk watermerken direct op de pagina en exporteer het oorspronkelijke document met je markeringen. Gebruik Batch voor meerdere bestanden.",
+    "reader": {
+      "previous": "Vorige Pagina",
+      "next": "Volgende Pagina",
+      "page": "Pagina",
+      "ofPages": "van {{total}}",
+      "pageStatus": "{{name}} · Pagina {{page}} van {{total}}",
+      "preview": "PDF-Pagina {{page}}",
+      "pageText": "Paginatekst",
+      "open": "PDF Openen",
+      "empty": "Open een PDF of sleep deze hierheen om de pagina’s te bekijken en je watermerk te plaatsen.",
+      "invalidFile": "Kies een PDF binnen de toegestane documentgrootte.",
+      "chooseMark": "Voeg een geldig watermerk toe voordat je dit document exporteert.",
+      "changed": "Het document of watermerk is tijdens het exporteren gewijzigd. Exporteer opnieuw om de huidige wijzigingen te gebruiken.",
+      "download": "PDF Downloaden",
+      "cloudSaved": "De PDF met watermerk is opgeslagen in je cloudopslag.",
+      "originalHint": "Originele tekst, vectorillustraties, pagina-afmetingen en ingesloten afbeeldingen blijven behouden. Alleen het watermerk wordt gerasterd. PDF’s met wachtwoordbeveiliging moeten eerst worden ontgrendeld."
+    }
   },
   "verify": {
     "checkEmail": {
@@ -981,98 +973,102 @@
   "landing": {
     "nav": "Account",
     "signIn": "Aanmelden",
-    "heroBody": "Voeg tekst, logo’s of handtekeningen toe. Gebruik presets voor losse bestanden of batches, werk offline en synchroniseer zodra je weer verbinding hebt.",
-    "featuresHeading": "Gereedschap voor het hele proces",
+    "heroBody": "Voeg tekst, logo’s, handtekeningen, vormen, stickers of QR-codes toe. Pas ze aan op je foto, bekijk pdf-pagina’s of verplaats een watermerk op een videotijdlijn. Sla je stijl op en gebruik die opnieuw voor een hele batch.",
+    "featuresHeading": "Gereedschap voor elk watermerk",
     "footer": "Lumafoil is opensource onder de MIT-licentie.",
     "privacy": "Privacy",
     "terms": "Voorwaarden",
     "heroTitleStart": "Watermerken voor foto’s,",
     "heroTitleEnd": "video’s en pdf’s.",
     "heroAlt": "Lumafoil-foto-editor met plaatsings- en exportinstellingen",
-    "previewLabel": "De Lumafoil-editor",
-    "privacyNote": "Bestanden worden op je apparaat verwerkt. Opslaan in de cloud is optioneel.",
+    "previewLabel": "In de afbeeldingseditor",
+    "privacyNote": "Bewerken gebeurt op je apparaat. Jij kiest wat je opslaat of deelt.",
     "formatsLabel": "Foto’s · PDF’s · Video",
     "workflowHeading": "Openen. Aanpassen. Exporteren.",
-    "workflowNote": "Je werkruimte houdt presets en opgeslagen bestanden bij elkaar.",
+    "workflowNote": "Bewaar herbruikbare voorinstellingen in de Bibliotheek en opgeslagen foto’s in de Galerij. Organiseer beide in mappen binnen je werkruimte.",
     "steps": {
-      "openTitle": "Breng je foto’s mee",
-      "openBody": "Open één afbeelding of een hele reeks. Je originelen blijven ongewijzigd.",
-      "markTitle": "Maak jouw merk",
-      "markBody": "Kies een opgeslagen voorinstelling of maak iets onmiskenbaar eigens.",
-      "exportTitle": "Exporteren en klaar",
-      "exportBody": "Download de bestanden of sla ze op in je galerij en synchroniseer."
+      "openTitle": "Open je bestanden",
+      "openBody": "Kies een foto, pdf of ondersteunde video van je apparaat of verbonden opslag. Gebruik Batch voor meerdere bestanden. Je bronbestanden blijven ongewijzigd.",
+      "markTitle": "Kies en pas aan",
+      "markBody": "Begin met een sjabloon of opgeslagen voorinstelling en bewerk tekst, afbeeldingen, grootte, positie en uiterlijk naast het voorbeeld.",
+      "exportTitle": "Sla op of deel",
+      "exportBody": "Download het resultaat of kies een cloudmap. Sla voltooide foto’s op in de Galerij en maak links voor de foto’s die je wilt delen."
     },
     "github": "GitHub",
     "featuresIntro": "Ontwerp een watermerk, pas het toe op je bestanden en kies hoe je het resultaat opslaat of deelt.",
-    "moreHeading": "Meer gereedschap om je werk af te maken",
+    "moreHeading": "Bewerken, opslaan en delen",
     "capabilities": {
       "marks": {
-        "title": "Tekst, logo’s en je eigen handtekening",
-        "body": "Typ je naam of copyrightmelding, upload een logo of teken een handtekening. Pas grootte, hoek, dekking en kleur aan en combineer meerdere merken."
+        "title": "Tekst, logo’s, vormen en handtekeningen",
+        "body": "Typ een auteursrechtvermelding, upload een logo, teken een handtekening of kies uit 20 vormen. Pas grootte, draaiing, vulling, omlijning en dekking aan. Combineer lagen, sleep watermerken naar hun plek en maak wijzigingen tijdens het werken ongedaan."
       },
       "batch": {
-        "title": "Watermerken voor een hele reeks",
-        "body": "Pas een opgeslagen watermerk toe op meerdere foto’s. Bekijk de resultaten, pas afzonderlijke posities aan en download de reeks als ZIP."
+        "title": "Foto’s, pdf’s en video’s in één batch",
+        "body": "Pas een opgeslagen watermerk toe op een gemengde batch foto’s, pdf’s en ondersteunde video’s. Controleer elk resultaat, pas afzonderlijke foto’s aan en download bestanden los of samen als ZIP. Mislukte bestanden blijven zichtbaar voor controle."
       },
       "fonts": {
-        "title": "551 verschillende lettertypefamilies",
-        "body": "Zoek schreefletters, schreefloze, handgeschreven, decoratieve en monospaced lettertypen. Bekijk je tekst en sla de stijl op. De lettertypen zijn lokaal meegeleverd met open licenties."
+        "title": "551 unieke lettertypefamilies",
+        "body": "Zoek lettertypen op naam en bekijk elke keuze in het eigen lettertype. Gebruik recente lettertypen opnieuw, pas letterafstand en kromming aan en sla de stijl op in een voorinstelling. Lettertypebestanden en hun open licentievermeldingen worden met Lumafoil meegeleverd."
       },
       "stickers": {
         "title": "400 kleurrijke vectorstickers",
-        "body": "Ontdek dieren, bloemen, eten, reizen, feesten en dagelijkse voorwerpen. Zoek een ontwerp, voeg het toe aan je watermerk en vergroot het zonder wazige randen."
+        "body": "Zoek dieren, bloemen, eten, reizen, feesten en alledaagse voorwerpen. Verander de grootte van de vectorillustraties voor je watermerk. De licentievermeldingen van meegeleverde illustraties blijven bij geëxporteerde inhoud."
       },
       "qr": {
         "title": "Maak en bewaar QR-watermerken",
         "body": "Zet een webadres of tekst om in een QR-code. Bewaar verschillende codes voor je portfolio, contactpagina of projecten en gebruik ze opnieuw."
       },
       "templates": {
-        "title": "Bewaar je watermerken als sjablonen",
-        "body": "Bewaar tekst, afbeeldingen, stijl en positie. Gebruik sjablonen in de editor of voor reeksen en importeer of exporteer ze tussen apparaten."
+        "title": "18 sjablonen en je eigen voorinstellingen",
+        "body": "Begin met Concept, Vertrouwelijk, Niet kopiëren, Proef, beoordelingsstempels of fotovermeldingen. Bewerk een sjabloon, geef het een naam en sla het op in de Bibliotheek. Organiseer voorinstellingen in mappen en gebruik ze opnieuw bij Afbeelding, Documenten, Video of Batch."
       },
       "editing": {
         "title": "Bijsnijden, schalen en aanpassen",
-        "body": "Snijd je foto bij, kies afmetingen en pas helderheid, contrast en verzadiging aan vóór het uiteindelijke watermerk."
+        "body": "Snijd een foto bij of draai hem en pas helderheid, contrast en verzadiging aan. Zoom in voor de plaatsing, toon een verstelbaar raster en schakel uitlijning in. De bronresolutie blijft behouden tenzij je een uitsnede of kleinere uitvoer kiest."
       },
       "smart": {
         "title": "Slimme plaatsing en contrast",
         "body": "Lumafoil stelt een positie en een licht of donker merk voor op basis van de foto. Bekijk en wijzig het resultaat zelf."
       },
       "video": {
-        "title": "Watermerken op video’s",
-        "body": "Voeg in je browser watermerken toe aan ondersteunde video’s. Pas positie en timing aan en bekijk de voorvertoning vóór het exporteren."
+        "title": "Videoposities en vervagingseffecten",
+        "body": "Navigeer door de video naast de ingebouwde watermerkgereedschappen. Stel posities op verschillende tijdstippen in, kies wanneer elk watermerk verschijnt en voeg in- en uitfaden toe. Exports worden opnieuw gecodeerd; beschikbare formaten en audio-ondersteuning hangen af van je browser en bronbestand."
       },
       "pdf": {
-        "title": "Watermerken op PDF’s",
-        "body": "Pas een opgeslagen watermerk toe op geselecteerde PDF-pagina’s. Verwerk één document of een reeks en download de gemarkeerde PDF’s."
+        "title": "Bekijk en watermerk pdf-pagina’s",
+        "body": "Lees een pdf en plaats watermerken met gereedschappen naast de pagina. Pas ze toe in het hele document of verwerk meerdere pdf’s via Batch. Watermerken worden aan de originele pdf-pagina’s toegevoegd, met behoud van bestaande tekst, afbeeldingen en vectorillustraties."
       },
       "export": {
         "title": "Kies je exportformaat",
-        "body": "Exporteer foto’s als JPEG, PNG of WebP. Stel grootte en kwaliteit in of download een verwerkte reeks als ZIP."
+        "body": "Exporteer foto’s als PNG, JPEG of WebP. PNG is de verliesvrije standaard; JPEG en WebP gebruiken de gekozen kwaliteit. Exports worden uit de originele afbeelding opgebouwd, niet uit het kleinere bewerkingsvoorbeeld."
       },
       "gallery": {
-        "title": "Een privégalerij",
-        "body": "Sla afgewerkte afbeeldingen op in je account en vind ze later terug. Download bestanden of selecteer foto’s om te delen."
+        "title": "Mappen en recent werk",
+        "body": "Organiseer voorinstellingen in de Bibliotheek en opgeslagen foto’s in de Galerij met mappen, recente items en miniatuur-, lijst- of detailweergaven. Je werkruimte blijft privé tenzij je uitdrukkelijk toegang deelt of een galerijlink maakt."
       },
       "sharing": {
-        "title": "Deel de gekozen foto’s",
-        "body": "Maak een Lumafoil-galerijlink voor geselecteerde foto’s. Stel een vervaldatum in of trek de link weer in."
+        "title": "Deel foto’s of een werkruimte",
+        "body": "Maak intrekbare galerijlinks met een vervaldatum voor geselecteerde foto’s. Eigenaren kunnen lees- of bewerktoegang geven via een link, e-mailuitnodiging of directe toevoeging van een bestaande gebruiker. Toegang tot een werkruimte staat los van een uitnodiging voor Lumafoil."
       },
       "offline": {
-        "title": "Offline werken, later synchroniseren",
-        "body": "Bereid Lumafoil voor op offline gebruik. Bewerk sjablonen en sla foto’s op zonder verbinding. Wijzigingen synchroniseren bij terugkeer, met zichtbare fouten en conflictherstel."
+        "title": "Werk offline, synchroniseer later",
+        "body": "Bereid de app voor op offlinegebruik terwijl je bent aangemeld. Bewerk foto’s en voorinstellingen en zet galerijopslag in de wachtrij zonder verbinding. Maak met hetzelfde account weer verbinding om te synchroniseren. Cloudtransfers, uitnodigingen en wijzigingen in deelrechten vereisen een verbinding."
       },
       "privacy": {
         "title": "Jouw account, jouw werkruimte",
-        "body": "Nieuwe gebruikers hebben een uitnodiging nodig en krijgen een eigen privéwerkruimte. Een uitnodiging geeft geen toegang tot jouw foto’s of sjablonen."
+        "body": "Nieuwe gebruikers hebben een site-uitnodiging nodig en krijgen een afzonderlijke privéwerkruimte. Een site-uitnodiging deelt nooit je foto’s of voorinstellingen. Voor het delen van een werkruimte moet de eigenaar uitdrukkelijk toegang verlenen."
       },
       "languages": {
-        "title": "Interface in 12 talen",
+        "title": "12 interfacetalen",
         "body": "Kies uit de 12 talen van Lumafoil, waaronder Arabisch met een indeling van rechts naar links."
       },
       "theme": {
         "title": "Lichte en donkere modus",
         "body": "Kies een thema of volg je apparaatinstelling. De interface past zich aan telefoons, tablets en grotere schermen aan."
+      },
+      "cloud": {
+        "title": "Verbonden cloudmappen",
+        "body": "Verbind Google Drive, Dropbox of OneDrive om bestanden te openen, exportmappen te kiezen en deellinks van de aanbieder te maken. Verbindingen blijven bewaard totdat je ze verbreekt of de aanbieder opnieuw toestemming vraagt. Google Drive-toegang is beperkt tot bestanden en mappen die je met Lumafoil selecteert of maakt. Voor werk- of schoolaccounts kan goedkeuring van je Microsoft-beheerder nodig zijn."
       }
     },
     "inviteHosting": "Lumafoil werkt alleen op uitnodiging. Wil je het zelf hosten?",
@@ -1152,12 +1148,12 @@
       },
       "acceptableUse": {
         "heading": "Aanvaardbaar gebruik",
-        "p1": "Gebruik de dienst niet om de wet te overtreden of om content te uploaden of te delen waarvoor je geen gebruiksrecht hebt. Probeer geen beveiligingsmaatregelen of snelheidslimieten te omzeilen, of gegevens te bereiken van organisaties waarvan je geen lid bent.",
-        "p2": "Toegang binnen een organisatie volgt je rol, en die rollen worden op de server afgedwongen."
+        "p1": "Gebruik de dienst niet om de wet te overtreden of om content te uploaden of te delen waarvoor je geen gebruiksrecht hebt. Probeer geen beveiligingsmaatregelen of snelheidslimieten te omzeilen, of gegevens te bereiken van werkruimtes waarvan je geen lid bent.",
+        "p2": "Toegang binnen een werkruimte volgt je rol, en die rollen worden op de server afgedwongen."
       },
       "teams": {
         "heading": "Privéwerkruimten en samenwerking",
-        "p1": "Elk account heeft een privéwerkruimte. Site-uitnodigingen delen die niet. Afzonderlijke samenwerkingsruimten kunnen expliciet eigenaren, beheerders, bewerkers of kijkers toevoegen; de server handhaaft hun rechten. Deze rollen geven geen sitebeheer."
+        "p1": "Elk account begint met een privéwerkruimte. Site-uitnodigingen delen geen inhoud van de uitnodiger. De eigenaar van een werkruimte kan expliciet toegang geven om die werkruimte te Bekijken of Bewerken. Dit deelt geen andere werkruimten en geeft geen rechten voor sitebeheer."
       },
       "availability": {
         "heading": "Beschikbaarheid, garantie en wijzigingen",
@@ -1239,16 +1235,12 @@
     "revoke": "Intrekken",
     "revokeEmail": "Uitnodiging aan {{email}} intrekken",
     "invalidEmail": "Voer een geldig e-mailadres in.",
-    "privateHeading": "Je privéwerkruimte",
-    "privateBody": "Alleen jij hebt toegang. Nodig mensen uit voor Lumafoil zonder deze ruimte te delen, of maak een aparte ruimte om samen te werken.",
-    "collaborate": "Samenwerkingsruimte maken",
     "status": {
       "pending": "In afwachting",
       "accepted": "Geaccepteerd",
       "revoked": "Ingetrokken",
       "expired": "Verlopen"
     },
-    "collaborationNotice": "Een uitnodiging voor deze werkruimte geeft toegang tot de foto’s en voorinstellingen. De ontvanger moet al een Lumafoil-account hebben. Gebruik anders eerst Mensen uitnodigen.",
     "role": "Siterol",
     "roleHelp": "Beheerders beheren siteaccounts. Lidmaatschap van werkruimten staat daar los van."
   },
@@ -1322,5 +1314,218 @@
     "owner": "Eigenaar",
     "admin": "Beheerder",
     "user": "Gebruiker"
+  },
+  "guidance": {
+    "dismiss": "Tip sluiten",
+    "back": "Terug",
+    "next": "Volgende",
+    "done": "Begrepen",
+    "page": "{{current}} van {{total}}",
+    "image": {
+      "title": "Afbeelding",
+      "first": "Open een foto. Het originele bestand blijft intact.",
+      "second": "Canvaszoom verandert alleen de weergave. Downloads worden uit de originele afbeelding opgebouwd; PNG is de verliesvrije standaard."
+    },
+    "watermark": {
+      "title": "Watermerkgereedschap",
+      "first": "Kies tekst, symbool, vorm, logo of QR-code.",
+      "second": "Tik op een watermerk om de grepen te tonen. Sleep om te verplaatsen, knijp om te schalen of draai met je vingers om te roteren. Tik ergens anders om de grepen te verbergen."
+    },
+    "presets": {
+      "title": "Opgeslagen Voorinstellingen",
+      "first": "Begin met Concept, Vertrouwelijk of een ander sjabloon, of kies een opgeslagen watermerk.",
+      "second": "Opslaan vraagt om een naam en map. Nieuw begint een nieuw watermerk en houdt het bestand open."
+    },
+    "crop": {
+      "title": "Foto Bijsnijden",
+      "first": "Sleep de randen of kies een beeldverhouding.",
+      "second": "Bijsnijden herstellen toont de hele foto weer. Het origineel blijft intact."
+    },
+    "adjust": {
+      "title": "Fotoaanpassingen",
+      "first": "Verander het uiterlijk van je foto met de schuifregelaars.",
+      "second": "Elke herstelknop zet de standaardwaarde terug. Ongedaan maken herstelt je vorige bewerking."
+    },
+    "resize": {
+      "title": "Uitvoerformaat",
+      "first": "Behoud de originele afmetingen of kies een ander formaat.",
+      "second": "Schalen verandert de export. Zoom verandert alleen de weergave."
+    },
+    "export": {
+      "title": "Resultaat Opslaan",
+      "first": "Download, sla op in Galerij of kies een cloudbestemming.",
+      "second": "Controleer formaat, afmetingen en kwaliteit. Opslaan in de cloud deelt het bestand niet; maak links apart bij Opgeslagen cloudbestanden."
+    },
+    "library": {
+      "title": "Je Bibliotheek",
+      "first": "Vind recente voorinstellingen, bekijk watermerksjablonen en organiseer opgeslagen ontwerpen in mappen.",
+      "second": "Zoek of wissel van weergave om een voorinstelling te vinden. Open die om te bewerken of gebruik die bij Afbeelding, Documenten, Video of Batch."
+    },
+    "gallery": {
+      "title": "Je Galerij",
+      "first": "Vind recente foto’s en organiseer opgeslagen afbeeldingen in mappen in deze werkruimte.",
+      "second": "Kies miniaturen, lijst of details. Foto controleren zoekt naar een onzichtbaar Lumafoil-merk; dit bewijst geen eigendom."
+    },
+    "bulk": {
+      "title": "Batchverwerking",
+      "first": "Voeg foto’s, pdf’s en ondersteunde video’s toe, kies een opgeslagen watermerk en controleer de uitvoerinstellingen.",
+      "second": "Controleer elk resultaat of elke fout. Download een ZIP of sla op in de cloud; alleen fotoresultaten kunnen naar de Galerij."
+    },
+    "documents": {
+      "title": "Documentwatermerken",
+      "first": "Open een pdf, blader door de pagina’s en pas het watermerk aan met gereedschappen naast het voorbeeld.",
+      "second": "Het watermerk geldt voor het hele document. De export behoudt de originele pagina’s met bestaande tekst, afbeeldingen en vectorillustraties."
+    },
+    "video": {
+      "title": "Videowatermerken",
+      "first": "Open een ondersteunde video en navigeer of speel het voorbeeld af terwijl je het watermerk aanpast.",
+      "second": "Voeg sleutelframes toe om het merk in de tijd te bewegen. Stel Begin, Einde en vervagingen in; controleer uitvoer- en audio-opties vóór export."
+    },
+    "workspace": {
+      "title": "Toegang Tot Werkruimte",
+      "first": "Open Toegang beheren in je gebruikersmenu om delen te bekijken.",
+      "second": "Eigenaren kunnen lees- of bewerktoegang geven. Delen van deze werkruimte deelt geen andere werkruimten of verbonden cloudaccounts van anderen."
+    }
+  },
+  "workspaceAccess": {
+    "loading": "Toegang Laden…",
+    "ownerOnly": "Alleen de eigenaar van de werkruimte kan toegang wijzigen.",
+    "people": "Personen Met Toegang",
+    "general": "Algemene Toegang",
+    "restricted": "Beperkt",
+    "restrictedHint": "Alleen personen met toestemming kunnen deze werkruimte openen. Andere werkruimten blijven privé.",
+    "addPeople": "Personen Toevoegen",
+    "permission": "Machtiging",
+    "notify": "Melden Per E-mail",
+    "send": "Uitnodiging Verzenden",
+    "add": "Persoon Toevoegen",
+    "notifyHint": "Stuur een uitnodiging om deze werkruimte te bekijken of bewerken. Nieuwe gebruikers krijgen een aparte accountuitnodiging.",
+    "silentHint": "Voeg direct een bestaande, geverifieerde Lumafoil-gebruiker toe. Er wordt geen e-mail of melding verzonden.",
+    "sent": "Uitnodiging voor werkruimte verzonden.",
+    "added": "Toegang toegevoegd zonder melding.",
+    "view": "Bekijken",
+    "edit": "Bewerken",
+    "owner": "Eigenaar",
+    "admin": "Beheerder",
+    "removeFor": "Toegang Van {{name}} Verwijderen",
+    "inviteLink": "Uitnodigingslink",
+    "linkPermission": "Linkmachtiging",
+    "expires": "Vervaldatum Link",
+    "days_one": "{{count}} Dag",
+    "days_other": "{{count}} Dagen",
+    "createLink": "Link Maken",
+    "linkHint": "Aangemelde Lumafoil-gebruikers kunnen via deze link deelnemen totdat deze verloopt of wordt ingetrokken. Intrekken voorkomt nieuwe deelnemers; verwijder personen apart om bestaande toegang te beëindigen.",
+    "copyLink": "Link Kopiëren",
+    "copied": "Link gekopieerd.",
+    "copyFailed": "Kopiëren mislukt. Selecteer de link en kopieer deze handmatig.",
+    "revoke": "Intrekken",
+    "revokeFor": "Uitnodiging Voor {{name}} Intrekken",
+    "joinTitle": "Deelnemen Aan {{name}}",
+    "joinDescription": "Deze uitnodiging geeft alleen toegang voor {{permission}} tot deze werkruimte.",
+    "join": "Deelnemen Aan Werkruimte",
+    "open": "Werkruimte Openen",
+    "unavailable": "Uitnodiging Niet Beschikbaar",
+    "unavailableHint": "Deze uitnodiging is verlopen, ingetrokken of bedoeld voor een ander account. Meld je aan met het uitgenodigde e-mailadres of vraag de eigenaar om een nieuwe link.",
+    "cancel": "Annuleren"
+  },
+  "cloudStorage": {
+    "heading": "Cloudopslag",
+    "description": "Verbind accounts eenmaal en hergebruik de verbinding om bestanden te openen, bewaren of delen.",
+    "chooseDestination": "Kies de map waarin je bestanden worden opgeslagen.",
+    "chooseFiles": "Kies bestanden om in Lumafoil te openen.",
+    "loading": "Cloudopslag Laden",
+    "unavailable": "Deze aanbieder is niet beschikbaar op deze server.",
+    "connectHint": "Verbind je account om bestanden en mappen te bekijken. De verbinding blijft bewaard.",
+    "connect": "{{provider}} Verbinden",
+    "dropboxScope": "Dropbox-toegang is beperkt tot de Lumafoil-appmap.",
+    "googleScope": "Hier staan alleen voor Lumafoil toegestane items. Gebruik Drive Doorzoeken om andere items te kiezen.",
+    "location": "Maplocatie",
+    "appFolder": "Lumafoil-Appmap",
+    "root": "Mijn Bestanden",
+    "empty": "Geen overeenkomende bestanden of mappen.",
+    "folderName": "Nieuwe Mapnaam",
+    "createFolder": "Map Maken",
+    "useFolder": "Deze Map Gebruiken",
+    "openSelected": "Selectie Openen",
+    "browseGoogle": "Drive Doorzoeken",
+    "connected": "Verbonden",
+    "notConnected": "Niet Verbonden",
+    "reconnect": "Opnieuw Verbinden",
+    "disconnect": "Verbinding Verbreken",
+    "managePermissions": "Machtigingen Beheren",
+    "revocationHint": "Verbinding met Lumafoil verbroken. Verwijder overige toestemming in de instellingen van de aanbieder.",
+    "retry": "Opnieuw Proberen",
+    "waiting": "Rond de aanmelding bij de aanbieder af. Je kunt hier annuleren.",
+    "personalAccount": "Persoonlijk Account",
+    "workAccount": "Werk- Of Schoolaccount",
+    "microsoftConsent": "Voor werk- of schoolaccounts kan goedkeuring van je Microsoft-beheerder nodig zijn."
+  },
+  "folders": {
+    "heading": "Mappen",
+    "rootPhoto": "Galerij",
+    "rootPreset": "Bibliotheek",
+    "path": "Mappad",
+    "new": "Nieuwe Map",
+    "name": "Mapnaam",
+    "rename": "Map Hernoemen",
+    "moveFolder": "Map Verplaatsen",
+    "moveItems": "Items Verplaatsen",
+    "moveNamed": "{{name}} Verplaatsen",
+    "destination": "Doelmap",
+    "saveLocation": "Opslaglocatie",
+    "choose": "Map Kiezen",
+    "expand": "{{name}} Uitvouwen",
+    "collapse": "{{name}} Invouwen",
+    "open": "{{name}} Openen",
+    "loading": "Mappen Laden…",
+    "unavailable": "Deze map is niet beschikbaar. Open de hoofdcollectie of kies een andere map.",
+    "loadError": "De mappen konden niet worden geladen. De hoofdcollectie blijft beschikbaar.",
+    "delete": "Map Verwijderen",
+    "deleteTitle": "{{name}} Verwijderen?",
+    "deleteHint": "Alleen lege mappen kunnen worden verwijderd. Bestanden en submappen worden nooit samen met een map verwijderd.",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "moveHere": "Hierheen Verplaatsen",
+    "newHint": "Maak een map op de geselecteerde locatie.",
+    "renameHint": "Kies een naam en locatie voor deze map.",
+    "moving": "Items Verplaatsen ({{count}})",
+    "invalidName": "Gebruik een naam zonder schuine strepen of besturingstekens.",
+    "nameTaken": "Hier bestaat al een map met deze naam.",
+    "selection": "Geselecteerde Items: {{count}}"
+  },
+  "templates": {
+    "heading": "Watermerksjablonen",
+    "hint": "Pas een kant-en-klare indeling toe, pas deze aan en sla je eigen voorinstelling op.",
+    "search": "Sjablonen Zoeken",
+    "category": "Sjablooncategorie",
+    "use": "{{name}} Gebruiken",
+    "empty": "Geen overeenkomende sjablonen.",
+    "unavailable": "Dit sjabloon is niet beschikbaar. Kies een sjabloon uit de Bibliotheek.",
+    "categories": {
+      "all": "Alle",
+      "documents": "Documenten",
+      "review": "Beoordeling",
+      "photography": "Foto’s"
+    },
+    "names": {
+      "draft": "Concept",
+      "confidential": "Vertrouwelijk",
+      "strictlyConfidential": "Strikt Vertrouwelijk",
+      "internalUseOnly": "Alleen Voor Intern Gebruik",
+      "doNotCopy": "Niet Kopiëren",
+      "doNotDistribute": "Niet Verspreiden",
+      "copy": "Kopie",
+      "void": "Ongeldig",
+      "forReview": "Ter Beoordeling",
+      "proof": "Proef",
+      "sample": "Voorbeeld",
+      "preview": "Voorvertoning",
+      "approved": "Goedgekeurd",
+      "final": "Definitief",
+      "unpaid": "Onbetaald",
+      "copyright": "Auteursrecht",
+      "photoCredit": "Fotocredit",
+      "repeatingProof": "Herhaalde Proef"
+    }
   }
 }

@@ -96,7 +96,7 @@ describe('site management roles', () => {
     await user.selectOptions(control, 'user')
     await waitFor(() => expect(client.state.user?.role).toBe('user'))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
     expect(screen.queryByRole('heading', { name: 'Recent work' })).not.toBeInTheDocument()
     expect(screen.queryByRole('tab', { name: 'Users' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument()

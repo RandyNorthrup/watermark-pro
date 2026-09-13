@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import type { TFunction } from 'i18next'
 import { KeyRound } from 'lucide-react'
+import { lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { accountSearchSchema } from '../../../shared/client-search'
@@ -34,6 +35,11 @@ function siteRoleName(role: unknown, t: TFunction): string {
   return t('siteRoles.user')
 }
 
+const CloudConnectionsCard = lazy(async () => {
+  const module = await import('../../components/cloud-connections-card')
+  return { default: module.CloudConnectionsCard }
+})
+
 function AccountPage() {
   const { t } = useTranslation()
   const { session } = Route.useRouteContext()
@@ -64,7 +70,7 @@ function AccountPage() {
           <p className="mt-1 truncate text-ink-muted">{session.user.name}</p>
         </div>
       </header>
-      <div className="grid gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <Card className="flex flex-col gap-5 p-6">
           <div className="flex items-center gap-4">
             <Avatar
@@ -125,6 +131,9 @@ function AccountPage() {
           <SocialAuth mode="link" />
         </Card>
       </div>
+      <Suspense fallback={null}>
+        <CloudConnectionsCard key={session.user.id} userId={session.user.id} />
+      </Suspense>
     </div>
   )
 }

@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vitest/config'
 
+import { pdfjsAssetsPlugin } from './scripts/lib/pdfjs-assets.ts'
+
 const PAGE_TEST_TIMEOUT_MS = 20_000
 
 /** Coverage floors. Lowering one needs a PLAN.md §9 entry. */
@@ -49,6 +51,7 @@ export default defineConfig({
       {
         // Canvas rendering, encoding and the Web Worker run in a real
         // Chromium; jsdom has no 2D context worth testing against.
+        plugins: [pdfjsAssetsPlugin()],
         optimizeDeps: { include: ['zod/mini'] },
         test: {
           name: 'browser',
@@ -66,6 +69,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
+      // Preserve coverage diagnostics when an assertion fails; failures and
+      // thresholds still fail the gate instead of hiding the remaining gaps.
+      reportOnFailure: true,
       // Runtime TypeScript/TSX is executable coverage. JSON catalogues and CSS
       // are data/assets, verified by catalogue tests and rendered UI checks;
       // treating Vite's raw JSON ?import URL as JavaScript cannot be parsed.

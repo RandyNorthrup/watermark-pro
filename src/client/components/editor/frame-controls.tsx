@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { type Border, MAX_BORDER_RATIO } from '../../engine/pipeline'
+import { ColorInput } from '../ui/color-input'
 import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
 
@@ -44,8 +45,7 @@ export function FrameControls({ border, onChange }: FrameControlsProps) {
           />
           <label className="flex items-center gap-2 text-sm">
             <span className="w-24">{t('editor.frame.colour')}</span>
-            <input
-              type="color"
+            <ColorInput
               aria-label={t('editor.frame.colour')}
               value={border.colour}
               onChange={(event) => {

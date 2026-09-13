@@ -1,17 +1,10 @@
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { Popover as Radix } from 'radix-ui'
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { FONT_WEIGHTS } from '../../../shared/constants'
-import {
-  findFont,
-  FONT_CATALOGUE,
-  FONT_CATEGORIES,
-  FONT_CATEGORY_LABELS,
-  type FontFamily,
-  nearestWeight,
-} from '../../fonts/catalogue'
+import { findFont, FONT_CATALOGUE, type FontFamily, nearestWeight } from '../../fonts/catalogue'
 import { previewFont } from '../../fonts/preview'
 import { cn } from '../../lib/cn'
 import { captureOfflineOwner } from '../../lib/offline-context'
@@ -85,6 +78,7 @@ function FontOption({
     <button
       type="button"
       role="option"
+      tabIndex={-1}
       data-font-preview=""
       data-font-family={candidate.family}
       data-font-weight={nearestWeight(candidate, REGULAR_WEIGHT)}
@@ -92,7 +86,13 @@ function FontOption({
       className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-start text-base hover:bg-brand-50 focus-visible:bg-brand-50 focus-visible:outline-none dark:hover:bg-brand-900/40 dark:focus-visible:bg-brand-900/40"
       onClick={onSelect}
     >
-      <span className="truncate" style={{ fontFamily: `"${candidate.family}"` }}>
+      <span
+        className="truncate"
+        style={{
+          fontFamily: `"${candidate.family}"`,
+          fontWeight: nearestWeight(candidate, REGULAR_WEIGHT),
+        }}
+      >
         {candidate.family}
       </span>
       {isSelected ? <Check aria-hidden="true" className="size-4 shrink-0 text-brand-600" /> : null}
@@ -119,7 +119,9 @@ export function FontPicker({
   const [open, setOpen] = useState(false)
   const [menuOwner, setMenuOwner] = useState<ReturnType<typeof captureOfflineOwner> | null>(null)
   const [recentFonts, setRecentFonts] = useState<FontFamily[]>([])
-  const list = useRef<HTMLDivElement>(null)
+  const [listElement, setListElement] = useState<HTMLDivElement | null>(null)
+  const [triggerElement, setTriggerElement] = useState<HTMLButtonElement | null>(null)
+  const [hasPreviewError, setHasPreviewError] = useState(false)
   const weightId = useId()
   const font = findFont(family)
   const availableWeights = font?.weights ?? []
@@ -145,7 +147,7 @@ export function FontPicker({
   }, [family, font, weight])
   useEffect(() => {
     if (!open || typeof IntersectionObserver === 'undefined') return
-    const root = list.current
+    const root = listElement
     if (root === null) return
     const controller = new AbortController()
     const observer = new IntersectionObserver(
@@ -156,7 +158,9 @@ export function FontPicker({
           const familyName = entry.target.dataset['fontFamily']
           const fontWeight = Number(entry.target.dataset['fontWeight'])
           if (familyName === undefined || !Number.isFinite(fontWeight)) continue
-          void previewFont(familyName, fontWeight, controller.signal).catch(() => false)
+          void previewFont(familyName, fontWeight, controller.signal).catch(() => {
+            if (!controller.signal.aborted) setHasPreviewError(true)
+          })
         }
       },
       { root },
@@ -168,7 +172,7 @@ export function FontPicker({
       controller.abort()
       observer.disconnect()
     }
-  }, [open, query, recentKey])
+  }, [open, query, recentKey, listElement])
 
   function selectFont(candidate: FontFamily): void {
     if (menuOwner === null) return
@@ -185,7 +189,13 @@ export function FontPicker({
   }
   return (
     <div
-      className={cn('grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto]', className)}
+      className={cn(
+        'grid min-w-0 items-start gap-3',
+        weight === undefined || onWeightChange === undefined
+          ? 'grid-cols-1'
+          : 'grid-cols-[minmax(0,1fr)_5rem]',
+        className,
+      )}
     >
       <div className="flex min-w-0 flex-col gap-1.5">
         <label htmlFor={familyId} className="text-sm font-medium">
@@ -196,6 +206,7 @@ export function FontPicker({
           onOpenChange={(nextOpen) => {
             setOpen(nextOpen)
             if (nextOpen) {
+              setHasPreviewError(false)
               try {
                 const owner = captureOfflineOwner()
                 setMenuOwner(owner)
@@ -211,116 +222,119 @@ export function FontPicker({
           }}
         >
           <Radix.Trigger
+            ref={setTriggerElement}
             id={familyId}
             role="combobox"
             aria-controls={listId}
             aria-expanded={open}
-            className="glass-control flex h-12 w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-control-line bg-surface-raised px-3 text-start shadow-xs transition-colors hover:border-brand-400 focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none"
+            title={family}
+            className="glass-control flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-xl border border-control-line bg-surface-raised px-3 text-start shadow-xs transition-colors hover:border-brand-400 focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none"
           >
-            <span className="min-w-0">
-              <span
-                className="block truncate text-sm font-medium"
-                style={{ fontFamily: `"${family}"` }}
-              >
-                {family}
-              </span>
-              <span
-                className="block truncate text-base text-ink-muted"
-                style={{ fontFamily: `"${family}"` }}
-                aria-hidden="true"
-              >
-                {t('designer.font.specimen')}
-              </span>
-            </span>
+            <span className="min-w-0 truncate font-sans text-sm">{family}</span>
             <ChevronDown
               aria-hidden="true"
               className={cn('size-4 shrink-0 transition-transform', open && 'rotate-180')}
             />
           </Radix.Trigger>
-          <Radix.Content
-            align="start"
-            sideOffset={8}
-            className="glass-popover z-50 w-(--radix-popover-trigger-width) min-w-72 overflow-hidden rounded-2xl border border-line bg-surface-raised p-2 shadow-card"
-            onWheel={(event) => event.stopPropagation()}
-          >
-            <div className="relative z-30 bg-surface-raised">
-              <Search
-                aria-hidden="true"
-                className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted"
-              />
-              <Input
-                id={searchId}
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.currentTarget.value)}
-                onKeyDown={(event) => {
-                  if (event.key !== 'ArrowDown') return
-                  event.preventDefault()
-                  list.current?.querySelector<HTMLButtonElement>('[role="option"]')?.focus()
-                }}
-                aria-label={t('designer.font.search')}
-                aria-controls={listId}
-                className="ps-9"
-              />
-            </div>
-            <p
-              role="status"
-              className="relative z-30 bg-surface-raised px-2 pt-2 pb-1 text-xs text-ink-muted"
-            >
-              {t('designer.font.resultCount', { count: matches.length })}
-            </p>
-            <div
-              ref={list}
-              id={listId}
-              role="listbox"
+          <Radix.Portal container={triggerElement?.closest<HTMLElement>('[role="dialog"]')}>
+            <Radix.Content
               aria-label={t('designer.font.family')}
-              className="max-h-[min(18rem,calc(100dvh-14rem))] touch-pan-y [scrollbar-gutter:stable] overflow-x-hidden overflow-y-auto overscroll-contain p-1"
+              align="start"
+              sideOffset={8}
+              onOpenAutoFocus={(event) => {
+                // Opening the picker on a phone should show fonts, not summon a
+                // keyboard that covers the choices before the user requests search.
+                if (window.matchMedia('(pointer: coarse)').matches) event.preventDefault()
+              }}
+              className="glass-popover z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-line bg-surface-raised p-2 shadow-card"
               onWheel={(event) => event.stopPropagation()}
             >
-              {recentMatches.length === 0 ? null : (
-                <section role="group" aria-label={t('designer.font.recent')}>
-                  <p className="sticky top-0 z-20 bg-surface-raised px-2 py-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                    {t('designer.font.recent')}
-                  </p>
-                  {recentMatches.map((candidate) => (
+              <div className="relative z-30 bg-surface-raised">
+                <Search
+                  aria-hidden="true"
+                  className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted"
+                />
+                <Input
+                  id={searchId}
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.currentTarget.value)}
+                  onKeyDown={(event) => {
+                    if (event.key !== 'ArrowDown') return
+                    event.preventDefault()
+                    listElement?.querySelector<HTMLButtonElement>('[role="option"]')?.focus()
+                  }}
+                  aria-label={t('designer.font.search')}
+                  aria-controls={listId}
+                  className="ps-9"
+                />
+              </div>
+              {hasPreviewError ? (
+                <p role="status" className="px-2 py-1 text-xs text-ink-muted">
+                  {t('designer.font.previewError')}
+                </p>
+              ) : null}
+              <div
+                ref={setListElement}
+                id={listId}
+                role="listbox"
+                aria-label={t('designer.font.family')}
+                className="max-h-[min(18rem,calc(var(--radix-popover-content-available-height,100dvh)-5rem))] touch-pan-y [scrollbar-gutter:stable] overflow-x-hidden overflow-y-auto overscroll-contain p-1"
+                onWheel={(event) => event.stopPropagation()}
+                onKeyDown={(event) => {
+                  const options =
+                    event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="option"]')
+                  if (!(event.target instanceof HTMLButtonElement)) return
+                  const index = [...options].indexOf(event.target)
+                  if (index === -1) return
+                  const last = options.length - 1
+                  const destinations: Record<string, number> = {
+                    ArrowDown: Math.min(last, index + 1),
+                    ArrowUp: Math.max(0, index - 1),
+                    Home: 0,
+                    End: last,
+                  }
+                  const next = destinations[event.key]
+                  if (next === undefined) return
+                  event.preventDefault()
+                  options[next]?.focus()
+                }}
+              >
+                {recentMatches.length === 0 ? null : (
+                  <section role="group" aria-label={t('designer.font.recent')}>
+                    <p className="sticky top-0 z-20 bg-surface-raised px-2 py-1.5 text-xs font-semibold tracking-wide text-ink-muted capitalize">
+                      {t('designer.font.recent')}
+                    </p>
+                    {recentMatches.map((candidate) => (
+                      <FontOption
+                        key={`recent-${candidate.id}`}
+                        candidate={candidate}
+                        isSelected={candidate.family === family}
+                        onSelect={() => selectFont(candidate)}
+                      />
+                    ))}
+                  </section>
+                )}
+                {matches
+                  .filter((candidate) =>
+                    recentMatches.every((recent) => recent.family !== candidate.family),
+                  )
+                  .map((candidate) => (
                     <FontOption
-                      key={`recent-${candidate.id}`}
+                      key={candidate.id}
                       candidate={candidate}
                       isSelected={candidate.family === family}
                       onSelect={() => selectFont(candidate)}
                     />
                   ))}
-                </section>
-              )}
-              <p className="sticky top-0 z-20 bg-surface-raised px-2 py-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                {t('designer.font.all')}
-              </p>
-              {FONT_CATEGORIES.map((category) => {
-                const categoryMatches = matches.filter(
-                  (candidate) => candidate.category === category,
-                )
-                if (categoryMatches.length === 0) return null
-                return (
-                  <section key={category} aria-label={FONT_CATEGORY_LABELS[category]}>
-                    <p className="sticky top-0 z-20 bg-surface-raised px-2 py-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                      {FONT_CATEGORY_LABELS[category]}
-                    </p>
-                    {categoryMatches.map((candidate) => {
-                      const isSelected = candidate.family === family
-                      return (
-                        <FontOption
-                          key={candidate.id}
-                          candidate={candidate}
-                          isSelected={isSelected}
-                          onSelect={() => selectFont(candidate)}
-                        />
-                      )
-                    })}
-                  </section>
-                )
-              })}
-            </div>
-          </Radix.Content>
+              </div>
+              {matches.length === 0 ? (
+                <p role="status" className="px-2 py-3 text-sm text-ink-muted">
+                  {t('designer.font.empty')}
+                </p>
+              ) : null}
+            </Radix.Content>
+          </Radix.Portal>
         </Radix.Root>
         {font?.licensePath === undefined ? null : (
           <a
@@ -347,7 +361,7 @@ export function FontPicker({
                 onWeightChange(next)
               }
             }}
-            className={cn(selectClassName, 'min-w-28')}
+            className={cn(selectClassName, 'text-base sm:text-sm')}
           >
             {FONT_WEIGHTS.map((candidate) => (
               <option

@@ -28,7 +28,11 @@ import { SNIFF_LENGTH, sniffImageType } from '../uploads'
 const ASSET_CACHE_CONTROL = 'private, no-store'
 
 function isMatchingPreset(record: WatermarkRecord, body: SaveWatermarkRequest): boolean {
-  return record.name === body.name && JSON.stringify(record.spec) === JSON.stringify(body.spec)
+  return (
+    record.name === body.name &&
+    JSON.stringify(record.spec) === JSON.stringify(body.spec) &&
+    (body.folderId === undefined || (record.folderId ?? null) === body.folderId)
+  )
 }
 
 function logoKey(organizationId: string, assetId: string, digest: string): string {
@@ -68,6 +72,12 @@ async function parseSaveRequest(
     throw apiErrors.validation(parsed.error.issues)
   }
   await assertAssetOwned(c, organizationId, parsed.data.spec)
+  if (
+    parsed.data.folderId !== undefined &&
+    parsed.data.folderId !== null &&
+    !(await c.get('services').folders.exists(organizationId, 'preset', parsed.data.folderId))
+  )
+    throw apiErrors.conflict()
   return parsed.data
 }
 
@@ -93,7 +103,7 @@ export const libraryRoutes = new Hono<AppContext>()
     async (c) => {
       const organizationId = c.req.param('orgId')
       const body = await parseSaveRequest(c, organizationId)
-      const { watermarks, audit } = c.get('services')
+      const { watermarks } = c.get('services')
       const session = c.get('session')
       const operationId = syncOperationId(c.req.raw)
       const id = operationId ?? crypto.randomUUID()
@@ -104,22 +114,25 @@ export const libraryRoutes = new Hono<AppContext>()
         }
         return c.json(watermarkDtoSchema.parse(watermarkToDto(existing)), HTTP_STATUS.ok)
       }
-      const record = await watermarks.create({
-        id,
-        organizationId,
-        name: body.name,
-        spec: body.spec,
-        createdBy: session.user.id,
-      })
-      await audit.append({
-        organizationId,
-        actorUserId: session.user.id,
-        actorName: session.user.name,
-        action: 'watermark.created',
-        targetType: 'watermark',
-        targetId: record.id,
-        metadata: { name: record.name, kind: record.spec.kind },
-      })
+      const record = await watermarks.create(
+        {
+          id,
+          organizationId,
+          name: body.name,
+          spec: body.spec,
+          createdBy: session.user.id,
+          folderId: body.folderId ?? null,
+        },
+        {
+          organizationId,
+          actorUserId: session.user.id,
+          actorName: session.user.name,
+          action: 'watermark.created',
+          targetType: 'watermark',
+          targetId: id,
+          metadata: { name: body.name, kind: body.spec.kind },
+        },
+      )
       return c.json(watermarkDtoSchema.parse(watermarkToDto(record)), HTTP_STATUS.created)
     },
   )
@@ -130,8 +143,13 @@ export const libraryRoutes = new Hono<AppContext>()
     async (c) => {
       const organizationId = c.req.param('orgId')
       const body = await parseSaveRequest(c, organizationId)
-      const { watermarks, audit } = c.get('services')
+      const { watermarks } = c.get('services')
       const existing = await watermarks.find(organizationId, c.req.param('id'))
+      if (
+        body.folderId !== undefined &&
+        (body.expectedFolderRevision === undefined || body.expectedFolderVersionId === undefined)
+      )
+        throw apiErrors.validation('A folder reassignment requires its current version')
       if (
         existing !== null &&
         body.expectedUpdatedAt !== undefined &&
@@ -139,23 +157,30 @@ export const libraryRoutes = new Hono<AppContext>()
       ) {
         return c.json(watermarkDtoSchema.parse(watermarkToDto(existing)), HTTP_STATUS.ok)
       }
-      const record = await watermarks.update(organizationId, c.req.param('id'), body)
+      const session = c.get('session')
+      const record = await watermarks.update(
+        organizationId,
+        c.req.param('id'),
+        { ...body, nextFolderVersionId: syncOperationId(c.req.raw) ?? crypto.randomUUID() },
+        {
+          organizationId,
+          actorUserId: session.user.id,
+          actorName: session.user.name,
+          action: 'watermark.updated',
+          targetType: 'watermark',
+          targetId: c.req.param('id'),
+          metadata: { name: body.name, kind: body.spec.kind },
+        },
+      )
       if (record === null) {
-        if (existing !== null && body.expectedUpdatedAt !== undefined) {
+        if (
+          existing !== null &&
+          (body.expectedUpdatedAt !== undefined || body.folderId !== undefined)
+        ) {
           throw apiErrors.conflict()
         }
         throw apiErrors.notFound()
       }
-      const session = c.get('session')
-      await audit.append({
-        organizationId,
-        actorUserId: session.user.id,
-        actorName: session.user.name,
-        action: 'watermark.updated',
-        targetType: 'watermark',
-        targetId: record.id,
-        metadata: { name: record.name, kind: record.spec.kind },
-      })
       return c.json(watermarkDtoSchema.parse(watermarkToDto(record)), HTTP_STATUS.ok)
     },
   )

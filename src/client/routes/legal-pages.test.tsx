@@ -37,7 +37,7 @@ describe('factual privacy and terms', () => {
     )
     expect(screen.queryByText(/Nothing is kept on our servers unless/)).not.toBeInTheDocument()
   })
-  it('preserves ownership/warranty clauses while describing cloud sharing and bundled licences honestly', async () => {
+  it('preserves ownership/warranty clauses while describing cloud sharing and bundled licenses honestly', async () => {
     renderApp('/terms')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Terms of service')
     expect(screen.getByText(/You keep every right you already hold/)).toBeInTheDocument()
@@ -46,9 +46,11 @@ describe('factual privacy and terms', () => {
       screen.getByText(/selected cloud transfers and sharing send content/),
     ).toBeInTheDocument()
     expect(screen.getByText(/Disconnected devices can retain local copies/)).toBeInTheDocument()
+    expect(screen.getByText(/grants no site administration rights/)).toBeInTheDocument()
     expect(
-      screen.getByText(/Workspace ownership or administration does not grant site administration/),
+      screen.getByText(/explicitly grant View or Edit access to that workspace/),
     ).toBeInTheDocument()
+    expect(screen.getByText(/This shares no other workspace/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'support@lumafoil.com' })).toHaveAttribute(
       'href',
       LEGAL_LINKS.support,

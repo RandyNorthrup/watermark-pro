@@ -34,7 +34,7 @@ describe('creative catalogue pickers', () => {
     expect(fontPicker).toHaveAttribute('aria-expanded', 'false')
     await user.click(fontPicker)
     await user.type(screen.getByRole('searchbox', { name: 'Search fonts' }), 'not-a-font')
-    expect(screen.getByRole('status')).toHaveTextContent('0')
+    expect(screen.getByRole('status')).toHaveTextContent('No Matching Fonts')
   })
 
   it('searches names and keywords, narrows categories, and exposes selected state', async () => {

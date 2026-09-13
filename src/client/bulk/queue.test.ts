@@ -42,6 +42,47 @@ function statuses(snapshot: QueueSnapshot<string, string>): string[] {
 }
 
 describe('JobQueue', () => {
+  it('keeps the mixed-media concurrency limit across repeated starts and pause/resume', async () => {
+    const runner = controlledRunner()
+    const queue = new JobQueue({ concurrency: 3, run: runner.run })
+    queue.add(['pdf', 'video', 'photo'])
+    await expect(queue.start(0)).rejects.toThrow(RangeError)
+    await expect(queue.start(4)).rejects.toThrow(RangeError)
+    const first = queue.start(1)
+    const second = queue.start(1)
+    await settle()
+    expect(runner.running).toEqual(['pdf'])
+    queue.pause()
+    runner.finish('pdf')
+    await Promise.all([first, second])
+    const resumed = queue.resume()
+    await settle()
+    expect(runner.running).toEqual(['video'])
+    runner.finish('video')
+    await settle()
+    expect(runner.running).toEqual(['photo'])
+    runner.finish('photo')
+    const result = await resumed
+    expect(result.jobs.every((job) => job.status === 'done')).toBe(true)
+  })
+
+  it('does not revive old work when a canceled queue is cleared and restarted', async () => {
+    const pending = Promise.withResolvers<string>()
+    const queue = new JobQueue<string, string>({
+      concurrency: 1,
+      run: (name) => (name === 'old' ? pending.promise : Promise.resolve(name)),
+    })
+    queue.add(['old'])
+    const old = queue.start()
+    queue.clear()
+    queue.add(['new'])
+    const next = queue.start()
+    pending.resolve('stale output')
+    await old
+    const result = await next
+    expect(result.jobs.map((job) => job.output)).toEqual(['new'])
+  })
+
   it('rejects a non-positive concurrency', () => {
     expect(() => new JobQueue({ concurrency: 0, run: () => Promise.resolve('') })).toThrow(
       RangeError,

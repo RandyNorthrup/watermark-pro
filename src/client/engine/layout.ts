@@ -33,6 +33,58 @@ const MAX_HEIGHT_FRACTION = 0.9
 /** Centre and span for turning a [0, 1) random into a symmetric jitter. */
 const RANDOM_CENTRE = 0.5
 const RANDOM_SPAN = 2
+const HALF_TURN_DEGREES = 180
+
+/** Axis-aligned footprint of a rotated mark, in the same pixel space as its size. */
+export function rotatedMarkSize(mark: Size, rotation: number): Size {
+  const angle = (rotation * Math.PI) / HALF_TURN_DEGREES
+  const cosine = Math.abs(Math.cos(angle))
+  const sine = Math.abs(Math.sin(angle))
+  return {
+    width: mark.width * cosine + mark.height * sine,
+    height: mark.width * sine + mark.height * cosine,
+  }
+}
+
+/** Scale down oversized marks so their rotated silhouette remains inside the image. */
+export function fitMarkSize(mark: Size, image: Size, rotation: number): Size {
+  const heightScale = Math.min(1, (image.height * MAX_HEIGHT_FRACTION) / mark.height)
+  const upright = { width: mark.width * heightScale, height: mark.height * heightScale }
+  const footprint = rotatedMarkSize(upright, rotation)
+  const factor = Math.min(1, image.width / footprint.width, image.height / footprint.height)
+  return { width: upright.width * factor, height: upright.height * factor }
+}
+
+/** Keep the full footprint inside; optional grid snapping aligns its upper-left edge. */
+export function clampMarkCentre(
+  centre: { x: number; y: number },
+  image: Size,
+  mark: Size,
+  rotation: number,
+  gridSpacing?: number,
+): { x: number; y: number } {
+  const footprint = rotatedMarkSize(mark, rotation)
+  function axis(value: number, extent: number, markExtent: number): number {
+    if (markExtent >= extent) return extent / 2
+    if (gridSpacing === undefined || gridSpacing <= 0) {
+      return Math.min(extent - markExtent / 2, Math.max(markExtent / 2, value))
+    }
+    const limit = extent - markExtent
+    const leading = Math.min(limit, Math.max(0, value - markExtent / 2))
+    const snapped = Math.max(
+      0,
+      Math.min(
+        Math.floor(limit / gridSpacing) * gridSpacing,
+        Math.round(leading / gridSpacing) * gridSpacing,
+      ),
+    )
+    return snapped + markExtent / 2
+  }
+  return {
+    x: axis(centre.x, image.width, footprint.width),
+    y: axis(centre.y, image.height, footprint.height),
+  }
+}
 
 /**
  * Pixel size of the mark from the spec's scale (a fraction of the image
@@ -42,14 +94,8 @@ export function markSize(spec: WatermarkSpec, image: Size, aspect: number): Size
   if (!(aspect > 0) || !Number.isFinite(aspect)) {
     throw new RangeError('mark aspect ratio must be a positive finite number')
   }
-  let width = spec.style.scale * image.width
-  let height = width / aspect
-  const maxHeight = image.height * MAX_HEIGHT_FRACTION
-  if (height > maxHeight) {
-    height = maxHeight
-    width = height * aspect
-  }
-  return { width, height }
+  const width = spec.style.scale * image.width
+  return fitMarkSize({ width, height: width / aspect }, image, spec.style.rotation)
 }
 
 /** Mean luminance of the map region under a box given in image-fraction units. */
@@ -94,8 +140,9 @@ export function resolvePlacement(
   map: LuminanceMap,
   seed = 1,
 ): ResolvedPlacement {
-  const widthFraction = mark.width / image.width
-  const heightFraction = mark.height / image.height
+  const footprint = rotatedMarkSize(mark, spec.style.rotation)
+  const widthFraction = footprint.width / image.width
+  const heightFraction = footprint.height / image.height
 
   if (spec.placement.mode === 'smart') {
     const [best] = rankPlacements({

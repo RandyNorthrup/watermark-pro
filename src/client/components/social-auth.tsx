@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { ProviderLogo } from './provider-logo'
 import { Alert } from './ui/alert'
 import { Button } from './ui/button'
+import { loginSearchSchema } from '../../shared/client-search'
 import { INVITATION_HEADER } from '../../shared/invitation'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError, describeError } from '../lib/errors'
@@ -19,10 +20,15 @@ import { publicConfigQueryOptions } from '../lib/queries'
 interface SocialAuthProps {
   invitation?: string | undefined
   mode?: 'sign-in' | 'link'
+  callbackURL?: string | undefined
 }
 
 /** Provider identity and cloud-file authorization remain separate, explicit actions. */
-export function SocialAuth({ invitation, mode = 'sign-in' }: SocialAuthProps) {
+export function SocialAuth({
+  invitation,
+  mode = 'sign-in',
+  callbackURL = '/app',
+}: SocialAuthProps) {
   const { t } = useTranslation()
   const config = useQuery(publicConfigQueryOptions)
   const [pending, setPending] = useState<'google' | 'microsoft' | null>(null)
@@ -41,6 +47,7 @@ export function SocialAuth({ invitation, mode = 'sign-in' }: SocialAuthProps) {
     const admission = invitation ?? pendingInvitation()
     if (mode === 'sign-in' && admission !== undefined) rememberInvitation(admission)
     try {
+      const redirect = loginSearchSchema.parse({ redirect: callbackURL }).redirect ?? '/app'
       const result =
         mode === 'link'
           ? await authClient.linkSocial({
@@ -51,7 +58,7 @@ export function SocialAuth({ invitation, mode = 'sign-in' }: SocialAuthProps) {
           : await authClient.signIn.social(
               {
                 provider,
-                callbackURL: '/app',
+                callbackURL: redirect,
                 errorCallbackURL: '/login',
                 requestSignUp: admission !== undefined,
               },

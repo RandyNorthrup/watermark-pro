@@ -27,15 +27,16 @@ import {
   IDENTITY_ORIENTATION,
   type Orientation,
 } from '../../../shared/adjustments'
-import { CLOUD_SAVE_FOLDER, MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
+import { IMAGE_EXPORT_DEFAULTS, MAX_INVISIBLE_MESSAGE_LENGTH } from '../../../shared/constants'
 import {
   type BulkFile,
   canPickDirectory,
-  collectImages,
+  collectMedia,
   MAX_BULK_FILES,
   readEntries,
   zipPath,
 } from '../../bulk/folders'
+import { BULK_ACCEPTED_TYPES, bulkMediaKind } from '../../bulk/media-kind'
 import { DEFAULT_NAME_PATTERN, resolveNamePattern } from '../../bulk/names'
 import type { BulkJobInput, BulkSettings, BulkResult } from '../../bulk/processor'
 import { extensionFor } from '../../bulk/processor'
@@ -56,7 +57,7 @@ import type { Border } from '../../engine/pipeline'
 import { downloadBlob } from '../../lib/download'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
-import { galleryQueryKey, uploadPhoto } from '../../lib/gallery'
+import { uploadPhoto } from '../../lib/gallery'
 import { PROVIDER_LABELS } from '../../lib/imports/source'
 import { subscribeLaunchFiles } from '../../lib/launch-consumer'
 import { watermarksQueryOptions } from '../../lib/library'
@@ -70,6 +71,7 @@ import { FORMAT_OPTIONS } from '../editor/formats'
 import { FrameControls } from '../editor/frame-controls'
 import { MetadataPolicyField } from '../editor/metadata-policy'
 import { OrientationControls } from '../editor/orientation-controls'
+import { FolderPicker } from '../folders/folder-picker'
 import { CloudImportButtons } from '../import/cloud-import-buttons'
 import { CloudSaveButtons } from '../import/cloud-save-buttons'
 import { TakePhotoButton } from '../import/take-photo-button'
@@ -84,6 +86,7 @@ import { Input } from '../ui/input'
 import { Select, type SelectOption } from '../ui/select'
 import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
+import { VideoOutputSettings, type VideoOutputChoice } from '../video/video-output-settings'
 
 interface BulkToolProps {
   organizationId: string
@@ -99,8 +102,6 @@ interface SaveProgress {
   failed: number
 }
 
-const ACCEPTED_PHOTO_TYPES = 'image/png,image/jpeg,image/webp,image/avif,image/gif'
-const DEFAULT_QUALITY = 0.9
 const MIN_QUALITY = 0.3
 const QUALITY_STEP = 0.01
 const PERCENT = 100
@@ -195,7 +196,11 @@ const STATUS_LABELS = {
  * through the worker pool with progress, cancel and retry, then download
  * everything as one ZIP or file by file.
  */
-export function BulkTool({ organizationId, organizationName, canSave = false }: BulkToolProps) {
+export function BulkTool(props: BulkToolProps) {
+  return <BulkSession key={props.organizationId} {...props} />
+}
+
+function BulkSession({ organizationId, organizationName, canSave = false }: BulkToolProps) {
   const { t } = useTranslation()
   const presets = useQuery(watermarksQueryOptions(organizationId))
   const publicConfig = useQuery(publicConfigQueryOptions)
@@ -223,7 +228,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   useEffect(
     () =>
       subscribeLaunchFiles('/app/bulk', (incoming) => {
-        const scan = collectImages(incoming)
+        const scan = collectMedia(incoming)
         setFiles((previous) => dedupe(previous, scan.files))
       }),
     [],
@@ -242,7 +247,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
       if (shared.length === 0) {
         return
       }
-      const scan = collectImages(shared)
+      const scan = collectMedia(shared)
       setFiles((previous) => dedupe(previous, scan.files))
     })().catch((error: unknown) => {
       if (isDisposed) return
@@ -259,8 +264,13 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   }, [])
   /** Chosen presets in the order they were ticked, which is the order they are drawn. */
   const [presetIds, setPresetIds] = useState<string[]>([])
-  const [format, setFormat] = useState<OutputFormat>('image/jpeg')
-  const [quality, setQuality] = useState(DEFAULT_QUALITY)
+  const [format, setFormat] = useState<OutputFormat>(IMAGE_EXPORT_DEFAULTS.format)
+  const [videoOptions, setVideoOptions] = useState<VideoOutputChoice>({
+    quality: 'high',
+    resolution: 'original',
+  })
+  const [galleryFolder, setGalleryFolder] = useState<string | null>(null)
+  const [quality, setQuality] = useState<number>(IMAGE_EXPORT_DEFAULTS.quality)
   const [policy, setPolicy] = useState<MetadataPolicy>(DEFAULT_METADATA_POLICY)
   const [wantsInvisible, setWantsInvisible] = useState(false)
   const [invisibleMessage, setInvisibleMessage] = useState(organizationName)
@@ -289,6 +299,8 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   }, [snapshot.jobs])
   const finished = counts.done + counts.failed + counts.cancelled
   const results = snapshot.jobs.filter((job) => job.output !== null)
+  const photoResults = results.filter((job) => job.output?.blob.type.startsWith('image/') === true)
+  const hasVideos = files.some((entry) => bulkMediaKind(entry.file) === 'video')
   const elapsedSeconds = elapsedOf(timing)
 
   // One uniform row shape before and after the batch starts; the list is
@@ -307,7 +319,6 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
     : files.map((entry) => ({ file: entry.file, relativePath: entry.relativePath, job: null }))
   const visibleRows = showAll ? rows : rows.slice(0, VISIBLE_ROW_LIMIT)
 
-  const isShareable = canShareFiles(format)
   const sizeOptions: readonly SelectOption<SizeChoice>[] = [
     { value: 'original', label: t('bulk.size.original') },
     ...LONG_EDGE_PRESETS.map((side) => ({
@@ -360,6 +371,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
     }
     return {
       output,
+      video: videoOptions,
       fitLongestSide: size === 'original' ? null : Number(size),
       orientation: { turns: orientation.turns, flipX: orientation.flipX, flipY: orientation.flipY },
       adjust,
@@ -416,7 +428,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
   }
 
   function addFiles(list: FileList | File[]) {
-    addScan(collectImages([...list]))
+    addScan(collectMedia([...list]))
   }
 
   async function onDrop(event: DragEvent<HTMLDivElement>) {
@@ -471,14 +483,19 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
 
   /** Uploads every finished result one at a time; a failure does not stop the rest. */
   async function saveAll() {
-    const outputs = results.flatMap((job) => (job.output === null ? [] : [job.output]))
+    const outputs = photoResults.flatMap((job) => (job.output === null ? [] : [job.output]))
     const progress: SaveProgress = { done: 0, total: outputs.length, failed: 0 }
     setSaving({ ...progress })
     setZipError(null)
+    const owner = captureOfflineOwner()
     for (const output of outputs) {
+      owner.assertCurrent()
       try {
+        if (output.width === null || output.height === null)
+          throw new Error('Missing image dimensions.')
         await uploadPhoto(organizationId, {
           blob: output.blob,
+          folderId: galleryFolder,
           name: output.fileName,
           width: output.width,
           height: output.height,
@@ -490,7 +507,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
       progress.done += 1
       setSaving({ ...progress })
     }
-    await queryClient.invalidateQueries({ queryKey: galleryQueryKey(organizationId) })
+    await queryClient.invalidateQueries({ queryKey: ['organization', organizationId] })
   }
 
   async function downloadZip() {
@@ -509,7 +526,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
             ],
       )
       const blob = await zipEntries(entries)
-      downloadBlob(blob, `watermarked-${String(entries.length)}-photos.zip`)
+      downloadBlob(blob, `watermarked-${String(entries.length)}-files.zip`)
     } catch (error_) {
       setZipError(describeError(error_))
     } finally {
@@ -561,7 +578,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               <input
                 ref={inputRef}
                 type="file"
-                accept={ACCEPTED_PHOTO_TYPES}
+                accept={BULK_ACCEPTED_TYPES}
                 multiple
                 aria-label={t('bulk.addPhotos')}
                 className="sr-only"
@@ -575,7 +592,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
               <input
                 ref={attachFolderInput}
                 type="file"
-                accept={ACCEPTED_PHOTO_TYPES}
+                accept={BULK_ACCEPTED_TYPES}
                 multiple
                 aria-label={t('bulk.addFolder')}
                 className="sr-only"
@@ -640,6 +657,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 />
                 {publicConfig.data === undefined ? null : (
                   <CloudImportButtons
+                    mediaKinds={['image', 'document', 'video']}
                     config={publicConfig.data}
                     disabled={snapshot.isRunning}
                     onImport={(cloudFiles) => {
@@ -653,7 +671,10 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 )}
               </div>
               <p className="mt-5 max-w-2xl text-xs leading-5 text-ink-muted">
-                {t('bulk.capacity', { max: MAX_BULK_FILES, count: workers })}
+                {t('bulk.capacity', {
+                  max: MAX_BULK_FILES,
+                  count: files.some((entry) => bulkMediaKind(entry.file) !== 'image') ? 1 : workers,
+                })}
               </p>
             </div>
 
@@ -754,7 +775,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                             {t(STATUS_LABELS[job.status])}
                           </span>
                         )}
-                        {job === null ? null : (
+                        {job === null || bulkMediaKind(file) !== 'image' ? null : (
                           <Button
                             type="button"
                             variant="ghost"
@@ -774,7 +795,7 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                         )}
                         {job?.output === undefined || job.output === null ? null : (
                           <>
-                            {isShareable ? (
+                            {canShareFiles(job.output.blob.type) ? (
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -944,12 +965,28 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 <AdjustPanel
                   adjust={adjust}
                   onChange={setAdjust}
-                  photoFile={files[0]?.file ?? null}
+                  photoFile={
+                    files.find((entry) => bulkMediaKind(entry.file) === 'image')?.file ?? null
+                  }
                 />
                 <FrameControls border={border} onChange={setBorder} />
               </div>
             </details>
 
+            <p className="text-xs text-ink-muted">{t('bulk.media.imageSettingsHint')}</p>
+            {hasVideos ? (
+              <section
+                className="flex flex-col gap-3 border-t border-line pt-4"
+                aria-label={t('bulk.media.videoOutput')}
+              >
+                <h2 className="text-sm font-semibold">{t('bulk.media.videoOutput')}</h2>
+                <VideoOutputSettings
+                  value={videoOptions}
+                  onChange={setVideoOptions}
+                  disabled={snapshot.isRunning}
+                />
+              </section>
+            ) : null}
             <div className="flex flex-wrap gap-2">
               {snapshot.isRunning || snapshot.isPaused ? (
                 <>
@@ -1012,7 +1049,17 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                 <Button type="button" variant="ghost" size="sm" onClick={downloadReport}>
                   {t('bulk.downloadReport')}
                 </Button>
-                {canSave ? (
+                {canSave && photoResults.length > 0 ? (
+                  <FolderPicker
+                    organizationId={organizationId}
+                    kind="photo"
+                    value={galleryFolder}
+                    onChange={setGalleryFolder}
+                    canCreate
+                    disabled={saving !== null && saving.done < saving.total}
+                  />
+                ) : null}
+                {canSave && photoResults.length > 0 ? (
                   <Button
                     type="button"
                     variant="secondary"
@@ -1024,13 +1071,16 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                   >
                     {saving === null ? <Images aria-hidden="true" className="size-4" /> : null}
                     {saving === null
-                      ? t('bulk.saveToGallery', { count: results.length })
+                      ? t('bulk.saveToGallery', { count: photoResults.length })
                       : t('bulk.savedProgress', {
                           done: saving.done - saving.failed,
                           total: saving.total,
                         })}
                   </Button>
                 ) : null}
+                {photoResults.length === results.length ? null : (
+                  <p className="text-xs text-ink-muted">{t('bulk.media.galleryHint')}</p>
+                )}
                 {saving !== null && saving.done === saving.total ? (
                   <Alert tone={saving.failed === 0 ? 'success' : 'error'}>
                     <Trans
@@ -1059,7 +1109,6 @@ export function BulkTool({ organizationId, organizationName, canSave = false }: 
                         text: t('bulk.savedToCloud', {
                           count,
                           provider: PROVIDER_LABELS[provider],
-                          folder: CLOUD_SAVE_FOLDER,
                         }),
                       })
                     }}

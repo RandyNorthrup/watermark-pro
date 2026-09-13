@@ -109,11 +109,13 @@ export class PreviewRenderer {
   readonly #resources: MarkResources
   #subject: EngineCanvas | null = null
   #original: File | null = null
+  #requestedOriginal: File | null = null
   #metadata: PhotoMetadata | null = null
   #sourceSize: Size | null = null
   #sampleSubject: Promise<void> | null = null
   #sequence = 0
   #subjectRequest = 0
+  #readySubjectRequest = 0
   #disposed = false
 
   constructor(
@@ -151,6 +153,11 @@ export class PreviewRenderer {
     return file === null ? createSamplePhoto() : createImageBitmap(file)
   }
 
+  #assertExportSubject(request: number): void {
+    if (this.#disposed || request !== this.#subjectRequest || request !== this.#readySubjectRequest)
+      throw new Error('The selected photo changed or has not finished loading. Try again.')
+  }
+
   /** Share the first sample decode so concurrent renders keep latest-frame ordering. */
   async #ensureSampleSubject(): Promise<void> {
     if (this.#subject !== null) return
@@ -168,6 +175,15 @@ export class PreviewRenderer {
     return this.#sourceSize
   }
 
+  /** Export controls may use only the fully decoded current subject. */
+  get isSubjectReady(): boolean {
+    return (
+      !this.#disposed &&
+      this.#subject !== null &&
+      this.#subjectRequest === this.#readySubjectRequest
+    )
+  }
+
   /** Preview pixels per source pixel. */
   get subjectScale(): number {
     if (this.#subject === null || this.#sourceSize === null) {
@@ -178,6 +194,7 @@ export class PreviewRenderer {
 
   /** Replaces the subject photo; `null` restores the built-in sample. Metadata fills tokens and export policy. */
   async setSubject(file: File | null, metadata: PhotoMetadata | null = null): Promise<void> {
+    this.#requestedOriginal = file
     this.#subjectRequest += 1
     const request = this.#subjectRequest
     this.#sequence += 1
@@ -192,6 +209,7 @@ export class PreviewRenderer {
     this.#sourceSize = size
     this.#original = file
     this.#metadata = metadata
+    this.#readySubjectRequest = request
   }
 
   /** Forget a cached logo, for example after it was replaced. */
@@ -205,6 +223,11 @@ export class PreviewRenderer {
    * stale frames without their own bookkeeping.
    */
   async render(input: SpecInput, options: RenderOptions = {}): Promise<PreviewResult | null> {
+    // A pending real photo must not be displaced by lazy sample initialization
+    // or rendered with the previous subject's pixels and the new photo's geometry.
+    const isLazySamplePending =
+      this.#sampleSubject !== null && this.#requestedOriginal === null && this.#subject === null
+    if (!isLazySamplePending && this.#subjectRequest !== this.#readySubjectRequest) return null
     if (this.#subject === null) {
       await this.#ensureSampleSubject()
     }
@@ -249,20 +272,42 @@ export class PreviewRenderer {
     transform?: Transform,
     tokenOutput?: Size,
   ): Promise<Blob> {
+    // A first export may race the first preview. Share its sample initialization
+    // before taking the export snapshot, but never replace a pending real photo.
+    if (
+      !this.#disposed &&
+      this.#subject === null &&
+      this.#requestedOriginal === null &&
+      (this.#subjectRequest === 0 || this.#sampleSubject !== null)
+    ) {
+      const pending = this.#ensureSampleSubject()
+      const sampleRequest = this.#subjectRequest
+      await pending
+      this.#assertExportSubject(sampleRequest)
+    }
+    const subjectRequest = this.#subjectRequest
+    this.#assertExportSubject(subjectRequest)
     const source = await this.#decode(this.#original)
-    const resources = await this.#resources.resolve(
-      this.#marksFor(input, tokenOutput),
-      this.#seed(),
-    )
-    const metadata = this.#rawMetadata()
-    const result = await this.#engine.apply({
-      ...resources,
-      source,
-      output,
-      ...(transform !== undefined && { transform }),
-      ...(metadata !== null && { metadata }),
-    })
-    return result.blob
+    try {
+      this.#assertExportSubject(subjectRequest)
+      const resources = await this.#resources.resolve(
+        this.#marksFor(input, tokenOutput),
+        this.#seed(),
+      )
+      this.#assertExportSubject(subjectRequest)
+      const metadata = this.#rawMetadata()
+      const result = await this.#engine.apply({
+        ...resources,
+        source,
+        output,
+        ...(transform !== undefined && { transform }),
+        ...(metadata !== null && { metadata }),
+      })
+      this.#assertExportSubject(subjectRequest)
+      return result.blob
+    } finally {
+      source.close()
+    }
   }
 
   dispose(): void {

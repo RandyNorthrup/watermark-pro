@@ -95,7 +95,7 @@ function LoginPage() {
           )}
         </Alert>
       )}
-      <SocialAuth invitation={invitation} />
+      <SocialAuth invitation={invitation} callbackURL={redirect} />
       <form
         onSubmit={(event) => void handleSubmit(event)}
         noValidate

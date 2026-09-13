@@ -2,18 +2,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { PickerResponse } from './google-picker'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
+import { cloudToken } from '../cloud-connections'
 
-type TokenOptions = Parameters<
-  NonNullable<Window['google']>['accounts']['oauth2']['initTokenClient']
->[0]
-type TokenReply = Parameters<TokenOptions['callback']>[0]
-type TokenError = Parameters<TokenOptions['error_callback']>[0]
+vi.mock('../cloud-connections', () => ({ cloudToken: vi.fn() }))
+const TOKEN = {
+  accessToken: 'provider-token',
+  expiresAt: '2030-01-01T00:00:00.000Z',
+  providerAccountId: 'cloud-account',
+  generation: 1,
+}
+
 type Builder = InstanceType<NonNullable<Window['google']>['picker']['PickerBuilder']>
 
 const sdk: {
-  tokenReply: TokenReply | null
-  tokenError: TokenError | null
-  tokenOptions: TokenOptions | null
   pickerReply: PickerResponse | null
   pickerCallback: ((response: PickerResponse) => void) | null
   scriptEvent: 'load' | 'error'
@@ -27,9 +28,6 @@ const sdk: {
     token?: string
   }
 } = {
-  tokenReply: null,
-  tokenError: null,
-  tokenOptions: null,
   pickerReply: null,
   pickerCallback: null,
   scriptEvent: 'load',
@@ -78,8 +76,23 @@ class PickerBoundary implements Builder {
 
 class ViewBoundary {
   readonly id: string
+  includeFolders = false
+  folderSelection = false
+  mimeTypes = ''
   constructor(id: string) {
     this.id = id
+  }
+  setIncludeFolders(isIncluded: boolean): this {
+    this.includeFolders = isIncluded
+    return this
+  }
+  setSelectFolderEnabled(isEnabled: boolean): this {
+    this.folderSelection = isEnabled
+    return this
+  }
+  setMimeTypes(value: string): this {
+    this.mimeTypes = value
+    return this
   }
 }
 
@@ -92,9 +105,7 @@ async function subject() {
 
 beforeEach(() => {
   vi.resetModules()
-  sdk.tokenReply = { access_token: 'provider-token' }
-  sdk.tokenError = null
-  sdk.tokenOptions = null
+  vi.mocked(cloudToken).mockReset().mockResolvedValue(TOKEN)
   sdk.pickerReply = {
     action: 'picked',
     docs: [{ id: 'photo/id', name: 'coast.png', mimeType: 'image/png' }],
@@ -111,27 +122,11 @@ beforeEach(() => {
     }),
   }
   const google: NonNullable<Window['google']> = {
-    accounts: {
-      oauth2: {
-        initTokenClient(options) {
-          sdk.tokenOptions = options
-          return {
-            requestAccessToken(request) {
-              expect(request).toEqual({ prompt: 'select_account' })
-              queueMicrotask(() => {
-                if (sdk.tokenError !== null) options.error_callback(sdk.tokenError)
-                else if (sdk.tokenReply !== null) options.callback(sdk.tokenReply)
-              })
-            },
-          }
-        },
-      },
-    },
     picker: {
       PickerBuilder: PickerBoundary,
       DocsView: ViewBoundary,
-      ViewId: { DOCS_IMAGES: 'images' },
-      Feature: { MULTISELECT_ENABLED: 'multiselect' },
+      ViewId: { DOCS_IMAGES: 'images', DOCS: 'docs', FOLDERS: 'folders' },
+      Feature: { MULTISELECT_ENABLED: 'multiselect', SUPPORT_DRIVES: 'shared-drives' },
       Action: { PICKED: 'picked', CANCEL: 'cancel' },
     },
   }
@@ -169,12 +164,13 @@ describe('actual Google Drive picker entry point', () => {
     expect(file?.name).toBe('coast.png')
     expect(file?.type).toBe('image/png')
     expect(await file?.text()).toBe('ACTUAL IMAGE BYTES')
-    expect(sdk.tokenOptions).toMatchObject({
-      client_id: ALL_CLOUD_CONFIG.googleOAuthClientId,
-      scope: 'https://www.googleapis.com/auth/drive.file',
-    })
     expect(sdk.settings).toEqual({
-      view: { id: 'images' },
+      view: {
+        id: 'docs',
+        includeFolders: true,
+        folderSelection: false,
+        mimeTypes: 'image/png,image/jpeg,image/webp',
+      },
       feature: 'multiselect',
       key: ALL_CLOUD_CONFIG.googlePickerApiKey,
       appId: ALL_CLOUD_CONFIG.googlePickerAppId,
@@ -189,7 +185,7 @@ describe('actual Google Drive picker entry point', () => {
       }),
     )
     await pickFromGoogleDrive(ALL_CLOUD_CONFIG)
-    expect(document.head.querySelectorAll('script')).toHaveLength(2)
+    expect(document.head.querySelectorAll('script')).toHaveLength(1)
     const gapi = window.gapi
     expect(gapi?.load).toHaveBeenCalledOnce()
   })
@@ -206,35 +202,15 @@ describe('actual Google Drive picker entry point', () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 
-  it.each([
-    [
-      { access_token: '', error: 'access_denied', error_description: 'Consent denied' },
-      'Consent denied',
-    ],
-    [{ access_token: '', error: 'access_denied' }, 'access_denied'],
-    [{ access_token: '' }, 'usable token'],
-  ])(
-    'rejects a failed or empty token response %j before opening the picker',
-    async (reply, message) => {
-      sdk.tokenReply = reply
-      const { pickFromGoogleDrive } = await subject()
-      await expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow(message)
-      expect(sdk.visible).toEqual([])
-      expect(fetch).not.toHaveBeenCalled()
-    },
-  )
-
-  it.each([
-    [{ type: 'popup_closed' }, 'popup_closed'],
-    [{ type: 'popup_failed_to_open', message: 'Popup blocked' }, 'Popup blocked'],
-  ])('reports browser token errors %j without issuing a download', async (error, message) => {
-    sdk.tokenError = error
+  it('rejects a disconnected server grant before scripts or selection', async () => {
+    vi.mocked(cloudToken).mockRejectedValue(new Error('Reconnect required'))
     const { pickFromGoogleDrive } = await subject()
-    await expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow(message)
+    await expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow('Reconnect')
+    expect(sdk.visible).toEqual([])
     expect(fetch).not.toHaveBeenCalled()
   })
 
-  it.each(['googleOAuthClientId', 'googlePickerApiKey', 'googlePickerAppId'] as const)(
+  it.each(['googlePickerApiKey', 'googlePickerAppId'] as const)(
     'rejects missing deployment configuration %s before injecting scripts',
     async (field) => {
       const { pickFromGoogleDrive } = await subject()
@@ -245,22 +221,18 @@ describe('actual Google Drive picker entry point', () => {
     },
   )
 
-  it('reports missing API and Identity globals instead of pretending SDK load succeeded', async () => {
-    const { pickFromGoogleDrive, acquireGoogleDriveToken } = await subject()
+  it('reports a missing API global instead of pretending SDK load succeeded', async () => {
+    const { pickFromGoogleDrive } = await subject()
     delete window.gapi
     await expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow(
-      'API loader did not initialise',
-    )
-    delete window.google
-    await expect(acquireGoogleDriveToken('client-id')).rejects.toThrow(
-      'Identity SDK did not initialise',
+      'API loader did not initialize',
     )
   })
 
   it('reports missing combined SDK global after successful module loading', async () => {
     const { pickFromGoogleDrive } = await subject()
     delete window.google
-    await expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow('SDKs did not initialise')
+    await expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow('Picker did not load')
     expect(fetch).not.toHaveBeenCalled()
   })
 
@@ -273,7 +245,7 @@ describe('actual Google Drive picker entry point', () => {
     sdk.scriptEvent = 'load'
     const files = await pickFromGoogleDrive(ALL_CLOUD_CONFIG)
     expect(files[0]?.name).toBe('coast.png')
-    expect(document.head.querySelectorAll('script')).toHaveLength(2)
+    expect(document.head.querySelectorAll('script')).toHaveLength(1)
   })
 
   it('retries a failed Picker module without reinjecting the SDK scripts', async () => {
@@ -286,13 +258,13 @@ describe('actual Google Drive picker entry point', () => {
     expect(await pickFromGoogleDrive(ALL_CLOUD_CONFIG)).toHaveLength(1)
     const gapi = window.gapi
     expect(gapi?.load).toHaveBeenCalledTimes(2)
-    expect(document.head.querySelectorAll('script')).toHaveLength(2)
+    expect(document.head.querySelectorAll('script')).toHaveLength(1)
   })
 
   it('closes the picker on an account transition and never downloads its stale selection', async () => {
     sdk.pickerReply = null
     const { pickFromGoogleDrive, setOfflineUser } = await subject()
-    const pending = expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow('account changed')
+    const pending = expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow('interrupted')
     await vi.waitFor(() => expect(sdk.pickerCallback).not.toBeNull())
     setOfflineUser('other')
     const { ACCOUNT_CHANGED_EVENT } = await import('../offline-account')
@@ -306,15 +278,41 @@ describe('actual Google Drive picker entry point', () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('rejects a stale sign-in callback even when no account-change event arrives', async () => {
-    sdk.tokenReply = null
+  it('rejects a stale server token callback even without an account-change event', async () => {
+    const token = Promise.withResolvers<typeof TOKEN>()
+    vi.mocked(cloudToken).mockReturnValueOnce(token.promise)
     const { pickFromGoogleDrive, setOfflineUser } = await subject()
     const pending = expect(pickFromGoogleDrive(ALL_CLOUD_CONFIG)).rejects.toThrow('account changed')
-    await vi.waitFor(() => expect(sdk.tokenOptions).not.toBeNull())
+    await vi.waitFor(() => expect(cloudToken).toHaveBeenCalled())
     setOfflineUser('other')
-    sdk.tokenOptions?.callback({ access_token: 'old-account-token' })
+    token.resolve(TOKEN)
     await pending
     expect(sdk.visible).toEqual([])
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('grants an explicit folder destination and filters PDF selection without converting it', async () => {
+    const { pickGoogleDriveFolder, pickFromGoogleDrive } = await subject()
+    sdk.pickerReply = {
+      action: 'picked',
+      docs: [{ id: 'folder', name: 'Documents', mimeType: 'application/vnd.google-apps.folder' }],
+    }
+    expect(await pickGoogleDriveFolder(ALL_CLOUD_CONFIG)).toEqual({
+      folder: { id: 'folder', name: 'Documents' },
+      providerAccountId: 'cloud-account',
+      generation: 1,
+    })
+    expect(sdk.settings.view).toMatchObject({ id: 'folders', folderSelection: true })
+    sdk.pickerReply = {
+      action: 'picked',
+      docs: [{ id: 'pdf', name: 'original.pdf', mimeType: 'application/pdf' }],
+    }
+    const [file] = await pickFromGoogleDrive(ALL_CLOUD_CONFIG, ['document'])
+    expect(sdk.settings.view).toMatchObject({
+      mimeTypes: 'application/pdf',
+      folderSelection: false,
+    })
+    expect(file?.type).toBe('application/pdf')
+    expect(await file?.text()).toBe('ACTUAL IMAGE BYTES')
   })
 })

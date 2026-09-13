@@ -38,18 +38,22 @@ describe('GET /api/health', () => {
     })
   })
 
-  it('echoes an inbound X-Request-Id and generates one otherwise', async () => {
+  it('generates a trusted request id even when the caller supplies private data', async () => {
     const { app, env } = createTestHarness()
 
     const passedThrough = await app.request(
       HEALTH_PATH,
-      { headers: { 'x-request-id': 'upstream-123' } },
+      { headers: { 'x-request-id': '/api/cloud/google/callback?code=CODE_CANARY' } },
       env,
     )
-    expect(passedThrough.headers.get('x-request-id')).toBe('upstream-123')
+    expect(passedThrough.headers.get('x-request-id')).toMatch(/^[0-9a-f-]{36}$/)
+    expect(passedThrough.headers.get('x-request-id')).not.toContain('CANARY')
 
     const generated = await app.request(HEALTH_PATH, {}, env)
     expect(generated.headers.get('x-request-id')).toMatch(/[0-9a-f-]{36}/)
+    expect(generated.headers.get('x-request-id')).not.toBe(
+      passedThrough.headers.get('x-request-id'),
+    )
   })
 
   it('sets hardened security headers on every response', async () => {
@@ -61,7 +65,7 @@ describe('GET /api/health', () => {
     expect(response.headers.get('strict-transport-security')).toMatch(
       /^max-age=\d+; includeSubDomains$/,
     )
-    expect(response.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin')
+    expect(response.headers.get('referrer-policy')).toBe('strict-origin')
     expect(response.headers.get('x-content-type-options')).toBe('nosniff')
     expect(response.headers.get('permissions-policy')).toContain('camera=()')
   })

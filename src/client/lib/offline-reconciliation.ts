@@ -2,8 +2,9 @@
 import { captureOfflineOwner } from './offline-context'
 import { offlineOperations, offlineRecordKey, retireOfflineOperations } from './offline-database'
 import type { CachedRecord, PendingOperation } from './offline-model'
+import type { FolderKind } from '../../shared/folders'
 
-type CollectionKind = 'preset' | 'photo' | 'logo'
+type CollectionKind = 'preset' | 'photo' | 'logo' | 'folder'
 
 function mediaFiles(operation: PendingOperation): { id: string; path: string; blob: Blob }[] {
   const root = `/api/orgs/${operation.organizationId}`
@@ -40,6 +41,7 @@ function deletedMediaPaths(operation: PendingOperation, ids: string[]): string[]
 export async function workspaceCacheReconciliation(
   organizationId: string,
   kind: CollectionKind,
+  folderKind?: FolderKind,
 ): Promise<(ids: string[], isComplete: boolean) => Promise<void>> {
   const owner = captureOfflineOwner()
   const operations = await offlineOperations(owner.userId)
@@ -48,7 +50,9 @@ export async function workspaceCacheReconciliation(
     (operation) =>
       operation.organizationId === organizationId &&
       operation.state === 'synced' &&
-      operation.change.kind.startsWith(`${kind}-`),
+      operation.change.kind.startsWith(`${kind}-`) &&
+      (kind !== 'folder' ||
+        ('folder' in operation.change && operation.change.folder.kind === folderKind)),
   )
   return async (ids, isComplete) => {
     owner.assertCurrent()

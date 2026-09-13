@@ -7,6 +7,7 @@
 import { z } from 'zod'
 
 import { presetNameSchema } from './api'
+import { folderIdSchema, folderRevisionSchema } from './folders'
 import { presetVersionSchema } from './sync'
 import { watermarkSpecSchema } from './watermark'
 
@@ -14,6 +15,9 @@ export const saveWatermarkRequestSchema = z.object({
   name: presetNameSchema,
   spec: watermarkSpecSchema,
   expectedUpdatedAt: presetVersionSchema.optional(),
+  folderId: folderIdSchema.nullable().optional(),
+  expectedFolderRevision: folderRevisionSchema.optional(),
+  expectedFolderVersionId: folderIdSchema.nullable().optional(),
 })
 
 export type SaveWatermarkRequest = z.infer<typeof saveWatermarkRequestSchema>
@@ -26,8 +30,12 @@ export const watermarkDtoSchema = z.object({
   createdBy: z.string().nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+  folderId: folderIdSchema.nullable().default(null),
+  folderRevision: folderRevisionSchema.default(0),
+  folderVersionId: folderIdSchema.nullable().default(null),
 })
 
+/** Decoding older records supplies root placement; every admitted DTO has explicit fields. */
 export type WatermarkDto = z.infer<typeof watermarkDtoSchema>
 
 export const watermarkListResponseSchema = z.object({ watermarks: z.array(watermarkDtoSchema) })

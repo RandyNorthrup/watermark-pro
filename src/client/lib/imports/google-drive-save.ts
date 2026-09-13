@@ -24,6 +24,7 @@
  */
 import { z } from 'zod'
 
+import { cloudTargetToken, type CloudSaveTarget } from './cloud-folders'
 import {
   cloudFileIdSchema,
   cloudFileName,
@@ -31,7 +32,7 @@ import {
   uploadCloudBatch,
   type CloudSavedFile,
 } from './cloud-transfer'
-import { acquireGoogleDriveToken } from './google-picker'
+import { GOOGLE_SIMPLE_UPLOAD_BYTES, uploadResumableGoogleFile } from './google-drive-upload'
 import type { CloudUpload, CloudUploadSource } from './source'
 import type { PublicConfig } from '../../../shared/api'
 import {
@@ -39,7 +40,7 @@ import {
   GOOGLE_DRIVE_FILES_ENDPOINT,
   GOOGLE_DRIVE_UPLOAD_ENDPOINT,
 } from '../../../shared/constants'
-import { captureOfflineOwner } from '../offline-context'
+import { captureCloudOwner } from '../cloud-connection-context'
 
 /** Drive's own MIME type for a folder; matching it in a query finds folders only. */
 const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
@@ -121,7 +122,7 @@ export function folderSearchUrl(folderName: string): string {
 
 /** The multipart upload endpoint with `uploadType=multipart` applied. */
 function multipartUploadUrl(): string {
-  return `${GOOGLE_DRIVE_UPLOAD_ENDPOINT}?${UPLOAD_TYPE_PARAM}=${UPLOAD_TYPE_MULTIPART}`
+  return `${GOOGLE_DRIVE_UPLOAD_ENDPOINT}?${UPLOAD_TYPE_PARAM}=${UPLOAD_TYPE_MULTIPART}&supportsAllDrives=true`
 }
 
 /**
@@ -211,7 +212,9 @@ export async function uploadFile(
   folderId: string,
   upload: CloudUpload,
 ): Promise<CloudSavedFile> {
-  const owner = captureOfflineOwner()
+  if (upload.blob.size > GOOGLE_SIMPLE_UPLOAD_BYTES)
+    return await uploadResumableGoogleFile(accessToken, folderId, upload)
+  const owner = captureCloudOwner()
   const name = cloudFileName(upload.name)
   const { contentType, body } = buildMultipartBody({ name, parents: [folderId] }, upload.blob)
   return await cloudRequest(
@@ -253,6 +256,7 @@ export async function uploadFile(
 export async function saveToGoogleDrive(
   config: PublicConfig,
   uploads: CloudUploadSource,
+  target?: CloudSaveTarget,
 ): Promise<CloudSavedFile[]> {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('Saving to Google Drive is only available in a browser.')
@@ -262,13 +266,19 @@ export async function saveToGoogleDrive(
     throw new Error('Google Drive save is not configured for this deployment.')
   }
 
-  const owner = captureOfflineOwner()
-  const accessToken = await acquireGoogleDriveToken(clientId)
+  const owner = captureCloudOwner()
+  const connection = await cloudTargetToken('google', target)
+  const accessToken = connection.accessToken
   owner.assertCurrent()
   const files = typeof uploads === 'function' ? await uploads() : uploads
   owner.assertCurrent()
   if (files.length === 0) return []
-  const folderId = await ensureSaveFolder(accessToken)
+  const folderId = target?.folder.id ?? (await ensureSaveFolder(accessToken))
   owner.assertCurrent()
-  return await uploadCloudBatch(files, (upload) => uploadFile(accessToken, folderId, upload))
+  return await uploadCloudBatch(files, async (upload) => {
+    const current = await cloudTargetToken('google', connection)
+    owner.assertCurrent()
+    const saved = await uploadFile(current.accessToken, folderId, upload)
+    return { ...saved, providerAccountId: current.providerAccountId }
+  })
 }

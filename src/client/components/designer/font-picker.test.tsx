@@ -10,28 +10,48 @@ import { setOfflineUser } from '../../lib/offline-context'
 vi.mock('../../fonts/preview', () => ({ previewFont: vi.fn().mockResolvedValue(true) }))
 
 beforeEach(() => {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn(() => ({ matches: false })),
+  )
   localStorage.clear()
   setOfflineUser('font-owner-a')
   vi.mocked(previewFont).mockClear()
 })
 afterEach(() => {
+  vi.unstubAllGlobals()
   localStorage.clear()
   setOfflineUser(null)
   vi.restoreAllMocks()
 })
 
 describe('font dropdown previews and recent choices', () => {
-  it('previews the selected name and options in their own families without eager option downloads', async () => {
+  it('does not focus search automatically on touch devices', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    )
+    const user = userEvent.setup()
+    render(<FontPicker family="Inter Variable" onFamilyChange={vi.fn()} />)
+    await user.click(screen.getByRole('combobox', { name: 'Font' }))
+    expect(screen.getByRole('searchbox', { name: 'Search fonts' })).not.toHaveFocus()
+  })
+  it('keeps the selected name readable and previews dropdown options in their own families', async () => {
     const user = userEvent.setup()
     render(<FontPicker family="Inter Variable" onFamilyChange={vi.fn()} />)
     const trigger = screen.getByRole('combobox', { name: 'Font' })
-    expect(within(trigger).getByText('Inter Variable')).toHaveStyle({
+    expect(within(trigger).getByText('Inter Variable')).not.toHaveStyle({
       fontFamily: '"Inter Variable"',
     })
     await waitFor(() => expect(previewFont).toHaveBeenCalledTimes(1))
     await user.click(trigger)
-    expect(screen.getByText('All Fonts')).toBeVisible()
+    expect(screen.queryByText('All Fonts')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sans serif')).not.toBeInTheDocument()
+    expect(screen.queryByText(/551 font families/)).not.toBeInTheDocument()
     const lobster = screen.getByRole('option', { name: 'Lobster' })
+    // Inline tools scroll and establish a backdrop-filter containing block.
+    // The menu must escape that panel so its rendered options remain clickable.
+    expect(trigger.parentElement).not.toContainElement(lobster)
     expect(within(lobster).getByText('Lobster')).toHaveStyle({ fontFamily: '"Lobster"' })
     expect(previewFont).toHaveBeenCalledTimes(1)
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
@@ -102,7 +122,6 @@ describe('font dropdown previews and recent choices', () => {
       'touch-pan-y',
     )
     expect(list.parentElement).toHaveClass('overflow-hidden')
-    expect(screen.getByText('All Fonts')).toHaveClass('sticky', 'bg-surface-raised', 'z-20')
     fireEvent.wheel(list, { deltaY: 120 })
     expect(screen.getByRole('listbox', { name: 'Font' })).toBeVisible()
   })

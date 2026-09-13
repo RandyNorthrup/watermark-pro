@@ -19,6 +19,7 @@ import {
   SHARE_EXPIRY_DAYS,
   MAX_PRESET_NAME_LENGTH,
 } from './constants'
+import { folderIdSchema, folderRevisionSchema } from './folders'
 import { classifyClientError, redactRoutePath, sanitizeErrorSource } from './observability'
 
 export {
@@ -97,8 +98,12 @@ export const photoDtoSchema = z.object({
   presetName: z.string().nullable(),
   createdBy: z.string().nullable(),
   createdAt: z.iso.datetime(),
+  folderId: folderIdSchema.nullable().default(null),
+  folderRevision: folderRevisionSchema.default(0),
+  folderVersionId: folderIdSchema.nullable().default(null),
 })
 
+/** Decoding older records supplies root placement; every admitted DTO has explicit fields. */
 export type PhotoDto = z.infer<typeof photoDtoSchema>
 
 export const photoListResponseSchema = z.object({
@@ -111,6 +116,7 @@ export const photoListQuerySchema = z.object({
   presetId: z.string().min(1).max(MAX_PRESET_NAME_LENGTH).optional(),
   search: z.string().trim().max(MAX_PRESET_NAME_LENGTH).optional(),
   cursor: z.string().max(MAX_CURSOR_LENGTH).optional(),
+  folderId: z.union([folderIdSchema, z.literal('root')]).optional(),
 })
 
 /** Form fields accompanying a photo upload; dimensions are client-reported. */
@@ -119,6 +125,7 @@ export const photoUploadFieldsSchema = z.object({
   width: z.coerce.number().int().positive().max(MAX_PHOTO_SIDE),
   height: z.coerce.number().int().positive().max(MAX_PHOTO_SIDE),
   presetId: z.string().min(1).optional(),
+  folderId: folderIdSchema.nullable().default(null),
 })
 
 export const photoDeleteRequestSchema = z.object({

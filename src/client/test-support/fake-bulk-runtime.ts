@@ -1,4 +1,5 @@
 import type { WatermarkSpec } from '../../shared/watermark'
+import { bulkMediaKind } from '../bulk/media-kind'
 import { resolveNamePattern } from '../bulk/names'
 import {
   extensionFor,
@@ -67,15 +68,26 @@ export function createBulkRuntime(): BulkRuntime {
         width: FAKE_WIDTH,
         height: FAKE_HEIGHT,
       })
-      const fileName = `${name}.${extensionFor(settings.output.format)}`
+      const media = bulkMediaKind(input.file)
+      let format: string = settings.output.format
+      let extension = extensionFor(settings.output.format)
+      if (media === 'document') {
+        format = 'application/pdf'
+        extension = 'pdf'
+      } else if (media === 'video') {
+        format = 'video/mp4'
+        extension = 'mp4'
+      }
+      const fileName = `${name}.${extension}`
+      const hasDimensions = media !== 'document' && !input.file.name.startsWith('dimensionless-')
       return new Promise<BulkResult>((resolve, reject) => {
         const finish = () => {
           resolve({
-            blob: new Blob([`out:${input.file.name}`], { type: settings.output.format }),
+            blob: new Blob([`out:${input.file.name}`], { type: format }),
             fileName,
             relativePath: input.relativePath,
-            width: FAKE_WIDTH,
-            height: FAKE_HEIGHT,
+            width: hasDimensions ? FAKE_WIDTH : null,
+            height: hasDimensions ? FAKE_HEIGHT : null,
           })
         }
         if (input.file.name.startsWith('fail-')) {

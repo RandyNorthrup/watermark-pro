@@ -8,9 +8,7 @@
  * hide controls the user cannot use (never as a security boundary).
  */
 import { createAccessControl } from 'better-auth/plugins/access'
-import { adminAc, defaultStatements, ownerAc } from 'better-auth/plugins/organization/access'
-
-import type { ASSIGNABLE_ROLES } from './constants'
+import { defaultStatements, ownerAc } from 'better-auth/plugins/organization/access'
 
 export const statement = {
   ...defaultStatements,
@@ -42,7 +40,9 @@ export const roles = {
     audit: ['read'],
   }),
   admin: accessControl.newRole({
-    ...adminAc.statements,
+    // Legacy workspace admins retain production tools and settings, but only
+    // the workspace owner can grant access, manage groups, or change policy.
+    organization: ['update'],
     ...productionStatements,
     audit: ['read'],
   }),
@@ -53,10 +53,6 @@ export const roles = {
 export const ORGANIZATION_ROLES = ['owner', 'admin', 'editor', 'viewer'] as const
 
 export type OrganizationRole = (typeof ORGANIZATION_ROLES)[number]
-
-/** Roles a user may assign when inviting or promoting; `owner` transfers are a separate flow. */
-
-export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number]
 
 export function isOrganizationRole(value: string): value is OrganizationRole {
   return (ORGANIZATION_ROLES as readonly string[]).includes(value)

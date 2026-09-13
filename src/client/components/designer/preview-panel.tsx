@@ -280,7 +280,6 @@ export function PreviewPanel({
                       key={`${organizationId}:${String(subjectVersion)}:${spec.kind}`}
                       placement={outcome.placement}
                       position={spec.placement}
-                      renderedScale={shownResult.specs?.[0]?.style.scale}
                       previewSize={{ width: shownResult.width, height: shownResult.height }}
                       displaySize={displaySize}
                       scale={spec.style.scale}
@@ -294,10 +293,18 @@ export function PreviewPanel({
         )}
       </div>
       {shownResult === null ? null : (
-        <div className="flex flex-col gap-1 text-xs text-ink-muted">
-          <p aria-live="polite">{describePlacement(shownResult)}</p>
+        <div className="flex min-w-0 items-center gap-3 overflow-hidden text-xs whitespace-nowrap text-ink-muted">
+          <p
+            className="max-w-1/2 truncate"
+            aria-live="polite"
+            title={describePlacement(shownResult)}
+          >
+            {describePlacement(shownResult)}
+          </p>
           {onSpecChange === undefined || spec.style.tiling.enabled ? null : (
-            <p>{t('editor.mark.position')}</p>
+            <p className="min-w-0 flex-1 truncate" title={t('editor.mark.position')}>
+              {t('editor.mark.position')}
+            </p>
           )}
         </div>
       )}

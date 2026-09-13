@@ -34,6 +34,19 @@ const SIGNED_IN_PATHS = new Set([
   '/delete-user',
 ])
 const activeWorkspaceSchema = z.object({ activeOrganizationId: z.nullish(accountIdSchema) })
+const OWNER_MUTATION_PATHS = new Set([
+  '/organization/invite-member',
+  '/organization/add-member',
+  '/organization/update-member-role',
+  '/organization/remove-member',
+  '/organization/cancel-invitation',
+])
+const ownerMutationSchema = z.object({
+  organizationId: z.optional(accountIdSchema),
+  memberId: z.optional(accountIdSchema),
+  memberIdOrEmail: z.optional(z.string()),
+  invitationId: z.optional(accountIdSchema),
+})
 const workspaceQuerySchema = z.object({
   organizationId: z.optional(accountIdSchema),
   organizationSlug: z.optional(accountIdSchema),
@@ -45,10 +58,11 @@ export async function enforceAuthPrivacy(
 ): Promise<void> {
   const path = ctx.path.replace(/\/$/, '')
   const isPrivateRead = PRIVATE_READ_PATHS.has(path)
+  const isOwnerMutation = OWNER_MUTATION_PATHS.has(path)
   const expected = ctx.headers?.get(ACCOUNT_ID_HEADER)
   const isAccountBound =
     path.startsWith('/organization/') || path.startsWith('/admin/') || SIGNED_IN_PATHS.has(path)
-  if (!isPrivateRead && (!isAccountBound || expected == null)) return
+  if (!isPrivateRead && !isOwnerMutation && (!isAccountBound || expected == null)) return
   const session = await getSessionFromCtx(ctx)
   if (session === null) return
   if (expected != null) {
@@ -58,6 +72,49 @@ export async function enforceAuthPrivacy(
         code: 'ACCOUNT_CHANGED',
         message: 'Sign in again before continuing.',
       })
+    }
+  }
+  if (isOwnerMutation) {
+    const input = ownerMutationSchema.safeParse(ctx.body)
+    if (!input.success) throw denied()
+    const active = activeWorkspaceSchema.parse(session.session)
+    let organizationId = input.data.organizationId ?? active.activeOrganizationId
+    if (input.data.invitationId !== undefined) {
+      const invitation = await ctx.context.adapter.findOne<{ organizationId: string }>({
+        model: 'invitation',
+        where: [{ field: 'id', value: input.data.invitationId }],
+      })
+      if (invitation === null) throw denied()
+      organizationId = invitation.organizationId
+    }
+    if (organizationId == null) throw denied()
+    const actor = await ctx.context.adapter.findOne<{ role: string }>({
+      model: 'member',
+      where: [
+        { field: 'organizationId', value: organizationId },
+        { field: 'userId', value: session.user.id },
+      ],
+    })
+    if (actor?.role !== 'owner') throw denied()
+    const targetId = input.data.memberId ?? input.data.memberIdOrEmail
+    if (targetId !== undefined) {
+      const members = await ctx.context.adapter.findMany<{
+        id: string
+        userId: string
+        role: string
+      }>({
+        model: 'member',
+        where: [{ field: 'organizationId', value: organizationId }],
+      })
+      for (const member of members) {
+        if (member.role !== 'owner') continue
+        const owner = await ctx.context.adapter.findOne<{ email: string }>({
+          model: 'user',
+          where: [{ field: 'id', value: member.userId }],
+        })
+        if (member.id === targetId || owner?.email.toLowerCase() === targetId.toLowerCase())
+          throw denied()
+      }
     }
   }
   if (!isPrivateRead) return

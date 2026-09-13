@@ -83,9 +83,9 @@ test('the site owner manages users and sees account totals', async ({ browser, p
   await signIn(memberPage, member, memberOrganization)
   await memberContext.close()
 
-  await navigateTo(page, 'Organizations')
+  await navigateTo(page, 'Workspaces')
   await expect(page).toHaveURL(/\/app\/admin\?section=organizations/)
-  const organizations = page.getByRole('table', { name: /Organizations/ })
+  const organizations = page.getByRole('table', { name: /Workspaces/ })
   await expect(organizations).toContainText(ownerOrganization)
   await expect(organizations).toContainText(memberOrganization)
   await expectAccessible(page)

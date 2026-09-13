@@ -7,8 +7,107 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Local Release Verification
+
+- The canonical quality command passed with 2,742 unit/browser tests, 61 real
+  workerd tests and all 42 built-artifact checks. Coverage meets the unchanged
+  thresholds; static, dependency, publication and bundle checks passed.
+  Staged-source SAST passed 509 rules over 2,098 targets with zero findings.
+  This checkpoint precedes the Account overflow and named Dropbox credential
+  format corrections found during subsequent release checks.
+  The corrected Account build subsequently passed all 42 artifact checks and
+  a fresh protected publication scan comparing all eight configured private
+  values, including the new cloud credentials, without exposing them.
+- All 128 four-device E2E cases have passing evidence across the initial run
+  and the corrected 49-case rerun, counting nine repeated setup cases once.
+  This is combined case closure, not one clean 128-case run. The original
+  failures and exact log hashes remain in the M19 verification records.
+- Consolidated screenshot/axe evidence covers every one of 752 required
+  surface/profile/locale/theme combinations with 800 PNGs across desktop,
+  iPhone, iPad and Android profiles. Completed profile evidence spans four
+  invocations; original failures remain preserved. Every selected file was
+  hashed and matched before/after archiving; raw evidence stays in ignored
+  local storage and a compact per-file inventory keeps the publication budget.
+- This bundle remains unreleased. Live cloud-provider journeys,
+  final production configuration and hosted deployment
+  verification remain separate evidence. Performance work stays deferred until
+  after launch. Microsoft publisher verification is deferred because the owner
+  has no verified Partner Center/MPN account; work/school tenants may require
+  administrator approval, as disclosed in the cloud UI and landing copy.
+  Account's horizontal overflow was corrected and passed a native iPhone check
+  and fresh build. The subsequent screenshot harness fixes wait for pending
+  requests before navigation and distinguish workspace Audit from site Admin
+  Audit; strict browser-error, axe and overflow checks remain in force.
+
+### Landing Page Reconciliation
+
+- Updated feature descriptions across all twelve languages for mixed-file Bulk, the inline PDF
+  reader, video timestamp placement and fades, common templates, first-party
+  folders, persistent cloud connections, and explicit workspace sharing. Removed
+  the unsupported selected-PDF-page claim and qualified offline, video-format,
+  image-quality, Google Drive access and Microsoft tenant-consent limits.
+- Replaced the landing-page screenshots with actual current-build captures:
+  light/dark Image editors, a font dropdown with recent choices and rendered
+  typefaces, sticker tiles, a generated QR watermark, and fitted template tiles.
+  Responsive image variants are regenerated from those captures. The approved
+  rose-glass layout remains in place; these assets await the combined deployment.
+
+- Reconciled the first-use guide after the media, folder and canvas layout work:
+  instructions now explain templates, named saves with folders, selection handles,
+  inline PDFs, video keyframes/fades and mixed-file processing. The existing
+  thirteen topic identities remain stable; shared media tool tabs use the same
+  one-at-a-time guidance queue as Image.
+
 ### Added
 
+- CSV batch reports quote spreadsheet formula prefixes as literal text in
+  filenames, output paths, preset names and errors, while retaining ordinary
+  numeric report cells. Alternate separators and embedded quotes remain inside
+  their CSV field.
+
+- Saving a new video watermark now retains its timeline poses and fades after
+  the draft receives its saved layer identity. Replacing a clip retains the
+  watermark designs but clears the previous clip's timing and undo history.
+  After Clear, typing in the inline tools starts a new visible draft.
+
+- Mixed-file Bulk processing for images, PDFs and videos, with format-specific
+  exports, separate video settings, preserved folder paths, per-file failures
+  and bounded mixed-batch concurrency. Image-only Gallery saves now expose a
+  destination folder; cloud saves and downloads retain all output types.
+
+- Eighteen editable starter watermark templates, including Draft, Confidential,
+  Internal Use Only, Do Not Copy, Proof, Sample, review stamps and photo credits.
+  The searchable category picker uses original project-licensed layouts and
+  normal watermark specs; applying a template does not create a server record.
+- An inline PDF editor with a real page reader, page navigation, accessible page
+  text, shared watermark controls, canvas handles and cloud output. Its exporter
+  analyzes each page and preserves original text, vector artwork and embedded
+  images while respecting the visible page crop and rotation.
+- A native video viewer with a scrubbable timeline, per-layer timestamp poses,
+  shortest-path rotation and fade-in/out effects. The same motion functions drive
+  the preview and the worker that writes each encoded frame.
+
+- Twenty geometric shape tiles, including arrows, stars, polygons, a heart,
+  shield and speech bubble, rendered by the same watermark engine as exports.
+- A compact text toolbar for common symbols and photo-detail tokens, with
+  caret-aware insertion and the editor's shared undo/redo history.
+- Snap to grid using the displayed grid spacing, with rotated watermark bounds
+  constrained inside the photo. Background touch gestures pan and zoom the view;
+  gestures on the selected watermark move, scale and rotate the mark.
+- New starts a fresh unsaved watermark while retaining the source photo. Saving
+  an inline watermark opens a preset-name dialog before writing the preset.
+- Manage access in the account menu beneath the active workspace name, opening
+  a compact sharing modal over the current tool. Workspace owners can grant
+  View/Edit access, silently add verified existing users, send email invitations,
+  create expiring invitation links, revoke links and remove members. Site
+  admission remains separate, and existing legacy invitations remain revocable.
+- First-use guidance with thirteen stable topics and two short pages each. A
+  shared queue shows one tip at a time, pauses for conflicting menus/modals and
+  drops tips from a previous page. Server-side claims prevent repeats across
+  reloads and devices; unavailable connections defer unknown tips. Cards support
+  swipe, keyboard paging and permanent dismissal.
+- A centered optional PayPal donation prompt in the application header, using
+  the owner's supplied hosted button and a locally served official provider mark.
 - Direct canvas manipulation in both preset design and photo editing: click a
   mark to select it, drag to move it, use visible resize/rotate handles, pinch
   to scale, twist to rotate, and use the documented keyboard controls.
@@ -20,10 +119,7 @@ what was planned; superseded entries stay.
 - Account- and workspace-scoped Editor session restoration for the active
   canvas document, draft watermark and original source photo after a reload.
 - One-click reset controls beside placement and appearance sliders.
-- A same-origin Microsoft OAuth response bridge for popup and silent-iframe
-  flows. The Worker serves only the built bridge at the canonical OAuth document paths,
-  strips request credentials from the asset subrequest and applies no-store,
-  frame and referrer protections.
+  Letter Spacing and Curve use the same control and reset independently to zero.
 - Official provider marks beside Google and Microsoft account actions, Google
   Drive, Dropbox and OneDrive file actions, connected accounts, and the GitHub
   source link. The unmodified assets and their usage sources are documented in
@@ -31,6 +127,62 @@ what was planned; superseded entries stay.
 
 ### Changed
 
+- Fresh browser verification caught a build-hook ordering error that omitted
+  PDF.js worker assets and a media policy that blocked local video playback.
+  The client build now emits versioned reader assets independently of HTML hook
+  order, verifies their exact bytes/offline inventory, and admits local blob video.
+- Persistent cloud OAuth replaces the old browser token SDK/redirect bridges;
+  unused MSAL dependencies and script/frame allowances were removed.
+  An intermediate same-origin Microsoft popup/silent-iframe response bridge was
+  superseded before this release by the confidential server callback flow.
+
+- Selection handles appear when a watermark is clicked or keyboard-focused,
+  then hide on an outside click, focus leaving the mark, or Escape. Shape
+  selection and placement include the outside of the stroke; round joins stay
+  inside those bounds. Shapes use their explicit stroke controls rather than
+  a separate text-shadow outline setting.
+- Subtle themed separators divide shape proportions, fill, stroke and text/style
+  control groups without adding nested cards.
+
+- Single-line form controls and text buttons use the same
+  40-pixel height. The Gallery's Check A Photo action uses primary styling.
+
+- Image, document and video toolboxes allow native scrolling to continue into
+  the main page when the toolbox reaches its top or bottom.
+
+- Curved text now uses the same measured glyph layout for drawing and selection.
+  Rotated ink bounds include glyph corners and overhangs; curve measurement no
+  longer leaks its probe font into final rendering. Angular spacing prevents
+  curved glyphs from colliding, and multiline curves remain separated.
+
+- Photo replacement cannot export the previous file while the new image is
+  loading or after decoding fails. Source changes also invalidate an in-flight
+  export, preventing mismatched pixels, metadata and output names.
+- Image and bulk exports default to lossless PNG at the original dimensions.
+  JPEG/WebP compression and resizing require an explicit choice; previews remain
+  separate from the original file used for exports. A high-frequency pixel check
+  guards against accidentally exporting an enlarged, downsampled preview.
+- The canvas status bar stays on one line, truncating long captions while
+  retaining their full text. Interface captions use title casing and English
+  interface copy uses American spellings. User-facing organization terminology
+  is now workspace; compatible route, database and API identifiers remain intact.
+- Desktop tool content scrolls in its own clipped region beneath the header;
+  mobile headers scroll naturally with the page. Valid unsaved watermark drafts
+  can be exported directly without first creating a library preset.
+- Google and Microsoft sign-in retain the validated internal return destination,
+  including workspace invitations. Referrers now send only the origin even for
+  same-origin requests, omitting invitation/share paths without dropping the
+  origin required by provider key restrictions.
+- Unified mobile button, range and choice controls; compact visible canvas
+  handles retain larger invisible touch targets. Taps select without moving the
+  mark, and a two-finger gesture continues as a drag when one finger lifts.
+- The closed font selector shows only the font name in the interface typeface.
+  Open choices load and display their own fonts; recents remain available without
+  font-count or category headings. The popup escapes the scrolling tools panel
+  while preserving an enclosing dialog's scroll boundary when used in a modal.
+- Photo name and dimensions sit beside the bottom canvas instructions, aligned
+  right. Canvas Fit accounts for original output dimensions; zoom affects the
+  view without changing the exported photo.
 - Standard users now enter the Editor directly and no longer have a redundant
   dashboard. Owners and Admins retain a compact Overview. The workspace primary
   rail contains Library, Editor, Bulk, Video, Documents, Gallery and Shares;
@@ -77,6 +229,13 @@ what was planned; superseded entries stay.
   an admin. These roles remain separate from private-workspace roles.
 
 ### Fixed
+
+- Accepted Dropbox's 15-character alphanumeric app-secret format as a private
+  scan input only when named `DROPBOX_APP_SECRET`. The global 16-character minimum
+  remains in force for other secret inputs, and every encoded comparison remains
+  active. Nineteen focused publication tests passed, including an encoded canary
+  that fails the real scan and passes again after removal; no credential finding
+  was suppressed.
 
 - Repaired offline build identity after the service-worker source version changed.
   The builder now replaces the cache declaration itself and refuses a missing or

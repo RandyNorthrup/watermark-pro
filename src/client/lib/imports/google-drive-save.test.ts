@@ -19,7 +19,7 @@ import {
 beforeEach(() => setOfflineUser('user-1'))
 
 const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
-const MULTIPART_UPLOAD_URL = `${GOOGLE_DRIVE_UPLOAD_ENDPOINT}?uploadType=multipart`
+const MULTIPART_UPLOAD_URL = `${GOOGLE_DRIVE_UPLOAD_ENDPOINT}?uploadType=multipart&supportsAllDrives=true`
 
 afterEach(() => {
   vi.unstubAllGlobals()

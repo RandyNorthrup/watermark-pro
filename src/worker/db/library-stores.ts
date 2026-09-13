@@ -11,10 +11,12 @@ import type {
   WatermarkStore,
 } from '../stores'
 import type { Database } from './client'
+import { createPresetWriter } from './preset-writes'
 import { asset, photo, share, watermark } from './schema'
 
 /** D1-backed preset store. Exercised by the Workers test project. */
 export function createDrizzleWatermarkStore(db: Database): WatermarkStore {
+  const writer = createPresetWriter(db)
   return {
     async findMany(organizationId, ids) {
       if (ids.length === 0) return []
@@ -38,30 +40,8 @@ export function createDrizzleWatermarkStore(db: Database): WatermarkStore {
         .limit(1)
       return row ?? null
     },
-    async create(input) {
-      const [row] = await db.insert(watermark).values(input).returning()
-      if (row === undefined) {
-        throw new Error('insert returned no row')
-      }
-      return row
-    },
-    async update(organizationId, id, patch) {
-      const expected =
-        patch.expectedUpdatedAt === undefined ? null : new Date(patch.expectedUpdatedAt)
-      const nextTimestamp = new Date(Math.max(Date.now(), (expected?.getTime() ?? 0) + 1))
-      const [row] = await db
-        .update(watermark)
-        .set({ name: patch.name, spec: patch.spec, updatedAt: nextTimestamp })
-        .where(
-          and(
-            eq(watermark.organizationId, organizationId),
-            eq(watermark.id, id),
-            expected === null ? undefined : eq(watermark.updatedAt, expected),
-          ),
-        )
-        .returning()
-      return row ?? null
-    },
+    create: (input, audit) => writer.create(input, audit),
+    update: (organizationId, id, patch, audit) => writer.update(organizationId, id, patch, audit),
     async delete(organizationId, id) {
       const rows = await db
         .delete(watermark)
@@ -190,6 +170,10 @@ export function createDrizzlePhotoStore(db: Database): PhotoStore {
     async list(organizationId, query) {
       const after = decodeCursor(query.cursor)
       const conditions = [eq(photo.organizationId, organizationId)]
+      if (query.folderId !== undefined)
+        conditions.push(
+          query.folderId === null ? isNull(photo.folderId) : eq(photo.folderId, query.folderId),
+        )
       if (query.presetId !== undefined) {
         conditions.push(eq(photo.presetId, query.presetId))
       }

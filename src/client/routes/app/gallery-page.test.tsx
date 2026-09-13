@@ -14,6 +14,14 @@ vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-modu
 
 const client = fakeAuth
 
+function photoList() {
+  return within(screen.getByRole('region', { name: 'Gallery' })).getByRole('list')
+}
+async function readyPhotos() {
+  const region = await screen.findByRole('region', { name: 'Gallery' })
+  return await within(region).findByRole('list')
+}
+
 function seedPhotos(count: number) {
   return Array.from({ length: count }, (_, index) =>
     makePhoto({
@@ -87,7 +95,7 @@ describe('gallery page', () => {
     )
     expect(screen.getByRole('progressbar', { name: 'Storage used' })).toBeInTheDocument()
 
-    const grid = await screen.findByRole('list')
+    const grid = await readyPhotos()
     expect(within(grid).getAllByRole('listitem')).toHaveLength(PHOTO_PAGE_SIZE)
     // Newest first.
     expect(within(grid).getAllByRole('listitem')[0]).toHaveTextContent('shot-064.jpg')
@@ -98,17 +106,11 @@ describe('gallery page', () => {
     expect(screen.queryByRole('button', { name: 'Load more' })).not.toBeInTheDocument()
 
     await user.selectOptions(screen.getByLabelText('Preset'), 'wm-2')
-    await waitFor(() =>
-      expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(32),
-    )
+    await waitFor(() => expect(within(photoList()).getAllByRole('listitem')).toHaveLength(32))
     await user.type(screen.getByLabelText('Search'), 'shot-00')
-    await waitFor(() =>
-      expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(5),
-    )
+    await waitFor(() => expect(within(photoList()).getAllByRole('listitem')).toHaveLength(5))
     await user.selectOptions(screen.getByLabelText('Preset'), '')
-    await waitFor(() =>
-      expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(10),
-    )
+    await waitFor(() => expect(within(photoList()).getAllByRole('listitem')).toHaveLength(10))
 
     await user.click(screen.getByRole('button', { name: 'Open shot-003.jpg' }))
     const dialog = await screen.findByRole('dialog')
@@ -129,7 +131,7 @@ describe('gallery page', () => {
       gallery: { photos: seedPhotos(3), maxBytes: 1024, uploadFailsWith: null },
     })
     renderApp('/app/gallery')
-    await screen.findByRole('list')
+    await readyPhotos()
     await user.click(screen.getByRole('checkbox', { name: 'Select shot-000.jpg' }))
     await user.click(screen.getByRole('checkbox', { name: 'Select shot-001.jpg' }))
     await user.click(screen.getByRole('button', { name: 'Delete 2' }))
@@ -160,7 +162,7 @@ describe('gallery page', () => {
       gallery: { photos: seedPhotos(2), maxBytes: 1024, uploadFailsWith: null },
     })
     renderApp('/app/gallery')
-    await screen.findByRole('list')
+    await readyPhotos()
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Delete/ })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Open shot-001.jpg' }))

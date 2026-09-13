@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -10,6 +10,7 @@ import {
   OWNER,
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
+import { installLibraryApi } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
 import { requestUrl } from '../../test-support/request-url'
 
@@ -199,20 +200,54 @@ describe('site invitation page', () => {
     expect(screen.queryByText('Invitation sent. It expires in seven days.')).toBeNull()
   })
   it('keeps personal workspace sharing separate from site admission', async () => {
+    const user = userEvent.setup()
     const state = fakeAuth().state
     const personalId = `personal-${OWNER.id}`
     const organization = makeOrganization(personalId, 'My workspace', personalId)
     organization.members = [makeMember(personalId, OWNER, 'owner')]
     state.organizations = [organization]
     state.activeOrganizationId = organization.id
-    renderApp('/app/members')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      'Your private workspace',
+    const api = installLibraryApi()
+    const { router } = renderApp('/app/members')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Manage Access')
+    await screen.findByRole('heading', { name: 'People With Access' })
+    expect(organization.members.map((member) => member.userId)).toEqual([OWNER.id])
+    expect(
+      screen.getByText(
+        'Only people granted access can open this workspace. Other workspaces remain private.',
+      ),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Create Link' }))
+    const workspaceLink = await screen.findByRole('textbox', { name: 'Invitation Link' })
+    expect(workspaceLink.getAttribute('value')).toContain('/workspace-invitation/')
+    expect(api.access.links.get(personalId)?.[0]).toMatchObject({
+      role: 'viewer',
+      email: null,
+      status: 'pending',
+    })
+    expect(organization.members.map((member) => member.userId)).toEqual([OWNER.id])
+    expect(
+      vi
+        .mocked(fetch)
+        .mock.calls.some(([input]) => requestUrl(input).startsWith('/api/me/invitations')),
+    ).toBe(false)
+
+    const siteRequests = invitationApi()
+    await act(async () => {
+      await router.navigate({ to: '/app/invitations' })
+    })
+    await user.type(await screen.findByLabelText('Email address'), INVITATION.email)
+    await user.click(screen.getByRole('button', { name: 'Send invitation' }))
+    await screen.findByText('Invitation sent. It expires in seven days.')
+    expect(
+      siteRequests.mock.calls.some(
+        ([input, init]) => requestUrl(input) === '/api/me/invitations' && init?.method === 'POST',
+      ),
+    ).toBe(true)
+    expect(siteRequests.mock.calls.some(([input]) => requestUrl(input).includes('/access/'))).toBe(
+      false,
     )
-    expect(screen.queryByRole('button', { name: 'Send invitation' })).toBeNull()
-    expect(screen.getByRole('link', { name: 'Create a collaboration workspace' })).toHaveAttribute(
-      'href',
-      '/app/organizations/new',
-    )
+    expect(organization.members.map((member) => member.userId)).toEqual([OWNER.id])
+    expect(api.access.links.get(personalId)).toHaveLength(1)
   })
 })

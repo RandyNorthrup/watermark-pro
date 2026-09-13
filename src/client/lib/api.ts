@@ -15,7 +15,7 @@ const ERROR_MESSAGES: Partial<Record<string, string>> = {
   [API_ERROR_CODE.conflict]: 'This item is still in use.',
   [API_ERROR_CODE.payloadTooLarge]: 'That file is too large.',
   [API_ERROR_CODE.unsupportedMedia]: 'That file type is not supported.',
-  [API_ERROR_CODE.quotaExceeded]: 'The limit for this organization has been reached.',
+  [API_ERROR_CODE.quotaExceeded]: 'The limit for this workspace has been reached.',
 }
 
 const ACCOUNT_API_PREFIXES = ['/api/orgs', '/api/me', '/api/admin']

@@ -28,7 +28,7 @@ the final release has passed every device, accessibility and performance gate.
   floating chrome and stronger depth, retaining the rose palette. The reference is Margarita's
   MIT-licensed [CSS UI kit](https://codepen.io/Margarita-the-solid/pen/NPRPBjd);
   its required notice is retained in `public/brand/UI-KIT-LICENSE.txt`.
-- Standard users open directly in Editor. Preset recents live in Library and
+- Standard users open directly in Image (the existing `/app/editor` URL is retained). Preset recents live in Library and
   photo recents live in Gallery, each with thumbnail, list and details views.
   History and the selected view belong to the signed-in account.
 - The tools sidebar takes limited inspiration from GrapesJS's visual tool
@@ -42,16 +42,28 @@ The landing markup is shared by the runtime route and build-time static renderer
 through `src/client/components/landing-page.tsx`; individual feature sections
 live in `landing-features.tsx`. All twelve language catalogues contain the new
 feature and self-hosting copy. The feature page describes actual text/logo/
-signature marks, batch processing, 551 font families, 400 vector stickers, QR
-presets, templates, editing controls, smart placement, video, PDFs, export,
-gallery links, offline sync, private workspaces, languages and themes.
+signature marks and 20 shapes, mixed-file batches, 551 font families, 400 vector
+stickers, saved QR codes, 18 starter templates, editing controls, smart placement,
+inline video/PDF tools, export choices, folders, gallery links, explicit workspace
+access, persistent cloud connections, scoped offline work, languages and themes.
+The 2026-09-12 copy revision explicitly describes video re-encoding and
+browser/audio limits, original-source image exports with lossless PNG default,
+Google Drive's selected/created-item access, and the distinction between site
+invitations and workspace sharing. It removes unsupported selected-PDF-page
+claims. These source changes await the combined release; they are not all live yet.
 
 `scripts/fixtures/capture-product.mjs` creates disposable local accounts and real
-presets, then captures the editor, QR preview and library. Screenshots are real
+presets, then captures the Image editor, font dropdown, sticker browser, QR
+preview and starter-template library. Screenshots are real
 UI states; recapture after final source changes. It waits for the offline-ready
-indicator before capturing editor chrome. Fresh glass captures were generated and
-visually inspected on 2026-09-09. They still need the final status-row geometry
-and corrected editor privacy sentence before release certification.
+indicator before capturing editor chrome. Fresh captures were generated and
+visually inspected on 2026-09-12 after the layout, selection-boundary and
+inline-media changes (`temp/release-product-capture-final.log`). Hero captures use
+a 1920-by-1200 viewport at double pixel density, then produce 1440-by-900 WebP
+images. Detail images capture actual controls and rendered output. They contain
+only disposable local fixture accounts, original template text and the project's
+generated coastal scene, with no customer content. Template preview clipping
+found during capture was fixed and independently checked at narrow tile widths.
 
 The Windows host requests reduced transparency. Its solid fallback was observed
 in an unmodified browser context. Marketing captures explicitly emulate
@@ -67,10 +79,10 @@ controls and the React theme control update its selected source, including when
 a manual choice differs from the operating system. Feature images also provide
 480/720/960-pixel candidates; capture regenerates these derivatives.
 
-`scripts/fixtures/build-font-example.py` outlines six actual bundled font
-families for the typography illustration. `public/product/stickers.svg` composes
-twenty licensed Fluent vectors with unique gradient identifiers.
-`public/product/*.webp` contains the optimized feature illustrations.
+The earlier font/sticker SVG illustrations remain as source artwork; the active
+font and sticker WebP images now show the real font picker and sticker tiles.
+The picker capture selects a font through the UI to populate Recently Used,
+clears its search, and waits for visible fonts to load before capture.
 
 The coastal source is generated example artwork, not customer work or a
 testimonial. It was created with the built-in image tool for this project and

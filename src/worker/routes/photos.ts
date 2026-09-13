@@ -109,9 +109,11 @@ export const photoRoutes = new Hono<AppContext>()
     if (!parsed.success) {
       throw apiErrors.validation(parsed.error.issues)
     }
-    const page = await c
-      .get('services')
-      .photos.list(c.req.param('orgId'), { ...parsed.data, limit: PHOTO_PAGE_SIZE })
+    const page = await c.get('services').photos.list(c.req.param('orgId'), {
+      ...parsed.data,
+      folderId: parsed.data.folderId === 'root' ? null : parsed.data.folderId,
+      limit: PHOTO_PAGE_SIZE,
+    })
     return c.json(
       photoListResponseSchema.parse({
         photos: page.photos.map((record) => photoToDto(record)),
@@ -156,10 +158,16 @@ export const photoRoutes = new Hono<AppContext>()
         width: form.get('width'),
         height: form.get('height'),
         presetId: form.get('presetId') ?? undefined,
+        folderId: form.get('folderId') ?? null,
       })
       if (!fields.success) {
         throw apiErrors.validation(fields.error.issues)
       }
+      if (
+        fields.data.folderId !== null &&
+        !(await services.folders.exists(organizationId, 'photo', fields.data.folderId))
+      )
+        throw apiErrors.conflict()
       const image = await imageField(form, 'file', MAX_PHOTO_BYTES)
       const thumbnail = await imageField(form, 'thumbnail', MAX_THUMBNAIL_BYTES)
       const preset =
@@ -184,7 +192,8 @@ export const photoRoutes = new Hono<AppContext>()
           record.name !== uploadFields.name ||
           record.width !== uploadFields.width ||
           record.height !== uploadFields.height ||
-          record.presetId !== (preset?.id ?? null)
+          record.presetId !== (preset?.id ?? null) ||
+          (record.folderId ?? null) !== uploadFields.folderId
         )
           throw apiErrors.conflict()
       }
@@ -206,12 +215,16 @@ export const photoRoutes = new Hono<AppContext>()
         height: fields.data.height,
         presetId: preset?.id ?? null,
         presetName: preset?.name ?? null,
+        folderId: fields.data.folderId,
+        folderRevision: 0,
         createdBy: session.user.id,
       }
+      const { folderId, ...legacyFields } = fields.data
       const fingerprint = await payloadFingerprint({
         digest,
         thumbnailDigest,
-        ...fields.data,
+        ...legacyFields,
+        ...(folderId !== null && { folderId }),
         presetId: preset?.id ?? null,
       })
       const outcome = await persistUpload(

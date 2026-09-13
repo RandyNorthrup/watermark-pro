@@ -3,6 +3,7 @@ import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HTTP_STATUS } from '../../../shared/constants'
+import { setOfflineUser } from '../../lib/offline-context'
 import { activeOrganizationQueryOptions } from '../../lib/queries'
 import { createQueryClient } from '../../lib/query-client'
 import {
@@ -15,6 +16,7 @@ import {
 } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { installLibraryApi } from '../../test-support/fake-library-api'
+import { pendingBackgroundQuery } from '../../test-support/pending-background-query'
 import { renderApp } from '../../test-support/render-app'
 import { requestUrl } from '../../test-support/request-url'
 
@@ -85,7 +87,7 @@ describe('authenticated layout', () => {
     const privateId = `personal-${OWNER.id}`
     installLibraryApi()
     const { router } = renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
     expect(router.state.location.pathname).toBe('/app/editor')
     expect(screen.queryByRole('link', { name: /Dashboard|Overview/ })).not.toBeInTheDocument()
     expect(
@@ -101,7 +103,7 @@ describe('authenticated layout', () => {
     seedOwnerWorkspace(client())
     client().state.activeOrganizationId = null
     renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
     expect(client().organization.setActive).toHaveBeenCalledWith({
       organizationId: `personal-${OWNER.id}`,
     })
@@ -114,7 +116,7 @@ describe('authenticated layout', () => {
     queryClient.setQueryData(activeOrganizationQueryOptions.queryKey, null)
     renderApp('/app', queryClient)
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Editor'),
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Image'),
     )
     expect(screen.queryByRole('heading', { name: 'Your workspace' })).toBeNull()
   })
@@ -140,68 +142,72 @@ describe('authenticated layout', () => {
         screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }),
       ).toBeInTheDocument()
       expect(
-        screen.getByRole('button', { name: 'Organization: Acme Studio. Switch organization' }),
+        screen.getByRole('button', { name: 'Workspace: Acme Studio. Switch workspace' }),
       ).toBeInTheDocument()
     },
   )
 })
 
 describe('members page', () => {
-  it('lets an owner invite, change roles, remove members and cancel invitations', async () => {
+  it('lets an owner invite, change roles, remove members and cancel older invitations', async () => {
     const user = userEvent.setup()
-    seedOwnerWorkspace(client())
+    const organization = seedOwnerWorkspace(client())
+    const api = installLibraryApi()
     renderApp('/app/members')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Members')
-    expect(screen.getByRole('heading', { level: 2, name: '2 members' })).toBeInTheDocument()
-
-    await user.type(screen.getByLabelText('Email'), 'new@example.test')
-    await user.click(screen.getByRole('button', { name: 'Send invitation' }))
-    expect(await screen.findByText('Invitation sent to new@example.test.')).toBeInTheDocument()
-    expect(client().organization.inviteMember).toHaveBeenCalledWith({
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Manage Access')
+    await screen.findByRole('heading', { name: 'People With Access' })
+    await user.type(screen.getByLabelText('Add People'), 'new@example.test')
+    await user.click(screen.getByRole('button', { name: 'Send Invite' }))
+    expect(await screen.findByText('Workspace invitation sent.')).toBeInTheDocument()
+    expect(api.access.links.get(organization.id)?.[0]).toMatchObject({
       email: 'new@example.test',
-      role: 'editor',
-      organizationId: 'org-1',
+      role: 'viewer',
+      status: 'pending',
     })
-
-    await user.click(screen.getByRole('button', { name: `Remove ${VIEWER.name}` }))
+    await user.click(screen.getByRole('combobox', { name: `Role for ${VIEWER.name}` }))
+    await user.click(await screen.findByRole('option', { name: 'Edit' }))
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 2, name: '1 member' })).toBeInTheDocument(),
+      expect(organization.members.find((member) => member.userId === VIEWER.id)?.role).toBe(
+        'editor',
+      ),
     )
-
+    await user.click(screen.getByRole('button', { name: `Remove Access For ${VIEWER.name}` }))
+    await waitFor(() => expect(screen.queryByText(VIEWER.email)).not.toBeInTheDocument())
     await user.click(
       screen.getByRole('button', { name: 'Cancel invitation for pending@example.test' }),
     )
     await waitFor(() => expect(screen.queryByText('pending@example.test')).not.toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: 'Revoke Invitation For new@example.test' }))
+    await waitFor(() => expect(screen.queryByText('new@example.test')).not.toBeInTheDocument())
   })
 
   it('hides management controls from a viewer', async () => {
     seedViewerWorkspace(client())
-
     renderApp('/app/members')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Members')
-    expect(screen.queryByRole('button', { name: 'Send invitation' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Remove/ })).not.toBeInTheDocument()
-    const list = screen.getByRole('heading', { level: 2, name: '2 members' }).nextElementSibling
-    expect(list).not.toBeNull()
-    expect(within(list as HTMLElement).getByText('(you)')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Manage Access')
+    await screen.findByRole('heading', { name: 'People With Access' })
+    expect(screen.queryByRole('button', { name: 'Send Invite' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Remove Access/ })).not.toBeInTheDocument()
+    expect(screen.getByText('Only the workspace owner can change access.')).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('region', { name: 'People With Access' })).getByText(VIEWER.name),
+    ).toBeInTheDocument()
+    expect(screen.getByText('(you)')).toBeInTheDocument()
   })
 
-  it('surfaces a failed role change inline', async () => {
+  it('surfaces a failed role change inline without changing displayed permissions', async () => {
     const user = userEvent.setup()
     seedOwnerWorkspace(client())
-    client().organization.updateMemberRole.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: null,
-        error: { message: 'Role is locked', code: 'LOCKED', status: 400 },
-      }),
-    )
+    const api = installLibraryApi()
     renderApp('/app/members')
-    await screen.findByRole('heading', { level: 1 })
+    await screen.findByRole('heading', { name: 'People With Access' })
     const trigger = screen.getByRole('combobox', { name: `Role for ${VIEWER.name}` })
-    expect(trigger).toHaveTextContent('Viewer')
+    expect(trigger).toHaveTextContent('View')
     await user.click(trigger)
-    await user.click(await screen.findByRole('option', { name: 'Admin' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Role is locked')
+    api.failWith = 'forbidden'
+    await user.click(await screen.findByRole('option', { name: 'Edit' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Your role does not allow this.')
+    expect(trigger).toHaveTextContent('View')
   })
 })
 
@@ -242,11 +248,17 @@ describe('invitations', () => {
     client().state.user = VIEWER
     client().state.organizations = [organization]
 
-    const { router } = renderApp('/accept-invitation/inv-9')
+    const { router, queryClient } = renderApp('/accept-invitation/inv-9')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Join Acme Studio')
-    await user.click(screen.getByRole('button', { name: 'Accept invitation' }))
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app/members'))
-    expect(client().organization.acceptInvitation).toHaveBeenCalledWith({ invitationId: 'inv-9' })
+    const background = pendingBackgroundQuery(queryClient)
+    try {
+      await user.click(screen.getByRole('button', { name: 'Accept invitation' }))
+      await waitFor(() => expect(router.state.location.pathname).toBe('/app/members'))
+      expect(background.isPending()).toBe(true)
+      expect(client().organization.acceptInvitation).toHaveBeenCalledWith({ invitationId: 'inv-9' })
+    } finally {
+      background.complete()
+    }
   })
 
   it('shows a clear message for an unknown invitation', async () => {
@@ -257,17 +269,103 @@ describe('invitations', () => {
 })
 
 describe('new organization', () => {
+  it('opens the created workspace while an unrelated active query is still pending', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const queryClient = createQueryClient()
+    const { router } = renderApp('/app/organizations/new', queryClient)
+    const name = await screen.findByLabelText('Name')
+    const background = pendingBackgroundQuery(queryClient)
+    try {
+      expect(background.isPending()).toBe(true)
+      await user.type(name, 'New Workspace')
+      await user.click(screen.getByRole('button', { name: 'Create workspace' }))
+      await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
+      expect(background.isPending()).toBe(true)
+      expect(
+        screen.getByRole('button', { name: 'Workspace: New Workspace. Switch workspace' }),
+      ).toBeInTheDocument()
+    } finally {
+      background.complete()
+    }
+  })
+
+  it.each(['create', 'activate'] as const)(
+    'keeps form values and permits retry after a %s transport failure',
+    async (stage) => {
+      const user = userEvent.setup()
+      seedOwnerWorkspace(client())
+      const { router } = renderApp('/app/organizations/new')
+      await user.type(await screen.findByLabelText('Name'), 'Retained Workspace')
+      const operation =
+        stage === 'create' ? client().organization.create : client().organization.setActive
+      operation.mockRejectedValueOnce(new Error('The connection was interrupted.'))
+      await user.click(screen.getByRole('button', { name: 'Create workspace' }))
+      expect(await screen.findByRole('alert')).toHaveTextContent('The connection was interrupted.')
+      expect(screen.getByLabelText('Name')).toHaveValue('Retained Workspace')
+      expect(screen.getByLabelText('URL identifier')).toHaveValue('retained-workspace')
+      expect(screen.getByRole('button', { name: 'Create workspace' })).toBeEnabled()
+      expect(router.state.location.pathname).toBe('/app/organizations/new')
+    },
+  )
+
+  it('reports a refused activation without routing to a successful workspace', async () => {
+    const user = userEvent.setup()
+    seedOwnerWorkspace(client())
+    const { router } = renderApp('/app/organizations/new')
+    await user.type(await screen.findByLabelText('Name'), 'Activation Denied')
+    client().organization.setActive.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Workspace activation refused.', code: 'FORBIDDEN', status: 403 },
+    })
+    await user.click(screen.getByRole('button', { name: 'Create workspace' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Workspace activation refused.')
+    expect(router.state.location.pathname).toBe('/app/organizations/new')
+    expect(screen.getByLabelText('Name')).toHaveValue('Activation Denied')
+    expect(screen.getByRole('button', { name: 'Create workspace' })).toBeEnabled()
+  })
+
+  it.each(['create', 'activate'] as const)(
+    'refuses later submission steps when the account changes during %s',
+    async (stage) => {
+      const user = userEvent.setup()
+      seedOwnerWorkspace(client())
+      const { router } = renderApp('/app/organizations/new')
+      await user.type(await screen.findByLabelText('Name'), 'Previous Account Workspace')
+      if (stage === 'create') {
+        const original = client().organization.create.getMockImplementation()
+        if (original === undefined) throw new Error('Missing create fixture')
+        client().organization.create.mockImplementationOnce(async (input) => {
+          const result = await original(input)
+          setOfflineUser(VIEWER.id)
+          return result
+        })
+      } else {
+        const original = client().organization.setActive.getMockImplementation()
+        if (original === undefined) throw new Error('Missing activation fixture')
+        client().organization.setActive.mockImplementationOnce(async (input) => {
+          const result = await original(input)
+          setOfflineUser(VIEWER.id)
+          return result
+        })
+      }
+      await user.click(screen.getByRole('button', { name: 'Create workspace' }))
+      expect(client().organization.setActive).toHaveBeenCalledTimes(stage === 'create' ? 0 : 1)
+      expect(router.state.location.pathname).toBe('/app/organizations/new')
+    },
+  )
+
   it('derives the slug from the name and creates the organization', async () => {
     const user = userEvent.setup()
     client().state.user = OWNER
     const { router } = renderApp('/app/organizations/new')
     await user.type(await screen.findByLabelText('Name'), 'Northrup Photo')
     expect(screen.getByLabelText('URL identifier')).toHaveValue('northrup-photo')
-    await user.click(screen.getByRole('button', { name: 'Create organization' }))
+    await user.click(screen.getByRole('button', { name: 'Create workspace' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
     expect(
-      screen.getByRole('button', { name: 'Organization: Northrup Photo. Switch organization' }),
+      screen.getByRole('button', { name: 'Workspace: Northrup Photo. Switch workspace' }),
     ).toBeInTheDocument()
     expect(client().organization.create).toHaveBeenCalledWith({
       name: 'Northrup Photo',
@@ -282,7 +380,7 @@ describe('new organization', () => {
     await user.type(await screen.findByLabelText('Name'), 'Taken')
     await user.clear(screen.getByLabelText('URL identifier'))
     await user.type(screen.getByLabelText('URL identifier'), 'taken')
-    await user.click(screen.getByRole('button', { name: 'Create organization' }))
+    await user.click(screen.getByRole('button', { name: 'Create workspace' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Organization slug is taken')
   })
 })

@@ -6,6 +6,7 @@ import {
   expectAccessible,
   latestLinkFor,
   navigateTo,
+  prepareReturningUser,
   signUpAndVerify,
   test,
 } from './support'
@@ -59,7 +60,8 @@ test('site invitations create separate private workspaces and protect account to
   await page.getByRole('button', { name: 'Create account', exact: true }).click()
   await expect(page).toHaveURL(/\/check-email/)
   await page.goto(await latestLinkFor(request, recipient.email, '/api/auth/verify-email'))
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await prepareReturningUser(page)
   const recipientSession = await page.request.get('/api/auth/get-session')
   const recipientWorkspace = workspaceSessionSchema.parse(await recipientSession.json()).session
     .activeOrganizationId
@@ -69,8 +71,10 @@ test('site invitations create separate private workspaces and protect account to
   await navigateTo(page, 'Library')
   await expect(page.getByText('Owner-only preset canary')).toHaveCount(0)
   await navigateTo(page, 'Members')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your private workspace')
-  await expect(page.getByRole('button', { name: 'Send invitation' })).toHaveCount(0)
+  const personalAccess = page.getByRole('dialog', { name: 'Manage Access' })
+  await expect(personalAccess.getByRole('heading', { name: 'People With Access' })).toBeVisible()
+  await expect(personalAccess.getByRole('list').first().getByRole('listitem')).toHaveCount(1)
+  await expect(personalAccess.getByText(owner.email, { exact: true })).toHaveCount(0)
   await navigateTo(page, 'Invite people')
   await expect(page.getByText('You have not sent any invitations.')).toBeVisible()
   await expect(page.getByLabel('Invitation link')).not.toHaveValue(ownerReferral)

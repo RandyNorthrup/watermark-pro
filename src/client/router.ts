@@ -13,6 +13,8 @@ export function createAppRouter(queryClient: QueryClient, history?: RouterHistor
     context: { queryClient },
     defaultPreload: 'intent',
     scrollRestoration: true,
+    // Desktop pages scroll below the header; new routes must reset that region too.
+    scrollToTopSelectors: ['#main'],
     ...(history !== undefined && { history }),
   })
 }

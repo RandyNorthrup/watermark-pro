@@ -1,6 +1,6 @@
 # Local overrides for Worker variables and secrets. Copy to `.dev.vars`
 # (git-ignored) and fill in real values. Production values are set with
-# `wrangler secret put <NAME>`; non-secret vars live in wrangler.jsonc.
+# `wrangler secret put <NAME> --env production`; non-secret vars live in wrangler.jsonc.
 #
 # Every variable listed here is validated by src/worker/env.ts.
 
@@ -27,10 +27,14 @@ BETTER_AUTH_SECRET=
 # browser at runtime, but is stored as an encrypted Worker secret; never commit
 # its value. Restrict that key to Picker and the required app/Google frame hosts.
 # Set local values here to enable the provider buttons. Register a separate
-# Google cloud Web client, a Microsoft SPA client with delegated Files.ReadWrite
-# and User.Read, and a Dropbox App Folder client with PKCE, file/sharing scopes,
-# Chooser hosts and callbacks. Authorize the production origin and localhost:5273;
-# see docs/verification/m19/domain-migration.md for the exact callback paths.
+# Google and Microsoft confidential Web clients, and a Dropbox Full Dropbox app.
+# These are separate from account sign-in clients. Server-side refresh requires
+# the cloud client secrets and token-encryption secret listed below. Register
+# /api/cloud/google/callback, /api/cloud/onedrive/callback, and
+# /api/cloud/dropbox/callback under the configured APP_URL. Google uses drive.file;
+# Microsoft uses delegated Files.ReadWrite with openid/profile/offline_access; Dropbox
+# needs metadata read, content read/write and sharing read/write scopes.
+# See docs/verification/m19/cloud-storage.md for setup and provider limits.
 # GOOGLE_OAUTH_CLIENT_ID=
 # GOOGLE_PICKER_API_KEY=
 # GOOGLE_PICKER_APP_ID=
@@ -47,3 +51,12 @@ BETTER_AUTH_SECRET=
 # MICROSOFT_AUTH_CLIENT_ID=
 # MICROSOFT_AUTH_CLIENT_SECRET=
 # MICROSOFT_AUTH_TENANT_ID=common
+
+# Durable cloud-file connections, separate from account sign-in clients.
+# Generate CLOUD_TOKEN_SECRET with cryptographic randomness; keep it stable to decrypt saved grants.
+# CLOUD_TOKEN_SECRET=
+# GOOGLE_CLOUD_CLIENT_SECRET=
+# MICROSOFT_CLOUD_CLIENT_SECRET=
+# DROPBOX_APP_SECRET=
+# Match the Dropbox developer-console access type; changing this does not expand an OAuth grant.
+# DROPBOX_ACCESS_TYPE=app_folder

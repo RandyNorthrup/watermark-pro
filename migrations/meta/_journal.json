@@ -92,6 +92,41 @@
       "when": 1789072920971,
       "tag": "0012_site_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1789243200000,
+      "tag": "0013_guidance_claims",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1789243200001,
+      "tag": "0014_workspace_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1789243711526,
+      "tag": "0015_workspace_invitation_budget",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1789247300886,
+      "tag": "0016_cloud_connections",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1789247300898,
+      "tag": "0017_workspace_folders",
+      "breakpoints": true
     }
   ]
 }

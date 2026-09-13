@@ -3,6 +3,7 @@
  * `db/`; in-memory implementations in `test-support/` let the Node tests run
  * real routes and real Better Auth without Cloudflare bindings.
  */
+import type { AuditEntry } from './audit'
 import type { WatermarkSpec } from '../shared/watermark'
 
 export interface WatermarkRecord {
@@ -13,17 +14,32 @@ export interface WatermarkRecord {
   createdBy: string | null
   createdAt: Date
   updatedAt: Date
+  folderId?: string | null | undefined
+  folderRevision?: number | undefined
+  folderVersionId?: string | null | undefined
 }
 
 export interface WatermarkStore {
   listForOrganization(organizationId: string): Promise<WatermarkRecord[]>
   find(organizationId: string, id: string): Promise<WatermarkRecord | null>
   findMany(organizationId: string, ids: readonly string[]): Promise<WatermarkRecord[]>
-  create(input: Omit<WatermarkRecord, 'createdAt' | 'updatedAt'>): Promise<WatermarkRecord>
+  create(
+    input: Omit<WatermarkRecord, 'createdAt' | 'updatedAt'>,
+    audit?: AuditEntry,
+  ): Promise<WatermarkRecord>
   update(
     organizationId: string,
     id: string,
-    patch: { name: string; spec: WatermarkSpec; expectedUpdatedAt?: string | undefined },
+    patch: {
+      name: string
+      spec: WatermarkSpec
+      expectedUpdatedAt?: string | undefined
+      folderId?: string | null | undefined
+      expectedFolderRevision?: number | undefined
+      expectedFolderVersionId?: string | null | undefined
+      nextFolderVersionId?: string | undefined
+    },
+    audit?: AuditEntry,
   ): Promise<WatermarkRecord | null>
   delete(organizationId: string, id: string): Promise<boolean>
   /** Presets whose image mark references the asset. */
@@ -84,6 +100,9 @@ export interface PhotoRecord {
   presetName: string | null
   createdBy: string | null
   createdAt: Date
+  folderId?: string | null | undefined
+  folderRevision?: number | undefined
+  folderVersionId?: string | null | undefined
 }
 
 export interface PhotoPage {
@@ -97,6 +116,7 @@ export interface PhotoQuery {
   /** Case-insensitive substring of the name. */
   search?: string | undefined
   cursor?: string | undefined
+  folderId?: string | null | undefined
   limit: number
 }
 

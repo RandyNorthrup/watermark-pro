@@ -1,5 +1,5 @@
 # Extends every default rule. The only value-based allowlist entries are the
-# current and retired public Dropbox application identifiers used by its SDK.
+# current and retired public Dropbox application identifiers used by OAuth.
 # They do not grant access to a user's files without that user's OAuth consent.
 # Google Picker keys are runtime configuration, never committed key values.
 # A revoked historical Google key is tracked by an immutable fingerprint/digest;
@@ -11,8 +11,10 @@ title = "Lumafoil"
 useDefault = true
 
 [allowlist]
-description = "Public Dropbox SDK application identifiers"
+description = "Exact public Dropbox application identifiers; no credentials or file exclusions"
 regexes = [
-  '''s93kl2ruaou8f3p''',
-  '''n4p4sfvxnat9ccd''',
+  '''^s93kl2ruaou8f3p$''',
+  '''^n4p4sfvxnat9ccd$''',
+  # Full Dropbox registration verified in the provider console on 2026-09-12.
+  '''^97gncjw0zquwc91$''',
 ]

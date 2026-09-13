@@ -29,6 +29,7 @@ import type { Border, Transform } from '../engine/pipeline'
 import { seedFor } from '../engine/random'
 import type { MarkResources } from '../lib/mark-resources'
 import { baseName, specForPhoto } from '../lib/spec-tokens'
+import type { VideoQuality, VideoResolution } from '../video/plan'
 
 /** Position of a photo within a batch, for the `{index}` and `{count}` tokens. */
 export interface BatchPosition {
@@ -59,6 +60,8 @@ export interface BulkSettings {
   namePattern: string
   /** Name of the first ticked preset, for the `{preset}` name token. */
   presetName: string
+  /** Video choices are independent of the image export format and adjustment controls. */
+  video?: { quality: VideoQuality; resolution: VideoResolution }
 }
 
 /** Builds the transform every photo in a batch shares (orientation, resize, adjustments). */
@@ -141,8 +144,8 @@ export interface BulkResult {
   fileName: string
   /** The source's path within its folder, so the ZIP can preserve the tree. */
   relativePath: string
-  width: number
-  height: number
+  width: number | null
+  height: number | null
 }
 
 const EXTENSIONS: Record<EncodeOptions['format'], string> = {

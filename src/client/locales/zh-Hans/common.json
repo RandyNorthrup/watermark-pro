@@ -5,7 +5,7 @@
   "shell": {
     "nav": {
       "library": "水印库",
-      "editor": "编辑器",
+      "editor": "图像",
       "bulk": "批量",
       "video": "视频",
       "documents": "文档",
@@ -22,18 +22,22 @@
     "toolsNav": "工具",
     "signOut": "退出登录",
     "accountMenu": "{{name}} 的账户菜单",
-    "menuDescription": "切换组织，或前往 Lumafoil 的任意部分。",
-    "switchOrganizationFor": "组织：{{name}}。切换组织",
-    "chooseOrganization": "选择一个组织",
-    "chooseOrganizationShort": "选择组织",
-    "organizations": "组织",
-    "newOrganization": "新建组织",
+    "menuDescription": "切换工作区，或前往 Lumafoil 的任意部分。",
+    "switchOrganizationFor": "工作区：{{name}}。切换工作区",
+    "chooseOrganization": "选择一个工作区",
+    "chooseOrganizationShort": "选择工作区",
+    "organizations": "工作区",
+    "newOrganization": "新建工作区",
     "theme": {
       "system": "主题：跟随系统。切换为浅色",
       "light": "主题：浅色。切换为深色",
       "dark": "主题：深色。切换为跟随系统"
     },
-    "closeMenu": "关闭菜单"
+    "closeMenu": "关闭菜单",
+    "manageAccess": "管理访问权限",
+    "supportPrompt": "如果 Lumafoil 对您有帮助，请考虑捐赠支持。",
+    "donate": "捐赠",
+    "supportPayPal": "通过 PayPal 捐赠（新标签页）"
   },
   "auth": {
     "backToSignIn": "返回登录",
@@ -102,11 +106,11 @@
     "pendingInvitations_other": "{{count}} 个待处理的邀请。",
     "manageMembers": "管理成员",
     "auditLog": "审计日志",
-    "auditDescription": "每一次成员和组织变更都会记录操作人和时间。",
+    "auditDescription": "每一次成员和工作区变更都会记录操作人和时间。",
     "viewAuditLog": "查看审计日志"
   },
   "library": {
-    "orgRequired": "创建或加入一个组织，以构建水印库。",
+    "orgRequired": "创建或加入一个工作区，以构建水印库。",
     "heading": "水印库",
     "description": "{{name}} 中保存的水印。可应用于单个文件或整个批次。",
     "export": "导出",
@@ -118,7 +122,7 @@
     "loadErrorTitle": "无法加载水印库",
     "empty": "还没有预设。预设将一个标记（文字、符号或 Logo）与放置、对比度和样式设置组合在一起。",
     "createFirst": "创建第一个预设",
-    "orgRequiredShort": "请先创建或加入一个组织。",
+    "orgRequiredShort": "请先创建或加入一个工作区。",
     "loadingPreset": "正在加载预设",
     "loadPresetErrorTitle": "无法加载该预设",
     "presetGone": "该预设已不存在。",
@@ -141,12 +145,6 @@
       "logo": "Logo",
       "qr": "{{content}} 的二维码",
       "sticker": "贴纸 {{name}}"
-    },
-    "shape": {
-      "rectangle": "矩形",
-      "roundedRectangle": "圆角矩形",
-      "ellipse": "椭圆",
-      "line": "直线"
     },
     "placement": {
       "smart": "智能放置",
@@ -175,12 +173,16 @@
     "notAnImage": "该文件不是浏览器可以读取的图片。",
     "text": {
       "label": "文字",
-      "hint": "最多 {{max}} 个字符，最多 {{lines}} 行。使用“插入详情”可添加日期或相机等令牌，每张照片会分别填入。{location} 会将照片的 GPS 位置打印在图片上。"
+      "hint": "最多 {{max}} 个字符，最多 {{lines}} 行。使用“插入详情”可添加日期或相机等令牌，每张照片会分别填入。{location} 会将照片的 GPS 位置打印在图片上。",
+      "symbols": "文本符号",
+      "insertSymbol": "插入 {{symbol}}",
+      "insertLimit": "已达到字数上限。请选择要替换的文本或删除部分字符。"
     },
     "qr": {
       "content": "二维码内容",
       "hint": "通常是一个链接。最多 {{max}} 个字符；二维码始终为浅底深色，以便扫描。",
-      "savedHint": "为每个二维码命名并单独保存。可从素材库重复使用，也可为不同链接保存多个二维码。分享前，请按实际使用尺寸测试导出的图片。"
+      "savedHint": "为每个二维码命名并单独保存。可从素材库重复使用，也可为不同链接保存多个二维码。分享前，请按实际使用尺寸测试导出的图片。",
+      "shortLabel": "QR"
     },
     "tokens": {
       "menu": "插入详情",
@@ -204,12 +206,11 @@
     "font": {
       "family": "字体",
       "weight": "字重",
-      "specimen": "敏捷的棕色狐狸跃过懒狗",
       "search": "搜索字体",
-      "resultCount": "{{count}} 个字体家族",
       "recent": "最近使用",
-      "all": "所有字体",
-      "license": "字体许可证"
+      "license": "字体许可证",
+      "previewError": "部分字体预览未能加载。请联网后重新打开列表以重试。",
+      "empty": "没有匹配的字体"
     },
     "symbol": {
       "icons": "图标",
@@ -231,7 +232,23 @@
       "fillOpacity": "填充不透明度",
       "strokeWidth": "描边宽度",
       "customStrokeColour": "自定义描边颜色",
-      "strokeColour": "描边颜色"
+      "strokeColour": "描边颜色",
+      "triangle": "三角形",
+      "diamond": "菱形",
+      "pentagon": "五边形",
+      "hexagon": "六边形",
+      "octagon": "八边形",
+      "star": "星形",
+      "starburst": "放射星形",
+      "heart": "心形",
+      "shield": "盾形",
+      "speechBubble": "对话气泡",
+      "arrowLeft": "向左箭头",
+      "arrowRight": "向右箭头",
+      "arrowUp": "向上箭头",
+      "arrowDown": "向下箭头",
+      "doubleArrow": "双向箭头",
+      "plus": "十字"
     },
     "effects": {
       "letterSpacing": "字间距",
@@ -376,11 +393,12 @@
       "license": "Fluent Emoji · MIT 许可证",
       "usage": "允许商业使用；再次分发时请保留附带的图形许可声明。",
       "guide": "图形许可指南"
-    }
+    },
+    "saveNameHint": "为此预设选择名称。"
   },
   "editor": {
-    "orgRequired": "创建或加入一个组织，以使用编辑器。",
-    "heading": "编辑器",
+    "orgRequired": "创建或加入一个工作区，以编辑图像。",
+    "heading": "图像",
     "description": "在设备上选择预设、调整位置、裁剪和缩放。可下载结果，也可自主选择保存到图库或云端。",
     "tabs": {
       "presets": "预设",
@@ -411,7 +429,8 @@
       "fit": "适合窗口",
       "actualSize": "100%",
       "grid": "网格",
-      "gridSpacing": "网格间距"
+      "gridSpacing": "网格间距",
+      "snapToGrid": "对齐网格"
     },
     "altCrop": "带裁剪框的照片",
     "altWatermark": "已应用水印的照片",
@@ -531,27 +550,28 @@
       "download": "下载",
       "share": "分享",
       "saveToGallery": "保存到图库",
-      "savedToFolder": "已保存到您的 {{provider}}“{{folder}}”文件夹。"
+      "savedToFolder": "已保存到 {{provider}}。"
     },
     "mark": {
       "position": "水印位置。拖动以移动（会吸附到边距、三等分线和中心；按住 Alt 可自由放置），双指捏合以调整大小，旋转手势以旋转；方向键微调，加号和减号调整大小，方括号旋转。",
       "rotate": "旋转水印",
       "resize": "调整水印大小"
-    }
+    },
+    "newWorkspace": "新建"
   },
   "bulk": {
-    "orgRequired": "创建或加入一个组织，以批量添加水印。",
+    "orgRequired": "创建或加入一个工作区，以批量添加水印。",
     "heading": "批量添加水印",
-    "description": "将一个预设应用于整组照片。照片会在您的浏览器中并行处理，并以 ZIP 形式或逐个下载。",
+    "description": "在同一批次中为图像、PDF 和视频添加水印。逐个下载结果，或将其打包为 ZIP。",
     "emptyHint": "即可将其应用于批量处理。",
-    "addPhotos": "添加照片",
+    "addPhotos": "添加文件",
     "addFolder": "添加文件夹",
-    "dropHint": "将照片或文件夹拖放到此处，或",
+    "dropHint": "将文件或文件夹拖到此处，或",
     "fromLink": "从链接",
-    "capacity_other": "每批最多 {{max}} 张照片。处理在您的浏览器中使用 {{count}} 个工作线程完成。",
-    "skipped_other": "已跳过 {{count}} 个文件：非图片",
+    "capacity_other": "每批最多 {{max}} 个文件。图像、PDF 和视频均在你的设备上处理。",
+    "skipped_other": "已跳过文件：{{count}}。不支持此格式。",
     "importErrorTitle": "无法从云端导入",
-    "photoCount_other": "{{count}} 张照片",
+    "photoCount_other": "{{count}} 个文件",
     "clearList": "清空列表",
     "batchProgress": "批量进度",
     "progress": {
@@ -561,7 +581,7 @@
       "rate": "，用时 {{seconds}} 秒（{{rate}} 张/秒）",
       "end": "。"
     },
-    "photosList": "此批次中的照片",
+    "photosList": "本批次中的文件",
     "custom": "自定义",
     "selected": "已选择",
     "status": {
@@ -605,7 +625,7 @@
     "savedProgress": "已保存 {{done}}/{{total}}",
     "allSaved": "全部已保存到<galleryLink>图库</galleryLink>。",
     "someSaved": "{{failed}} 张无法保存（存储配额或限制）。其余的已在<galleryLink>图库</galleryLink>中。",
-    "savedToCloud_other": "已将 {{count}} 张照片保存到您的 {{provider}}“{{folder}}”文件夹。",
+    "savedToCloud_other": "已将 {{count}} 个文件保存到 {{provider}}。",
     "privacyNote": "智能放置和自动对比度会为每张照片单独计算。任何内容都不会上传。",
     "watch": {
       "label": "监视文件夹",
@@ -614,14 +634,19 @@
       "hint": "选择一个输入文件夹和一个输出文件夹；放入输入文件夹的新照片会使用勾选的预设添加水印，并写入输出文件夹。仅在此页面打开时运行。",
       "wrote": "已写入 {{name}}",
       "failed": "{{name}} 失败：{{error}}"
+    },
+    "media": {
+      "imageSettingsHint": "图像格式、尺寸、调整和隐形水印仅适用于照片。PDF 会保留原始页面。",
+      "videoOutput": "视频输出",
+      "galleryHint": "图库仅保存图像。请下载文档和视频，或将其保存到云存储。"
     }
   },
   "gallery": {
-    "orgRequired": "创建或加入一个组织，以保存图库。",
+    "orgRequired": "创建或加入一个工作区，以保存图库。",
     "heading": "图库",
     "description": "保存在 {{name}} 中的水印照片。可搜索、筛选、下载或删除。",
     "usage_other": "{{count}} 张照片 · {{used}}/{{max}}",
-    "maxCount": "每个组织最多 {{count}} 张照片",
+    "maxCount": "每个工作区最多 {{count}} 张照片",
     "storageUsed": "已用存储",
     "storagePercent": "已使用 {{percent}}% 的存储空间",
     "checkPhoto": "勾选一张照片",
@@ -670,10 +695,12 @@
     "manageLinks": "在“分享”中管理链接。",
     "linkCopied": "链接已复制到剪贴板。",
     "linkShared": "链接已分享。",
-    "copyLink": "复制链接"
+    "copyLink": "复制链接",
+    "shareSyncPending": "请等待所选照片同步完成后再创建链接。",
+    "shareSyncBlocked": "请解决所选照片的同步问题后再创建链接。"
   },
   "shares": {
-    "orgRequired": "创建或加入一个组织，以分享照片。",
+    "orgRequired": "创建或加入一个工作区，以分享照片。",
     "noPermission": "您的角色不包含分享权限。",
     "heading": "分享",
     "description": "让 {{name}} 以外的人查看和下载选定照片的链接。撤销链接会立即使其失效。",
@@ -703,7 +730,7 @@
     "sectionsLabel": "管理分区",
     "tabs": {
       "users": "用户",
-      "organizations": "组织",
+      "organizations": "工作区",
       "audit": "审计追踪",
       "health": "健康检查",
       "clientErrors": "客户端错误"
@@ -754,11 +781,11 @@
     "reasonLabel": "原因",
     "cancel": "取消",
     "banConfirm": "封禁用户",
-    "loadingOrganizations": "正在加载组织",
-    "organizationsErrorTitle": "无法加载组织",
-    "organizationsTable": "组织，最新在前",
+    "loadingOrganizations": "正在加载工作区",
+    "organizationsErrorTitle": "无法加载工作区",
+    "organizationsTable": "工作区，最新在前",
     "th": {
-      "organization": "组织",
+      "organization": "工作区",
       "members": "成员",
       "photos": "照片",
       "storage": "存储",
@@ -766,36 +793,25 @@
     },
     "loadingAudit": "正在加载审计追踪",
     "auditErrorTitle": "无法加载审计追踪",
-    "auditCaption": "所有组织的审计条目，最新在前",
-    "auditDetailHeading": "组织",
+    "auditCaption": "所有工作区的审计条目，最新在前",
+    "auditDetailHeading": "工作区",
     "platform": "平台",
     "siteRole": "网站角色：{{role}}",
     "roleFor": "{{email}} 的网站角色",
     "ownerProtected": "所有者账号受到保护。"
   },
   "members": {
-    "orgRequired": "创建或加入一个组织，以管理成员。",
-    "heading": "成员",
-    "description": "{{name}} 中的成员及其权限。",
-    "count_other": "{{count}} 位成员",
+    "orgRequired": "创建或加入一个工作区，以管理成员。",
     "pendingInvitations": "待处理的邀请",
-    "inviteHeading": "邀请他人",
     "emailLabel": "电子邮箱",
-    "roleLabel": "角色",
-    "sendInvitation": "发送邀请",
-    "invitationSent": "邀请已发送至 {{email}}。",
     "you": "（您）",
     "roleFor": "{{name}} 的角色",
-    "remove": "移除",
-    "removeMember": "移除 {{name}}",
-    "invitedAs": "受邀角色",
-    "cancel": "取消",
     "cancelInvitation": "取消对 {{email}} 的邀请"
   },
   "audit": {
     "heading": "审计日志",
     "description": "{{name}} 中的最近更改。所有者和管理员可以查看此页面。",
-    "thisOrganization": "此组织",
+    "thisOrganization": "此工作区",
     "loading": "正在加载审计日志",
     "loadErrorTitle": "无法加载审计日志",
     "noAccess": "您的角色不包含审计访问权限。",
@@ -807,14 +823,14 @@
     "action": "操作"
   },
   "organizations": {
-    "firstTitle": "创建您的第一个组织",
-    "newTitle": "新建组织",
+    "firstTitle": "创建您的第一个工作区",
+    "newTitle": "新建工作区",
     "description": "为水印和照片创建独立工作区。除非你明确邀请成员，否则它保持私密。",
-    "createFailed": "无法创建该组织。",
+    "createFailed": "无法创建该工作区。",
     "nameLabel": "名称",
     "slugLabel": "URL 标识符",
     "slugHint": "小写字母、数字和连字符。用于链接，且必须唯一。",
-    "submit": "创建组织"
+    "submit": "创建工作区"
   },
   "import": {
     "takePhoto": "拍照",
@@ -827,19 +843,6 @@
       "errorTitle": "无法导入该链接",
       "fetch": "获取"
     },
-    "onedrive": {
-      "title": "从 OneDrive 导入",
-      "name": "OneDrive",
-      "description": "登录 Microsoft，然后选择要添加的照片。",
-      "loading": "正在加载 OneDrive",
-      "empty": "这里没有文件夹或图片。",
-      "folderPath": "文件夹路径",
-      "errorTitle": "OneDrive 导入失败",
-      "tryAgain": "重试",
-      "noneSelected": "未选择照片",
-      "selectedCount": "已选择 {{count}} 张",
-      "addSelected": "添加所选"
-    },
     "cloudSaved": "已保存的云端文件（{{total}}）",
     "cloudSavedTitle": "已保存的云端文件",
     "cloudSharingHint": "保存不会创建公开链接。只有希望任何持有链接的人都能查看文件时才创建。现有文件夹权限仍然适用。其他访问权限请在云服务中管理。",
@@ -850,39 +853,18 @@
     "copyLink": "复制链接"
   },
   "video": {
-    "orgRequired": "创建或加入一个组织，以为视频添加水印。",
+    "orgRequired": "创建或加入一个工作区，以为视频添加水印。",
     "heading": "视频添加水印",
-    "description": "将预设应用于整个视频。每一帧都会在您的浏览器中添加水印，并保留音频；任何内容都不会上传。",
+    "description": "预览视频，在不同时间点放置水印，添加淡入淡出效果，并保留音频导出。",
     "checkingSupport": "正在检查视频支持",
     "unsupportedTitle": "此浏览器不支持视频",
     "unsupportedBody": "您的浏览器无法编码视频。Chrome、Edge 或 Safari 17 及更高版本可以。",
-    "emptyHint": "即可将其应用于视频。",
     "addVideo": "添加视频",
     "dropHint": "将一个视频拖放到此处，或",
-    "formatsHint": "MP4、WebM 或 MOV。一切都在您的浏览器中完成；任何内容都不会上传，且图库暂不支持视频。",
-    "fileMeta": "{{width}} × {{height}} px · {{duration}} 秒 · {{size}} · {{audio}}",
-    "choosePresetPreview": "选择一个预设，以在某一帧上预览水印。",
-    "outputSize": "输出 {{width}} × {{height}} px。",
     "transcodingProgress": "转码进度",
-    "progress": {
-      "noEta": "第 {{frame}} 帧 · {{percent}}%",
-      "withEta": "第 {{frame}} 帧 · {{percent}}% · 剩余约 {{seconds}} 秒"
-    },
+    "progress": {},
     "cancel": "取消",
-    "cancelled": "转码已取消。",
-    "runErrorTitle": "无法为视频添加水印",
-    "download": "下载 {{fileName}}",
     "share": "分享",
-    "presets": "预设",
-    "placement": "放置",
-    "placementOptions": {
-      "smart": "智能",
-      "bottomRight": "右下",
-      "bottomLeft": "左下",
-      "topRight": "右上",
-      "topLeft": "左上",
-      "center": "居中"
-    },
     "quality": "质量",
     "qualityOptions": {
       "low": "低",
@@ -895,37 +877,50 @@
       "fit1080p": "适应 1080p",
       "fit720p": "适应 720p"
     },
-    "watermarking": "正在添加水印…",
-    "watermarkVideo": "为视频添加水印",
-    "fixedPlacementNote": "水印在整个视频中保持一个固定位置。音频在符合输出条件时会直接复制，否则会重新编码。",
-    "renderingPreview": "正在渲染预览",
-    "previewAlt": "视频某一帧上的水印"
+    "previewAlt": "视频某一帧上的水印",
+    "timeline": {
+      "heading": "时间与运动",
+      "play": "播放",
+      "pause": "暂停",
+      "playhead": "播放位置",
+      "start": "开始",
+      "end": "结束",
+      "fadeIn": "淡入",
+      "fadeOut": "淡出",
+      "keyframes": "关键帧",
+      "addKeyframe": "在此添加关键帧",
+      "updateKeyframe": "更新此处的关键帧",
+      "removeKeyframe": "移除 {{time}} 处的关键帧",
+      "hint": "添加关键帧，移动到另一时间点，然后拖动、缩放或旋转水印。Lumafoil 会生成关键帧之间的运动。",
+      "playbackFailed": "此浏览器无法播放所选视频。",
+      "chooseVideo": "请先打开视频并添加有效的水印。",
+      "waitPreview": "请等待水印预览显示后再添加关键帧。",
+      "changed": "导出过程中，视频或水印发生了变化。请重新导出以使用当前的编辑内容。",
+      "download": "下载视频",
+      "cloudSaved": "带水印的视频已保存到你的云存储。"
+    }
   },
   "documents": {
-    "orgRequired": "创建或加入一个组织，以为文档添加水印。",
+    "orgRequired": "创建或加入一个工作区，以为文档添加水印。",
     "heading": "文档",
-    "description": "将预设加盖到 PDF 的每一页上。文件会在您的浏览器中处理，并逐个下载或以 ZIP 形式下载。",
-    "emptyHint": "即可用它为文档添加水印。",
-    "addPdfs": "添加 PDF",
-    "dropHint": "将 PDF 拖放到此处，或",
-    "filesHint": "最多 {{max}} 个文件，每个 {{size}}。每一页都会在您的浏览器中添加水印；任何内容都不会上传。",
-    "skipped_other": "已跳过 {{count}} 个文件：非 PDF 或超过 {{max}}。",
-    "fileCount_other": "{{count}} 个文档",
-    "clearList": "清空列表",
-    "watermarkingProgress": "加水印进度",
-    "progressFinished": "{{done}}/{{total}} 已完成",
-    "progressFailed": "，{{count}} 个失败",
-    "progressEnd": "。",
-    "listLabel": "要加水印的文档",
-    "downloadFile": "下载 {{fileName}}",
-    "removeFile": "移除 {{fileName}}",
-    "presetHint": "勾选一个或多个；它们会按勾选顺序绘制，后勾选的覆盖先勾选的。",
-    "placement": "放置",
-    "smartPlacementHint": "智能放置适用于照片；文档请选择边角或自定义位置。",
-    "watermarkEmpty": "为文档添加水印",
-    "watermarkCount": "为 {{count}} 个添加水印",
-    "downloadZip": "以 ZIP 下载 {{count}} 个",
-    "savedAsHint": "每个文档都会保存为 {name}-watermarked.pdf。加密的 PDF 会被拒绝。"
+    "description": "预览 PDF 的每一页，直接编辑水印，并将水印添加到原始文档后导出。处理多个文件时，请使用批量处理。",
+    "reader": {
+      "previous": "上一页",
+      "next": "下一页",
+      "page": "页码",
+      "ofPages": "共 {{total}} 页",
+      "pageStatus": "{{name}} · 第 {{page}} 页，共 {{total}} 页",
+      "preview": "PDF 第 {{page}} 页",
+      "pageText": "页面文本",
+      "open": "打开 PDF",
+      "empty": "打开或拖入 PDF，预览页面并放置水印。",
+      "invalidFile": "请选择未超过文档大小限制的 PDF。",
+      "chooseMark": "导出此文档前，请添加有效的水印。",
+      "changed": "导出过程中，文档或水印发生了变化。请重新导出以使用当前的编辑内容。",
+      "download": "下载 PDF",
+      "cloudSaved": "带水印的 PDF 已保存到你的云存储。",
+      "originalHint": "原始文本、矢量图形、页面尺寸和嵌入的图像均会保留。仅水印会被栅格化。受密码保护的 PDF 必须先解锁。"
+    }
   },
   "verify": {
     "checkEmail": {
@@ -964,98 +959,102 @@
   "landing": {
     "nav": "账户",
     "signIn": "登录",
-    "heroBody": "添加文字、标志或签名。在单个文件或批量任务中复用预设，离线编辑，并在恢复连接后同步。",
-    "featuresHeading": "覆盖完整流程的功能",
-    "footer": "Lumafoil 是基于 MIT 许可证的开源软件。",
+    "heroBody": "添加文字、徽标、签名、形状、贴纸或二维码。在照片上直接调整，预览 PDF 页面，或沿视频时间轴移动水印。保存自己的样式，再将它用于批量文件。",
+    "featuresHeading": "满足各种水印需求的工具",
+    "footer": "Lumafoil 是采用 MIT 许可证的开源项目。",
     "privacy": "隐私",
     "terms": "条款",
-    "heroTitleStart": "为照片、视频和PDF",
+    "heroTitleStart": "为照片、视频和 PDF",
     "heroTitleEnd": "添加水印。",
     "heroAlt": "带水印位置和导出设置的Lumafoil照片编辑器",
-    "previewLabel": "Lumafoil编辑器",
-    "privacyNote": "文件在您的设备上处理。云端保存是可选的。",
+    "previewLabel": "图片编辑器一览",
+    "privacyNote": "编辑在你的设备上进行。由你决定保存或分享什么。",
     "formatsLabel": "照片 · PDF · 视频",
     "workflowHeading": "打开。调整。导出。",
-    "workflowNote": "工作区集中管理预设和已保存的文件。",
+    "workflowNote": "将可复用的预设保存在素材库，将已保存的照片放在图库。两者都可在工作空间内按文件夹整理。",
     "steps": {
-      "openTitle": "导入照片",
-      "openBody": "打开单张图片或整批照片，原始文件保持不变。",
-      "markTitle": "制作你的水印",
-      "markBody": "选择已保存的预设，或创作属于你的独特印记。",
-      "exportTitle": "导出即可",
-      "exportBody": "下载完成的文件，或保存到图库并同步。"
+      "openTitle": "打开文件",
+      "openBody": "从设备或已连接的存储中选择照片、PDF 或受支持的视频。多个文件可使用批量处理。源文件不会被修改。",
+      "markTitle": "选择并调整",
+      "markBody": "从模板或已保存的预设开始，在预览旁边编辑文字、图案、大小、位置和外观。",
+      "exportTitle": "保存或分享",
+      "exportBody": "下载结果或选择云端文件夹。将完成的照片保存到图库，并为想分享的照片创建链接。"
     },
     "github": "GitHub",
     "featuresIntro": "设计水印，应用到文件，再选择保存或分享结果的方式。",
-    "moreHeading": "更多实用工具",
+    "moreHeading": "编辑、存储与分享",
     "capabilities": {
       "marks": {
-        "title": "文字、标志和亲笔签名",
-        "body": "输入姓名或版权声明，上传标志，或绘制签名。调整大小、角度、不透明度和颜色，还能组合多个水印。"
+        "title": "文字、徽标、形状和签名",
+        "body": "输入版权声明、上传徽标、绘制签名，或从 20 种形状中选择。调整大小、旋转、填充、描边和不透明度。组合图层，拖动水印定位，并在工作时撤销修改。"
       },
       "batch": {
-        "title": "批量添加水印",
-        "body": "将保存的水印应用到多张照片。检查结果，单独调整每张图片的位置，再将成品打包为 ZIP 下载。"
+        "title": "照片、PDF 和视频混合批处理",
+        "body": "将已保存的水印应用于照片、PDF 和受支持视频组成的混合批次。检查每个结果，单独调整照片，再分别下载文件或打包为 ZIP。处理失败的文件会继续显示，便于检查。"
       },
       "fonts": {
         "title": "551 个不同的字体家族",
-        "body": "搜索衬线、无衬线、手写、装饰和等宽字体。预览文字并保存样式。字体以开放许可证在本地提供，无需外部字体请求。"
+        "body": "按名称搜索字体，并以各自的字形查看选项。再次使用最近的字体，调整字距和弯曲程度，再将样式保存为预设。Lumafoil 附带字体文件及其开放许可证声明。"
       },
       "stickers": {
         "title": "400 款彩色矢量贴纸",
-        "body": "浏览动物、花卉、食物、旅行、庆典和日常物品。搜索图案，添加到水印中，缩放时保持边缘清晰。"
+        "body": "搜索动物、花卉、食物、旅行、庆祝活动和日常物品。调整矢量图案的大小，用作水印。导出内容会保留内置图案的许可证声明。"
       },
       "qr": {
         "title": "创建并保存二维码水印",
         "body": "将网址或文字转换成二维码。为作品集、联系页面或不同项目分别保存代码，再应用到文件中。"
       },
       "templates": {
-        "title": "将水印保存为模板",
-        "body": "保存文字、图案、样式和位置。在编辑器或批量工具中使用预设，并通过导入和导出在设备之间转移。"
+        "title": "18 个模板与自己的预设",
+        "body": "从草稿、机密、禁止复制、校样、审核印章或照片署名开始。编辑任意模板，命名并保存到素材库。将预设整理到文件夹，再用于图片、文档、视频或批量处理。"
       },
       "editing": {
-        "title": "裁剪、缩放和调整",
-        "body": "裁剪照片，选择输出尺寸，并在完成水印前调整亮度、对比度和饱和度。"
+        "title": "裁剪、调整大小与画面",
+        "body": "裁剪或旋转照片，并调整亮度、对比度和饱和度。放大画面以便定位，显示间距可调的网格，并启用吸附。除非选择裁剪或更小的输出尺寸，否则会保留原始分辨率。"
       },
       "smart": {
-        "title": "智能位置和对比度",
+        "title": "智能位置与对比度",
         "body": "Lumafoil 根据图片推荐位置及浅色或深色水印。检查结果后，可自行移动或调整样式。"
       },
       "video": {
-        "title": "视频水印",
-        "body": "在浏览器中为支持的视频添加水印。设置位置和显示时间，导出前预览效果。"
+        "title": "视频位置与淡入淡出效果",
+        "body": "在集成的水印工具旁拖动视频播放位置。设置不同时间点的位置，选择每个水印出现的时间，并添加淡入淡出。导出时会重新编码；可用格式和音频支持取决于浏览器及源文件。"
       },
       "pdf": {
-        "title": "PDF 文档水印",
-        "body": "将保存的水印应用到选定的 PDF 页面。处理单个或多个文档，再下载带水印的 PDF。"
+        "title": "预览 PDF 页面并添加水印",
+        "body": "阅读 PDF，并使用页面旁的工具放置水印。将水印应用于整份文档，或通过批量处理一次处理多个 PDF。水印会添加到原始 PDF 页面，保留已有的文字、图片和矢量图案。"
       },
       "export": {
         "title": "选择导出格式",
-        "body": "将照片导出为 JPEG、PNG 或 WebP。设置尺寸和质量，或将处理好的照片打包为 ZIP 下载。"
+        "body": "将照片导出为 PNG、JPEG 或 WebP。默认 PNG 为无损格式；JPEG 和 WebP 使用你选择的质量。导出基于原始图片生成，而不是较小的编辑预览。"
       },
       "gallery": {
-        "title": "私人图库",
-        "body": "将完成的图片保存在账户中，方便以后查找。下载文件或选择要分享的照片。"
+        "title": "文件夹与最近的工作",
+        "body": "利用文件夹、最近项目以及缩略图、列表或详细信息视图，整理素材库中的预设和图库中保存的照片。除非明确分享访问权限或创建图库链接，否则工作空间保持私密。"
       },
       "sharing": {
-        "title": "分享选定的照片",
-        "body": "为选定的照片创建 Lumafoil 图库链接。设置到期时间，或随时撤销链接。"
+        "title": "分享照片或工作空间",
+        "body": "为选定的照片创建可撤销、有期限的图库链接。所有者可通过链接、邮件邀请或直接添加现有用户来授予查看或编辑权限。工作空间权限与加入 Lumafoil 的邀请相互独立。"
       },
       "offline": {
         "title": "离线工作，稍后同步",
-        "body": "完成离线准备后，无需连接即可编辑预设和保存照片。重新连接时同步更改，并显示错误及冲突恢复选项。"
+        "body": "登录后先准备应用的离线使用。没有网络时也能编辑照片和预设，将图库保存操作加入队列。使用同一账号重新连接后即可同步。云端传输、邀请和分享设置变更需要联网。"
       },
       "privacy": {
-        "title": "你的账户，你的工作空间",
-        "body": "新用户需要邀请，并各自获得私人的工作空间。邀请他人不会授予其访问你的照片或预设的权限。"
+        "title": "你的账号，你的工作空间",
+        "body": "新用户需要网站邀请，并会获得独立的私密工作空间。网站邀请绝不会分享你的照片或预设。分享工作空间需要由所有者明确授予访问权限。"
       },
       "languages": {
         "title": "12 种界面语言",
         "body": "可选择 12 种语言，包括采用从右到左布局的阿拉伯语。"
       },
       "theme": {
-        "title": "浅色和深色模式",
+        "title": "浅色与深色模式",
         "body": "选择主题或跟随设备设置。界面适应手机、平板电脑和更大的屏幕。"
+      },
+      "cloud": {
+        "title": "已连接的云端文件夹",
+        "body": "连接 Google Drive、Dropbox 或 OneDrive，即可打开文件、选择导出文件夹，并创建服务商的分享链接。连接会一直保存，直到你主动断开或服务商要求重新授权。Google Drive 的访问范围仅限于你通过 Lumafoil 选择或创建的文件和文件夹。 工作或学校账号可能需要 Microsoft 管理员批准。"
       }
     },
     "inviteHosting": "Lumafoil 仅限受邀用户使用。想自行托管？",
@@ -1135,12 +1134,12 @@
       },
       "acceptableUse": {
         "heading": "可接受的使用",
-        "p1": "请勿使用本服务违反法律，或上传、分享您无权使用的内容。请勿试图绕过安全控制或速率限制，或访问属于您并非成员的组织的数据。",
-        "p2": "组织内的访问权限遵循您的角色，且这些角色会在服务器端强制执行。"
+        "p1": "请勿使用本服务违反法律，或上传、分享您无权使用的内容。请勿试图绕过安全控制或速率限制，或访问属于您并非成员的工作区的数据。",
+        "p2": "工作区内的访问权限遵循您的角色，且这些角色会在服务器端强制执行。"
       },
       "teams": {
         "heading": "私人工作区与协作",
-        "p1": "每个账号都有私人工作区。网站邀请不会共享该空间。独立的协作空间可以明确添加所有者、管理员、编辑者或查看者，服务器会强制执行权限。这些角色并不授予网站管理权。"
+        "p1": "每个账号最初都有独立的私人工作区。网站邀请不会共享邀请人的内容。工作区所有者可以明确授予该工作区的查看或编辑权限。这不会共享其他工作区，也不会授予网站管理权限。"
       },
       "availability": {
         "heading": "可用性、担保与变更",
@@ -1221,16 +1220,12 @@
     "revoke": "撤销",
     "revokeEmail": "撤销发送给 {{email}} 的邀请",
     "invalidEmail": "请输入有效的邮箱地址。",
-    "privateHeading": "你的私人工作区",
-    "privateBody": "只有你可以访问。你可以邀请他人使用 Lumafoil 而不共享此空间，或另建工作区进行协作。",
-    "collaborate": "创建协作工作区",
     "status": {
       "pending": "待接受",
       "accepted": "已接受",
       "revoked": "已撤销",
       "expired": "已过期"
     },
-    "collaborationNotice": "工作区邀请会授予其中照片和预设的访问权限。收件人必须已有 Lumafoil 账号；如未注册，请先使用邀请用户功能。",
     "role": "网站角色",
     "roleHelp": "管理员管理网站账号。工作区成员权限与此独立。"
   },
@@ -1304,5 +1299,218 @@
     "owner": "所有者",
     "admin": "管理员",
     "user": "用户"
+  },
+  "guidance": {
+    "dismiss": "关闭提示",
+    "back": "上一步",
+    "next": "下一步",
+    "done": "知道了",
+    "page": "{{current}} / {{total}}",
+    "image": {
+      "title": "图像",
+      "first": "打开照片即可开始。原始文件保持不变。",
+      "second": "画布缩放只改变视图。下载结果由原始图片生成，默认 PNG 为无损格式。"
+    },
+    "watermark": {
+      "title": "水印工具",
+      "first": "选择文字、符号、形状、标志或二维码。",
+      "second": "点按水印以显示控制点。拖动可移动，双指缩放可调整大小，双指扭转可旋转。点按其他位置可隐藏控制点。"
+    },
+    "presets": {
+      "title": "已保存预设",
+      "first": "从草稿、机密或其他模板开始，也可以选择已保存的水印。",
+      "second": "保存时需要名称和文件夹。新建会保留当前打开的文件，同时开始新的水印。"
+    },
+    "crop": {
+      "title": "裁剪照片",
+      "first": "拖动边缘或选择宽高比。",
+      "second": "重置裁剪可恢复完整照片。原始文件不会被覆盖。"
+    },
+    "adjust": {
+      "title": "照片调整",
+      "first": "使用滑块调整照片的外观。",
+      "second": "重置按钮恢复默认值。撤销可还原上一次编辑。"
+    },
+    "resize": {
+      "title": "输出尺寸",
+      "first": "保留原始尺寸或选择新的尺寸。",
+      "second": "调整尺寸会影响导出图像。画布缩放仅改变显示。"
+    },
+    "export": {
+      "title": "保存结果",
+      "first": "下载、保存到图库或选择云端位置。",
+      "second": "检查格式、尺寸和质量。保存到云端不会自动分享文件；请在已保存的云端文件中单独创建链接。"
+    },
+    "library": {
+      "title": "您的资源库",
+      "first": "查找最近的预设，浏览水印模板，并将保存的设计整理到文件夹。",
+      "second": "通过搜索或切换视图查找预设。打开后可编辑，也可应用于图片、文档、视频或批量处理。"
+    },
+    "gallery": {
+      "title": "您的图库",
+      "first": "查找最近的照片，并将此工作空间中保存的图片整理到文件夹。",
+      "second": "选择缩略图、列表或详细信息。检查照片会寻找不可见的 Lumafoil 标记，但不能证明所有权。"
+    },
+    "bulk": {
+      "title": "批量处理",
+      "first": "添加照片、PDF 和受支持的视频，再选择已保存的水印并检查输出设置。",
+      "second": "检查每个结果或错误。可下载 ZIP 或保存到云端；只有照片结果可以保存到图库。"
+    },
+    "documents": {
+      "title": "文档水印",
+      "first": "打开 PDF，翻阅页面，并使用预览旁的工具调整水印。",
+      "second": "水印会应用于整份文档。导出会保留原始页面及已有的文字、图片和矢量图案。"
+    },
+    "video": {
+      "title": "视频水印",
+      "first": "打开受支持的视频，在调整水印时拖动播放位置或播放预览。",
+      "second": "添加关键帧，让水印随时间移动。设置开始、结束和淡入淡出，并在导出前检查输出与音频选项。"
+    },
+    "workspace": {
+      "title": "工作区访问",
+      "first": "在用户菜单中打开管理访问以检查共享设置。",
+      "second": "所有者可以授予查看或编辑权限。分享此工作空间不会分享其他工作空间或任何人的已连接云端账号。"
+    }
+  },
+  "workspaceAccess": {
+    "loading": "正在加载访问权限…",
+    "ownerOnly": "只有工作区所有者可以更改访问权限。",
+    "people": "有权访问的用户",
+    "general": "常规访问权限",
+    "restricted": "受限",
+    "restrictedHint": "只有获得授权的人才能打开此工作区。其他工作区仍保持私密。",
+    "addPeople": "添加用户",
+    "permission": "权限",
+    "notify": "通过邮件通知",
+    "send": "发送邀请",
+    "add": "添加用户",
+    "notifyHint": "发送邮件邀请对方查看或编辑此工作区。新用户还会收到单独的账户邀请。",
+    "silentHint": "立即添加已验证的现有 Lumafoil 用户。不发送邮件或通知。",
+    "sent": "工作区邀请已发送。",
+    "added": "已添加访问权限，未发送通知。",
+    "view": "查看",
+    "edit": "编辑",
+    "owner": "所有者",
+    "admin": "管理员",
+    "removeFor": "移除 {{name}} 的访问权限",
+    "inviteLink": "邀请链接",
+    "linkPermission": "链接权限",
+    "expires": "链接有效期",
+    "days_one": "{{count}} 天",
+    "days_other": "{{count}} 天",
+    "createLink": "创建链接",
+    "linkHint": "已登录的 Lumafoil 用户可通过此链接加入，直到链接到期或被撤销。撤销链接仅阻止新用户加入；如需终止现有访问权限，请单独移除用户。",
+    "copyLink": "复制链接",
+    "copied": "链接已复制。",
+    "copyFailed": "复制失败。请选择链接并手动复制。",
+    "revoke": "撤销",
+    "revokeFor": "撤销对 {{name}} 的邀请",
+    "joinTitle": "加入 {{name}}",
+    "joinDescription": "此邀请仅授予您对此工作区的{{permission}}权限。",
+    "join": "加入工作区",
+    "open": "打开工作区",
+    "unavailable": "邀请不可用",
+    "unavailableHint": "此邀请已到期、被撤销或属于其他账户。请使用收到邀请的邮箱登录，或向所有者索取新链接。",
+    "cancel": "取消"
+  },
+  "cloudStorage": {
+    "heading": "云存储",
+    "description": "连接账号一次，即可在打开、保存或共享文件时重复使用连接。",
+    "chooseDestination": "选择文件保存到的文件夹。",
+    "chooseFiles": "选择要在 Lumafoil 中打开的文件。",
+    "loading": "正在加载云存储",
+    "unavailable": "此服务器无法使用该提供商。",
+    "connectHint": "连接账号即可浏览文件和文件夹。连接会保存供下次访问使用。",
+    "connect": "连接 {{provider}}",
+    "dropboxScope": "Dropbox 访问仅限于 Lumafoil 应用文件夹。",
+    "googleScope": "这里只显示已授权给 Lumafoil 的项目。使用浏览 Drive 选择其他文件或文件夹。",
+    "location": "文件夹位置",
+    "appFolder": "Lumafoil 应用文件夹",
+    "root": "我的文件",
+    "empty": "这里没有匹配的文件或文件夹。",
+    "folderName": "新文件夹名称",
+    "createFolder": "创建文件夹",
+    "useFolder": "使用此文件夹",
+    "openSelected": "打开所选",
+    "browseGoogle": "浏览 Drive",
+    "connected": "已连接",
+    "notConnected": "未连接",
+    "reconnect": "重新连接",
+    "disconnect": "断开连接",
+    "managePermissions": "管理权限",
+    "revocationHint": "已与 Lumafoil 断开连接。请在提供商的权限设置中移除剩余授权。",
+    "retry": "重试",
+    "waiting": "请在提供商处完成登录。您可以在此取消。",
+    "personalAccount": "个人账号",
+    "workAccount": "工作或学校账号",
+    "microsoftConsent": "工作或学校账号可能需要 Microsoft 管理员批准。"
+  },
+  "folders": {
+    "heading": "文件夹",
+    "rootPhoto": "图库",
+    "rootPreset": "预设库",
+    "path": "文件夹路径",
+    "new": "新建文件夹",
+    "name": "文件夹名称",
+    "rename": "重命名文件夹",
+    "moveFolder": "移动文件夹",
+    "moveItems": "移动项目",
+    "moveNamed": "移动 {{name}}",
+    "destination": "目标文件夹",
+    "saveLocation": "保存位置",
+    "choose": "选择文件夹",
+    "expand": "展开 {{name}}",
+    "collapse": "折叠 {{name}}",
+    "open": "打开 {{name}}",
+    "loading": "正在加载文件夹…",
+    "unavailable": "此文件夹不可用。请打开主集合或选择其他文件夹。",
+    "loadError": "无法加载文件夹。主集合仍然可用。",
+    "delete": "删除文件夹",
+    "deleteTitle": "删除 {{name}}？",
+    "deleteHint": "只能删除空文件夹。删除文件夹不会同时删除其中的文件或子文件夹。",
+    "save": "保存",
+    "cancel": "取消",
+    "moveHere": "移动到此处",
+    "newHint": "在所选位置创建文件夹。",
+    "renameHint": "为此文件夹选择名称和位置。",
+    "moving": "移动项目（{{count}}）",
+    "invalidName": "名称不能包含斜杠或控制字符。",
+    "nameTaken": "此处已存在同名文件夹。",
+    "selection": "已选项目：{{count}}"
+  },
+  "templates": {
+    "heading": "水印模板",
+    "hint": "应用现成的布局，按需调整，然后保存为自己的预设。",
+    "search": "搜索模板",
+    "category": "模板类别",
+    "use": "使用 {{name}}",
+    "empty": "没有匹配的模板。",
+    "unavailable": "此模板不可用。请从预设库中选择模板。",
+    "categories": {
+      "all": "全部",
+      "documents": "文档",
+      "review": "审核",
+      "photography": "照片"
+    },
+    "names": {
+      "draft": "草稿",
+      "confidential": "机密",
+      "strictlyConfidential": "绝密",
+      "internalUseOnly": "仅限内部使用",
+      "doNotCopy": "禁止复制",
+      "doNotDistribute": "禁止分发",
+      "copy": "副本",
+      "void": "作废",
+      "forReview": "供审核",
+      "proof": "校样",
+      "sample": "样本",
+      "preview": "预览",
+      "approved": "已批准",
+      "final": "最终版",
+      "unpaid": "未付款",
+      "copyright": "版权",
+      "photoCredit": "摄影署名",
+      "repeatingProof": "重复校样"
+    }
   }
 }

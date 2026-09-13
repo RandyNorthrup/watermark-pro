@@ -85,7 +85,7 @@ function assertStampedPage(page: PDFPage) {
   }
 }
 
-test('stamps every PDF page, preserves original content, and isolates refused files', async ({
+test('previews pages and stamps the original PDF without replacing its content', async ({
   page,
   request,
 }) => {
@@ -97,7 +97,7 @@ test('stamps every PDF page, preserves original content, and isolates refused fi
   }
   await signUpAndVerify(page, request, person)
   const { organization } = await expectActiveWorkspace(page, person, 'My workspace')
-  const preset = await page.request.post(`/api/orgs/${organization.id}/watermarks`, {
+  const response = await page.request.post(`/api/orgs/${organization.id}/watermarks`, {
     headers: { origin: PREVIEW_ORIGIN },
     data: {
       name: PRESET_NAME,
@@ -111,40 +111,32 @@ test('stamps every PDF page, preserves original content, and isolates refused fi
       },
     },
   })
-  expect(preset.status()).toBe(201)
-  // API fixture writes bypass TanStack Query. Reload cached shell queries.
+  expect(response.status()).toBe(201)
   await page.reload()
   await navigateTo(page, 'Documents')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Documents')
-  await expect(
-    page.getByRole('button', { name: 'Watermark documents', exact: true }),
-  ).toBeDisabled()
+  const downloadButton = page.getByRole('button', { name: 'Download PDF', exact: true })
+  await expect(downloadButton).toBeDisabled()
   const source = await pdfFixture(PAGE_SIZES)
-  const oversized = await pdfFixture(Array.from({ length: MAX_PDF_PAGES + 1 }, () => [72, 72]))
-  await page.getByLabel('Add PDFs').setInputFiles([
-    { name: 'report.pdf', mimeType: 'application/pdf', buffer: source },
-    { name: 'broken.pdf', mimeType: 'application/pdf', buffer: Buffer.from('not a PDF') },
-    { name: 'too-many-pages.pdf', mimeType: 'application/pdf', buffer: oversized },
-  ])
-  const run = page.getByRole('button', { name: 'Watermark 3', exact: true })
-  await expect(run).toBeDisabled()
-  await page.getByRole('checkbox', { name: PRESET_NAME }).check()
-  await expect(run).toBeEnabled()
+  await page
+    .getByLabel('Open PDF', { exact: true })
+    .setInputFiles({ name: 'report.pdf', mimeType: 'application/pdf', buffer: source })
+  await expect(page.getByRole('img', { name: 'PDF Page 1' })).toBeVisible()
+  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
+  await page
+    .getByRole('combobox', { name: 'Preset', exact: true })
+    .selectOption({ label: PRESET_NAME })
+  await page.getByRole('button', { name: 'Next Page', exact: true }).click()
+  await expect(page.getByRole('img', { name: 'PDF Page 2' })).toBeVisible()
+  await expect(page.getByRole('spinbutton', { name: 'Page', exact: true })).toHaveValue('2')
+  await page.getByRole('button', { name: 'Next Page', exact: true }).click()
+  await expect(page.getByRole('img', { name: 'PDF Page 3' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Next Page', exact: true })).toBeDisabled()
+  await page.getByRole('button', { name: 'Previous Page', exact: true }).click()
+  await expect(page.getByRole('img', { name: 'PDF Page 2' })).toBeVisible()
   await expectAccessible(page)
-  await run.click()
-  await expect(page.getByText(/3 of 3 finished, 2 failed/)).toBeVisible()
-  await expect(
-    page.getByText(
-      `This PDF has ${String(MAX_PDF_PAGES + 1)} pages; the limit is ${String(MAX_PDF_PAGES)}.`,
-    ),
-  ).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Download broken-watermarked.pdf' })).toHaveCount(0)
-  await expect(
-    page.getByRole('button', { name: 'Download too-many-pages-watermarked.pdf' }),
-  ).toHaveCount(0)
-  const downloadPending = page.waitForEvent('download')
-  await page.getByRole('button', { name: 'Download report-watermarked.pdf', exact: true }).click()
-  const download = await downloadPending
+  const pending = page.waitForEvent('download')
+  await downloadButton.click()
+  const download = await pending
   expect(download.suggestedFilename()).toBe('report-watermarked.pdf')
   const original = await PDFDocument.load(source, { updateMetadata: false })
   const output = await PDFDocument.load(await downloadBytes(download), { updateMetadata: false })
@@ -159,5 +151,42 @@ test('stamps every PDF page, preserves original content, and isolates refused fi
     expect(pageContent(stamped)).toContain(pageContent(sourcePage))
     assertStampedPage(stamped)
   }
+  await expectAccessible(page)
+})
+
+test('refuses broken and oversized-page PDFs and recovers with a valid document', async ({
+  page,
+  request,
+}) => {
+  test.slow()
+  await signUpAndVerify(page, request, {
+    name: 'Document Validation',
+    email: `document-validation-${crypto.randomUUID()}@example.test`,
+    password: 'synthetic document passphrase',
+  })
+  await navigateTo(page, 'Documents')
+  const input = page.getByLabel('Open PDF', { exact: true })
+  await input.setInputFiles({
+    name: 'broken.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('not a PDF'),
+  })
+  await expect(page.getByRole('alert')).toContainText(/PDF/i)
+  await expect(page.getByRole('img', { name: /^PDF Page/ })).toHaveCount(0)
+  const oversized = await pdfFixture(Array.from({ length: MAX_PDF_PAGES + 1 }, () => [72, 72]))
+  await input.setInputFiles({
+    name: 'too-many-pages.pdf',
+    mimeType: 'application/pdf',
+    buffer: oversized,
+  })
+  await expect(page.getByRole('alert')).toContainText(/page limit/)
+  await expect(page.getByRole('img', { name: /^PDF Page/ })).toHaveCount(0)
+  await input.setInputFiles({
+    name: 'valid.pdf',
+    mimeType: 'application/pdf',
+    buffer: await pdfFixture([[240, 320]]),
+  })
+  await expect(page.getByRole('img', { name: 'PDF Page 1' })).toBeVisible()
+  await expect(page.getByRole('alert')).toHaveCount(0)
   await expectAccessible(page)
 })

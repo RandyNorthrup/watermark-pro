@@ -10,7 +10,7 @@ export const PUBLIC_SURFACES = [
 
 export const WORKSPACE_SURFACES = [
   { id: 'dashboard', route: '/app', heading: 'dashboard.overviewHeading' },
-  { id: 'members', route: '/app/members', heading: 'members.heading' },
+  { id: 'members', route: '/app/members', heading: 'shell.manageAccess' },
   { id: 'audit', route: '/app/audit', heading: 'audit.heading' },
   { id: 'new-organization', route: '/app/organizations/new', heading: 'organizations.newTitle' },
   { id: 'library', route: '/app/library', heading: 'library.heading' },
@@ -30,6 +30,7 @@ export const PREPARED_SURFACES = [
   { id: 'reset-password-valid', route: '/reset-password', heading: 'auth.resetPassword.title' },
   { id: 'reset-password-invalid', route: '/reset-password', heading: 'auth.resetPassword.title' },
   { id: 'accept-invitation', route: '/accept-invitation/$invitationId', heading: null },
+  { id: 'workspace-invitation', route: '/workspace-invitation/$token', heading: null },
   { id: 'share-public', route: '/share/$token', heading: null },
   { id: 'designer-new', route: '/app/library/new', heading: 'library.newPreset' },
   { id: 'designer-edit', route: '/app/library/$watermarkId', heading: null },

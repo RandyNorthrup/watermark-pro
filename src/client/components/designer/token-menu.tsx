@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ListPlus } from 'lucide-react'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -13,6 +13,9 @@ import {
 
 interface TokenMenuProps {
   onInsert: (token: TextToken) => void
+  isCompact?: boolean
+  tabIndex?: number
+  onFocus?: () => void
 }
 
 /** Catalogue keys for each placeholder's plain name; the raw token is shown beside it. */
@@ -35,7 +38,7 @@ const TOKEN_LABELS = {
 } as const satisfies Record<TextToken, string>
 
 /** A menu that inserts a text token (camera field, date, batch position) at the caret. */
-export function TokenMenu({ onInsert }: TokenMenuProps) {
+export function TokenMenu({ onInsert, isCompact = false, tabIndex, onFocus }: TokenMenuProps) {
   const { t } = useTranslation()
   const insertionRef = useRef(false)
   return (
@@ -43,10 +46,24 @@ export function TokenMenu({ onInsert }: TokenMenuProps) {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-1 self-start rounded-md border border-line px-2 py-1 text-xs font-medium text-ink-muted hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none dark:hover:bg-brand-900/40"
+          tabIndex={tabIndex}
+          onFocus={onFocus}
+          aria-label={t('designer.tokens.menu')}
+          title={t('designer.tokens.menu')}
+          className={
+            isCompact
+              ? 'flex h-8 w-full min-w-0 items-center justify-center rounded-md text-ink-muted hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 dark:hover:bg-brand-900/40'
+              : 'inline-flex items-center gap-1 self-start rounded-md border border-line px-2 py-1 text-xs font-medium text-ink-muted hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:outline-none dark:hover:bg-brand-900/40'
+          }
         >
-          {t('designer.tokens.menu')}
-          <ChevronDown aria-hidden="true" className="size-3" />
+          {isCompact ? (
+            <ListPlus aria-hidden="true" className="size-4" />
+          ) : (
+            <>
+              {t('designer.tokens.menu')}
+              <ChevronDown aria-hidden="true" className="size-3" />
+            </>
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

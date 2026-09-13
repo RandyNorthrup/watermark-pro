@@ -82,3 +82,33 @@ it('reports render failure and recovers on the next real control change', async 
   expect(result.current.error).toBeNull()
   expect(result.current.result).not.toBeNull()
 })
+
+it('withholds export readiness until the current subject and its first frame are ready', async () => {
+  const { result, rerender } = renderHook(
+    ({ owner }) => useRenderer(owner, [DEFAULT_TEXT_SPEC], undefined, { width: 300, height: 200 }),
+    { initialProps: { owner: 'workspace-a' } },
+  )
+  expect(result.current.isSubjectReady).toBe(false)
+  await nextFrame()
+  expect(result.current.isSubjectReady).toBe(true)
+  const renderer = result.current.renderer.current
+  if (renderer === null) throw new Error('Expected a mounted renderer')
+  const pending = Promise.withResolvers<undefined>()
+  vi.spyOn(renderer, 'setSubject').mockImplementationOnce(() => pending.promise)
+  let loading: Promise<void> = Promise.resolve()
+  act(() => {
+    loading = result.current.setSubject(new File(['image'], 'next.png'))
+  })
+  expect(result.current.isSubjectReady).toBe(false)
+  await act(async () => {
+    pending.resolve(undefined)
+    await loading
+  })
+  expect(result.current.isSubjectReady).toBe(false)
+  await nextFrame()
+  expect(result.current.isSubjectReady).toBe(true)
+  rerender({ owner: 'workspace-b' })
+  expect(result.current.isSubjectReady).toBe(false)
+  await nextFrame()
+  expect(result.current.isSubjectReady).toBe(true)
+})

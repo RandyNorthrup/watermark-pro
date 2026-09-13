@@ -1,37 +1,16 @@
-/**
- * Google Drive picker (M16). Opens Drive's own file picker, lets the member
- * choose one or more images, and returns them as `File`s the app ingests like a
- * local pick. Two Google SDKs are pulled in on demand by injecting their
- * `<script>` tags — no npm dependency — and each injection is memoised in a
- * module-level cache so re-opening the picker never re-loads them:
- *
- *   • the API loader (`apis.google.com/js/api.js`), whose `gapi.load('picker')`
- *     brings in the Picker UI, and
- *   • Google Identity Services (`accounts.google.com/gsi/client`), which mints a
- *     short-lived OAuth access token for the narrow `drive.file` scope.
- *
- * The token flow opens a popup on `accounts.google.com`; the served page must
- * therefore relax `Cross-Origin-Opener-Policy` to `same-origin-allow-popups`
- * (the default `same-origin` severs the opener and the popup can never report
- * back). Chosen files are streamed from the Drive media endpoint with the
- * bearer token and converted through `toImageFile`. The pure pieces — the media
- * URL, the picker-response mapping, and the per-file download — are extracted so
- * they unit-test without the SDKs; only the script/token/PickerBuilder
- * orchestration needs a browser.
- */
-import { z } from 'zod'
-
-import { cloudRequest } from './cloud-transfer'
-import { toImageFile } from './download'
-import type { PublicConfig } from '../../../shared/api'
+/** Google Drive Picker supplies per-file/folder authorization; durable OAuth tokens come from the Worker. */
+import { cloudTargetToken, type CloudSaveTarget } from './cloud-folders'
 import {
-  GOOGLE_API_SCRIPT_URL,
-  GOOGLE_DRIVE_FILES_ENDPOINT,
-  GOOGLE_DRIVE_SCOPE,
-  GOOGLE_IDENTITY_SCRIPT_URL,
-} from '../../../shared/constants'
+  DEFAULT_CLOUD_MEDIA_KINDS,
+  cloudMediaTypes,
+  toCloudFile,
+  type CloudMediaKind,
+} from './cloud-media'
+import { cloudRequest, trustedCloudUrl } from './cloud-transfer'
+import type { PublicConfig } from '../../../shared/api'
+import { GOOGLE_API_SCRIPT_URL, GOOGLE_DRIVE_FILES_ENDPOINT } from '../../../shared/constants'
+import { CLOUD_CONNECTION_CHANGED_EVENT, captureCloudOwner } from '../cloud-connection-context'
 import { ACCOUNT_CHANGED_EVENT } from '../offline-account'
-import { captureOfflineOwner } from '../offline-context'
 
 /** The `gapi` module name that supplies the Picker UI. */
 const PICKER_MODULE = 'picker'
@@ -40,35 +19,6 @@ const DRIVE_ALT_MEDIA_QUERY = 'alt=media'
 /** Authorization header carrying the OAuth bearer token on the media download. */
 const AUTHORIZATION_HEADER = 'Authorization'
 const BEARER_PREFIX = 'Bearer '
-
-/** The token-flow slice of Google Identity Services we drive. */
-interface GoogleTokenResponse {
-  readonly access_token: string
-  readonly error?: string
-  readonly error_description?: string
-}
-
-interface GoogleTokenErrorResponse {
-  readonly type: string
-  readonly message?: string
-}
-
-interface GoogleTokenClientConfig {
-  readonly client_id: string
-  readonly scope: string
-  readonly callback: (response: GoogleTokenResponse) => void
-  readonly error_callback: (error: GoogleTokenErrorResponse) => void
-}
-
-interface GoogleTokenClient {
-  readonly requestAccessToken: (options: { prompt: 'select_account' }) => void
-}
-
-interface GoogleAccounts {
-  readonly oauth2: {
-    readonly initTokenClient: (config: GoogleTokenClientConfig) => GoogleTokenClient
-  }
-}
 
 /** One document as the Picker reports it in its callback payload. */
 interface PickerDocument {
@@ -83,7 +33,7 @@ export interface PickerResponse {
   readonly docs?: readonly PickerDocument[]
 }
 
-/** A chosen Drive file, normalised to what the download step needs. */
+/** A chosen Drive file, normalized to what the download step needs. */
 export interface PickedFile {
   readonly id: string
   readonly name: string
@@ -104,16 +54,21 @@ interface GooglePickerBuilder {
   readonly build: () => GooglePickerInstance
 }
 
+interface GoogleDocsView {
+  setIncludeFolders: (isIncluded: boolean) => GoogleDocsView
+  setSelectFolderEnabled: (isEnabled: boolean) => GoogleDocsView
+  setMimeTypes: (types: string) => GoogleDocsView
+}
+
 interface GooglePickerApi {
   readonly PickerBuilder: new () => GooglePickerBuilder
-  readonly DocsView: new (viewId: string) => object
-  readonly ViewId: { readonly DOCS_IMAGES: string }
-  readonly Feature: { readonly MULTISELECT_ENABLED: string }
+  readonly DocsView: new (viewId: string) => GoogleDocsView
+  readonly ViewId: { readonly DOCS_IMAGES: string; readonly DOCS: string; readonly FOLDERS: string }
+  readonly Feature: { readonly MULTISELECT_ENABLED: string; readonly SUPPORT_DRIVES: string }
   readonly Action: { readonly PICKED: string; readonly CANCEL: string }
 }
 
 interface GoogleApi {
-  readonly accounts: GoogleAccounts
   readonly picker: GooglePickerApi
 }
 
@@ -152,12 +107,16 @@ export function mapPickedDocuments(response: PickerResponse): PickedFile[] {
 export async function downloadDriveFiles(
   picked: readonly PickedFile[],
   accessToken: string,
+  mediaKinds: readonly CloudMediaKind[] = DEFAULT_CLOUD_MEDIA_KINDS,
+  signal?: AbortSignal,
 ): Promise<File[]> {
   return await Promise.all(
     picked.map(async (item) => {
       return await cloudRequest(
         driveMediaUrl(item.id),
         {
+          signal: signal ?? null,
+          redirect: 'follow',
           headers: { [AUTHORIZATION_HEADER]: `${BEARER_PREFIX}${accessToken}` },
         },
         async (response) => {
@@ -166,8 +125,10 @@ export async function downloadDriveFiles(
               `Could not download ${item.name} from Google Drive (HTTP ${String(response.status)}).`,
             )
           }
+          if (response.url !== '')
+            trustedCloudUrl(response.url, ['www.googleapis.com', 'googleusercontent.com'])
           const blob = await response.blob()
-          return toImageFile(blob, item.name, item.type)
+          return toCloudFile(blob, item.name, item.type, mediaKinds)
         },
       )
     }),
@@ -211,7 +172,7 @@ async function loadPickerModule(): Promise<void> {
   await loadScriptOnce(GOOGLE_API_SCRIPT_URL)
   const gapi = window.gapi
   if (gapi === undefined) {
-    throw new Error('The Google API loader did not initialise.')
+    throw new Error('The Google API loader did not initialize.')
   }
   const promise =
     loadPromises.get(PICKER_MODULE) ??
@@ -230,140 +191,129 @@ async function loadPickerModule(): Promise<void> {
   await promise
 }
 
-/** Load Google Identity Services. Memoised. */
-function loadIdentityServices(): Promise<void> {
-  return loadScriptOnce(GOOGLE_IDENTITY_SCRIPT_URL)
+interface PickerOptions {
+  mode: 'files' | 'folder'
+  mediaKinds: readonly CloudMediaKind[]
+  signal?: AbortSignal | undefined
 }
 
-/**
- * Load Google Identity Services and mint a `drive.file` access token through its
- * popup flow. Exported so the save module (`google-drive-save`) shares the same
- * token dance rather than duplicating it.
- */
-export async function acquireGoogleDriveToken(clientId: string): Promise<string> {
-  const owner = captureOfflineOwner()
-  await loadIdentityServices()
-  owner.assertCurrent()
-  const google = window.google
-  if (google === undefined) {
-    throw new Error('The Google Identity SDK did not initialise.')
-  }
-  return await requestAccessToken(google.accounts, clientId)
-}
-
-/** Request a `drive.file` access token via the GIS popup flow. */
-function requestAccessToken(accounts: GoogleAccounts, clientId: string): Promise<string> {
-  const owner = captureOfflineOwner()
-  return new Promise<string>((resolve, reject) => {
-    const changed = () => reject(new Error('The app account changed during Google sign-in.'))
-    window.addEventListener(ACCOUNT_CHANGED_EVENT, changed, { once: true })
-    const client = accounts.oauth2.initTokenClient({
-      client_id: clientId,
-      scope: GOOGLE_DRIVE_SCOPE,
-      callback: (response) => {
-        window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
-        try {
-          owner.assertCurrent()
-        } catch (error) {
-          reject(error instanceof Error ? error : new Error('Google sign-in was interrupted.'))
-          return
-        }
-        if (response.error !== undefined) {
-          reject(
-            new Error(`Google sign-in failed: ${response.error_description ?? response.error}.`),
-          )
-          return
-        }
-        const token = z.string().min(1).safeParse(response.access_token)
-        if (!token.success) {
-          reject(new Error('Google sign-in did not return a usable token.'))
-          return
-        }
-        resolve(token.data)
-      },
-      error_callback: (error) => {
-        window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
-        reject(new Error(`Google sign-in was cancelled or failed: ${error.message ?? error.type}.`))
-      },
-    })
-    client.requestAccessToken({ prompt: 'select_account' })
-  })
-}
-
-/**
- * Build and show the Picker, resolving the chosen files (empty on cancel). The
- * view is limited to Drive images and multi-select is enabled; the payload
- * mapping is delegated to the pure `mapPickedDocuments`.
- */
+/** Google Picker grants selected files/folders while the durable server connection supplies its token. */
 function showPicker(
   picker: GooglePickerApi,
   token: string,
   apiKey: string,
   appId: string,
+  options: PickerOptions,
 ): Promise<PickedFile[]> {
-  const owner = captureOfflineOwner()
-  return new Promise<PickedFile[]>((resolve, reject) => {
+  const owner = captureCloudOwner()
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
+      window.removeEventListener(CLOUD_CONNECTION_CHANGED_EVENT, changed)
+      options.signal?.removeEventListener('abort', changed)
+    }
     const changed = () => {
       instance.setVisible(false)
-      reject(new Error('The app account changed while choosing Drive files.'))
+      cleanup()
+      reject(new Error('Cloud file selection was interrupted.'))
     }
-    const instance = new picker.PickerBuilder()
-      .addView(new picker.DocsView(picker.ViewId.DOCS_IMAGES))
-      .enableFeature(picker.Feature.MULTISELECT_ENABLED)
+    const view = new picker.DocsView(
+      options.mode === 'folder' ? picker.ViewId.FOLDERS : picker.ViewId.DOCS,
+    )
+      .setIncludeFolders(true)
+      .setSelectFolderEnabled(options.mode === 'folder')
+      .setMimeTypes(
+        options.mode === 'folder'
+          ? 'application/vnd.google-apps.folder'
+          : cloudMediaTypes(options.mediaKinds).join(','),
+      )
+    const builder = new picker.PickerBuilder()
+      .addView(view)
+      .enableFeature(picker.Feature.SUPPORT_DRIVES)
       .setDeveloperKey(apiKey)
       .setAppId(appId)
       .setOAuthToken(token)
       .setCallback((data) => {
         if (data.action === picker.Action.PICKED) {
-          window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
+          cleanup()
           try {
             owner.assertCurrent()
+            const picked = mapPickedDocuments(data)
+            if (picked.length === 0) throw new Error('Google Drive returned no selected file.')
+            resolve(picked)
           } catch (error) {
-            reject(
-              error instanceof Error ? error : new Error('Google file selection was interrupted.'),
-            )
-            return
+            reject(error instanceof Error ? error : new Error('Google file selection failed.'))
           }
-          resolve(mapPickedDocuments(data))
         } else if (data.action === picker.Action.CANCEL) {
-          window.removeEventListener(ACCOUNT_CHANGED_EVENT, changed)
+          cleanup()
           resolve([])
         }
-        // Intermediate actions (e.g. the picker finishing loading) are ignored.
       })
-      .build()
+    if (options.mode === 'files') builder.enableFeature(picker.Feature.MULTISELECT_ENABLED)
+    const instance = builder.build()
     window.addEventListener(ACCOUNT_CHANGED_EVENT, changed, { once: true })
+    window.addEventListener(CLOUD_CONNECTION_CHANGED_EVENT, changed, { once: true })
+    options.signal?.addEventListener('abort', changed, { once: true })
+    options.signal?.throwIfAborted()
     instance.setVisible(true)
   })
 }
 
-/**
- * Open the Google Drive picker and resolve the chosen images as `File`s
- * (empty when the member cancels). Throws when the deployment has not
- * configured Google's keys or when the browser globals are unavailable.
- */
-export async function pickFromGoogleDrive(config: PublicConfig): Promise<File[]> {
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
-    throw new Error('The Google Drive picker is only available in a browser.')
-  }
-  const clientId = config.googleOAuthClientId
+async function choose(
+  config: PublicConfig,
+  options: PickerOptions,
+  expected?: Pick<CloudSaveTarget, 'providerAccountId' | 'generation'>,
+) {
+  const owner = captureCloudOwner()
   const apiKey = config.googlePickerApiKey
   const appId = config.googlePickerAppId
-  if (clientId === null || apiKey === null || appId === null) {
-    throw new Error('Google Drive import is not configured for this deployment.')
-  }
-
-  const owner = captureOfflineOwner()
-  await Promise.all([loadPickerModule(), loadIdentityServices()])
+  if (apiKey === null || appId === null)
+    throw new Error('Google Drive Picker is not configured on this server.')
+  const token = await cloudTargetToken('google', expected, options.signal)
+  await loadPickerModule()
   owner.assertCurrent()
   const google = window.google
-  if (google === undefined) {
-    throw new Error('The Google SDKs did not initialise.')
-  }
+  if (google === undefined) throw new Error('Google Drive Picker did not load.')
+  const picked = await showPicker(google.picker, token.accessToken, apiKey, appId, options)
+  owner.assertCurrent()
+  return { token, picked }
+}
 
-  const token = await requestAccessToken(google.accounts, clientId)
+/** Explicit native picker selection authorizes additional files without requesting OAuth consent again. */
+export async function pickFromGoogleDrive(
+  config: PublicConfig,
+  mediaKinds: readonly CloudMediaKind[] = DEFAULT_CLOUD_MEDIA_KINDS,
+  expected?: Pick<CloudSaveTarget, 'providerAccountId' | 'generation'>,
+  signal?: AbortSignal,
+): Promise<File[]> {
+  const owner = captureCloudOwner()
+  const { token, picked } = await choose(config, { mode: 'files', mediaKinds, signal }, expected)
   owner.assertCurrent()
-  const picked = await showPicker(google.picker, token, apiKey, appId)
+  const files = await downloadDriveFiles(picked, token.accessToken, mediaKinds, signal)
   owner.assertCurrent()
-  return await downloadDriveFiles(picked, token)
+  return files
+}
+
+/** A selected destination stays bound to the connected account and its grant generation. */
+export async function pickGoogleDriveFolder(
+  config: PublicConfig,
+  expected?: Pick<CloudSaveTarget, 'providerAccountId' | 'generation'>,
+  signal?: AbortSignal,
+): Promise<CloudSaveTarget | null> {
+  const owner = captureCloudOwner()
+  const { token, picked } = await choose(
+    config,
+    { mode: 'folder', mediaKinds: [], signal },
+    expected,
+  )
+  owner.assertCurrent()
+  const folder = picked[0]
+  if (folder === undefined) return null
+  if (folder.type !== 'application/vnd.google-apps.folder')
+    throw new Error('Choose a Google Drive folder for this destination.')
+  return {
+    folder: { id: folder.id, name: folder.name },
+    providerAccountId: token.providerAccountId,
+    generation: token.generation,
+  }
 }

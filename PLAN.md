@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-09-10 (M19 navigation and account organization)
+Last updated: 2026-09-12 (M19 editor, mobile controls and workspace sharing)
 
 ---
 
@@ -15,6 +15,234 @@ PDF documents. The hosted service is invitation-only; each admitted user gets
 a private workspace and a unique invitation link. The source is available free
 on GitHub for self-hosting. Cloudflare Workers at `lumafoil.com` is the target
 production origin; cutover and full release certification remain open in M19.
+
+### Active goal — revised 2026-09-12
+
+Finish and verify the deployed, invitation-only Lumafoil application at
+`https://lumafoil.com`. This revision incorporates the owner's latest instructions
+and supersedes conflicting wording in earlier goal summaries. Deployment alone
+does not certify completion. Keep every remaining requirement below in scope.
+
+1. Finish the cohesive image-editor and mobile tools pass while preserving the
+   general canvas layout: uniform rose glass controls, matching 40-pixel heights
+   for single-line inputs/selects and text buttons, a prominent
+   primary Check A Photo action in Gallery, compact type tabs, at least
+   20 geometric shapes, a searchable library of common editable watermark
+   templates (Draft, Confidential, Internal Use Only, Do Not Copy, review labels
+   and photo credits), real font previews in the dropdown and a plain selected
+   font name, recent fonts without count/category clutter, integrated alternate
+   symbols and photo-detail insertion, small visible handles with usable touch
+   targets, responsive controls and accessible keyboard behavior. Use American
+   English for English interface text (Color, Center, Favorite, License, and
+   corresponding inflections). Apply title casing to interface headings and
+   multiword labels, including buttons, tabs and menus, without changing typed
+   content or watermark text. Verify tap, drag/swipe, pinch, pan, rotation,
+   continuous gesture history, image bounds and
+   grid snapping at the displayed spacing. Keep selection frames hidden until
+   click/keyboard focus; hide them on outside click, blur or Escape. Shape bounds
+   include the entire stroke at every width/rotation. Separate toolbox groups
+   with subtle themed rules rather than additional nested panels. Preserve image aspect ratio and source
+   resolution. Keep the original image file intact and use the full-resolution
+   source for output, never a downsampled preview. Do not downscale or choose
+   lossy export defaults without the user's explicit output choice; distinguish
+   metadata privacy choices from pixel quality. Place photo metadata at the bottom beside the instructions,
+   aligned right. The entire canvas status bar stays on exactly one line at every
+   screen width; truncate long text with its full accessible text retained. New starts a fresh unsaved watermark while retaining the source
+   photo; Save asks for its preset name.
+2. Put Manage access beneath the active workspace name in the user menu; open a
+   compact, responsive sharing modal inspired by Google Drive without navigating
+   away from the current tool. Use "workspace" in all user-facing copy, including
+   account, administration, switches and creation flows; internal schema/API names
+   can remain compatible. A
+   workspace owner can grant, change and revoke View/Edit access through workspace
+   invitation links, invite emails or silent addition of an existing user.
+   Explicit grants apply only to that workspace, including its intentionally
+   shared content. Keep unrelated workspace data, private account information,
+   credentials and offline queues isolated. Site admission and personal referral
+   links remain separate from workspace access grants.
+3. Complete persistent Google Drive, Dropbox and OneDrive connections for load,
+   save and native sharing, including folder navigation and chosen save
+   destinations. Encrypt durable provider credentials server-side and bind them
+   to the authenticated account. Add first-party folders for organizing stored
+   content. Preserve local photo editing, gallery saves and preset edits offline,
+   with correct reconnect synchronization, conflict recovery and account binding.
+4. Rename the visible Editor tool to Image while preserving existing links.
+   Documents receives inline watermark tools and a real document reader/page
+   preview. Video receives inline tools, a scrubbable viewer, timestamp-specific
+   watermark placement and fade effects. Bulk accepts photos, PDFs and videos
+   through the existing processing architecture with correct per-file outputs,
+   errors and cancellation. Do not substitute static previews for these workflows.
+5. Preserve accounts and the single anchored site Owner. There are no site Admins
+   until the Owner appoints them. Admins have the Owner's management permissions
+   except they cannot remove, demote or take over the Owner. Ordinary users remain
+   ordinary users; workspace ownership never grants site administration. Verify
+   Google/Microsoft account creation and sign-in, invite-only admission, trackable
+   personal invitation links, provider file operations, native cloud links and
+   Lumafoil gallery links. Support mailbox and branding must remain consistent.
+6. Standard users open Image directly, with Image first in the tools navigation.
+   There is no standard-user dashboard. Keep recent presets in Library and recent
+   photos in Gallery, with thumbnail/list/details choices saved per account.
+   Toolboxes hand wheel/touch scrolling to the main page at their top and bottom
+   through native scroll chaining; clipping must not trap scrolling.
+   Clip every scroll region at its visible boundary, including content beneath
+   headers. The desktop header sits outside the independently scrolling content;
+   on mobile the header is part of normal page flow and must not stay pinned.
+   Keep account/profile, invitations, access and audit organized through the user
+   menu and contextual navigation. Preserve the approved landing layout, rose
+   `#C86B82` glass theme, original rounded icon, accurate feature descriptions,
+   invitation-only notice and free GitHub self-hosting/footer links. Recapture
+   landing screenshots after the UI is stable. The owner reconfirmed on
+   2026-09-12 that the same release must refresh both screenshots and feature copy.
+   Capture real final-build screens, retain the approved modern rose-glass design,
+   and reconcile every feature/security/performance statement with shipped,
+   verified behavior. Describe the new templates, inline PDF/video editors,
+   mixed-file Bulk, folders and sharing accurately. State browser/format limits,
+   distinguish offline work from connected cloud operations, and remove claims
+   that cannot be substantiated. Retain the legally usable
+   551-family font, 400-sticker and multiple saved QR-code capabilities.
+   Center a small PayPal donation call to action in the application header:
+   "If Lumafoil helps, please consider donating." Use the owner's supplied payment
+   destination; never invent a PayPal account or URL. First-use contextual tips
+   appear as users explore tools. Keep them brief and small enough for phone
+   screens, with multiple pages, swipe and equivalent accessible controls.
+   Only one tip may be visible at a time through a shared queue; pause guidance
+   while a dialog or conflicting menu is open. Dismissal is permanent per account across devices and reconnects; do not
+   resurrect dismissed tips on reload, sign-in or a new release.
+7. Push and deploy coherent completed changes, verify live behavior, and continue
+   the full quality, coverage, security, publication, offline, browser/device,
+   accessibility, screenshot, performance and release audits without weakening
+   thresholds or representing partial checks as certification. Keep performance
+   work after launch as previously authorized. Protect the public repository and
+   artifacts from secrets and sensitive operational/user data. Keep GitHub Actions
+   manual-only and Dependabot disabled; use direct main pushes. The owner
+   authorized two subagents on 2026-09-12 to accelerate delivery, superseding the
+   earlier stop instruction. Use bounded ownership and root integration. Stop only verified
+   project-owned processes and preserve unrelated projects and user edits.
+
+Editor geometry correction (2026-09-12): the owner reported transformed text
+outside its selection box and curved text overlapping itself. The old renderer
+changed the canvas font during a second measurement, then painted with that
+probe font instead of the requested size. Drawing and measurement now share one
+probe-space glyph layout, including rotated ink corners, true ink centering,
+nonintersecting curved glyph sectors and separated multiline bounds. Letter
+Spacing and Curve each reset to zero through the shared reset control. Focused
+verification: 29 rendering tests and four designer/segmentation tests passed.
+The original renderer failed all five new transformed-pixel containment cases;
+restoring the fix passed all eight layout/curve checks. This is local evidence,
+not deployed behavior or full release certification. These corrections remain
+inside the combined final delivery below.
+
+Earlier media integration evidence (2026-09-12): inline document/video tools and eighteen
+common templates are implemented locally. Native PDF checks retain searchable
+content and place marks correctly on cropped pages at 0/90/180/270 degrees.
+A real video-worker export demonstrates timestamp movement and both fade edges.
+The mixed-batch check produces image, PDF and video outputs and isolates a malformed
+PDF failure. Queue concurrency/restart tests, template filtering and motion tests
+pass. Latest shape/text containment and mixed-media run: 48 browser tests; selection
+visibility/designer controls: 19 tests. These were focused checks, not full UI or
+release certification; the combined source, translation, guidance and E2E evidence
+below supersedes this intermediate checkpoint. The new PDF reader adds an exact pdfjs-dist dependency, versioned local
+worker/font/decoder assets and narrowly scoped WASM compilation in CSP; it does not
+execute PDF actions or XFA. No part of this bundle has been pushed or deployed.
+
+Provider preparation (2026-09-12): all three server callbacks are saved. The
+owner-approved Full Dropbox registration has file/sharing scopes and both rose
+brand icons. Google Audience independently reports In production. Google and
+Microsoft cloud credentials were generated with specific owner approval, and an
+independent cloud-token encryption key was generated. Credentials remain in
+protected local staging for the combined release; no production binding has
+changed. The Microsoft secret expires on 2027-03-11. External work/school consent
+may require tenant-admin approval because Microsoft publisher verification is
+still incomplete. The owner confirmed no verified Partner Center/MPN account is
+available, so publisher verification is deferred; disclose tenant-admin consent
+requirements and retain provider-policy refusals. See
+docs/verification/m19/cloud-storage.md for the precise
+console status and remaining live round trips. An earlier suite passed 2,625
+assertions but failed the function (89.42%) and branch (82.46%) coverage gates.
+That historical failed gate is retained; the complete canonical run below now
+passes all original thresholds without lowering them.
+
+Guidance sequencing correction (2026-09-12): the owner required feature and layout
+changes to finish before finalizing the first-use guide. This sequence is now
+complete locally: all twelve catalogs describe the finished document, video,
+bulk, folder and cloud workflows. The final built-browser guidance proof passed
+on desktop, Android and iPhone for one visible tip, conflicting-menu/modal
+suppression, permanent cross-device claims and account isolation, with native
+Android swipe also verified (`temp/guidance-qa/report.json`). The thirteen topic
+identities remain stable. This is verified local behavior, still awaiting the
+single combined deployment.
+
+Delivery correction (2026-09-12): the owner requested completing all remaining
+work before shipping, to avoid repeated release overhead. Do not deploy or push
+intermediate feature bundles. Finish editor/mobile and workspace access;
+complete persistent cloud connections and provider/app folders; implement the
+document/video/mixed-bulk workflow; finalize first-use guidance against those
+finished workflows; refresh screenshots; run the combined final
+integration/release checks; then push and deploy together. Preserve useful
+completed verification and avoid repeating unchanged checks between small edits.
+Maintain accurate implemented, deployed and verified distinctions in M19 and the
+changelog. The active goal remains unfinished until the full scope is satisfied.
+
+### Current Release Evidence — 2026-09-12
+
+The canonical `npm run quality` passed with exit 0 in
+`temp/quality-staged-release.log`: 2,742 unit/browser tests, 61 real workerd tests,
+all auxiliary checks and 42 built-artifact checks. Coverage is 92.43% statements,
+85.17% branches, 92.20% functions and 93.33% lines; all original thresholds remain
+unchanged. Formatting, lint, types, dead code, all 1,212 translation keys, cycles,
+zero duplication, dependency audit, source/built publication and bundle budgets
+passed. The application shell is 138.1 KiB gzip against its 140 KiB limit.
+Staged-source SAST separately passed 509 rules over 2,098 targets with zero
+findings. Exact logs, hashes and scanner scope limits are recorded in
+[quality verification](docs/verification/m19/quality.md).
+This checkpoint precedes the final screenshot-discovered Account overflow fix
+and named Dropbox credential-format correction; follow-up evidence for those
+later edits must remain distinct from the completed canonical invocation.
+The subsequent publication correction now has 19 passing focused tests and
+clean scoped lint/formatting: exactly 15 alphanumeric characters are accepted only
+for the named `DROPBOX_APP_SECRET` private input, matching the approved provider
+format while retaining the global 16-character minimum for other secrets. Full
+encoded-value comparisons remain active. An encoded private fixture reproduced
+green → intended red → restored green; malformed, short and unrelated inputs
+remain rejected. This is input classification for leak detection, not permission
+to publish the value. See the focused log and hash in the quality record.
+The Account base grid correction then passed a native iPhone 390/390-pixel
+no-overflow diagnostic. A fresh build passed all 42 artifact checks and budgets,
+and subsequent SAST again passed 509 rules/2,098 targets with zero findings.
+Protected source publication compares eight private values. The standard Account
+rebuild compared four; the release owner then freshly reran the protected built
+scan against that exact artifact with all eight configured values and passed
+2,640 checks/114 archive entries. This closes the final artifact-correspondence
+gap without attributing the earlier built scan to a later build.
+
+The four-device E2E case inventory is closed through the initial 88 passes and
+the corrected 49-case rerun, with nine repeated setup cases: 128 distinct passing
+cases, 32 per device. All 37 initial failures and three unrun serial fallouts
+now have successful evidence. This is combined closure, not one clean 128-case
+execution or a claim that every case was freshly rerun on the final build.
+[Release E2E triage](docs/verification/m19/release-e2e-triage.md) preserves the
+failed run and records the complete per-device accounting and corrections.
+
+Product screenshots and their responsive variants now show the current Image
+editor, font picker, stickers, QR marks and templates; landing copy and final
+guidance are reconciled across all twelve locales. Screenshot/axe evidence now
+covers all 752 required surface/profile/locale/theme combinations with 800 PNGs:
+desktop 200, iPhone 200, iPad 196 and Android 204. This combines completed profiles
+from four invocations; it is not one clean uninterrupted four-profile run.
+Independent inventory checks found no missing required capture, detected a
+missing-file negative and matched every selected file before/after archiving.
+All 1,008 generated terminal evidence files remain hash-verified in ignored local
+storage, with completed profiles distinct from failed attempts. The repository
+contains the compact [audit receipt](docs/verification/m19/audit-inventory.md) and
+[per-file inventory](docs/verification/m19/screenshot-inventory.json), preserving
+the publication byte budget. Account overflow and harness navigation corrections
+retain their original failed-run evidence. Live provider
+connect/load/save/share/revoke/refresh journeys, final production configuration,
+migrations/deployment and hosted checks remain open. Microsoft publisher
+verification remains explicitly deferred because no verified Partner Center/MPN
+account is available; some work/school tenants require their administrator's
+approval. Performance/Lighthouse work remains after launch as already authorized.
+No part of the pending bundle is declared shipped by these local results.
 
 ### Required capabilities (from the product brief)
 
@@ -94,6 +322,7 @@ and expensive to block on. If any is wrong, say so and the plan will be revised.
 | OneDrive (M16)  | `@azure/msal-browser` (bundled, not CDN)                                                          | **5.21.0**                                      | MIT, no peer dependencies. The 2026-09-02 release validates relayed popup requests and adds optional authority-origin pinning. Only OneDrive import loads it for delegated Microsoft Graph file access.                                                                                                                                                                                                     |
 | Video (M17)     | `mediabunny`                                                                                      | **1.55.6**                                      | MPL-2.0, no peer dependencies. The patch relaxes an invalidly strict `esds` assertion; real valid/corrupt media tests and the matching deterministic source offer remain required. Loaded only when the Video tool performs its capability/media work.                                                                                                                                                      |
 | PDF (M17)       | `pdf-lib`                                                                                         | **1.17.1**                                      | MIT, no peer dependencies. Browser-side PDF load/embed/draw/save for the Documents tool (`src/client/pdf/watermark-pdf.ts`). **Unmaintained** (last release 2021); the maintained fork `@cantoo/pdf-lib` is the drop-in migration target if a fix is ever needed — none is required for the load/embed/drawImage/save path in use. Pinned exact; loaded only on `/app/documents` via the `pdf` chunk group. |
+| PDF reader      | `pdfjs-dist`                                                                                      | **6.3.289**                                     | Apache-2.0. Registry metadata and `npm info pdfjs-dist@6.3.289 peerDependencies engines --json` verified on 2026-09-12: no peers, Node `>=22.13.0                                                                                                                                                                                                                                                           |     | >=24`, installed Node 24.20.0 supported; published 2026-08-29. Exact install succeeded with zero audit findings. Use Mozilla's [document/page rendering API](https://mozilla.github.io/pdf.js/examples/) for actual page previews; load on demand and serve worker/CMap/font/WASM resources locally. |
 | i18n (M18)      | `i18next`, `react-i18next`                                                                        | **26.4.1 / 17.0.13**                            | MIT. Both patches fix strict selector/key-prefix typing. Peers remain satisfied by React 19 and TypeScript 6. No HTTP backend, browser detector or ICU plugin is added; local catalogues and `Intl.PluralRules` remain canonical. `eslint-plugin-i18next` **6.1.5** keeps the JSX literal gate.                                                                                                             |
 
 Dependency security refresh (2026-09-08): Miniflare 5.20260903.0-alpha and
@@ -695,6 +924,36 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
 
 ### M19 — Performance and production hardening (planned) — `docs/plans/m19-performance.md`
 
+- **Current owner additions (2026-09-12, in progress):** complete the mobile
+  tools pass as a single change: uniform compact type tabs, real loaded font
+  names in the dropdown, a plain readable selected-font name, no font-count or
+  category headings, an integrated symbol/detail insertion toolbar, themed range controls,
+  consistent button sizing, and small visible canvas handles with usable touch
+  targets. Expand geometric shapes beyond the original four. Verify tap,
+  swipe/drag, two-finger scale/pan, rotation and gesture history. Photo name and
+  dimensions belong beside the canvas instructions at the bottom, aligned right.
+  Preserve the general canvas layout. Following that pass, add persistent cloud
+  connections so normal load/save operations reuse authorization, provider folder
+  navigation and explicit save destinations, and first-party folders for organizing
+  saved content. Durable provider credentials must be encrypted server-side and
+  bound to the authenticated account; every folder/content operation retains
+  workspace authorization and offline/reconnect isolation. These cloud/folder
+  additions are requested work, not shipped capabilities at this checkpoint.
+  The tools pass also includes New to start a fresh unsaved watermark and a
+  name dialog on Save. Manage access belongs in the user menu under the active
+  workspace. Owners must be able to grant View/Edit through a share invitation
+  link, an invite email, or a silent addition of an existing user. These grants
+  must never apply to another workspace or expose an account's unrelated content.
+- **Unified media workflow request (2026-09-12, pending implementation):** rename
+  the visible Editor tool to Image; preserve working image editing and existing
+  links. Documents needs the same inline watermark controls beside a document
+  reader/page preview. Video needs inline watermark editing beside a scrubbable
+  timeline, timestamp-specific watermark placement and fade effects. Bulk must
+  process photos, PDFs and videos through the same queue with type-appropriate
+  controls and outputs. Extend the existing PDF/video engines and bulk queue,
+  preserving source resolution, per-file error reporting, offline behavior and
+  account/workspace isolation. Do not present static video presets as keyframes
+  or a PDF watermark-only raster as a preview of the document itself.
 - **Owner clarification (2026-09-08):** offline photos, gallery saves, and preset
   edits must synchronize after reconnection. Account, sharing, and member/admin
   changes remain online. The updated M19 specification owns this requirement;
@@ -726,6 +985,9 @@ Randy's direction on 2026-09-06: implement every feature the market research fou
   checks pass. The manual production deployment, guarded account split and
   domain cutover completed; unchecked performance, interactive provider,
   screenshot/update-flow and tag/release items remain unchecked.
+  This is the historical 2026-09-10 deployment checkpoint; it does not describe
+  the pending 2026-09-12 bundle. Its current evidence and remaining release gates
+  are recorded in §1 and `docs/verification/m19/quality.md`.
 - **Role and UI correction (2026-09-10):** the owner clarified that the global
   model is one immutable Owner, initially zero Admins, and ordinary Users;
   Owner/Admin may manage non-owner roles while Admin can never alter the Owner.
@@ -1143,6 +1405,14 @@ M17.0 spike (2026-09-07): before any product code, a Chromium browser test encod
 
 ## 9. Tracked escape hatches
 
+The Dropbox scanner exception covers only three verified public OAuth app
+identifiers, each matched by an anchored exact value in `.gitleaks.toml`.
+The new Full Dropbox app identifier was confirmed in its developer console.
+A real-scanner negative control still rejects an unrelated identifier with the
+same length/format as a Dropbox secret. This does not exempt a file, a whole
+credential rule, or any actual cloud client secret. See the 2026-09-12 evidence
+in `docs/verification/m19/cloud-storage.md`.
+
 The revoked Picker-key history exception is intentionally narrower than a file
 or rule allowlist. `scripts/lib/retired-publication-secrets.mjs` retains only its
 SHA-256 digest and exact immutable commit/file/rule/line fingerprint. Historical
@@ -1158,6 +1428,7 @@ Every suppression, `@ts-expect-error`, cast, or config loosening. Empty is the g
 
 | Location                                                        | What                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Why                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Remove when                                                                                                                       |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/lib/pdfjs-assets.ts`                                   | One-line `unicorn/no-this-outside-of-class` suppression on `this.emitFile`                                                                                                                                                                                                                                                                                                                                                                                                                                          | Vite binds the generated-bundle hook to its `PluginContext`. The supported asset-emission API requires this context; directly mutating generated bundle internals would bypass its accounting. All locally served PDF worker/font/decoder assets use this single emission call.                                                                                                                                                                                                                          | Remove if Vite provides an explicit context argument.                                                                             |
 | `public/_headers`                                               | `style-src 'unsafe-inline'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | UI primitives set inline `style` attributes; see §5.4.                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Radix/Base UI ship nonce or CSS-only positioning, or `style-src-attr` is universally supported.                                   |
 | `eslint.config.mjs`                                             | `unicorn/prevent-abbreviations` and `unicorn/name-replacements` off                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Cloudflare (`env`) and React (`props`) vocabulary is short by API design; the rules generate churn against vendor names.                                                                                                                                                                                                                                                                                                                                                                                 | Never; documented choice.                                                                                                         |
 | `eslint.config.mjs`                                             | `unicorn/single-line-block-comment-style` off                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | One-line `/** */` is still JSDoc and feeds editor hover text.                                                                                                                                                                                                                                                                                                                                                                                                                                            | Never; documented choice.                                                                                                         |

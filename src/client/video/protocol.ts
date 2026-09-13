@@ -3,6 +3,7 @@
  * In its own module so both sides share one definition and the worker file
  * stays free of main-thread imports (mirrors `engine/protocol.ts`).
  */
+import type { VideoMotion } from './motion'
 import type { TranscodePlan } from './plan'
 import type { FontResource, MarkInput } from '../engine/protocol'
 
@@ -15,6 +16,7 @@ export interface TranscodeStartMessage {
   marks: MarkInput[]
   fonts: FontResource[]
   plan: TranscodePlan
+  motions?: readonly (VideoMotion | null)[] | undefined
 }
 
 export interface CancelRequestMessage {

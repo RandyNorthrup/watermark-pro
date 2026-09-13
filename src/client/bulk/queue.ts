@@ -55,11 +55,13 @@ function describe(error: unknown): string {
 
 export class JobQueue<Input, Output> {
   readonly #concurrency: number
+  #runConcurrency: number
   readonly #run: JobRunner<Input, Output>
   readonly #onChange: ((snapshot: QueueSnapshot<Input, Output>) => void) | undefined
   readonly #jobs: JobState<Input, Output>[] = []
   #controller = new AbortController()
   #active = 0
+  readonly #slots = new Set<() => void>()
   #nextId = 1
   #isPaused = false
 
@@ -68,6 +70,7 @@ export class JobQueue<Input, Output> {
       throw new RangeError('concurrency must be a positive integer')
     }
     this.#concurrency = options.concurrency
+    this.#runConcurrency = options.concurrency
     this.#run = options.run
     this.#onChange = options.onChange
   }
@@ -76,10 +79,22 @@ export class JobQueue<Input, Output> {
     this.#onChange?.(this.snapshot)
   }
 
+  #wake(): void {
+    for (const resolve of this.#slots) resolve()
+    this.#slots.clear()
+  }
+
   async #drain(): Promise<void> {
+    const controller = this.#controller
     for (;;) {
-      if (this.#isPaused || isAborted(this.#controller.signal)) {
+      if (this.#isPaused || isAborted(controller.signal)) {
         return
+      }
+      if (this.#active >= this.#runConcurrency) {
+        await new Promise<void>((resolve) => {
+          this.#slots.add(resolve)
+        })
+        continue
       }
       const job = this.#jobs.find((candidate) => candidate.status === 'queued')
       if (job === undefined) {
@@ -90,8 +105,8 @@ export class JobQueue<Input, Output> {
       this.#notify()
       const started = performance.now()
       try {
-        const output = await this.#run(job.input, this.#controller.signal)
-        if (isAborted(this.#controller.signal)) {
+        const output = await this.#run(job.input, controller.signal)
+        if (isAborted(controller.signal)) {
           job.status = 'cancelled'
         } else {
           job.status = 'done'
@@ -99,7 +114,7 @@ export class JobQueue<Input, Output> {
           job.error = null
         }
       } catch (error) {
-        if (isAborted(this.#controller.signal) || error instanceof CancelledError) {
+        if (isAborted(controller.signal) || error instanceof CancelledError) {
           job.status = 'cancelled'
         } else {
           job.status = 'failed'
@@ -108,6 +123,7 @@ export class JobQueue<Input, Output> {
       } finally {
         job.durationMs = performance.now() - started
         this.#active -= 1
+        this.#wake()
         this.#notify()
       }
     }
@@ -135,12 +151,15 @@ export class JobQueue<Input, Output> {
   }
 
   /** Runs queued jobs up to the concurrency limit; resolves when the queue settles. */
-  async start(): Promise<QueueSnapshot<Input, Output>> {
+  async start(concurrency = this.#runConcurrency): Promise<QueueSnapshot<Input, Output>> {
+    if (!Number.isSafeInteger(concurrency) || concurrency < 1 || concurrency > this.#concurrency)
+      throw new RangeError('Run concurrency must fit the configured queue limit.')
+    this.#runConcurrency = concurrency
     if (isAborted(this.#controller.signal)) {
       this.#controller = new AbortController()
     }
     this.#isPaused = false
-    const workers = Array.from({ length: this.#concurrency }, () => this.#drain())
+    const workers = Array.from({ length: this.#runConcurrency }, () => this.#drain())
     await Promise.all(workers)
     this.#notify()
     return this.snapshot
@@ -153,6 +172,7 @@ export class JobQueue<Input, Output> {
     }
 
     this.#isPaused = true
+    this.#wake()
     this.#notify()
   }
 
@@ -180,6 +200,7 @@ export class JobQueue<Input, Output> {
   /** Aborts running jobs and marks queued ones cancelled; finished results stay. */
   cancel(): void {
     this.#controller.abort()
+    this.#wake()
     for (const job of this.#jobs) {
       if (job.status === 'queued') {
         job.status = 'cancelled'

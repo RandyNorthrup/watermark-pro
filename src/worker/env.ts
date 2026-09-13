@@ -41,6 +41,11 @@ const envSchema = z
     MICROSOFT_AUTH_CLIENT_SECRET: z.string().min(1).optional(),
     MICROSOFT_AUTH_TENANT_ID: z.string().min(1).optional(),
     /** Cloud import pickers (M16): each provider is offered only when its keys are set; all optional. */
+    CLOUD_TOKEN_SECRET: z.string().min(AUTH_SECRET_MIN_LENGTH).optional(),
+    GOOGLE_CLOUD_CLIENT_SECRET: z.string().min(1).optional(),
+    MICROSOFT_CLOUD_CLIENT_SECRET: z.string().min(1).optional(),
+    DROPBOX_APP_SECRET: z.string().min(1).optional(),
+    DROPBOX_ACCESS_TYPE: z.enum(['app_folder', 'full']).default('app_folder'),
     GOOGLE_OAUTH_CLIENT_ID: z.string().min(1).optional(),
     GOOGLE_PICKER_API_KEY: z.string().min(1).optional(),
     GOOGLE_PICKER_APP_ID: z.string().min(1).optional(),

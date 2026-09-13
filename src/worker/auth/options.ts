@@ -43,7 +43,9 @@ import { newOrganizationSchema } from '../../shared/validation'
 import type { AuditStore } from '../audit'
 import type { RateLimitStorage } from './rate-limit'
 import { invitationEmail, resetPasswordEmail, verificationEmail } from './templates'
+import { WORKSPACE_ACCESS_POLICY } from '../../shared/workspace-access'
 import type { EmailSender } from '../email/sender'
+import type { WorkspaceAccessStore } from '../workspace-access-store'
 
 /** Adapter factory shape shared by every Better Auth adapter package. */
 export type DatabaseAdapter = ReturnType<typeof drizzleAdapter>
@@ -56,6 +58,12 @@ export const CAPTCHA_PROTECTED_ENDPOINTS = ['/sign-up/email', '/request-password
  * locales so `updateUser` (via `PATCH /api/me`) can never persist free text.
  */
 const localeFieldSchema = z.union(LOCALE_CODES.map((code) => z.literal(code)))
+
+const workspaceInvitationResultSchema = z.object({
+  id: z.string(),
+  organizationId: z.string(),
+  email: z.email(),
+})
 
 const ADMIN_AUDIT_ACTIONS: Record<string, string> = {
   '/admin/ban-user': 'admin.user_banned',
@@ -83,6 +91,8 @@ export interface AuthDependencies {
   rateLimitEnabled: boolean
   /** Explicit fixture bootstrap only; production always uses invitation admission. */
   canSignUpWithoutInvitation?: boolean | undefined
+  /** CLI schema generation does not send email; runtime construction supplies the durable guard. */
+  reserveWorkspaceInvitation?: WorkspaceAccessStore['reserveInvitationEmail']
 }
 
 export function buildAuthOptions(deps: AuthDependencies) {
@@ -219,12 +229,8 @@ export function buildAuthOptions(deps: AuthDependencies) {
         invitationExpiresIn: INVITATION_TTL_SECONDS,
         cancelPendingInvitationsOnReInvite: true,
         requireEmailVerificationOnInvitation: true,
-        sendInvitationEmail: async (data) => {
-          const acceptUrl = `${appOrigin.origin}/accept-invitation/${data.id}`
-          await deps.email.send(
-            invitationEmail(data.email, data.organization.name, data.inviter.user.name, acceptUrl),
-          )
-        },
+        // Delivery runs in our awaited after-hook: Better Auth's built-in
+        // email callback swallows failures and otherwise returns false success.
         organizationHooks: {
           beforeCreateOrganization: ({ organization }) => {
             const parsed = newOrganizationSchema.safeParse(organization)
@@ -359,6 +365,44 @@ export function buildAuthOptions(deps: AuthDependencies) {
       before: invitationAdmission(deps.accounts, deps.canSignUpWithoutInvitation === true),
       // Platform-admin actions are not covered by the organization hooks; record them here.
       after: createAuthMiddleware(async (ctx) => {
+        if (
+          ctx.path === '/organization/invite-member' &&
+          !(ctx.context.returned instanceof APIError)
+        ) {
+          const invitation = workspaceInvitationResultSchema.parse(ctx.context.returned)
+          const actor = ctx.context.session?.user
+          if (actor === undefined) throw new APIError('FORBIDDEN')
+          if (deps.reserveWorkspaceInvitation === undefined)
+            throw new Error('Workspace invitation budget is not configured')
+          const isAllowed = await deps.reserveWorkspaceInvitation(
+            invitation.organizationId,
+            actor.id,
+            invitation.id,
+          )
+          if (!isAllowed)
+            throw new APIError(
+              'TOO_MANY_REQUESTS',
+              {
+                code: 'WORKSPACE_INVITATION_LIMIT',
+                message: 'Too many workspace invitations. Try again in one hour.',
+              },
+              { 'retry-after': String(WORKSPACE_ACCESS_POLICY.sendWindowSeconds) },
+            )
+          const workspace = await ctx.context.adapter.findOne<{ name: string }>({
+            model: 'organization',
+            where: [{ field: 'id', value: invitation.organizationId }],
+          })
+          if (workspace === null) throw new APIError('FORBIDDEN')
+          await deps.email.send(
+            invitationEmail(
+              invitation.email,
+              workspace.name,
+              actor.name,
+              `${appOrigin.origin}/accept-invitation/${invitation.id}`,
+            ),
+          )
+          return
+        }
         const action = ADMIN_AUDIT_ACTIONS[ctx.path]
         const actor = ctx.context.session?.user
         if (action === undefined || actor === undefined) {

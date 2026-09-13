@@ -1,13 +1,17 @@
 import { vi } from 'vitest'
 
 import { NO_CLOUD_CONFIG } from './cloud-config'
+import { handleFolders } from './fake-folder-api'
 import { type FakeGalleryState, handleGallery } from './fake-gallery-api'
 import { emptyRecentState, handleRecent, type FakeRecentState } from './fake-recent-api'
 import { type FakeShareState, handleShares } from './fake-share-api'
+import { handleWorkspaceAccess, type FakeWorkspaceAccessState } from './fake-workspace-access-api'
 import { requestUrl } from './request-url'
 import type { AssetDto, PublicConfig } from '../../shared/api'
 import { saveWatermarkRequestSchema, type WatermarkDto } from '../../shared/api-watermark'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
+import type { FolderDto, FolderWriteResult } from '../../shared/folders'
+import { guidanceClaimSchema } from '../../shared/guidance'
 
 /**
  * In-memory stand-in for the library routes, installed as `fetch`. It
@@ -24,6 +28,9 @@ export interface FakeLibraryState {
   /** Served from GET /api/config; defaults to every cloud provider off. */
   publicConfig: PublicConfig
   recents: FakeRecentState
+  access: FakeWorkspaceAccessState
+  folders: FolderDto[]
+  folderReceipts: Map<string, { fingerprint: string; value: FolderWriteResult }>
 }
 
 const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
@@ -81,6 +88,9 @@ export function makeWatermark(overrides: Partial<WatermarkDto> = {}): WatermarkD
         backdrop: { enabled: false, opacity: 0.6 },
       },
     },
+    folderId: null,
+    folderRevision: 0,
+    folderVersionId: null,
     createdBy: 'user-1',
     createdAt: '2026-09-01T10:00:00.000Z',
     updatedAt: '2026-09-02T10:00:00.000Z',
@@ -116,6 +126,19 @@ function handle(state: FakeLibraryState, url: string, init: RequestInit): Respon
   if (state.failWith !== null) {
     return errorResponse(state.failWith)
   }
+  if (
+    new URL(url, 'http://localhost').pathname === '/api/me/guidance/claim' &&
+    init.method === 'POST'
+  ) {
+    // General page fixtures represent returning users. Dedicated guidance
+    // tests exercise fresh-account claims and visible tips through the API.
+    guidanceClaimSchema.parse(JSON.parse(readBody(init)))
+    return Response.json({ claimed: false })
+  }
+  const access = handleWorkspaceAccess(state.access, url, init)
+  if (access !== null) return access
+  const folders = handleFolders(state, url, init)
+  if (folders !== null) return folders
   const recent = handleRecent(state, url, init)
   if (recent !== null) return recent
   const gallery = handleGallery(state.gallery, url, init)
@@ -143,7 +166,13 @@ function handle(state: FakeLibraryState, url: string, init: RequestInit): Respon
       }
       if (method === 'POST') {
         nextId += 1
-        const created = makeWatermark({ id: `wm-${String(nextId)}`, ...parsed.data })
+        const created = makeWatermark({
+          id: `wm-${String(nextId)}`,
+          organizationId: match.groups['org'] ?? 'org-1',
+          name: parsed.data.name,
+          spec: parsed.data.spec,
+          folderId: parsed.data.folderId ?? null,
+        })
         state.watermarks.push(created)
         return Response.json(created, { status: HTTP_STATUS.created })
       }
@@ -152,7 +181,12 @@ function handle(state: FakeLibraryState, url: string, init: RequestInit): Respon
       if (existing === undefined) {
         return errorResponse('notFound')
       }
-      const updated = { ...existing, ...parsed.data }
+      const updated = {
+        ...existing,
+        name: parsed.data.name,
+        spec: parsed.data.spec,
+        folderId: parsed.data.folderId === undefined ? existing.folderId : parsed.data.folderId,
+      }
       state.watermarks[index] = updated
       return Response.json(updated)
     }
@@ -213,6 +247,9 @@ export function installLibraryApi(initial: Partial<FakeLibraryState> = {}): Fake
     shares: { shares: [] },
     publicConfig: NO_CLOUD_CONFIG,
     recents: emptyRecentState(),
+    access: { links: new Map() },
+    folders: [],
+    folderReceipts: new Map(),
     ...initial,
   }
   vi.stubGlobal(

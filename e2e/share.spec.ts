@@ -32,7 +32,7 @@ test('publishes a link, serves a visitor, and revokes', async ({ browser, page, 
   await page.getByLabel('Preset name').fill('Share preset')
   await page.getByRole('button', { name: 'Save preset' }).click()
   await page.getByRole('link', { name: 'Open Share preset in the editor' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Editor')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
   await page.getByRole('tab', { name: 'Export' }).click()
   await page.getByRole('combobox', { name: 'Format' }).click()
   await page.getByRole('option', { name: 'PNG' }).click()

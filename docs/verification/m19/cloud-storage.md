@@ -1,139 +1,273 @@
-# Cloud storage and native sharing — 2026-09-08
+# Cloud Storage and Native Sharing — 2026-09-12
 
-This is implementation and focused test evidence for the ongoing M19 work.
-Live provider consent, real storage round trips and production deployment
-remain separate release gates. No provider-console configuration or production
-data was changed by this subtask.
+This document describes the current source implementation and focused local
+evidence. The durable-connection changes are not yet deployed. Live consent,
+provider storage round trips and the combined release remain separate gates.
+The complete screenshot/axe inventory is recorded in [audit verification](audit-inventory.md).
+Provider registration preparation below is now complete;
+production bindings still await the combined release.
 
-## Delivered behavior
+## Connections and Account Boundaries
 
-### Saving and native links
+Google Drive, Dropbox and OneDrive use confidential authorization-code flows with
+S256 PKCE. Connect is an explicit user action. Each random state is stored as a
+SHA-256 digest and bound to the exact Lumafoil account, session and provider.
+Attempts expire after ten minutes and are consumed atomically once. Replaying a
+callback, returning it under another account/session, or cancelling an old popup
+cannot replace a newer connection.
 
-Google Drive, Dropbox and OneDrive now return confirmed saved-file identities,
-names and provider-management URLs. Saving does **not** call a sharing endpoint.
-The separate **Saved cloud files** dialog offers **Create public link**, **Copy
-link**, **Revoke public link**, and a link to manage the file at its provider.
-The UI explains that a public link grants view access to anyone who has it and
-that existing destination-folder permissions continue to apply. These native
-links complement the existing Lumafoil gallery-link feature; they do not
-replace it.
+Access tokens, refresh tokens and temporary PKCE verifiers are encrypted with
+AES-GCM using an HKDF-derived key. Authenticated data binds each ciphertext to its
+account, provider and credential purpose. The encryption key remains a Worker
+secret. Browser state receives only short-lived access tokens in memory for direct
+provider transfers; refresh credentials never reach browser storage, application
+caches, logs or public configuration.
 
-Google requests an `anyone`/`reader` permission with discovery disabled and
-records the exact permission ID for later revocation. OneDrive requests a
-`view`/`anonymous` link and revokes its exact returned permission. Dropbox
-creates a shared link, or retrieves the exact file's direct link when one
-already exists, and revokes that URL. Provider policy failures remain visible
-and leave the provider-management link available. Deleting a link does not
-delete its file. The implementation follows the providers' primary
-[Google Drive sharing documentation](https://developers.google.com/workspace/drive/api/guides/manage-sharing),
-[Dropbox sharing guide](https://developers.dropbox.com/dbx-sharing-guide), and
-[Microsoft Graph createLink documentation](https://learn.microsoft.com/en-us/graph/api/driveitem-createlink?view=graph-rest-1.0).
+The account page lists connected cloud accounts and explicit Connect/Disconnect
+actions. A cloud account may differ from the Google/Microsoft account used to sign
+in to Lumafoil. Connections belong to the individual user, regardless of which
+workspace is open or shared. Workspace access does not share cloud credentials.
 
-The saved-file/link list is intentionally temporary page state. It is not
-persisted to localStorage, IndexedDB, the query cache or the Lumafoil server.
-After leaving the page, users manage existing native access at the provider.
-Access granted by another folder permission or another link is not claimed to
-be revoked by removing the one link represented in this dialog.
+A reload or another browser session reuses the server connection. Expired access
+tokens refresh under an atomic D1 lease. Concurrent requests wait for that refresh
+instead of opening consent. Refresh rotation replaces encrypted credentials only
+while the connection generation and lease still match. Disconnect or a newer
+connection prevents late refresh/callback responses from restoring old access.
+Changing a provider client ID requires reconnecting the associated grant.
 
-### Non-destructive writes and partial progress
+Transient provider failures remain visible and retryable. Revoked/insufficient
+grants require an explicit reconnect. Token/profile responses are bounded to
+128 KiB; arbitrary provider error text is never reflected in application errors.
+Cloud operations require a connection; this does not change the separate offline
+queue for Lumafoil photos, gallery saves, presets and folders.
 
-- Dropbox's new app uses **App Folder** access. Its upload path is now
-  `/<filename>` relative to that app folder, avoiding the erroneous nested
-  `Apps/Lumafoil/Lumafoil` directory. `add` with `autorename` preserves existing
-  files. Filenames containing slash/backslash paths, control characters or
-  traversal-only segments are rejected.
-- OneDrive explicitly looks up or creates the `Lumafoil` folder before writing
-  children. A concurrent folder creation is handled without treating a file
-  named `Lumafoil` as a folder. The previous comment and implementation
-  incorrectly assumed a simple PUT created parent directories.
-- OneDrive writes through an upload session with `rename` on name conflict,
-  using sequential 5 MiB chunks (a multiple of Graph's required 320 KiB
-  alignment). The transfer verifies progress offsets and requires a completed
-  `driveItem` acknowledgement. Early completion, wrong offsets, missing final
-  acknowledgement, empty data and HTTP failures cannot become successful
-  saves. No bearer token is sent to the preauthenticated upload URL. These
-  choices follow Microsoft's [folder creation](https://learn.microsoft.com/en-us/graph/api/driveitem-post-children?view=graph-rest-1.0)
-  and [upload-session](https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0)
-  contracts.
-- Each provider saves a batch serially. A failure retains confirmed prior
-  saves, reports the confirmed count and the failed position, and leaves later
-  files unsent. An interrupted request whose acknowledgement was lost is not
-  falsely declared saved; the message tells the user to inspect the provider
-  before retrying. Export bytes are generated lazily after authorization so a
-  long render does not consume the click needed to open the sign-in popup.
+## Folder Browsing and Original Files
 
-### Identity, tokens and URL boundaries
+The shared browser provides folder navigation, breadcrumbs, folder creation,
+selection and explicit save destinations. Image defaults to supported photos;
+Documents requests PDFs, Video requests supported video containers and Bulk can
+request all three. Downloads retain the original bytes. Native Google Docs are
+not silently exported or converted; the selected editor validates/decode-checks
+the resulting media.
 
-- Cloud operations capture the Lumafoil account generation before asynchronous
-  work. Identity is checked before later uploads and after awaited results,
-  including body reads. Changing away and back still invalidates the earlier
-  generation. Account events abort active fetches and clear provider-file and
-  OneDrive-dialog state. Returned saved-file entries carry the app owner ID;
-  link creation/revocation refuses a different owner before provider auth.
-- Provider HTTP requests use `cache: no-store`, `credentials: omit` and
-  `referrerPolicy: no-referrer`. Explicit bearer headers go only to their
-  fixed API endpoints. Temporary download/upload URLs are validated against
-  the expected Microsoft/Dropbox domain boundaries and never persisted.
-- Microsoft MSAL is dynamically imported when OneDrive is used, uses
-  `memoryStorage`, and is discarded on app-account transitions. First
-  interactive auth requests account selection. Initialization failures are
-  retryable. The implementation does not sign the user out of Microsoft
-  globally. Microsoft's [MSAL caching guide](https://learn.microsoft.com/en-us/entra/msal/javascript/browser/caching)
-  documents the selected cache option.
-- OneDrive lists every page of a folder while accepting next links only at
-  the exact same Graph children endpoint. Repeated links and excessive page
-  chains fail explicitly. Images with no download URL remain unavailable in
-  the picker; non-images are omitted.
-- Dropbox reserves its popup synchronously before deriving PKCE, generates
-  an independent random state, validates returned state before exchanging a
-  code, and closes on cancellation, timeout or app-account change. There is no
-  refresh token or browser-persisted Dropbox credential. Its requested scopes
-  now include `sharing.read` and `sharing.write`, in addition to the existing
-  file read/write scopes. The flow follows the [Dropbox OAuth guide](https://developers.dropbox.com/oauth-guide).
-- Google token and picker callbacks reject stale app-account results. Google
-  account selection is requested explicitly. Failed SDK loads can be retried;
-  provider tokens remain local variables rather than query-cache data.
+Google retains the narrow
+[drive.file permission](https://developers.google.com/workspace/drive/api/guides/api-specific-auth).
+Only authorized items appear in its list. Browse Drive opens Google's native
+Picker to authorize additional files or a destination folder without another
+OAuth consent flow. Shared-drive API operations include the appropriate
+supportsAllDrives flags; access still depends on the actual per-file grant.
 
-## Verification performed
+Dropbox lists folders within the registration's actual access boundary.
+DROPBOX_ACCESS_TYPE defaults to app_folder and the UI explicitly labels that
+limitation. Set it to full only with a matching Full Dropbox registration and
+fresh grant. Changing a configuration label never expands provider permissions.
+A chosen path stays relative to the granted root, with traversal and unsafe names
+rejected.
 
-- Final combined unit/protocol/UI suite: **159 passed** across 21 files,
-  including existing cloud import/export cases, the editor/bulk save journeys,
-  negative protocol cases and account-cache checks.
-- Scoped coverage run over the new transfer/sharing/upload modules and saved
-  dialog: **128 passed**, **95.96% statements, 91.42% branches, 100% functions,
-  96.17% lines**. The first scoped run failed the unchanged 85% branch gate at
-  84.76%; actual missing folder/progress/revocation scenarios were added and
-  the gate then passed. The full repository coverage gate remains separate.
-- Tests independently assert exact native grant/revoke endpoints and bodies,
-  no implicit share action on save, clipboard behavior, visible provider
-  policy errors, partial-save counts, stale-result suppression, no old-owner
-  callback delivery, URL credential/lookalike rejection, same-folder paging,
-  non-overwriting request policy, aligned chunk boundaries, final upload
-  acknowledgement, and no bearer header on the upload URL.
-- Dropbox popup tests cover synchronous reservation, matching and forged
-  state, token exchange, popup blocking, user cancellation, timeout and
-  account-change closure. Microsoft auth tests assert `memoryStorage`, lazy
-  instance reuse confined to one app account, new instance after account
-  transition, account-selection prompts and late-popup rejection.
-- Three targeted red drills changed the URL credential guard, Dropbox state
-  validation and OneDrive rename policy. Each produced the intended assertion
-  failure. Each file was restored byte-for-byte and its test returned green.
-  These short mutations ran only after the other build owner confirmed its
-  client build completed; both owners were notified when the build lock was
-  released. Logs: `lumafoil-{cloud-url,dropbox-state,onedrive-no-overwrite}-{red,green}.log`
-  in the task's temporary log directory.
+OneDrive navigates the connected account's own drive through Microsoft Graph.
+It does not claim that arbitrary SharePoint sites or another user's drives are
+available through the current Files.ReadWrite scope.
 
-## Remaining release gates
+Every destination carries the provider account identity and connection generation.
+A changed app account or replaced cloud connection invalidates that destination.
+In-flight transfers are aborted on account/connection changes and stale results
+are not shown. Pagination is bounded; Graph next links remain on the same folder
+endpoint. Preauthenticated download/upload URLs are validated against exact
+provider domain boundaries and never receive bearer headers. Authenticated API
+writes refuse redirects.
 
-The implementation has not yet been proven against real Google, Dropbox and
-Microsoft account consent plus real create/read/share/revoke requests from the
-final `lumafoil.com` deployment. Provider tenant policy and app development-mode
-limits may prevent public native links even when configuration is valid; the
-UI handles that refusal but a simulated response is not live-provider proof.
+## Saves and Native Links
 
-The root integration task owns final full quality/coverage, security scanning,
-production-build Playwright with axe, visual/device checks and deployment.
-No new dependency was added by this cloud subtask. The existing MSAL package
-was moved behind a dynamic import; the performance agent measured the editor
-shared chunk falling from approximately 109 kB to 50.7 kB, with the 70.2 kB MSAL
-chunk requested only for the cloud action.
+All providers preserve existing files. Dropbox uses add plus autorename;
+OneDrive uses rename; Google creates a new file. The UI asks for a destination
+before generating exports. Programmatic callers without an explicit destination
+retain compatible defaults: Lumafoil folders in Drive/OneDrive and the granted
+Dropbox root.
+
+Large media uses resumable uploads: Google above 5 MiB with 8 MiB chunks,
+Dropbox above 128 MiB with 8 MiB chunks, and OneDrive sessions with 5 MiB aligned
+chunks. Completed file identities are accepted only after provider acknowledgement.
+A failed batch reports confirmed files separately and stops before later files;
+an unacknowledged request is not declared saved.
+
+Saving does not create a public link. Saved Cloud Files offers a separate explicit
+public-link action and provider management link. Google requests an undiscoverable
+anyone/reader permission; OneDrive requests view/anonymous access; Dropbox creates
+or finds that file's direct shared link. Revoke removes the represented native
+link/permission, not the file or other existing folder permissions. Provider
+policy refusals remain visible.
+
+The current saved-file/link list is temporary page state. Returning later does
+not reconstruct that list; existing access can be managed at the provider.
+Native cloud links complement Lumafoil gallery links.
+
+Disconnect immediately clears the local server grant. Google and Dropbox also
+attempt provider revocation. If remote removal cannot be confirmed, the response
+and UI say so. Microsoft local disconnect does not claim global consent removal:
+the UI links separately to personal-account and work/school permission settings.
+
+## Deployment Configuration
+
+Migration 0016 creates encrypted connections and exact-session attempts.
+Migration 0017 adds first-party workspace folders and their independent content
+placement revisions. These migrations have local D1 evidence; they have not been
+applied to production by this subtask.
+
+Use distinct confidential Web callbacks:
+
+| Provider     | Callback                                         | Required Worker Secret        |
+| ------------ | ------------------------------------------------ | ----------------------------- |
+| Google Drive | https://lumafoil.com/api/cloud/google/callback   | GOOGLE_CLOUD_CLIENT_SECRET    |
+| Dropbox      | https://lumafoil.com/api/cloud/dropbox/callback  | DROPBOX_APP_SECRET            |
+| OneDrive     | https://lumafoil.com/api/cloud/onedrive/callback | MICROSOFT_CLOUD_CLIENT_SECRET |
+
+CLOUD_TOKEN_SECRET must be independently generated with cryptographic randomness,
+at least 32 characters, and retained securely for decryption. Losing/changing it
+makes existing grants unusable and requires reconnecting. Public IDs remain
+GOOGLE_OAUTH_CLIENT_ID, GOOGLE_PICKER_APP_ID, DROPBOX_APP_KEY and MICROSOFT_CLIENT_ID.
+The Picker API key remains server configuration and is exposed only as needed
+through the existing public-config contract. Secrets belong in .dev.vars locally
+and Worker secret bindings in production; .dev.vars.example lists all names.
+
+The Full Dropbox registration's public application identifier is explicitly
+recognized by the publication scanner, alongside the two retired public IDs.
+The three allowlist patterns match whole identifiers only; they do not exclude
+files, rules, app secrets or OAuth tokens. A real scanner test accepts the
+registered public ID and rejects an unrelated 15-character Dropbox app-secret
+canary in the same configuration file. This is a public-identifier classification,
+not a credential exception.
+
+Google requests drive.file plus access_type=offline. Dropbox requests
+token_access_type=offline with files.content.read, files.content.write,
+files.metadata.read, sharing.read, sharing.write and account_info.read.
+Microsoft requests openid, profile, offline_access and Files.ReadWrite using a
+confidential Web callback. Account-sign-in registrations and cloud-file grants
+remain separate.
+
+Google branding publication does not establish OAuth audience publishing status:
+external apps left in Testing can receive refresh tokens with a seven-day
+lifetime. The live Audience console was checked on 2026-09-12 and reports External,
+In production. Microsoft uses a Web registration rather than the shorter-lived
+SPA refresh model.
+
+### Provider Preparation — 2026-09-12
+
+- Created the owner-approved **Lumafoil Cloud** Dropbox registration with Full
+  Dropbox access, the canonical callback, metadata/content/sharing scopes and
+  Lumafoil publisher, website, privacy URL and description. Additional users are
+  enabled; the console reports Development with a 500-user allowance. This is
+  not Dropbox production approval. A fresh Branding page visually confirms both
+  the 64-pixel and 256-pixel rose Lumafoil icons. The former App Folder
+  registration is retained until the combined cutover.
+- Saved the Google **Lumafoil Web** server callback and created a cloud client
+  secret with the owner's approval. The existing account sign-in client was
+  not changed. Google Audience is In production, independently of branding
+  verification status.
+- Saved a Web callback on **Lumafoil Cloud Storage** for OneDrive and created
+  the approved 180-day client secret. The console gives an expiration date of
+  **2027-03-11**; replace this secret before expiry to preserve refresh and new
+  connections. Existing SPA callbacks remain until the combined cutover.
+- Captured each new credential through encrypted transfer and protected local
+  staging. Generated an independent cryptographically random cloud-token
+  encryption key. None of these values is in the repository or documentation;
+  final binding to Cloudflare Worker secrets is still pending.
+
+Microsoft's console reports that this application lacks a verified publisher.
+The owner confirmed on 2026-09-12 that no verified Microsoft Partner Center
+account/MPN ID is available. Publisher verification is therefore deferred;
+external work/school access depends on each tenant's administrator/consent policy.
+This is an explicit provider limitation, not permission to weaken those policies
+or claim universal work/school consent. It does not require blocking the entire
+invitation-only service while other supported sign-in and storage paths work.
+Website/domain branding alone does not complete publisher verification. External
+work/school tenants can require administrator approval, particularly for newly
+registered multitenant applications requesting file permissions. Do not weaken
+tenant consent policies to bypass that requirement. See Microsoft's
+[publisher verification policy](https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview).
+Personal-account and external-tenant round trips remain separate acceptance
+checks; successful client-secret creation is not proof of user consent.
+
+## Request Metadata Privacy
+
+Both local and production Wrangler configurations disable observability,
+invocation logs, log persistence and trace persistence. The deploy Wrangler
+supports redact_query_string but the pinned Workers test Wrangler does not; that
+unsupported setting was removed. Privacy relies on supported disabled-log/trace
+controls, not an ignored redaction flag.
+
+Sanitized application diagnostics remain in the admin client-error and health
+views. Authentication diagnostics retain fixed classifications while omitting
+provider bodies and stacks. Worker errors use route templates rather than raw
+request URLs. Request IDs are generated on the server; caller-supplied IDs cannot
+inject private content into logs or D1 reports. Callback HTML has no scripts,
+tokens or postMessage payload, uses no-store and no-referrer, and directs the
+user back to the existing Lumafoil window.
+
+The release owner's read-only production Worker overview check on 2026-09-12
+explicitly showed Workers Logs and Workers Traces disabled. The canonical custom
+domain remains configured, and the `workers.dev` endpoint is disabled. This describes the
+existing deployment; verify those controls again after the combined release,
+and verify that no external Tail Worker retains raw request metadata.
+Do not use live tail while processing real OAuth callbacks. Zone-level HTTP
+request logs are separate controls: remove URL queries and bearer-link paths
+from any such external export or disable that job for this application.
+
+The release owner's read-only dashboard inspection on 2026-09-12 closed the
+Logpush inspection gap left by an API 403. The exact account's Investigate →
+Logpush page displayed no configured jobs and 0 GB. Selecting `lumafoil.com`
+showed a Free-plan zone with the Logpush feature unavailable and a Contact Sales
+offer, rather than configured jobs. This is dashboard-observed absence of
+account jobs and zone feature availability, not a successful API response or a
+claim that an API returned an empty job list. No dashboard setting was changed.
+The separately observed disabled Worker logging/tracing and any external Tail
+Worker checks remain distinct from this Logpush evidence. The historical probe
+and current configuration correction are recorded in
+[platform observability privacy](platform-observability-privacy.md).
+
+## Verification and Remaining Gates
+
+The combined focused run passed 190 tests across 30 files:
+temp/cloud-final-focused.log. It covers account/session isolation, PKCE and
+encryption, state replay, generation changes, refresh contention and rotation,
+provider errors/scopes, folder navigation, original PDF/video bytes, chosen save
+destinations, large upload acknowledgements, native sharing, account settings,
+and logging privacy. TypeScript passed in temp/cloud-final-typecheck.log.
+
+Two real-D1 connection tests passed with the supported Wrangler configuration:
+temp/cloud-d1-final.log. They exercise atomic claims, leases,
+encrypted storage, cancellation and generation isolation using the actual
+migration-backed store. First-party folder proofs are recorded by that subtask.
+
+The canonical `npm run quality` completed successfully after integration:
+temp/quality-staged-release.log, process exit 0. All 2,742 unit/browser tests and
+61 workerd tests passed. Coverage was 92.43% statements, 85.17% branches, 92.2%
+functions and 93.33% lines, with every original threshold retained. Bootstrap,
+gate, performance, publication and asset suites passed, along with all 42 built
+artifact checks. Source and built publication scans passed; dependency audit
+reported no vulnerabilities and the application shell stayed within its bundle
+budget. Additional cloud tests cover delayed modal completion, cancelled consent,
+remote revocation refusal, pending refresh and provider download boundaries.
+
+The separate staged-source SAST passed 509 rules over 2,098 targets with zero
+findings. The four-device E2E case inventory is closed through the initial 88
+passes and the corrected 49-case rerun, with nine repeated setup cases; this is
+128 distinct passing cases across two runs, not one clean full-matrix run. See
+[quality verification](quality.md) and [release E2E triage](release-e2e-triage.md)
+for the logs, exact accounting and remaining gates.
+
+The consolidated screenshot/axe inventory now covers all 752 required combinations
+with 800 PNGs across completed profile runs. These completed local checks do not
+replace real Google/Dropbox/Microsoft connect → browse →
+load → save → share → revoke round trips, reload/refresh reuse, or final production
+verification. Simulated provider responses do not establish console correctness,
+tenant-policy support or a successful live grant.
+No new dependency was added by this cloud work; obsolete browser OAuth paths
+were removed.
+
+Primary protocol references:
+[Google Web-Server OAuth](https://developers.google.com/identity/protocols/oauth2/web-server),
+[Google Token Expiration](https://developers.google.com/identity/protocols/oauth2#expiration),
+[Dropbox OAuth Guide](https://developers.dropbox.com/oauth-guide),
+[Microsoft Authorization Code Flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow),
+[Microsoft Refresh Tokens](https://learn.microsoft.com/en-us/entra/identity-platform/refresh-tokens),
+[Microsoft UserInfo](https://learn.microsoft.com/en-us/entra/identity-platform/userinfo).

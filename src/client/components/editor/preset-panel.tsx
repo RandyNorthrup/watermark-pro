@@ -4,10 +4,12 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { WatermarkDto } from '../../../shared/api-watermark'
+import type { WatermarkSpec } from '../../../shared/watermark'
 import { type Layer, MAX_LAYERS } from '../../editor/state'
 import { cn } from '../../lib/cn'
 import { watermarksQueryOptions } from '../../lib/library'
 import { PresetGate } from '../presets/preset-gate'
+import { PresetTemplates } from '../presets/preset-templates'
 import { Button } from '../ui/button'
 
 interface PresetPanelProps {
@@ -16,13 +18,14 @@ interface PresetPanelProps {
   layers: readonly Layer[]
   activeLayerId: string | null
   onAddPreset: (preset: WatermarkDto) => void
+  onUseTemplate?: ((spec: WatermarkSpec) => void) | undefined
   onNewPreset: () => void
   onSelectLayer: (layerId: string) => void
   onRemoveLayer: (layerId: string) => void
 }
 
 const selectClassName =
-  'h-11 w-full rounded-xl border border-control-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
+  'h-10 w-full rounded-xl border border-control-line bg-surface-raised px-3 text-sm text-ink shadow-xs focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none'
 
 /** Choose saved presets and organize the watermark layers applied to this photo. */
 export function PresetPanel({ organizationId, canCreate, ...props }: PresetPanelProps) {
@@ -31,26 +34,31 @@ export function PresetPanel({ organizationId, canCreate, ...props }: PresetPanel
   const presets = useQuery(watermarksQueryOptions(organizationId))
 
   return (
-    <PresetGate
-      query={presets}
-      emptyHint={t('editor.watermark.emptyHint')}
-      emptyContent={
-        <div className="flex flex-col items-center gap-3 text-center">
-          <p className="text-sm text-ink-muted">
-            {t(canCreate ? 'editor.watermark.createHint' : 'editor.watermark.emptyReadOnly')}
-          </p>
-          {canCreate ? (
-            <Button type="button" onClick={props.onNewPreset}>
-              {t('library.newPreset')}
-            </Button>
-          ) : null}
-        </div>
-      }
-    >
-      {(list) => (
-        <PresetPanelBody list={list} selectId={selectId} canCreate={canCreate} {...props} />
-      )}
-    </PresetGate>
+    <div className="flex min-w-0 flex-col gap-6">
+      <PresetGate
+        query={presets}
+        emptyHint={t('editor.watermark.emptyHint')}
+        emptyContent={
+          <div className="flex flex-col items-center gap-3 text-center">
+            <p className="text-sm text-ink-muted">
+              {t(canCreate ? 'editor.watermark.createHint' : 'editor.watermark.emptyReadOnly')}
+            </p>
+            {canCreate ? (
+              <Button type="button" onClick={props.onNewPreset}>
+                {t('library.newPreset')}
+              </Button>
+            ) : null}
+          </div>
+        }
+      >
+        {(list) => (
+          <PresetPanelBody list={list} selectId={selectId} canCreate={canCreate} {...props} />
+        )}
+      </PresetGate>
+      {canCreate && props.onUseTemplate !== undefined ? (
+        <PresetTemplates onChoose={(template) => props.onUseTemplate?.(template.spec)} />
+      ) : null}
+    </div>
   )
 }
 

@@ -7,8 +7,23 @@
  * Column naming is snake_case in the database and camelCase in code.
  */
 import { sql } from 'drizzle-orm'
-import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import {
+  check,
+  index,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core'
+import type { AnySQLiteColumn } from 'drizzle-orm/sqlite-core'
 
+import type {
+  CloudAttemptState,
+  CloudConnectionState,
+  CloudProvider,
+} from '../../shared/cloud-connections'
+import type { GuidanceTopic } from '../../shared/guidance'
 import type { RecentActivity, RecentView } from '../../shared/recent-work'
 import type { AssignableSiteRole } from '../../shared/site-roles'
 import type { WatermarkSpec } from '../../shared/watermark'
@@ -192,8 +207,54 @@ export const auditLog = sqliteTable(
   },
   (table) => [
     index('audit_log_organization_id_created_at_idx').on(table.organizationId, table.createdAt),
+    index('audit_log_actor_action_created_at_idx').on(
+      table.actorUserId,
+      table.action,
+      table.createdAt,
+    ),
   ],
 )
+
+/** Workspace-owned folders; mutations validate parent scope and cycles before committing. */
+export const workspaceFolder = sqliteTable(
+  'workspace_folder',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    kind: text('kind').$type<'photo' | 'preset'>().notNull(),
+    name: text('name').notNull(),
+    nameKey: text('name_key').notNull(),
+    parentId: text('parent_id').references((): AnySQLiteColumn => workspaceFolder.id, {
+      onDelete: 'no action',
+    }),
+    revision: integer('revision').default(0).notNull(),
+    versionId: text('version_id').notNull(),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAtColumn(),
+    updatedAt: updatedAtColumn({ hasInsertDefault: true }),
+  },
+  (table) => [
+    uniqueIndex('workspace_folder_sibling_unique').on(
+      table.organizationId,
+      table.kind,
+      sql`coalesce(${table.parentId}, '')`,
+      table.nameKey,
+    ),
+    index('workspace_folder_parent_idx').on(table.organizationId, table.kind, table.parentId),
+    check('workspace_folder_kind', sql`${table.kind} in ('photo', 'preset')`),
+  ],
+)
+
+/** Each content table gets independent column builders with the same placement contract. */
+function folderPlacementColumns() {
+  return {
+    folderId: text('folder_id').references(() => workspaceFolder.id, { onDelete: 'no action' }),
+    folderRevision: integer('folder_revision').default(0).notNull(),
+    folderVersionId: text('folder_version_id'),
+  }
+}
 
 /** Saved watermark presets (PLAN.md R3). */
 export const watermark = sqliteTable(
@@ -203,13 +264,17 @@ export const watermark = sqliteTable(
     organizationId: text('organization_id')
       .notNull()
       .references(() => organization.id, { onDelete: 'cascade' }),
+    ...folderPlacementColumns(),
     name: text('name').notNull(),
     spec: text('spec', { mode: 'json' }).$type<WatermarkSpec>().notNull(),
     createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
     createdAt: createdAtColumn(),
     updatedAt: updatedAtColumn({ hasInsertDefault: true }),
   },
-  (table) => [index('watermark_organization_id_idx').on(table.organizationId)],
+  (table) => [
+    index('watermark_organization_id_idx').on(table.organizationId),
+    index('watermark_folder_idx').on(table.organizationId, table.folderId),
+  ],
 )
 
 /** Binary assets owned by an organization; bytes live in R2 under `key`. */
@@ -247,6 +312,7 @@ export const photo = sqliteTable(
     organizationId: text('organization_id')
       .notNull()
       .references(() => organization.id, { onDelete: 'cascade' }),
+    ...folderPlacementColumns(),
     name: text('name').notNull(),
     key: text('key').notNull(),
     thumbnailKey: text('thumbnail_key').notNull(),
@@ -264,6 +330,12 @@ export const photo = sqliteTable(
   (table) => [
     index('photo_organization_id_created_at_idx').on(table.organizationId, table.createdAt),
     index('photo_organization_id_preset_id_idx').on(table.organizationId, table.presetId),
+    index('photo_folder_created_id_idx').on(
+      table.organizationId,
+      table.folderId,
+      table.createdAt,
+      table.id,
+    ),
   ],
 )
 
@@ -359,7 +431,7 @@ export const siteInvitation = sqliteTable(
   ],
 )
 
-/** One default personal workspace per account; no collaboration is allowed here. */
+/** One default personal workspace per account, private unless its owner explicitly grants access. */
 export const privateWorkspace = sqliteTable(
   'private_workspace',
   {
@@ -467,4 +539,102 @@ export const recentViewPreference = sqliteTable(
     view: text('view').$type<RecentView>().notNull(),
   },
   (table) => [check('recent_view_valid', sql`${table.view} in ('thumbnails', 'list', 'details')`)],
+)
+
+/** Permanent per-account consumption; there is deliberately no application delete/update path. */
+export const guidanceClaim = sqliteTable(
+  'guidance_claim',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    topic: text('topic').$type<GuidanceTopic>().notNull(),
+    claimedAt: integer('claimed_at', { mode: 'timestamp_ms' }).$defaultFn(now).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.topic] })],
+)
+
+/** Explicit workspace grants remain separate from site admission and account credentials. */
+export const workspaceAccessLink = sqliteTable(
+  'workspace_access_link',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    tokenHash: text('token_hash').notNull(),
+    role: text('role').$type<'viewer' | 'editor'>().notNull(),
+    email: text('email'),
+    createdAt: createdAtColumn(),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+    revokedAt: integer('revoked_at', { mode: 'timestamp_ms' }),
+    acceptedUserId: text('accepted_user_id').references(() => user.id, { onDelete: 'set null' }),
+    siteInvitationId: text('site_invitation_id').references(() => siteInvitation.id, {
+      onDelete: 'set null',
+    }),
+  },
+  (table) => [
+    uniqueIndex('workspace_access_link_token_unique').on(table.tokenHash),
+    index('workspace_access_link_workspace_idx').on(table.organizationId),
+    check('workspace_access_link_role', sql`${table.role} in ('viewer', 'editor')`),
+  ],
+)
+
+/** Durable provider credentials are account-owned even when workspace content is shared. */
+export const cloudConnection = sqliteTable(
+  'cloud_connection',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    provider: text('provider').$type<CloudProvider>().notNull(),
+    status: text('status').$type<CloudConnectionState>().default('disconnected').notNull(),
+    generation: integer('generation').default(0).notNull(),
+    clientId: text('client_id'),
+    providerAccountId: text('provider_account_id'),
+    accountLabel: text('account_label'),
+    accessCipher: text('access_cipher'),
+    refreshCipher: text('refresh_cipher'),
+    accessExpiresAt: integer('access_expires_at', { mode: 'timestamp_ms' }),
+    scopes: text('scopes').default('').notNull(),
+    refreshLeaseId: text('refresh_lease_id'),
+    refreshLeaseExpiresAt: integer('refresh_lease_expires_at', { mode: 'timestamp_ms' }),
+    updatedAt: updatedAtColumn({ hasInsertDefault: true }),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.provider] }),
+    check('cloud_connection_provider', sql`${table.provider} in ('google', 'dropbox', 'onedrive')`),
+    check(
+      'cloud_connection_status',
+      sql`${table.status} in ('disconnected', 'connected', 'reconnect')`,
+    ),
+  ],
+)
+
+/** State hashes and encrypted PKCE verifiers expire; a callback is claimed atomically once. */
+export const cloudAttempt = sqliteTable(
+  'cloud_attempt',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    sessionId: text('session_id')
+      .notNull()
+      .references(() => session.id, { onDelete: 'cascade' }),
+    provider: text('provider').$type<CloudProvider>().notNull(),
+    stateHash: text('state_hash').notNull(),
+    verifierCipher: text('verifier_cipher').notNull(),
+    generation: integer('generation').notNull(),
+    status: text('status').$type<CloudAttemptState>().default('pending').notNull(),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [
+    uniqueIndex('cloud_attempt_state_unique').on(table.stateHash),
+    index('cloud_attempt_expiry_idx').on(table.expiresAt),
+    index('cloud_attempt_owner_provider_idx').on(table.userId, table.provider),
+  ],
 )

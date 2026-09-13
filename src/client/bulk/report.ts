@@ -31,11 +31,15 @@ const HEADER = [
   'override',
 ] as const
 
-const NEEDS_QUOTING = /[",\r\n]/
+const NEEDS_QUOTING = /[",;\r\n]/
+/** Spreadsheet readers can treat these prefixes as formulas, even after CSV quoting. */
+const FORMULA_PREFIX = /^[\s\0]*[=+\-@＝＋－＠]|^[\t\r\n\0]/u
 
-/** Quotes a field only when it contains a comma, quote or newline. */
+/** Keep untrusted filenames, preset names and errors as text when imported into a spreadsheet. */
 function escapeCsv(value: string): string {
-  return NEEDS_QUOTING.test(value) ? `"${value.replaceAll('"', '""')}"` : value
+  const isFormula = FORMULA_PREFIX.test(value)
+  const text = isFormula ? `'${value}` : value
+  return isFormula || NEEDS_QUOTING.test(text) ? `"${text.replaceAll('"', '""')}"` : text
 }
 
 function numberField(value: number | null): string {

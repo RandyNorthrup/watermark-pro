@@ -1,218 +1,243 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { PDFDocument } from 'pdf-lib'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { DEFAULT_TEXT_SPEC } from '../../../shared/watermark'
+import { canShareFiles, shareFile } from '../../lib/share-file'
+import { processDocument } from '../../pdf/process-document'
+import type { PdfPagePreview } from '../../pdf/reader'
 import { seedOwnerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
-import {
-  DocumentRasteriser as FakeRasteriser,
-  fakeRasterControls,
-  rasterisedSizes,
-  resetFakePdfRaster,
-} from '../../test-support/fake-pdf-raster'
+import { resetFakePreview } from '../../test-support/fake-preview'
+import { interruptMediaExport } from '../../test-support/interrupt-media-export'
+import { mockElementBounds } from '../../test-support/mock-element-bounds'
+import { markPng } from '../../test-support/pdf-fixtures'
 import { renderApp } from '../../test-support/render-app'
 
+interface ReaderFixture {
+  pageCount: number
+  render: (page: number, signal: AbortSignal) => Promise<PdfPagePreview>
+  close: () => Promise<void>
+}
+const reader = vi.hoisted(() => ({
+  open: vi.fn<(file: File) => Promise<ReaderFixture>>(),
+  close: vi.fn<() => Promise<void>>(),
+}))
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
-const rasterModuleLoaded = vi.hoisted(() => vi.fn())
-vi.mock('../../pdf/raster', () => {
-  rasterModuleLoaded()
-  return import('../../test-support/fake-pdf-raster')
-})
+vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
 vi.mock('../../lib/download', () => import('../../test-support/fake-download'))
+vi.mock('../../lib/share-file', () => ({ canShareFiles: vi.fn(), shareFile: vi.fn() }))
+vi.mock('../../pdf/reader', () => ({ PdfReader: { open: reader.open } }))
+vi.mock('../../pdf/process-document', () => ({ processDocument: vi.fn() }))
 
-const client = fakeAuth
-
-/** A real PDF with the given page sizes (points), as a picked file. */
-async function pdfFile(name: string, pageSizes: readonly [number, number][]): Promise<File> {
-  const document = await PDFDocument.create()
-  for (const [width, height] of pageSizes) {
-    document.addPage([width, height])
+async function pdfFile(name = 'report.pdf') {
+  const pdf = await PDFDocument.create()
+  pdf.addPage([300, 400])
+  pdf.addPage([500, 300])
+  return new File([Uint8Array.from(await pdf.save())], name, { type: 'application/pdf' })
+}
+async function readFixture(file: File): Promise<ReaderFixture> {
+  const pdf = await PDFDocument.load(await file.arrayBuffer())
+  return {
+    pageCount: pdf.getPageCount(),
+    close: reader.close,
+    render: (page, signal) => {
+      signal.throwIfAborted()
+      const source = pdf.getPage(page - 1)
+      const size = { width: source.getWidth(), height: source.getHeight() }
+      const bytes = Uint8Array.from(markPng())
+      return Promise.resolve({
+        file: new File([bytes], 'page.png', { type: 'image/png' }),
+        size,
+        pixels: size,
+        text: `Original Page ${String(page)}`,
+      })
+    },
   }
-  const bytes = await document.save()
-  // The cast bridges TS 6's narrower lib.dom BlobPart; a Uint8Array is one at runtime.
-  return new File([bytes] as BlobPart[], name, { type: 'application/pdf' })
 }
-
-type TestUser = ReturnType<typeof userEvent.setup>
-
-/** Seeds the workspace, renders the documents page, and returns a fresh user. */
-async function openDocuments(): Promise<TestUser> {
+async function openDocuments() {
   const user = userEvent.setup()
-  seedOwnerWorkspace(client())
-  installLibraryApi({ watermarks: [makeWatermark()] })
-  renderApp('/app/documents')
-  await screen.findByLabelText('Add PDFs')
-  return user
+  seedOwnerWorkspace(fakeAuth())
+  installLibraryApi({
+    watermarks: [
+      makeWatermark(),
+      makeWatermark({
+        id: 'wm-2',
+        name: 'Second Mark',
+        spec: { ...DEFAULT_TEXT_SPEC, text: 'Second' },
+      }),
+    ],
+  })
+  const view = renderApp('/app/documents')
+  const input = await screen.findByLabelText('Open PDF')
+  return { ...view, input, user }
 }
-
+async function loadDocument(user: ReturnType<typeof userEvent.setup>) {
+  const source = await pdfFile()
+  await user.upload(screen.getByLabelText('Open PDF'), source)
+  await screen.findByRole('img', { name: 'PDF Page 1' })
+  return source
+}
 beforeEach(() => {
   installFakeAuth()
-  resetFakePdfRaster()
+  resetFakePreview()
   downloads.mockClear()
+  reader.open.mockReset().mockImplementation(readFixture)
+  reader.close.mockReset().mockResolvedValue()
+  vi.mocked(processDocument)
+    .mockReset()
+    .mockResolvedValue(new Blob(['complete PDF'], { type: 'application/pdf' }))
+  vi.mocked(canShareFiles).mockReset().mockReturnValue(false)
+  vi.mocked(shareFile).mockReset().mockResolvedValue('shared')
+  mockElementBounds()
+  Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:pdf-test'), revokeObjectURL: vi.fn() })
 })
-
 afterEach(() => {
+  vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
 
-describe('documents page', () => {
-  it('watermarks a PDF, shows the smart-placement hint, and downloads it', async () => {
-    const user = await openDocuments()
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Documents')
-    expect(rasterModuleLoaded).not.toHaveBeenCalled()
-
-    await user.upload(
-      screen.getByLabelText('Add PDFs'),
-      await pdfFile('report.pdf', [
-        [300, 400],
-        [300, 400],
-      ]),
+describe('inline Documents page', () => {
+  it('defers decoding until a file is selected and provides templates without requiring saved presets', async () => {
+    const { user } = await openDocuments()
+    expect(reader.open).not.toHaveBeenCalled()
+    expect(screen.getByRole('textbox', { name: 'Text' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Download PDF' })).toBeDisabled()
+    await user.click(screen.getByRole('tab', { name: 'Presets' }))
+    expect(screen.getByRole('region', { name: 'Watermark Templates' })).toBeVisible()
+  })
+  it('navigates pages, edits inline and exports the current source and marks', async () => {
+    const { user, unmount } = await openDocuments()
+    const source = await loadDocument(user)
+    await user.click(screen.getByRole('button', { name: 'Next Page' }))
+    expect(await screen.findByRole('img', { name: 'PDF Page 2' })).toBeVisible()
+    expect(screen.getByRole('spinbutton', { name: 'Page' })).toHaveValue(2)
+    expect(screen.getByRole('button', { name: 'Next Page' })).toBeDisabled()
+    await user.click(screen.getByText('Page Text', { exact: true }))
+    expect(screen.getByText('Original Page 2', { exact: true })).toBeVisible()
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Page' }), { target: { value: '9' } })
+    expect(screen.getByRole('spinbutton', { name: 'Page' })).toHaveValue(2)
+    await user.click(screen.getByRole('button', { name: 'Previous Page' }))
+    expect(await screen.findByRole('img', { name: 'PDF Page 1' })).toBeVisible()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Text' }), {
+      target: { value: 'Document QA' },
+    })
+    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
+    expect(processDocument).toHaveBeenCalledWith(
+      source,
+      [expect.objectContaining({ kind: 'text', text: 'Document QA' })],
+      expect.any(Function),
+      expect.any(AbortSignal),
     )
-    expect(screen.getByRole('heading', { level: 2, name: '1 document' })).toBeInTheDocument()
-
-    // makeWatermark uses smart placement, so ticking it shows the hint.
-    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
-    expect(screen.getByText(/Smart placement is for photos/)).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /Watermark/ }))
-    await waitFor(() => expect(screen.getByText(/1 of 1 finished/)).toBeInTheDocument())
-    expect(rasterModuleLoaded).toHaveBeenCalledOnce()
-    expect(FakeRasteriser.closed).toBe(1)
-
-    // Two pages of one size: the fake was asked to rasterise that size once.
-    expect(rasterisedSizes).toEqual([{ width: 300, height: 400 }])
-
-    await user.click(screen.getByRole('button', { name: 'Download report-watermarked.pdf' }))
-    expect(downloads).toHaveBeenLastCalledWith(expect.any(Blob), 'report-watermarked.pdf')
+    expect(downloads).toHaveBeenCalledWith(expect.any(Blob), 'report-watermarked.pdf')
+    unmount()
+    expect(reader.close).toHaveBeenCalledOnce()
   })
-
-  it('downloads several results as a ZIP and skips non-PDF files', async () => {
-    const user = await openDocuments()
-
-    // Drop, rather than pick, so the non-PDF is not filtered out by the
-    // input's `accept` before the tool sees and reports it.
-    const dropZone = screen.getByLabelText('Add PDFs').parentElement
-    if (dropZone === null) {
-      throw new Error('drop zone not found')
-    }
-    fireEvent.drop(dropZone, {
-      dataTransfer: {
-        files: [
-          await pdfFile('a.pdf', [[300, 400]]),
-          await pdfFile('b.pdf', [[500, 600]]),
-          new File([new Uint8Array(4)], 'notes.txt', { type: 'text/plain' }),
-        ],
-      },
+  it('hides zoom until page dimensions exist and reports decoder errors without a fake page', async () => {
+    const pending = Promise.withResolvers<ReaderFixture>()
+    reader.open.mockReturnValueOnce(pending.promise)
+    const { user } = await openDocuments()
+    await user.upload(screen.getByLabelText('Open PDF'), await pdfFile())
+    expect(screen.queryByRole('group', { name: 'Canvas view' })).not.toBeInTheDocument()
+    await act(async () => {
+      pending.reject(new Error('PDF could not be decoded'))
+      await expect(pending.promise).rejects.toThrow('PDF could not be decoded')
     })
-    expect(
-      await screen.findByRole('heading', { level: 2, name: '2 documents' }),
-    ).toBeInTheDocument()
-    expect(screen.getByText(/1 file skipped/)).toBeInTheDocument()
-
-    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
-    await user.click(screen.getByRole('button', { name: /Watermark/ }))
-    await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
-
-    await user.click(screen.getByRole('button', { name: 'Download 2 as ZIP' }))
-    await waitFor(() => expect(downloads).toHaveBeenCalledTimes(1))
-    expect(downloads.mock.calls[0]?.[1]).toBe('watermarked-2-documents.zip')
+    expect(await screen.findByText('PDF could not be decoded')).toBeVisible()
+    expect(screen.queryByRole('img', { name: /^PDF Page/ })).not.toBeInTheDocument()
   })
-
-  it('reports a per-file failure without stopping the batch', async () => {
-    const user = await openDocuments()
-
-    await user.upload(screen.getByLabelText('Add PDFs'), [
-      new File([new Uint8Array([1, 2, 3, 4])], 'broken.pdf', { type: 'application/pdf' }),
-      await pdfFile('good.pdf', [[300, 400]]),
-    ])
-    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
-    await user.click(screen.getByRole('button', { name: /Watermark/ }))
-
-    await waitFor(() => expect(screen.getByText(/2 of 2 finished, 1 failed/)).toBeInTheDocument())
-    const list = screen.getByRole('list', { name: 'Documents to watermark' })
-    expect(within(list).getByRole('alert')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: 'Download good-watermarked.pdf' }),
-    ).toBeInTheDocument()
-  })
-
-  it('removes a queued file and clears the list', async () => {
-    const user = await openDocuments()
-    await user.upload(screen.getByLabelText('Add PDFs'), [
-      await pdfFile('one.pdf', [[300, 400]]),
-      await pdfFile('two.pdf', [[300, 400]]),
-    ])
-    expect(
-      await screen.findByRole('heading', { level: 2, name: '2 documents' }),
-    ).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Remove one.pdf' }))
-    expect(screen.getByRole('heading', { level: 2, name: '1 document' })).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Clear list' }))
-    expect(screen.queryByRole('list', { name: 'Documents to watermark' })).not.toBeInTheDocument()
-  })
-
-  it('reports a shared-step failure and stops the batch', async () => {
-    fakeRasterControls.prepareError = new Error('a logo could not be loaded')
-    const user = await openDocuments()
-    await user.upload(screen.getByLabelText('Add PDFs'), await pdfFile('a.pdf', [[300, 400]]))
-    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
-    await user.click(screen.getByRole('button', { name: /Watermark/ }))
-
-    expect(await screen.findByText('a logo could not be loaded')).toBeInTheDocument()
-    // Nothing was rasterised, and no result is offered.
-    expect(rasterisedSizes).toEqual([])
-    expect(screen.queryByRole('button', { name: /Download/ })).not.toBeInTheDocument()
-  })
-
-  it('adds through the button, de-duplicates, ignores drag-over, and toggles presets', async () => {
-    const user = userEvent.setup()
-    seedOwnerWorkspace(client())
-    installLibraryApi({
-      watermarks: [makeWatermark(), makeWatermark({ id: 'wm-2', name: 'Corner mark' })],
+  it('reuses an unchanged export and invalidates it after an edit', async () => {
+    const { user } = await openDocuments()
+    await loadDocument(user)
+    const button = screen.getByRole('button', { name: 'Download PDF' })
+    await user.click(button)
+    await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
+    await user.click(button)
+    await waitFor(() => expect(downloads).toHaveBeenCalledTimes(2))
+    expect(processDocument).toHaveBeenCalledOnce()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Text' }), {
+      target: { value: 'Changed' },
     })
-    renderApp('/app/documents')
-    const input = await screen.findByLabelText('Add PDFs')
-
-    // The visible button forwards to the hidden input.
-    await user.click(screen.getByRole('button', { name: 'Add PDFs' }))
-
-    await user.upload(input, await pdfFile('one.pdf', [[300, 400]]))
-    // A second add merges over the non-empty list, dropping the duplicate.
-    await user.upload(input, [
-      await pdfFile('one.pdf', [[300, 400]]),
-      await pdfFile('two.pdf', [[300, 400]]),
-    ])
-    expect(
-      await screen.findByRole('heading', { level: 2, name: '2 documents' }),
-    ).toBeInTheDocument()
-
-    // Drag-over is accepted (default prevented) and changes nothing.
-    const dropZone = input.parentElement
-    if (dropZone === null) {
-      throw new Error('drop zone not found')
-    }
-    fireEvent.dragOver(dropZone)
-    expect(screen.getByRole('heading', { level: 2, name: '2 documents' })).toBeInTheDocument()
-
-    // Ticking a second preset filters the existing selection; unticking filters
-    // again. Regex names because the order badge joins the label once ticked.
-    await user.click(screen.getByRole('checkbox', { name: /Studio signature/ }))
-    await user.click(screen.getByRole('checkbox', { name: /Corner mark/ }))
-    await user.click(screen.getByRole('checkbox', { name: /Corner mark/ }))
-    expect(screen.getByRole('checkbox', { name: /Studio signature/ })).toBeChecked()
+    await user.click(button)
+    await waitFor(() => expect(processDocument).toHaveBeenCalledTimes(2))
   })
-
-  it('points at the library when there are no presets', async () => {
-    seedOwnerWorkspace(client())
-    installLibraryApi()
-    renderApp('/app/documents')
-    expect(
-      await screen.findByRole('link', { name: 'Create a preset in the library' }),
-    ).toBeInTheDocument()
+  it('preserves selected layer order and makes clear undoable', async () => {
+    const { user } = await openDocuments()
+    await loadDocument(user)
+    await user.click(screen.getByRole('tab', { name: 'Presets' }))
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Preset' }), 'wm-2')
+    await user.click(screen.getByRole('tab', { name: 'Presets' }))
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Add another preset' }), 'wm-1')
+    await user.click(screen.getByRole('button', { name: 'Clear canvas' }))
+    expect(screen.getByRole('button', { name: 'Download PDF' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
+    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await waitFor(() => expect(processDocument).toHaveBeenCalledOnce())
+    expect(processDocument).toHaveBeenCalledWith(
+      expect.any(File),
+      [
+        expect.objectContaining({ text: 'Second' }),
+        expect.objectContaining({ text: '© Acme Studio' }),
+      ],
+      expect.any(Function),
+      expect.any(AbortSignal),
+    )
+  })
+  it.each(['edit', 'cancel', 'account', 'unmount'] as const)(
+    'rejects late completion after %s',
+    async (action) => {
+      const pending = Promise.withResolvers<Blob>()
+      vi.mocked(processDocument).mockReturnValueOnce(pending.promise)
+      const { user, unmount } = await openDocuments()
+      await loadDocument(user)
+      await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+      await waitFor(() => expect(processDocument).toHaveBeenCalledOnce())
+      const signal = vi.mocked(processDocument).mock.calls[0]?.[3]
+      await interruptMediaExport(action, user, unmount)
+      await act(async () => {
+        pending.resolve(new Blob(['stale export']))
+        await pending.promise
+      })
+      expect(downloads).not.toHaveBeenCalled()
+      if (action === 'cancel' || action === 'unmount') expect(signal?.aborted).toBe(true)
+      else if (action === 'edit')
+        expect(await screen.findByText(/changed during export/)).toBeVisible()
+    },
+  )
+  it('rejects unsupported drops without replacing the document and permits an export retry', async () => {
+    const { user, input } = await openDocuments()
+    await loadDocument(user)
+    const parent = input.parentElement
+    if (parent === null) throw new Error('Document drop target missing')
+    fireEvent.drop(parent, {
+      dataTransfer: { files: [new File(['text'], 'notes.txt', { type: 'text/plain' })] },
+    })
+    expect(await screen.findByText('Choose a PDF within the document size limit.')).toBeVisible()
+    expect(screen.getByRole('img', { name: 'PDF Page 1' })).toBeVisible()
+    vi.mocked(processDocument).mockRejectedValueOnce(new Error('Decoder failed'))
+    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    expect(await screen.findByText('Decoder failed')).toBeVisible()
+    expect(downloads).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
+  })
+  it('shares the output and preserves it after a refused share', async () => {
+    vi.mocked(canShareFiles).mockReturnValue(true)
+    const { user } = await openDocuments()
+    await loadDocument(user)
+    await user.click(screen.getByRole('button', { name: 'Share' }))
+    await waitFor(() =>
+      expect(shareFile).toHaveBeenCalledWith(expect.any(Blob), 'report-watermarked.pdf'),
+    )
+    vi.mocked(shareFile).mockRejectedValueOnce(new Error('Share refused'))
+    await user.click(screen.getByRole('button', { name: 'Share' }))
+    expect(await screen.findByText('Share refused')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
+    expect(processDocument).toHaveBeenCalledOnce()
   })
 })

@@ -1,11 +1,220 @@
 # Integrated quality verification
 
+## Current staged-release checkpoint — 2026-09-12
+
+The canonical `npm run quality` completed with **exit code 0** on the integrated
+release candidate. The successful record is `temp/quality-staged-release.log`,
+SHA-256 `316f1fa62ea419120522bc8cea09e0c754827f47bc044c20d7b77225739720ae`.
+This establishes the current local quality/build checkpoint; it does not certify
+the still-open live provider journeys or deployment.
+This checkpoint also predates the subsequent Account overflow correction and
+named Dropbox credential-format adjustment identified during final release
+checks. Their follow-up verification must be recorded separately; the completed
+canonical invocation is not retroactively attributed to later edits.
+
+Formatting, ESLint, Stylelint, TypeScript, dead-code detection, all **1,212**
+translation keys, dependency cycles and duplication checks passed. The duplicate
+count was zero. Dependency audit reported zero vulnerabilities.
+
+The canonical test chain passed:
+
+- **2,742 unit/browser tests across 253 files.**
+- **61 real workerd tests across 16 files.**
+- 30 bootstrap, 12 gate/transport, 36 performance/audit-helper and 16 publication
+  checks.
+- 24 Python asset/recovery checks, comprising the five-case and nineteen-case
+  suites.
+- **42 independent built-artifact checks**, including byte-exact PDF reader
+  assets, offline inventory, translated public documents, security headers,
+  license/source artifacts and the resolved logging configuration.
+
+All original coverage thresholds remained in force:
+
+| Metric     | Observed | Required |
+| ---------- | -------: | -------: |
+| Statements |   92.43% |      90% |
+| Branches   |   85.17% |      85% |
+| Functions  |   92.20% |      90% |
+| Lines      |   93.33% |      90% |
+
+The source/index/history publication scan passed **13,842 candidate/object
+checks** and **297 archive entries**, comparing four configured private values
+without exposing them. Five revoked-key occurrences were masked only in
+historical scan copies, and one exact immutable historical finding was accepted.
+No current credential exception was introduced. The new Dropbox registration's
+public application identifier is classified by an exact-value pattern alongside
+two retired public identifiers; a real scanner test still rejects a same-format
+unrelated Dropbox app secret in the same configuration file.
+
+The production build and every byte budget passed. The initial application shell
+measured **138.1 KiB gzip against the 140 KiB budget**. The built publication scan
+passed **2,640 candidate/object checks** and **114 archive entries**, with four
+configured private values compared and no retired-key masking or historical
+finding exception applied to current artifacts.
+
+### Staged-source SAST
+
+The separate final staged-source SAST invocation passed **509 rules over 2,098
+targets with zero findings**. All intended new modules were staged before this
+invocation; this result supersedes the earlier inventories taken before staging.
+The evidence is `temp/security-staged-release.log`, SHA-256
+`c32313a729f9ae3158441b0d3214358f4aeeef56fc8733a50525f610e7a56ca8`.
+The scanner reported approximately 99.9% parsed lines and thirteen files skipped
+by its default 1 MB size limit. Those reported scope limits remain explicit;
+this is not a claim that every repository byte was parsed.
+
+### Subsequent publication-policy correction
+
+Final credential preparation exposed a valid provider format shorter than the
+generic private-value input minimum. The publication policy now admits exactly
+15 alphanumeric characters only for the named `DROPBOX_APP_SECRET` input. The
+global 16-character minimum remains unchanged. This admits the credential into
+private-value scanning; it does not allow publishing it or suppress a finding.
+Raw, JSON, URL, Base64, hexadecimal and UTF-16 forms remain covered, with unrelated
+15-character names, malformed values and shorter Dropbox values rejected.
+
+The focused publication suite passed **19 tests with zero skipped**, and scoped
+ESLint and formatting passed. A real fixture scan was green, failed on an encoded
+private canary identified as `DROPBOX_APP_SECRET`, then passed after restoration.
+No real credential was read by this test change. This follow-up evidence is
+separate from the earlier canonical run's 16 publication tests. The record is
+`temp/dropbox-secret-publication-tests.log`, SHA-256
+`cd838de247e7b6dbef7770f83452b23ecfe24b899a159307bdb3dcd48fc31730`;
+`temp/dropbox-secret-publication-lint.log` is empty after successful scoped lint.
+
+### Account layout rebuild and protected release checks
+
+The Account layout now has an explicit single-column base grid. The native
+iPhone diagnostic changed from a 390-pixel viewport with 558-pixel document
+width to **390/390 pixels with no overflowing objects**
+(`temp/account-overflow.json`). A fresh `npm run build` completed with exit 0,
+all 42 built-artifact checks and every bundle budget passing. Its log is
+`temp/account-grid-release-build.log`, SHA-256
+`2c9731125eb71221cb28293adb52f9508cff123ef99cf12062d408efcaffc475`.
+The separate subsequent SAST again passed **509 rules over 2,098 targets with
+zero findings** in `temp/security-account-grid-release.log`, SHA-256
+`c32313a729f9ae3158441b0d3214358f4aeeef56fc8733a50525f610e7a56ca8`.
+The same thirteen-file size limit and approximately 99.9% parsed scope apply.
+
+Protected source publication passed **13,842 candidate/object checks, 297 archive
+entries and eight private-value comparisons**, including the four new cloud
+credentials, without printing them. Five revoked occurrences were masked in
+historical scan copies and one exact historical finding was accepted; these
+remain historical-only controls. The log is `temp/protected-publication-source.log`,
+SHA-256 `4c31445c215c20187ed1fa29c432216545406521c690d1417c45f757487b46cc`.
+
+A fresh protected scan of the Account build passed **2,640 checks, 114 archive entries and
+eight private-value comparisons**, without historical masks or accepted findings:
+`temp/protected-publication-built.log`, SHA-256
+`ec9bff464a8d32df04e6059d532b4d0a890f199b88638243f1447009d4ffb1a3`.
+The initial protected built checkpoint preceded the Account rebuild, whose
+standard build scan compared four configured values. The release owner then
+reran the protected scan against the final Account artifact with all eight
+configured private values, closing that artifact-correspondence gap. No production
+upload or secret binding is implied by this local scan. The earlier failed
+`temp/protected-publication-run.log` remains
+failure evidence, not the successful source/built checkpoint.
+
+Read-only production checks confirmed the sole Owner and absence of Admins
+without modifying accounts or content. A fresh encrypted backup was verified.
+Production dashboard readback showed Workers Logs/Traces disabled and no
+configured account Logpush jobs; the canonical Free-plan zone did not offer a
+configured Logpush feature. These are pre-deployment observations, with the exact
+dashboard/API distinction recorded in [cloud storage](cloud-storage.md).
+
+### Earlier attempts were not successful canonical runs
+
+Earlier logs remain useful failure evidence and are not substituted for the
+successful checkpoint above. Integration attempts stopped at formatting, lint,
+test typing, an obsolete PDF fixture, and stale UI assumptions after the new
+workflows landed. The first source-scan refusal for the new Dropbox public app
+identifier was resolved through exact classification with a live negative
+credential control, not a file-wide or rule-wide scanner exclusion.
+
+The earlier all-green application-test runs still failed coverage: one measured
+89.42% functions and 82.46% branches, and a later run measured 84.43% branches.
+Those were failed gates. Additional tests exercise real cloud cancellation and
+account boundaries, provider failures, media playback and gestures, workspace
+transitions, and selected-photo sharing readiness. No threshold was reduced.
+Coverage is now also emitted when an assertion fails so a test failure cannot
+hide the remaining coverage deficit; it does not change failure exit codes.
+
+`temp/quality-frozen-release.log` passed the application and Workers projects,
+coverage, bootstrap and transport checks, then failed two audit-helper checks:
+the new workspace-invitation route was missing from the surface inventory, and a
+fake video viewer used a raw range input. The route now has a stable prepared
+audit surface and the fixture uses the canonical themed slider. The entire
+canonical command subsequently passed in `temp/quality-staged-release.log`.
+These distinctions preserve the earlier red results rather than relabeling them
+as successful runs.
+
+### Four-device E2E case closure
+
+The initial isolated matrix collected 128 cases and finished with 88 passing,
+37 failing and three not run after serial-suite failures. The corrected rerun
+completed successfully with **49 passing cases across 11 files**. Matching
+project, file and full test title establishes nine repeated setup cases and
+**128 distinct passing cases across the two runs**: 32 each on desktop Chrome,
+iPhone, iPad and Android. All 37 initial failures and all three serial fallouts
+have successful rerun evidence.
+
+This is combined case closure, **not one clean uninterrupted 128-case run**, and
+it does not claim all 128 cases were freshly executed against the final build.
+The original failures remain preserved. See
+[release E2E triage](release-e2e-triage.md) for the per-device accounting,
+corrections, commands, retained logs and SHA-256 values. The successful rerun is
+`temp/release-e2e-rerun.log`; the initial record is `temp/release-e2e.log`.
+
+### Consolidated screenshot/axe inventory
+
+All four browser/device profiles now have complete screenshot evidence across
+English/Arabic and light/dark themes: **800 PNGs covering all 752 required
+combinations**, with zero missing required captures. Desktop contributed 200,
+iPhone 200, iPad 196 and Android 204. Strict page-error, axe, readiness and
+horizontal-overflow checks stayed active. The final phone and Android invocations
+completed with exit 0; desktop and tablet completed within earlier parent runs
+that failed on different profiles. This is consolidated coverage across four
+invocations, not one clean uninterrupted all-profile run.
+
+The [audit receipt](audit-inventory.md) and [compact inventory](screenshot-inventory.json)
+retain run/build provenance, per-file SHA-256 values and actual recorded preference
+metadata only. Every required combination was independently checked from the
+canonical surface declaration, including a missing-file negative control.
+All 1,008 terminal evidence files were archived outside publication candidates,
+with every file count, size and hash preserved. Selected capture bytes and runner
+inventories also matched an independent pre/post-archive comparison. The original
+failed runs remain retained; the Account overflow and harness navigation causes
+are documented without changing their original results.
+
+### Evidence still open
+
+The following remain separate, open release evidence at this checkpoint:
+
+- The separate full Lighthouse/performance audit evidence. Passing the
+  performance-helper tests and build byte budgets is not a full audit result.
+  The owner authorized performance work after launch; this remains disclosed
+  deferred evidence rather than a newly imposed pre-launch gate.
+- Real Google Drive, Dropbox and OneDrive connection, folder, load/save,
+  sharing/revocation and refresh-reuse verification. Local provider fixtures do
+  not establish live consent or tenant-policy behavior.
+- Final release configuration, migration/deployment and hosted verification.
+  A successful local build and staged-source scan do not prove production was
+  changed or that hosted journeys passed.
+
+## Historical verification record
+
+The sections below preserve earlier dated checkpoints and failures. Their
+"final," "latest," and open-gate statements describe their historical snapshots.
+For current canonical quality and staged SAST status, use the checkpoint above;
+no historical pass certifies uninspected later source or closes the open provider
+and deployment evidence.
+
 On 2026-09-09 (America/Los_Angeles), `npm run quality` completed with exit 0
 after the bootstrap, diagnostic-privacy, publication and logging-configuration
 changes. Runtime and test sources were frozen for this run. This is a verified
 integration checkpoint, not full production-launch certification.
 
-## Executed gates
+### Executed gates
 
 Formatting, ESLint, Stylelint, TypeScript, dead-code detection, all 1,043
 translation keys, dependency cycles and duplication checks passed. The source
@@ -38,7 +247,7 @@ passed; the application JavaScript shell measured 139.1 KiB gzip against the
 140 KiB limit. The built-output publication scan passed 2,388 candidate/object
 checks and 114 archive entries with no retirement exception used.
 
-## Failures corrected before this checkpoint
+### Failures corrected before this checkpoint
 
 The first attempt stopped at duplicated delayed-response test setup. A single
 case matrix now retains the account/session/workspace assertions for every
@@ -51,7 +260,7 @@ that label. The test now waits for the final selected-preset control before
 testing crop/resize/export behavior, and its twelve-test suite passed before
 the complete successful rerun. No timeout, coverage floor or gate was weakened.
 
-## Evidence and remaining limits
+### Evidence and remaining limits
 
 The ignored canonical log is `temp/lumafoil-quality-release-current-3.log`,
 SHA-256 `a98010ab5f6bcca4cada2113f0383ec4e3cab00a103b7e75b588d321cc43add0`.
@@ -68,7 +277,7 @@ cutover and provider branding approval remain required. Later source changes
 must receive their applicable checks again; do not apply this checkpoint to an
 uninspected final release candidate.
 
-## Subsequent focused checks and browser failure
+### Subsequent focused checks and browser failure
 
 After route-specific resource hints and the private SQL preparation helper were
 added, the separate Semgrep command passed 509 rules over 1,826 targets with no
@@ -96,7 +305,7 @@ specific Wrangler debug log confirmed the proxy failure, which matches an
 The proposed upstream fix was still unmerged when reviewed; a successful local
 test-runtime replacement and fresh complete browser run are required.
 
-## Supported gate and focused rerun
+### Supported gate and focused rerun
 
 The supported SDK/native service-and-asset gate subsequently passed 84 routing
 parity cases, eight protocol/startup checks, and actual cancelled-download and
@@ -115,7 +324,7 @@ quality run. Current focused logs are `temp/lumafoil-e2e-sdk-focused.log`,
 `temp/lumafoil-offline-conflict-lifecycle.log`, and
 `temp/lumafoil-coverage-launch-current.log`.
 
-## Integrated SDK, fallback and audit-inventory checkpoint
+### Integrated SDK, fallback and audit-inventory checkpoint
 
 The subsequent `npm run quality` completed with exit code 0. Its application
 projects passed 2,360 tests in 207 files; the real Workers project passed 42
@@ -142,7 +351,7 @@ Its ignored receipt is `temp/lumafoil-lint-staged-proof.json`.
 The checkpoint does not certify remote CI, the corrected full device matrix, final visual/performance matrices, full
 failure-drill run, or hosted deployment. Those remain explicit release gates.
 
-## Offline transport and Linux sandbox checkpoint
+### Offline transport and Linux sandbox checkpoint
 
 After integrating the WebKit outage transport, pinned Linux sandbox setup and
 shared Node response helper, the complete `npm run quality` command passed again.
@@ -160,7 +369,7 @@ certificate browser check. The new Linux helper installation still requires its
 fresh hosted-runner preflight, and all 104 device cases require the new-head CI
 run. Full UI, performance, red-drill and hosted release gates remain open.
 
-## Hosted runner and device findings
+### Hosted runner and device findings
 
 CI for commit `94d2b941837ac0215a83924d232227f1bf3cf7aa` proved the pinned
 publisher sandbox helper on GitHub's Linux runner, then passed quality, SAST and
@@ -184,7 +393,7 @@ the same failure. The runner now retains that exact target through content and
 image checks; focused home and populated-dashboard samples pass the corrected
 check. Full remote UI audits remain open.
 
-## Final interaction and selected-dashboard checkpoint
+### Final interaction and selected-dashboard checkpoint
 
 With the corrected interaction behavior, stable Recent work panel, compact phone
 thumbnails, redundant font-preload removal and exact Lighthouse page ownership,
@@ -212,7 +421,7 @@ That test now waits for `Add another preset`, as the user-visible final control;
 no timeout or product behavior changed. Fresh integrated and remote checks remain
 required.
 
-## Complete red drill and first full UI matrix
+### Complete red drill and first full UI matrix
 
 The complete current-source red drill ran all 93 declared faults. Every mutation
 produced the intended nonzero gate and the runner restored the exact source
@@ -241,7 +450,7 @@ heading while continuing to reject the wrong screen. New CI diagnostics retain
 only finite benchmark, DOM path/rectangle and task-source classes; page text,
 selectors and full URLs are omitted.
 
-## Final local startup and deferred-work checkpoint
+### Final local startup and deferred-work checkpoint
 
 Core login/audit/invitation imports initialize four schemas instead of 31 while
 retaining the same validators. Desktop launch delivery is outside the initial
@@ -295,7 +504,7 @@ gate asserts both sides. A fresh local HTTP/2 mobile diagnostic passes Home and
 Privacy at 100/100/100 with zero CLS and zero TBT under
 `docs/lighthouse/m19-public-preload/`. Fresh Linux proof remains required.
 
-## Private boot and final asynchronous-layout checkpoint
+### Private boot and final asynchronous-layout checkpoint
 
 The private query persister, account observer and offline admission installer
 are absent from the public Login closure and load before the first `/app`
@@ -341,7 +550,7 @@ requires complete nonzero dimensions. A delayed decode passes; a broken image
 and a decode beyond the deadline remain red. Lighthouse scoring and budgets are
 unchanged.
 
-## Sidebar and offline build verification — 2026-09-12
+### Sidebar and offline build verification — 2026-09-12
 
 The focused tools-sidebar refinement uses the shared `ChoiceGroup` for visual
 shape tiles and its existing keyboard semantics. The first full quality command
@@ -371,3 +580,52 @@ duplicate Recents link and a Layers list hidden after preset selection switched
 to Watermark. Those fixtures now use the library region and explicitly reopen
 Presets. The full final device, screenshot and performance matrices remain open;
 the diagnostic is not substituted for them.
+
+### Editor and workspace chrome checkpoint — 2026-09-12
+
+The durable baseline runner completed: `npm run quality` exited 0 on the
+sidebar/offline-build source, followed by `npm run test:e2e` with 118 passing and
+six failing cases. Failures included an offline-install evaluation timeout,
+iPhone/Android verification-page readiness, an iPad drag, an Android gallery
+save and an Android audit request that received an HTTP 502. This is not a
+passing device certificate, and the earlier GitHub matrix cannot certify later
+source changes. Logs remain in ignored `temp/quality-launch-final.log` and
+`temp/e2e-launch-final.log`.
+
+The focused editor-control browser fixture then passed desktop Chromium, iPhone
+WebKit, iPad WebKit and Android Chromium: actual font loading, compact controls,
+20 shape choices, naming before save, New clearing the mark, account-menu access,
+and zero axe violations or horizontal page overflow. Android additionally sent
+native two-touch traffic and verified rotation plus one-step undo. The first
+iPhone attempt proved the non-portalled font popup could display options that
+the scrolling glass panel intercepted; moving it outside that panel fixed the
+same interaction. Enclosing dialogs retain their own portal container for scroll
+containment. The successful device output is `temp/editor-controls-qa/report.json`.
+
+That device fixture preceded the requested sharing modal, PayPal header, American
+English/title casing, single-line status bar and lossless-default refinements.
+Those changes require refreshed browser proof. Current focused unit/engine checks
+exercise actual export options and original-resolution, one-pixel source detail,
+and distinguish explicit resize from display-only preview scaling. Full current
+quality, SAST and device certification remain open until fresh successful runs.
+
+The combined editor-control fixture subsequently passed all four devices again,
+including the sharing modal, PayPal link, one-line status bar and non-sticky
+phone header. The separate guidance browser run passed desktop, then found a
+real Android swipe cancellation: its nested scrolling body needed its own
+`touch-action: pan-y`. A controlled runtime CSS probe changed only that property
+and passed native swiping, popup suppression, account/device persistence and
+landscape bounds. Production source now contains the fix; final rebuilt-artifact
+guidance proof is still required. Probe files are kept separately from final
+artifact screenshots and are not a substitute for that run.
+
+Actual Chromium and WebKit referrer checks read the static header policy, visit
+a synthetic bearer path and verify that same-origin, cross-origin and subsequent
+SPA requests carry only the origin. An independent control using the old policy
+exposes its synthetic same-origin path, proving the negative assertion is live.
+Twelve account-OAuth UI checks cover both providers retaining the requested
+internal destination and rejecting external/control-character redirects.
+
+The first combined quality attempts stopped at formatting, lint and then dead
+code. Cleanup removes obsolete membership mutations and types superseded by the
+access modal; none of those incomplete runs are reported as a full green gate.

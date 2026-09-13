@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/cn'
 
+const THREE_COLUMN_CHOICE_COUNT = 3
+
 export interface Choice<T extends string> {
   value: T
   label: string
@@ -43,8 +45,11 @@ export function ChoiceGroup<T extends string>({
       className={cn(
         '[&>input[type=radio][aria-hidden=true]]:hidden',
         presentation === 'tiles'
-          ? 'grid grid-cols-2 gap-2'
-          : 'inline-flex flex-wrap rounded-lg border border-line bg-surface-raised p-1',
+          ? 'grid grid-cols-3 gap-2'
+          : 'grid grid-cols-2 gap-1 rounded-lg border border-line bg-surface-raised p-1',
+        presentation === 'segmented' &&
+          choices.length === THREE_COLUMN_CHOICE_COUNT &&
+          'grid-cols-3',
         className,
       )}
     >
@@ -56,8 +61,8 @@ export function ChoiceGroup<T extends string>({
           className={cn(
             'text-sm font-medium text-ink-muted outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',
             presentation === 'tiles'
-              ? 'glass-control flex min-h-24 min-w-0 flex-col items-center justify-center gap-3 rounded-xl border p-3 text-center transition-colors hover:border-brand-500/60 data-[state=checked]:border-brand-600 data-[state=checked]:bg-brand-600 data-[state=checked]:text-white'
-              : 'rounded-md px-3 py-1.5 data-[state=checked]:bg-brand-600 data-[state=checked]:text-white',
+              ? 'glass-control flex h-20 min-w-0 flex-col items-center justify-center gap-1 rounded-xl border p-2 text-center text-xs leading-4 transition-colors hover:border-brand-500/60 data-[state=checked]:border-brand-600 data-[state=checked]:bg-brand-600 data-[state=checked]:text-white'
+              : 'flex min-h-9 min-w-0 items-center justify-center rounded-md px-2 py-1.5 text-center data-[state=checked]:bg-brand-600 data-[state=checked]:text-white',
           )}
         >
           {choice.preview}

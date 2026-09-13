@@ -31,7 +31,7 @@ describe('MetadataPolicyField', () => {
     expect(screen.getByRole('radio', { name: /Keep everything/ })).toBeDisabled()
     expect(
       screen.getByText(
-        'WebP removes original photo metadata. Required artwork licence notices remain.',
+        'WebP removes original photo metadata. Required artwork license notices remain.',
       ),
     ).toBeInTheDocument()
     expect(screen.queryByText('WebP exports are always stripped.')).not.toBeInTheDocument()

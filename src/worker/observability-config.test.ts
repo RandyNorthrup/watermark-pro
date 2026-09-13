@@ -20,7 +20,6 @@ describe('platform request-metadata privacy', () => {
       name === 'default' ? configuration.observability : configuration.env[name]?.observability
     expect(observability).toEqual({
       enabled: false,
-      redact_query_string: true,
       logs: { enabled: false, invocation_logs: false, persist: false },
       traces: { enabled: false, persist: false },
     })

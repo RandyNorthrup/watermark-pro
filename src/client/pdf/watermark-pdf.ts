@@ -11,7 +11,8 @@
  * `PDF_PRODUCER`, and `ModDate`, refreshed; encrypted documents are refused and
  * a document over the page cap is rejected before any drawing.
  */
-import { distinctPageSizes, type PageSize, sizeKey } from './raster-layout'
+import { pdfPageGeometry } from './page-geometry'
+import { type PageSize, sizeKey } from './raster-layout'
 import { ARTWORK_NOTICE_FILE } from '../../shared/asset-licenses'
 import { MAX_PDF_PAGES, PDF_PRODUCER } from '../../shared/constants'
 
@@ -26,7 +27,7 @@ export class PdfPageLimitError extends Error {
 }
 
 /** Renders the chosen marks for one page size to transparent PNG bytes. */
-export type RasteriseForSize = (size: PageSize) => Promise<Uint8Array>
+export type RasteriseForSize = (size: PageSize, pageNumber: number) => Promise<Uint8Array>
 
 /**
  * Returns the watermarked PDF bytes. `rasterise` is called once per distinct
@@ -36,8 +37,10 @@ export async function watermarkPdf(
   input: Uint8Array,
   rasterise: RasteriseForSize,
   assetNotice: string | null = null,
+  options: { perPage?: boolean; signal?: AbortSignal } = {},
 ): Promise<Uint8Array> {
-  const { PDFDocument } = await import('pdf-lib')
+  options.signal?.throwIfAborted()
+  const { PDFDocument, degrees } = await import('pdf-lib')
   // Keep the existing Info dictionary: `updateMetadata` would overwrite
   // Producer and ModDate on load, and we set exactly those two ourselves.
   // `ignoreEncryption` lets an encrypted document load far enough to be
@@ -59,15 +62,19 @@ export async function watermarkPdf(
     )
   }
 
-  const sizes = pages.map((page) => ({ width: page.getWidth(), height: page.getHeight() }))
-  for (const distinct of distinctPageSizes(sizes)) {
-    const image = await document.embedPng(await rasterise(distinct.size))
-    for (const page of pages) {
-      const size = { width: page.getWidth(), height: page.getHeight() }
-      if (sizeKey(size) === distinct.key) {
-        page.drawImage(image, { x: 0, y: 0, width: size.width, height: size.height })
-      }
+  const images = new Map<string, Awaited<ReturnType<typeof document.embedPng>>>()
+  for (const [index, page] of pages.entries()) {
+    options.signal?.throwIfAborted()
+    const geometry = pdfPageGeometry(page)
+    const size = { width: geometry.width, height: geometry.height }
+    const key = options.perPage === true ? String(index) : sizeKey(size)
+    let image = images.get(key)
+    if (image === undefined) {
+      image = await document.embedPng(await rasterise(size, index + 1))
+      images.set(key, image)
     }
+    options.signal?.throwIfAborted()
+    page.drawImage(image, { ...geometry, rotate: degrees(geometry.rotation) })
   }
 
   document.setProducer(PDF_PRODUCER)
@@ -82,5 +89,8 @@ export async function watermarkPdf(
     )
   }
   document.setModificationDate(new Date())
-  return await document.save()
+  options.signal?.throwIfAborted()
+  const output = await document.save()
+  options.signal?.throwIfAborted()
+  return output
 }

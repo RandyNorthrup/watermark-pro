@@ -13,6 +13,7 @@ import {
 } from '../../../shared/watermark'
 import { blankSpec, defaultSpecFor, withContrast, withStyle } from '../../lib/spec-edit'
 import { ChoiceGroup } from '../ui/choice-group'
+import { ColorInput } from '../ui/color-input'
 import { SliderField } from '../ui/slider-field'
 import { Switch } from '../ui/switch'
 
@@ -89,6 +90,8 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
   const { style, contrast } = spec
   const defaultStyle = defaultSpecFor(spec.kind, blankSpec()).style
   const resetLabel = (label: string) => t('editor.adjust.reset', { name: label })
+  const hasContrast =
+    spec.kind !== 'shape' || (spec.stroke.width > 0 && spec.stroke.colour === null)
   const hasBackdrop = spec.kind === 'text' || spec.kind === 'symbol'
   const contrastChoices = CONTRAST_CHOICES.map((choice) => ({
     ...choice,
@@ -98,65 +101,67 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
   const variantChoices = VARIANT_CHOICES.map((choice) => ({ ...choice, label: t(choice.label) }))
   return (
     <div className="flex flex-col gap-6">
-      <section aria-labelledby="contrast-heading" className="flex flex-col gap-3">
-        <h2 id="contrast-heading" className="text-sm font-semibold">
-          {t('designer.style.contrast')}
-        </h2>
-        <ChoiceGroup
-          label={t('designer.style.contrastMode')}
-          value={contrast.mode}
-          choices={contrastChoices}
-          onChange={(mode) => {
-            onChange(withContrast(spec, contrastFor(mode, contrast)))
-          }}
-        />
-        {contrast.mode === 'auto' ? (
-          <p className="text-sm text-ink-muted">{t('designer.style.autoHint')}</p>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {contrast.mode === 'manual' ? (
-              <ChoiceGroup
-                label={t('designer.style.ink')}
-                value={contrast.variant}
-                choices={variantChoices}
-                onChange={(variant) => {
-                  onChange(withContrast(spec, { ...contrast, variant }))
-                }}
-              />
-            ) : (
-              <label className="flex items-center justify-between gap-3 text-sm font-medium">
-                {t('designer.style.inkColour')}
-                <span className="flex items-center gap-2 font-mono text-xs text-ink-muted">
-                  {contrast.colour}
-                  <input
-                    type="color"
-                    value={contrast.colour}
-                    onChange={(event) => {
-                      onChange(withContrast(spec, { ...contrast, colour: event.target.value }))
-                    }}
-                    className="size-9 cursor-pointer rounded-lg border border-line bg-surface-raised p-1"
-                  />
-                </span>
-              </label>
-            )}
-            <SliderField
-              label={t('designer.style.outlineStrength')}
-              value={contrast.outline}
-              min={0}
-              max={1}
-              step={FRACTION_STEP}
-              format={percent}
-              resetValue={DEFAULT_MANUAL_OUTLINE}
-              resetLabel={resetLabel(t('designer.style.outlineStrength'))}
-              onChange={(outline) => {
-                onChange(withContrast(spec, { ...contrast, outline }))
-              }}
-            />
-          </div>
-        )}
-      </section>
+      {hasContrast ? (
+        <section aria-labelledby="contrast-heading" className="flex flex-col gap-3">
+          <h2 id="contrast-heading" className="text-sm font-semibold">
+            {t('designer.style.contrast')}
+          </h2>
+          <ChoiceGroup
+            label={t('designer.style.contrastMode')}
+            value={contrast.mode}
+            choices={contrastChoices}
+            onChange={(mode) => {
+              onChange(withContrast(spec, contrastFor(mode, contrast)))
+            }}
+          />
+          {contrast.mode === 'auto' ? (
+            <p className="text-sm text-ink-muted">{t('designer.style.autoHint')}</p>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {contrast.mode === 'manual' ? (
+                <ChoiceGroup
+                  label={t('designer.style.ink')}
+                  value={contrast.variant}
+                  choices={variantChoices}
+                  onChange={(variant) => {
+                    onChange(withContrast(spec, { ...contrast, variant }))
+                  }}
+                />
+              ) : (
+                <label className="flex items-center justify-between gap-3 text-sm font-medium">
+                  {t('designer.style.inkColour')}
+                  <span className="flex items-center gap-2 font-mono text-xs text-ink-muted">
+                    {contrast.colour}
+                    <ColorInput
+                      value={contrast.colour}
+                      onChange={(event) => {
+                        onChange(withContrast(spec, { ...contrast, colour: event.target.value }))
+                      }}
+                    />
+                  </span>
+                </label>
+              )}
+              {spec.kind === 'shape' ? null : (
+                <SliderField
+                  label={t('designer.style.outlineStrength')}
+                  value={contrast.outline}
+                  min={0}
+                  max={1}
+                  step={FRACTION_STEP}
+                  format={percent}
+                  resetValue={DEFAULT_MANUAL_OUTLINE}
+                  resetLabel={resetLabel(t('designer.style.outlineStrength'))}
+                  onChange={(outline) => {
+                    onChange(withContrast(spec, { ...contrast, outline }))
+                  }}
+                />
+              )}
+            </div>
+          )}
+        </section>
+      ) : null}
 
-      <section aria-labelledby="appearance-heading" className="flex flex-col gap-4">
+      <section aria-labelledby="appearance-heading" className="tool-section flex flex-col gap-4">
         <h2 id="appearance-heading" className="text-sm font-semibold">
           {t('designer.style.appearance')}
         </h2>
@@ -216,7 +221,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
       </section>
 
       {hasBackdrop ? (
-        <section aria-labelledby="backdrop-heading" className="flex flex-col gap-4">
+        <section aria-labelledby="backdrop-heading" className="tool-section flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 id="backdrop-heading" className="text-sm font-semibold">
               {t('designer.style.backdrop')}
@@ -246,7 +251,7 @@ export function StylePanel({ spec, onChange }: StylePanelProps) {
         </section>
       ) : null}
 
-      <section aria-labelledby="tiling-heading" className="flex flex-col gap-4">
+      <section aria-labelledby="tiling-heading" className="tool-section flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 id="tiling-heading" className="text-sm font-semibold">
             {t('designer.style.tiling')}

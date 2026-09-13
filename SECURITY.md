@@ -19,8 +19,18 @@ Only the `main` branch and the latest tagged release receive fixes.
 
 ## Controls in place
 
+- Bulk CSV reports escape delimiters/quotes and prefix spreadsheet-like text
+  values so imported file names, preset names and error strings are not emitted
+  as formulas. This is an export safeguard, not a guarantee about later editing,
+  re-saving or interpretation by every spreadsheet importer. See
+  [OWASP CSV Injection](https://owasp.org/www-community/attacks/CSV_Injection).
+
 - Response headers: CSP, HSTS, `Referrer-Policy`, `Permissions-Policy`,
   `X-Content-Type-Options`, `X-Frame-Options` on both API and static responses.
+  The default referrer policy is `strict-origin`: request referrers contain only
+  the origin, including same-origin requests from invitation/share pages. This
+  removes bearer paths while retaining the origin used by provider key
+  restrictions. Cloud authorization callback responses use the stricter `no-referrer` policy.
 - Same-origin guard on every state-changing API request, plus Hono's CSRF
   check for form bodies and Better Auth's own origin checks.
 - Invitation-only signup with mandatory verified email. Google and Microsoft
@@ -36,7 +46,9 @@ Only the `main` branch and the latest tagged release receive fixes.
   inviter exists, has verified email and is not banned, including during OAuth
   callbacks. Banning through the application revokes outstanding admissions;
   unbanning does not revive those links. Deleting the inviter cascades their
-  invitation/link rows. Explicit collaboration uses separate workspaces.
+  invitation/link rows. Workspace sharing requires an explicit owner grant for
+  the selected workspace, including when its owner chooses to share a personal
+  workspace. Site admission alone never grants access to the inviter's content.
 - Exactly one anchored site Owner. Workspace owner/admin roles do not grant
   global site management. The Owner may appoint Admins; both roles can manage
   non-owner users. API and D1 guards refuse another Owner, anchor changes,
@@ -116,13 +128,14 @@ Only the `main` branch and the latest tagged release receive fixes.
 - Fonts, stickers, styles and application code are self-hosted. Turnstile uses
   Cloudflare's challenge origin; explicitly invoked cloud connections also use
   the Google, Dropbox and Microsoft script, frame and API origins enumerated in
-  `public/_headers`. Microsoft authentication code is bundled. The canonical
-  `/oauth/microsoft`, `/oauth/microsoft/` and `/oauth/microsoft.html` document
-  paths serve a same-origin MSAL response bridge with no-store, no-referrer and
-  same-origin frame protections; the Worker removes cookies, authorization and
-  request data before reading that static asset. Earlier analytics CSP allowances were
-  removed, and the final hosted audit confirmed that Cloudflare automatic Web
-  Analytics injection is disabled on `lumafoil.com`.
+  `public/_headers`. Cloud OAuth callbacks and encrypted refresh credentials now
+  stay on the Worker; obsolete browser token/redirect bridges and their SDK were
+  removed. The native video viewer admits only same-origin and local blob media.
+  PDF.js, its parsing worker and font/decoder assets are self-hosted; its image
+  and color decoders use narrowly allowed WebAssembly compilation, without
+  allowing general JavaScript eval. Earlier analytics CSP allowances were
+  removed, and the hosted audit confirmed Cloudflare automatic Web Analytics
+  injection is disabled on `lumafoil.com`.
 - Logo uploads (M3): type decided by file signature, never by the declared
   MIME type or extension; size limited before the body is read; per-organization
   quota; objects stored in R2 under organization-scoped keys, never public,
@@ -175,11 +188,12 @@ Only the `main` branch and the latest tagged release receive fixes.
   the file's metadata before any frame is decoded, and the watermarked file is
   downloaded through a same-origin object URL; the gallery does not store videos.
 - PDF watermarking (M17) runs entirely in the browser: `pdf-lib` parses the
-  chosen documents' untrusted bytes in the page, with no Worker or server
-  exposure and no upload. Encrypted documents are refused rather than
+  chosen documents' untrusted bytes in the page, while PDF.js supplies a
+  dedicated local parsing/rendering worker. There is no upload unless the user
+  explicitly chooses a cloud save. Encrypted documents are refused rather than
   processed, and each file is bounded before work begins by a size cap
   (`MAX_PDF_BYTES`), a page cap (`MAX_PDF_PAGES`, enforced in
-  `watermark-pdf.ts`) and a per-batch file cap (`MAX_PDF_FILES`); the marks are
+  `watermark-pdf.ts`) and the shared 500-file Bulk cap; the marks are
   drawn from the same presets as photos and the watermarked file is downloaded
   through a same-origin object URL. `pdf-lib` is unmaintained (last release
   2021); its maintained fork `@cantoo/pdf-lib` is the migration target if a fix

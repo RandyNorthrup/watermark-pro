@@ -36,6 +36,7 @@ export function useRenderer(
     error: null,
   })
   const subjectRequest = useRef(0)
+  const [loadingRenderer, setLoadingRenderer] = useState<PreviewRenderer | null>(null)
   const [subjectVersion, setSubjectVersion] = useState(0)
 
   useEffect(() => {
@@ -65,17 +66,32 @@ export function useRenderer(
       }
       subjectRequest.current += 1
       const request = subjectRequest.current
+      setLoadingRenderer(renderer)
       try {
         await renderer.setSubject(file, metadata)
-        if (rendererRef.current === renderer && request === subjectRequest.current)
+        if (rendererRef.current === renderer && request === subjectRequest.current) {
           setSubjectVersion((version) => version + 1)
+          setState((previous) => ({ ...previous, error: null }))
+        }
       } catch (error_) {
         if (rendererRef.current !== renderer || request !== subjectRequest.current) return
         setState((previous) => ({ ...previous, error: describeError(error_) }))
+      } finally {
+        if (rendererRef.current === renderer && request === subjectRequest.current)
+          setLoadingRenderer(null)
       }
     },
     [],
   )
 
-  return { ...frames, error: state.error ?? frames.error, renderer: rendererRef, setSubject }
+  return {
+    ...frames,
+    isSubjectReady:
+      loadingRenderer !== rendererRef.current &&
+      frames.result !== null &&
+      rendererRef.current?.isSubjectReady === true,
+    error: state.error ?? frames.error,
+    renderer: rendererRef,
+    setSubject,
+  }
 }

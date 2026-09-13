@@ -5,7 +5,7 @@
   "shell": {
     "nav": {
       "library": "Bibliothek",
-      "editor": "Editor",
+      "editor": "Bild",
       "bulk": "Stapel",
       "video": "Video",
       "documents": "Dokumente",
@@ -22,18 +22,22 @@
     "toolsNav": "Tools",
     "signOut": "Abmelden",
     "accountMenu": "Kontomenü für {{name}}",
-    "menuDescription": "Organisation wechseln oder zu einem beliebigen Bereich von Lumafoil springen.",
-    "switchOrganizationFor": "Organisation: {{name}}. Organisation wechseln",
-    "chooseOrganization": "Organisation auswählen",
-    "chooseOrganizationShort": "Organisation wählen",
-    "organizations": "Organisationen",
-    "newOrganization": "Neue Organisation",
+    "menuDescription": "Arbeitsbereich wechseln oder zu einem beliebigen Bereich von Lumafoil springen.",
+    "switchOrganizationFor": "Arbeitsbereich: {{name}}. Arbeitsbereich wechseln",
+    "chooseOrganization": "Arbeitsbereich auswählen",
+    "chooseOrganizationShort": "Arbeitsbereich wählen",
+    "organizations": "Arbeitsbereiche",
+    "newOrganization": "Neuer Arbeitsbereich",
     "theme": {
       "system": "Design: folgt System. Zu Hell wechseln",
       "light": "Design: hell. Zu Dunkel wechseln",
       "dark": "Design: dunkel. Zu System wechseln"
     },
-    "closeMenu": "Menü schließen"
+    "closeMenu": "Menü schließen",
+    "manageAccess": "Zugriff verwalten",
+    "supportPrompt": "Wenn Lumafoil hilft, freuen wir uns über eine Spende.",
+    "donate": "Spenden",
+    "supportPayPal": "Mit PayPal spenden (neuer Tab)"
   },
   "auth": {
     "backToSignIn": "Zurück zur Anmeldung",
@@ -43,7 +47,7 @@
     },
     "login": {
       "title": "Willkommen zurück",
-      "description": "Melden Sie sich bei Ihrem Workspace an.",
+      "description": "Melden Sie sich bei Ihrem Arbeitsbereich an.",
       "footerPrompt": "Neu hier?",
       "createAccount": "Konto erstellen",
       "verifyTitle": "Bestätigen Sie zuerst Ihre E-Mail",
@@ -103,11 +107,11 @@
     "pendingInvitations_other": "{{count}} ausstehende Einladungen.",
     "manageMembers": "Mitglieder verwalten",
     "auditLog": "Audit-Log",
-    "auditDescription": "Jede Änderung an Mitgliedschaften und der Organisation wird mit Urheber und Zeitpunkt aufgezeichnet.",
+    "auditDescription": "Jede Änderung an Mitgliedschaften und am Arbeitsbereich wird mit Urheber und Zeitpunkt aufgezeichnet.",
     "viewAuditLog": "Audit-Log ansehen"
   },
   "library": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um eine Wasserzeichen-Bibliothek aufzubauen.",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um eine Wasserzeichen-Bibliothek aufzubauen.",
     "heading": "Wasserzeichen-Bibliothek",
     "description": "Gespeicherte Wasserzeichen in {{name}}. Auf eine Datei oder einen ganzen Stapel anwenden.",
     "export": "Exportieren",
@@ -119,7 +123,7 @@
     "loadErrorTitle": "Bibliothek konnte nicht geladen werden",
     "empty": "Noch keine Presets. Ein Preset kombiniert eine Markierung (Text, Symbol oder Logo) mit Platzierung, Kontrast und Stileinstellungen.",
     "createFirst": "Erstes Preset erstellen",
-    "orgRequiredShort": "Erstellen Sie zuerst eine Organisation oder treten Sie einer bei.",
+    "orgRequiredShort": "Erstellen Sie zuerst einen Arbeitsbereich oder treten Sie einem bei.",
     "loadingPreset": "Preset wird geladen",
     "loadPresetErrorTitle": "Preset konnte nicht geladen werden",
     "presetGone": "Dieses Preset existiert nicht mehr.",
@@ -142,12 +146,6 @@
       "logo": "Logo",
       "qr": "QR-Code für {{content}}",
       "sticker": "Sticker {{name}}"
-    },
-    "shape": {
-      "rectangle": "Rechteck",
-      "roundedRectangle": "Abgerundetes Rechteck",
-      "ellipse": "Ellipse",
-      "line": "Linie"
     },
     "placement": {
       "smart": "Intelligente Platzierung",
@@ -176,12 +174,16 @@
     "notAnImage": "Diese Datei ist kein Bild, das der Browser lesen kann.",
     "text": {
       "label": "Text",
-      "hint": "Bis zu {{max}} Zeichen auf bis zu {{lines}} Zeilen. Verwenden Sie „Detail einfügen“ für Platzhalter wie Datum oder Kamera, die je Foto ausgefüllt werden. {location} druckt die GPS-Position des Fotos auf das Bild."
+      "hint": "Bis zu {{max}} Zeichen auf bis zu {{lines}} Zeilen. Verwenden Sie „Detail einfügen“ für Platzhalter wie Datum oder Kamera, die je Foto ausgefüllt werden. {location} druckt die GPS-Position des Fotos auf das Bild.",
+      "symbols": "Textzeichen",
+      "insertSymbol": "{{symbol}} einfügen",
+      "insertLimit": "Der Text ist voll. Markiere Text zum Ersetzen oder entferne Zeichen."
     },
     "qr": {
       "content": "QR-Code-Inhalt",
       "hint": "Meist ein Link. Bis zu {{max}} Zeichen; der Code ist stets dunkel auf hellem Grund, damit er scanbar bleibt.",
-      "savedHint": "Benenne und speichere jeden QR-Code einzeln. Verwende ihn aus der Bibliothek erneut oder speichere mehrere für unterschiedliche Links. Prüfe den fertigen Export vor dem Teilen in der vorgesehenen Größe."
+      "savedHint": "Benenne und speichere jeden QR-Code einzeln. Verwende ihn aus der Bibliothek erneut oder speichere mehrere für unterschiedliche Links. Prüfe den fertigen Export vor dem Teilen in der vorgesehenen Größe.",
+      "shortLabel": "QR"
     },
     "tokens": {
       "menu": "Detail einfügen",
@@ -205,12 +207,11 @@
     "font": {
       "family": "Schriftart",
       "weight": "Schriftstärke",
-      "specimen": "Zwölf Boxkämpfer jagen Viktor",
       "search": "Schriften suchen",
-      "resultCount": "{{count}} Schriftfamilien",
       "recent": "Zuletzt verwendet",
-      "all": "Alle Schriftarten",
-      "license": "Schriftlizenz"
+      "license": "Schriftlizenz",
+      "previewError": "Einige Schriftvorschauen konnten nicht geladen werden. Öffne die Liste mit Verbindung erneut.",
+      "empty": "Keine Passenden Schriftarten"
     },
     "symbol": {
       "icons": "Icons",
@@ -232,7 +233,23 @@
       "fillOpacity": "Deckkraft der Füllung",
       "strokeWidth": "Konturstärke",
       "customStrokeColour": "Eigene Konturfarbe",
-      "strokeColour": "Konturfarbe"
+      "strokeColour": "Konturfarbe",
+      "triangle": "Dreieck",
+      "diamond": "Raute",
+      "pentagon": "Fünfeck",
+      "hexagon": "Sechseck",
+      "octagon": "Achteck",
+      "star": "Stern",
+      "starburst": "Strahlenstern",
+      "heart": "Herz",
+      "shield": "Schild",
+      "speechBubble": "Sprechblase",
+      "arrowLeft": "Pfeil links",
+      "arrowRight": "Pfeil rechts",
+      "arrowUp": "Pfeil oben",
+      "arrowDown": "Pfeil unten",
+      "doubleArrow": "Doppelpfeil",
+      "plus": "Plus"
     },
     "effects": {
       "letterSpacing": "Zeichenabstand",
@@ -377,11 +394,12 @@
       "license": "Fluent Emoji · MIT-Lizenz",
       "usage": "Kommerzielle Nutzung erlaubt; bewahre den Lizenzhinweis der Grafiken bei der Weitergabe auf.",
       "guide": "Lizenzhinweise für Grafiken"
-    }
+    },
+    "saveNameHint": "Wähle einen Namen für diese Vorlage."
   },
   "editor": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um den Editor zu nutzen.",
-    "heading": "Editor",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Bilder zu bearbeiten.",
+    "heading": "Bild",
     "description": "Wähle eine Vorlage, passe ihre Position an und beschneide oder skaliere auf deinem Gerät. Lade das Ergebnis herunter oder speichere es wahlweise in Galerie oder Cloud.",
     "tabs": {
       "presets": "Voreinstellungen",
@@ -412,7 +430,8 @@
       "fit": "Einpassen",
       "actualSize": "100%",
       "grid": "Raster",
-      "gridSpacing": "Rasterabstand"
+      "gridSpacing": "Rasterabstand",
+      "snapToGrid": "Am Raster ausrichten"
     },
     "altCrop": "Foto mit dem Zuschnittrahmen",
     "altWatermark": "Foto mit angewendetem Wasserzeichen",
@@ -532,30 +551,31 @@
       "download": "Herunterladen",
       "share": "Teilen",
       "saveToGallery": "In Galerie speichern",
-      "savedToFolder": "In Ihrem {{provider}}-Ordner „{{folder}}“ gespeichert."
+      "savedToFolder": "In {{provider}} gespeichert."
     },
     "mark": {
       "position": "Wasserzeichen-Position. Zum Verschieben ziehen (rastet an Rändern, Dritteln und Mitte ein; Alt halten für freie Platzierung), zum Skalieren zusammenziehen, zum Drehen verdrehen; Pfeiltasten verschieben, Plus und Minus skalieren, eckige Klammern drehen.",
       "rotate": "Wasserzeichen drehen",
       "resize": "Wasserzeichen skalieren"
-    }
+    },
+    "newWorkspace": "Neu"
   },
   "bulk": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um im Stapel mit Wasserzeichen zu versehen.",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um im Stapel mit Wasserzeichen zu versehen.",
     "heading": "Wasserzeichen im Stapel",
-    "description": "Ein Preset auf ein ganzes Shooting anwenden. Fotos werden parallel in Ihrem Browser verarbeitet und als ZIP oder einzeln heruntergeladen.",
+    "description": "Wende Wasserzeichen in einem Durchgang auf Bilder, PDFs und Videos an. Lade jedes Ergebnis einzeln oder alle zusammen als ZIP herunter.",
     "emptyHint": "um es auf einen Stapel anzuwenden.",
-    "addPhotos": "Fotos hinzufügen",
+    "addPhotos": "Dateien Hinzufügen",
     "addFolder": "Ordner hinzufügen",
-    "dropHint": "Fotos oder einen Ordner hier ablegen, oder",
+    "dropHint": "Dateien oder einen Ordner hier ablegen, oder",
     "fromLink": "Von einem Link",
-    "capacity_one": "Bis zu {{max}} Fotos pro Stapel. Die Verarbeitung erfolgt in Ihrem Browser mit {{count}} Worker.",
-    "capacity_other": "Bis zu {{max}} Fotos pro Stapel. Die Verarbeitung erfolgt in Ihrem Browser mit {{count}} Workern.",
-    "skipped_one": "{{count}} Datei übersprungen: keine Bilder",
-    "skipped_other": "{{count}} Dateien übersprungen: keine Bilder",
+    "capacity_one": "Bis zu {{max}} Dateien pro Stapel. Bilder, PDFs und Videos werden auf deinem Gerät verarbeitet.",
+    "capacity_other": "Bis zu {{max}} Dateien pro Stapel. Bilder, PDFs und Videos werden auf deinem Gerät verarbeitet.",
+    "skipped_one": "Übersprungene Dateien: {{count}}. Nicht unterstütztes Format.",
+    "skipped_other": "Übersprungene Dateien: {{count}}. Nicht unterstütztes Format.",
     "importErrorTitle": "Import aus der Cloud fehlgeschlagen",
-    "photoCount_one": "{{count}} Foto",
-    "photoCount_other": "{{count}} Fotos",
+    "photoCount_one": "{{count}} Datei",
+    "photoCount_other": "{{count}} Dateien",
     "clearList": "Liste leeren",
     "batchProgress": "Stapelfortschritt",
     "progress": {
@@ -565,7 +585,7 @@
       "rate": " in {{seconds}} s ({{rate}} Fotos/s)",
       "end": "."
     },
-    "photosList": "Fotos in diesem Stapel",
+    "photosList": "Dateien In Diesem Stapel",
     "custom": "Eigene",
     "selected": "Ausgewählt",
     "status": {
@@ -609,8 +629,8 @@
     "savedProgress": "{{done}} von {{total}} gespeichert",
     "allSaved": "Alle in der <galleryLink>Galerie</galleryLink> gespeichert.",
     "someSaved": "{{failed}} konnten nicht gespeichert werden (Speicherkontingent oder Limits). Der Rest ist in der <galleryLink>Galerie</galleryLink>.",
-    "savedToCloud_one": "{{count}} Foto in Ihrem {{provider}}-Ordner „{{folder}}“ gespeichert.",
-    "savedToCloud_other": "{{count}} Fotos in Ihrem {{provider}}-Ordner „{{folder}}“ gespeichert.",
+    "savedToCloud_one": "{{count}} Datei in {{provider}} gespeichert.",
+    "savedToCloud_other": "{{count}} Dateien in {{provider}} gespeichert.",
     "privacyNote": "Intelligente Platzierung und Auto-Kontrast werden für jedes Foto separat ermittelt. Nichts wird hochgeladen.",
     "watch": {
       "label": "Ordner überwachen",
@@ -619,15 +639,20 @@
       "hint": "Wählen Sie einen Eingabe- und einen Ausgabeordner; neue Fotos, die in den Eingabeordner gelegt werden, erhalten die gewählten Presets als Wasserzeichen und werden in den Ausgabeordner geschrieben. Läuft nur, solange diese Seite geöffnet ist.",
       "wrote": "{{name}} geschrieben",
       "failed": "Fehlgeschlagen {{name}}: {{error}}"
+    },
+    "media": {
+      "imageSettingsHint": "Bildformat, Größe, Anpassungen und unsichtbare Wasserzeichen gelten nur für Fotos. PDFs behalten ihre Originalseiten.",
+      "videoOutput": "Videoausgabe",
+      "galleryHint": "In der Galerie werden nur Bilder gespeichert. Lade Dokumente und Videos herunter oder speichere sie in der Cloud."
     }
   },
   "gallery": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um eine Galerie zu führen.",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um eine Galerie zu führen.",
     "heading": "Galerie",
     "description": "Mit Wasserzeichen versehene Fotos in {{name}}. Suchen, filtern, herunterladen oder löschen.",
     "usage_one": "{{count}} Foto · {{used}} von {{max}}",
     "usage_other": "{{count}} Fotos · {{used}} von {{max}}",
-    "maxCount": "Bis zu {{count}} Fotos pro Organisation",
+    "maxCount": "Bis zu {{count}} Fotos pro Arbeitsbereich",
     "storageUsed": "Belegter Speicher",
     "storagePercent": "{{percent}} % des Speichers belegt",
     "checkPhoto": "Foto prüfen",
@@ -680,10 +705,12 @@
     "manageLinks": "Links unter „Freigaben“ verwalten.",
     "linkCopied": "Link in die Zwischenablage kopiert.",
     "linkShared": "Link geteilt.",
-    "copyLink": "Link kopieren"
+    "copyLink": "Link kopieren",
+    "shareSyncPending": "Warte, bis die ausgewählten Fotos synchronisiert sind, bevor du einen Link erstellst.",
+    "shareSyncBlocked": "Behebe die Synchronisierungsprobleme der ausgewählten Fotos, bevor du einen Link erstellst."
   },
   "shares": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Fotos zu teilen.",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Fotos zu teilen.",
     "noPermission": "Ihre Rolle umfasst kein Teilen.",
     "heading": "Freigaben",
     "description": "Links, mit denen Personen außerhalb von {{name}} ausgewählte Fotos ansehen und herunterladen können. Ein Widerruf stoppt den Link sofort.",
@@ -714,7 +741,7 @@
     "sectionsLabel": "Administrationsbereiche",
     "tabs": {
       "users": "Benutzer",
-      "organizations": "Organisationen",
+      "organizations": "Arbeitsbereiche",
       "audit": "Audit-Trail",
       "health": "Zustand",
       "clientErrors": "Client-Fehler"
@@ -766,11 +793,11 @@
     "reasonLabel": "Grund",
     "cancel": "Abbrechen",
     "banConfirm": "Benutzer sperren",
-    "loadingOrganizations": "Organisationen werden geladen",
-    "organizationsErrorTitle": "Organisationen konnten nicht geladen werden",
-    "organizationsTable": "Organisationen, neueste zuerst",
+    "loadingOrganizations": "Arbeitsbereiche werden geladen",
+    "organizationsErrorTitle": "Arbeitsbereiche konnten nicht geladen werden",
+    "organizationsTable": "Arbeitsbereiche, neueste zuerst",
     "th": {
-      "organization": "Organisation",
+      "organization": "Arbeitsbereich",
       "members": "Mitglieder",
       "photos": "Fotos",
       "storage": "Speicher",
@@ -778,37 +805,25 @@
     },
     "loadingAudit": "Audit-Trail wird geladen",
     "auditErrorTitle": "Audit-Trail konnte nicht geladen werden",
-    "auditCaption": "Audit-Einträge über alle Organisationen, neueste zuerst",
-    "auditDetailHeading": "Organisation",
+    "auditCaption": "Audit-Einträge über alle Arbeitsbereiche, neueste zuerst",
+    "auditDetailHeading": "Arbeitsbereich",
     "platform": "Plattform",
     "siteRole": "Website-Rolle: {{role}}",
     "roleFor": "Website-Rolle für {{email}}",
     "ownerProtected": "Das Konto des Inhabers ist geschützt."
   },
   "members": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Mitglieder zu verwalten.",
-    "heading": "Mitglieder",
-    "description": "Personen in {{name}} und was sie tun können.",
-    "count_one": "{{count}} Mitglied",
-    "count_other": "{{count}} Mitglieder",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Mitglieder zu verwalten.",
     "pendingInvitations": "Ausstehende Einladungen",
-    "inviteHeading": "Jemanden einladen",
     "emailLabel": "E-Mail",
-    "roleLabel": "Rolle",
-    "sendInvitation": "Einladung senden",
-    "invitationSent": "Einladung an {{email}} gesendet.",
     "you": "(Sie)",
     "roleFor": "Rolle für {{name}}",
-    "remove": "Entfernen",
-    "removeMember": "{{name}} entfernen",
-    "invitedAs": "Eingeladen als",
-    "cancel": "Abbrechen",
     "cancelInvitation": "Einladung für {{email}} zurückziehen"
   },
   "audit": {
     "heading": "Audit-Log",
     "description": "Die neuesten Änderungen in {{name}}. Inhaber und Admins können diese Seite ansehen.",
-    "thisOrganization": "diese Organisation",
+    "thisOrganization": "diesem Arbeitsbereich",
     "loading": "Audit-Log wird geladen",
     "loadErrorTitle": "Audit-Log konnte nicht geladen werden",
     "noAccess": "Ihre Rolle umfasst keinen Zugriff auf das Audit-Log.",
@@ -820,14 +835,14 @@
     "action": "Aktion"
   },
   "organizations": {
-    "firstTitle": "Erstellen Sie Ihre erste Organisation",
-    "newTitle": "Neue Organisation",
+    "firstTitle": "Erstellen Sie Ihren ersten Arbeitsbereich",
+    "newTitle": "Neuer Arbeitsbereich",
     "description": "Erstelle einen separaten Bereich für Wasserzeichen und Fotos. Er bleibt privat, bis du ausdrücklich Mitglieder einlädst.",
-    "createFailed": "Die Organisation konnte nicht erstellt werden.",
+    "createFailed": "Der Arbeitsbereich konnte nicht erstellt werden.",
     "nameLabel": "Name",
     "slugLabel": "URL-Kennung",
     "slugHint": "Kleinbuchstaben, Zahlen und Bindestriche. Wird in Links verwendet und muss eindeutig sein.",
-    "submit": "Organisation erstellen"
+    "submit": "Arbeitsbereich erstellen"
   },
   "import": {
     "takePhoto": "Foto aufnehmen",
@@ -840,19 +855,6 @@
       "errorTitle": "Dieser Link konnte nicht importiert werden",
       "fetch": "Abrufen"
     },
-    "onedrive": {
-      "title": "Aus OneDrive importieren",
-      "name": "OneDrive",
-      "description": "Bei Microsoft anmelden, dann Fotos zum Hinzufügen auswählen.",
-      "loading": "OneDrive wird geladen",
-      "empty": "Keine Ordner oder Bilder hier.",
-      "folderPath": "Ordnerpfad",
-      "errorTitle": "OneDrive-Import fehlgeschlagen",
-      "tryAgain": "Erneut versuchen",
-      "noneSelected": "Keine Fotos ausgewählt",
-      "selectedCount": "{{count}} ausgewählt",
-      "addSelected": "Auswahl hinzufügen"
-    },
     "cloudSaved": "Gespeicherte Cloud-Dateien ({{total}})",
     "cloudSavedTitle": "Gespeicherte Cloud-Dateien",
     "cloudSharingHint": "Speichern erstellt keinen öffentlichen Link. Erstelle ihn nur, wenn jeder mit dem Link die Datei sehen darf. Bestehende Ordnerberechtigungen gelten weiterhin. Verwalte weitere Zugriffe direkt beim Anbieter.",
@@ -863,39 +865,18 @@
     "copyLink": "Link kopieren"
   },
   "video": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Videos mit Wasserzeichen zu versehen.",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Videos mit Wasserzeichen zu versehen.",
     "heading": "Video-Wasserzeichen",
-    "description": "Ein Preset auf ein ganzes Video anwenden. Jedes Bild wird in Ihrem Browser mit einem Wasserzeichen versehen und der Ton bleibt erhalten; nichts wird hochgeladen.",
+    "description": "Sieh dir dein Video an, platziere Wasserzeichen zu verschiedenen Zeitpunkten, füge Überblendungen hinzu und exportiere mit Ton.",
     "checkingSupport": "Video-Unterstützung wird geprüft",
     "unsupportedTitle": "Video wird in diesem Browser nicht unterstützt",
     "unsupportedBody": "Ihr Browser kann kein Video codieren. Chrome, Edge oder Safari 17 und neuer können es.",
-    "emptyHint": "um es auf ein Video anzuwenden.",
     "addVideo": "Video hinzufügen",
     "dropHint": "Ein Video hier ablegen, oder",
-    "formatsHint": "MP4, WebM oder MOV. Alles geschieht in Ihrem Browser; nichts wird hochgeladen, und die Galerie nimmt noch keine Videos auf.",
-    "fileMeta": "{{width}} × {{height}} px · {{duration}} s · {{size}} · {{audio}}",
-    "choosePresetPreview": "Wählen Sie ein Preset, um das Wasserzeichen auf einem Bild in der Vorschau zu sehen.",
-    "outputSize": "Ausgabe {{width}} × {{height}} px.",
     "transcodingProgress": "Transkodierungsfortschritt",
-    "progress": {
-      "noEta": "Bild {{frame}} · {{percent}} %",
-      "withEta": "Bild {{frame}} · {{percent}} % · noch etwa {{seconds}} s"
-    },
+    "progress": {},
     "cancel": "Abbrechen",
-    "cancelled": "Transkodierung abgebrochen.",
-    "runErrorTitle": "Video konnte nicht mit Wasserzeichen versehen werden",
-    "download": "{{fileName}} herunterladen",
     "share": "Teilen",
-    "presets": "Presets",
-    "placement": "Platzierung",
-    "placementOptions": {
-      "smart": "Intelligent",
-      "bottomRight": "Unten rechts",
-      "bottomLeft": "Unten links",
-      "topRight": "Oben rechts",
-      "topLeft": "Oben links",
-      "center": "Mitte"
-    },
     "quality": "Qualität",
     "qualityOptions": {
       "low": "Niedrig",
@@ -908,39 +889,50 @@
       "fit1080p": "Auf 1080p",
       "fit720p": "Auf 720p"
     },
-    "watermarking": "Wird versehen…",
-    "watermarkVideo": "Video mit Wasserzeichen versehen",
-    "fixedPlacementNote": "Das Wasserzeichen behält eine feste Platzierung für das gesamte Video. Der Ton wird durchgereicht, wenn er zur Ausgabe passt, andernfalls neu codiert.",
-    "renderingPreview": "Vorschau wird gerendert",
-    "previewAlt": "Das Wasserzeichen auf einem Bild des Videos"
+    "previewAlt": "Das Wasserzeichen auf einem Bild des Videos",
+    "timeline": {
+      "heading": "Zeit Und Bewegung",
+      "play": "Abspielen",
+      "pause": "Pause",
+      "playhead": "Abspielposition",
+      "start": "Anfang",
+      "end": "Ende",
+      "fadeIn": "Einblenden",
+      "fadeOut": "Ausblenden",
+      "keyframes": "Schlüsselbilder",
+      "addKeyframe": "Schlüsselbild Hier Hinzufügen",
+      "updateKeyframe": "Schlüsselbild Hier Aktualisieren",
+      "removeKeyframe": "Schlüsselbild Bei {{time}} Entfernen",
+      "hint": "Füge ein Schlüsselbild hinzu, gehe zu einer anderen Zeit und verschiebe, skaliere oder drehe das Wasserzeichen. Lumafoil erzeugt die Bewegung zwischen den Schlüsselbildern.",
+      "playbackFailed": "Dieser Browser konnte das ausgewählte Video nicht abspielen.",
+      "chooseVideo": "Öffne zuerst ein Video und füge ein gültiges Wasserzeichen hinzu.",
+      "waitPreview": "Warte auf die Wasserzeichenvorschau, bevor du ein Schlüsselbild hinzufügst.",
+      "changed": "Das Video oder Wasserzeichen wurde während des Exports geändert. Exportiere erneut, um die aktuellen Änderungen zu übernehmen.",
+      "download": "Video Herunterladen",
+      "cloudSaved": "Das Video mit Wasserzeichen wurde in deinem Cloudspeicher gespeichert."
+    }
   },
   "documents": {
-    "orgRequired": "Erstellen Sie eine Organisation oder treten Sie einer bei, um Dokumente mit Wasserzeichen zu versehen.",
+    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Dokumente mit Wasserzeichen zu versehen.",
     "heading": "Dokumente",
-    "description": "Ein Preset auf jede Seite eines PDFs stempeln. Dateien werden in Ihrem Browser verarbeitet und einzeln oder als ZIP heruntergeladen.",
-    "emptyHint": "um damit Dokumente mit Wasserzeichen zu versehen.",
-    "addPdfs": "PDFs hinzufügen",
-    "dropHint": "PDFs hier ablegen, oder",
-    "filesHint": "Bis zu {{max}} Dateien, je {{size}}. Jede Seite wird in Ihrem Browser mit einem Wasserzeichen versehen; nichts wird hochgeladen.",
-    "skipped_one": "{{count}} Datei übersprungen: kein PDF oder über {{max}}.",
-    "skipped_other": "{{count}} Dateien übersprungen: kein PDF oder über {{max}}.",
-    "fileCount_one": "{{count}} Dokument",
-    "fileCount_other": "{{count}} Dokumente",
-    "clearList": "Liste leeren",
-    "watermarkingProgress": "Wasserzeichen-Fortschritt",
-    "progressFinished": "{{done}} von {{total}} fertig",
-    "progressFailed": ", {{count}} fehlgeschlagen",
-    "progressEnd": ".",
-    "listLabel": "Dokumente für Wasserzeichen",
-    "downloadFile": "{{fileName}} herunterladen",
-    "removeFile": "{{fileName}} entfernen",
-    "presetHint": "Wählen Sie eines oder mehrere aus; sie werden in der Reihenfolge der Auswahl gezeichnet, spätere über früheren.",
-    "placement": "Platzierung",
-    "smartPlacementHint": "Intelligente Platzierung ist für Fotos; wählen Sie für Dokumente eine Ecke oder eine eigene Position.",
-    "watermarkEmpty": "Dokumente mit Wasserzeichen versehen",
-    "watermarkCount": "{{count}} mit Wasserzeichen versehen",
-    "downloadZip": "{{count}} als ZIP herunterladen",
-    "savedAsHint": "Jedes Dokument wird als {name}-watermarked.pdf gespeichert. Verschlüsselte PDFs werden abgelehnt."
+    "description": "Sieh dir jede PDF-Seite an, bearbeite Wasserzeichen direkt auf der Seite und exportiere das Originaldokument mit deinen Markierungen. Nutze die Stapelverarbeitung für mehrere Dateien.",
+    "reader": {
+      "previous": "Vorherige Seite",
+      "next": "Nächste Seite",
+      "page": "Seite",
+      "ofPages": "von {{total}}",
+      "pageStatus": "{{name}} · Seite {{page}} von {{total}}",
+      "preview": "PDF-Seite {{page}}",
+      "pageText": "Seitentext",
+      "open": "PDF Öffnen",
+      "empty": "Öffne eine PDF oder ziehe sie hierher, um ihre Seiten anzusehen und dein Wasserzeichen zu platzieren.",
+      "invalidFile": "Wähle eine PDF innerhalb der zulässigen Dokumentgröße.",
+      "chooseMark": "Füge vor dem Export dieses Dokuments ein gültiges Wasserzeichen hinzu.",
+      "changed": "Das Dokument oder Wasserzeichen wurde während des Exports geändert. Exportiere erneut, um die aktuellen Änderungen zu übernehmen.",
+      "download": "PDF Herunterladen",
+      "cloudSaved": "Die PDF mit Wasserzeichen wurde in deinem Cloudspeicher gespeichert.",
+      "originalHint": "Originaltext, Vektorgrafiken, Seitengrößen und eingebettete Bilder bleiben erhalten. Nur das Wasserzeichen wird gerastert. Passwortgeschützte PDFs müssen zuerst entsperrt werden."
+    }
   },
   "verify": {
     "checkEmail": {
@@ -981,98 +973,102 @@
   "landing": {
     "nav": "Konto",
     "signIn": "Anmelden",
-    "heroBody": "Fügen Sie Text, Logos oder Signaturen hinzu. Nutzen Sie Vorlagen für einzelne Dateien und Stapel, bearbeiten Sie offline und synchronisieren Sie nach dem Verbinden.",
-    "featuresHeading": "Werkzeuge für den ganzen Ablauf",
+    "heroBody": "Füge Text, Logos, Unterschriften, Formen, Sticker oder QR-Codes hinzu. Passe sie direkt auf deinem Foto an, prüfe PDF-Seiten oder bewege ein Wasserzeichen entlang einer Videozeitleiste. Speichere deinen Stil und verwende ihn für einen ganzen Stapel.",
+    "featuresHeading": "Werkzeuge für jedes Wasserzeichen",
     "footer": "Lumafoil ist Open Source unter der MIT-Lizenz.",
     "privacy": "Datenschutz",
     "terms": "Nutzungsbedingungen",
     "heroTitleStart": "Wasserzeichen für Fotos,",
     "heroTitleEnd": "Videos und PDFs.",
     "heroAlt": "Lumafoil-Fotoeditor mit Platzierungs- und Exportsteuerung",
-    "previewLabel": "Der Lumafoil-Editor",
-    "privacyNote": "Dateien werden auf Ihrem Gerät verarbeitet. Cloud-Speichern ist optional.",
+    "previewLabel": "Einblick in den Bildeditor",
+    "privacyNote": "Die Bearbeitung erfolgt auf deinem Gerät. Du entscheidest, was du speicherst oder teilst.",
     "formatsLabel": "Fotos · PDFs · Video",
     "workflowHeading": "Öffnen. Anpassen. Exportieren.",
-    "workflowNote": "Ihr Arbeitsbereich hält Vorlagen und gespeicherte Dateien zusammen.",
+    "workflowNote": "Bewahre wiederverwendbare Vorlagen in der Bibliothek und gespeicherte Fotos in der Galerie auf. Organisiere beides in Ordnern innerhalb deines Arbeitsbereichs.",
     "steps": {
-      "openTitle": "Fotos mitbringen",
-      "openBody": "Ein einzelnes Bild oder einen ganzen Stapel öffnen. Die Originale bleiben unverändert.",
-      "markTitle": "Dein Zeichen setzen",
-      "markBody": "Eine gespeicherte Vorlage wählen oder etwas unverwechselbar Eigenes gestalten.",
-      "exportTitle": "Exportieren und fertig",
-      "exportBody": "Fertige Dateien herunterladen oder in der Galerie speichern und synchronisieren."
+      "openTitle": "Dateien öffnen",
+      "openBody": "Wähle ein Foto, PDF oder unterstütztes Video von deinem Gerät oder einem verbundenen Speicher. Nutze die Stapelverarbeitung für mehrere Dateien. Deine Quelldateien bleiben unverändert.",
+      "markTitle": "Auswählen und anpassen",
+      "markBody": "Beginne mit einer Vorlage oder gespeicherten Einstellung und bearbeite Text, Grafik, Größe, Position und Aussehen neben der Vorschau.",
+      "exportTitle": "Speichern oder teilen",
+      "exportBody": "Lade das Ergebnis herunter oder wähle einen Cloud-Ordner. Speichere fertige Fotos in der Galerie und erstelle Links für die Fotos, die du teilen möchtest."
     },
     "github": "GitHub",
     "featuresIntro": "Gestalte ein Wasserzeichen, wende es auf deine Dateien an und entscheide, wie du die Ergebnisse speicherst oder teilst.",
-    "moreHeading": "Weitere Werkzeuge für deine Arbeit",
+    "moreHeading": "Bearbeitung, Speicherung und Freigabe",
     "capabilities": {
       "marks": {
-        "title": "Text, Logos und deine Unterschrift",
-        "body": "Schreibe deinen Namen oder Copyright-Hinweis, lade ein Logo hoch oder zeichne eine Unterschrift. Passe Größe, Winkel, Deckkraft und Farbe an und kombiniere mehrere Zeichen."
+        "title": "Text, Logos, Formen und Unterschriften",
+        "body": "Schreibe einen Urheberrechtshinweis, lade ein Logo hoch, zeichne eine Unterschrift oder wähle aus 20 Formen. Passe Größe, Drehung, Füllung, Kontur und Deckkraft an. Kombiniere Ebenen, ziehe Wasserzeichen an ihre Position und mache Änderungen während der Arbeit rückgängig."
       },
       "batch": {
-        "title": "Wasserzeichen für ganze Stapel",
-        "body": "Wende ein gespeichertes Wasserzeichen auf mehrere Fotos an. Prüfe die Ergebnisse, passe einzelne Positionen an und lade den fertigen Stapel als ZIP herunter."
+        "title": "Fotos, PDFs und Videos in einem Stapel",
+        "body": "Wende ein gespeichertes Wasserzeichen auf einen gemischten Stapel aus Fotos, PDFs und unterstützten Videos an. Prüfe jedes Ergebnis, passe einzelne Fotos an und lade Dateien einzeln oder zusammen als ZIP herunter. Fehlgeschlagene Dateien bleiben zur Prüfung sichtbar."
       },
       "fonts": {
-        "title": "551 verschiedene Schriftfamilien",
-        "body": "Suche nach Serifenschriften, serifenlosen, handschriftlichen, dekorativen und Monospace-Schriften. Sieh deinen Text in der Vorschau und speichere den Stil. Alle Schriften werden lokal mit offenen Lizenzen bereitgestellt."
+        "title": "551 einzigartige Schriftfamilien",
+        "body": "Suche Schriften nach Namen und sieh jede Auswahl in ihrer eigenen Schriftart. Greife auf zuletzt verwendete Schriften zu, passe Zeichenabstand und Krümmung an und speichere den Stil als Vorlage. Schriftdateien und Hinweise zu ihren offenen Lizenzen werden mit Lumafoil bereitgestellt."
       },
       "stickers": {
-        "title": "400 farbige Vektorsticker",
-        "body": "Entdecke Tiere, Blumen, Essen, Reisen, Feste und Alltagsgegenstände. Suche ein Motiv, füge es als Wasserzeichen hinzu und ändere die Größe ohne unscharfe Kanten."
+        "title": "400 farbige Vektor-Sticker",
+        "body": "Durchsuche Tiere, Blumen, Essen, Reisen, Feiern und Alltagsgegenstände. Skaliere die Vektorgrafiken für dein Wasserzeichen. Die Lizenzhinweise der enthaltenen Grafiken bleiben bei exportierten Inhalten erhalten."
       },
       "qr": {
         "title": "QR-Wasserzeichen erstellen und speichern",
         "body": "Verwandle eine Webadresse oder Text in einen QR-Code. Speichere eigene Codes für Portfolio, Kontaktseite oder Projekte und verwende sie erneut."
       },
       "templates": {
-        "title": "Wasserzeichen als Vorlagen speichern",
-        "body": "Bewahre Text, Grafiken, Stil und Position auf. Nutze Vorlagen im Editor oder für Stapel und importiere oder exportiere sie zwischen Geräten."
+        "title": "18 Vorlagen und eigene gespeicherte Einstellungen",
+        "body": "Beginne mit Entwurf, Vertraulich, Nicht kopieren, Korrekturabzug, Prüfstempeln oder Bildnachweisen. Bearbeite jede Vorlage, benenne sie und speichere sie in der Bibliothek. Organisiere Vorlagen in Ordnern und nutze sie für Bilder, Dokumente, Videos oder Stapel."
       },
       "editing": {
         "title": "Zuschneiden, skalieren und anpassen",
-        "body": "Schneide Fotos zu, wähle Ausgabegrößen und passe Helligkeit, Kontrast und Sättigung vor dem Wasserzeichen an."
+        "body": "Schneide ein Foto zu oder drehe es und passe Helligkeit, Kontrast und Sättigung an. Zoome zur Platzierung hinein, zeige ein verstellbares Raster an und aktiviere das Einrasten. Die Quellauflösung bleibt erhalten, sofern du keinen Zuschnitt oder eine kleinere Ausgabe wählst."
       },
       "smart": {
         "title": "Intelligente Platzierung und Kontrast",
         "body": "Lumafoil schlägt eine Position und ein helles oder dunkles Zeichen passend zum Bild vor. Prüfe das Ergebnis und passe es selbst an."
       },
       "video": {
-        "title": "Videos mit Wasserzeichen",
-        "body": "Versehe unterstützte Videos im Browser mit Wasserzeichen. Passe Position und Einblendzeit an und prüfe die Vorschau vor dem Export."
+        "title": "Videopositionen und Überblendungen",
+        "body": "Bewege die Wiedergabeposition neben den integrierten Wasserzeichenwerkzeugen. Lege Positionen zu verschiedenen Zeitpunkten fest, bestimme, wann jedes Wasserzeichen erscheint, und füge Überblendungen hinzu. Exporte werden neu kodiert; verfügbare Formate und Audiounterstützung hängen von Browser und Quelldatei ab."
       },
       "pdf": {
-        "title": "PDF-Dokumente markieren",
-        "body": "Wende ein gespeichertes Wasserzeichen auf ausgewählte PDF-Seiten an. Verarbeite einzelne Dokumente oder Stapel und lade die Ergebnisse herunter."
+        "title": "PDF-Seiten ansehen und mit Wasserzeichen versehen",
+        "body": "Lies ein PDF und platziere Wasserzeichen mit den Werkzeugen neben der Seite. Wende sie auf das gesamte Dokument an oder verarbeite mehrere PDFs als Stapel. Wasserzeichen werden den ursprünglichen PDF-Seiten hinzugefügt; vorhandener Text, Bilder und Vektorgrafiken bleiben erhalten."
       },
       "export": {
-        "title": "Exportformat wählen",
-        "body": "Exportiere Fotos als JPEG, PNG oder WebP. Bestimme Größe und Qualität oder lade einen fertigen Stapel als ZIP herunter."
+        "title": "Ausgabeformat wählen",
+        "body": "Exportiere Fotos als PNG, JPEG oder WebP. PNG ist der verlustfreie Standard; JPEG und WebP verwenden die gewählte Qualität. Exporte werden aus dem Originalbild erzeugt, nicht aus der kleineren Bearbeitungsvorschau."
       },
       "gallery": {
-        "title": "Private Galerie",
-        "body": "Speichere fertige Bilder in deinem Konto und finde sie später wieder. Lade Dateien herunter oder wähle Fotos zum Teilen aus."
+        "title": "Ordner und zuletzt verwendete Inhalte",
+        "body": "Organisiere Vorlagen in der Bibliothek und gespeicherte Fotos in der Galerie mit Ordnern, zuletzt verwendeten Inhalten sowie Miniatur-, Listen- oder Detailansichten. Dein Arbeitsbereich bleibt privat, bis du ausdrücklich Zugriff freigibst oder einen Galerielink erstellst."
       },
       "sharing": {
-        "title": "Ausgewählte Fotos teilen",
-        "body": "Erstelle einen Lumafoil-Galerielink für ausgewählte Fotos. Lege ein Ablaufdatum fest oder widerrufe den Link."
+        "title": "Fotos oder einen Arbeitsbereich teilen",
+        "body": "Erstelle ablaufende, widerrufbare Galerielinks für ausgewählte Fotos. Eigentümer können per Link, E-Mail-Einladung oder direktem Hinzufügen vorhandener Nutzer Lese- oder Bearbeitungszugriff auf ihren Arbeitsbereich gewähren. Dieser Zugriff ist von einer Einladung zu Lumafoil getrennt."
       },
       "offline": {
         "title": "Offline arbeiten, später synchronisieren",
-        "body": "Bereite Lumafoil für die Offline-Nutzung vor. Bearbeite Vorlagen und speichere Fotos ohne Verbindung. Änderungen werden nach dem Verbinden synchronisiert; Fehler und Konflikte bleiben sichtbar."
+        "body": "Bereite die App angemeldet für die Offline-Nutzung vor. Bearbeite Fotos und Vorlagen und stelle Galeriespeicherungen ohne Verbindung in die Warteschlange. Verbinde dich mit demselben Konto erneut, um zu synchronisieren. Cloud-Übertragungen, Einladungen und Freigabeänderungen benötigen eine Verbindung."
       },
       "privacy": {
         "title": "Dein Konto, dein Arbeitsbereich",
-        "body": "Neue Nutzer benötigen eine Einladung und erhalten einen privaten Arbeitsbereich. Deine Einladung gewährt keinen Zugriff auf deine Fotos oder Vorlagen."
+        "body": "Neue Nutzer benötigen eine Einladung zur Website und erhalten einen eigenen privaten Arbeitsbereich. Eine Website-Einladung teilt niemals deine Fotos oder Vorlagen. Die Freigabe eines Arbeitsbereichs erfordert eine ausdrückliche Zugriffsberechtigung durch dessen Eigentümer."
       },
       "languages": {
-        "title": "Oberfläche in 12 Sprachen",
+        "title": "12 Oberflächensprachen",
         "body": "Wähle eine der 12 Sprachen, darunter Arabisch mit einem Layout von rechts nach links."
       },
       "theme": {
         "title": "Heller und dunkler Modus",
         "body": "Wähle ein Design oder übernimm die Geräteeinstellung. Die Oberfläche passt sich Smartphones, Tablets und größeren Bildschirmen an."
+      },
+      "cloud": {
+        "title": "Verbundene Cloud-Ordner",
+        "body": "Verbinde Google Drive, Dropbox oder OneDrive, um Dateien zu öffnen, Exportordner zu wählen und Freigabelinks des Anbieters zu erstellen. Verbindungen bleiben gespeichert, bis du sie trennst oder der Anbieter erneut eine Autorisierung verlangt. Google Drive ist auf Dateien und Ordner beschränkt, die du mit Lumafoil auswählst oder erstellst. Geschäfts- oder Schulkonten benötigen möglicherweise die Genehmigung deiner Microsoft-Administration."
       }
     },
     "inviteHosting": "Lumafoil ist nur auf Einladung zugänglich. Möchtest du es selbst hosten?",
@@ -1152,12 +1148,12 @@
       },
       "acceptableUse": {
         "heading": "Zulässige Nutzung",
-        "p1": "Nutzen Sie den Dienst nicht, um gegen Gesetze zu verstoßen oder Inhalte hochzuladen oder zu teilen, zu deren Nutzung Sie nicht berechtigt sind. Versuchen Sie nicht, Sicherheitskontrollen oder Ratenbegrenzungen zu umgehen oder auf Daten von Organisationen zuzugreifen, denen Sie nicht angehören.",
-        "p2": "Der Zugriff innerhalb einer Organisation richtet sich nach Ihrer Rolle, und diese Rollen werden auf dem Server durchgesetzt."
+        "p1": "Nutzen Sie den Dienst nicht, um gegen Gesetze zu verstoßen oder Inhalte hochzuladen oder zu teilen, zu deren Nutzung Sie nicht berechtigt sind. Versuchen Sie nicht, Sicherheitskontrollen oder Ratenbegrenzungen zu umgehen oder auf Daten von Arbeitsbereichen zuzugreifen, denen Sie nicht angehören.",
+        "p2": "Der Zugriff innerhalb eines Arbeitsbereichs richtet sich nach Ihrer Rolle, und diese Rollen werden auf dem Server durchgesetzt."
       },
       "teams": {
         "heading": "Private Arbeitsbereiche und Zusammenarbeit",
-        "p1": "Jedes Konto hat einen privaten Arbeitsbereich. Websiteeinladungen teilen ihn nicht. Separate gemeinsame Arbeitsbereiche können ausdrücklich Eigentümer, Administratoren, Bearbeiter oder Betrachter aufnehmen; der Server setzt Rechte durch. Diese Rollen gewähren keine Websiteadministration."
+        "p1": "Jedes Konto beginnt mit einem privaten Arbeitsbereich. Websiteeinladungen teilen keine Inhalte der einladenden Person. Der Eigentümer eines Arbeitsbereichs kann ausdrücklich die Berechtigung Ansehen oder Bearbeiten für diesen Arbeitsbereich erteilen. Dadurch werden weder andere Arbeitsbereiche geteilt noch Website-Administratorrechte gewährt."
       },
       "availability": {
         "heading": "Verfügbarkeit, Gewährleistung und Änderungen",
@@ -1239,16 +1235,12 @@
     "revoke": "Widerrufen",
     "revokeEmail": "Einladung an {{email}} widerrufen",
     "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
-    "privateHeading": "Dein privater Arbeitsbereich",
-    "privateBody": "Nur du hast Zugriff. Lade Personen zu Lumafoil ein, ohne diesen Bereich zu teilen, oder erstelle einen separaten Bereich für Zusammenarbeit.",
-    "collaborate": "Gemeinsamen Arbeitsbereich erstellen",
     "status": {
       "pending": "Ausstehend",
       "accepted": "Angenommen",
       "revoked": "Widerrufen",
       "expired": "Abgelaufen"
     },
-    "collaborationNotice": "Eine Einladung in diesen Bereich gewährt Zugriff auf seine Fotos und Vorlagen. Die Person braucht bereits ein Lumafoil-Konto. Nutze andernfalls zuerst Personen einladen.",
     "role": "Website-Rolle",
     "roleHelp": "Administratoren verwalten Websitekonten. Die Mitgliedschaft in Arbeitsbereichen bleibt getrennt."
   },
@@ -1322,5 +1314,218 @@
     "owner": "Inhaber",
     "admin": "Administrator",
     "user": "Benutzer"
+  },
+  "guidance": {
+    "dismiss": "Tipp schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "done": "Verstanden",
+    "page": "{{current}} von {{total}}",
+    "image": {
+      "title": "Bild",
+      "first": "Öffne ein Foto. Die Originaldatei bleibt unverändert.",
+      "second": "Der Canvas-Zoom ändert nur die Ansicht. Downloads werden aus dem Originalbild erzeugt; PNG ist der verlustfreie Standard."
+    },
+    "watermark": {
+      "title": "Wasserzeichen-Werkzeuge",
+      "first": "Wähle Text, Symbol, Form, Logo oder QR-Code.",
+      "second": "Tippe auf ein Wasserzeichen, um seine Griffe anzuzeigen. Ziehe es zum Verschieben, ändere die Größe mit zwei Fingern oder drehe es mit einer Drehbewegung. Tippe an eine andere Stelle, um die Griffe auszublenden."
+    },
+    "presets": {
+      "title": "Gespeicherte Vorlagen",
+      "first": "Beginne mit Entwurf, Vertraulich oder einer anderen Vorlage, oder wähle ein gespeichertes Wasserzeichen.",
+      "second": "Beim Speichern wählst du Name und Ordner. Neu beginnt ein neues Wasserzeichen und lässt die Datei geöffnet."
+    },
+    "crop": {
+      "title": "Foto Zuschneiden",
+      "first": "Ziehe die Ränder oder wähle ein Seitenverhältnis.",
+      "second": "Zuschnitt zurücksetzen stellt das ganze Foto wieder her. Das Original bleibt unverändert."
+    },
+    "adjust": {
+      "title": "Fotoanpassungen",
+      "first": "Ändere das Aussehen mit den Schiebereglern.",
+      "second": "Jede Zurücksetzen-Taste stellt den Standardwert wieder her. Rückgängig kehrt den letzten Schritt um."
+    },
+    "resize": {
+      "title": "Ausgabegröße",
+      "first": "Behalte die Originalmaße oder wähle eine neue Größe.",
+      "second": "Die Größenänderung betrifft den Export. Zoom ändert nur die Ansicht."
+    },
+    "export": {
+      "title": "Ergebnis Speichern",
+      "first": "Lade das Ergebnis herunter, speichere es in der Galerie oder in der Cloud.",
+      "second": "Prüfe Format, Abmessungen und Qualität. Cloud-Speicherung teilt die Datei nicht; erstelle Links separat unter Gespeicherte Cloud-Dateien."
+    },
+    "library": {
+      "title": "Deine Bibliothek",
+      "first": "Finde kürzlich verwendete Vorlagen, durchsuche Wasserzeichen-Vorlagen und organisiere gespeicherte Designs in Ordnern.",
+      "second": "Suche oder wechsle die Ansicht, um eine Vorlage zu finden. Öffne sie zum Bearbeiten oder nutze sie für Bilder, Dokumente, Videos oder Stapel."
+    },
+    "gallery": {
+      "title": "Deine Galerie",
+      "first": "Finde kürzlich verwendete Fotos und organisiere gespeicherte Bilder in Ordnern dieses Arbeitsbereichs.",
+      "second": "Wähle Miniaturen, Liste oder Details. Foto prüfen sucht nach einem unsichtbaren Lumafoil-Zeichen; es beweist keine Eigentumsrechte."
+    },
+    "bulk": {
+      "title": "Stapelverarbeitung",
+      "first": "Füge Fotos, PDFs und unterstützte Videos hinzu, wähle ein gespeichertes Wasserzeichen und prüfe die Ausgabeeinstellungen.",
+      "second": "Prüfe jedes Ergebnis oder jeden Fehler. Lade ein ZIP herunter oder speichere in der Cloud; nur Fotoergebnisse können in der Galerie gespeichert werden."
+    },
+    "documents": {
+      "title": "Dokument-Wasserzeichen",
+      "first": "Öffne ein PDF, blättere durch seine Seiten und passe dein Wasserzeichen mit den Werkzeugen neben der Vorschau an.",
+      "second": "Das Wasserzeichen gilt für das gesamte Dokument. Der Export erhält die Originalseiten mit bestehendem Text, Bildern und Vektorgrafiken."
+    },
+    "video": {
+      "title": "Video-Wasserzeichen",
+      "first": "Öffne ein unterstütztes Video und bewege die Wiedergabeposition oder spiele die Vorschau ab, während du das Wasserzeichen anpasst.",
+      "second": "Füge Schlüsselbilder hinzu, um das Zeichen über die Zeit zu bewegen. Lege Anfang, Ende und Überblendungen fest und prüfe vor dem Export Ausgabe- und Audiooptionen."
+    },
+    "workspace": {
+      "title": "Arbeitsbereich-Zugriff",
+      "first": "Öffne Zugriff verwalten im Benutzermenü, um die Freigaben zu prüfen.",
+      "second": "Eigentümer können Lese- oder Bearbeitungszugriff gewähren. Diese Freigabe teilt weder andere Arbeitsbereiche noch verbundene Cloud-Konten."
+    }
+  },
+  "workspaceAccess": {
+    "loading": "Zugriff Wird Geladen…",
+    "ownerOnly": "Nur der Eigentümer des Arbeitsbereichs kann Zugriffsrechte ändern.",
+    "people": "Personen Mit Zugriff",
+    "general": "Allgemeiner Zugriff",
+    "restricted": "Eingeschränkt",
+    "restrictedHint": "Nur berechtigte Personen können diesen Arbeitsbereich öffnen. Andere Arbeitsbereiche bleiben privat.",
+    "addPeople": "Personen Hinzufügen",
+    "permission": "Berechtigung",
+    "notify": "Per E-Mail Benachrichtigen",
+    "send": "Einladung Senden",
+    "add": "Person Hinzufügen",
+    "notifyHint": "Sende eine Einladung zum Ansehen oder Bearbeiten dieses Arbeitsbereichs. Neue Nutzer erhalten eine separate Kontoeinladung.",
+    "silentHint": "Füge einen vorhandenen, bestätigten Lumafoil-Nutzer sofort hinzu. Es wird keine E-Mail oder Benachrichtigung gesendet.",
+    "sent": "Einladung zum Arbeitsbereich gesendet.",
+    "added": "Zugriff ohne Benachrichtigung hinzugefügt.",
+    "view": "Ansehen",
+    "edit": "Bearbeiten",
+    "owner": "Eigentümer",
+    "admin": "Administrator",
+    "removeFor": "Zugriff Für {{name}} Entfernen",
+    "inviteLink": "Einladungslink",
+    "linkPermission": "Linkberechtigung",
+    "expires": "Linkablauf",
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "createLink": "Link Erstellen",
+    "linkHint": "Angemeldete Lumafoil-Nutzer können mit diesem Link beitreten, bis er abläuft oder widerrufen wird. Ein Widerruf verhindert neue Beitritte; entferne Personen separat, um bestehenden Zugriff zu beenden.",
+    "copyLink": "Link Kopieren",
+    "copied": "Link kopiert.",
+    "copyFailed": "Kopieren fehlgeschlagen. Wähle den Link aus und kopiere ihn manuell.",
+    "revoke": "Widerrufen",
+    "revokeFor": "Einladung Für {{name}} Widerrufen",
+    "joinTitle": "{{name}} Beitreten",
+    "joinDescription": "Diese Einladung gewährt {{permission}}-Zugriff nur auf diesen Arbeitsbereich.",
+    "join": "Arbeitsbereich Beitreten",
+    "open": "Arbeitsbereich Öffnen",
+    "unavailable": "Einladung Nicht Verfügbar",
+    "unavailableHint": "Diese Einladung ist abgelaufen, wurde widerrufen oder ist für ein anderes Konto bestimmt. Melde dich mit der eingeladenen E-Mail-Adresse an oder bitte den Eigentümer um einen neuen Link.",
+    "cancel": "Abbrechen"
+  },
+  "cloudStorage": {
+    "heading": "Cloud-Speicher",
+    "description": "Verbinde deine Speicherkonten einmal und verwende die Verbindung zum Öffnen, Speichern und Teilen erneut.",
+    "chooseDestination": "Wähle den Ordner zum Speichern deiner Dateien.",
+    "chooseFiles": "Wähle Dateien zum Öffnen in Lumafoil.",
+    "loading": "Cloud-Speicher Wird Geladen",
+    "unavailable": "Dieser Anbieter ist auf diesem Server nicht verfügbar.",
+    "connectHint": "Verbinde dein Konto zum Durchsuchen von Dateien und Ordnern. Die Verbindung bleibt gespeichert.",
+    "connect": "{{provider}} Verbinden",
+    "dropboxScope": "Dropbox-Zugriff ist auf den Lumafoil-App-Ordner beschränkt.",
+    "googleScope": "Hier erscheinen nur für Lumafoil freigegebene Elemente. Wähle weitere über Drive durchsuchen.",
+    "location": "Ordnerpfad",
+    "appFolder": "Lumafoil-App-Ordner",
+    "root": "Meine Dateien",
+    "empty": "Keine passenden Dateien oder Ordner vorhanden.",
+    "folderName": "Neuer Ordnername",
+    "createFolder": "Ordner Erstellen",
+    "useFolder": "Diesen Ordner Verwenden",
+    "openSelected": "Auswahl Öffnen",
+    "browseGoogle": "Drive Durchsuchen",
+    "connected": "Verbunden",
+    "notConnected": "Nicht Verbunden",
+    "reconnect": "Erneut Verbinden",
+    "disconnect": "Trennen",
+    "managePermissions": "Berechtigungen Verwalten",
+    "revocationHint": "Von Lumafoil getrennt. Entferne verbleibende Freigaben in den Berechtigungseinstellungen des Anbieters.",
+    "retry": "Erneut Versuchen",
+    "waiting": "Schließe die Anmeldung beim Anbieter ab. Du kannst hier abbrechen.",
+    "personalAccount": "Persönliches Konto",
+    "workAccount": "Geschäfts- Oder Schulkonto",
+    "microsoftConsent": "Geschäfts- oder Schulkonten benötigen möglicherweise die Genehmigung deiner Microsoft-Administration."
+  },
+  "folders": {
+    "heading": "Ordner",
+    "rootPhoto": "Galerie",
+    "rootPreset": "Bibliothek",
+    "path": "Ordnerpfad",
+    "new": "Neuer Ordner",
+    "name": "Ordnername",
+    "rename": "Ordner Umbenennen",
+    "moveFolder": "Ordner Verschieben",
+    "moveItems": "Elemente Verschieben",
+    "moveNamed": "{{name}} Verschieben",
+    "destination": "Zielordner",
+    "saveLocation": "Speicherort",
+    "choose": "Ordner Auswählen",
+    "expand": "{{name}} Aufklappen",
+    "collapse": "{{name}} Zuklappen",
+    "open": "{{name}} Öffnen",
+    "loading": "Ordner Werden Geladen…",
+    "unavailable": "Dieser Ordner ist nicht verfügbar. Öffne die Hauptsammlung oder wähle einen anderen Ordner.",
+    "loadError": "Die Ordner konnten nicht geladen werden. Die Hauptsammlung bleibt verfügbar.",
+    "delete": "Ordner Löschen",
+    "deleteTitle": "{{name}} Löschen?",
+    "deleteHint": "Nur leere Ordner können gelöscht werden. Dateien und Unterordner werden dabei niemals mitgelöscht.",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "moveHere": "Hierher Verschieben",
+    "newHint": "Erstelle einen Ordner am ausgewählten Speicherort.",
+    "renameHint": "Wähle einen Namen und Speicherort für diesen Ordner.",
+    "moving": "Elemente Verschieben ({{count}})",
+    "invalidName": "Verwende einen Namen ohne Schrägstriche oder Steuerzeichen.",
+    "nameTaken": "Hier gibt es bereits einen Ordner mit diesem Namen.",
+    "selection": "Ausgewählte Elemente: {{count}}"
+  },
+  "templates": {
+    "heading": "Wasserzeichen-Vorlagen",
+    "hint": "Übernimm ein fertiges Layout, passe es an und speichere deine eigene Voreinstellung.",
+    "search": "Vorlagen Suchen",
+    "category": "Vorlagenkategorie",
+    "use": "{{name}} Verwenden",
+    "empty": "Keine passenden Vorlagen.",
+    "unavailable": "Diese Vorlage ist nicht verfügbar. Wähle eine Vorlage aus der Bibliothek.",
+    "categories": {
+      "all": "Alle",
+      "documents": "Dokumente",
+      "review": "Prüfung",
+      "photography": "Fotos"
+    },
+    "names": {
+      "draft": "Entwurf",
+      "confidential": "Vertraulich",
+      "strictlyConfidential": "Streng Vertraulich",
+      "internalUseOnly": "Nur Für Internen Gebrauch",
+      "doNotCopy": "Nicht Kopieren",
+      "doNotDistribute": "Nicht Weitergeben",
+      "copy": "Kopie",
+      "void": "Ungültig",
+      "forReview": "Zur Prüfung",
+      "proof": "Korrekturabzug",
+      "sample": "Muster",
+      "preview": "Vorschau",
+      "approved": "Freigegeben",
+      "final": "Endfassung",
+      "unpaid": "Unbezahlt",
+      "copyright": "Urheberrecht",
+      "photoCredit": "Bildnachweis",
+      "repeatingProof": "Wiederholter Korrekturabzug"
+    }
   }
 }

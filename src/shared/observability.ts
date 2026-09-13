@@ -40,7 +40,6 @@ const DIAGNOSTIC_ROUTES = new Set([
   '/reset-password',
   '/signup',
   '/terms',
-  '/oauth/dropbox',
   '/oauth/microsoft',
 ])
 
@@ -61,6 +60,7 @@ export function redactRoutePath(path: string): string {
   if (/^\/app\/library\/[^/]+$/.test(pathname)) return '/app/library/:id'
   if (/^\/share\/[^/]+$/.test(pathname)) return '/share/:token'
   if (/^\/accept-invitation\/[^/]+$/.test(pathname)) return '/accept-invitation/:token'
+  if (/^\/workspace-invitation\/[^/]+$/.test(pathname)) return '/workspace-invitation/:token'
   if (/^\/api\/share\/[^/]+\/photos\/[^/]+\/file$/.test(pathname))
     return '/api/share/:token/photos/:id/file'
   return '/unknown'

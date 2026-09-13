@@ -3,6 +3,12 @@ import { z } from 'zod'
 
 import { assetDtoSchema, photoDtoSchema } from '../../shared/api'
 import { saveWatermarkRequestSchema, watermarkDtoSchema } from '../../shared/api-watermark'
+import {
+  contentPlacementSchema,
+  folderDtoSchema,
+  folderIdSchema,
+  folderRevisionSchema,
+} from '../../shared/folders'
 import { syncOperationIdSchema } from '../../shared/sync'
 
 const blobSchema = z.instanceof(Blob)
@@ -32,6 +38,26 @@ const logoUploadSchema = z.object({
   blob: blobSchema,
 })
 const logoDeleteSchema = z.object({ kind: z.literal('logo-delete'), assetId: z.string() })
+const folderCreateSchema = z.object({ kind: z.literal('folder-create'), folder: folderDtoSchema })
+const folderUpdateSchema = z.object({
+  kind: z.literal('folder-update'),
+  folder: folderDtoSchema,
+  expectedRevision: folderRevisionSchema,
+  expectedVersionId: folderIdSchema,
+})
+const folderDeleteSchema = z.object({ kind: z.literal('folder-delete'), folder: folderDtoSchema })
+const photoMoveSchema = z.object({
+  kind: z.literal('photo-move'),
+  photos: z.array(photoDtoSchema),
+  placements: z.array(contentPlacementSchema),
+  folderId: folderIdSchema.nullable(),
+})
+const presetMoveSchema = z.object({
+  kind: z.literal('preset-move'),
+  presets: z.array(watermarkDtoSchema),
+  placements: z.array(contentPlacementSchema),
+  folderId: folderIdSchema.nullable(),
+})
 
 export const offlineChangeSchema = z.discriminatedUnion('kind', [
   presetCreateSchema,
@@ -41,6 +67,11 @@ export const offlineChangeSchema = z.discriminatedUnion('kind', [
   photoDeleteSchema,
   logoUploadSchema,
   logoDeleteSchema,
+  folderCreateSchema,
+  folderUpdateSchema,
+  folderDeleteSchema,
+  photoMoveSchema,
+  presetMoveSchema,
 ])
 export type OfflineChange = z.infer<typeof offlineChangeSchema>
 

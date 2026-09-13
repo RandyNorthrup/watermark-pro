@@ -48,6 +48,7 @@ async function handle(message: TranscodeStartMessage): Promise<void> {
         marks: message.marks,
         plan: message.plan,
         signal: jobController.signal,
+        motions: message.motions,
       },
       {
         onProgress: (frames, timestamp) => {

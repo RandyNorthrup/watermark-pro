@@ -16,11 +16,18 @@ describe('request failure privacy', () => {
       new Error('SQL_PARAMS_CANARY user@example.test ACCESS_TOKEN_CANARY'),
     )
     const response = await harness.app.fetch(
-      new Request('http://localhost:5273/api/auth/sign-in/email', {
-        method: 'POST',
-        headers: { origin: 'http://localhost:5273', 'content-type': 'application/json' },
-        body: JSON.stringify({ email: 'fixture@example.test', password: 'a fixture passphrase' }),
-      }),
+      new Request(
+        'http://localhost:5273/api/auth/sign-in/email?code=CODE_CANARY&state=STATE_CANARY',
+        {
+          method: 'POST',
+          headers: {
+            origin: 'http://localhost:5273',
+            'content-type': 'application/json',
+            'x-request-id': 'https://provider.test/?code=HEADER_CODE_CANARY',
+          },
+          body: JSON.stringify({ email: 'fixture@example.test', password: 'a fixture passphrase' }),
+        },
+      ),
       harness.env,
     )
     expect(response.status).toBe(500)
@@ -29,6 +36,8 @@ describe('request failure privacy', () => {
     for (const sensitive of [
       'SQL_PARAMS_CANARY',
       'ACCESS_TOKEN_CANARY',
+      'CODE_CANARY',
+      'STATE_CANARY',
       'user@example.test',
       '# SERVER_ERROR',
     ])

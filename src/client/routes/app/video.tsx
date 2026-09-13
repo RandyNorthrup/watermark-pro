@@ -27,8 +27,7 @@ function VideoPage() {
       </header>
       <VideoTool
         organizationId={organization.id}
-        organizationName={organization.name}
-        canSave={canRole(membership?.role, { photo: ['upload'] })}
+        canCreatePresets={canRole(membership?.role, { watermark: ['create'] })}
       />
     </div>
   )

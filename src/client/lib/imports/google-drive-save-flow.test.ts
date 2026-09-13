@@ -2,15 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { saveToGoogleDrive } from './google-drive-save'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
+import { cloudToken } from '../cloud-connections'
 import { ACCOUNT_CHANGED_EVENT } from '../offline-account'
 import { setOfflineUser } from '../offline-context'
 
-type TokenOptions = Parameters<
-  NonNullable<Window['google']>['accounts']['oauth2']['initTokenClient']
->[0]
-const sdk: { mode: 'grant' | 'cancel' | 'hold'; request: TokenOptions | null } = {
-  mode: 'grant',
-  request: null,
+vi.mock('../cloud-connections', () => ({ cloudToken: vi.fn() }))
+const TOKEN = {
+  accessToken: 'provider-token',
+  expiresAt: '2030-01-01T00:00:00.000Z',
+  providerAccountId: 'cloud-account',
+  generation: 1,
 }
 const uploads = [
   { name: 'first.png', blob: new Blob(['FIRST IMAGE'], { type: 'image/png' }) },
@@ -20,44 +21,15 @@ const uploads = [
 
 beforeEach(() => {
   setOfflineUser('owner')
-  sdk.mode = 'grant'
-  sdk.request = null
-  const append = document.head.append.bind(document.head)
-  vi.spyOn(document.head, 'append').mockImplementation((...nodes) => {
-    append(...nodes)
-    for (const node of nodes)
-      if (node instanceof HTMLScriptElement)
-        queueMicrotask(() => node.dispatchEvent(new Event('load')))
-  })
-  Object.assign(window, {
-    google: {
-      accounts: {
-        oauth2: {
-          initTokenClient(options: TokenOptions) {
-            sdk.request = options
-            return {
-              requestAccessToken(request: { prompt: string }) {
-                expect(request.prompt).toBe('select_account')
-                if (sdk.mode === 'grant')
-                  queueMicrotask(() => options.callback({ access_token: 'provider-token' }))
-                else if (sdk.mode === 'cancel')
-                  queueMicrotask(() => options.error_callback({ type: 'popup_closed' }))
-              },
-            }
-          },
-        },
-      },
-    },
-  })
+  vi.mocked(cloudToken).mockReset().mockResolvedValue(TOKEN)
 })
 afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
-  delete window.google
 })
 
 describe('actual Google Drive save entry point', () => {
-  it('runs GIS before lazy export, creates a missing folder, and returns confirmed upload identities', async () => {
+  it('gets the saved grant before lazy export, creates a missing folder, and returns confirmed upload identities', async () => {
     const bodies: string[] = []
     const fetcher = vi.fn<typeof fetch>(async (url, init) => {
       expect(new Headers(init?.headers).get('authorization')).toBe('Bearer provider-token')
@@ -76,8 +48,7 @@ describe('actual Google Drive save entry point', () => {
     })
     vi.stubGlobal('fetch', fetcher)
     const collect = vi.fn(() => {
-      expect(sdk.request?.client_id).toBe(ALL_CLOUD_CONFIG.googleOAuthClientId)
-      expect(sdk.request?.scope).toBe('https://www.googleapis.com/auth/drive.file')
+      expect(cloudToken).toHaveBeenCalled()
       return Promise.resolve(uploads.slice(0, 2))
     })
     const saved = await saveToGoogleDrive(ALL_CLOUD_CONFIG, collect)
@@ -87,6 +58,7 @@ describe('actual Google Drive save entry point', () => {
         id: 'saved-1',
         name: 'first.png',
         userId: 'owner',
+        providerAccountId: 'cloud-account',
         manageUrl: 'https://drive.google.com/file/d/saved-1/view',
       },
       {
@@ -94,6 +66,7 @@ describe('actual Google Drive save entry point', () => {
         id: 'saved-2',
         name: 'second.png',
         userId: 'owner',
+        providerAccountId: 'cloud-account',
         manageUrl: 'https://drive.google.com/file/d/saved-2/view',
       },
     ])
@@ -120,7 +93,7 @@ describe('actual Google Drive save entry point', () => {
   })
 
   it('does not export or upload after popup cancellation', async () => {
-    sdk.mode = 'cancel'
+    vi.mocked(cloudToken).mockRejectedValueOnce(new Error('Connection cancelled'))
     const fetcher = vi.fn()
     const collect = vi.fn(() => Promise.resolve(uploads))
     vi.stubGlobal('fetch', fetcher)
@@ -130,19 +103,20 @@ describe('actual Google Drive save entry point', () => {
   })
 
   it('rejects a stale token callback and a stale lazy export before any provider mutation', async () => {
-    sdk.mode = 'hold'
+    const pending = Promise.withResolvers<typeof TOKEN>()
+    vi.mocked(cloudToken).mockReturnValueOnce(pending.promise)
     const fetcher = vi.fn()
     vi.stubGlobal('fetch', fetcher)
     const saving = expect(saveToGoogleDrive(ALL_CLOUD_CONFIG, uploads)).rejects.toThrow(
       'account changed',
     )
-    await vi.waitFor(() => expect(sdk.request).not.toBeNull())
+    await vi.waitFor(() => expect(cloudToken).toHaveBeenCalled())
     setOfflineUser('other')
     window.dispatchEvent(new Event(ACCOUNT_CHANGED_EVENT))
-    sdk.request?.callback({ access_token: 'stale-token' })
+    pending.resolve(TOKEN)
     await saving
     setOfflineUser('owner')
-    sdk.mode = 'grant'
+    vi.mocked(cloudToken).mockResolvedValue(TOKEN)
     await expect(
       saveToGoogleDrive(ALL_CLOUD_CONFIG, () => {
         setOfflineUser('other')

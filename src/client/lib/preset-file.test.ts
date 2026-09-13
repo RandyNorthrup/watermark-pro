@@ -63,6 +63,9 @@ function watermark(name: string, spec: WatermarkSpec): WatermarkDto {
     organizationId: 'org-1',
     name,
     spec,
+    folderId: null,
+    folderRevision: 0,
+    folderVersionId: null,
     createdBy: 'user-1',
     createdAt: '2026-09-07T12:00:00.000Z',
     updatedAt: '2026-09-07T12:00:00.000Z',
@@ -175,6 +178,7 @@ describe('importPresetFile', () => {
     expect(createWatermark).toHaveBeenCalledWith('org-1', {
       name: 'Text mark',
       spec: DEFAULT_TEXT_SPEC,
+      folderId: null,
     })
     expect(created).toHaveLength(1)
   })

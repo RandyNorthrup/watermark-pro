@@ -22,6 +22,7 @@ import {
 } from '../../shared/api'
 
 export interface GalleryFilters {
+  folderId?: string | null | undefined
   presetId?: string | undefined
   search?: string | undefined
 }
@@ -65,6 +66,7 @@ export function photosQueryOptions(organizationId: string, filters: GalleryFilte
     networkMode: 'always',
     queryFn: async ({ pageParam }) => {
       const params = new URLSearchParams()
+      if (filters.folderId !== undefined) params.set('folderId', filters.folderId ?? 'root')
       if (filters.presetId !== undefined && filters.presetId !== '') {
         params.set('presetId', filters.presetId)
       }
@@ -107,14 +109,20 @@ export function photosQueryOptions(organizationId: string, filters: GalleryFilte
         isCached = true
         response = await cachedGallery(organizationId)
       }
-      if (pageParam !== null || !hasOfflineDatabase()) {
+      if (!hasOfflineDatabase()) {
         return response
       }
-      const photos = await mergeLocalPhotos(organizationId, response.photos, isCached)
+      const photos = await mergeLocalPhotos(
+        organizationId,
+        response.photos,
+        isCached,
+        pageParam === null,
+      )
       return {
         ...response,
         photos: photos.filter(
           (photo) =>
+            (filters.folderId === undefined || photo.folderId === filters.folderId) &&
             ([undefined, ''].includes(filters.presetId) || photo.presetId === filters.presetId) &&
             (filters.search === undefined ||
               photo.name.toLocaleLowerCase().includes(filters.search.toLocaleLowerCase())),
@@ -148,6 +156,7 @@ export function photoThumbnailUrl(organizationId: string, photoId: string): stri
 }
 
 export interface PhotoUpload {
+  folderId?: string | null | undefined
   blob: Blob
   name: string
   width: number
@@ -172,6 +181,7 @@ export async function uploadPhoto(organizationId: string, upload: PhotoUpload): 
       presetName: null,
       createdBy: offlineUserId(),
       createdAt: new Date().toISOString(),
+      folderId: upload.folderId ?? null,
     })
     const saved = await savePhotoLocally(organizationId, photo, upload.blob, thumbnail.blob)
     owner.assertCurrent()
@@ -187,6 +197,8 @@ export async function uploadPhoto(organizationId: string, upload: PhotoUpload): 
   if (upload.presetId !== undefined && upload.presetId !== null) {
     form.append('presetId', upload.presetId)
   }
+  if (upload.folderId !== undefined && upload.folderId !== null)
+    form.append('folderId', upload.folderId)
   const saved = await fetchJson(galleryPath(organizationId), photoDtoSchema, {
     method: 'POST',
     body: form,

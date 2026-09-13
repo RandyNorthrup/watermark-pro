@@ -25,6 +25,27 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+it('inserts symbols at the text selection with undo and refuses to exceed the text limit', async () => {
+  const user = userEvent.setup()
+  renderApp('/app/library/new')
+  const text = await screen.findByRole('textbox', { name: 'Text' })
+  fireEvent.change(text, { target: { value: 'ABCD' } })
+  if (!(text instanceof HTMLTextAreaElement)) throw new Error('Expected text editor')
+  text.focus()
+  text.setSelectionRange(1, 3)
+  await user.click(screen.getByRole('button', { name: 'Insert ©' }))
+  expect(text).toHaveValue('A©D')
+  await waitFor(() => expect(text).toHaveFocus())
+  expect(text.selectionStart).toBe(2)
+  await user.click(screen.getByRole('button', { name: 'Undo' }))
+  expect(text).toHaveValue('ABCD')
+  fireEvent.change(text, { target: { value: 'A'.repeat(120) } })
+  text.setSelectionRange(120, 120)
+  await user.click(screen.getByRole('button', { name: 'Insert ™' }))
+  expect(text).toHaveValue('A'.repeat(120))
+  expect(screen.getByText(/Text is full/)).toBeVisible()
+})
+
 it('undoes form/spec changes and supports native modifier shortcuts without losing kind drafts', async () => {
   const user = userEvent.setup()
   renderApp('/app/library/new')

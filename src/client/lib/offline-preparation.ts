@@ -10,14 +10,32 @@ import {
   storageUsageSchema,
 } from '../../shared/api'
 import { watermarkListResponseSchema } from '../../shared/api-watermark'
+import { folderListSchema } from '../../shared/folders'
 
 /** Gallery media is retained when opened or saved; preset logos are prepared eagerly. */
 export async function prepareWorkspaceOffline(organizationId: string): Promise<void> {
   const root = `/api/orgs/${organizationId}`
-  const paths = [`${root}/watermarks`, `${root}/assets`, `${root}/photos`, `${root}/photos/usage`]
+  const paths = [
+    `${root}/watermarks`,
+    `${root}/assets`,
+    `${root}/photos`,
+    `${root}/photos/usage`,
+    `${root}/folders?kind=photo`,
+    `${root}/folders?kind=preset`,
+  ]
   const reconcilePhotos = await workspaceCacheReconciliation(organizationId, 'photo')
   const reconcilePresets = await workspaceCacheReconciliation(organizationId, 'preset')
   const reconcileLogos = await workspaceCacheReconciliation(organizationId, 'logo')
+  const reconcilePhotoFolders = await workspaceCacheReconciliation(
+    organizationId,
+    'folder',
+    'photo',
+  )
+  const reconcilePresetFolders = await workspaceCacheReconciliation(
+    organizationId,
+    'folder',
+    'preset',
+  )
   const photoRead = { isFallback: false }
   const markPhotoFallback = () => {
     photoRead.isFallback = true
@@ -51,6 +69,26 @@ export async function prepareWorkspaceOffline(organizationId: string): Promise<v
       markPhotoFallback,
     ),
     cachedWorkspaceJson(organizationId, `${root}/photos/usage`, storageUsageSchema),
+    cachedWorkspaceJson(
+      organizationId,
+      `${root}/folders?kind=photo`,
+      folderListSchema,
+      async (value) =>
+        await reconcilePhotoFolders(
+          value.folders.map((folder) => folder.id),
+          true,
+        ),
+    ),
+    cachedWorkspaceJson(
+      organizationId,
+      `${root}/folders?kind=preset`,
+      folderListSchema,
+      async (value) =>
+        await reconcilePresetFolders(
+          value.folders.map((folder) => folder.id),
+          true,
+        ),
+    ),
   ])
   const photoIds = firstPage.photos.map((photo) => photo.id)
   const cursors = new Set<string>()

@@ -110,17 +110,7 @@ test('SDK gate uses real migrations, R2 and rate bindings with test-only configu
     const asset = await fetch(gate.origin + '/application-route')
     assert.equal(asset.status, 200)
     assert.equal(await asset.text(), '<!doctype html><title>Built fixture asset</title>')
-    for (const pathname of [
-      '/',
-      '/privacy',
-      '/terms',
-      '/api/',
-      '/api/missing',
-      '/oauth/microsoft',
-      '/oauth/microsoft/',
-      '/oauth/microsoft.html',
-      '/oauth/microsoft-bridge.js',
-    ]) {
+    for (const pathname of ['/', '/privacy', '/terms', '/api/', '/api/missing']) {
       const routed = await fetch(gate.origin + pathname)
       assert.equal(routed.status, 404, `${pathname} must reach the actual Worker`)
       assert.equal(await routed.text(), 'fixture Worker rejection')

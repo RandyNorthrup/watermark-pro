@@ -76,7 +76,7 @@ export const SENSITIVE_AUTH_PATHS = [
 /** Editor-sized derivative of the licensed coast photograph used on the landing page. */
 export const SAMPLE_SCENE_PATH = '/sample-scene-v2.jpg'
 
-export const MIN_CANVAS_ZOOM_PERCENT = 10
+export const MIN_CANVAS_ZOOM_PERCENT = 1
 export const MAX_CANVAS_ZOOM_PERCENT = 400
 export const CANVAS_ZOOM_STEP_PERCENT = 5
 export const DEFAULT_CANVAS_ZOOM_PERCENT = 100
@@ -106,6 +106,8 @@ export const MAX_PHOTOS_PER_ORGANIZATION = 10_000
 export const MAX_STORAGE_BYTES_PER_ORGANIZATION = 2 * 1024 * BYTES_PER_MEGABYTE
 export const MAX_PHOTO_SIDE = 8192
 export const PHOTO_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const
+/** Preserve rendered pixels by default; lossy formats require an explicit export choice. */
+export const IMAGE_EXPORT_DEFAULTS = { format: 'image/png', quality: 1 } as const
 export const PHOTO_PAGE_SIZE = 60
 export const MAX_BULK_DELETE = 200
 export const MAX_PHOTO_NAME_LENGTH = 200
@@ -241,32 +243,21 @@ export const SHARED_FILES_TTL_MS = 10 * 60 * MILLISECONDS_PER_SECOND
  * origins are also the CSP allowances in public/_headers, so the two must move
  * together. Google requests the narrow per-file `drive.file` scope (which also
  * covers writing back the files the app creates) and reads/writes through the
- * Drive media and upload endpoints; Dropbox reads via the Chooser's short-lived
- * direct links and writes through its content API after a PKCE sign-in; OneDrive
- * signs in with MSAL and reads/writes through Microsoft Graph with `Files.ReadWrite`.
+ * Drive media and upload endpoints. All providers use durable confidential
+ * server grants; Dropbox uses its content API and OneDrive uses Microsoft Graph
+ * with `Files.ReadWrite`. Access and refresh credentials are encrypted at rest.
  */
 export const GOOGLE_API_SCRIPT_URL = 'https://apis.google.com/js/api.js'
-export const GOOGLE_IDENTITY_SCRIPT_URL = 'https://accounts.google.com/gsi/client'
 export const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
 export const GOOGLE_DRIVE_FILES_ENDPOINT = 'https://www.googleapis.com/drive/v3/files'
 /** Multipart upload endpoint for creating a Drive file (M16 save-to-cloud). */
 export const GOOGLE_DRIVE_UPLOAD_ENDPOINT = 'https://www.googleapis.com/upload/drive/v3/files'
-export const DROPBOX_DROPINS_SCRIPT_URL = 'https://www.dropbox.com/static/api/2/dropins.js'
-/** Dropbox write (M16 save-to-cloud): browser PKCE sign-in, then the content API. */
-export const DROPBOX_OAUTH_AUTHORIZE_URL = 'https://www.dropbox.com/oauth2/authorize'
-export const DROPBOX_OAUTH_TOKEN_URL = 'https://api.dropboxapi.com/oauth2/token'
-export const DROPBOX_UPLOAD_ENDPOINT = 'https://content.dropboxapi.com/2/files/upload'
-export const DROPBOX_OAUTH_REDIRECT_PATH = '/oauth/dropbox'
 /** Space-separated Dropbox scopes for the save flow (write, plus read for parity). */
 export const DROPBOX_WRITE_SCOPES =
   'files.content.write files.content.read files.metadata.read sharing.read sharing.write'
-/** `common` accepts both Microsoft Entra (work/school) and personal accounts. */
-export const MICROSOFT_AUTHORITY = 'https://login.microsoftonline.com/common'
 /** `Files.ReadWrite` covers both the OneDrive browse (read) and save (write) flows. */
 export const MICROSOFT_GRAPH_SCOPE = 'Files.ReadWrite'
 export const MICROSOFT_GRAPH_ROOT = 'https://graph.microsoft.com/v1.0'
-/** Registered SPA redirect path for the MSAL popup; joined onto the app origin. */
-export const MICROSOFT_OAUTH_REDIRECT_PATH = '/oauth/microsoft'
 /** Folder each provider saves watermarked photos into (created if missing). */
 export const CLOUD_SAVE_FOLDER = 'Lumafoil'
 
@@ -277,6 +268,8 @@ export const CLOUD_SAVE_FOLDER = 'Lumafoil'
 export const MAX_VIDEO_BYTES = 2 * 1024 * BYTES_PER_MEGABYTE
 export const MAX_VIDEO_SECONDS = 600
 export const MAX_VIDEO_SIDE = 3840
+/** Display-only mark raster; encoded video always uses the selected original/output resolution. */
+export const VIDEO_PREVIEW_MAX_SIDE = 1440
 /**
  * Encoder codec preference, best first (docs/plans/m17 "Codec choice"): H.264 in
  * MP4, then HEVC in MP4 (Safari), then VP9 and AV1 in WebM. The first the running
@@ -313,7 +306,6 @@ export const AUDIO_REENCODE_BITRATE = 128_000
  */
 export const MAX_PDF_BYTES = 50 * BYTES_PER_MEGABYTE
 export const MAX_PDF_PAGES = 200
-export const MAX_PDF_FILES = 50
 /** Resolution the marks are rasterised at before being drawn onto the page. */
 export const PDF_RASTER_DPI = 150
 /** Points per inch in the PDF coordinate system (a PDF user unit is 1/72 inch). */
@@ -325,6 +317,3 @@ export const PDF_PRODUCER = 'Lumafoil'
 export const EMAIL_MAX_LENGTH = 254
 export const MAX_AUTH_ERROR_LENGTH = 200
 export const MAX_ACCOUNT_ID_LENGTH = 128
-
-/** Roles offered when inviting or promoting; owner transfer is separate. */
-export const ASSIGNABLE_ROLES = ['admin', 'editor', 'viewer'] as const

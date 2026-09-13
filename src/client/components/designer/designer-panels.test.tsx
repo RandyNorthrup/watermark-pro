@@ -46,7 +46,7 @@ describe('ShapePanel', () => {
         onChange={onChange}
       />,
     )
-    fireEvent.change(screen.getByLabelText('Fill colour'), { target: { value: '#123456' } })
+    fireEvent.change(screen.getByLabelText('Fill color'), { target: { value: '#123456' } })
     expect(onChange.mock.calls.at(-1)?.[0].fill.colour).toBe('#123456')
     fireEvent.change(screen.getByRole('slider', { name: 'Fill opacity' }), {
       target: { value: '0.75' },
@@ -58,7 +58,7 @@ describe('ShapePanel', () => {
     })
     expect(onChange.mock.calls.at(-1)?.[0].stroke.width).toBe(0.05)
 
-    await user.click(screen.getByRole('switch', { name: 'Custom stroke colour' }))
+    await user.click(screen.getByRole('switch', { name: 'Custom stroke color' }))
     expect(onChange.mock.calls.at(-1)?.[0].stroke.colour).toBe('#c86b82')
 
     // With a custom stroke colour set, its picker appears and edits the colour.
@@ -68,7 +68,7 @@ describe('ShapePanel', () => {
         onChange={onChange}
       />,
     )
-    fireEvent.change(screen.getByLabelText('Stroke colour'), { target: { value: '#abcdef' } })
+    fireEvent.change(screen.getByLabelText('Stroke color'), { target: { value: '#abcdef' } })
     expect(onChange.mock.calls.at(-1)?.[0].stroke.colour).toBe('#abcdef')
 
     // A line spec renders the length control instead of proportions.
@@ -105,6 +105,10 @@ describe('TextEffects', () => {
       <TextEffects spec={{ ...textSpec, letterSpacing: 0.3, curve: 0.4 }} onChange={onChange} />,
     )
     expect(screen.getByText('+30%')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Reset Letter spacing' }))
+    expect(onChange).toHaveBeenLastCalledWith({ ...textSpec, letterSpacing: 0, curve: 0.4 })
+    await user.click(screen.getByRole('button', { name: 'Reset Curve' }))
+    expect(onChange).toHaveBeenLastCalledWith({ ...textSpec, letterSpacing: 0.3, curve: 0 })
   })
 })
 

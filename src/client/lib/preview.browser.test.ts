@@ -142,6 +142,76 @@ describe('sample photo', () => {
 })
 
 describe('PreviewRenderer', () => {
+  it('shares lazy sample initialization between a first export and the first preview', async () => {
+    const pending = Promise.withResolvers<Response>()
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+    const sample = await fetch(SAMPLE_SCENE_PATH)
+    fetcher.mockImplementationOnce(() => pending.promise)
+    const renderer = new PreviewRenderer(() => Promise.reject(new Error('no logos')))
+    try {
+      expect(renderer.isSubjectReady).toBe(false)
+      const exported = renderer.exportFull([], { format: 'image/png', quality: 1 })
+      const preview = renderer.render([])
+      expect(renderer.isSubjectReady).toBe(false)
+      pending.resolve(sample)
+      const [blob, frame] = await Promise.all([exported, preview])
+      expect(renderer.isSubjectReady).toBe(true)
+      expect(blob.type).toBe('image/png')
+      const bitmap = await createImageBitmap(blob)
+      expect([bitmap.width, bitmap.height]).toEqual([SAMPLE_PHOTO_WIDTH, SAMPLE_PHOTO_HEIGHT])
+      bitmap.close()
+      expect(frame).not.toBeNull()
+      if (frame !== null) URL.revokeObjectURL(frame.url)
+    } finally {
+      pending.resolve(sample)
+      renderer.dispose()
+      fetcher.mockRestore()
+    }
+  })
+
+  it.each(['replace', 'dispose'] as const)(
+    'rejects a first sample export after %s while its initial decode is pending',
+    async (change) => {
+      const sample = await fetch(SAMPLE_SCENE_PATH)
+      const photo = await logoFile()
+      const pending = Promise.withResolvers<Response>()
+      const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementationOnce(() => pending.promise)
+      const renderer = new PreviewRenderer(() => Promise.reject(new Error('no logos')))
+      try {
+        const exported = renderer.exportFull([], { format: 'image/png', quality: 1 })
+        const rejected = expect(exported).rejects.toThrow('has not finished loading')
+        if (change === 'replace') await renderer.setSubject(photo)
+        else renderer.dispose()
+        pending.resolve(sample)
+        await rejected
+        expect(renderer.isSubjectReady).toBe(change === 'replace')
+      } finally {
+        pending.resolve(sample)
+        renderer.dispose()
+        fetcher.mockRestore()
+      }
+    },
+  )
+
+  it('refuses to export the previous photo after the newly selected file fails to decode', async () => {
+    const renderer = new PreviewRenderer(() => Promise.reject(new Error('no logos')))
+    try {
+      await renderer.setSubject(await logoFile())
+      const valid = await renderer.exportFull(DEFAULT_TEXT_SPEC, {
+        format: 'image/png',
+        quality: 1,
+      })
+      expect(valid.type).toBe('image/png')
+      await expect(
+        renderer.setSubject(new File(['invalid image'], 'broken.png', { type: 'image/png' })),
+      ).rejects.toThrow()
+      await expect(
+        renderer.exportFull(DEFAULT_TEXT_SPEC, { format: 'image/png', quality: 1 }),
+      ).rejects.toThrow('has not finished loading')
+    } finally {
+      renderer.dispose()
+    }
+  })
   it('keeps the latest decoded subject when older file reads finish later', async () => {
     const originalDecode = globalThis.createImageBitmap.bind(globalThis)
     const first = new File(['first'], 'first.png', { type: 'image/png' })
@@ -166,6 +236,10 @@ describe('PreviewRenderer', () => {
     try {
       const oldRead = renderer.setSubject(first)
       const latestRead = renderer.setSubject(second)
+      expect(await renderer.render([])).toBeNull()
+      await expect(
+        renderer.exportFull(DEFAULT_TEXT_SPEC, { format: 'image/png', quality: 1 }),
+      ).rejects.toThrow('has not finished loading')
       fast.resolve(secondBitmap)
       await latestRead
       expect(renderer.sourceSize).toEqual({ width: 160, height: 80 })
@@ -379,6 +453,13 @@ describe('PreviewRenderer', () => {
         }
         ctx.fillStyle = '#4488cc'
         ctx.fillRect(0, 0, 2560, 1600)
+        // One-pixel detail would be blurred by a preview-sized source and changed
+        // by a lossy intermediate, even if its dimensions were later restored.
+        ctx.fillStyle = '#fd0185'
+        for (let y = 0; y < 32; y += 2) {
+          for (let x = 0; x < 32; x += 2) ctx.fillRect(x, y, 1, 1)
+        }
+        const originalDetail = ctx.getImageData(0, 0, 32, 32)
         await renderer.setSubject(
           new File([await big.convertToBlob({ type: 'image/png' })], 'big.png', {
             type: 'image/png',
@@ -406,13 +487,21 @@ describe('PreviewRenderer', () => {
         expect(await decodedSize(URL.createObjectURL(full))).toEqual({ width: 640, height: 400 })
 
         const untouched = await renderer.exportFull(DEFAULT_TEXT_SPEC, {
-          format: 'image/webp',
-          quality: 0.8,
+          format: 'image/png',
+          quality: 1,
         })
+        expect(untouched.type).toBe('image/png')
         expect(await decodedSize(URL.createObjectURL(untouched))).toEqual({
           width: 2560,
           height: 1600,
         })
+        const fullBitmap = await createImageBitmap(untouched)
+        const detail = new OffscreenCanvas(32, 32)
+        const detailContext = detail.getContext('2d')
+        if (detailContext === null) throw new Error('no detail context')
+        detailContext.drawImage(fullBitmap, 0, 0)
+        fullBitmap.close()
+        expect(detailContext.getImageData(0, 0, 32, 32).data).toEqual(originalDetail.data)
       } finally {
         renderer.dispose()
       }

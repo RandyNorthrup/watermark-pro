@@ -3,9 +3,10 @@ import type { ComponentProps } from 'react'
 import { cn } from '../lib/cn'
 
 export type ProviderLogoId =
-  'dropbox' | 'github' | 'google' | 'google-drive' | 'microsoft' | 'onedrive'
+  'dropbox' | 'github' | 'google' | 'google-drive' | 'microsoft' | 'onedrive' | 'paypal'
 
 const PROVIDER_LOGOS: Record<ProviderLogoId, string> = {
+  paypal: '/providers/paypal.svg',
   google: '/providers/google.svg',
   microsoft: '/providers/microsoft.svg',
   'google-drive': '/providers/google-drive.png',

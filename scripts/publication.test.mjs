@@ -210,6 +210,76 @@ test('private-value comparison covers common encodings without treating a source
     /Unsupported archive/,
   )
 })
+
+test('the named 15-character Dropbox app secret retains full exact private-value encodings', () => {
+  const secret = randomBytes(15).toString('hex').slice(0, 15)
+  const name = 'DROPBOX_APP_SECRET'
+  const patterns = configuredSecretPatterns([{ name, value: secret }])
+  for (const value of [
+    Buffer.from(secret),
+    Buffer.from(JSON.stringify(secret).slice(1, -1)),
+    Buffer.from(encodeURIComponent(secret)),
+    Buffer.from(Buffer.from(secret).toString('base64')),
+    Buffer.from(Buffer.from(secret).toString('hex')),
+    Buffer.from(secret, 'utf16le'),
+  ])
+    assert.deepEqual(findConfiguredSecrets(value, patterns), [name])
+  const partial = secret.slice(0, -1)
+  assert.deepEqual(findConfiguredSecrets(Buffer.from(partial), patterns), [])
+  assert.deepEqual(findConfiguredSecrets(Buffer.from(`${partial}!`), patterns), [])
+  assert.deepEqual(findConfiguredSecrets(Buffer.from('safe unrelated source'), patterns), [])
+})
+
+test('the Dropbox short-format admission never lowers the general minimum or accepts malformed short values', () => {
+  const secret = randomBytes(15).toString('hex').slice(0, 15)
+  for (const name of [
+    'BETTER_AUTH_SECRET',
+    'OTHER_SECRET',
+    'dropbox_app_secret',
+    'DROPBOX_APP_SECRET_COPY',
+  ])
+    assert.throws(() => configuredSecretPatterns([{ name, value: secret }]), /too short/)
+  for (const value of [
+    secret.slice(0, -1),
+    `${secret.slice(0, -1)}_`,
+    `${secret.slice(0, -1)} `,
+    `${secret.slice(0, -1)}\n`,
+    `${secret.slice(0, -1)}é`,
+    '',
+  ])
+    assert.throws(
+      () => configuredSecretPatterns([{ name: 'DROPBOX_APP_SECRET', value }]),
+      /too short/,
+    )
+  const standard = configuredSecretPatterns([{ name: 'OTHER_SECRET', value: `${secret}x` }])
+  assert.deepEqual(findConfiguredSecrets(Buffer.from(`${secret}x`), standard), ['OTHER_SECRET'])
+})
+
+test('a configured 15-character Dropbox app secret is private and a bare encoded leak blocks publication', async () => {
+  await fixture(async (root) => {
+    const privateCanary = randomBytes(15).toString('hex').slice(0, 15)
+    await writeFile(path.join(root, '.dev.vars'), `DROPBOX_APP_SECRET=${privateCanary}\n`)
+    const green = await auditPublication(root)
+    assert.equal(green.status, 'pass')
+    assert.ok(green.stats.configuredSecrets >= 1)
+    const filename = path.join(root, 'src', 'encoded-data.bin')
+    await writeFile(filename, Buffer.from(Buffer.from(privateCanary).toString('base64')))
+    const red = await auditPublication(root)
+    assert.equal(red.status, 'fail')
+    assert.ok(
+      red.findings.some(
+        (finding) =>
+          finding.check === 'configured-secret' &&
+          finding.path === 'working:src/encoded-data.bin' &&
+          finding.name === 'DROPBOX_APP_SECRET',
+      ),
+    )
+    assert.equal(JSON.stringify(red).includes(privateCanary), false)
+    await rm(filename)
+    const restored = await auditPublication(root)
+    assert.equal(restored.status, 'pass')
+  })
+})
 test('ZIP inspection checks real bytes, rejects traversal and CRC tampering, and enforces size and ratio limits', () => {
   const data = zip({ 'nested/example.browser.test.ts': 'export const value = true' })
   const extracted = inspectZip(data)
@@ -264,6 +334,32 @@ test('real candidate scan is green, red for a staged private value hidden by a c
     git(root, ['add', 'src/sample.browser.test.ts'])
     const restored = await auditPublication(root)
     assert.equal(restored.status, 'pass')
+  })
+})
+
+test('the registered public Dropbox app identifier is allowed but a same-format app secret is rejected', async () => {
+  await fixture(async (root) => {
+    const filename = path.join(root, 'wrangler.jsonc')
+    const publicConfiguration = { vars: { DROPBOX_APP_KEY: '97gncjw0zquwc91' } }
+    await writeFile(filename, JSON.stringify(publicConfiguration))
+    const publicScan = await auditPublication(root)
+    assert.equal(publicScan.status, 'pass')
+    // Distinct random hex characters ensure a realistic high-entropy 15-character
+    // test value. The alphabet suffix guarantees length without a flaky draw.
+    const characters = [...new Set(randomBytes(64).toString('hex') + '0123456789abcdef')]
+    const privateCanary = characters.slice(0, 15).join('')
+    await writeFile(
+      filename,
+      JSON.stringify({ vars: { ...publicConfiguration.vars, DROPBOX_APP_SECRET: privateCanary } }),
+    )
+    const credentialScan = await auditPublication(root)
+    assert.equal(credentialScan.status, 'fail')
+    assert.ok(
+      credentialScan.findings.some(
+        (finding) => finding.check === 'gitleaks' && finding.rule === 'dropbox-api-token',
+      ),
+    )
+    assert.equal(JSON.stringify(credentialScan).includes(privateCanary), false)
   })
 })
 test('real Gitleaks scans browser-test source and historical ZIP members after the unsafe current archive was removed', async () => {

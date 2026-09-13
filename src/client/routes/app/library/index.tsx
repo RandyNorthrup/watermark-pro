@@ -18,9 +18,12 @@ import { useTranslation } from 'react-i18next'
 
 import type { AssetDto } from '../../../../shared/api'
 import type { WatermarkDto } from '../../../../shared/api-watermark'
+import { folderSearchSchema } from '../../../../shared/client-search'
 import { LOGO_CONTENT_TYPES } from '../../../../shared/constants'
-import type { Shape, WatermarkSpec } from '../../../../shared/watermark'
+import type { WatermarkSpec } from '../../../../shared/watermark'
+import { FolderBrowser, MoveItemsDialog } from '../../../components/folders/folder-browser'
 import { ImportDialog } from '../../../components/presets/import-dialog'
+import { PresetTemplates } from '../../../components/presets/preset-templates'
 import { RecentWork } from '../../../components/recent-work/recent-work'
 import { Alert } from '../../../components/ui/alert'
 import { Badge } from '../../../components/ui/badge'
@@ -31,6 +34,7 @@ import { Spinner } from '../../../components/ui/spinner'
 import { useActiveOrganization } from '../../../lib/active-organization'
 import { downloadBlob } from '../../../lib/download'
 import { describeError } from '../../../lib/errors'
+import { movePresets } from '../../../lib/folders'
 import {
   assetFileUrl,
   assetsQueryOptions,
@@ -42,21 +46,15 @@ import { loadWorkspaceMedia } from '../../../lib/offline-media'
 import { buildPresetFile, type ExportLogo } from '../../../lib/preset-file'
 import { readActiveMemberRole } from '../../../lib/queries'
 import { canRole } from '../../../lib/roles'
+import { SHAPE_CATALOGUE } from '../../../shapes/catalogue'
 
 export const Route = createFileRoute('/app/library/')({
+  validateSearch: folderSearchSchema,
   loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: LibraryPage,
 })
 
 const KIND_ICONS = { text: Type, symbol: Stamp, shape: Shapes, image: Image, qr: QrCode } as const
-
-/** Catalogue keys for each shape; translated where a preset is described. */
-const SHAPE_LABELS = {
-  rectangle: 'library.shape.rectangle',
-  'rounded-rectangle': 'library.shape.roundedRectangle',
-  ellipse: 'library.shape.ellipse',
-  line: 'library.shape.line',
-} as const satisfies Record<Shape, string>
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
 
@@ -78,7 +76,7 @@ function describeSpec(t: TFunction, spec: WatermarkSpec): string {
         : t('library.describe.icon', { name: spec.symbol.name })
     }
     case 'shape': {
-      return t(SHAPE_LABELS[spec.shape])
+      return t(SHAPE_CATALOGUE[spec.shape].label)
     }
     case 'image': {
       return t('library.describe.logo')
@@ -165,6 +163,9 @@ function LibraryPage() {
   const { t } = useTranslation()
   const organization = useActiveOrganization()
   const membership = Route.useLoaderData()
+  const { folderId: selectedFolder } = Route.useSearch()
+  const folderId = selectedFolder ?? null
+  const navigate = Route.useNavigate()
   const organizationId = organization?.id ?? ''
   const queryClient = useQueryClient()
   const presets = useQuery({
@@ -188,7 +189,7 @@ function LibraryPage() {
     return <Alert tone="info">{t('library.orgRequired')}</Alert>
   }
   const canManage = canRole(membership?.role, { watermark: ['create'] })
-  const items = presets.data ?? []
+  const items = (presets.data ?? []).filter((preset) => preset.folderId === folderId)
 
   return (
     <div className="flex flex-col gap-6">
@@ -215,7 +216,7 @@ function LibraryPage() {
           {canManage ? (
             <Link
               to="/app/library/new"
-              search={{ kind: 'qr' }}
+              search={{ kind: 'qr', folderId: folderId ?? undefined }}
               className={buttonVariants({ variant: 'secondary' })}
             >
               <QrCode aria-hidden="true" className="size-4" />
@@ -226,6 +227,7 @@ function LibraryPage() {
             <ImportDialog
               organizationId={organization.id}
               existingNames={items.map((preset) => preset.name)}
+              folderId={folderId}
               trigger={
                 <Button type="button" variant="secondary">
                   <Upload aria-hidden="true" className="size-4" />
@@ -235,7 +237,11 @@ function LibraryPage() {
             />
           ) : null}
           {canManage ? (
-            <Link to="/app/library/new" className={buttonVariants({ variant: 'primary' })}>
+            <Link
+              to="/app/library/new"
+              search={{ folderId: folderId ?? undefined }}
+              className={buttonVariants({ variant: 'primary' })}
+            >
               <Plus aria-hidden="true" className="size-4" />
               {t('library.newPreset')}
             </Link>
@@ -248,6 +254,16 @@ function LibraryPage() {
         role={membership?.role}
         kind="preset"
       />
+      <FolderBrowser
+        key={organization.id}
+        organizationId={organization.id}
+        kind="preset"
+        folderId={folderId}
+        canManage={canManage}
+        onNavigate={async (next) => {
+          await navigate({ search: { folderId: next ?? undefined } })
+        }}
+      />
       {exportPresets.isError ? (
         <Alert tone="error" title={t('library.exportErrorTitle')}>
           {describeError(exportPresets.error)}
@@ -256,6 +272,8 @@ function LibraryPage() {
       <section aria-label={t('library.heading')}>
         <PresetList
           query={presets}
+          items={items}
+          folderId={folderId}
           organizationId={organization.id}
           canManage={canManage}
           onExport={(preset) => {
@@ -263,18 +281,39 @@ function LibraryPage() {
           }}
         />
       </section>
+      {canManage ? (
+        <Card>
+          <PresetTemplates
+            onChoose={(template) => {
+              void navigate({
+                to: '/app/library/new',
+                search: { template: template.id, folderId: folderId ?? undefined },
+              })
+            }}
+          />
+        </Card>
+      ) : null}
     </div>
   )
 }
 
 interface PresetListProps {
+  items: WatermarkDto[]
+  folderId: string | null
   query: ReturnType<typeof useQuery<WatermarkDto[]>>
   organizationId: string
   canManage: boolean
   onExport: (preset: WatermarkDto) => void
 }
 
-function PresetList({ query, organizationId, canManage, onExport }: PresetListProps) {
+function PresetList({
+  query,
+  items,
+  folderId,
+  organizationId,
+  canManage,
+  onExport,
+}: PresetListProps) {
   const { t } = useTranslation()
   const [qrOnly, setQrOnly] = useState(false)
   if (query.isPending) {
@@ -287,12 +326,16 @@ function PresetList({ query, organizationId, canManage, onExport }: PresetListPr
       </Alert>
     )
   }
-  if (query.data.length === 0) {
+  if (items.length === 0) {
     return (
       <Card className="flex flex-col items-start gap-3">
         <p className="text-sm text-ink-muted">{t('library.empty')}</p>
         {canManage ? (
-          <Link to="/app/library/new" className={buttonVariants({ variant: 'secondary' })}>
+          <Link
+            to="/app/library/new"
+            search={{ folderId: folderId ?? undefined }}
+            className={buttonVariants({ variant: 'secondary' })}
+          >
             {t('library.createFirst')}
           </Link>
         ) : null}
@@ -312,11 +355,11 @@ function PresetList({ query, organizationId, canManage, onExport }: PresetListPr
         <QrCode aria-hidden="true" className="size-4" />
         {t('library.qrOnly')}
       </Button>
-      {qrOnly && query.data.every((preset) => preset.spec.kind !== 'qr') ? (
+      {qrOnly && items.every((preset) => preset.spec.kind !== 'qr') ? (
         <p className="text-sm text-ink-muted">{t('library.noQr')}</p>
       ) : null}
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {query.data
+        {items
           .filter((preset) => !qrOnly || preset.spec.kind === 'qr')
           .map((preset) => (
             <PresetCard
@@ -394,6 +437,22 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
             >
               <PencilRuler aria-hidden="true" className="size-4" />
             </Link>
+            {canManage ? (
+              <MoveItemsDialog
+                organizationId={organizationId}
+                kind="preset"
+                count={1}
+                initialFolderId={preset.folderId}
+                isIconOnly
+                label={t('folders.moveNamed', { name: preset.name })}
+                onMove={async (destination) => {
+                  await movePresets(organizationId, [preset], destination)
+                  await queryClient.invalidateQueries({
+                    queryKey: ['organization', organizationId],
+                  })
+                }}
+              />
+            ) : null}
             {canManage ? (
               <Button
                 type="button"

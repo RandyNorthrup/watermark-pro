@@ -3,11 +3,13 @@ import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FILTER_BY_ID, IDENTITY_ADJUSTMENTS } from '../../../shared/adjustments'
+import type { FileSystemEntryLike } from '../../bulk/folders'
 import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
 import { takeLaunchFiles } from '../../lib/launch-consumer'
 import { clearLaunchFiles, receiveLaunchFiles } from '../../lib/launch-files'
 import { watermarksQueryOptions } from '../../lib/library'
 import { setOfflineUser } from '../../lib/offline-context'
+import { canShareFiles, shareFile } from '../../lib/share-file'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
@@ -18,16 +20,24 @@ import {
   runs,
 } from '../../test-support/fake-bulk-runtime'
 import { cloudUploadBatches, fakeCloudSaver } from '../../test-support/fake-cloud-save'
+import { chooseCloudSaveDestination } from '../../test-support/fake-cloud-selection'
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import { renderApp } from '../../test-support/render-app'
 
-vi.mock('../../lib/imports/google-drive-save', () => ({ saveToGoogleDrive: vi.fn() }))
-const googleSave = vi.mocked(saveToGoogleDrive)
+vi.mock(
+  '../../lib/imports/google-drive-save',
+  () => import('../../test-support/fake-google-drive-save'),
+)
+vi.mock(
+  '../../components/import/cloud-browser-dialog',
+  () => import('../../test-support/fake-cloud-browser-module'),
+)
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../bulk/runtime', () => import('../../test-support/fake-bulk-runtime'))
 vi.mock('../../lib/thumbnail', () => import('../../test-support/fake-thumbnail'))
+vi.mock('../../lib/share-file', () => ({ canShareFiles: vi.fn(), shareFile: vi.fn() }))
 vi.mock('../../lib/download', () => import('../../test-support/fake-download'))
 const zipEntries = vi.fn((entries: { name: string }[]) =>
   Promise.resolve(
@@ -39,6 +49,7 @@ vi.mock('../../bulk/zip', () => ({
 }))
 
 const client = fakeAuth
+const googleSave = vi.mocked(saveToGoogleDrive)
 
 function photo(name: string, size = 2048): File {
   return new File([new Uint8Array(size)], name, { type: 'image/jpeg' })
@@ -59,8 +70,8 @@ async function addTwoPhotoBatch(): Promise<TestUser> {
   seedOwnerWorkspace(client())
   installLibraryApi({ watermarks: [makeWatermark()] })
   renderApp('/app/bulk')
-  await screen.findByLabelText('Add photos')
-  await user.upload(screen.getByLabelText('Add photos'), [photo('one.jpg'), photo('two.jpg')])
+  await screen.findByLabelText('Add files')
+  await user.upload(screen.getByLabelText('Add files'), [photo('one.jpg'), photo('two.jpg')])
   await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
   return user
 }
@@ -71,8 +82,8 @@ async function runCloudBatch(): Promise<TestUser> {
   seedOwnerWorkspace(client())
   installLibraryApi({ watermarks: [makeWatermark()], publicConfig: ALL_CLOUD_CONFIG })
   renderApp('/app/bulk')
-  await screen.findByLabelText('Add photos')
-  await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg'), photo('b.jpg')])
+  await screen.findByLabelText('Add files')
+  await user.upload(screen.getByLabelText('Add files'), [photo('a.jpg'), photo('b.jpg')])
   await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
   await user.click(screen.getByRole('button', { name: 'Start' }))
   await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
@@ -87,6 +98,8 @@ beforeEach(() => {
   downloads.mockClear()
   zipEntries.mockClear()
   googleSave.mockReset()
+  vi.mocked(canShareFiles).mockReset().mockReturnValue(false)
+  vi.mocked(shareFile).mockReset().mockResolvedValue('shared')
 })
 
 afterEach(() => {
@@ -95,6 +108,143 @@ afterEach(() => {
 })
 
 describe('bulk page', () => {
+  it('keeps mixed results separate from image-only Gallery saves and honors the chosen folder', async () => {
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ watermarks: [makeWatermark()] })
+    const user = userEvent.setup()
+    renderApp('/app/bulk')
+    const input = await screen.findByLabelText('Add files')
+    await user.upload(input, [
+      photo('image.jpg'),
+      new File(['pdf'], 'report.pdf', { type: 'application/pdf' }),
+      new File(['video'], 'clip.mp4', { type: 'video/mp4' }),
+    ])
+    const output = screen.getByRole('region', { name: 'Video Output' })
+    await user.click(within(output).getByRole('combobox', { name: 'Quality' }))
+    await user.click(screen.getByRole('option', { name: 'Low' }))
+    await user.click(within(output).getByRole('combobox', { name: 'Resolution' }))
+    await user.click(screen.getByRole('option', { name: 'Fit 720p' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await screen.findByRole('button', { name: 'Download report-watermarked.pdf' })
+    expect(
+      screen.getByRole('button', { name: 'Download clip-watermarked.mp4' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Adjust report.pdf' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Adjust clip.mp4' })).not.toBeInTheDocument()
+    expect(
+      runs.every(
+        (run) => run.settings.video?.quality === 'low' && run.settings.video.resolution === '720p',
+      ),
+    ).toBe(true)
+    expect(screen.getByText(/Gallery saves include images only/)).toBeInTheDocument()
+    const saveActions = screen.getByRole('button', { name: 'Save 1 to gallery' }).parentElement
+    if (saveActions === null) throw new Error('Gallery save actions missing')
+    await user.click(within(saveActions).getByRole('button', { name: 'Destination Folder' }))
+    await user.click(screen.getByRole('button', { name: 'New Folder' }))
+    const folderDialog = screen.getByRole('dialog', { name: 'New Folder' })
+    await user.type(
+      within(folderDialog).getByRole('textbox', { name: 'Folder Name' }),
+      'Deliveries',
+    )
+    await user.click(within(folderDialog).getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(api.folders).toHaveLength(1))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: 'Save 1 to gallery' }))
+    await waitFor(() => expect(api.gallery.photos).toHaveLength(1))
+    expect(api.gallery.photos[0]).toMatchObject({
+      name: 'image-watermarked.png',
+      folderId: api.folders[0]?.id,
+    })
+    await user.click(screen.getByRole('button', { name: 'Download report (CSV)' }))
+    const report = downloads.mock.calls.at(-1)?.[0]
+    if (!(report instanceof Blob)) throw new Error('Expected CSV report')
+    expect(await report.text()).toContain('report.pdf')
+  })
+
+  it('accepts directory drops and ignores empty entry handles without losing the source path', async () => {
+    seedOwnerWorkspace(client())
+    installLibraryApi({ watermarks: [makeWatermark()] })
+    renderApp('/app/bulk')
+    const input = await screen.findByLabelText('Add files')
+    const target = input.parentElement
+    if (target === null) throw new Error('Drop target missing')
+    let isServed = false
+    const file: FileSystemEntryLike = {
+      isDirectory: false,
+      isFile: true,
+      name: 'hero.jpg',
+      fullPath: '/shoot/hero.jpg',
+      file: (success) => success(photo('hero.jpg')),
+    }
+    const directory: FileSystemEntryLike = {
+      isDirectory: true,
+      isFile: false,
+      name: 'shoot',
+      fullPath: '/shoot',
+      createReader: () => ({
+        readEntries: (success) => {
+          success(isServed ? [] : [file])
+          isServed = true
+        },
+      }),
+    }
+    fireEvent.dragEnter(target)
+    fireEvent.dragLeave(target)
+    fireEvent.drop(target, {
+      dataTransfer: {
+        files: [],
+        items: [
+          { webkitGetAsEntry: () => null },
+          { webkitGetAsEntry: vi.fn() },
+          { webkitGetAsEntry: () => directory },
+        ],
+      },
+    })
+    expect(await screen.findByText('shoot/hero.jpg')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove shoot/hero.jpg' })).toBeInTheDocument()
+    fireEvent.change(input, { target: { files: null } })
+    fireEvent.change(screen.getByLabelText('Add a folder'), { target: { files: null } })
+    expect(screen.getByRole('heading', { name: '1 file' })).toBeInTheDocument()
+  })
+
+  it('reports sharing failures while keeping the finished photo downloadable', async () => {
+    const user = await addTwoPhotoBatch()
+    vi.mocked(canShareFiles).mockReturnValue(true)
+    vi.mocked(shareFile).mockRejectedValueOnce(new Error('Share canceled by target'))
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    const share = await screen.findByRole('button', { name: 'Share one-watermarked.png' })
+    await user.click(share)
+    expect(await screen.findByText('Share canceled by target')).toBeInTheDocument()
+    await user.click(share)
+    expect(shareFile).toHaveBeenCalledWith(expect.any(Blob), 'one-watermarked.png')
+    await user.click(screen.getByRole('button', { name: 'Download one-watermarked.png' }))
+    expect(downloads).toHaveBeenCalledWith(expect.any(Blob), 'one-watermarked.png')
+  })
+
+  it('refuses Gallery upload when an image worker result lacks dimensions', async () => {
+    seedOwnerWorkspace(client())
+    const api = installLibraryApi({ watermarks: [makeWatermark()] })
+    const user = userEvent.setup()
+    renderApp('/app/bulk')
+    await user.upload(await screen.findByLabelText('Add files'), [
+      photo('dimensionless-image.jpg'),
+      photo('fail-image.jpg'),
+    ])
+    await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await screen.findByRole('button', { name: 'Save 1 to gallery' })
+    await user.click(screen.getByRole('button', { name: 'Save 1 to gallery' }))
+    expect(await screen.findByText(/1 could not be saved/)).toBeInTheDocument()
+    expect(api.gallery.photos).toEqual([])
+    await user.click(screen.getByRole('button', { name: 'Download report (CSV)' }))
+    const report = downloads.mock.calls.at(-1)?.[0]
+    if (!(report instanceof Blob)) throw new Error('Expected CSV report')
+    const text = await report.text()
+    expect(text).toContain('fail-image.jpg')
+    expect(text).toContain('failed')
+  })
+
   it('enables directory selection when the input mounts after the library gate opens', async () => {
     seedOwnerWorkspace(client())
     const library = installLibraryApi()
@@ -106,7 +256,7 @@ describe('bulk page', () => {
       queryClient.invalidateQueries({ queryKey: watermarksQueryOptions('org-1').queryKey }),
     )
     expect(await screen.findByLabelText('Add a folder')).toHaveAttribute('webkitdirectory', '')
-    expect(screen.getByLabelText('Add photos')).not.toHaveAttribute('webkitdirectory')
+    expect(screen.getByLabelText('Add files')).not.toHaveAttribute('webkitdirectory')
   })
 
   it('adopts startup and later OS batches once while preserving editor-targeted launches', async () => {
@@ -114,9 +264,9 @@ describe('bulk page', () => {
     installLibraryApi({ watermarks: [makeWatermark()] })
     await openLaunch(['startup-one.jpg', 'startup-two.jpg'])
     renderApp('/app/bulk')
-    expect(await screen.findByRole('heading', { level: 2, name: '2 photos' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 2, name: '2 files' })).toBeInTheDocument()
     await act(() => openLaunch(['later-one.jpg', 'later-two.jpg']))
-    expect(await screen.findByRole('heading', { level: 2, name: '4 photos' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 2, name: '4 files' })).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Remove startup-one.jpg' })).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Remove later-two.jpg' })).toBeInTheDocument()
     expect(takeLaunchFiles('/app/bulk')).toEqual([])
@@ -132,20 +282,22 @@ describe('bulk page', () => {
     installLibraryApi({ watermarks: [makeWatermark(), second] })
     renderApp('/app/bulk')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Bulk watermarking')
-    expect(await screen.findByText(/using 2 workers/)).toBeInTheDocument()
+    expect(
+      await screen.findByText(/Images, PDFs, and videos are processed on your device/),
+    ).toBeInTheDocument()
 
-    await user.upload(screen.getByLabelText('Add photos'), [
+    await user.upload(screen.getByLabelText('Add files'), [
       photo('one.jpg'),
       photo('two.jpg', 3 * 1024 * 1024),
       photo('fail-three.jpg'),
       photo('one.jpg'),
     ])
-    expect(screen.getByRole('heading', { level: 2, name: '3 photos' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: '3 files' })).toBeInTheDocument()
     expect(screen.getByText('3.0 MB')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Start' })).toBeDisabled()
 
     await user.click(screen.getByRole('button', { name: 'Remove two.jpg' }))
-    expect(screen.getByRole('heading', { level: 2, name: '2 photos' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: '2 files' })).toBeInTheDocument()
 
     // Ticked in reverse library order: the batch applies presets in the order ticked.
     await user.click(screen.getByRole('checkbox', { name: 'Corner glyph' }))
@@ -158,13 +310,14 @@ describe('bulk page', () => {
     await waitFor(() => expect(screen.getByText(/2 of 2 finished, 1 failed/)).toBeInTheDocument())
     expect(runs.map((run) => run.name)).toEqual(['one.jpg', 'fail-three.jpg'])
     expect(runs[0]?.settings).toEqual({
-      output: { format: 'image/jpeg', quality: 0.9, metadata: 'strip' },
+      output: { format: 'image/png', quality: 1, metadata: 'strip' },
       fitLongestSide: 2048,
       orientation: { turns: 0, flipX: false, flipY: false },
       adjust: IDENTITY_ADJUSTMENTS,
       border: null,
       namePattern: '{name}-watermarked',
       presetName: expect.any(String),
+      video: { quality: 'high', resolution: 'original' },
     })
     expect(runs[0]?.specs).toEqual([second.spec, makeWatermark().spec])
     expect(screen.getByRole('alert')).toHaveTextContent('cannot decode fail-three.jpg')
@@ -173,8 +326,8 @@ describe('bulk page', () => {
       '2',
     )
 
-    await user.click(screen.getByRole('button', { name: 'Download one-watermarked.jpg' }))
-    expect(downloads).toHaveBeenLastCalledWith(expect.any(Blob), 'one-watermarked.jpg')
+    await user.click(screen.getByRole('button', { name: 'Download one-watermarked.png' }))
+    expect(downloads).toHaveBeenLastCalledWith(expect.any(Blob), 'one-watermarked.png')
 
     await user.click(screen.getByRole('button', { name: 'Retry 1' }))
     await waitFor(() => expect(screen.getByText(/2 of 2 finished, 1 failed/)).toBeInTheDocument())
@@ -183,9 +336,9 @@ describe('bulk page', () => {
     await user.click(screen.getByRole('button', { name: 'Download 1 as ZIP' }))
     await waitFor(() => expect(downloads).toHaveBeenCalledTimes(2))
     expect(zipEntries.mock.calls[0]?.[0].map((entry) => entry.name)).toEqual([
-      'one-watermarked.jpg',
+      'one-watermarked.png',
     ])
-    expect(downloads.mock.calls[1]?.[1]).toBe('watermarked-1-photos.zip')
+    expect(downloads.mock.calls[1]?.[1]).toBe('watermarked-1-files.zip')
   })
 
   it('cancels a running batch, keeps finished results, and reports ZIP failures', async () => {
@@ -193,8 +346,8 @@ describe('bulk page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     const { unmount } = renderApp('/app/bulk')
-    await screen.findByLabelText('Add photos')
-    await user.upload(screen.getByLabelText('Add photos'), [
+    await screen.findByLabelText('Add files')
+    await user.upload(screen.getByLabelText('Add files'), [
       photo('quick.png'),
       photo('slow-a.png'),
       photo('slow-b.png'),
@@ -211,11 +364,11 @@ describe('bulk page', () => {
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() =>
       expect(
-        screen.getByText(/1 of 4 finished, 3 cancelled|4 of 4 finished, 3 cancelled/),
+        screen.getByText(/1 of 4 finished, 3 canceled|4 of 4 finished, 3 canceled/),
       ).toBeInTheDocument(),
     )
-    const list = screen.getByRole('list', { name: 'Photos in this batch' })
-    expect(within(list).getAllByText('Cancelled')).toHaveLength(3)
+    const list = screen.getByRole('list', { name: 'Files In This Batch' })
+    expect(within(list).getAllByText('Canceled')).toHaveLength(3)
     expect(within(list).getByText('Done')).toBeInTheDocument()
 
     zipEntries.mockRejectedValueOnce(new Error('archive too large'))
@@ -230,7 +383,7 @@ describe('bulk page', () => {
     await waitFor(() => expect(screen.getByText(/4 of 4 finished in/)).toBeInTheDocument())
 
     await user.click(screen.getByRole('button', { name: 'Clear list' }))
-    expect(screen.queryByRole('list', { name: 'Photos in this batch' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('list', { name: 'Files In This Batch' })).not.toBeInTheDocument()
     unmount()
     expect(disposed.count).toBe(1)
   })
@@ -240,8 +393,8 @@ describe('bulk page', () => {
     seedOwnerWorkspace(client())
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/bulk')
-    await screen.findByLabelText('Add photos')
-    await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg'), photo('b.jpg')])
+    await screen.findByLabelText('Add files')
+    await user.upload(screen.getByLabelText('Add files'), [photo('a.jpg'), photo('b.jpg')])
     await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
     await user.click(screen.getByRole('button', { name: 'Start' }))
     await waitFor(() => expect(screen.getByText(/2 of 2 finished in/)).toBeInTheDocument())
@@ -249,8 +402,8 @@ describe('bulk page', () => {
     await user.click(screen.getByRole('button', { name: 'Save 2 to gallery' }))
     expect(await screen.findByText(/All saved to the/)).toBeInTheDocument()
     expect(api.gallery.photos.map((stored) => stored.name)).toEqual([
-      'a-watermarked.jpg',
-      'b-watermarked.jpg',
+      'a-watermarked.png',
+      'b-watermarked.png',
     ])
     expect(api.gallery.photos[0]?.presetId).toBe('wm-1')
 
@@ -265,17 +418,17 @@ describe('bulk page', () => {
     googleSave.mockImplementation(fakeCloudSaver('google'))
     const user = await runCloudBatch()
 
-    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await chooseCloudSaveDestination(user, 'Google Drive')
     await waitFor(() => expect(googleSave).toHaveBeenCalledTimes(1))
     expect(cloudUploadBatches.at(-1)).toHaveLength(2)
-    expect(await screen.findByText(/to your Google Drive .Lumafoil. folder/)).toBeInTheDocument()
+    expect(await screen.findByText('Saved 2 files to Google Drive.')).toBeInTheDocument()
   })
 
   it('reports a cloud save failure', async () => {
     googleSave.mockRejectedValue(new Error('Drive is full'))
     const user = await runCloudBatch()
 
-    await user.click(screen.getByRole('button', { name: 'Save to Google Drive' }))
+    await chooseCloudSaveDestination(user, 'Google Drive')
     expect(await screen.findByText('Drive is full')).toBeInTheDocument()
   })
 
@@ -290,7 +443,7 @@ describe('bulk page', () => {
 
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/bulk')
-    const input = await screen.findByLabelText('Add photos')
+    const input = await screen.findByLabelText('Add files')
     const dropZone = input.parentElement
     expect(dropZone).not.toBeNull()
     fireEvent.drop(dropZone!, {
@@ -302,7 +455,7 @@ describe('bulk page', () => {
       },
     })
     expect(await screen.findByText('dropped.jpg')).toBeInTheDocument()
-    expect(screen.getByText(/1 file skipped: not images/)).toBeInTheDocument()
+    expect(screen.getByText(/1 file skipped: unsupported format/)).toBeInTheDocument()
   })
 
   it('applies a batch orientation and filter to every photo', async () => {
@@ -310,8 +463,8 @@ describe('bulk page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/bulk')
-    await screen.findByLabelText('Add photos')
-    await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg'), photo('b.jpg')])
+    await screen.findByLabelText('Add files')
+    await user.upload(screen.getByLabelText('Add files'), [photo('a.jpg'), photo('b.jpg')])
     await user.click(screen.getByRole('checkbox', { name: 'Studio signature' }))
 
     await user.click(screen.getByText('Photo adjustments'))
@@ -333,9 +486,9 @@ describe('bulk page', () => {
     await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
 
     expect(runs[0]?.settings.namePattern).toBe('{index}-{name}')
-    expect(screen.getByRole('button', { name: 'Download 1-one.jpg' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Download 1-one.png' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /Download report/ }))
+    await user.click(screen.getByRole('button', { name: 'Download report (CSV)' }))
     expect(downloads).toHaveBeenLastCalledWith(expect.any(Blob), 'report.csv')
   })
 
@@ -344,15 +497,15 @@ describe('bulk page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/bulk')
-    await screen.findByLabelText('Add photos')
-    await user.upload(screen.getByLabelText('Add photos'), [photo('a.jpg')])
+    await screen.findByLabelText('Add files')
+    await user.upload(screen.getByLabelText('Add files'), [photo('a.jpg')])
     fireEvent.change(screen.getByLabelText('File names'), { target: { value: ' '.repeat(3) } })
     expect(screen.getByText(/must produce a name/)).toBeInTheDocument()
     expect(screen.getByLabelText('File names')).toHaveAttribute('aria-invalid', 'true')
     expect(screen.getByLabelText('File names')).toHaveAccessibleDescription(/must produce a name/)
     fireEvent.change(screen.getByLabelText('File names'), { target: { value: '{index}-{name}' } })
     expect(screen.getByLabelText('File names')).toHaveAttribute('aria-invalid', 'false')
-    expect(screen.getByLabelText('File names')).toHaveAccessibleDescription(/Example: 1-a.jpg/)
+    expect(screen.getByLabelText('File names')).toHaveAccessibleDescription(/Example: 1-a.png/)
   })
 
   it('pauses a running batch and resumes it', async () => {
@@ -360,8 +513,8 @@ describe('bulk page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/bulk')
-    await screen.findByLabelText('Add photos')
-    await user.upload(screen.getByLabelText('Add photos'), [
+    await screen.findByLabelText('Add files')
+    await user.upload(screen.getByLabelText('Add files'), [
       photo('slow-a.png'),
       photo('slow-b.png'),
       photo('slow-c.png'),
@@ -390,7 +543,7 @@ describe('bulk page', () => {
     expect(runs.at(-1)?.override).not.toBeNull()
     expect(screen.getByText('Custom')).toBeInTheDocument()
     await waitFor(() => expect(screen.getByText(/2 of 2 finished/)).toBeInTheDocument())
-    await user.click(screen.getByRole('button', { name: /Download report/ }))
+    await user.click(screen.getByRole('button', { name: 'Download report (CSV)' }))
     const report = downloads.mock.calls.at(-1)
     if (report === undefined) throw new Error('The report was not downloaded.')
     expect(report[1]).toBe('report.csv')
@@ -440,12 +593,12 @@ describe('bulk page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/bulk')
-    await screen.findByLabelText('Add photos')
+    await screen.findByLabelText('Add files')
     await user.upload(
-      screen.getByLabelText('Add photos'),
+      screen.getByLabelText('Add files'),
       Array.from({ length: 61 }, (_, index) => photo(`p${String(index)}.jpg`)),
     )
-    const list = screen.getByRole('list', { name: 'Photos in this batch' })
+    const list = screen.getByRole('list', { name: 'Files In This Batch' })
     expect(within(list).getAllByRole('listitem')).toHaveLength(60)
     await user.click(screen.getByRole('button', { name: /Show all 61 photos/ }))
     expect(within(list).getAllByRole('listitem')).toHaveLength(61)

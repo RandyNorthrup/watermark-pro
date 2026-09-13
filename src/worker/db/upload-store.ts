@@ -10,6 +10,8 @@ import type { AuditEntry } from '../audit'
 import type { StorageUsage } from '../stores'
 import { UPLOAD_POLICY, type UploadReservation, type UploadStore } from '../upload-store'
 import type { Database } from './client'
+import { folderDestination, workspaceWriter } from './folder-guards'
+import { apiErrors } from '../errors'
 import { asset, organization, photo, uploadReservation } from './schema'
 
 function ticket(row: typeof uploadReservation.$inferSelect): UploadReservation {
@@ -128,7 +130,12 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
       return receipt.length > 0 ? 'deleted' : 'quota'
     },
     async commit(input, record, audit) {
-      const ready = sql`EXISTS (SELECT 1 FROM upload_reservation WHERE id = ${input.id} AND organization_id = ${input.organizationId} AND status = 'pending' AND expires_at > ${Date.now()})`
+      const destination =
+        record.kind === 'photo'
+          ? folderDestination(input.organizationId, 'photo', record.value.folderId ?? null)
+          : sql`1`
+      const permission = workspaceWriter(input.organizationId, input.userId)
+      const ready = sql`EXISTS (SELECT 1 FROM upload_reservation WHERE id = ${input.id} AND organization_id = ${input.organizationId} AND status = 'pending' AND expires_at > ${Date.now()}) AND ${permission} AND ${destination}`
       const value = record.value
       if (
         value.id !== input.uploadId ||
@@ -144,8 +151,8 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
         if (item.thumbnailKey !== input.keys[1])
           throw new Error('Thumbnail does not match its reservation')
         insert = sql`
-          INSERT INTO photo (id, organization_id, name, key, thumbnail_key, thumbnail_size, content_type, size, width, height, preset_id, preset_name, created_by, created_at)
-                    SELECT ${item.id}, ${item.organizationId}, ${item.name}, ${item.key}, ${item.thumbnailKey}, ${item.thumbnailSize ?? 0}, ${item.contentType}, ${item.size}, ${item.width}, ${item.height}, ${item.presetId}, ${item.presetName}, ${item.createdBy}, ${Date.now()} WHERE ${ready} RETURNING id
+          INSERT INTO photo (id, organization_id, name, key, thumbnail_key, thumbnail_size, content_type, size, width, height, preset_id, preset_name, created_by, created_at, folder_id, folder_revision)
+                    SELECT ${item.id}, ${item.organizationId}, ${item.name}, ${item.key}, ${item.thumbnailKey}, ${item.thumbnailSize ?? 0}, ${item.contentType}, ${item.size}, ${item.width}, ${item.height}, ${item.presetId}, ${item.presetName}, ${item.createdBy}, ${Date.now()}, ${item.folderId ?? null}, 0 WHERE ${ready} RETURNING id
         `
       } else {
         insert = sql`
@@ -159,6 +166,12 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
         sql`UPDATE upload_reservation SET status = 'committed' WHERE id = ${input.id} AND ${ready}`,
       ])
       if (created === undefined) throw new Error('Upload commit returned no result')
+      if (created.results.length === 0) {
+        const writer = await db.all(sql`SELECT 1 WHERE ${permission}`)
+        if (writer.length === 0) throw apiErrors.forbidden()
+        const target = await db.all(sql`SELECT 1 WHERE ${destination}`)
+        if (target.length === 0) throw apiErrors.conflict()
+      }
       return created.results.length > 0
     },
     async abandon(id) {

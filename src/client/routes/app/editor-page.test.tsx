@@ -8,10 +8,12 @@ import { saveToGoogleDrive } from '../../lib/imports/google-drive-save'
 import { takeLaunchFiles } from '../../lib/launch-consumer'
 import { clearLaunchFiles, receiveLaunchFiles } from '../../lib/launch-files'
 import { setOfflineUser } from '../../lib/offline-context'
+import * as sharing from '../../lib/share-file'
 import { ALL_CLOUD_CONFIG } from '../../test-support/cloud-config'
 import { seedOwnerWorkspace, seedViewerWorkspace } from '../../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { cloudUploadBatches, fakeCloudSaver } from '../../test-support/fake-cloud-save'
+import { chooseCloudSaveDestination } from '../../test-support/fake-cloud-selection'
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import {
@@ -21,12 +23,19 @@ import {
   renderedTransforms,
   resetFakePreview,
   previewSubjects,
+  PreviewRenderer,
 } from '../../test-support/fake-preview'
 import { mockElementBounds } from '../../test-support/mock-element-bounds'
 import { renderApp } from '../../test-support/render-app'
 
-vi.mock('../../lib/imports/google-drive-save', () => ({ saveToGoogleDrive: vi.fn() }))
-const googleSave = vi.mocked(saveToGoogleDrive)
+vi.mock(
+  '../../lib/imports/google-drive-save',
+  () => import('../../test-support/fake-google-drive-save'),
+)
+vi.mock(
+  '../../components/import/cloud-browser-dialog',
+  () => import('../../test-support/fake-cloud-browser-module'),
+)
 
 vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-module'))
 vi.mock('../../lib/preview', () => import('../../test-support/fake-preview'))
@@ -40,6 +49,7 @@ vi.mock('../../editor/session', () => ({
 }))
 
 const client = fakeAuth
+const googleSave = vi.mocked(saveToGoogleDrive)
 
 function lastSpec() {
   return renderedSpecs.at(-1)
@@ -49,6 +59,13 @@ function lastSpec() {
 async function presetSelect(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('tab', { name: 'Presets' }))
   return screen.getByRole('combobox', { name: /^(Preset|Add another preset)$/ })
+}
+
+/** Confirms the proposed name through the actual inline preset dialog. */
+async function saveInlinePreset(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: 'Save' }))
+  const dialog = await screen.findByRole('dialog', { name: 'Save preset' })
+  await user.click(within(dialog).getByRole('button', { name: 'Save' }))
 }
 
 /** Opens the editor with the first preset and switches to a square crop. */
@@ -71,7 +88,7 @@ async function openExportCloudSave(): Promise<{ user: ReturnType<typeof userEven
   await user.click(await screen.findByRole('tab', { name: 'Export' }))
   const saveButton = await screen.findByRole('button', { name: 'Save to Google Drive' })
   await waitFor(() => expect(saveButton).toBeEnabled())
-  await user.click(saveButton)
+  await chooseCloudSaveDestination(user, 'Google Drive')
   return { user }
 }
 
@@ -85,6 +102,66 @@ beforeEach(() => {
   Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:unused'), revokeObjectURL: vi.fn() })
   // jsdom has no layout; give the preview image a size so the overlays render.
   mockElementBounds()
+})
+
+it('exports the visible unsaved watermark losslessly without creating a preset', async () => {
+  const user = userEvent.setup()
+  seedOwnerWorkspace(client())
+  const api = installLibraryApi()
+  renderApp('/app/editor')
+  await user.clear(await screen.findByRole('textbox', { name: 'Text' }))
+  await user.click(screen.getByRole('tab', { name: 'Export' }))
+  expect(screen.getByRole('button', { name: 'Download' })).toBeDisabled()
+  await user.click(screen.getByRole('tab', { name: 'Watermark' }))
+  await user.type(screen.getByRole('textbox', { name: 'Text' }), 'Unsaved Signature')
+  await user.click(screen.getByRole('tab', { name: 'Export' }))
+  await user.click(screen.getByRole('button', { name: 'Download' }))
+  expect(exports.at(-1)).toMatchObject({
+    specs: [{ kind: 'text', text: 'Unsaved Signature' }],
+    output: { format: 'image/png', quality: 1 },
+  })
+  expect(api.watermarks).toHaveLength(0)
+  expect(screen.queryByRole('dialog', { name: 'Save preset' })).not.toBeInTheDocument()
+})
+
+it('disables every export destination during photo metadata and its first frame, then exports the ready photo', async () => {
+  const user = userEvent.setup()
+  vi.spyOn(sharing, 'canShareFiles').mockReturnValue(true)
+  seedOwnerWorkspace(client())
+  installLibraryApi({ watermarks: [makeWatermark()] })
+  renderApp('/app/editor?preset=wm-1')
+  await user.click(await screen.findByRole('tab', { name: 'Export' }))
+  const download = screen.getByRole('button', { name: 'Download' })
+  await waitFor(() => expect(download).toBeEnabled())
+  const size = Promise.withResolvers<{ width: number; height: number }>()
+  vi.spyOn(imageSize, 'readImageSize').mockImplementationOnce(() => size.promise)
+  const decode = Promise.withResolvers<undefined>()
+  const render = PreviewRenderer.prototype.render.bind(PreviewRenderer.prototype)
+  const subject = vi
+    .spyOn(PreviewRenderer.prototype, 'render')
+    .mockImplementationOnce(async (input, options) => {
+      await decode.promise
+      return await render(input, options)
+    })
+  await user.upload(
+    screen.getByLabelText('Open a photo'),
+    new File(['image'], 'loading.png', { type: 'image/png' }),
+  )
+  for (const name of ['Download', 'Share', 'Save to gallery'])
+    expect(screen.getByRole('button', { name })).toBeDisabled()
+  await act(async () => {
+    size.resolve({ width: 100, height: 200 })
+    await size.promise
+  })
+  await waitFor(() => expect(subject).toHaveBeenCalled())
+  expect(download).toBeDisabled()
+  await act(async () => {
+    decode.resolve(undefined)
+    await decode.promise
+  })
+  await waitFor(() => expect(download).toBeEnabled())
+  await user.click(download)
+  expect(downloads).toHaveBeenCalledWith(expect.any(Blob), 'loading-watermarked.png')
 })
 
 afterEach(() => {
@@ -121,7 +198,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor')
-    await screen.findByRole('heading', { level: 1, name: 'Editor' })
+    await screen.findByRole('heading', { level: 1, name: 'Image' })
     const files = ['bulk-one.png', 'bulk-two.png'].map(
       (name) => new File(['synthetic'], name, { type: 'image/png' }),
     )
@@ -142,7 +219,7 @@ describe('editor page', () => {
       seedOwnerWorkspace(client())
       installLibraryApi({ watermarks: [makeWatermark()] })
       const view = renderApp('/app/editor')
-      await screen.findByRole('heading', { level: 1, name: 'Editor' })
+      await screen.findByRole('heading', { level: 1, name: 'Image' })
       const size = Promise.withResolvers<{ width: number; height: number }>()
       const readSize = vi
         .spyOn(imageSize, 'readImageSize')
@@ -182,7 +259,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark(), makeWatermark({ id: 'wm-2', name: 'Two' })] })
     renderApp('/app/editor?preset=wm-1')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
     expect(
       screen.getByText(/Download the result or choose a gallery or cloud save/),
     ).toBeInTheDocument()
@@ -332,6 +409,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor')
+    await user.click(await screen.findByRole('button', { name: 'New' }))
     await user.click(await screen.findByRole('tab', { name: 'Presets' }))
     await screen.findByRole('combobox', { name: 'Preset' })
     expect(
@@ -425,11 +503,11 @@ describe('editor page', () => {
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
     expect(
-      await screen.findByText(/Saved sample-photo-watermarked\.jpg to the/),
+      await screen.findByText(/Saved sample-photo-watermarked\.png to the/),
     ).toBeInTheDocument()
     expect(api.gallery.photos).toHaveLength(1)
     expect(api.gallery.photos[0]).toMatchObject({
-      name: 'sample-photo-watermarked.jpg',
+      name: 'sample-photo-watermarked.png',
       width: 960,
       height: 640,
       presetId: 'wm-1',
@@ -438,7 +516,7 @@ describe('editor page', () => {
     api.gallery.uploadFailsWith = 'quotaExceeded'
     await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'The limit for this organization has been reached.',
+      'The limit for this workspace has been reached.',
     )
   })
 
@@ -448,9 +526,7 @@ describe('editor page', () => {
 
     await waitFor(() => expect(googleSave).toHaveBeenCalledTimes(1))
     expect(cloudUploadBatches.at(-1)).toHaveLength(1)
-    expect(
-      await screen.findByText(/Saved to your Google Drive .Lumafoil. folder/),
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Saved to Google Drive.')).toBeInTheDocument()
   })
 
   it('reports a cloud save failure in the export panel', async () => {
@@ -491,15 +567,23 @@ describe('editor page', () => {
     const save = within(designer).getByRole('button', { name: 'Save' })
     expect(save.parentElement).toHaveClass('justify-center')
     await user.click(save)
+    const naming = await screen.findByRole('dialog', { name: 'Save preset' })
+    expect(api.watermarks).toHaveLength(0)
+    await user.clear(within(naming).getByLabelText('Preset name'))
+    await user.click(within(naming).getByRole('button', { name: 'Save' }))
+    expect(api.watermarks).toHaveLength(0)
+    expect(within(naming).getByText(/Give the preset a name/)).toBeVisible()
+    await user.type(within(naming).getByLabelText('Preset name'), 'First photo preset')
+    await user.click(within(naming).getByRole('button', { name: 'Save' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(router.state.location.pathname).toBe('/app/editor')
     expect(api.watermarks).toHaveLength(1)
-    expect(api.watermarks[0]?.name).toBe('© My first photo')
+    expect(api.watermarks[0]?.name).toBe('First photo preset')
     expect(api.watermarks[0]?.spec).toMatchObject({ kind: 'text', text: '© My first photo' })
     expect(previewSubjects.filter((subject) => subject === photo)).toHaveLength(1)
     await user.click(screen.getByRole('tab', { name: 'Presets' }))
     expect(await screen.findByRole('list', { name: 'Layers, bottom to top' })).toHaveTextContent(
-      '© My first photo',
+      'First photo preset',
     )
     await user.click(screen.getByRole('tab', { name: 'Export' }))
     await user.click(await screen.findByRole('button', { name: 'Download' }))
@@ -518,14 +602,15 @@ describe('editor page', () => {
     await user.click(screen.getByRole('button', { name: 'Clear canvas' }))
     expect(screen.getByRole('button', { name: 'Clear canvas' })).toBeDisabled()
     await user.click(screen.getByRole('tab', { name: 'Shape' }))
-    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await saveInlinePreset(user)
 
     await waitFor(() => expect(api.watermarks).toHaveLength(1))
     expect(api.watermarks[0]?.name).toBe('New preset')
 
-    await user.selectOptions(await presetSelect(user), 'draft')
+    await user.click(screen.getByRole('button', { name: 'New' }))
+    expect(screen.queryByRole('group', { name: /Watermark position/ })).not.toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'QR code' }))
-    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await saveInlinePreset(user)
     await waitFor(() => expect(api.watermarks).toHaveLength(2))
     expect(api.watermarks[1]?.name).toBe('https://')
   })

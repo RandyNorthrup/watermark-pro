@@ -12,7 +12,7 @@ export function Textarea({ className, ref, ...props }: TextareaProps) {
     <textarea
       ref={ref}
       className={cn(
-        'min-h-20 w-full rounded-lg border border-line bg-surface-raised px-3 py-2 text-sm text-ink shadow-xs transition-colors placeholder:text-ink-muted',
+        'min-h-20 w-full min-w-0 rounded-lg border border-line bg-surface-raised px-3 py-2 text-base text-ink shadow-xs transition-colors placeholder:text-ink-muted sm:text-sm',
         'focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 focus-visible:outline-none',
         'aria-invalid:border-rose-500 aria-invalid:ring-rose-500/30',
         className,

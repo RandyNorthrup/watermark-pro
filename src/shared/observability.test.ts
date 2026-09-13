@@ -14,9 +14,15 @@ describe('private route context', () => {
       '/accept-invitation/:token',
     )
     expect(redactRoutePath('/app/library/private-id')).toBe('/app/library/:id')
+    expect(redactRoutePath('/workspace-invitation/private-canary?secret=value')).toBe(
+      '/workspace-invitation/:token',
+    )
     expect(redactRoutePath('/app/library/new')).toBe('/app/library/new')
     expect(redactRoutePath('/app/')).toBe('/app')
     expect(redactRoutePath('/private-person-name/secret')).toBe('/unknown')
+    expect(redactRoutePath('/api/cloud/google/callback?code=CODE_CANARY&state=STATE_CANARY')).toBe(
+      '/unknown',
+    )
   })
 
   it('keeps only fixed error classifications and compiled asset coordinates', () => {

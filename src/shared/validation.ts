@@ -7,12 +7,7 @@
  */
 import { z } from 'zod'
 
-import {
-  ASSIGNABLE_ROLES,
-  EMAIL_MAX_LENGTH,
-  PASSWORD_MAX_LENGTH,
-  PASSWORD_MIN_LENGTH,
-} from './constants'
+import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from './constants'
 
 export const NAME_MAX_LENGTH = 80
 export const ORGANIZATION_NAME_MAX_LENGTH = 60
@@ -59,11 +54,6 @@ export const slugSchema = /* @__PURE__ */ z
 export const newOrganizationSchema = /* @__PURE__ */ z.object({
   name: organizationNameSchema,
   slug: slugSchema,
-})
-
-export const inviteMemberSchema = /* @__PURE__ */ z.object({
-  email: emailSchema,
-  role: /* @__PURE__ */ z.enum(ASSIGNABLE_ROLES),
 })
 
 /** Derives a URL-safe slug from a display name. */

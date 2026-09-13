@@ -1,62 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  base64UrlFromBytes,
-  buildAuthorizeUrl,
-  deriveCodeChallenge,
-  dropboxApiArg,
-  escapeNonAscii,
-  readAuthorizationCode,
-} from './dropbox-save'
-import { DROPBOX_OAUTH_AUTHORIZE_URL, DROPBOX_WRITE_SCOPES } from '../../../shared/constants'
-
-describe('base64UrlFromBytes', () => {
-  it('uses the URL-safe alphabet and strips padding', () => {
-    // 0xFF -> standard "/w==", so the "/" must become "_" and padding must drop.
-    expect(base64UrlFromBytes(new Uint8Array([255]))).toBe('_w')
-    // 0xFB,0xFF exercises both "+"->"-" and "/"->"_" in one value.
-    expect(base64UrlFromBytes(new Uint8Array([251, 255]))).toBe('-_8')
-    expect(base64UrlFromBytes(new Uint8Array([1, 2, 3]))).toBe('AQID')
-  })
-
-  it('encodes an empty input as an empty string', () => {
-    expect(base64UrlFromBytes(new Uint8Array([]))).toBe('')
-  })
-})
-
-describe('deriveCodeChallenge', () => {
-  it('matches the RFC 7636 Appendix B PKCE test vector', async () => {
-    // verifier and expected challenge are the worked example from RFC 7636 §B.
-    const verifier = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'
-    await expect(deriveCodeChallenge(verifier)).resolves.toBe(
-      'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
-    )
-  })
-})
-
-describe('buildAuthorizeUrl', () => {
-  it('targets the Dropbox authorize endpoint with the PKCE query', () => {
-    const url = new URL(
-      buildAuthorizeUrl({
-        appKey: 'app-key-123',
-        codeChallenge: 'challenge-xyz',
-        redirectUri: 'https://app.example.com/oauth/dropbox',
-        state: 'random-state',
-      }),
-    )
-    expect(`${url.origin}${url.pathname}`).toBe(DROPBOX_OAUTH_AUTHORIZE_URL)
-    expect(Object.fromEntries(url.searchParams)).toEqual({
-      client_id: 'app-key-123',
-      response_type: 'code',
-      code_challenge: 'challenge-xyz',
-      code_challenge_method: 'S256',
-      redirect_uri: 'https://app.example.com/oauth/dropbox',
-      scope: DROPBOX_WRITE_SCOPES,
-      token_access_type: 'online',
-      state: 'random-state',
-    })
-  })
-})
+import { dropboxApiArg, escapeNonAscii } from './dropbox-save'
 
 describe('escapeNonAscii', () => {
   it('leaves printable ASCII untouched', () => {
@@ -96,36 +40,5 @@ describe('dropboxApiArg', () => {
     // The escaped JSON still parses back to the original, accented path.
     const parsed: unknown = JSON.parse(header)
     expect(parsed).toMatchObject({ path: `/café.png` })
-  })
-})
-
-describe('readAuthorizationCode', () => {
-  it('refuses missing, mismatched, or empty OAuth state even with a valid-looking code', () => {
-    expect(() => readAuthorizationCode('?code=abc&state=other', 'expected')).toThrow(
-      'state did not match',
-    )
-    expect(() => readAuthorizationCode('?code=abc', 'expected')).toThrow('state did not match')
-    expect(() => readAuthorizationCode('?code=abc&state=', '')).toThrow('state did not match')
-  })
-  it('returns the code from the redirect query', () => {
-    expect(readAuthorizationCode('?code=abc123&state=x', 'x')).toBe('abc123')
-  })
-
-  it('throws with the error description when Dropbox denied the request', () => {
-    expect(() =>
-      readAuthorizationCode('?error=access_denied&error_description=User+said+no&state=x', 'x'),
-    ).toThrow('User said no')
-  })
-
-  it('falls back to the error code when no description is present', () => {
-    expect(() => readAuthorizationCode('?error=access_denied&state=x', 'x')).toThrow(
-      'access_denied',
-    )
-  })
-
-  it('throws when neither a code nor an error is present', () => {
-    expect(() => readAuthorizationCode('?state=x', 'x')).toThrow(
-      'did not return an authorization code',
-    )
   })
 })

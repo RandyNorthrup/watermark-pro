@@ -1,9 +1,15 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createFakeAuthClient, seedOwnerWorkspace } from '../test-support/fake-auth-client'
+import {
+  createFakeAuthClient,
+  OWNER,
+  seedOwnerWorkspace,
+  VIEWER,
+} from '../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../test-support/fake-auth-module'
+import { installLibraryApi } from '../test-support/fake-library-api'
 import { renderApp } from '../test-support/render-app'
 
 vi.mock('../lib/auth-client', () => import('../test-support/fake-auth-module'))
@@ -18,21 +24,25 @@ describe('landing page', () => {
   it('shows the product pitch to visitors', async () => {
     renderApp('/')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
-      'Watermark photos, videos, and PDFs.',
+      'Watermark Photos, Videos, And PDFs.',
     )
     expect(
       screen
-        .getAllByRole('link', { name: 'Sign in' })
+        .getAllByRole('link', { name: 'Sign In' })
         .every((link) => link.getAttribute('href') === '/login'),
     ).toBe(true)
-    expect(screen.queryByRole('link', { name: 'Create your workspace' })).toBeNull()
+    expect(
+      screen
+        .getAllByRole('link')
+        .some((link) => link.getAttribute('href')?.startsWith('/signup') === true),
+    ).toBe(false)
   })
 
   it('sends signed-in standard users straight to the editor', async () => {
     seedOwnerWorkspace(client())
     const { router } = renderApp('/')
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Editor')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
   })
 
   it('renders a not-found page for unknown paths', async () => {
@@ -64,17 +74,27 @@ describe('sign in', () => {
     expect(client().signIn.email).not.toHaveBeenCalled()
   })
 
-  it('signs in to the personal workspace while honouring the requested destination', async () => {
+  it('signs in to the personal workspace while honoring the requested destination', async () => {
     const user = userEvent.setup()
     client().state.organizations = seedOrganizationsWithoutSession()
+    installLibraryApi()
     const { router } = renderApp('/login?redirect=/app/members')
     await user.type(await screen.findByLabelText('Email'), 'olivia@example.test')
     await user.type(screen.getByLabelText('Password'), 'correct horse battery')
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/members'))
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Your private workspace' }),
+      await screen.findByRole('heading', { level: 1, name: 'Manage Access' }),
     ).toBeInTheDocument()
+    await screen.findByRole('heading', { name: 'People With Access' })
+    const people = screen.getByRole('region', { name: 'People With Access' })
+    expect(within(people).getByText(OWNER.email)).toBeInTheDocument()
+    expect(within(people).queryByText(VIEWER.email)).not.toBeInTheDocument()
+    expect(client().state.activeOrganizationId).toBe(`personal-${OWNER.id}`)
+    const personal = client().state.organizations.find(
+      (organization) => organization.id === `personal-${OWNER.id}`,
+    )
+    expect(personal?.members.map((member) => member.userId)).toEqual([OWNER.id])
   })
 
   it('explains an unverified email and offers to resend', async () => {

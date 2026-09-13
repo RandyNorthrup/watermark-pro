@@ -1,11 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, Copy, Link2, Share2 } from 'lucide-react'
 import { Dialog } from 'radix-ui'
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { SHARE_EXPIRY_DAYS } from '../../../shared/constants'
 import { describeError } from '../../lib/errors'
+import { captureOfflineOwner } from '../../lib/offline-context'
+import { offlineStatus, subscribeOfflineStatus } from '../../lib/offline-status'
+import { photoShareReadiness } from '../../lib/photo-share-readiness'
 import { copyLink, createShare, shareLink, sharesQueryKey } from '../../lib/shares'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -31,9 +34,25 @@ function isExpiryDays(value: number): value is (typeof SHARE_EXPIRY_DAYS)[number
  * Creates a share link for the given photos, then offers the link through
  * the platform share sheet or the clipboard.
  */
-export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }: ShareDialogProps) {
+export function ShareDialog(props: ShareDialogProps) {
+  return <ShareDialogSession key={props.organizationId} {...props} />
+}
+
+function ShareDialogSession({ organizationId, photoIds, defaultTitle, trigger }: ShareDialogProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const account = useMemo(
+    () => ({ owner: captureOfflineOwner(), organizationId }),
+    [organizationId],
+  )
+  const version = useRef(0)
+  useEffect(
+    () => () => {
+      version.current += 1
+    },
+    [account],
+  )
+  const status = useSyncExternalStore(subscribeOfflineStatus, offlineStatus)
   const expiryChoices: readonly { value: ExpiryChoice; label: string }[] = [
     ...SHARE_EXPIRY_DAYS.map((days) => ({
       value: String(days) as ExpiryChoice,
@@ -46,18 +65,59 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
   const [expiry, setExpiry] = useState<ExpiryChoice>('7')
   const [outcome, setOutcome] = useState<'shared' | 'copied' | null>(null)
   const [shareError, setShareError] = useState<string | null>(null)
+  const readiness = useQuery({
+    queryKey: [
+      'photo-share-readiness',
+      account.owner.userId,
+      organizationId,
+      photoIds.toSorted((first, second) => first.localeCompare(second)),
+    ],
+    queryFn: async () => {
+      account.owner.assertCurrent()
+      const state = await photoShareReadiness(organizationId, photoIds)
+      account.owner.assertCurrent()
+      return state
+    },
+    enabled: isOpen,
+    gcTime: 0,
+    staleTime: 0,
+    retry: false,
+    networkMode: 'always',
+  })
+  const refreshReadiness = readiness.refetch
+  useEffect(() => {
+    if (isOpen) void refreshReadiness()
+  }, [isOpen, refreshReadiness, status.pending, status.blocked, status.isOnline])
 
   const create = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
+      const request = version.current
+      const assertCurrent = () => {
+        account.owner.assertCurrent()
+        if (request !== version.current) throw new Error('The sharing workspace or dialog changed.')
+      }
+      assertCurrent()
+      const ready = await photoShareReadiness(organizationId, photoIds)
+      assertCurrent()
+      if (ready !== 'ready')
+        throw new Error(
+          t(ready === 'blocked' ? 'gallery.shareSyncBlocked' : 'gallery.shareSyncPending'),
+        )
+      if (!offlineStatus().isOnline) throw new Error(t('offline.connectionRequired'))
       const days = expiry === 'never' ? undefined : Number(expiry)
-      return createShare(organizationId, {
+      const result = await createShare(organizationId, {
         title: title.trim() || defaultTitle,
         photoIds: [...photoIds],
         ...(days !== undefined && isExpiryDays(days) && { expiresInDays: days }),
       })
+      assertCurrent()
+      return result
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: sharesQueryKey(organizationId) })
+    },
+    onError: () => {
+      void refreshReadiness()
     },
   })
 
@@ -72,10 +132,16 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
     }
   }
 
+  let readinessMessage: string | null = null
+  if (!status.isOnline) readinessMessage = t('offline.connectionRequired')
+  else if (readiness.data === 'pending') readinessMessage = t('gallery.shareSyncPending')
+  else if (readiness.data === 'blocked') readinessMessage = t('gallery.shareSyncBlocked')
+
   return (
     <Dialog.Root
       open={isOpen}
       onOpenChange={(next) => {
+        version.current += 1
         setIsOpen(next)
         if (next) {
           setTitle(defaultTitle)
@@ -128,6 +194,14 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
                   {describeError(create.error)}
                 </Alert>
               ) : null}
+              {readiness.error === null ? null : (
+                <Alert tone="error">{describeError(readiness.error)}</Alert>
+              )}
+              {readinessMessage === null ? null : (
+                <p role="status" className="text-sm text-ink-muted">
+                  {readinessMessage}
+                </p>
+              )}
               <div className="flex justify-end gap-2">
                 <Dialog.Close asChild>
                   <Button type="button" variant="secondary">
@@ -137,6 +211,12 @@ export function ShareDialog({ organizationId, photoIds, defaultTitle, trigger }:
                 <Button
                   type="button"
                   isPending={create.isPending}
+                  disabled={
+                    !status.isOnline ||
+                    readiness.data !== 'ready' ||
+                    readiness.isFetching ||
+                    readiness.error !== null
+                  }
                   onClick={() => {
                     create.mutate()
                   }}

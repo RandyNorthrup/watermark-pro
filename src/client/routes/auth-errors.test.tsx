@@ -13,7 +13,9 @@ import {
   VIEWER,
 } from '../test-support/fake-auth-client'
 import { fakeAuth, installFakeAuth } from '../test-support/fake-auth-module'
+import { installLibraryApi } from '../test-support/fake-library-api'
 import { renderApp } from '../test-support/render-app'
+import { requestUrl } from '../test-support/request-url'
 
 vi.mock('../lib/auth-client', () => import('../test-support/fake-auth-module'))
 
@@ -150,28 +152,54 @@ describe('error paths on invitations', () => {
 describe('error paths in the workspace', () => {
   it('reports a failed invitation and a failed removal inline', async () => {
     const user = userEvent.setup()
-    seedOwnerWorkspace(client())
-    client().organization.inviteMember.mockImplementationOnce(() => failure('Seat limit reached'))
-    client().organization.removeMember.mockImplementationOnce(() => failure('Cannot remove'))
+    const organization = seedOwnerWorkspace(client())
+    const api = installLibraryApi()
     renderApp('/app/members')
-    await screen.findByRole('heading', { level: 1 })
+    await screen.findByRole('heading', { name: 'People With Access' })
 
-    await user.type(screen.getByLabelText('Email'), 'new@example.test')
-    await user.click(screen.getByRole('button', { name: 'Send invitation' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Seat limit reached')
+    api.failWith = 'quotaExceeded'
+    await user.type(screen.getByLabelText('Add People'), 'new@example.test')
+    await user.click(screen.getByRole('button', { name: 'Send Invite' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The limit for this workspace has been reached.',
+    )
+    expect(api.access.links.get(organization.id)).toBeUndefined()
+    expect(screen.queryByText('Workspace invitation sent.')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: `Remove ${VIEWER.name}` }))
-    expect(await screen.findByText('Cannot remove')).toBeInTheDocument()
+    api.failWith = 'forbidden'
+    await user.click(screen.getByRole('button', { name: `Remove Access For ${VIEWER.name}` }))
+    expect(await screen.findByText('Your role does not allow this.')).toBeInTheDocument()
+    expect(screen.getByText(VIEWER.email)).toBeInTheDocument()
+    expect(organization.members.some((member) => member.userId === VIEWER.id)).toBe(true)
+    const mutations = vi
+      .mocked(fetch)
+      .mock.calls.filter(([, init]) => init?.method === 'POST' || init?.method === 'DELETE')
+    expect(mutations.map(([input, init]) => [requestUrl(input), init?.method])).toEqual([
+      [`/api/orgs/${organization.id}/access/members`, 'POST'],
+      [
+        `/api/orgs/${organization.id}/access/members/member-${VIEWER.id}-${organization.id}`,
+        'DELETE',
+      ],
+    ])
   })
 
   it('validates the invitation email before sending', async () => {
     const user = userEvent.setup()
-    seedOwnerWorkspace(client())
+    const organization = seedOwnerWorkspace(client())
+    installLibraryApi()
     renderApp('/app/members')
-    await screen.findByRole('heading', { level: 1 })
-    await user.click(screen.getByRole('button', { name: 'Send invitation' }))
-    expect(await screen.findByText('Enter a valid email address')).toBeInTheDocument()
-    expect(client().organization.inviteMember).not.toHaveBeenCalled()
+    await screen.findByRole('heading', { name: 'People With Access' })
+    await user.click(screen.getByRole('button', { name: 'Send Invite' }))
+    expect(await screen.findByText('Enter a valid email address.')).toBeInTheDocument()
+    expect(
+      vi
+        .mocked(fetch)
+        .mock.calls.some(
+          ([input, init]) =>
+            requestUrl(input) === `/api/orgs/${organization.id}/access/members` &&
+            init?.method === 'POST',
+        ),
+    ).toBe(false)
   })
 
   it('shows an empty audit trail and a generic failure', async () => {

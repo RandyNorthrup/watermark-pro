@@ -3,7 +3,7 @@ import { captureOfflineOwner, offlineUserId } from './offline-context'
 import { commitOfflineChange, offlineOperations } from './offline-database'
 import type { OfflineChange, PendingOperation } from './offline-model'
 import { refreshOfflineStatus } from './offline-sync'
-import type { AssetDto, PhotoDto } from '../../shared/api'
+import { photoDtoSchema, type AssetDto, type PhotoDto } from '../../shared/api'
 import {
   type SaveWatermarkRequest,
   type WatermarkDto,
@@ -31,6 +31,9 @@ export async function savePresetLocally(
 ): Promise<WatermarkDto> {
   const operationId = crypto.randomUUID()
   const now = new Date().toISOString()
+  const didMove = body.folderId !== undefined && body.folderId !== existing?.folderId
+  const folderVersionId =
+    existing !== undefined && didMove ? operationId : (existing?.folderVersionId ?? null)
   const preset = watermarkDtoSchema.parse({
     id: existing?.id ?? operationId,
     organizationId,
@@ -39,6 +42,9 @@ export async function savePresetLocally(
     createdBy: existing?.createdBy ?? offlineUserId(),
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
+    folderVersionId,
+    folderId: body.folderId === undefined ? (existing?.folderId ?? null) : body.folderId,
+    folderRevision: existing === undefined ? 0 : existing.folderRevision + (didMove ? 1 : 0),
   })
   const change: OfflineChange =
     existing === undefined
@@ -46,7 +52,17 @@ export async function savePresetLocally(
       : {
           kind: 'preset-update',
           preset,
-          body: { ...body, expectedUpdatedAt: body.expectedUpdatedAt ?? existing.updatedAt },
+          body: {
+            ...body,
+            expectedUpdatedAt: body.expectedUpdatedAt ?? existing.updatedAt,
+            ...(body.folderId !== undefined && {
+              expectedFolderRevision: body.expectedFolderRevision ?? existing.folderRevision,
+              expectedFolderVersionId:
+                body.expectedFolderVersionId === undefined
+                  ? existing.folderVersionId
+                  : body.expectedFolderVersionId,
+            }),
+          },
         }
   await saveChange(organizationId, operationId, change)
   return preset
@@ -59,7 +75,12 @@ export async function savePhotoLocally(
   blob: Blob,
   thumbnail: Blob,
 ): Promise<PhotoDto> {
-  await saveChange(organizationId, photo.id, { kind: 'photo-upload', photo, blob, thumbnail })
+  await saveChange(organizationId, photo.id, {
+    kind: 'photo-upload',
+    photo: photoDtoSchema.parse(photo),
+    blob,
+    thumbnail,
+  })
   return photo
 }
 
@@ -94,20 +115,7 @@ export async function mergeLocalPresets(
 ): Promise<WatermarkDto[]> {
   const merged = new Map(remote.map((preset) => [preset.id, preset]))
   const operations = await changesFor(organizationId, shouldIncludeSynced)
-  for (const { change, state } of operations) {
-    if (change.kind === 'preset-create' || change.kind === 'preset-update') {
-      const current = merged.get(change.preset.id)
-      if (
-        state !== 'synced' ||
-        current === undefined ||
-        change.preset.updatedAt >= current.updatedAt
-      ) {
-        merged.set(change.preset.id, change.preset)
-      }
-    } else if (change.kind === 'preset-delete') {
-      merged.delete(change.presetId)
-    }
-  }
+  for (const operation of operations) applyPresetChange(merged, operation)
   return merged.values().toArray()
 }
 
@@ -116,18 +124,11 @@ export async function mergeLocalPhotos(
   organizationId: string,
   remote: PhotoDto[],
   shouldIncludeSynced = !navigator.onLine,
+  shouldIncludeMissing = true,
 ): Promise<PhotoDto[]> {
   const merged = new Map(remote.map((photo) => [photo.id, photo]))
   const operations = await changesFor(organizationId, shouldIncludeSynced)
-  for (const { change } of operations) {
-    if (change.kind === 'photo-upload') {
-      merged.set(change.photo.id, change.photo)
-    } else if (change.kind === 'photo-delete') {
-      for (const id of change.photoIds) {
-        merged.delete(id)
-      }
-    }
-  }
+  for (const operation of operations) applyPhotoChange(merged, operation, shouldIncludeMissing)
   return merged
     .values()
     .toArray()
@@ -160,4 +161,82 @@ export async function mergeLocalAssets(
     }
   }
   return merged.values().toArray()
+}
+
+function applyPresetChange(
+  merged: Map<string, WatermarkDto>,
+  { change, state }: PendingOperation,
+): void {
+  switch (change.kind) {
+    case 'preset-create':
+    case 'preset-update': {
+      const current = merged.get(change.preset.id)
+      if (
+        state !== 'synced' ||
+        current === undefined ||
+        change.preset.updatedAt >= current.updatedAt
+      ) {
+        merged.set(change.preset.id, change.preset)
+      }
+
+      return
+    }
+    case 'preset-delete': {
+      merged.delete(change.presetId)
+
+      return
+    }
+    case 'preset-move': {
+      for (const preset of change.presets) {
+        const placement = change.placements.find((item) => item.id === preset.id)
+        if (placement !== undefined)
+          merged.set(preset.id, {
+            ...(merged.get(preset.id) ?? preset),
+            folderId: placement.folderId,
+            folderRevision: placement.folderRevision,
+            folderVersionId: placement.folderVersionId,
+          })
+      }
+
+      return
+    }
+    // No default
+  }
+}
+
+function applyPhotoChange(
+  merged: Map<string, PhotoDto>,
+  { change }: PendingOperation,
+  shouldIncludeMissing: boolean,
+): void {
+  switch (change.kind) {
+    case 'photo-upload': {
+      if (shouldIncludeMissing || merged.has(change.photo.id))
+        merged.set(change.photo.id, change.photo)
+
+      return
+    }
+    case 'photo-delete': {
+      for (const id of change.photoIds) {
+        merged.delete(id)
+      }
+
+      return
+    }
+    case 'photo-move': {
+      for (const photo of change.photos) {
+        const placement = change.placements.find((item) => item.id === photo.id)
+        if (placement !== undefined && (shouldIncludeMissing || merged.has(photo.id)))
+          merged.set(photo.id, {
+            ...(merged.get(photo.id) ?? photo),
+            folderId: placement.folderId,
+            folderRevision: placement.folderRevision,
+            folderVersionId: placement.folderVersionId,
+          })
+      }
+
+      return
+    }
+    // No default
+  }
 }

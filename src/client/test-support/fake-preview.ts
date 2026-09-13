@@ -48,6 +48,8 @@ export class PreviewRenderer {
 
   sourceSize = { width: SAMPLE_WIDTH, height: SAMPLE_HEIGHT }
 
+  isSubjectReady = true
+
   subjectScale = 1
 
   setSubject = vi.fn(recordSubject)

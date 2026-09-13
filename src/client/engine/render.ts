@@ -6,8 +6,9 @@ import type { Canvas2D } from './canvas'
 import { INK, type ResolvedContrast } from './contrast'
 import type { MarkGeometry } from './layout'
 import { type QrMatrix, qrMatrix } from './qr'
-import { arcBounds, measureRun } from './text-layout'
+import { layoutText, type TextLayout } from './text-layout'
 import type { Shape, TextEffect, WatermarkSpec } from '../../shared/watermark'
+import { SHAPE_CATALOGUE, SHAPE_VIEWBOX } from '../shapes/catalogue'
 
 /** A spec plus the binary resources it needs, resolved by the caller. */
 export interface RenderableMark {
@@ -89,13 +90,11 @@ function textParams(mark: RenderableMark): { spacing: number; curve: number; eff
   return { spacing: 0, curve: 0, effect: 'solid' }
 }
 
-/** Widest run width at the probe size, with letter spacing, never zero. */
-function probeRunWidth(ctx: Canvas2D, mark: RenderableMark, spacing: number): number {
+/** One probe-space layout supplies both the selection dimensions and every painted glyph. */
+function glyphLayout(ctx: Canvas2D, mark: RenderableMark): TextLayout {
   ctx.font = glyphFont(mark, PROBE_FONT_SIZE)
-  return Math.max(
-    ...glyphLines(mark).map((line) => measureRun(ctx, line, spacing, PROBE_FONT_SIZE).width),
-    1,
-  )
+  const { spacing, curve } = textParams(mark)
+  return layoutText(ctx, glyphLines(mark), spacing, curve, PROBE_FONT_SIZE, LINE_HEIGHT)
 }
 
 /**
@@ -112,31 +111,13 @@ export function measureAspect(ctx: Canvas2D, mark: RenderableMark): number {
     return mark.image.width / mark.image.height
   }
   if (spec.kind === 'shape') {
-    return spec.aspect
+    return (spec.aspect + spec.stroke.width) / (1 + spec.stroke.width)
   }
   if (spec.kind === 'qr' || (spec.kind === 'symbol' && spec.symbol.type === 'icon')) {
     return 1
   }
-  const { spacing, curve } = textParams(mark)
-  const lines = glyphLines(mark)
-  const runWidth = probeRunWidth(ctx, mark, spacing)
-  if (curve === 0 && lines.length === 1) {
-    const metrics = ctx.measureText(lines[0] ?? '')
-    const height =
-      metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || PROBE_FONT_SIZE
-    return runWidth / height
-  }
-  const box = arcBounds(runWidth, PROBE_FONT_SIZE, lines.length, curve, LINE_HEIGHT)
-  return box.width / box.height
-}
-
-/** Font size at which the arced (or straight) text box fills `width`. */
-function fontSizeFor(ctx: Canvas2D, mark: RenderableMark, width: number): number {
-  const { spacing, curve } = textParams(mark)
-  const lines = glyphLines(mark)
-  const probeWidthValue = probeRunWidth(ctx, mark, spacing)
-  const box = arcBounds(probeWidthValue, PROBE_FONT_SIZE, lines.length, curve, LINE_HEIGHT)
-  return (width / box.width) * PROBE_FONT_SIZE
+  const layout = glyphLayout(ctx, mark)
+  return layout.width / layout.height
 }
 
 /** A box behind the mark in the opposite tone of the ink; the shadow is off while it is drawn. */
@@ -226,109 +207,72 @@ function paintGlyph(
   ctx.fillText(char, x, y)
 }
 
-/** Draws one line straight, its run centred on the origin. */
-function drawStraightLine(
-  ctx: Canvas2D,
-  line: string,
-  y: number,
-  spacing: number,
-  fontSize: number,
-  contrast: ResolvedContrast,
-  effect: TextEffect,
-): void {
-  if (spacing === 0) {
-    // Keep kerning and ligatures: one call for the whole line.
-    ctx.textAlign = 'center'
-    paintGlyph(ctx, line, 0, y, fontSize, contrast, effect)
-    return
-  }
-  ctx.textAlign = 'left'
-  const run = measureRun(ctx, line, spacing, fontSize)
-  let cursor = -run.width / 2
-  for (const glyph of run.glyphs) {
-    paintGlyph(ctx, glyph.char, cursor, y, fontSize, contrast, effect)
-    cursor += glyph.advance
-  }
-}
-
-/** Draws one line along an arc of radius `radius`; `sign` is +1 to bend over the top. */
-function drawArcLine(
-  ctx: Canvas2D,
-  line: string,
-  radius: number,
-  sign: number,
-  spacing: number,
-  fontSize: number,
-  contrast: ResolvedContrast,
-  effect: TextEffect,
-): void {
-  ctx.textAlign = 'center'
-  const run = measureRun(ctx, line, spacing, fontSize)
-  let cursor = 0
-  for (const glyph of run.glyphs) {
-    const centre = cursor + glyph.advance / 2
-    const angle = ((centre - run.width / 2) / radius) * sign
-    ctx.save()
-    ctx.translate(0, sign * radius)
-    ctx.rotate(angle)
-    ctx.translate(0, -sign * radius)
-    paintGlyph(ctx, glyph.char, 0, 0, fontSize, contrast, effect)
-    ctx.restore()
-    cursor += glyph.advance
-  }
-}
-
+/** Paint the measured layout at one uniform scale; never change the probe font mid-run. */
 function drawGlyphs(
   ctx: Canvas2D,
   mark: RenderableMark,
   width: number,
   contrast: ResolvedContrast,
 ): void {
-  const fontSize = fontSizeFor(ctx, mark, width)
-  ctx.font = glyphFont(mark, fontSize)
-  ctx.textBaseline = 'middle'
-  const { spacing, curve, effect } = textParams(mark)
-  if (effect === 'outline') {
-    ctx.shadowBlur = 0
-  }
-  const lines = glyphLines(mark)
-  const pitch = fontSize * LINE_HEIGHT
-  if (curve === 0) {
-    for (const [index, line] of lines.entries()) {
-      const y = (index - (lines.length - 1) / 2) * pitch
-      drawStraightLine(ctx, line, y, spacing, fontSize, contrast, effect)
-    }
-    return
-  }
-  const sign = curve > 0 ? 1 : -1
-  const angle = Math.abs(curve) * Math.PI
-  const baseRadius = (probeRunWidth(ctx, mark, spacing) * (fontSize / PROBE_FONT_SIZE)) / angle
-  for (const [index, line] of lines.entries()) {
-    const radius = baseRadius + (index - (lines.length - 1) / 2) * pitch * sign
-    drawArcLine(ctx, line, Math.max(radius, 1), sign, spacing, fontSize, contrast, effect)
+  const layout = glyphLayout(ctx, mark)
+  const factor = width / layout.width
+  const { effect } = textParams(mark)
+  if (effect === 'outline') ctx.shadowBlur = 0
+  ctx.scale(factor, factor)
+  ctx.translate(
+    -(layout.bounds.left + layout.bounds.right) / 2,
+    -(layout.bounds.top + layout.bounds.bottom) / 2,
+  )
+  for (const glyph of layout.glyphs) {
+    ctx.save()
+    ctx.translate(glyph.x, glyph.y)
+    ctx.rotate(glyph.rotation)
+    paintGlyph(ctx, glyph.text, 0, 0, PROBE_FONT_SIZE, contrast, effect)
+    ctx.restore()
   }
 }
 
-/** Draws a rectangle, rounded rectangle, ellipse or line filling the mark box. */
+/** Draws the selected geometric mark at output resolution with independent fill and stroke. */
 function drawShape(
   ctx: Canvas2D,
   spec: Extract<WatermarkSpec, { kind: 'shape' }>,
   geometry: MarkGeometry,
   contrast: ResolvedContrast,
 ): void {
-  const halfWidth = geometry.width / 2
-  const halfHeight = geometry.height / 2
-  const shorter = Math.min(geometry.width, geometry.height)
+  // Geometry describes the outside of the stroke, not the centerline of its path.
+  const height = geometry.height / (1 + spec.stroke.width)
+  const strokeWidth = height * spec.stroke.width
+  const width = geometry.width - strokeWidth
+  const halfWidth = width / 2
+  const halfHeight = height / 2
+  const shorter = Math.min(width, height)
+  ctx.shadowBlur = 0
+  ctx.lineJoin = 'round'
   const path = new Path2D()
   const shape: Shape = spec.shape
-  if (shape === 'ellipse') {
-    path.ellipse(0, 0, halfWidth, halfHeight, 0, 0, Math.PI * 2)
-  } else if (shape === 'rectangle') {
-    path.rect(-halfWidth, -halfHeight, geometry.width, geometry.height)
-  } else {
-    // Rounded rectangle and line (a very rounded, thin rectangle).
-    const radius = shape === 'line' ? halfHeight : shorter * SHAPE_CORNER_RATIO
-    path.roundRect(-halfWidth, -halfHeight, geometry.width, geometry.height, radius)
+  switch (shape) {
+    case 'ellipse': {
+      path.ellipse(0, 0, halfWidth, halfHeight, 0, 0, Math.PI * 2)
+      break
+    }
+    case 'rectangle': {
+      path.rect(-halfWidth, -halfHeight, width, height)
+      break
+    }
+    case 'rounded-rectangle':
+    case 'line': {
+      const radius = shape === 'line' ? halfHeight : shorter * SHAPE_CORNER_RATIO
+      path.roundRect(-halfWidth, -halfHeight, width, height, radius)
+      break
+    }
+    default: {
+      path.addPath(new Path2D(SHAPE_CATALOGUE[shape].path), {
+        a: width / SHAPE_VIEWBOX,
+        d: height / SHAPE_VIEWBOX,
+        e: -halfWidth,
+        f: -halfHeight,
+      })
+    }
   }
   if (spec.fill.enabled) {
     ctx.save()
@@ -340,7 +284,7 @@ function drawShape(
   if (spec.stroke.width > 0) {
     // A chosen stroke colour, else the auto-contrast ink.
     ctx.strokeStyle = spec.stroke.colour ?? contrast.fill
-    ctx.lineWidth = geometry.height * spec.stroke.width
+    ctx.lineWidth = strokeWidth
     ctx.stroke(path)
   }
 }

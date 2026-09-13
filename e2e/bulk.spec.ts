@@ -86,14 +86,14 @@ test('preserves folder paths, names outputs by size, and reports a one-photo ove
     prefix = 'source-folder/'
   } else {
     await expect(folderButton).toHaveCount(0)
-    await page.getByLabel('Add photos', { exact: true }).setInputFiles([
+    await page.getByLabel('Add files', { exact: true }).setInputFiles([
       { name: 'wide.png', mimeType: 'image/png', buffer: wide },
       { name: 'tall.png', mimeType: 'image/png', buffer: tall },
     ])
   }
   const widePath = canPickFolders ? `${prefix}a/wide.png` : 'wide.png'
   const tallPath = canPickFolders ? `${prefix}b/tall.png` : 'tall.png'
-  const list = page.getByRole('list', { name: 'Photos in this batch', exact: true })
+  const list = page.getByRole('list', { name: 'Files In This Batch', exact: true })
   await expect(list.getByRole('listitem')).toHaveCount(2)
   await expect(list).toContainText(widePath)
   await expect(list).toContainText(tallPath)
@@ -241,7 +241,7 @@ test('watermarks twenty photos and downloads them as a ZIP', async ({ page, requ
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Bulk watermarking')
   await expectAccessible(page)
 
-  await page.getByLabel('Add photos').setInputFiles(
+  await page.getByLabel('Add files').setInputFiles(
     Array.from({ length: FIXTURES }, (_, index) => ({
       name: `shot-${String(index + 1).padStart(2, '0')}.png`,
       mimeType: 'image/png',
@@ -253,7 +253,7 @@ test('watermarks twenty photos and downloads them as a ZIP', async ({ page, requ
     })),
   )
   await expect(
-    page.getByRole('heading', { level: 2, name: `${String(FIXTURES)} photos` }),
+    page.getByRole('heading', { level: 2, name: `${String(FIXTURES)} files` }),
   ).toBeVisible()
   await page.getByRole('checkbox', { name: 'Batch preset' }).check()
   await page.getByRole('checkbox', { name: 'Batch symbol' }).check()
@@ -273,7 +273,7 @@ test('watermarks twenty photos and downloads them as a ZIP', async ({ page, requ
   const downloadPromise = page.waitForEvent('download')
   await page.getByRole('button', { name: `Download ${String(FIXTURES)} as ZIP` }).click()
   const download = await downloadPromise
-  expect(download.suggestedFilename()).toBe(`watermarked-${String(FIXTURES)}-photos.zip`)
+  expect(download.suggestedFilename()).toBe(`watermarked-${String(FIXTURES)}-files.zip`)
   const files = unzipSync(await downloadBytes(download))
   const names = Object.keys(files).toSorted((a, b) => a.localeCompare(b))
   expect(names).toHaveLength(FIXTURES)

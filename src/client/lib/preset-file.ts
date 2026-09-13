@@ -193,6 +193,7 @@ function logoUpload(logo: EmbeddedLogo): LogoUpload {
 export async function importPresetFile(
   organizationId: string,
   selection: readonly PresetFileEntry[],
+  folderId: string | null = null,
 ): Promise<WatermarkDto[]> {
   const created: WatermarkDto[] = []
   for (const entry of selection) {
@@ -206,10 +207,11 @@ export async function importPresetFile(
         await createWatermark(organizationId, {
           name: entry.name,
           spec: { ...spec, assetId: asset.id },
+          folderId,
         }),
       )
     } else {
-      created.push(await createWatermark(organizationId, { name: entry.name, spec }))
+      created.push(await createWatermark(organizationId, { name: entry.name, spec, folderId }))
     }
   }
   return created

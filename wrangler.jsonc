@@ -30,22 +30,12 @@
     // prerendered files (dist/client/landing/<locale>.html) and the SPA shell.
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": [
-      "/api/*",
-      "/",
-      "/privacy",
-      "/terms",
-      "/oauth/microsoft",
-      "/oauth/microsoft/",
-      "/oauth/microsoft.html",
-      "/oauth/microsoft-bridge.js",
-    ],
+    "run_worker_first": ["/api/*", "/", "/privacy", "/terms"],
   },
   "observability": {
     // Custom console logs retain bearer paths in platform metadata even when
     // invocation logs are disabled. Application diagnostics remain in D1.
     "enabled": false,
-    "redact_query_string": true,
     "logs": {
       "enabled": false,
       "invocation_logs": false,
@@ -139,7 +129,6 @@
       "observability": {
         // Preserve the same privacy boundary in the resolved production build.
         "enabled": false,
-        "redact_query_string": true,
         "logs": {
           "enabled": false,
           "invocation_logs": false,
@@ -158,16 +147,7 @@
       "assets": {
         "binding": "ASSETS",
         "not_found_handling": "single-page-application",
-        "run_worker_first": [
-          "/api/*",
-          "/",
-          "/privacy",
-          "/terms",
-          "/oauth/microsoft",
-          "/oauth/microsoft/",
-          "/oauth/microsoft.html",
-          "/oauth/microsoft-bridge.js",
-        ],
+        "run_worker_first": ["/api/*", "/", "/privacy", "/terms"],
       },
       "vars": {
         "APP_ENV": "production",
@@ -182,7 +162,8 @@
         "GOOGLE_OAUTH_CLIENT_ID": "33646039034-62bcsfbjdakffvvdjbr96kv13sl9sc1f.apps.googleusercontent.com",
         "GOOGLE_PICKER_APP_ID": "33646039034",
         "MICROSOFT_CLIENT_ID": "1165fcc2-276c-4dde-b83b-394d32441fad",
-        "DROPBOX_APP_KEY": "n4p4sfvxnat9ccd",
+        "DROPBOX_APP_KEY": "97gncjw0zquwc91",
+        "DROPBOX_ACCESS_TYPE": "full",
       },
       "d1_databases": [
         {

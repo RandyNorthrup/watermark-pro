@@ -6,6 +6,7 @@ import {
 } from '../../../shared/metadata'
 import type { WatermarkSpec } from '../../../shared/watermark'
 import type { BulkFile } from '../../bulk/folders'
+import { bulkMediaKind } from '../../bulk/media-kind'
 import type { BulkJobInput, BulkResult, BulkSettings } from '../../bulk/processor'
 import { JobQueue, type QueueSnapshot } from '../../bulk/queue'
 import { type BulkRuntime, createBulkRuntime } from '../../bulk/runtime'
@@ -32,7 +33,8 @@ async function readMetadata(files: readonly File[]): Promise<PhotoMetadata[]> {
       if (file === undefined) {
         return
       }
-      results[index] = await readPhotoMetadata(file)
+      results[index] =
+        bulkMediaKind(file) === 'image' ? await readPhotoMetadata(file) : EMPTY_METADATA
     }
   }
   const workers = Math.min(METADATA_CONCURRENCY, files.length)
@@ -108,7 +110,10 @@ export function useBulkQueue(organizationId: string) {
   const start = useCallback((specs: readonly WatermarkSpec[], settings: BulkSettings) => {
     specsRef.current = specs
     settingsRef.current = settings
-    return queueRef.current?.start() ?? Promise.resolve(EMPTY)
+    const concurrency = inputsRef.current.some((entry) => bulkMediaKind(entry.file) !== 'image')
+      ? 1
+      : (runtimeRef.current?.workers ?? 1)
+    return queueRef.current?.start(concurrency) ?? Promise.resolve(EMPTY)
   }, [])
 
   /** Sets or clears one photo's override document and re-runs just that job. */
