@@ -50,6 +50,59 @@ async function authorize(client: TestClient) {
   return { ...started, callback }
 }
 
+it.each(['exchange', 'identity'] as const)(
+  'records only a bounded %s failure for an authenticated one-use callback',
+  async (stage) => {
+    const { harness, client, userId } = await actor()
+    const fetcher = vi.fn<typeof fetch>()
+    if (stage === 'exchange') {
+      fetcher.mockResolvedValueOnce(
+        Response.json(
+          { error: 'invalid_grant', error_description: 'PRIVATE_PROVIDER_CANARY' },
+          { status: 400 },
+        ),
+      )
+    } else {
+      fetcher.mockResolvedValueOnce(
+        Response.json({
+          access_token: 'PRIVATE_ACCESS_CANARY',
+          refresh_token: 'PRIVATE_REFRESH_CANARY',
+          token_type: 'Bearer',
+          expires_in: 3600,
+        }),
+      )
+      fetcher.mockResolvedValueOnce(Response.json({ user: { private: 'PRIVATE_IDENTITY_CANARY' } }))
+    }
+    vi.stubGlobal('fetch', fetcher)
+    const started = await authorize(client)
+    const failures = harness.audit.records.filter(
+      (record) => record.action === 'cloud.connection_failed',
+    )
+    expect(failures).toHaveLength(1)
+    expect(failures[0]).toMatchObject({
+      actorUserId: userId,
+      targetType: 'cloud_connection',
+      metadata:
+        stage === 'exchange'
+          ? { provider: 'google', stage, reason: 'provider_refused', httpStatus: 400 }
+          : { provider: 'google', stage, reason: 'invalid_data' },
+    })
+    expect(
+      Object.keys(failures[0]?.metadata ?? {}).toSorted((left, right) => left.localeCompare(right)),
+    ).toEqual(
+      stage === 'exchange'
+        ? ['httpStatus', 'provider', 'reason', 'stage']
+        : ['provider', 'reason', 'stage'],
+    )
+    expect(JSON.stringify(failures)).not.toContain('PRIVATE_')
+    expect(JSON.stringify(failures)).not.toContain(started.authorizationUrl)
+    expect(await responseStatus(client.get(started.callback))).toBe(403)
+    expect(
+      harness.audit.records.filter((record) => record.action === 'cloud.connection_failed'),
+    ).toHaveLength(1)
+  },
+)
+
 async function expire(context: Awaited<ReturnType<typeof actor>>) {
   const record = await context.harness.services.cloud.find(context.userId, 'google')
   if (record === null) throw new Error('Expected connection')
@@ -277,6 +330,9 @@ describe('durable cloud connections through authenticated API', () => {
     expect(fetch).not.toHaveBeenCalled()
     expect(await responseStatus(client.get(callback))).toBe(200)
     expect(await responseStatus(client.get(callback))).toBe(403)
+    expect(
+      harness.audit.records.some((record) => record.action === 'cloud.connection_failed'),
+    ).toBe(false)
     const exchange = fetch.mock.calls.find(([url]) => url === 'https://oauth2.googleapis.com/token')
     const form = formBody(exchange?.[1])
     expect(await cloudDigest(form.get('code_verifier') ?? '')).toBe(

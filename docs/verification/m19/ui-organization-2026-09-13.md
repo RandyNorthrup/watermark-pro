@@ -2,6 +2,10 @@
 
 ## Current Integration State
 
+Source `4c5a2ed` is now pushed and deployed with 12 passing hosted public checks.
+The [deployment receipt](deployment-2026-09-13.md) records the exact Worker
+version, artifact hashes and retained failure boundaries.
+
 The final image action is **Save Image**, with its existing output controls.
 All 128 distinct device cases have passing evidence across the original run and
 targeted closures; this is not one uninterrupted matrix. The final Android

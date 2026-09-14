@@ -20,6 +20,16 @@ interface CloudServices {
   cloud: CloudStore
 }
 
+type CompletionStage = 'consent' | 'verifier' | 'exchange' | 'identity' | 'encryption' | 'storage'
+interface CloudCompletion {
+  isConnected: boolean
+  failure: {
+    stage: CompletionStage
+    reason: CloudProviderError['reason'] | 'invalid_data' | 'not_completed'
+    httpStatus?: number | undefined
+  } | null
+}
+
 function configured(services: CloudServices, provider: CloudProvider): CloudProviderConfig {
   const config = cloudProviderConfig(services.config, provider)
   if (config === null) throw apiErrors.retryLater()
@@ -95,7 +105,7 @@ export async function finishCloudConnection(
   sessionId: string,
   provider: CloudProvider,
   result: { state: string; code?: string | undefined; error?: string | undefined },
-): Promise<{ isConnected: boolean }> {
+): Promise<CloudCompletion> {
   const config = configured(services, provider)
   const attempt = await services.cloud.claim(
     await cloudDigest(result.state),
@@ -107,8 +117,9 @@ export async function finishCloudConnection(
   if (attempt === null) throw apiErrors.forbidden()
   if (result.error !== undefined || result.code === undefined) {
     await services.cloud.failAttempt(attempt.id, userId, sessionId)
-    return { isConnected: false }
+    return { isConnected: false, failure: { stage: 'consent', reason: 'not_completed' } }
   }
+  let stage: CompletionStage = 'verifier'
   try {
     const verifier = await decryptCloudValue(
       config.encryptionSecret,
@@ -117,17 +128,28 @@ export async function finishCloudConnection(
       attempt.id,
       attempt.verifierCipher,
     )
+    stage = 'exchange'
     const tokens = await exchangeCloudTokens(config, { code: result.code, verifier })
+    stage = 'identity'
     const account = await cloudAccountIdentity(provider, tokens.accessToken)
+    stage = 'encryption'
     const credentials = await protectTokens(config, userId, tokens, account)
+    stage = 'storage'
     const isSaved = await services.cloud.complete(attempt, credentials, new Date())
     if (!isSaved) await services.cloud.failAttempt(attempt.id, userId, sessionId)
-    return { isConnected: isSaved }
-  } catch {
+    return { isConnected: isSaved, failure: isSaved ? null : { stage, reason: 'not_completed' } }
+  } catch (error) {
     // Provider responses, authorization codes, and credential errors must never
     // enter request diagnostics. The polling UI receives a bounded failed state.
     await services.cloud.failAttempt(attempt.id, userId, sessionId)
-    return { isConnected: false }
+    return {
+      isConnected: false,
+      failure: {
+        stage,
+        reason: error instanceof CloudProviderError ? error.reason : 'invalid_data',
+        ...(error instanceof CloudProviderError && { httpStatus: error.httpStatus }),
+      },
+    }
   }
 }
 

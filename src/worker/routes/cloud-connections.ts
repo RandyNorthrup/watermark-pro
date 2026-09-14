@@ -162,12 +162,24 @@ export const cloudConnectionRoutes = new Hono<AppContext>()
     const parsed = cloudCallbackSchema.safeParse(c.req.query())
     if (!parsed.success) throw apiErrors.validation('Invalid cloud authorization callback')
     const session = c.get('session')
-    const { isConnected } = await finishCloudConnection(
-      c.get('services'),
+    const services = c.get('services')
+    const selectedProvider = provider(c.req.param('provider'))
+    const { isConnected, failure } = await finishCloudConnection(
+      services,
       session.user.id,
       session.session.id,
-      provider(c.req.param('provider')),
+      selectedProvider,
       parsed.data,
     )
+    if (failure !== null) {
+      // Finite internal classifications support private diagnostics without
+      // persisting callback URLs, provider messages, codes or personal claims.
+      await services.audit.append({
+        actorUserId: session.user.id,
+        action: 'cloud.connection_failed',
+        targetType: 'cloud_connection',
+        metadata: { provider: selectedProvider, ...failure },
+      })
+    }
     return callbackPage(isConnected)
   })

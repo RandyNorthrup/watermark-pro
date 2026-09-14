@@ -34,14 +34,30 @@ const requiredScopes = {
 export class CloudProviderError extends Error {
   override readonly name = 'CloudProviderError'
   readonly requiresReconnect: boolean
+  readonly reason:
+    | 'transport'
+    | 'redirect'
+    | 'response_body'
+    | 'provider_refused'
+    | 'token_response'
+    | 'missing_refresh'
+    | 'missing_scope'
+    | 'invalid_expiry'
+  readonly httpStatus: number | undefined
 
-  constructor(requiresReconnect: boolean) {
+  constructor(
+    requiresReconnect: boolean,
+    reason: CloudProviderError['reason'] = 'provider_refused',
+    httpStatus?: number,
+  ) {
     super(
       requiresReconnect
         ? 'The cloud connection needs authorization again.'
         : 'The cloud provider could not complete this request.',
     )
     this.requiresReconnect = requiresReconnect
+    this.reason = reason
+    this.httpStatus = httpStatus
   }
 }
 
@@ -63,18 +79,18 @@ async function providerJson(url: string, init: RequestInit): Promise<unknown> {
       cache: 'no-store',
       signal: AbortSignal.timeout(CLOUD_OAUTH.requestTimeoutMs),
     })
-    if (!response.ok && response.status < HTTP_STATUS.badRequest) {
-      await response.body?.cancel()
-      throw new CloudProviderError(false)
-    }
   } catch {
-    throw new CloudProviderError(false)
+    throw new CloudProviderError(false, 'transport')
+  }
+  if (!response.ok && response.status < HTTP_STATUS.badRequest) {
+    await response.body?.cancel()
+    throw new CloudProviderError(false, 'redirect', response.status)
   }
   let payload: unknown
   try {
     payload = await readJsonBody(response, CLOUD_OAUTH.maxProviderBodyBytes)
   } catch {
-    throw new CloudProviderError(false)
+    throw new CloudProviderError(false, 'response_body', response.status)
   }
   if (!response.ok) {
     const failure = providerFailureSchema.safeParse(payload)
@@ -84,6 +100,8 @@ async function providerJson(url: string, init: RequestInit): Promise<unknown> {
           ['invalid_grant', 'invalid_scope', 'interaction_required', 'consent_required'].includes(
             failure.data.error,
           )),
+      'provider_refused',
+      response.status,
     )
   }
   return payload
@@ -115,10 +133,10 @@ export async function exchangeCloudTokens(
       body: form,
     }),
   )
-  if (!parsed.success) throw new CloudProviderError(false)
+  if (!parsed.success) throw new CloudProviderError(false, 'token_response')
   const response = parsed.data
   const refreshToken = response.refresh_token ?? (isRefresh ? grant.refreshToken : undefined)
-  if (refreshToken === undefined) throw new CloudProviderError(true)
+  if (refreshToken === undefined) throw new CloudProviderError(true, 'missing_refresh')
   const scopes = response.scope ?? (isRefresh ? grant.scopes : config.scopes)
   const granted = new Set(
     scopes
@@ -129,9 +147,9 @@ export async function exchangeCloudTokens(
       ),
   )
   if (requiredScopes[config.provider].some((scope) => !granted.has(scope)))
-    throw new CloudProviderError(true)
+    throw new CloudProviderError(true, 'missing_scope')
   const expiresAt = new Date(Date.now() + response.expires_in * MILLISECONDS_PER_SECOND)
-  if (!Number.isFinite(expiresAt.getTime())) throw new CloudProviderError(false)
+  if (!Number.isFinite(expiresAt.getTime())) throw new CloudProviderError(false, 'invalid_expiry')
   return { accessToken: response.access_token, refreshToken, expiresAt, scopes }
 }
 

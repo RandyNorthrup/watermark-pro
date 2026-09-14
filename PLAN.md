@@ -59,6 +59,13 @@ complete; implementation and configured credentials alone are not completion.
 This instruction resumes the provider lane alongside final UI verification and
 supersedes the earlier decision to leave provider work outside this batch.
 
+Live provider diagnostics use the existing private audit store with finite
+callback stage/reason classifications and HTTP status only. The failure is
+written only after a session-bound one-use attempt is claimed. Do not enable
+platform request logging or persist provider messages, codes, tokens, callback
+URLs or identity payloads. This permits OneDrive-specific diagnosis after Google
+Drive and Dropbox connect/refresh succeeded on the shared runtime correction.
+
 ### Consolidated Completion Backlog — 2026-09-13
 
 The owner requested the total remaining scope, including checks deferred for the
@@ -73,12 +80,15 @@ the newer inline media editors or current navigation.
       redirect refusal succeeds at the transport boundary. Complete the runtime
       fix and then repeat live workflows. The owner approved the exact new
       persistent Dropbox account grant on 2026-09-13.
-- [ ] Complete the current UI-01–UI-07 release: final native tour swipe/replay
-      proof, updated product screenshots, final artifact, direct push/deployment
-      and hosted readback. Implementation and selected contrast/layout evidence
-      are recorded in `docs/verification/m19/ui-organization-2026-09-13.md`.
-- [ ] Close every final four-device E2E case and the complete English/Arabic,
-      light/dark screenshot/axe inventory. Investigate the isolated gate's SDK
+- [x] Ship the current UI implementation: native tour swipe/replay proof,
+      updated product screenshots, final artifact, direct push/deployment and
+      hosted readback passed. Source `4c5a2ed` is live; representative contrast
+      evidence does not close the full UI-07 conformance boundary below. See
+      `docs/verification/m19/deployment-2026-09-13.md`.
+- [x] Close all 128 distinct four-device E2E cases across the original run and
+      targeted closures. This is cumulative case closure, not a single green run.
+- [ ] Complete the English/Arabic, light/dark screenshot/axe inventory and
+      whole-app contrast/keyboard review. Investigate the isolated gate's SDK
       forwarding 502s rather than weakening readiness checks or converting them
       into passing application results.
 - [ ] Complete final quality/coverage, deliberate-failure drills, source and
@@ -272,7 +282,19 @@ completed verification and avoid repeating unchanged checks between small edits.
 Maintain accurate implemented, deployed and verified distinctions in M19 and the
 changelog. The active goal remains unfinished until the full scope is satisfied.
 
-### Current Release Evidence — 2026-09-12
+### Current Release Evidence — 2026-09-13
+
+Source `4c5a2ed65ed4b6425ebe40befa10db855335d54e` is pushed to `origin/main` and
+deployed at `https://lumafoil.com`, Worker
+`94614672-421b-4ef6-bb85-a577e6f19914`. The protected canonical build/deployment
+and 12 hosted public checks passed. D1 needed no migration; one anchored Owner,
+no Admins and existing content counts were retained. The final image action is
+Save Image. Google Drive and Dropbox authorization and actual refresh exchange
+pass; OneDrive and remaining live round trips are in progress. Full screenshot,
+performance and certification boundaries remain open. See the
+[current receipt](docs/verification/m19/deployment-2026-09-13.md).
+
+### Earlier Release Evidence — 2026-09-12
 
 The combined changes are deployed at `https://lumafoil.com` from source commit
 `0d764ecf9c88a002ac41fde24ca0cc02fba7a188`, Worker version

@@ -1,5 +1,18 @@
 # Integrated quality verification
 
+## Current Deployment Checkpoint — 2026-09-13
+
+Source `4c5a2ed` is deployed with the final Save Image label and coordinated UI
+changes. Current evidence includes 2,781 unit/browser tests, 63 Worker tests,
+unchanged coverage floors, all 42 build checks, zero SAST findings and 12 hosted
+public checks. The quality invocation and its continued command chain are
+recorded separately; this is not a claim of one new exit-zero quality invocation.
+All 128 distinct E2E cases have cumulative passing evidence. Full screenshots,
+performance and whole-app certification remain open. See the
+[current release](deployment-2026-09-13.md) and
+[integration boundaries](ui-organization-2026-09-13.md). Older checkpoints below
+retain their original scope and source revision.
+
 ## Production deployment checkpoint — 2026-09-12
 
 Source commit `0d764ecf9c88a002ac41fde24ca0cc02fba7a188` is deployed at

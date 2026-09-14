@@ -7,8 +7,27 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Production Deployment — 2026-09-13
+
+- Pushed source `4c5a2ed` directly to main and deployed it to `lumafoil.com` as
+  Worker `94614672-421b-4ef6-bb85-a577e6f19914`, including the final Save Image
+  label. Build, bundle limits and the eight-value protected publication scan
+  passed. No migration or credential change was needed.
+- Twelve hosted public checks passed with exact current asset hashes. Read-only
+  checks retained one anchored Owner, no Admins and existing content counts.
+  Production Logs and Traces remain disabled. The first deployment's D1
+  authorization failure is retained separately from the successful retry.
+- Google Drive and Dropbox authorization and real refresh-token exchange now
+  pass. OneDrive and the remaining live file/folder/share workflows are still
+  being verified; broader screenshot, performance and final certification gates
+  remain explicitly open.
+
 ### Editor Organization And Accessible Tour — 2026-09-13
 
+- Failed cloud callbacks now append a private audit classification using only
+  the authenticated actor, provider, finite internal stage/reason and HTTP status.
+  Codes, tokens, provider messages, callback URLs and personal claims are excluded.
+  The callback page and one-use session-bound authorization remain unchanged.
 - Separated included Presets from Saved user watermarks in the editor tools.
   Navigation now reads Images, Documents, Videos, Bulk, Saved Watermarks and
   Watermarked Images. Existing user content keeps its storage identities.
