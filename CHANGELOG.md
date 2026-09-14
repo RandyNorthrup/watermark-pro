@@ -24,6 +24,15 @@ what was planned; superseded entries stay.
 
 ### Editor Organization And Accessible Tour — 2026-09-13
 
+- OneDrive upload sessions now pass the filename only in the URL and retain the
+  explicit rename-on-conflict body. Real personal-account probes rejected the
+  redundant body name with HTTP 400 and accepted the rename-only request; probe
+  sessions were cancelled without uploading data.
+- The local audit server now pools static-file HTTP connections while retaining
+  SDK dispatch for application routes and uploads. This fixes reproduced Windows
+  loopback socket exhaustion without reintroducing the rejected-upload failure.
+  Sustained exact-byte, real authentication and negative origin/header checks
+  passed; the broader screenshot inventory still requires completion.
 - Microsoft cloud identity parsing now accepts optional name/email claims while
   requiring the provider's stable subject. Available full/given/family names or
   email supply the label; a bounded real subject is shown when those claims are

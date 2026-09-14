@@ -86,7 +86,9 @@ export async function uploadOneDriveImage(
     {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ item: { name, [CONFLICT_BEHAVIOR]: 'rename' } }),
+      // Personal OneDrive rejects the redundant name property. The validated
+      // path already supplies it; keep the explicit no-overwrite policy.
+      body: JSON.stringify({ item: { [CONFLICT_BEHAVIOR]: 'rename' } }),
     },
     async (response) => {
       if (!response.ok)

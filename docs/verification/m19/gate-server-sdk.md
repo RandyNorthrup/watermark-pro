@@ -1,6 +1,7 @@
-# Isolated built-Worker gate transport — 2026-09-09
+# Isolated built-Worker gate transport — 2026-09-09 and 2026-09-13
 
-This records the gate-server repair and its verification boundary. The full E2E
+This records the initial gate-server repair and the later connection-reuse
+correction. The full E2E
 run interrupted by Wrangler's proxy crash is not certified by these focused
 checks. Application authorization, CSRF checks, input limits, dependency pins and
 coverage floors remain unchanged.
@@ -44,9 +45,11 @@ and GET/HEAD request bodies before dispatch. Request bodies and response bodies
 stream with per-request cancellation. A normal completed request does not abort
 its response; a disconnected client cancels only its own work.
 
-The bridge preserves Origin, cookies, status, response headers and separate
-Set-Cookie values. It strips hop-by-hop fields. It asks the SDK for identity
-encoding because SDK fetch may decode responses, and fails a contrary encoded
+The bridge preserves Origin, account headers, cookies, status, response headers
+and separate Set-Cookie values. It strips hop-by-hop fields and untrusted `MF-*`
+headers before either dispatch path. Header names are snapshotted before deletion
+so adjacent routing fields cannot be skipped. It asks for identity encoding
+because either fetch implementation may decode responses, and fails a contrary encoded
 response instead of sending decoded bytes with stale gzip/Brotli headers.
 Requests arriving before migration readiness receive 503. Dispatch errors
 receive 502, or a terminated stream if headers have already been sent. No failed
@@ -63,11 +66,19 @@ bridge or converted to success, and the subsequent isolated offline conflict
 rerun produced no additional gate failures. The stage diagnostics allow any
 recurrence in the final run to be investigated without exposing private data.
 
-The final dispatcher is a small local test adapter Worker. Its supported
-`WorkerHandle.fetch` delegates `/api/*`, `/`, `/privacy`, and `/terms` through a
-native service binding to the unchanged compiled application Worker. All other
-requests go to the native ASSETS binding inside workerd. The adapter does not
-read or rewrite request bodies, Origin, cookies, status or response bodies. The
+The dispatcher is a small local test adapter Worker, configured as the primary
+Worker. Application paths (`/api/*`, `/`, `/privacy`, `/terms`) and all requests
+carrying a body retain the supported `WorkerHandle.fetch` transport. Bodyless
+static and SPA requests use the supported harness `listen().url` through pooled
+HTTP. The same `isGateWorkerPath` matcher controls dispatch and service routing;
+there is no second route list. The adapter sends application paths through a
+native service binding to the unchanged compiled application Worker; other paths
+go to the native ASSETS binding inside workerd.
+
+At adapter entry, the request's external URL is restored from trusted
+`GATE_ORIGIN` configuration because the native listener otherwise supplies its
+own ephemeral address. The path and query remain intact. Caller Origin, account
+headers, cookies and request/response bodies are not rewritten or buffered. The
 native asset service retains SPA fallback, redirects, `_headers`, and method
 handling. Startup fails unless the built configuration has exactly that
 verified set of four disjoint Worker-first patterns and the ASSETS binding;
@@ -78,7 +89,7 @@ matcher. The actual built application remains `no_bundle`, with its original
 compiled modules. Both Workers and the asset binding are local to the same
 owned SDK session; no remote service or deployment is created.
 
-## Observed verification and rejected transport approaches
+## Initial 2026-09-09 verification and rejected approaches
 
 - Five real Node HTTP bridge tests pass: readiness, exact POST framing,
   foreign-Origin preservation, multiple cookies, response encoding failure,
@@ -152,3 +163,91 @@ passing application response. Passing native-adapter evidence is also under
 `temp/lumafoil-workerd-*` and `temp/lumafoil-gate-native-*`. Full quality,
 E2E/axe, SAST and performance certification must be completed by the release
 owner against the final transport; the earlier interrupted run remains failed.
+
+## 2026-09-13 connection-reuse correction
+
+The later screenshot investigation reproduced real static HTTP 502 responses,
+including a JavaScript module and a font-license install request, and a separate
+unanswered module request. A failed screenshot attempt is retained as failed;
+successful retries or isolated probes do not establish that every historical
+failure had the same cause.
+
+A separate fixture copied all 2,418 public offline-inventory URLs into an owned
+directory. It used synthetic Workers, both native ASSETS bindings and the gate's
+compatibility settings, with no application authentication, D1/R2 user data or
+developer credentials. Each transport received eight inventory rounds, eight
+readers, five-second idle gaps and 64 early cancellations per round. No request
+was retried. The probe's own request deadline recorded a failure if exceeded;
+no application or audit timeout changed.
+
+The SDK path failed in round eight with the nested exception
+`connect EADDRINUSE 127.0.0.1:<owned runtime port>` (Windows errno -4091), which
+became the gate's fixed 502 response. Installed Miniflare source sets
+`options.reset = true` on each SDK runtime dispatch; its bundled Undici destroys
+that connection after the response. An independent 40-read observation of
+`undici:client:connected` counted 41 opened connections through the SDK and 2
+through the native listener. Together, these establish a reproduced loopback
+connection-allocation failure and the SDK's avoidable per-asset connection churn.
+The finite diagnostic allowlist now identifies `EADDRINUSE` without logging the
+address, exception text or stack.
+
+| Isolated workload                                                      | Asset reads | Early cancellations | Incorrect responses | Byte mismatches |
+| ---------------------------------------------------------------------- | ----------: | ------------------: | ------------------: | --------------: |
+| Original SDK dispatch                                                  |      19,344 |                 512 |          1 HTTP 502 |               0 |
+| Native listener comparison                                             |      19,344 |                 512 |                   0 |               0 |
+| Corrected native adapter, with trusted-origin and forged-header checks |      19,344 |                 512 |                   0 |               0 |
+
+The initial native comparison failed the external-origin contract. Restoring the
+trusted configured origin corrected that difference. A negative header test also
+caught an early implementation mistake: deleting from a live Headers iterator
+skipped an adjacent `MF-*` field. The snapshot-before-delete correction was
+verified before integration.
+
+Routing every request through the native listener was rejected by the actual
+Worker fixture: an unread upload received its correct 403, but the next healthy
+request returned 500. Adding `Connection: close` only to body-bearing requests
+did not fix that failure. The final split therefore retains the already proven
+SDK path for application requests and streamed bodies, while pooled HTTP handles
+the large volume of bodyless static requests. This changes no production Worker,
+upload buffering, operating-system settings, dependency version, retry policy or
+acceptance threshold.
+
+The final canonical `startGateServer` factory was then exercised against its own
+copied public assets and isolated synthetic bindings for eight complete rounds:
+19,344 asset reads, 16 early refused uploads (both API 403 and static-path 405),
+and healthy API and exact-byte asset responses immediately after each refusal.
+There were zero failed reads, incorrect statuses or byte mismatches. This mixed
+run verifies the final dispatch selection, not only the standalone native helper.
+
+The maintained `npm run test:gate` suite passes all 15 tests. Its real Worker
+fixture verifies migrations, R2 and rate bindings, external URL and original
+Origin/account/cookie/body values, forged routing-header removal, multiple
+Set-Cookie values, redirects, live streamed output, cancellation, early unread
+403/405 responses followed by healthy requests, identity encoding, native SPA
+handling, invalid configuration refusal and owned cleanup. Separate bridge tests
+exercise truncated uploads, cancelled downloads, hostile targets and failures
+without leaking arbitrary diagnostics.
+
+Disposable mutations removed trusted-origin restoration and routing-header
+removal separately. Each failed the direct request assertion with exit 1;
+byte-exact restoration returned the eight bridge tests to green. A real built
+application smoke also passed initial signup, verification-email origin, returning
+login, session-cookie domain/path/HttpOnly attributes, session identity,
+foreign-Origin and foreign-account refusal followed by healthy API/assets, and
+logout revocation without a global site-data wipe. It used isolated D1/R2 state
+and printed only fixed check labels.
+
+Scoped ESLint, TypeScript and dead-code checks passed. The unchanged SAST rule
+sets ran 203 applicable rules on the five changed gate source/test files with
+zero findings and complete parsing. This is scoped evidence, not a replacement
+for the release owner's full quality and application security gates.
+
+Detailed private evidence remains under ignored
+`temp/gate-sustained-u0C3iZ/`, `temp/gate-native-red-*`,
+`temp/gate-post-close-*`, `temp/gate-auth-origin-smoke.log`, and
+`temp/gate-final-isolated-upload-tests.log`. Final mixed-load evidence is at
+`temp/gate-final-mixed-probe.log` and `temp/gate-final-mixed-QKhS4y/results.json`;
+the final origin/header drill receipt is under `temp/gate-native-red-Jqdyky/`.
+The release owner still owns full
+quality, E2E/axe, Lighthouse and screenshot certification against this final
+transport. These focused checks do not close the earlier interrupted audits.

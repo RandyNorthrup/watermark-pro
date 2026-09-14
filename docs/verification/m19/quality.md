@@ -2,6 +2,16 @@
 
 ## Current Deployment Checkpoint — 2026-09-13
 
+The subsequent canonical `npm run quality` completed with exit 0 on the integrated
+cloud/upload and conservative gate-transport corrections. It passed 2,789
+unit/browser tests, 63 real Worker tests, unchanged coverage floors (92.50%
+statements, 85.31% branches, 92.31% functions, 93.40% lines), 15 gate tests and all
+42 build checks/bundle limits. Global SAST then passed 509 rules over 2,110 files
+with zero findings. Evidence is `temp/cloud-final-quality.log` and
+`temp/cloud-final-sast.log`. This new complete invocation supersedes the earlier
+continued-chain quality boundary for these source changes; it does not change
+the retained failed commands or finish the remaining UI/performance inventories.
+
 Source `4c5a2ed` is deployed with the final Save Image label and coordinated UI
 changes. Current evidence includes 2,781 unit/browser tests, 63 Worker tests,
 unchanged coverage floors, all 42 build checks, zero SAST findings and 12 hosted

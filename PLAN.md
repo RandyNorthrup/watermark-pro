@@ -115,6 +115,17 @@ consent. Automatic GitHub Actions and Dependabot remain intentionally disabled
 per the owner's cost decision. Local coverage and security thresholds were not
 lowered, and manual-only CI is not a feature that needs to be switched back on.
 
+The gate transport investigation reproduced Windows `EADDRINUSE`: SDK dispatch
+reset every static-file socket. The integrated fix pools bodyless asset/SPA
+requests through the supported native listener and retains the SDK for canonical
+Worker paths and streamed uploads, using the existing routing classifier. An
+all-native candidate and a body-only Connection:close variant failed the real
+early-refused upload check and were rejected. The final split passed 15 gate
+tests, 19,344 mixed exact-byte reads with rejected uploads, real auth/cookie
+boundaries, and deliberate origin/header failures. See
+`docs/verification/m19/gate-server-sdk.md`. This repairs the audit infrastructure;
+it does not retroactively pass earlier screenshot attempts.
+
 ### Active goal — revised 2026-09-12
 
 Finish and verify the deployed, invitation-only Lumafoil application at

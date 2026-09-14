@@ -7,10 +7,32 @@ import { test } from 'node:test'
 import { GATE_WORKER_PATTERNS } from './lib/gate-routing.mjs'
 import { startGateServer } from './lib/gate-runtime.mjs'
 
+const STREAM_OBSERVATION_TIMEOUT_MS = 5000
+
 const FIXTURE_WORKER = `export default {
   async fetch(request, env) {
     const pathname = new URL(request.url).pathname
     if (pathname === '/api/health') return Response.json({ status: 'ok', environment: env.APP_ENV })
+    if (pathname === '/api/deny') return new Response('forbidden', { status: 403 })
+    if (pathname === '/api/request') {
+      const headers = new Headers({ 'cache-control': 'private, no-store' })
+      headers.append('set-cookie', 'first=1; Path=/; HttpOnly')
+      headers.append('set-cookie', 'second=2; Path=/; SameSite=Lax')
+      return Response.json({
+        url: request.url,
+        origin: request.headers.get('origin'),
+        account: request.headers.get('x-lumafoil-account-id'),
+        cookie: request.headers.get('cookie'),
+        internal: Array.from(request.headers.keys()).filter(name => name.startsWith('mf-')),
+        body: await request.text(),
+      }, { headers })
+    }
+    if (pathname === '/api/redirect') return new Response(null, {
+      status: 302, headers: { location: env.APP_URL + '/api/request?preserved=yes' },
+    })
+    if (pathname === '/api/stream') return new Response(new ReadableStream({
+      start(controller) { controller.enqueue(new TextEncoder().encode('first live chunk')) },
+    }))
     if (pathname === '/api/bindings') {
       await env.BUCKET.put('test-value', 'isolated bytes')
       const stored = await env.BUCKET.get('test-value')
@@ -102,6 +124,56 @@ test('SDK gate uses real migrations, R2 and rate bindings with test-only configu
       testSecret: true,
       inheritedSecrets: false,
     })
+    const echoed = await fetch(gate.origin + '/api/request?preserved=yes', {
+      method: 'POST',
+      headers: {
+        origin: 'https://foreign.example',
+        'x-lumafoil-account-id': 'account-a',
+        cookie: 'session=synthetic',
+        'mf-original-url': 'https://forged.example/api/private',
+        'mf-probe': 'forged',
+        'mf-route-override': 'lumafoil-local-gates',
+      },
+      body: 'Exact bytes \u{0} ©',
+    })
+    assert.equal(echoed.status, 200)
+    assert.deepEqual(await echoed.json(), {
+      url: gate.origin + '/api/request?preserved=yes',
+      origin: 'https://foreign.example',
+      account: 'account-a',
+      cookie: 'session=synthetic',
+      internal: [],
+      body: 'Exact bytes \u{0} ©',
+    })
+    assert.deepEqual(echoed.headers.getSetCookie(), [
+      'first=1; Path=/; HttpOnly',
+      'second=2; Path=/; SameSite=Lax',
+    ])
+    assert.equal(echoed.headers.get('cache-control'), 'private, no-store')
+    const redirect = await fetch(gate.origin + '/api/redirect', { redirect: 'manual' })
+    assert.equal(redirect.status, 302)
+    assert.equal(redirect.headers.get('location'), gate.origin + '/api/request?preserved=yes')
+    const stream = await fetch(gate.origin + '/api/stream', {
+      signal: AbortSignal.timeout(STREAM_OBSERVATION_TIMEOUT_MS),
+    })
+    const reader = stream.body.getReader()
+    const first = await reader.read()
+    assert.equal(first.done, false)
+    assert.equal(new TextDecoder().decode(first.value), 'first live chunk')
+    await reader.cancel()
+    const afterStream = await fetch(gate.origin + '/api/health')
+    assert.equal(afterStream.status, 200)
+    await afterStream.text()
+    const rejectedUpload = await fetch(gate.origin + '/api/deny', {
+      method: 'POST',
+      headers: { origin: 'https://foreign.example' },
+      body: 'unread rejected body'.repeat(4096),
+    })
+    assert.equal(rejectedUpload.status, 403)
+    assert.equal(await rejectedUpload.text(), 'forbidden')
+    const afterRejection = await fetch(gate.origin + '/api/health')
+    assert.equal(afterRejection.status, 200)
+    assert.deepEqual(await afterRejection.json(), { status: 'ok', environment: 'test' })
     const config = JSON.parse(await readFile(path.join(gate.directory, 'wrangler.json'), 'utf8'))
     assert.equal(config.d1_databases[0].remote, false)
     assert.equal(config.r2_buckets[0].remote, false)

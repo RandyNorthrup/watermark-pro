@@ -24,8 +24,21 @@ makes name/email claims conditional on availability. The parser now keeps `sub`
 mandatory and uses available name claims, email, or the actual subject for its
 bounded display label. Four intended failures with the previous required-name
 parser and two still-rejected missing-subject controls establish the regression;
-the corrected focused suite passed 47 cases. The live OneDrive retry remains
-pending until this parser correction is deployed.
+the corrected focused suite passed 47 cases. The parser correction is deployed
+as source `8735ea3`, Worker `6fbbebef-c230-45ae-bd1a-a288f79c4566`. OneDrive now
+connects and passed a real canonical refresh grant with matching account identity
+and a rotated refresh token. The rotated credential was encrypted and DPAPI
+protected; no production rows or expiry timestamps changed.
+
+OneDrive folder browsing/creation passed, but its first file save failed. A
+protected raw Graph listing confirmed the test folder was actually empty. The
+canonical upload-session request returned HTTP 400 `invalidRequest`; adding
+fileSize did not help. An empty-body control and a rename-only body each returned
+HTTP 200 with a recognized Microsoft upload host. Each created session was
+cancelled with HTTP 204 before sending any bytes. The narrow correction removes
+only redundant item.name; the validated filename remains in the URL and explicit
+rename-on-conflict remains in the body. Final live save/collision/share/reload
+checks remain pending until this correction is deployed.
 
 The earlier checkpoints below retain their original scope. They are not current
 claims that every provider remains disconnected or that the revised UI has a

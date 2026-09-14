@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 import { ensureOneDriveFolder, oneDriveUploadUrl, uploadOneDriveImage } from './onedrive-upload'
 import { MICROSOFT_GRAPH_ROOT } from '../../../shared/constants'
@@ -77,7 +78,19 @@ describe('OneDrive safe writes', () => {
   it('uploads with explicit rename policy and never sends a bearer token to the upload URL', async () => {
     const fetcher = vi
       .fn<typeof fetch>()
-      .mockResolvedValueOnce(Response.json({ uploadUrl: SESSION }))
+      .mockImplementationOnce((_input, init) => {
+        if (typeof init?.body !== 'string') throw new Error('Expected JSON session body')
+        const payload: unknown = JSON.parse(init.body)
+        const { item } = z.object({ item: z.record(z.string(), z.unknown()) }).parse(payload)
+        // The real personal endpoint refuses a duplicated filename even when
+        // it agrees with the path, but accepts the rename policy by itself.
+        if (Object.hasOwn(item, 'name'))
+          return Promise.resolve(
+            Response.json({ error: { code: 'invalidRequest' } }, { status: 400 }),
+          )
+        expect(item['@microsoft.graph.conflictBehavior']).toBe('rename')
+        return Promise.resolve(Response.json({ uploadUrl: SESSION }))
+      })
       .mockResolvedValueOnce(Response.json(SAVED, { status: 201 }))
     vi.stubGlobal('fetch', fetcher)
     const result = await uploadOneDriveImage('secret-token', UPLOAD, 'folder')
@@ -88,7 +101,7 @@ describe('OneDrive safe writes', () => {
     expect(fetcher.mock.calls[0]?.[1]).toMatchObject({
       method: 'POST',
       body: JSON.stringify({
-        item: { name: 'photo.png', '@microsoft.graph.conflictBehavior': 'rename' },
+        item: { '@microsoft.graph.conflictBehavior': 'rename' },
       }),
     })
     const upload = fetcher.mock.calls[1]

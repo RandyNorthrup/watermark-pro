@@ -4,12 +4,110 @@ import { randomBytes } from 'node:crypto'
 import { request as httpRequest } from 'node:http'
 import { test } from 'node:test'
 
-import { classifyGateFailure, createGateBridge } from './lib/gate-http-bridge.mjs'
+import {
+  classifyGateFailure,
+  createGateBridge,
+  createNativeGateDispatcher,
+} from './lib/gate-http-bridge.mjs'
+import gateRouter from './lib/gate-router-worker.mjs'
 import { loopbackRequest as request } from './lib/test-http-request.mjs'
 
 function expectedFailure() {
   // Intentional client aborts and gateway failures are asserted through their result and signal.
 }
+
+test('native listener restores trusted URL and preserves Origin, account, bytes and cookies while stripping forged routing headers', async () => {
+  const bridge = await createGateBridge(0)
+  const listener = await createGateBridge(0)
+  const cookies = ['first=1; Path=/; HttpOnly', 'second=2; Path=/; SameSite=Lax']
+  const inspectRequest = (destination) => ({
+    async fetch(request) {
+      const headers = new Headers({
+        'content-type': 'application/json',
+        'cache-control': 'private, no-store',
+      })
+      for (const cookie of cookies) headers.append('set-cookie', cookie)
+      return Response.json(
+        {
+          destination,
+          url: request.url,
+          origin: request.headers.get('origin'),
+          account: request.headers.get('x-lumafoil-account-id'),
+          cookie: request.headers.get('cookie'),
+          internal: request.headers
+            .keys()
+            .filter((name) => name.startsWith('mf-'))
+            .toArray(),
+          body: await request.text(),
+        },
+        { headers },
+      )
+    },
+  })
+  listener.ready((url, init) =>
+    gateRouter.fetch(new Request(url, init), {
+      GATE_ORIGIN: bridge.origin,
+      APP: inspectRequest('worker'),
+      ASSETS: inspectRequest('assets'),
+    }),
+  )
+  bridge.ready(createNativeGateDispatcher(listener.origin))
+  try {
+    for (const [pathname, destination] of [
+      ['/api/echo?preserved=yes', 'worker'],
+      ['/app/editor?preserved=yes', 'assets'],
+    ]) {
+      const response = await request(
+        bridge.origin,
+        pathname,
+        {
+          method: 'POST',
+          headers: {
+            origin: 'https://foreign.example',
+            'x-lumafoil-account-id': 'account-a',
+            cookie: 'session=synthetic',
+            'mf-original-url': 'https://forged.example/api/private',
+            'mf-probe': 'untrusted',
+            'mf-route-override': 'other-worker',
+          },
+        },
+        'Exact bytes \u{0} ©',
+      )
+      assert.equal(response.status, 200)
+      assert.deepEqual(JSON.parse(response.bytes), {
+        destination,
+        url: bridge.origin + pathname,
+        origin: 'https://foreign.example',
+        account: 'account-a',
+        cookie: 'session=synthetic',
+        internal: [],
+        body: 'Exact bytes \u{0} ©',
+      })
+      assert.deepEqual(response.headers['set-cookie'], cookies)
+      assert.equal(response.headers['cache-control'], 'private, no-store')
+    }
+  } finally {
+    await bridge.close()
+    await listener.close()
+  }
+})
+
+test('native listener refuses remote origins, credentials and non-origin URLs', () => {
+  const remote = new URL('http://127.0.0.1/')
+  remote.hostname = 'remote.example'
+  for (const url of [
+    'https://127.0.0.1/',
+    remote,
+    'http://user@127.0.0.1/',
+    'http://user:password@127.0.0.1/',
+    'http://127.0.0.1/path',
+    'http://127.0.0.1/?query=value',
+    'http://127.0.0.1/#fragment',
+  ])
+    assert.throws(() => createNativeGateDispatcher(url), /plain loopback HTTP origin/)
+  for (const url of ['http://127.0.0.1:1234/', 'http://localhost:1234/', 'http://[::1]:1234/'])
+    assert.equal(typeof createNativeGateDispatcher(url), 'function')
+})
 
 async function expectStatus(origin, pathname, status, options = {}, body) {
   const response = await request(origin, pathname, options, body)
@@ -106,7 +204,7 @@ test('dispatcher exceptions and mislabeled encoded responses fail without killin
     assert.deepEqual(
       diagnostic.mock.calls.map((call) => call.arguments[0]),
       [
-        'Gate request failed (forwarding_failed; sdk_dispatch; unclassified).',
+        'Gate request failed (forwarding_failed; runtime_dispatch; unclassified).',
         'Gate request failed (forwarding_failed; response_headers; response_encoding_mismatch).',
       ],
     )
@@ -118,10 +216,11 @@ test('dispatcher exceptions and mislabeled encoded responses fail without killin
 test('response chunks stream before completion and an unread client cancellation cancels only that request', async (context) => {
   context.mock.method(console, 'error', expectedFailure)
   const bridge = await createGateBridge(0)
+  const listener = await createGateBridge(0)
   const streamed = Promise.withResolvers()
   const cancelled = Promise.withResolvers()
   let requestSignal
-  bridge.ready(async (url, init) => {
+  listener.ready(async (url, init) => {
     if (url.pathname === '/healthy') return new Response('still alive')
     requestSignal = init.signal
     return new Response(
@@ -136,6 +235,7 @@ test('response chunks stream before completion and an unread client cancellation
       }),
     )
   })
+  bridge.ready(createNativeGateDispatcher(listener.origin))
   try {
     const url = new URL(bridge.origin)
     const received = Promise.withResolvers()
@@ -160,15 +260,17 @@ test('response chunks stream before completion and an unread client cancellation
     assert.equal(healthy.bytes.toString(), 'still alive')
   } finally {
     await bridge.close()
+    await listener.close()
   }
 })
 
 test('an upload interrupted after dispatch aborts its body read and leaves the bridge usable', async (context) => {
   context.mock.method(console, 'error', expectedFailure)
   const bridge = await createGateBridge(0)
+  const listener = await createGateBridge(0)
   const entered = Promise.withResolvers()
   const failed = Promise.withResolvers()
-  bridge.ready(async (url, init) => {
+  listener.ready(async (url, init) => {
     if (url.pathname === '/healthy') return new Response('still alive')
     entered.resolve()
     try {
@@ -179,6 +281,7 @@ test('an upload interrupted after dispatch aborts its body read and leaves the b
       throw error
     }
   })
+  bridge.ready(createNativeGateDispatcher(listener.origin))
   try {
     const url = new URL(bridge.origin)
     const client = httpRequest({
@@ -196,6 +299,7 @@ test('an upload interrupted after dispatch aborts its body read and leaves the b
     await expectStatus(bridge.origin, '/healthy', 200)
   } finally {
     await bridge.close()
+    await listener.close()
   }
 })
 
@@ -248,6 +352,12 @@ test('finite SDK diagnostics identify nested transport, fetch-policy and I/O fai
     ],
     [Object.assign(new Error(canary), { code: 'UND_ERR_BODY_TIMEOUT' }), 'UND_ERR_BODY_TIMEOUT'],
     [
+      new TypeError('fetch failed', {
+        cause: Object.assign(new Error(canary), { code: 'EADDRINUSE' }),
+      }),
+      'EADDRINUSE',
+    ],
+    [
       new TypeError('fetch failed', { cause: new Error('unexpected redirect') }),
       'unexpected_redirect',
     ],
@@ -278,7 +388,7 @@ test('finite SDK diagnostics identify nested transport, fetch-policy and I/O fai
       assert.equal(response.bytes.toString(), '{"error":"gate_request_failed"}')
       const logged = diagnostic.mock.calls.at(-1).arguments
       assert.deepEqual(logged, [
-        `Gate request failed (forwarding_failed; sdk_dispatch; ${classification}).`,
+        `Gate request failed (forwarding_failed; runtime_dispatch; ${classification}).`,
       ])
       assert.equal(JSON.stringify(logged).includes(canary), false)
     }

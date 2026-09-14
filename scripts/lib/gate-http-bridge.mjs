@@ -16,6 +16,7 @@ const TRANSPORT_CODES = new Set([
   'EAI_AGAIN',
   'ENOTFOUND',
   'EPIPE',
+  'EADDRINUSE',
   'ERR_INVALID_ARG_TYPE',
   'ERR_STREAM_PREMATURE_CLOSE',
   'UND_ERR_CONNECT_TIMEOUT',
@@ -48,6 +49,42 @@ const MESSAGE_CODES = new Map([
   ['Worker threw an uncaught exception', 'worker_uncaught_exception'],
 ])
 const CROSS_REQUEST_IO_PREFIX = 'Cannot perform I/O on behalf of a different request.'
+const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]'])
+
+function removeRoutingHeaders(headers) {
+  // Snapshot first: deletion from the live iterator can skip adjacent headers.
+  const internalHeaders = headers
+    .keys()
+    .filter((name) => name.startsWith('mf-'))
+    .toArray()
+  for (const name of internalHeaders) headers.delete(name)
+}
+
+/** Use the supported listener with persistent HTTP connections; SDK dispatch resets every socket. */
+export function createNativeGateDispatcher(listenerUrl) {
+  const listener = new URL(listenerUrl)
+  if (
+    listener.protocol !== 'http:' ||
+    !LOOPBACK_HOSTS.has(listener.hostname) ||
+    listener.username !== '' ||
+    listener.password !== '' ||
+    listener.pathname !== '/' ||
+    listener.search !== '' ||
+    listener.hash !== ''
+  )
+    throw new Error('The gate runtime listener must be a plain loopback HTTP origin.')
+  return async (url, init) => {
+    const target = new URL(listener)
+    target.pathname = url.pathname
+    target.search = url.search
+    const headers = new Headers(init.headers)
+    // Miniflare consumes these before the router runs. Browser-supplied values
+    // must not select another Worker or forge the URL used by authentication.
+    removeRoutingHeaders(headers)
+    headers.set('host', listener.host)
+    return await fetch(target, { ...init, headers })
+  }
+}
 
 /** Error objects can have arbitrary properties; diagnostics must remain safe even if a getter throws. */
 function errorField(error, field) {
@@ -85,6 +122,7 @@ function requestHeaders(request) {
   // SDK fetch can decode an encoded response. Ask for identity and reject a
   // contrary response so decoded bytes cannot retain gzip/br labels or lengths.
   headers.set('accept-encoding', 'identity')
+  removeRoutingHeaders(headers)
   return headers
 }
 
@@ -180,7 +218,7 @@ export async function createGateBridge(port) {
       )
         throw new GateRequestError(BAD_REQUEST)
       if (state.dispatch === null) throw new GateRequestError(UNAVAILABLE)
-      stage = 'sdk_dispatch'
+      stage = 'runtime_dispatch'
       const result = await state.dispatch(url, {
         method: request.method,
         headers,
