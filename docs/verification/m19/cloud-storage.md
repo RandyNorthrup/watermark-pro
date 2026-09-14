@@ -1,5 +1,38 @@
 # Cloud Storage and Native Sharing — 2026-09-12
 
+## Current Live Closure — 2026-09-13
+
+The shared runtime correction is live. Google Drive and Dropbox now complete
+real authorization. Both passed real refresh-token exchange and matching account
+identity through the canonical crypto/token code in an isolated no-log Worker.
+The probe changed no production rows or expiry timestamps, and retained returned
+credentials only as encrypted, DPAPI-protected evidence. Natural expiry was not
+observed. Private finite summaries are under `temp/private-config/`.
+
+Google's live UI journey created a synthetic QA folder, saved and reopened a
+480 × 320 PNG, created a native public link, revoked it back to private access,
+and reused the connection from a fresh Lumafoil page without OAuth. The QA folder
+and file were moved to recoverable Trash. Dropbox file-flow checks are ongoing.
+
+OneDrive reached successful token exchange but failed identity parsing. Source
+`a31b1f7`, deployed as Worker `e16ff83b-fa27-4984-ad0e-a4ba9361faf2`, records only
+finite private callback audit stage/reason/status fields; the observed result was
+`identity / invalid_data`. No provider messages, URLs, codes, tokens or claims
+were recorded. Microsoft's discovery endpoint matches the pinned UserInfo URL.
+Its [UserInfo contract](https://learn.microsoft.com/en-us/entra/identity-platform/userinfo)
+makes name/email claims conditional on availability. The parser now keeps `sub`
+mandatory and uses available name claims, email, or the actual subject for its
+bounded display label. Four intended failures with the previous required-name
+parser and two still-rejected missing-subject controls establish the regression;
+the corrected focused suite passed 47 cases. The live OneDrive retry remains
+pending until this parser correction is deployed.
+
+The earlier checkpoints below retain their original scope. They are not current
+claims that every provider remains disconnected or that the revised UI has a
+complete screenshot certification.
+
+## Earlier Deployment Checkpoint — 2026-09-12
+
 The durable-connection changes are deployed at `https://lumafoil.com` from source
 commit `0d764ec`, Worker version `fbbf320b-9041-4801-8373-f8d7fb022191`.
 All four cloud secret bindings were accepted and migrations 0013–0017 applied.

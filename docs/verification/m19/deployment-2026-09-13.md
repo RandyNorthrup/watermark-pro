@@ -31,7 +31,7 @@ comparison of every record.
 
 ## Hosted Evidence
 
-The retained public receipt `temp/hosted-release-public.json` records 12 passing
+The retained public receipt `temp/ui-organization-hosted-public.json` records 12 passing
 checks: production health and configured sign-in/cloud clients, anonymous 401s
 on protected routes, callback no-referrer policy, and exact hashes for the
 service worker, offline manifest, updated editor/font/preset product images and
@@ -39,9 +39,9 @@ PDF.js worker. Production settings readback reported Logs and Traces disabled.
 
 Sanitized local evidence:
 
-- `temp/protected-publication-deploy.log`, SHA-256
+- `temp/ui-organization-deploy-success.log`, SHA-256
   `6eef2ba0538ed9aec56de59ab3e97970da240f1a99019344d87f4abe431e5ac5`.
-- `temp/hosted-release-public.json`, SHA-256
+- `temp/ui-organization-hosted-public.json`, SHA-256
   `625d8d6aa8a9a8986cea964e46b6b86af33cc795bea6200ee10b1c309f31c3df`.
 - `temp/ui-release-preservation.json` records the private aggregate check without
   publishing identities or content counts.

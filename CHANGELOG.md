@@ -24,6 +24,11 @@ what was planned; superseded entries stay.
 
 ### Editor Organization And Accessible Tour — 2026-09-13
 
+- Microsoft cloud identity parsing now accepts optional name/email claims while
+  requiring the provider's stable subject. Available full/given/family names or
+  email supply the label; a bounded real subject is shown when those claims are
+  absent. Missing or empty subjects still fail. Live diagnostics isolated the
+  OneDrive failure to identity parsing after successful token exchange.
 - Failed cloud callbacks now append a private audit classification using only
   the authenticated actor, provider, finite internal stage/reason and HTTP status.
   Codes, tokens, provider messages, callback URLs and personal claims are excluded.

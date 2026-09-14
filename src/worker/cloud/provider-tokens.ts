@@ -205,8 +205,23 @@ export async function cloudAccountIdentity(
         {},
       ),
     )
+  const optionalName = z.string().trim().max(CLOUD_OAUTH.maxLabelLength).nullish()
   const account = z
-    .object({ sub: z.string(), name: z.string() })
+    .object({
+      sub: identity.shape.id,
+      name: optionalName,
+      given_name: optionalName,
+      family_name: optionalName,
+      email: optionalName,
+    })
     .parse(await providerJson(configuration.userinfo_endpoint, { headers }))
-  return identity.parse({ id: account.sub, label: account.name })
+  // Microsoft only supplies name/email claims when available. The subject
+  // remains mandatory; its real identifier is the last-resort display label.
+  const label =
+    [
+      account.name ?? '',
+      [account.given_name, account.family_name].filter(Boolean).join(' '),
+      account.email ?? '',
+    ].find((value) => value.length > 0) ?? account.sub
+  return identity.parse({ id: account.sub, label: label.slice(0, CLOUD_OAUTH.maxLabelLength) })
 }

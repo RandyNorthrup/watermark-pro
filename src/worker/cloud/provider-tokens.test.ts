@@ -203,3 +203,42 @@ it('reads cloud identities independently and refuses an untrusted Microsoft disc
   await expect(cloudAccountIdentity('onedrive', 'token')).rejects.toThrow()
   expect(fetcher).toHaveBeenCalledTimes(5)
 })
+
+it.each([
+  [{ sub: 'microsoft-id', given_name: 'Microsoft', family_name: 'User' }, 'Microsoft User'],
+  [{ sub: 'microsoft-id', name: ' ', email: 'cloud@example.test' }, 'cloud@example.test'],
+  [{ sub: 'microsoft-id' }, 'microsoft-id'],
+  [
+    { sub: 'microsoft-id', name: null, given_name: null, family_name: null, email: null },
+    'microsoft-id',
+  ],
+] as const)(
+  'accepts an authenticated Microsoft subject when optional name claims are absent',
+  async (payload, label) => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json({ userinfo_endpoint: 'https://graph.microsoft.com/oidc/userinfo' }),
+      )
+      .mockResolvedValueOnce(Response.json(payload))
+    vi.stubGlobal('fetch', fetcher)
+    expect(await cloudAccountIdentity('onedrive', 'opaque-microsoft-token')).toEqual({
+      id: 'microsoft-id',
+      label,
+    })
+  },
+)
+
+it.each([{ name: 'Unbound User' }, { sub: '', name: 'Unbound User' }])(
+  'never substitutes a display name for a missing Microsoft subject',
+  async (payload) => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json({ userinfo_endpoint: 'https://graph.microsoft.com/oidc/userinfo' }),
+      )
+      .mockResolvedValueOnce(Response.json(payload))
+    vi.stubGlobal('fetch', fetcher)
+    await expect(cloudAccountIdentity('onedrive', 'opaque-microsoft-token')).rejects.toThrow()
+  },
+)
