@@ -258,7 +258,9 @@ export async function disconnectCloudConnection(
   try {
     const init: RequestInit = {
       method: 'POST',
-      redirect: 'error',
+      // Native workerd does not accept redirect:error. A manual redirect is
+      // non-OK, so it cannot forward credentials or report successful revocation.
+      redirect: 'manual',
       cache: 'no-store',
       signal: AbortSignal.timeout(CLOUD_OAUTH.requestTimeoutMs),
     }

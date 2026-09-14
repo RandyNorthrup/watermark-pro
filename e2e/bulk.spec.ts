@@ -230,8 +230,8 @@ test('watermarks twenty photos and downloads them as a ZIP', async ({ page, requ
     expect(watermarkDtoSchema.parse(await response.json())).toMatchObject(preset)
   }
   await page.reload()
-  await navigateTo(page, 'Library')
-  const library = page.getByRole('region', { name: 'Watermark library', exact: true })
+  await navigateTo(page, 'Saved Watermarks')
+  const library = page.getByRole('region', { name: 'Saved Watermarks', exact: true })
   for (const preset of presets)
     await expect(library.getByRole('link', { name: preset.name, exact: true })).toBeVisible()
   // Two cards with long descriptions must still fit a phone's width.

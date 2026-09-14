@@ -15,10 +15,10 @@ vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-modu
 const client = fakeAuth
 
 function photoList() {
-  return within(screen.getByRole('region', { name: 'Gallery' })).getByRole('list')
+  return within(screen.getByRole('region', { name: 'Watermarked Images' })).getByRole('list')
 }
 async function readyPhotos() {
-  const region = await screen.findByRole('region', { name: 'Gallery' })
+  const region = await screen.findByRole('region', { name: 'Watermarked Images' })
   return await within(region).findByRole('list')
 }
 
@@ -61,7 +61,7 @@ describe('gallery page', () => {
     )
     renderApp('/app/gallery')
     expect(await screen.findByLabelText('Search')).toBeEnabled()
-    expect(screen.getByLabelText('Preset')).toBeEnabled()
+    expect(screen.getByLabelText('Saved Watermark')).toBeEnabled()
     expect(screen.getByRole('progressbar', { name: 'Storage used' })).not.toHaveAttribute('value')
     expect(screen.getByRole('button', { name: 'Select all' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Share' })).toBeDisabled()
@@ -87,7 +87,7 @@ describe('gallery page', () => {
       },
     })
     renderApp('/app/gallery')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Gallery')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Watermarked Images')
     await waitFor(() =>
       expect(screen.getByTestId('usage-summary')).toHaveTextContent(
         `${String(PHOTO_PAGE_SIZE + 5)} photos · `,
@@ -105,11 +105,11 @@ describe('gallery page', () => {
     )
     expect(screen.queryByRole('button', { name: 'Load more' })).not.toBeInTheDocument()
 
-    await user.selectOptions(screen.getByLabelText('Preset'), 'wm-2')
+    await user.selectOptions(screen.getByLabelText('Saved Watermark'), 'wm-2')
     await waitFor(() => expect(within(photoList()).getAllByRole('listitem')).toHaveLength(32))
     await user.type(screen.getByLabelText('Search'), 'shot-00')
     await waitFor(() => expect(within(photoList()).getAllByRole('listitem')).toHaveLength(5))
-    await user.selectOptions(screen.getByLabelText('Preset'), '')
+    await user.selectOptions(screen.getByLabelText('Saved Watermark'), '')
     await waitFor(() => expect(within(photoList()).getAllByRole('listitem')).toHaveLength(10))
 
     await user.click(screen.getByRole('button', { name: 'Open shot-003.jpg' }))
@@ -178,7 +178,7 @@ describe('gallery page', () => {
     installLibraryApi({ failWith: 'forbidden' })
     renderApp('/app/gallery')
     expect(await screen.findByText("Couldn't load recent work")).toBeInTheDocument()
-    const gallery = within(screen.getByRole('region', { name: 'Gallery' }))
+    const gallery = within(screen.getByRole('region', { name: 'Watermarked Images' }))
     await waitFor(() => expect(gallery.getAllByRole('alert')).toHaveLength(2))
     for (const alert of gallery.getAllByRole('alert')) {
       expect(alert).toHaveTextContent('Your role does not allow this.')

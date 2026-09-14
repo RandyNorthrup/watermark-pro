@@ -266,7 +266,8 @@ export const TEXT_EFFECTS = ['solid', 'outline', 'emboss', 'engrave'] as const
 export type TextEffect = (typeof TEXT_EFFECTS)[number]
 export const MIN_LETTER_SPACING = -0.1
 export const MAX_LETTER_SPACING = 1
-export const MAX_CURVE = 1
+/** Half-turn units preserve saved curves while allowing either direction to close a circle. */
+export const MAX_CURVE = 2
 
 /** Geometric watermark shapes; their original vector paths live in the client catalogue. */
 export const SHAPES = [

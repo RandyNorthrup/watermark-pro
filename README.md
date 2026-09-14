@@ -1,8 +1,8 @@
 # Lumafoil
 
 Watermark photos, videos, and PDFs with text, logos, signatures, QR codes, and
-reusable presets. Process files on your device, save finished photos to a private
-gallery, and share selected results when you choose.
+reusable saved watermarks. Start from an included preset or make your own design,
+process files on your device, and keep finished photos in Watermarked Images.
 
 The hosted service is live at **[lumafoil.com](https://lumafoil.com)** with
 **invitation-only** admission. Admitted users can
@@ -20,7 +20,7 @@ services have their own costs.
   drawn signatures, text effects, 20 geometric shapes, tiling, multiple marks and saved QR codes.
 - **Photo workflow:** single-image editing, batch processing, crop/resize,
   brightness/contrast/saturation controls, and JPEG/PNG/WebP export.
-- **Save and share:** reusable preset import/export, gallery storage,
+- **Save and share:** saved watermark import/export, private image storage,
   expiring/revocable gallery links and optional cloud-file connections.
 - **Offline work:** prepare the app, edit presets and save photos without a
   connection, then synchronize with visible retry and conflict recovery.
@@ -28,7 +28,8 @@ services have their own costs.
   sign-in, explicit provider linking, and workspaces kept private until their
   owner deliberately grants access.
 - **Interface:** twelve languages, Arabic right-to-left layout, light/dark
-  themes and responsive phone/tablet/desktop controls.
+  themes and responsive phone/tablet/desktop controls. An optional guided tour
+  can be exited at any point and replayed from Account Settings → Help And Credits.
 
 **Release status:** Lumafoil 2.0 is deployed on `lumafoil.com`. The latest complete
 local quality run passed on the preceding sidebar/offline-build revision. Its
@@ -264,10 +265,10 @@ dashboard under Turnstile, put the site key in `wrangler.jsonc`
 (`env.production.vars`) and the secret in
 `wrangler secret put TURNSTILE_SECRET_KEY --env production`.
 
-## Watermark library
+## Saved Watermarks
 
-Presets belong to an organization and are shared by all of its members. A
-preset is a mark plus placement, contrast and style settings
+Saved watermarks belong to a workspace and are available to its authorized members.
+A saved watermark contains a mark plus placement, contrast and style settings
 (`src/shared/watermark.ts`):
 
 - **Marks:** text in any of 551 bundled font families (Fontsource, OFL or
@@ -297,30 +298,31 @@ uploaded through the same route. When a logo is chosen a **Prepare** step can
 remove a flat background (an adjustable-tolerance corner flood with a
 one-pixel feather) and trim transparent margins, then uploads a clean PNG.
 
-Presets **export** to a portable `.wmp.json` file (logos embedded) and
-**import** back — one preset or the whole library. Import validates every
-preset against the same schema the app uses and renames a name clash rather
+Saved watermarks **export** to a portable `.wmp.json` file (logos embedded) and
+**import** back — one watermark or the collection. Import validates every
+watermark against the same schema the app uses and renames a name clash rather
 than overwriting, so a file from another workspace lands safely.
 
 The designer previews changes through the shared image engine, on the bundled
 sample scene or a photo you choose. Previewing does not upload the source photo;
 Gallery and cloud transfers are explicit save actions.
 
-## Editor
+## Images
 
 `/app/editor` watermarks one photo at a time. Open a photo (or drop it on the
-canvas), create a watermark in place or add a saved preset, and adjust it for
+canvas), create a watermark in place or add a saved watermark, and adjust it for
 this photo only: drag the mark,
 scale it from the corner handle, rotate it from the top handle, pinch and
 twist on a touch screen, or use the keyboard (arrow keys nudge, Shift for
 larger steps, `+`/`-` resize, `[`/`]` rotate). While dragging, the mark's
 center snaps to the margin lines, the thirds and the center, with guides
 drawn while it is snapped; hold Alt (Option on a Mac) to place it freely.
-Changes affect the current mark until you explicitly save its named preset;
-"Revert" restores the saved preset's style.
+Changes affect the current mark until you explicitly save its named watermark;
+"Revert" restores the saved watermark's style. Save Image, beside New above
+the canvas, opens the existing format, download, sharing and storage controls.
 
-Add up to eight presets to one photo. Each is a layer with its own
-placement and style; the list under the preset picker selects the layer the
+Add up to eight watermarks to one photo. Each is a layer with its own
+placement and style; the list in Saved selects the layer the
 handles and the panels edit, and later layers paint over earlier ones.
 
 Rotate in quarter turns, flip, and straighten with a slider that
@@ -339,15 +341,16 @@ appears only where the browser can share files). Every step is undoable
 Worker in your browser, or on the main thread where the browser has no
 `OffscreenCanvas`; nothing is uploaded.
 
-## Built-in templates
+## Included Presets
 
-The Library and the Image, Documents and Video Presets panels provide eighteen
+The Images, Documents and Videos Presets panels provide eighteen
 searchable starter layouts: Draft, Confidential, Strictly Confidential, Internal
 Use Only, Do Not Copy, Do Not Distribute, Copy, Void, For Review, Proof, Sample,
 Preview, Approved, Final, Unpaid, Copyright, Photo Credit and Repeating Proof.
 These are original project-licensed layouts using ordinary editable watermark
-specs. Applying one makes an unsaved draft; saving creates the user's own preset
+specs. Applying one makes an unsaved draft; saving creates the user's own watermark
 in the chosen workspace folder. A visual label does not change access permissions.
+Saved shows the workspace's stored watermarks separately from these included presets.
 
 ## Bulk watermarking
 
@@ -480,12 +483,12 @@ A token with no value is removed and any separator it left behind is tidied.
 `{location}` prints the photo's GPS position onto the picture; it is opt-in by
 typing the token, and no default preset uses it.
 
-## Gallery
+## Watermarked Images
 
 `/app/gallery` keeps watermarked photos in the organization's storage. Save a
-photo from the editor's Export tab or a whole batch from the bulk tool; the
+photo from the Save Image controls or a whole batch from the bulk tool; the
 browser builds a thumbnail and uploads both. Photos are listed newest first
-with search, a preset filter and paging; select several and delete them after
+with search, a saved-watermark filter and paging; select several and delete them after
 a confirmation, or open one to download or delete it. Viewers can browse and
 download; editors and above can save and delete.
 
@@ -499,8 +502,9 @@ Select photos in the gallery (or open one) and choose Share to publish them
 under a link that expires after 1, 7 or 30 days, or never. The link can be
 copied or handed to the device's share sheet. Anyone with it sees the album
 at `/share/<token>` and can download the photos; nothing else in the
-organization is reachable from it. `/app/shares` lists every link with its
-status and lets you revoke access. Revocation blocks subsequent server requests;
+workspace is reachable from it. Manage Links in Watermarked Images lists links
+with their status and lets you revoke access; there is no separate Shares page.
+Revocation blocks subsequent server requests;
 it cannot recall copies already downloaded. Editors and above can share;
 viewers cannot.
 

@@ -357,26 +357,27 @@ function WatermarkDesignerSession({
                   <>
                     <Field
                       label={t('designer.text.label')}
-                      hint={t('designer.text.hint', {
-                        max: MAX_TEXT_LENGTH,
-                        lines: MAX_TEXT_LINES,
-                      })}
+                      className="watermark-text-field"
+                      hint={t('designer.text.hint', { max: MAX_TEXT_LENGTH })}
                     >
                       {(controlProps) => (
-                        <Textarea
-                          {...controlProps}
-                          ref={textRef}
-                          value={spec.text}
-                          maxLength={MAX_TEXT_LENGTH}
-                          rows={2}
-                          onChange={(event) => {
-                            setHasTextInsertionError(false)
-                            setSpec({ ...spec, text: limitLines(event.currentTarget.value) })
-                          }}
-                        />
+                        <div className="watermark-text-input">
+                          <Textarea
+                            {...controlProps}
+                            ref={textRef}
+                            value={spec.text}
+                            maxLength={MAX_TEXT_LENGTH}
+                            rows={2}
+                            className="rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+                            onChange={(event) => {
+                              setHasTextInsertionError(false)
+                              setSpec({ ...spec, text: limitLines(event.currentTarget.value) })
+                            }}
+                          />
+                          <TextSymbolBar onInsert={insertText} />
+                        </div>
                       )}
                     </Field>
-                    <TextSymbolBar onInsert={insertText} />
                     {hasTextInsertionError ? (
                       <p role="status" className="text-xs text-ink-muted">
                         {t('designer.text.insertLimit')}

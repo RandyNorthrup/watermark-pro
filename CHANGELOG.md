@@ -7,6 +7,46 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Editor Organization And Accessible Tour — 2026-09-13
+
+- Separated included Presets from Saved user watermarks in the editor tools.
+  Navigation now reads Images, Documents, Videos, Bulk, Saved Watermarks and
+  Watermarked Images. Existing user content keeps its storage identities.
+- Moved Save Image beside New above the canvas while retaining the existing
+  output panel. Export PDF and Export Video now sit in their canvas toolbars and
+  retain their existing export actions. Crop occupies the former Export tool slot.
+- Renamed the image canvas action to Save Image after the final label request;
+  its output, download and cloud-save controls retain their existing behavior.
+- Link-backed actions now share the same title casing as ordinary buttons.
+- Fixed a late sample-photo decode invalidating the first preview of a newly
+  selected photo and leaving output controls disabled. Original-resolution
+  export readiness and stale-frame disposal remain enforced.
+- Failed or terminated image workers now reject subsequent requests promptly.
+  Refused message transfers release their untransferred bitmaps and clear only
+  the failed pending request, preserving other work.
+- Moved link management into a Watermarked Images modal and removed the redundant
+  Shares page. Public links and their copy, share and revoke actions remain.
+- Added a six-pixel selection clearance outside painted watermark bounds. Full
+  circular text is available without overlapping end glyphs; saved half-circle
+  values retain their appearance.
+- Attached the character/detail toolbar to the text field, shortened its helper
+  to the character limit, centered link actions and zoom/grid controls, condensed
+  synchronization status, and allowed canvas/tools to have independent heights.
+  Headers now scroll with the page on every device.
+- Replaced automatic feature tips with an optional, replayable guided tour.
+  Account Settings includes tour replay and discreet font, symbol, sticker and
+  interface license links.
+- Corrected shared glass gradients, text, button, switch and focus colors for
+  contrast. Current visual/contrast and aggregate release verification are tracked
+  in PLAN.md; implementation alone does not establish complete WCAG conformance.
+- Fixed the shared server request option that prevented Google Drive, Dropbox
+  and OneDrive connections from completing. The native Worker rejects
+  `redirect: 'error'` before sending a request; token, account-identity and
+  revocation requests now use manual redirects and refuse redirection. Credentials
+  are never forwarded to a redirect destination. Real Worker regression tests
+  and protocol refusal cases passed; post-deployment provider journeys remain
+  separately tracked until they have actually completed.
+
 ### Production Deployment — 2026-09-12
 
 - Deployed source commit `0d764ec` to `lumafoil.com` as Worker version

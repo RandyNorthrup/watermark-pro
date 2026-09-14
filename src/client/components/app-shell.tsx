@@ -17,7 +17,6 @@ import {
   PencilRuler,
   Plus,
   ScrollText,
-  Share2,
   ShieldCheck,
   Stamp,
   Users,
@@ -68,12 +67,11 @@ const FirstUseGuidance = lazy(async () => {
 // it at render. The two rails keep their literal keys for the typed catalogue.
 const WORKSPACE_NAV_ITEMS = [
   { to: '/app/editor', label: 'shell.nav.editor', icon: PencilRuler, exact: false },
-  { to: '/app/library', label: 'shell.nav.library', icon: Stamp, exact: false },
-  { to: '/app/bulk', label: 'shell.nav.bulk', icon: Layers, exact: false },
-  { to: '/app/video', label: 'shell.nav.video', icon: Film, exact: false },
   { to: '/app/documents', label: 'shell.nav.documents', icon: FileText, exact: false },
+  { to: '/app/video', label: 'shell.nav.video', icon: Film, exact: false },
+  { to: '/app/bulk', label: 'shell.nav.bulk', icon: Layers, exact: false },
+  { to: '/app/library', label: 'shell.nav.library', icon: Stamp, exact: false },
   { to: '/app/gallery', label: 'shell.nav.gallery', icon: Images, exact: false },
-  { to: '/app/shares', label: 'shell.nav.shares', icon: Share2, exact: false },
 ] as const
 
 const OVERVIEW_NAV_ITEM = {
@@ -146,9 +144,8 @@ function currentAdminSection(search: unknown): AdminSection {
 
 /** Tool routes keep a focused workspace rail; account routes switch to their own section. */
 function navItemsFor(session: SessionData, pathname: string): readonly NavItem[] {
+  if (!isSettingsArea(pathname)) return WORKSPACE_NAV_ITEMS
   const canManageSite = isPlatformAdmin(session.user)
-  if (!isSettingsArea(pathname))
-    return canManageSite ? [OVERVIEW_NAV_ITEM, ...WORKSPACE_NAV_ITEMS] : WORKSPACE_NAV_ITEMS
   const back = canManageSite
     ? { ...OVERVIEW_NAV_ITEM, icon: ArrowLeft }
     : BACK_TO_WORKSPACE_NAV_ITEM
@@ -186,7 +183,7 @@ export function AppShell({ session, organization, organizations, children }: App
       'shell.nav.admin')
     : currentItem?.label
   return (
-    <div className="workspace-scene flex min-h-svh md:h-svh md:overflow-hidden">
+    <div className="workspace-scene flex min-h-svh items-start">
       <a
         href="#main"
         className="sr-only z-50 rounded-md bg-brand-600 px-3 py-2 text-white focus:not-sr-only focus:absolute focus:start-2 focus:top-2"
@@ -259,13 +256,18 @@ export function AppShell({ session, organization, organizations, children }: App
         <main
           id="main"
           tabIndex={-1}
-          className="min-h-0 flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:overflow-y-auto md:overscroll-contain md:px-8 md:pt-6 md:pb-8"
+          className="min-h-0 flex-1 px-4 py-6 pb-[calc(var(--app-tab-bar-height)+1.5rem)] md:px-8 md:pt-6 md:pb-8"
         >
           <div className="w-full">{children}</div>
         </main>
         <TabBar items={TAB_BAR_ITEMS} />
         <Suspense fallback={null}>
-          <FirstUseGuidance key={session.user.id} userId={session.user.id} pathname={pathname} />
+          <FirstUseGuidance
+            key={session.user.id}
+            userId={session.user.id}
+            pathname={pathname}
+            workspaceId={organization?.id ?? null}
+          />
         </Suspense>
       </div>
     </div>
@@ -376,7 +378,7 @@ function TabBar({ items }: { items: readonly NavItem[] }) {
           key={to}
           to={to}
           activeOptions={{ exact }}
-          className="flex flex-col items-center justify-center gap-1 px-1 text-[0.6875rem] font-medium text-ink-muted"
+          className="flex flex-col items-center justify-center gap-1 px-1 text-center text-[0.6875rem] leading-tight font-medium text-ink-muted"
           activeProps={{ className: 'text-brand-700 dark:text-brand-200' }}
         >
           <Icon aria-hidden="true" className="size-5" />

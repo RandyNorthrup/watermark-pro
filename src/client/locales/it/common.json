@@ -4,13 +4,12 @@
   },
   "shell": {
     "nav": {
-      "library": "Libreria",
-      "editor": "Immagine",
-      "bulk": "In blocco",
+      "library": "Filigrane Salvate",
+      "editor": "Immagini",
+      "bulk": "Lotto",
       "video": "Video",
       "documents": "Documenti",
-      "gallery": "Galleria",
-      "shares": "Condivisioni",
+      "gallery": "Immagini Con Filigrana",
       "members": "Membri",
       "audit": "Registro",
       "admin": "Admin"
@@ -113,7 +112,7 @@
   },
   "library": {
     "orgRequired": "Crea uno spazio di lavoro o unisciti a uno per creare una libreria di filigrane.",
-    "heading": "Libreria delle filigrane",
+    "heading": "Filigrane Salvate",
     "description": "Filigrane salvate in {{name}}. Applicale a un file o a un intero gruppo.",
     "export": "Esporta",
     "exportPreset": "Esporta {{name}}",
@@ -175,7 +174,7 @@
     "notAnImage": "Quel file non è un'immagine leggibile dal browser.",
     "text": {
       "label": "Testo",
-      "hint": "Fino a {{max}} caratteri su un massimo di {{lines}} righe. Usa “Inserisci dettaglio” per token come la data o la fotocamera, compilati per ogni foto. {location} stampa sulla foto la posizione GPS dell'immagine.",
+      "hint": "Fino a {{max}} caratteri.",
       "symbols": "Simboli di testo",
       "insertSymbol": "Inserisci {{symbol}}",
       "insertLimit": "Il testo è pieno. Seleziona testo da sostituire o elimina dei caratteri."
@@ -210,15 +209,13 @@
       "weight": "Spessore",
       "search": "Cerca caratteri",
       "recent": "Usati di recente",
-      "license": "Licenza del carattere",
       "previewError": "Alcune anteprime dei caratteri non sono state caricate. Riapri la lista quando sei connesso per riprovare.",
       "empty": "Nessun Carattere Corrispondente"
     },
     "symbol": {
       "icons": "Icone",
       "glyphLabel": "Glifo {{glyph}}",
-      "iconLabel": "Icona {{label}}",
-      "license": "Licenze delle icone"
+      "iconLabel": "Icona {{label}}"
     },
     "shape": {
       "label": "Forma",
@@ -392,7 +389,6 @@
       "choose": "Scegli {{name}}",
       "previous": "Precedente",
       "next": "Successivo",
-      "license": "Fluent Emoji · licenza MIT",
       "usage": "Uso commerciale consentito; conserva l’avviso di licenza della grafica quando la ridistribuisci.",
       "guide": "Guida alle licenze della grafica"
     },
@@ -400,15 +396,15 @@
   },
   "editor": {
     "orgRequired": "Crea uno spazio di lavoro o unisciti a uno per modificare le immagini.",
-    "heading": "Immagine",
+    "heading": "Immagini",
     "description": "Scegli un preset, posizionalo, ritaglia e ridimensiona sul tuo dispositivo. Scarica il risultato o scegli di salvarlo nella galleria o nel cloud.",
     "tabs": {
-      "presets": "Preimpostazioni",
+      "presets": "Predefiniti",
       "watermark": "Filigrana",
       "crop": "Ritaglia",
       "adjust": "Regola",
       "resize": "Ridimensiona",
-      "export": "Esporta"
+      "saved": "Salvati"
     },
     "toolsLabel": "Strumenti dell'editor",
     "openPhoto": "Apri foto",
@@ -559,7 +555,8 @@
       "rotate": "Ruota la filigrana",
       "resize": "Ridimensiona la filigrana"
     },
-    "newWorkspace": "Nuovo"
+    "newWorkspace": "Nuovo",
+    "exportImage": "Salva Immagine"
   },
   "bulk": {
     "orgRequired": "Crea uno spazio di lavoro o unisciti a uno per applicare filigrane in blocco.",
@@ -653,7 +650,7 @@
   },
   "gallery": {
     "orgRequired": "Crea uno spazio di lavoro o unisciti a uno per avere una galleria.",
-    "heading": "Galleria",
+    "heading": "Immagini Con Filigrana",
     "description": "Foto con filigrana salvate in {{name}}. Cerca, filtra, scarica o elimina.",
     "usage_one": "{{count}} foto · {{used}} di {{max}}",
     "usage_many": "{{count}} foto · {{used}} di {{max}}",
@@ -712,7 +709,7 @@
     "link": "Link",
     "noExpiry": "Questo link non scade.",
     "expires": "Scade {{when}}.",
-    "manageLinks": "Gestisci i link in Condivisioni.",
+    "manageLinks": "Gestisci Link: Immagini Con Filigrana.",
     "linkCopied": "Link copiato negli appunti.",
     "linkShared": "Link condiviso.",
     "copyLink": "Copia link",
@@ -720,14 +717,11 @@
     "shareSyncBlocked": "Risolvi i problemi di sincronizzazione delle foto selezionate prima di creare un link."
   },
   "shares": {
-    "orgRequired": "Crea uno spazio di lavoro o unisciti a uno per condividere foto.",
-    "noPermission": "Il tuo ruolo non include la condivisione.",
-    "heading": "Condivisioni",
+    "heading": "Gestisci Link",
     "description": "Link che permettono a persone esterne a {{name}} di visualizzare e scaricare foto selezionate. Revocare un link lo disattiva immediatamente.",
     "loading": "Caricamento delle condivisioni",
     "loadErrorTitle": "Impossibile caricare le condivisioni",
     "empty": "Ancora nessun link. Seleziona le foto nella galleria e scegli Condividi.",
-    "openGallery": "Apri la galleria",
     "rowCreated_one": "{{count}} foto · creato {{created}}",
     "rowCreated_many": "{{count}} foto · creato {{created}}",
     "rowCreated_other": "{{count}} foto · creato {{created}}",
@@ -878,7 +872,7 @@
   },
   "video": {
     "orgRequired": "Crea uno spazio di lavoro o unisciti a uno per applicare filigrane ai video.",
-    "heading": "Filigrana sui video",
+    "heading": "Video",
     "description": "Visualizza l’anteprima del video, posiziona filigrane in momenti diversi, aggiungi dissolvenze ed esporta con l’audio.",
     "checkingSupport": "Verifica del supporto video",
     "unsupportedTitle": "Il video non è supportato in questo browser",
@@ -920,7 +914,7 @@
       "chooseVideo": "Apri un video e aggiungi prima una filigrana valida.",
       "waitPreview": "Attendi l’anteprima della filigrana prima di aggiungere un fotogramma chiave.",
       "changed": "Il video o la filigrana è cambiato durante l’esportazione. Esporta di nuovo per usare le modifiche attuali.",
-      "download": "Scarica Video",
+      "download": "Esporta Video",
       "cloudSaved": "Il video con filigrana è stato salvato nel tuo archivio cloud."
     }
   },
@@ -941,7 +935,7 @@
       "invalidFile": "Scegli un PDF entro il limite di dimensione del documento.",
       "chooseMark": "Aggiungi una filigrana valida prima di esportare questo documento.",
       "changed": "Il documento o la filigrana è cambiato durante l’esportazione. Esporta di nuovo per usare le modifiche attuali.",
-      "download": "Scarica PDF",
+      "download": "Esporta PDF",
       "cloudSaved": "Il PDF con filigrana è stato salvato nel tuo archivio cloud.",
       "originalHint": "Il testo originale, la grafica vettoriale, le dimensioni delle pagine e le immagini incorporate vengono conservati. Solo la filigrana viene rasterizzata. I PDF protetti da password devono prima essere sbloccati."
     }
@@ -1215,7 +1209,7 @@
     "syncing": "Sincronizzazione del lavoro salvato…",
     "disconnected": "Offline — le modifiche restano su questo dispositivo.",
     "pending": "Modifiche in attesa: {{count}}",
-    "upToDate": "Il lavoro salvato è sincronizzato.",
+    "upToDate": "Sincronizzato",
     "syncNow": "Sincronizza ora",
     "review": "Rivedi le modifiche ({{count}})",
     "deletion": "Eliminazione",
@@ -1233,7 +1227,7 @@
     "connectOnce": "Accedi e apri questo spazio di lavoro una volta con una connessione prima di usarlo offline.",
     "onlineOnly": "La gestione di account, condivisioni e membri richiede una connessione. Gli strumenti fotografici e i preset salvati restano disponibili offline.",
     "ready": "I file dell’app sono pronti per l’uso offline.",
-    "preparing": "Preparazione dei file offline. Tieni aperta questa scheda.",
+    "preparing": "Preparazione Offline",
     "updateAvailable": "Un aggiornamento è pronto. Completa le modifiche non salvate prima di ricaricare; il lavoro salvato resta su questo dispositivo.",
     "reload": "Ricarica per aggiornare"
   },
@@ -1330,78 +1324,6 @@
     "admin": "Amministratore",
     "user": "Utente"
   },
-  "guidance": {
-    "dismiss": "Chiudi suggerimento",
-    "back": "Indietro",
-    "next": "Avanti",
-    "done": "Capito",
-    "page": "{{current}} di {{total}}",
-    "image": {
-      "title": "Immagine",
-      "first": "Apri una foto. Il file originale resta intatto.",
-      "second": "Lo zoom dell’area di lavoro cambia solo la vista. I download vengono generati dall’immagine originale; PNG è il formato predefinito senza perdita."
-    },
-    "watermark": {
-      "title": "Strumenti Filigrana",
-      "first": "Scegli testo, simbolo, forma, logo o codice QR.",
-      "second": "Tocca una filigrana per mostrare le maniglie. Trascina per spostare, avvicina o allontana le dita per ridimensionare e ruotale per girare. Tocca altrove per nascondere le maniglie."
-    },
-    "presets": {
-      "title": "Predefiniti Salvati",
-      "first": "Inizia con Bozza, Riservato o un altro modello, oppure scegli una filigrana salvata.",
-      "second": "Salva richiede un nome e una cartella. Nuovo inizia una nuova filigrana mantenendo il file aperto."
-    },
-    "crop": {
-      "title": "Ritaglia Foto",
-      "first": "Trascina i bordi o scegli le proporzioni.",
-      "second": "Ripristina ritaglio recupera la foto intera. L’originale non viene sovrascritto."
-    },
-    "adjust": {
-      "title": "Regolazioni Foto",
-      "first": "Usa i cursori per modificare l’aspetto della foto.",
-      "second": "Ogni ripristino recupera il valore predefinito. Annulla inverte l’ultima modifica."
-    },
-    "resize": {
-      "title": "Dimensioni Di Uscita",
-      "first": "Mantieni le dimensioni originali o scegli una nuova misura.",
-      "second": "Il ridimensionamento modifica l’esportazione. Lo zoom cambia solo la vista."
-    },
-    "export": {
-      "title": "Salva Risultato",
-      "first": "Scarica, salva nella Galleria o scegli una destinazione cloud.",
-      "second": "Controlla formato, dimensioni e qualità. Salvare nel cloud non condivide il file; crea i collegamenti separatamente in File cloud salvati."
-    },
-    "library": {
-      "title": "La Tua Libreria",
-      "first": "Trova le preimpostazioni recenti, esplora i modelli e organizza i progetti salvati in cartelle.",
-      "second": "Cerca o cambia vista per trovare una preimpostazione. Aprila per modificarla o applicala in Immagine, Documenti, Video o elaborazione in blocco."
-    },
-    "gallery": {
-      "title": "La Tua Galleria",
-      "first": "Trova foto recenti e organizza le immagini salvate in cartelle di questo spazio di lavoro.",
-      "second": "Scegli miniature, elenco o dettagli. Verifica una foto cerca una filigrana Lumafoil invisibile; non dimostra la proprietà."
-    },
-    "bulk": {
-      "title": "Elaborazione In Blocco",
-      "first": "Aggiungi foto, PDF e video supportati, scegli una filigrana salvata e controlla le impostazioni di uscita.",
-      "second": "Controlla ogni risultato o errore. Scarica uno ZIP o salva nel cloud; solo i risultati fotografici possono essere salvati nella Galleria."
-    },
-    "documents": {
-      "title": "Filigrane Documenti",
-      "first": "Apri un PDF, sfoglia le pagine e regola la filigrana con gli strumenti accanto all’anteprima.",
-      "second": "La filigrana si applica all’intero documento. L’esportazione conserva le pagine originali con testo, immagini e grafica vettoriale esistenti."
-    },
-    "video": {
-      "title": "Filigrane Video",
-      "first": "Apri un video supportato e scorri o riproduci l’anteprima mentre regoli la filigrana.",
-      "second": "Aggiungi fotogrammi chiave per muovere la filigrana nel tempo. Imposta Inizio, Fine e dissolvenze; controlla uscita e audio prima di esportare."
-    },
-    "workspace": {
-      "title": "Accesso Allo Spazio",
-      "first": "Apri Gestisci accesso nel menu utente per controllare la condivisione.",
-      "second": "I proprietari possono concedere accesso in visualizzazione o modifica. Condividere questo spazio non condivide altri spazi né gli account cloud collegati di altre persone."
-    }
-  },
   "workspaceAccess": {
     "loading": "Caricamento Accessi…",
     "ownerOnly": "Solo il proprietario dello spazio di lavoro può modificare gli accessi.",
@@ -1479,7 +1401,7 @@
   "folders": {
     "heading": "Cartelle",
     "rootPhoto": "Galleria",
-    "rootPreset": "Libreria",
+    "rootPreset": "Filigrane Salvate",
     "path": "Percorso Cartella",
     "new": "Nuova Cartella",
     "name": "Nome Cartella",
@@ -1510,7 +1432,7 @@
     "selection": "Elementi Selezionati: {{count}}"
   },
   "templates": {
-    "heading": "Modelli Di Filigrana",
+    "heading": "Predefiniti",
     "hint": "Applica un layout pronto, personalizzalo e salva la tua preimpostazione.",
     "search": "Cerca Modelli",
     "category": "Categoria Modelli",
@@ -1542,6 +1464,81 @@
       "copyright": "Diritti D’Autore",
       "photoCredit": "Credito Fotografico",
       "repeatingProof": "Prova Ripetuta"
+    }
+  },
+  "tour": {
+    "invitationTitle": "Vuoi Un Breve Tour?",
+    "invitationBody": "Scopri gli strumenti con un breve tour. Salva prima il lavoro in corso: il tour visita pagine diverse. Puoi uscire in qualsiasi momento o ripeterlo dalle impostazioni dell’account.",
+    "start": "Avvia Tour",
+    "decline": "No, Grazie",
+    "close": "Chiudi Tour",
+    "exit": "Esci Dal Tour",
+    "back": "Indietro",
+    "next": "Avanti",
+    "finish": "Fine",
+    "progress": "Passaggio {{current}} Di {{total}}",
+    "navigationError": "Impossibile aprire questa pagina. Riprova Avanti oppure esci dal tour.",
+    "settingsTitle": "Aiuto E Crediti",
+    "settingsBody": "Ripeti il tour guidato quando desideri rivedere le funzionalità.",
+    "replay": "Visualizza Tour Del Prodotto",
+    "licensesTitle": "Licenze E Crediti",
+    "licensesBody": "Le note su caratteri e illustrazioni restano disponibili qui. I simboli emoji usano i caratteri installati sul dispositivo.",
+    "fontPackages": "Licenze Dei Caratteri Inclusi",
+    "fontCatalog": "Catalogo Esteso Dei Caratteri E Licenze",
+    "stickerLicense": "Licenza Degli Adesivi",
+    "iconLicense": "Licenze Di Icone E Simboli",
+    "artworkUsage": "Uso Delle Illustrazioni E Note Di Esportazione",
+    "images": {
+      "title": "Immagini",
+      "body": "Apri una foto dal dispositivo, da un collegamento o dal cloud connesso. Zoom, griglia e aggancio aiutano il posizionamento. L’originale resta intatto; modifica e lavoro salvato sono disponibili offline."
+    },
+    "watermark": {
+      "title": "Crea Una Filigrana",
+      "body": "Aggiungi testo, simboli, forme, adesivi, loghi, firme o codici QR. Regola caratteri, posizione, colore, contorno, curva e stile. Trascina, pizzica e ruota sulla tela; Annulla ripristina le modifiche."
+    },
+    "presets": {
+      "title": "Preimpostazioni Incluse",
+      "body": "Preimpostazioni contiene i modelli inclusi, come Bozza e Riservato. Scegli una base e personalizzala in Filigrana. Restano separate dalle filigrane salvate."
+    },
+    "saved": {
+      "title": "I Tuoi Disegni Salvati",
+      "body": "Salvati apre le filigrane di questo spazio. Salva richiede un nome; Nuovo avvia un’altra filigrana conservando l’immagine. Riutilizza codici QR, loghi e testi con nome."
+    },
+    "transform": {
+      "title": "Ritaglia, Regola E Ridimensiona",
+      "body": "Ritaglia cambia l’inquadratura; Regola modifica l’aspetto; Ridimensiona imposta le dimensioni finali. Ogni cursore ha un ripristino. Mantieni le dimensioni originali salvo scelta diversa."
+    },
+    "export": {
+      "title": "Esporta Immagine",
+      "body": "Salva Immagine apre le opzioni finali. Scarica, condividi, salva in Immagini Con Filigrana o scegli una cartella cloud. PNG è il formato predefinito senza perdita; altri formati e qualità dipendono da te."
+    },
+    "documents": {
+      "title": "Documenti",
+      "body": "Apri un PDF, visualizza le pagine e applica filigrane con gli strumenti integrati. Esporta PDF salva il documento contrassegnato preservando il contenuto originale delle pagine."
+    },
+    "videos": {
+      "title": "Video",
+      "body": "Apri un video supportato e scorri la sequenza temporale. Posiziona filigrane in momenti diversi e aggiungi dissolvenze. L’esportazione ricodifica il video; i formati supportati dipendono dal browser."
+    },
+    "bulk": {
+      "title": "Elaborazione In Serie",
+      "body": "Elabora immagini, PDF e video insieme. Scegli una filigrana, controlla i risultati e scarica i file completati in uno ZIP. Un errore non elimina gli altri risultati."
+    },
+    "library": {
+      "title": "Filigrane Salvate",
+      "body": "Organizza i modelli riutilizzabili in cartelle. Cerca, filtra, cambia vista e trova il lavoro recente. I modelli appartengono allo spazio corrente e si sincronizzano alla riconnessione."
+    },
+    "gallery": {
+      "title": "Immagini Con Filigrana",
+      "body": "Trova le immagini recenti, organizza cartelle e cambia vista. Crea e gestisci collegamenti per le immagini selezionate. Controlla Una Foto cerca la filigrana invisibile di Lumafoil."
+    },
+    "account": {
+      "title": "Account E Cloud",
+      "body": "Gestisci gli accessi e connetti Google Drive, Dropbox o OneDrive. Le connessioni persistono fino a disconnessione o revoca. Esplora le cartelle consentite per aprire e salvare; valgono le regole del fornitore."
+    },
+    "workspace": {
+      "title": "Spazi E Accesso",
+      "body": "Usa il menu utente per cambiare spazio, invitare persone o Gestire L’Accesso. I proprietari concedono Visualizzazione o Modifica. Gli inviti personali non condividono contenuti. La sincronizzazione è in fondo alla barra laterale."
     }
   }
 }

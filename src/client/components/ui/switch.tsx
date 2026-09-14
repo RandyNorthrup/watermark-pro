@@ -28,8 +28,10 @@ export function Switch({ isChecked, className, onCheckedChange, ...props }: Swit
       <span
         aria-hidden="true"
         className={cn(
-          'pointer-events-none block size-5 rounded-full bg-white shadow-sm transition-transform',
-          isChecked ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0',
+          'pointer-events-none block size-5 rounded-full shadow-sm transition-transform',
+          isChecked
+            ? 'translate-x-5 bg-white rtl:-translate-x-5 dark:bg-brand-950'
+            : 'translate-x-0 bg-ink-muted dark:bg-white',
         )}
       />
     </button>

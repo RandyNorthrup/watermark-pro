@@ -1,8 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_SHAPE_SPEC, DEFAULT_STYLE, watermarkSpecSchema } from './watermark'
+import {
+  DEFAULT_SHAPE_SPEC,
+  DEFAULT_STYLE,
+  DEFAULT_TEXT_SPEC,
+  watermarkSpecSchema,
+} from './watermark'
 
 describe('M12 schema', () => {
+  it('allows full-circle curves in either direction without reinterpreting saved half circles', () => {
+    for (const curve of [-2, -1, 0, 1, 2]) {
+      const parsed = watermarkSpecSchema.parse({ ...DEFAULT_TEXT_SPEC, curve })
+      expect(parsed.kind === 'text' ? parsed.curve : null).toBe(curve)
+    }
+    for (const curve of [-2.01, 2.01, Infinity, NaN])
+      expect(watermarkSpecSchema.safeParse({ ...DEFAULT_TEXT_SPEC, curve }).success).toBe(false)
+  })
+
   it('parses a pre-M12 text preset, defaulting the new fields', () => {
     const legacy = {
       kind: 'text',

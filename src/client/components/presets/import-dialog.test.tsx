@@ -52,13 +52,13 @@ describe('ImportDialog', () => {
     const user = renderDialog(['Corner'])
 
     await user.click(screen.getByRole('button', { name: 'Open import' }))
-    await user.upload(screen.getByLabelText('Preset file'), presetFile())
+    await user.upload(screen.getByLabelText('Watermark file'), presetFile())
 
-    expect(await screen.findByText(/2 presets in this file/)).toBeInTheDocument()
+    expect(await screen.findByText(/2 watermarks in this file/)).toBeInTheDocument()
     expect(screen.getByText(/already exists/)).toBeInTheDocument()
 
     await user.click(screen.getByRole('checkbox', { name: /Studio/ }))
-    await user.click(screen.getByRole('button', { name: /Import 1 preset/ }))
+    await user.click(screen.getByRole('button', { name: /Import 1 watermark/ }))
 
     await waitFor(() => expect(importMock).toHaveBeenCalled())
     expect(importMock.mock.calls[0]?.[1]).toEqual([{ name: 'Corner (2)', spec: DEFAULT_TEXT_SPEC }])
@@ -69,11 +69,11 @@ describe('ImportDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Open import' }))
 
     parseMock.mockRejectedValueOnce(new Error('bad file'))
-    await user.upload(screen.getByLabelText('Preset file'), presetFile())
+    await user.upload(screen.getByLabelText('Watermark file'), presetFile())
     expect(await screen.findByText(/bad file/)).toBeInTheDocument()
 
     parseMock.mockResolvedValueOnce(bundle([]))
-    await user.upload(screen.getByLabelText('Preset file'), presetFile())
-    expect(await screen.findByText(/no presets/)).toBeInTheDocument()
+    await user.upload(screen.getByLabelText('Watermark file'), presetFile())
+    expect(await screen.findByText(/no watermarks/)).toBeInTheDocument()
   })
 })

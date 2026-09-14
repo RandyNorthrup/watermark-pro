@@ -20,6 +20,17 @@ import { shellOrganizationSchema, shellSessionSchema } from '../src/shared/shell
 
 export { expect } from '@playwright/test'
 
+/** Save the current sample as PNG through the same online/offline editor action. */
+export async function saveSampleImage(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Save Image' }).click()
+  await page.getByRole('combobox', { name: 'Format' }).click()
+  await page.getByRole('option', { name: 'PNG' }).click()
+  await page.getByRole('button', { name: 'Save To Watermarked Images' }).click()
+  await expect(
+    page.getByText(/Saved sample-photo-watermarked\.png to Watermarked Images\./),
+  ).toBeVisible()
+}
+
 /**
  * Navigates to `url`, retrying on WebKit's intermittent "Frame load
  * interrupted": on the iPhone/iPad projects the client-side load of a route
@@ -158,7 +169,7 @@ export async function navigateTo(page: Page, label: string) {
   // Desktop account routes intentionally replace workspace tools with a
   // contextual rail. Return through the role-appropriate workspace link, then
   // use the fresh workspace rail for the requested tool.
-  await sidebar.getByRole('link', { name: /^(Image|Overview)$/ }).click()
+  await sidebar.getByRole('link', { name: /^(Images|Overview)$/ }).click()
   const workspaceTarget = page
     .getByRole('navigation', { name: 'Primary', exact: true })
     .getByRole('link', { name: label, exact: true })
@@ -215,11 +226,11 @@ export async function signUpAndVerify(page: Page, request: APIRequestContext, pe
   await page.goto(verifyPath)
   // Every verified account starts in a separate personal workspace.
   await expect(page).toHaveURL(/\/app\/editor\/?$/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   await prepareReturningUser(page)
 }
 
-/** Existing feature journeys use experienced users; capture-guidance proves fresh-user tips. */
+/** Existing feature journeys use experienced users; capture-guidance proves the opt-in tour. */
 export async function prepareReturningUser(page: Page): Promise<void> {
   for (const topic of GUIDANCE_TOPICS) {
     const response = await page.request.post('/api/me/guidance/claim', {
@@ -228,7 +239,9 @@ export async function prepareReturningUser(page: Page): Promise<void> {
     })
     expect(response.status()).toBe(200)
   }
-  const dismiss = page.getByRole('button', { name: 'Dismiss Tip', exact: true })
+  // The initial page can claim and show its offer before these returning-user
+  // claims complete. Decline that specific invitation through the real UI.
+  const dismiss = page.getByRole('button', { name: 'No Thanks', exact: true })
   if (await dismiss.isVisible()) await dismiss.click()
 }
 
@@ -296,7 +309,7 @@ export async function signIn(
   await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page).toHaveURL(expectsSiteOverview ? /\/app\/?$/ : /\/app\/editor\/?$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    expectsSiteOverview ? 'Overview' : 'Image',
+    expectsSiteOverview ? 'Overview' : 'Images',
   )
   const personal = await expectActiveWorkspace(page, person, 'My workspace')
   expect(personal.member.role).toBe('owner')
@@ -307,7 +320,7 @@ export async function signIn(
   await page.getByRole('menuitem', { name: expectedWorkspace, exact: true }).click()
   await expect(switcher).toHaveText(expectedWorkspace)
   await closeMobileMenu(page)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   const selected = await expectActiveWorkspace(page, person, expectedWorkspace)
   expect(selected.organization.id).not.toBe(personal.organization.id)
 }
@@ -325,7 +338,7 @@ export async function createWorkspace(
   await page.getByLabel('Name').fill(organizationName)
   await page.getByRole('button', { name: 'Create workspace' }).click()
   await expect(page).toHaveURL(/\/app\/editor\/?$/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   const workspace = await expectActiveWorkspace(page, person, organizationName)
   expect(workspace.member.role).toBe('owner')
 }

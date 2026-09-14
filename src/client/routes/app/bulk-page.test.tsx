@@ -128,7 +128,7 @@ describe('bulk page', () => {
     await user.click(screen.getByRole('button', { name: 'Start' }))
     await screen.findByRole('button', { name: 'Download report-watermarked.pdf' })
     expect(
-      screen.getByRole('button', { name: 'Download clip-watermarked.mp4' }),
+      await screen.findByRole('button', { name: 'Download clip-watermarked.mp4' }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Adjust report.pdf' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Adjust clip.mp4' })).not.toBeInTheDocument()
@@ -137,7 +137,7 @@ describe('bulk page', () => {
         (run) => run.settings.video?.quality === 'low' && run.settings.video.resolution === '720p',
       ),
     ).toBe(true)
-    expect(screen.getByText(/Gallery saves include images only/)).toBeInTheDocument()
+    expect(screen.getByText(/Watermarked Images saves include images only/)).toBeInTheDocument()
     const saveActions = screen.getByRole('button', { name: 'Save 1 to gallery' }).parentElement
     if (saveActions === null) throw new Error('Gallery save actions missing')
     await user.click(within(saveActions).getByRole('button', { name: 'Destination Folder' }))
@@ -249,7 +249,7 @@ describe('bulk page', () => {
     seedOwnerWorkspace(client())
     const library = installLibraryApi()
     const { queryClient } = renderApp('/app/bulk')
-    await screen.findByRole('link', { name: 'Create a preset in the library' })
+    await screen.findByRole('link', { name: 'Create a watermark in Saved Watermarks' })
     expect(screen.queryByLabelText('Add a folder')).not.toBeInTheDocument()
     library.watermarks.push(makeWatermark())
     await act(() =>
@@ -437,7 +437,7 @@ describe('bulk page', () => {
     installLibraryApi()
     const { unmount } = renderApp('/app/bulk')
     expect(
-      await screen.findByRole('link', { name: 'Create a preset in the library' }),
+      await screen.findByRole('link', { name: 'Create a watermark in Saved Watermarks' }),
     ).toBeInTheDocument()
     unmount()
 

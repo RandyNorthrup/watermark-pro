@@ -1,15 +1,14 @@
 import type { GuidanceTopic } from '../../../shared/guidance'
 
-export interface GuidanceItem {
+interface GuidanceItem {
   topic: GuidanceTopic
-  anchor: HTMLElement | null
 }
 interface GuidanceState {
   active: GuidanceItem | null
   isBlocked: boolean
 }
 
-/** One account owns one queue. A claim must commit before any optional tip becomes visible. */
+/** One account owns one queue. A claim must commit before an optional tour offer becomes visible. */
 export class GuidanceQueue {
   readonly #claim: (topic: GuidanceTopic) => Promise<boolean>
   readonly #listeners = new Set<() => void>()
@@ -20,7 +19,6 @@ export class GuidanceQueue {
   #isClaiming = false
   #isDisposed = false
   #generation = 0
-  #context = ''
 
   readonly getSnapshot = (): GuidanceState => this.#state
   readonly subscribe = (listener: () => void): (() => void) => {
@@ -36,10 +34,6 @@ export class GuidanceQueue {
     if (this.#isDisposed) return
     this.#state = state
     for (const listener of this.#listeners) listener()
-  }
-
-  #hasContext(context: string): boolean {
-    return this.#context === context
   }
 
   #isCurrent(generation: number): boolean {
@@ -59,7 +53,6 @@ export class GuidanceQueue {
     if (item === undefined) return
     this.#isClaiming = true
     const generation = this.#generation
-    const context = this.#context
     // Strict Mode's setup/cleanup rehearsal must not consume a server claim.
     // Let synchronous navigation and cleanup finish before any request starts.
     await Promise.resolve()
@@ -68,12 +61,12 @@ export class GuidanceQueue {
       const isClaimed = await this.#claim(item.topic)
       if (!this.#isCurrent(generation)) return
       this.#consumed.add(item.topic)
-      if (isClaimed && this.#hasContext(context)) this.#publish({ ...this.#state, active: item })
+      if (isClaimed) this.#publish({ ...this.#state, active: item })
     } catch {
-      // Optional guidance waits for a later click/reconnect. A failed write
-      // never displays a tip or masquerades as a saved dismissal.
+      // A failed write waits for reconnect; it never displays an offer or
+      // masquerades as a saved dismissal.
       if (this.#isCurrent(generation)) {
-        if (this.#hasContext(context)) this.#pending.unshift(item)
+        this.#pending.unshift(item)
         this.#isClaiming = false
       }
       return
@@ -86,16 +79,9 @@ export class GuidanceQueue {
     this.#isDisposed = false
   }
 
-  setContext(context: string): void {
-    if (this.#context === context) return
-    this.#context = context
-    this.#pending.length = 0
-    this.#publish({ ...this.#state, active: null })
-  }
-
-  enqueue(topic: GuidanceTopic, anchor: HTMLElement | null): void {
+  enqueue(topic: GuidanceTopic): void {
     if (this.#isDisposed || this.#consumed.has(topic)) return
-    if (this.#pending.every((item) => item.topic !== topic)) this.#pending.push({ topic, anchor })
+    if (this.#pending.every((item) => item.topic !== topic)) this.#pending.push({ topic })
     void this.#advance()
   }
 

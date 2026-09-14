@@ -2,7 +2,12 @@
  * Main-thread handle on one watermark worker. Requests are correlated by id;
  * bitmaps are transferred, not copied.
  */
-import type { ApplyInput, ApplyOutput, WatermarkEngine } from './engine'
+import {
+  type ApplyInput,
+  type ApplyOutput,
+  closeInputBitmaps,
+  type WatermarkEngine,
+} from './engine'
 import type { ApplyMessage, WorkerResponse } from './protocol'
 
 export class WatermarkWorkerError extends Error {
@@ -18,6 +23,7 @@ export class WatermarkWorker implements WatermarkEngine {
   readonly #worker: Worker
   readonly #pending = new Map<number, Pending>()
   #nextId = 1
+  #failure: WatermarkWorkerError | null = null
 
   constructor(worker: Worker = createEngineWorker()) {
     this.#worker = worker
@@ -25,11 +31,7 @@ export class WatermarkWorker implements WatermarkEngine {
       this.#settle(event.data)
     })
     this.#worker.addEventListener('error', (event) => {
-      const failure = new WatermarkWorkerError(event.message || 'watermark worker crashed')
-      for (const pending of this.#pending.values()) {
-        pending.reject(failure)
-      }
-      this.#pending.clear()
+      this.#stop(new WatermarkWorkerError(event.message || 'watermark worker crashed'))
     })
   }
 
@@ -47,11 +49,25 @@ export class WatermarkWorker implements WatermarkEngine {
     }
   }
 
+  #stop(failure: WatermarkWorkerError): void {
+    if (this.#failure !== null) return
+    this.#failure = failure
+    this.#worker.terminate()
+    for (const pending of this.#pending.values()) {
+      pending.reject(failure)
+    }
+    this.#pending.clear()
+  }
+
   get busy(): number {
     return this.#pending.size
   }
 
   apply(input: ApplyInput): Promise<ApplyOutput> {
+    if (this.#failure !== null) {
+      closeInputBitmaps(input)
+      return Promise.reject(this.#failure)
+    }
     const id = this.#nextId
     this.#nextId += 1
     const message: ApplyMessage = { type: 'apply', id, ...input }
@@ -61,17 +77,24 @@ export class WatermarkWorker implements WatermarkEngine {
     ]
     return new Promise<ApplyOutput>((resolve, reject) => {
       this.#pending.set(id, { resolve, reject })
-      this.#worker.postMessage(message, transfer)
+      try {
+        this.#worker.postMessage(message, transfer)
+      } catch (error) {
+        this.#pending.delete(id)
+        // A refused transfer leaves the inputs owned by this engine, while
+        // successfully posted inputs must only be released inside the worker.
+        closeInputBitmaps(input)
+        reject(
+          new WatermarkWorkerError('watermark worker could not receive the request', {
+            cause: error,
+          }),
+        )
+      }
     })
   }
 
   terminate(): void {
-    this.#worker.terminate()
-    const failure = new WatermarkWorkerError('watermark worker terminated')
-    for (const pending of this.#pending.values()) {
-      pending.reject(failure)
-    }
-    this.#pending.clear()
+    this.#stop(new WatermarkWorkerError('watermark worker terminated'))
   }
 }
 

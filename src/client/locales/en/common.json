@@ -4,13 +4,12 @@
   },
   "shell": {
     "nav": {
-      "library": "Library",
-      "editor": "Image",
+      "library": "Saved Watermarks",
+      "editor": "Images",
       "bulk": "Bulk",
-      "video": "Video",
+      "video": "Videos",
       "documents": "Documents",
-      "gallery": "Gallery",
-      "shares": "Shares",
+      "gallery": "Watermarked Images",
       "members": "Members",
       "audit": "Audit log",
       "admin": "Admin"
@@ -112,25 +111,25 @@
   },
   "library": {
     "orgRequired": "Create or join a workspace to build a watermark library.",
-    "heading": "Watermark library",
+    "heading": "Saved Watermarks",
     "description": "Saved watermarks in {{name}}. Apply them to one file or a whole batch.",
     "export": "Export",
     "exportPreset": "Export {{name}}",
-    "importPresets": "Import presets",
-    "newPreset": "New preset",
-    "exportErrorTitle": "Could not export the presets",
-    "loadingPresets": "Loading presets",
-    "loadErrorTitle": "Could not load the library",
-    "empty": "No presets yet. A preset combines a mark (text, symbol or logo) with placement, contrast and style settings.",
-    "createFirst": "Create the first preset",
+    "importPresets": "Import watermarks",
+    "newPreset": "New watermark",
+    "exportErrorTitle": "Could not export the watermarks",
+    "loadingPresets": "Loading watermarks",
+    "loadErrorTitle": "Could not load Saved Watermarks",
+    "empty": "No watermarks yet. A watermark combines a mark (text, symbol or logo) with placement, contrast and style settings.",
+    "createFirst": "Create the first watermark",
     "orgRequiredShort": "Create or join a workspace first.",
-    "loadingPreset": "Loading preset",
-    "loadPresetErrorTitle": "Could not load the preset",
-    "presetGone": "That preset no longer exists.",
-    "editSubtitleManage": "Your changes update this saved preset for future use.",
+    "loadingPreset": "Loading watermark",
+    "loadPresetErrorTitle": "Could not load the watermark",
+    "presetGone": "That watermark no longer exists.",
+    "editSubtitleManage": "Your changes update this saved watermark for future use.",
     "editSubtitleReadOnly": "Read-only view.",
-    "cannotCreate": "Your role does not allow creating presets.",
-    "newPresetSubtitle": "Design the mark, decide where it goes, then save it to the library.",
+    "cannotCreate": "Your role does not allow creating watermarks.",
+    "newPresetSubtitle": "Design the mark, decide where it goes, then save it to Saved Watermarks.",
     "openInEditor": "Open {{name}} in the editor",
     "deletePreset": "Delete {{name}}",
     "logoBadge": "logo",
@@ -138,7 +137,7 @@
     "manualContrast": "Manual contrast",
     "updated": "Updated {{date}}",
     "exportLogoTypeError": "A logo has an image type that cannot be exported.",
-    "exportMissingLogoError": "A preset refers to a logo that is no longer in the library.",
+    "exportMissingLogoError": "A watermark refers to a logo that is no longer in Saved Watermarks.",
     "describe": {
       "text": "“{{text}}” in {{fontFamily}}",
       "glyph": "Glyph {{glyph}}",
@@ -157,9 +156,9 @@
     "noQr": "No saved QR codes yet. Create one for each link you use."
   },
   "designer": {
-    "presetName": "Preset name",
+    "presetName": "Watermark name",
     "presetNamePlaceholder": "Studio signature",
-    "nameError": "Give the preset a name of up to 60 characters.",
+    "nameError": "Give the watermark a name of up to 60 characters.",
     "sections": {
       "label": "Designer sections",
       "type": "Type",
@@ -167,14 +166,14 @@
       "style": "Style"
     },
     "markType": "Mark type",
-    "saveError": "Could not save the preset",
-    "savePreset": "Save preset",
+    "saveError": "Could not save the watermark",
+    "savePreset": "Save watermark",
     "saveChanges": "Save changes",
-    "readOnlyHint": "Your role can view presets but not change them.",
+    "readOnlyHint": "Your role can view watermarks but not change them.",
     "notAnImage": "That file is not an image the browser can read.",
     "text": {
       "label": "Text",
-      "hint": "Up to {{max}} characters on up to {{lines}} lines. Use \"Insert detail\" for tokens like the date or camera, filled in per photo. {location} prints the photo's GPS position on the picture.",
+      "hint": "Up to {{max}} characters.",
       "symbols": "Text symbols",
       "insertSymbol": "Insert {{symbol}}",
       "insertLimit": "Text is full. Select text to replace or remove some characters."
@@ -182,7 +181,7 @@
     "qr": {
       "content": "QR code content",
       "hint": "A link, usually. Up to {{max}} characters; the code is always dark on a light field so it scans.",
-      "savedHint": "Name and save each QR code separately. Reuse it from your library, or keep several for different links. Test a finished export at its intended size before sharing.",
+      "savedHint": "Name and save each QR code separately. Reuse it from Saved Watermarks, or keep several for different links. Test a finished export at its intended size before sharing.",
       "shortLabel": "QR"
     },
     "tokens": {
@@ -209,15 +208,13 @@
       "weight": "Weight",
       "search": "Search fonts",
       "recent": "Recently used",
-      "license": "Font license",
       "previewError": "Some font previews could not load. Reopen the list when connected to retry.",
       "empty": "No Matching Fonts"
     },
     "symbol": {
       "icons": "Icons",
       "glyphLabel": "Glyph {{glyph}}",
-      "iconLabel": "Icon {{label}}",
-      "license": "Icon licenses"
+      "iconLabel": "Icon {{label}}"
     },
     "shape": {
       "label": "Shape",
@@ -371,7 +368,7 @@
       },
       "signature": {
         "draw": "Draw a signature",
-        "description": "Sign with a finger, a pen or the mouse. It is saved as a transparent logo in the library, cropped to the ink.",
+        "description": "Sign with a finger, a pen or the mouse. It is saved as a transparent logo in Saved Watermarks, cropped to the ink.",
         "pad": "Signature pad; draw here",
         "pen": "Pen",
         "penWidthGroup": "Pen width",
@@ -391,23 +388,22 @@
       "choose": "Choose {{name}}",
       "previous": "Previous",
       "next": "Next",
-      "license": "Fluent Emoji · MIT license",
       "usage": "Commercial use allowed; keep the included artwork license notice when redistributing.",
       "guide": "Artwork license guide"
     },
-    "saveNameHint": "Choose a name for this preset."
+    "saveNameHint": "Choose a name for this watermark."
   },
   "editor": {
     "orgRequired": "Create or join a workspace to edit images.",
-    "heading": "Image",
-    "description": "Pick a preset, adjust its placement, crop and resize on your device. Download the result or choose a gallery or cloud save.",
+    "heading": "Images",
+    "description": "Choose a preset or saved watermark, adjust its placement, crop and resize on your device. Export the result or save it to Watermarked Images or cloud storage.",
     "tabs": {
       "presets": "Presets",
       "watermark": "Watermark",
       "crop": "Crop",
       "adjust": "Adjust",
       "resize": "Resize",
-      "export": "Export"
+      "saved": "Saved"
     },
     "toolsLabel": "Editor tools",
     "openPhoto": "Open photo",
@@ -431,16 +427,16 @@
       "actualSize": "100%",
       "grid": "Grid",
       "gridSpacing": "Grid spacing",
-      "snapToGrid": "Snap to grid"
+      "snapToGrid": "Snap To Grid"
     },
     "altCrop": "Photo with the crop frame",
     "altWatermark": "Photo with the watermark applied",
-    "choosePresetHint": "Choose a preset to place a watermark. Drop a photo anywhere on the canvas.",
+    "choosePresetHint": "Choose a watermark to place a watermark. Drop a photo anywhere on the canvas.",
     "outputSize": "Output {{width}} × {{height}} px.",
     "notAnImage": "That file is not an image the browser can read.",
     "previewFailed": "Preview failed",
     "exportFailed": "Export failed",
-    "savedToGallery": "Saved {{name}} to the <galleryLink>gallery</galleryLink>.",
+    "savedToGallery": "Saved {{name}} to <galleryLink>Watermarked Images</galleryLink>.",
     "applyToPhoto": "Apply to this photo",
     "applyToAll": "Apply to all photos",
     "removeOverride": "Remove override",
@@ -454,17 +450,17 @@
     },
     "watermark": {
       "emptyHint": "to apply it here.",
-      "preset": "Preset",
-      "addPreset": "Add another preset",
+      "preset": "Saved Watermark",
+      "addPreset": "Add A Saved Watermark",
       "maxMarks": "Up to {{max}} marks per photo",
-      "choosePreset": "Choose a preset",
+      "choosePreset": "Choose A Saved Watermark",
       "marksHeading": "Marks on this photo",
       "layersLabel": "Layers, bottom to top",
-      "removedPreset": "Removed preset",
+      "removedPreset": "Removed watermark",
       "removeLayer": "Remove {{name}} from this photo",
-      "adjusted": "Adjusted for this photo; the library preset is unchanged.",
+      "adjusted": "Adjusted for this photo; Saved Watermarks watermark is unchanged.",
       "revert": "Revert",
-      "createHint": "Design your watermark here. Save it once to use on this photo and keep it in your library.",
+      "createHint": "Design your watermark here. Save it once to use on this photo and keep it in Saved Watermarks.",
       "save": "Save",
       "emptyReadOnly": "No watermarks are available in this library yet.",
       "firstUseHint": "Add a watermark, then open Export to download your photo."
@@ -550,7 +546,7 @@
       "shareClause": "; Share sends it to Photos, Messages or any app on this device",
       "download": "Download",
       "share": "Share",
-      "saveToGallery": "Save to gallery",
+      "saveToGallery": "Save To Watermarked Images",
       "savedToFolder": "Saved to {{provider}}."
     },
     "mark": {
@@ -558,7 +554,8 @@
       "rotate": "Rotate watermark",
       "resize": "Resize watermark"
     },
-    "newWorkspace": "New"
+    "newWorkspace": "New",
+    "exportImage": "Save Image"
   },
   "bulk": {
     "orgRequired": "Create or join a workspace to watermark in bulk.",
@@ -636,19 +633,19 @@
       "label": "Watch a folder",
       "stop": "Stop",
       "choose": "Choose folders",
-      "hint": "Pick an input and an output folder; new photos dropped into the input are watermarked with the ticked presets and written to the output. Runs only while this page is open.",
+      "hint": "Pick an input and an output folder; new photos dropped into the input are watermarked with the ticked watermarks and written to the output. Runs only while this page is open.",
       "wrote": "Wrote {{name}}",
       "failed": "Failed {{name}}: {{error}}"
     },
     "media": {
       "imageSettingsHint": "Image format, size, adjustments and invisible marks apply only to photos. PDFs retain their original pages.",
       "videoOutput": "Video Output",
-      "galleryHint": "Gallery saves include images only. Download documents and videos or save them to cloud storage."
+      "galleryHint": "Watermarked Images saves include images only. Download documents and videos or save them to cloud storage."
     }
   },
   "gallery": {
     "orgRequired": "Create or join a workspace to keep a gallery.",
-    "heading": "Gallery",
+    "heading": "Watermarked Images",
     "description": "Watermarked photos saved in {{name}}. Search, filter, download or delete.",
     "usage_one": "{{count}} photo · {{used}} of {{max}}",
     "usage_other": "{{count}} photos · {{used}} of {{max}}",
@@ -658,8 +655,8 @@
     "checkPhoto": "Check a photo",
     "search": "Search",
     "searchPlaceholder": "Photo name",
-    "preset": "Preset",
-    "allPresets": "All presets",
+    "preset": "Saved Watermark",
+    "allPresets": "All Saved Watermarks",
     "selectAll": "Select all",
     "clearSelection": "Clear selection",
     "photoCount_one": "{{count}} photo",
@@ -668,7 +665,7 @@
     "shareEllipsis": "Share…",
     "deleteErrorTitle": "Could not delete",
     "loadingPhotos": "Loading photos",
-    "loadErrorTitle": "Could not load the gallery",
+    "loadErrorTitle": "Could not load Watermarked Images",
     "empty": "No photos yet. Save one from the editor or a whole batch from the bulk tool.",
     "emptyFiltered": "No photos match these filters.",
     "openEditor": "Open the editor",
@@ -702,7 +699,7 @@
     "link": "Link",
     "noExpiry": "This link does not expire.",
     "expires": "Expires {{when}}.",
-    "manageLinks": "Manage links under Shares.",
+    "manageLinks": "Manage links in Watermarked Images.",
     "linkCopied": "Link copied to the clipboard.",
     "linkShared": "Link shared.",
     "copyLink": "Copy link",
@@ -710,14 +707,11 @@
     "shareSyncBlocked": "Resolve syncing issues for the selected photos before creating a link."
   },
   "shares": {
-    "orgRequired": "Create or join a workspace to share photos.",
-    "noPermission": "Your role does not include sharing.",
-    "heading": "Shares",
-    "description": "Links that let people outside {{name}} view and download selected photos. Revoking a link stops it immediately.",
+    "heading": "Manage Links",
+    "description": "Copy, share, or revoke links from {{name}}.",
     "loading": "Loading shares",
     "loadErrorTitle": "Could not load shares",
-    "empty": "No links yet. Select photos in the gallery and choose Share.",
-    "openGallery": "Open the gallery",
+    "empty": "No links yet. Select photos in Watermarked Images and choose Share.",
     "rowCreated_one": "{{count}} photo · created {{created}}",
     "rowCreated_other": "{{count}} photos · created {{created}}",
     "neverExpires": " · never expires",
@@ -866,7 +860,7 @@
   },
   "video": {
     "orgRequired": "Create or join a workspace to watermark video.",
-    "heading": "Video watermarking",
+    "heading": "Videos",
     "description": "Preview your video, place watermarks at different timestamps, add fades, and export with audio.",
     "checkingSupport": "Checking video support",
     "unsupportedTitle": "Video is not supported in this browser",
@@ -908,7 +902,7 @@
       "chooseVideo": "Open a video and add a valid watermark first.",
       "waitPreview": "Wait for the watermark preview before adding a keyframe.",
       "changed": "The video or watermark changed during export. Export again to use the current edits.",
-      "download": "Download Video",
+      "download": "Export Video",
       "cloudSaved": "The watermarked video was saved to your cloud storage."
     }
   },
@@ -929,7 +923,7 @@
       "invalidFile": "Choose a PDF within the document size limit.",
       "chooseMark": "Add a valid watermark before exporting this document.",
       "changed": "The document or watermark changed during export. Export again to use the current edits.",
-      "download": "Download PDF",
+      "download": "Export PDF",
       "cloudSaved": "The watermarked PDF was saved to your cloud storage.",
       "originalHint": "Original text, vector artwork, page dimensions and embedded images are retained. Only the watermark is rasterized. Password-protected PDFs must be unlocked first."
     }
@@ -954,21 +948,21 @@
   "filters": {},
   "a11y": {},
   "presets": {
-    "loading": "Loading presets",
-    "loadErrorTitle": "Could not load presets",
-    "emptyTitle": "No presets yet",
-    "createInLibrary": "Create a preset in the library",
-    "legend": "Presets",
-    "importTitle": "Import presets",
-    "importDescription": "Choose a Lumafoil preset file. Its presets, and any logos they use, are added to this library.",
-    "presetFileLabel": "Preset file",
-    "noPresets": "This preset file has no presets.",
-    "fileCount_one": "{{count}} preset in this file",
-    "fileCount_other": "{{count}} presets in this file",
-    "renamed": "A preset named “{{name}}” already exists; importing as “{{finalName}}”.",
+    "loading": "Loading watermarks",
+    "loadErrorTitle": "Could not load watermarks",
+    "emptyTitle": "No watermarks yet",
+    "createInLibrary": "Create a watermark in Saved Watermarks",
+    "legend": "Saved Watermarks",
+    "importTitle": "Import watermarks",
+    "importDescription": "Choose a Lumafoil watermark file. Its watermarks, and any logos they use, are added to this library.",
+    "presetFileLabel": "Watermark file",
+    "noPresets": "This watermark file has no watermarks.",
+    "fileCount_one": "{{count}} watermark in this file",
+    "fileCount_other": "{{count}} watermarks in this file",
+    "renamed": "A watermark named “{{name}}” already exists; importing as “{{finalName}}”.",
     "cancel": "Cancel",
-    "importButton_one": "Import {{count}} preset",
-    "importButton_other": "Import {{count}} presets"
+    "importButton_one": "Import {{count}} watermark",
+    "importButton_other": "Import {{count}} watermarks"
   },
   "landing": {
     "nav": "Account",
@@ -985,14 +979,14 @@
     "privacyNote": "Editing runs on your device. You choose what to save or share.",
     "formatsLabel": "Photos · PDFs · Video",
     "workflowHeading": "Open. Adjust. Export.",
-    "workflowNote": "Keep reusable presets in Library and saved photos in Gallery. Organize both into folders within your workspace.",
+    "workflowNote": "Keep reusable watermarks in Saved Watermarks and saved photos in Watermarked Images. Organize both into folders within your workspace.",
     "steps": {
       "openTitle": "Open Your Files",
       "openBody": "Choose a photo, PDF, or supported video from your device or connected storage. Use Bulk for multiple files. Your source files remain unchanged.",
       "markTitle": "Choose And Adjust",
-      "markBody": "Start with a template or saved preset, then edit its text, artwork, size, position, and appearance beside the preview.",
+      "markBody": "Start with a preset or saved watermark, then edit its text, artwork, size, position, and appearance beside the preview.",
       "exportTitle": "Save Or Share",
-      "exportBody": "Download the result or choose a cloud folder. Save finished photos to Gallery and create links for the photos you want to share."
+      "exportBody": "Download the result or choose a cloud folder. Save finished photos to Watermarked Images and create links for the photos you want to share."
     },
     "github": "GitHub",
     "featuresIntro": "Design a watermark, apply it across your files, and choose how to save or share the results.",
@@ -1004,11 +998,11 @@
       },
       "batch": {
         "title": "Photos, PDFs, And Videos In One Batch",
-        "body": "Apply a saved watermark to a mixed batch of photos, PDFs, and supported videos. Review each result, adjust individual photos, and download files separately or together as a ZIP. Failed files stay visible for review."
+        "body": "Apply saved watermarks to a mixed batch of photos, PDFs, and supported videos. Track each file, adjust individual photos, and download results separately or together as a ZIP. Failed files stay visible for review."
       },
       "fonts": {
         "title": "551 Unique Font Families",
-        "body": "Search fonts by name and see each choice in its own typeface. Revisit recent fonts, adjust letter spacing and curve, and save the style in a preset. Font files and their open-license notices are bundled with Lumafoil."
+        "body": "Search fonts by name and see each choice in its own typeface. Revisit recent fonts, adjust letter spacing and curve, and save the style in a watermark. Font files and their open-license notices are bundled with Lumafoil."
       },
       "stickers": {
         "title": "400 Colorful Vector Stickers",
@@ -1019,8 +1013,8 @@
         "body": "Turn a website address or text into a QR code. Keep separate saved codes for your portfolio, contact page, or different projects, then reuse them on your files."
       },
       "templates": {
-        "title": "18 Templates And Your Own Saved Presets",
-        "body": "Start with Draft, Confidential, Do Not Copy, Proof, review stamps, or photo credits. Edit any template, give it a name, and save it to Library. Organize presets into folders and reuse them in Image, Documents, Video, or Bulk."
+        "title": "18 Presets And Your Own Saved Watermarks",
+        "body": "Start with included presets such as Draft, Confidential, Do Not Copy, Proof, review stamps, or photo credits. Customize a preset and keep your version in Saved Watermarks. Organize saved watermarks into folders and reuse them in Images, Documents, Videos, or Bulk."
       },
       "editing": {
         "title": "Crop, Resize, And Adjust",
@@ -1044,19 +1038,19 @@
       },
       "gallery": {
         "title": "Folders And Recent Work",
-        "body": "Organize presets in Library and saved photos in Gallery with folders, recent items, and thumbnail, list, or details views. Your workspace is private unless you explicitly share access or create a gallery link."
+        "body": "Organize watermarks in Saved Watermarks and finished photos in Watermarked Images with folders. Browse Recent Work in thumbnail, list, or details views. Share selected photos through a link, or grant access to a workspace."
       },
       "sharing": {
         "title": "Share Photos Or A Workspace",
-        "body": "Create expiring, revocable gallery links for selected photos. Workspace owners can grant View or Edit access through a link, email invitation, or direct addition of an existing user. Workspace access is separate from an invitation to join Lumafoil."
+        "body": "Create expiring, revocable links for selected photos and manage them in Watermarked Images. Workspace owners can grant View or Edit access through a link, email invitation, or direct addition of an existing user. Workspace access is separate from an invitation to join Lumafoil."
       },
       "offline": {
         "title": "Work Offline, Sync Later",
-        "body": "Prepare the app for offline use while signed in. Edit photos and presets and queue Gallery saves without a connection. Reconnect with the same account to sync. Cloud transfers, invitations, and sharing changes require a connection."
+        "body": "Prepare the app for offline use while signed in. Edit photos and watermarks and queue Watermarked Images saves without a connection. Reconnect with the same account to sync. Cloud transfers, invitations, and sharing changes require a connection."
       },
       "privacy": {
         "title": "Your Account, Your Workspace",
-        "body": "New users need a site invitation and receive a separate private workspace. A site invitation never shares your photos or presets. Sharing a workspace requires an explicit access grant from its owner."
+        "body": "New users need a site invitation and receive a separate private workspace. A site invitation never shares your photos or watermarks. Sharing a workspace requires an explicit access grant from its owner."
       },
       "languages": {
         "title": "12 Interface Languages",
@@ -1068,7 +1062,7 @@
       },
       "cloud": {
         "title": "Connected Cloud Folders",
-        "body": "Connect Google Drive, Dropbox, or OneDrive to open files, choose export folders, and create provider sharing links. Connections remain saved until you disconnect or your provider requires authorization again. Google Drive access is limited to files and folders you select or create with Lumafoil. Work or school accounts may require approval from your Microsoft administrator."
+        "body": "Cloud storage is in preview. Connect Google Drive, Dropbox, or OneDrive to open permitted files, choose export folders, and create provider sharing links. Saved connections can be reused, but your provider may request authorization again. Google Drive shows files and folders selected or created with Lumafoil. Microsoft work or school accounts may need administrator approval."
       }
     },
     "inviteHosting": "Lumafoil is invitation-only. Want to self-host?",
@@ -1087,11 +1081,11 @@
       "photos": {
         "heading": "Photos are processed on your device",
         "p1": "Editing and watermarking run on your device. A preview does not upload your originals to Lumafoil.",
-        "p2": "You choose whether to download the output, save it to your gallery, transfer it to connected cloud storage, or create a sharing link."
+        "p2": "You choose whether to download the output, save it to Watermarked Images, transfer it to connected cloud storage, or create a sharing link."
       },
       "storage": {
         "heading": "Accounts, saved work and offline copies",
-        "p1": "Cloudflare hosts account records, saved presets, gallery photos, thumbnails, uploaded logos, sharing records and recent-work history. Saved content belongs to its workspace; other users need explicit membership or a sharing link.",
+        "p1": "Cloudflare hosts account records, saved watermarks, gallery photos, thumbnails, uploaded logos, sharing records and recent-work history. Saved content belongs to its workspace; other users need explicit membership or a sharing link.",
         "p2": "Account-scoped copies and queued edits are kept on this device for offline use. Reconnecting with the same account retries them. Pending edits block sign-out; completed sign-out clears the app’s offline data. Session expiry locks access without erasing pending work. Clearing browser data can erase unsynced edits."
       },
       "metadata": {
@@ -1133,7 +1127,7 @@
       },
       "whatItDoes": {
         "heading": "What the service does",
-        "p1": "Lumafoil adds watermarks to photos and supported documents and videos on your device. Accounts, saved galleries/presets, recent-work history, invitations and sharing use server storage; optional cloud features contact the chosen provider.",
+        "p1": "Lumafoil adds watermarks to photos and supported documents and videos on your device. Accounts, saved galleries/watermarks, recent-work history, invitations and sharing use server storage; optional cloud features contact the chosen provider.",
         "p2": "The source is free and open source under MIT. Bundled fonts and artwork have their own licenses."
       },
       "account": {
@@ -1144,7 +1138,7 @@
       "content": {
         "heading": "Your content",
         "p1": "You keep every right you already hold in the photos and watermarks you upload or create. You are responsible for having the right to use the images you bring to the service.",
-        "p2": "Content is processed for the features you choose. Gallery saves use Cloudflare; selected cloud transfers and sharing send content to providers or recipients. Lumafoil does not use it to train models. Bundled artwork has separate license-notice requirements."
+        "p2": "Content is processed for the features you choose. Watermarked Images saves use Cloudflare; selected cloud transfers and sharing send content to providers or recipients. Lumafoil does not use it to train models. Bundled artwork has separate license-notice requirements."
       },
       "acceptableUse": {
         "heading": "Acceptable use",
@@ -1200,11 +1194,11 @@
     "syncing": "Synchronizing saved work…",
     "disconnected": "Offline — saves stay on this device.",
     "pending": "Pending saves: {{count}}",
-    "upToDate": "Saved work is synchronized.",
+    "upToDate": "Synchronized",
     "syncNow": "Sync now",
     "review": "Review saved work ({{count}})",
     "deletion": "Deletion",
-    "conflict": "This preset changed elsewhere. Keep both versions or discard this local edit.",
+    "conflict": "This watermark changed elsewhere. Keep both versions or discard this local edit.",
     "savedHere": "Saved on this device. It will sync while the app is open and connected.",
     "retry": "Retry",
     "keepBoth": "Keep both versions",
@@ -1216,9 +1210,9 @@
     "signOutFailed": "Could not sign out. Try again.",
     "connectionRequired": "Connection required",
     "connectOnce": "Sign in and open this workspace once while connected before using it offline.",
-    "onlineOnly": "Account, sharing, and membership administration need a connection. Your photo tools and saved presets remain available offline.",
+    "onlineOnly": "Account, sharing, and membership administration need a connection. Your photo tools and saved watermarks remain available offline.",
     "ready": "App files are ready for offline use.",
-    "preparing": "Preparing offline app files. Keep this tab open.",
+    "preparing": "Preparing Offline",
     "updateAvailable": "An update is ready. Finish unsaved edits before reloading; saved work stays on this device.",
     "reload": "Reload to update"
   },
@@ -1226,7 +1220,7 @@
     "heading": "Invite people",
     "description": "Invite someone to create their own Lumafoil account.",
     "email": "Email address",
-    "privacy": "They get a private workspace. This invitation shares none of your photos, presets, or account details.",
+    "privacy": "They get a private workspace. This invitation shares none of your photos, watermarks, or account details.",
     "sent": "Invitation sent. It expires in seven days.",
     "send": "Send invitation",
     "sentHeading": "Your invitations",
@@ -1286,7 +1280,7 @@
     "retry": "Try again",
     "preferenceError": "Couldn't save your view preference.",
     "activityPending": "Recent work could not be updated. Reopen the item to try again.",
-    "empty": "Your recent work appears here. Save photos to Gallery and open watermarks to keep them close.",
+    "empty": "Your recent work appears here. Save photos to Watermarked Images and open watermarks to keep them close.",
     "noMatches": "No recent work matches your search.",
     "start": "Open editor",
     "detailsLabel": "Recent work details",
@@ -1300,7 +1294,7 @@
     "preset": "Watermark",
     "pending": "Activity waiting to sync",
     "saved": "Saved",
-    "gallery": "Gallery",
+    "gallery": "Watermarked Images",
     "library": "Watermark library",
     "needsAttention": "Needs attention",
     "workPending": "Work waiting to sync",
@@ -1314,78 +1308,6 @@
     "owner": "Owner",
     "admin": "Admin",
     "user": "User"
-  },
-  "guidance": {
-    "dismiss": "Dismiss Tip",
-    "back": "Back",
-    "next": "Next",
-    "done": "Got It",
-    "page": "{{current}} of {{total}}",
-    "image": {
-      "title": "Image",
-      "first": "Open a photo to begin. Your original file stays untouched.",
-      "second": "Canvas zoom changes only your view. Downloads render from the original image; PNG is the lossless default."
-    },
-    "watermark": {
-      "title": "Watermark Tools",
-      "first": "Choose text, a symbol, a shape, a logo, or a QR code.",
-      "second": "Tap a mark to show its handles. Drag to move, pinch to resize, or twist to rotate. Tap elsewhere to hide the handles."
-    },
-    "presets": {
-      "title": "Saved Presets",
-      "first": "Start with Draft, Confidential, or another template, or choose a saved watermark.",
-      "second": "Save asks for a name and folder. New starts a fresh watermark while keeping the file open."
-    },
-    "crop": {
-      "title": "Crop Your Photo",
-      "first": "Drag the crop edges or choose an aspect ratio.",
-      "second": "Reset Crop restores the full photo. Your original file is never overwritten."
-    },
-    "adjust": {
-      "title": "Photo Adjustments",
-      "first": "Use the sliders to change the look of your photo.",
-      "second": "Each reset control returns its slider to the default. Undo reverses your last edit."
-    },
-    "resize": {
-      "title": "Output Size",
-      "first": "Keep the original dimensions or choose a new output size.",
-      "second": "Resizing changes the exported image. Canvas zoom only changes the view."
-    },
-    "export": {
-      "title": "Save Your Result",
-      "first": "Download the result, save to Gallery, or choose a cloud destination.",
-      "second": "Review format, dimensions, and quality. Saving to cloud storage does not share the file; create links separately in Saved Cloud Files."
-    },
-    "library": {
-      "title": "Your Library",
-      "first": "Find recent presets, browse watermark templates, and organize saved designs into folders.",
-      "second": "Search or switch views to find a preset. Open it to edit, or apply it in Image, Documents, Video, or Bulk."
-    },
-    "gallery": {
-      "title": "Your Gallery",
-      "first": "Find recent photos and organize saved images into folders in this workspace.",
-      "second": "Choose thumbnails, list, or details. Check A Photo looks for an invisible Lumafoil mark; it does not prove ownership."
-    },
-    "bulk": {
-      "title": "Bulk Processing",
-      "first": "Add photos, PDFs, and supported videos, then choose a saved watermark and review the output settings.",
-      "second": "Review each result or error. Download a ZIP or save to cloud storage; only photo results can be saved to Gallery."
-    },
-    "documents": {
-      "title": "Document Watermarks",
-      "first": "Open a PDF, turn its pages, and adjust your watermark with the tools beside the preview.",
-      "second": "The watermark applies throughout the document. Export keeps the original pages and their existing text, images, and vector artwork."
-    },
-    "video": {
-      "title": "Video Watermarks",
-      "first": "Open a supported video and scrub or play the preview while adjusting your watermark.",
-      "second": "Add keyframes to move the mark over time. Set Start, End, and fades; review output and audio options before exporting."
-    },
-    "workspace": {
-      "title": "Workspace Access",
-      "first": "Open Manage Access from your user menu to review sharing.",
-      "second": "Owners can grant View or Edit access. Sharing this workspace does not share other workspaces or anyone's connected cloud accounts."
-    }
   },
   "workspaceAccess": {
     "loading": "Loading Access…",
@@ -1430,8 +1352,8 @@
   },
   "folders": {
     "heading": "Folders",
-    "rootPhoto": "Gallery",
-    "rootPreset": "Library",
+    "rootPhoto": "Watermarked Images",
+    "rootPreset": "Saved Watermarks",
     "path": "Folder Path",
     "new": "New Folder",
     "name": "Folder Name",
@@ -1462,13 +1384,13 @@
     "selection": "Selected Items: {{count}}"
   },
   "templates": {
-    "heading": "Watermark Templates",
-    "hint": "Apply a ready-made layout, customize it, and save your own preset.",
-    "search": "Search Templates",
-    "category": "Template Category",
+    "heading": "Presets",
+    "hint": "Choose a preset, customize it, and save your own watermark.",
+    "search": "Search Presets",
+    "category": "Preset Category",
     "use": "Use {{name}}",
-    "empty": "No matching templates.",
-    "unavailable": "This template is unavailable. Choose a template from the Library.",
+    "empty": "No matching presets.",
+    "unavailable": "This preset is unavailable. Choose a preset from the Saved Watermarks.",
     "categories": {
       "all": "All",
       "documents": "Documents",
@@ -1527,5 +1449,80 @@
     "personalAccount": "Personal Account",
     "workAccount": "Work Or School Account",
     "microsoftConsent": "Work or school accounts may require approval from your Microsoft administrator."
+  },
+  "tour": {
+    "invitationTitle": "Take A Quick Tour?",
+    "invitationBody": "Explore the tools with a short guided tour. Save unfinished work first: the tour visits different pages. You can quit anytime or replay it from Account Settings.",
+    "start": "Start Tour",
+    "decline": "No Thanks",
+    "close": "Close Tour",
+    "exit": "Exit Tour",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "progress": "Step {{current}} Of {{total}}",
+    "navigationError": "This page could not open. Try Next again, or exit the tour.",
+    "settingsTitle": "Help And Credits",
+    "settingsBody": "Revisit the guided tour whenever you need a refresher.",
+    "replay": "View Product Tour",
+    "licensesTitle": "Licenses And Credits",
+    "licensesBody": "Font and artwork notices remain available here. Symbols rendered as emoji use the fonts installed on your device.",
+    "fontPackages": "Bundled Font Licenses",
+    "fontCatalog": "Extended Font Catalog And Licenses",
+    "stickerLicense": "Sticker License",
+    "iconLicense": "Icon And Symbol Licenses",
+    "artworkUsage": "Artwork Usage And Export Notices",
+    "images": {
+      "title": "Images",
+      "body": "Open a photo from your device, a link, or connected cloud storage. Zoom, grid and snapping help with placement. The original file stays untouched; editing and saved work remain available offline."
+    },
+    "watermark": {
+      "title": "Create A Watermark",
+      "body": "Add text, symbols, shapes, stickers, a logo, a signature or a QR code. Choose fonts and adjust placement, color, stroke, curve and style. Drag, pinch and rotate on the canvas; Undo reverses changes."
+    },
+    "presets": {
+      "title": "Included Presets",
+      "body": "Presets contains the included designs, such as Draft and Confidential. Pick a starting point, then customize it in Watermark. These designs stay separate from your saved watermarks."
+    },
+    "saved": {
+      "title": "Your Saved Designs",
+      "body": "Saved opens watermarks from this workspace. Save asks for a name; New starts another watermark while keeping the image. Reuse named QR codes, logos and text designs."
+    },
+    "transform": {
+      "title": "Crop, Adjust And Resize",
+      "body": "Crop changes framing; Adjust controls photo appearance; Resize sets output dimensions. Each slider has a reset. Keep original dimensions unless you want a different size."
+    },
+    "export": {
+      "title": "Save Your Image",
+      "body": "Save Image opens the output controls. Download, share, save to Watermarked Images, or choose a cloud folder. PNG is the lossless default; other formats and quality settings are your choice."
+    },
+    "documents": {
+      "title": "Documents",
+      "body": "Open a PDF, preview its pages and apply watermarks with the same inline tools. Export PDF saves the marked document while preserving its original page content."
+    },
+    "videos": {
+      "title": "Videos",
+      "body": "Open a supported video and scrub the timeline. Place watermarks at different timestamps and add fades. Export Video uses those changes; output is re-encoded and format support depends on your browser."
+    },
+    "bulk": {
+      "title": "Bulk",
+      "body": "Process images, PDFs and videos together. Choose a watermark, review individual results, and download completed files in a ZIP. A failed file does not discard the other results."
+    },
+    "library": {
+      "title": "Saved Watermarks",
+      "body": "Organize your reusable designs into folders. Search, filter, switch views and find recent work here. Designs belong to the current workspace and sync when you reconnect."
+    },
+    "gallery": {
+      "title": "Watermarked Images",
+      "body": "Find recent saved images, organize folders and change views. Create and manage sharing links for selected images. Check A Photo looks for Lumafoil’s invisible mark."
+    },
+    "account": {
+      "title": "Account And Cloud",
+      "body": "Manage sign-in methods and connect Google Drive, Dropbox or OneDrive here. Connections persist until disconnected or revoked. Browse permitted folders when opening or saving files; provider consent rules still apply."
+    },
+    "workspace": {
+      "title": "Workspaces And Access",
+      "body": "Use the user menu to switch workspaces, invite people or Manage Access. Workspace owners grant View or Edit access. Personal invitation links admit new users without sharing your content. Sync status lives at the bottom of the sidebar."
+    }
   }
 }

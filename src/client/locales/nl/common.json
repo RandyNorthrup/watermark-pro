@@ -4,13 +4,12 @@
   },
   "shell": {
     "nav": {
-      "library": "Bibliotheek",
-      "editor": "Afbeelding",
-      "bulk": "Bulk",
-      "video": "Video",
+      "library": "Opgeslagen Watermerken",
+      "editor": "Afbeeldingen",
+      "bulk": "Batch",
+      "video": "Video’s",
       "documents": "Documenten",
-      "gallery": "Galerie",
-      "shares": "Gedeelde links",
+      "gallery": "Afbeeldingen Met Watermerk",
       "members": "Leden",
       "audit": "Auditlogboek",
       "admin": "Beheer"
@@ -112,7 +111,7 @@
   },
   "library": {
     "orgRequired": "Maak een werkruimte aan of word er lid van om een watermerkbibliotheek op te bouwen.",
-    "heading": "Watermerkbibliotheek",
+    "heading": "Opgeslagen Watermerken",
     "description": "Opgeslagen watermerken in {{name}}. Pas ze toe op één bestand of een hele reeks.",
     "export": "Exporteren",
     "exportPreset": "{{name}} exporteren",
@@ -174,7 +173,7 @@
     "notAnImage": "Dat bestand is geen afbeelding die de browser kan lezen.",
     "text": {
       "label": "Tekst",
-      "hint": "Tot {{max}} tekens op maximaal {{lines}} regels. Gebruik “Detail invoegen” voor tokens zoals de datum of camera, die per foto worden ingevuld. {location} drukt de GPS-positie van de foto op het beeld af.",
+      "hint": "Maximaal {{max}} tekens.",
       "symbols": "Tekstsymbolen",
       "insertSymbol": "{{symbol}} invoegen",
       "insertLimit": "De tekst is vol. Selecteer tekst om te vervangen of verwijder tekens."
@@ -209,15 +208,13 @@
       "weight": "Dikte",
       "search": "Lettertypen zoeken",
       "recent": "Recent gebruikt",
-      "license": "Lettertypelicentie",
       "previewError": "Sommige lettertypevoorbeelden konden niet laden. Open de lijst opnieuw met verbinding om het nogmaals te proberen.",
       "empty": "Geen Overeenkomende Lettertypen"
     },
     "symbol": {
       "icons": "Iconen",
       "glyphLabel": "Teken {{glyph}}",
-      "iconLabel": "Icoon {{label}}",
-      "license": "Pictogramlicenties"
+      "iconLabel": "Icoon {{label}}"
     },
     "shape": {
       "label": "Vorm",
@@ -391,7 +388,6 @@
       "choose": "{{name}} kiezen",
       "previous": "Vorige",
       "next": "Volgende",
-      "license": "Fluent Emoji · MIT-licentie",
       "usage": "Commercieel gebruik toegestaan; behoud de licentietekst van de illustraties bij verspreiding.",
       "guide": "Licentiehandleiding voor illustraties"
     },
@@ -399,7 +395,7 @@
   },
   "editor": {
     "orgRequired": "Maak een werkruimte aan of word er lid van om afbeeldingen te bewerken.",
-    "heading": "Afbeelding",
+    "heading": "Afbeeldingen",
     "description": "Kies een voorinstelling, pas de positie aan, snijd bij en wijzig het formaat op je apparaat. Download het resultaat of kies voor opslaan in de galerie of cloud.",
     "tabs": {
       "presets": "Voorinstellingen",
@@ -407,7 +403,7 @@
       "crop": "Bijsnijden",
       "adjust": "Aanpassen",
       "resize": "Grootte",
-      "export": "Export"
+      "saved": "Opgeslagen"
     },
     "toolsLabel": "Editor-tools",
     "openPhoto": "Foto openen",
@@ -558,7 +554,8 @@
       "rotate": "Watermerk draaien",
       "resize": "Watermerk schalen"
     },
-    "newWorkspace": "Nieuw"
+    "newWorkspace": "Nieuw",
+    "exportImage": "Afbeelding Opslaan"
   },
   "bulk": {
     "orgRequired": "Maak een werkruimte aan of word er lid van om in bulk te watermerken.",
@@ -648,7 +645,7 @@
   },
   "gallery": {
     "orgRequired": "Maak een werkruimte aan of word er lid van om een galerie bij te houden.",
-    "heading": "Galerie",
+    "heading": "Afbeeldingen Met Watermerk",
     "description": "Foto’s met watermerk opgeslagen in {{name}}. Zoek, filter, download of verwijder.",
     "usage_one": "{{count}} foto · {{used}} van {{max}}",
     "usage_other": "{{count}} foto's · {{used}} van {{max}}",
@@ -702,7 +699,7 @@
     "link": "Link",
     "noExpiry": "Deze link verloopt niet.",
     "expires": "Verloopt {{when}}.",
-    "manageLinks": "Beheer links onder Gedeelde links.",
+    "manageLinks": "Links Beheren: Afbeeldingen Met Watermerk.",
     "linkCopied": "Link gekopieerd naar het klembord.",
     "linkShared": "Link gedeeld.",
     "copyLink": "Link kopiëren",
@@ -710,14 +707,11 @@
     "shareSyncBlocked": "Los synchronisatieproblemen met de geselecteerde foto’s op voordat je een link maakt."
   },
   "shares": {
-    "orgRequired": "Maak een werkruimte aan of word er lid van om foto's te delen.",
-    "noPermission": "Je rol omvat geen deelrechten.",
-    "heading": "Gedeelde links",
+    "heading": "Links Beheren",
     "description": "Links waarmee mensen buiten {{name}} geselecteerde foto's kunnen bekijken en downloaden. Een link intrekken stopt hem meteen.",
     "loading": "Gedeelde links worden geladen",
     "loadErrorTitle": "Kon gedeelde links niet laden",
     "empty": "Nog geen links. Selecteer foto's in de galerie en kies Delen.",
-    "openGallery": "De galerie openen",
     "rowCreated_one": "{{count}} foto · aangemaakt {{created}}",
     "rowCreated_other": "{{count}} foto's · aangemaakt {{created}}",
     "neverExpires": " · verloopt nooit",
@@ -866,7 +860,7 @@
   },
   "video": {
     "orgRequired": "Maak een werkruimte aan of word er lid van om video te watermerken.",
-    "heading": "Video watermerken",
+    "heading": "Video’s",
     "description": "Bekijk je video, plaats watermerken op verschillende tijdstippen, voeg fades toe en exporteer met geluid.",
     "checkingSupport": "Videoondersteuning wordt gecontroleerd",
     "unsupportedTitle": "Video wordt niet ondersteund in deze browser",
@@ -908,7 +902,7 @@
       "chooseVideo": "Open eerst een video en voeg een geldig watermerk toe.",
       "waitPreview": "Wacht op de watermerkvoorvertoning voordat je een sleutelframe toevoegt.",
       "changed": "De video of het watermerk is tijdens het exporteren gewijzigd. Exporteer opnieuw om de huidige wijzigingen te gebruiken.",
-      "download": "Video Downloaden",
+      "download": "Video Exporteren",
       "cloudSaved": "De video met watermerk is opgeslagen in je cloudopslag."
     }
   },
@@ -929,7 +923,7 @@
       "invalidFile": "Kies een PDF binnen de toegestane documentgrootte.",
       "chooseMark": "Voeg een geldig watermerk toe voordat je dit document exporteert.",
       "changed": "Het document of watermerk is tijdens het exporteren gewijzigd. Exporteer opnieuw om de huidige wijzigingen te gebruiken.",
-      "download": "PDF Downloaden",
+      "download": "PDF Exporteren",
       "cloudSaved": "De PDF met watermerk is opgeslagen in je cloudopslag.",
       "originalHint": "Originele tekst, vectorillustraties, pagina-afmetingen en ingesloten afbeeldingen blijven behouden. Alleen het watermerk wordt gerasterd. PDF’s met wachtwoordbeveiliging moeten eerst worden ontgrendeld."
     }
@@ -1200,7 +1194,7 @@
     "syncing": "Opgeslagen werk synchroniseren…",
     "disconnected": "Offline — wijzigingen blijven op dit apparaat.",
     "pending": "Openstaande wijzigingen: {{count}}",
-    "upToDate": "Opgeslagen werk is gesynchroniseerd.",
+    "upToDate": "Gesynchroniseerd",
     "syncNow": "Nu synchroniseren",
     "review": "Wijzigingen bekijken ({{count}})",
     "deletion": "Verwijdering",
@@ -1218,7 +1212,7 @@
     "connectOnce": "Meld u aan en open deze werkruimte eenmaal met verbinding voordat u deze offline gebruikt.",
     "onlineOnly": "Account-, deel- en ledenbeheer vereisen een verbinding. Fototools en opgeslagen voorinstellingen blijven offline beschikbaar.",
     "ready": "De app-bestanden zijn klaar voor offline gebruik.",
-    "preparing": "Offline bestanden voorbereiden. Houd dit tabblad open.",
+    "preparing": "Offline Voorbereiden",
     "updateAvailable": "Er staat een update klaar. Rond niet-opgeslagen wijzigingen af voordat u herlaadt; opgeslagen werk blijft op dit apparaat.",
     "reload": "Herladen om bij te werken"
   },
@@ -1315,78 +1309,6 @@
     "admin": "Beheerder",
     "user": "Gebruiker"
   },
-  "guidance": {
-    "dismiss": "Tip sluiten",
-    "back": "Terug",
-    "next": "Volgende",
-    "done": "Begrepen",
-    "page": "{{current}} van {{total}}",
-    "image": {
-      "title": "Afbeelding",
-      "first": "Open een foto. Het originele bestand blijft intact.",
-      "second": "Canvaszoom verandert alleen de weergave. Downloads worden uit de originele afbeelding opgebouwd; PNG is de verliesvrije standaard."
-    },
-    "watermark": {
-      "title": "Watermerkgereedschap",
-      "first": "Kies tekst, symbool, vorm, logo of QR-code.",
-      "second": "Tik op een watermerk om de grepen te tonen. Sleep om te verplaatsen, knijp om te schalen of draai met je vingers om te roteren. Tik ergens anders om de grepen te verbergen."
-    },
-    "presets": {
-      "title": "Opgeslagen Voorinstellingen",
-      "first": "Begin met Concept, Vertrouwelijk of een ander sjabloon, of kies een opgeslagen watermerk.",
-      "second": "Opslaan vraagt om een naam en map. Nieuw begint een nieuw watermerk en houdt het bestand open."
-    },
-    "crop": {
-      "title": "Foto Bijsnijden",
-      "first": "Sleep de randen of kies een beeldverhouding.",
-      "second": "Bijsnijden herstellen toont de hele foto weer. Het origineel blijft intact."
-    },
-    "adjust": {
-      "title": "Fotoaanpassingen",
-      "first": "Verander het uiterlijk van je foto met de schuifregelaars.",
-      "second": "Elke herstelknop zet de standaardwaarde terug. Ongedaan maken herstelt je vorige bewerking."
-    },
-    "resize": {
-      "title": "Uitvoerformaat",
-      "first": "Behoud de originele afmetingen of kies een ander formaat.",
-      "second": "Schalen verandert de export. Zoom verandert alleen de weergave."
-    },
-    "export": {
-      "title": "Resultaat Opslaan",
-      "first": "Download, sla op in Galerij of kies een cloudbestemming.",
-      "second": "Controleer formaat, afmetingen en kwaliteit. Opslaan in de cloud deelt het bestand niet; maak links apart bij Opgeslagen cloudbestanden."
-    },
-    "library": {
-      "title": "Je Bibliotheek",
-      "first": "Vind recente voorinstellingen, bekijk watermerksjablonen en organiseer opgeslagen ontwerpen in mappen.",
-      "second": "Zoek of wissel van weergave om een voorinstelling te vinden. Open die om te bewerken of gebruik die bij Afbeelding, Documenten, Video of Batch."
-    },
-    "gallery": {
-      "title": "Je Galerij",
-      "first": "Vind recente foto’s en organiseer opgeslagen afbeeldingen in mappen in deze werkruimte.",
-      "second": "Kies miniaturen, lijst of details. Foto controleren zoekt naar een onzichtbaar Lumafoil-merk; dit bewijst geen eigendom."
-    },
-    "bulk": {
-      "title": "Batchverwerking",
-      "first": "Voeg foto’s, pdf’s en ondersteunde video’s toe, kies een opgeslagen watermerk en controleer de uitvoerinstellingen.",
-      "second": "Controleer elk resultaat of elke fout. Download een ZIP of sla op in de cloud; alleen fotoresultaten kunnen naar de Galerij."
-    },
-    "documents": {
-      "title": "Documentwatermerken",
-      "first": "Open een pdf, blader door de pagina’s en pas het watermerk aan met gereedschappen naast het voorbeeld.",
-      "second": "Het watermerk geldt voor het hele document. De export behoudt de originele pagina’s met bestaande tekst, afbeeldingen en vectorillustraties."
-    },
-    "video": {
-      "title": "Videowatermerken",
-      "first": "Open een ondersteunde video en navigeer of speel het voorbeeld af terwijl je het watermerk aanpast.",
-      "second": "Voeg sleutelframes toe om het merk in de tijd te bewegen. Stel Begin, Einde en vervagingen in; controleer uitvoer- en audio-opties vóór export."
-    },
-    "workspace": {
-      "title": "Toegang Tot Werkruimte",
-      "first": "Open Toegang beheren in je gebruikersmenu om delen te bekijken.",
-      "second": "Eigenaren kunnen lees- of bewerktoegang geven. Delen van deze werkruimte deelt geen andere werkruimten of verbonden cloudaccounts van anderen."
-    }
-  },
   "workspaceAccess": {
     "loading": "Toegang Laden…",
     "ownerOnly": "Alleen de eigenaar van de werkruimte kan toegang wijzigen.",
@@ -1463,7 +1385,7 @@
   "folders": {
     "heading": "Mappen",
     "rootPhoto": "Galerij",
-    "rootPreset": "Bibliotheek",
+    "rootPreset": "Opgeslagen Watermerken",
     "path": "Mappad",
     "new": "Nieuwe Map",
     "name": "Mapnaam",
@@ -1494,7 +1416,7 @@
     "selection": "Geselecteerde Items: {{count}}"
   },
   "templates": {
-    "heading": "Watermerksjablonen",
+    "heading": "Voorinstellingen",
     "hint": "Pas een kant-en-klare indeling toe, pas deze aan en sla je eigen voorinstelling op.",
     "search": "Sjablonen Zoeken",
     "category": "Sjablooncategorie",
@@ -1526,6 +1448,81 @@
       "copyright": "Auteursrecht",
       "photoCredit": "Fotocredit",
       "repeatingProof": "Herhaalde Proef"
+    }
+  },
+  "tour": {
+    "invitationTitle": "Een Korte Rondleiding?",
+    "invitationBody": "Ontdek de hulpmiddelen met een korte rondleiding. Sla lopend werk eerst op: de rondleiding bezoekt verschillende pagina’s. Je kunt altijd stoppen of opnieuw beginnen via Accountinstellingen.",
+    "start": "Rondleiding Starten",
+    "decline": "Nee Bedankt",
+    "close": "Rondleiding Sluiten",
+    "exit": "Rondleiding Stoppen",
+    "back": "Terug",
+    "next": "Volgende",
+    "finish": "Voltooien",
+    "progress": "Stap {{current}} Van {{total}}",
+    "navigationError": "Deze pagina kon niet openen. Probeer Volgende opnieuw of stop de rondleiding.",
+    "settingsTitle": "Hulp En Credits",
+    "settingsBody": "Bekijk de rondleiding opnieuw wanneer je iets wilt opfrissen.",
+    "replay": "Productrondleiding Bekijken",
+    "licensesTitle": "Licenties En Credits",
+    "licensesBody": "Kennisgevingen voor lettertypen en illustraties staan hier. Emoji-symbolen gebruiken lettertypen op je apparaat.",
+    "fontPackages": "Licenties Meegeleverde Lettertypen",
+    "fontCatalog": "Uitgebreide Lettertypecatalogus En Licenties",
+    "stickerLicense": "Stickerlicentie",
+    "iconLicense": "Pictogram- En Symboollicenties",
+    "artworkUsage": "Gebruik Van Illustraties En Exportmeldingen",
+    "images": {
+      "title": "Afbeeldingen",
+      "body": "Open een foto van je apparaat, een link of gekoppelde cloudopslag. Zoom, raster en uitlijnen helpen bij plaatsing. Het origineel blijft intact; bewerking en opgeslagen werk blijven offline beschikbaar."
+    },
+    "watermark": {
+      "title": "Een Watermerk Maken",
+      "body": "Voeg tekst, symbolen, vormen, stickers, logo’s, handtekeningen of QR-codes toe. Pas lettertype, plaatsing, kleur, rand, kromming en stijl aan. Sleep, knijp en draai op het canvas; Ongedaan Maken draait wijzigingen terug."
+    },
+    "presets": {
+      "title": "Meegeleverde Voorinstellingen",
+      "body": "Voorinstellingen bevat meegeleverde ontwerpen zoals Concept en Vertrouwelijk. Kies een beginpunt en pas het aan onder Watermerk. Deze ontwerpen blijven gescheiden van je opgeslagen watermerken."
+    },
+    "saved": {
+      "title": "Je Opgeslagen Ontwerpen",
+      "body": "Opgeslagen opent watermerken in deze werkruimte. Opslaan vraagt om een naam; Nieuw begint een volgend watermerk en behoudt de afbeelding. Hergebruik benoemde QR-codes, logo’s en tekst."
+    },
+    "transform": {
+      "title": "Bijsnijden, Aanpassen En Schalen",
+      "body": "Bijsnijden verandert het kader; Aanpassen het uiterlijk; Schalen de uitvoerafmetingen. Elke schuifregelaar heeft een reset. Behoud de oorspronkelijke afmetingen tenzij je een ander formaat wilt."
+    },
+    "export": {
+      "title": "Afbeelding Exporteren",
+      "body": "Afbeelding Opslaan opent uitvoeropties. Download, deel, sla op in Afbeeldingen Met Watermerk of kies een cloudmap. PNG is de verliesloze standaard; andere formaten en kwaliteit kies je zelf."
+    },
+    "documents": {
+      "title": "Documenten",
+      "body": "Open een PDF, bekijk de pagina’s en plaats watermerken met de ingebouwde hulpmiddelen. PDF Exporteren bewaart het gemarkeerde document met behoud van de oorspronkelijke pagina-inhoud."
+    },
+    "videos": {
+      "title": "Video’s",
+      "body": "Open een ondersteunde video en schuif door de tijdlijn. Plaats watermerken op verschillende momenten en voeg vervagingen toe. Export codeert opnieuw; ondersteunde formaten hangen af van je browser."
+    },
+    "bulk": {
+      "title": "Batch",
+      "body": "Verwerk afbeeldingen, PDF’s en video’s samen. Kies een watermerk, bekijk individuele resultaten en download voltooide bestanden als ZIP. Eén mislukt bestand verwijdert de andere resultaten niet."
+    },
+    "library": {
+      "title": "Opgeslagen Watermerken",
+      "body": "Orden herbruikbare ontwerpen in mappen. Zoek, filter, wissel van weergave en vind recent werk. Ontwerpen horen bij de huidige werkruimte en synchroniseren zodra je weer verbinding hebt."
+    },
+    "gallery": {
+      "title": "Afbeeldingen Met Watermerk",
+      "body": "Vind recente afbeeldingen, orden mappen en wissel van weergave. Maak en beheer deellinks voor geselecteerde afbeeldingen. Foto Controleren zoekt het onzichtbare Lumafoil-watermerk."
+    },
+    "account": {
+      "title": "Account En Cloud",
+      "body": "Beheer aanmeldmethoden en verbind Google Drive, Dropbox of OneDrive. Verbindingen blijven bestaan tot loskoppeling of intrekking. Blader door toegestane mappen bij openen en opslaan; toestemmingsregels blijven gelden."
+    },
+    "workspace": {
+      "title": "Werkruimten En Toegang",
+      "body": "Wissel van werkruimte, nodig mensen uit of beheer toegang via het gebruikersmenu. Eigenaren verlenen Kijk- of Bewerkrechten. Persoonlijke uitnodigingen delen geen inhoud. Synchronisatiestatus staat onderaan de zijbalk."
     }
   }
 }

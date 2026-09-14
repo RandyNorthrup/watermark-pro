@@ -13,6 +13,7 @@ import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import { resetFakePreview } from '../../test-support/fake-preview'
 import { interruptMediaExport } from '../../test-support/interrupt-media-export'
+import { selectSavedWatermarks } from '../../test-support/media-controls'
 import { mockElementBounds } from '../../test-support/mock-element-bounds'
 import { markPng } from '../../test-support/pdf-fixtures'
 import { renderApp } from '../../test-support/render-app'
@@ -105,9 +106,9 @@ describe('inline Documents page', () => {
     const { user } = await openDocuments()
     expect(reader.open).not.toHaveBeenCalled()
     expect(screen.getByRole('textbox', { name: 'Text' })).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Download PDF' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Export PDF' })).toBeDisabled()
     await user.click(screen.getByRole('tab', { name: 'Presets' }))
-    expect(screen.getByRole('region', { name: 'Watermark Templates' })).toBeVisible()
+    expect(screen.getByRole('region', { name: 'Presets' })).toBeVisible()
   })
   it('navigates pages, edits inline and exports the current source and marks', async () => {
     const { user, unmount } = await openDocuments()
@@ -125,7 +126,7 @@ describe('inline Documents page', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Text' }), {
       target: { value: 'Document QA' },
     })
-    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await user.click(screen.getByRole('button', { name: 'Export PDF' }))
     await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
     expect(processDocument).toHaveBeenCalledWith(
       source,
@@ -153,7 +154,7 @@ describe('inline Documents page', () => {
   it('reuses an unchanged export and invalidates it after an edit', async () => {
     const { user } = await openDocuments()
     await loadDocument(user)
-    const button = screen.getByRole('button', { name: 'Download PDF' })
+    const button = screen.getByRole('button', { name: 'Export PDF' })
     await user.click(button)
     await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
     await user.click(button)
@@ -168,14 +169,11 @@ describe('inline Documents page', () => {
   it('preserves selected layer order and makes clear undoable', async () => {
     const { user } = await openDocuments()
     await loadDocument(user)
-    await user.click(screen.getByRole('tab', { name: 'Presets' }))
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Preset' }), 'wm-2')
-    await user.click(screen.getByRole('tab', { name: 'Presets' }))
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Add another preset' }), 'wm-1')
+    await selectSavedWatermarks(user, ['wm-2', 'wm-1'])
     await user.click(screen.getByRole('button', { name: 'Clear canvas' }))
-    expect(screen.getByRole('button', { name: 'Download PDF' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Export PDF' })).toBeDisabled()
     await user.click(screen.getByRole('button', { name: 'Undo' }))
-    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await user.click(screen.getByRole('button', { name: 'Export PDF' }))
     await waitFor(() => expect(processDocument).toHaveBeenCalledOnce())
     expect(processDocument).toHaveBeenCalledWith(
       expect.any(File),
@@ -194,7 +192,7 @@ describe('inline Documents page', () => {
       vi.mocked(processDocument).mockReturnValueOnce(pending.promise)
       const { user, unmount } = await openDocuments()
       await loadDocument(user)
-      await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+      await user.click(screen.getByRole('button', { name: 'Export PDF' }))
       await waitFor(() => expect(processDocument).toHaveBeenCalledOnce())
       const signal = vi.mocked(processDocument).mock.calls[0]?.[3]
       await interruptMediaExport(action, user, unmount)
@@ -219,10 +217,10 @@ describe('inline Documents page', () => {
     expect(await screen.findByText('Choose a PDF within the document size limit.')).toBeVisible()
     expect(screen.getByRole('img', { name: 'PDF Page 1' })).toBeVisible()
     vi.mocked(processDocument).mockRejectedValueOnce(new Error('Decoder failed'))
-    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await user.click(screen.getByRole('button', { name: 'Export PDF' }))
     expect(await screen.findByText('Decoder failed')).toBeVisible()
     expect(downloads).not.toHaveBeenCalled()
-    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await user.click(screen.getByRole('button', { name: 'Export PDF' }))
     await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
   })
   it('shares the output and preserves it after a refused share', async () => {
@@ -236,7 +234,7 @@ describe('inline Documents page', () => {
     vi.mocked(shareFile).mockRejectedValueOnce(new Error('Share refused'))
     await user.click(screen.getByRole('button', { name: 'Share' }))
     expect(await screen.findByText('Share refused')).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Download PDF' }))
+    await user.click(screen.getByRole('button', { name: 'Export PDF' }))
     await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
     expect(processDocument).toHaveBeenCalledOnce()
   })

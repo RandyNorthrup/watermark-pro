@@ -14,6 +14,7 @@ import { fakeAuth, installFakeAuth } from '../../test-support/fake-auth-module'
 import { downloads } from '../../test-support/fake-download'
 import { installLibraryApi, makeWatermark } from '../../test-support/fake-library-api'
 import { interruptMediaExport } from '../../test-support/interrupt-media-export'
+import { selectSavedWatermarks } from '../../test-support/media-controls'
 import { renderApp } from '../../test-support/render-app'
 import type { VideoCapability } from '../../video/capabilities'
 import { CancelledError } from '../../video/errors'
@@ -194,7 +195,7 @@ describe('inline Video page', () => {
       expect(screen.getByRole('slider', { name: 'Rotation' })).toHaveValue('0')
       await user.click(screen.getByRole('button', { name: 'Redo' }))
       expect(screen.getByRole('slider', { name: 'Rotation' })).toHaveValue('25')
-      await user.click(screen.getByRole('button', { name: 'Download Video' }))
+      await user.click(screen.getByRole('button', { name: 'Export Video' }))
       await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
       const request = encoder.transcode.mock.calls[0]?.[0]
       if (mode === 'keyed') {
@@ -241,20 +242,17 @@ describe('inline Video page', () => {
     installLibraryApi()
     renderApp('/app/video')
     expect(await screen.findByRole('status', { name: 'Checking video support' })).toBeVisible()
-    expect(screen.queryByRole('button', { name: 'Download Video' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Export Video' })).not.toBeInTheDocument()
   })
   it('edits inline without saved presets and keeps chosen layers and export settings', async () => {
     const pending = Promise.withResolvers<Blob>()
     encoder.transcode.mockReturnValueOnce(pending.promise)
     const { user, unmount } = await openVideo()
-    expect(screen.getByRole('button', { name: 'Download Video' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Export Video' })).toBeDisabled()
     const file = await loadVideo(user)
-    await user.click(screen.getByRole('tab', { name: 'Presets' }))
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Preset' }), 'wm-2')
-    await user.click(screen.getByRole('tab', { name: 'Presets' }))
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Add another preset' }), 'wm-1')
+    await selectSavedWatermarks(user, ['wm-2', 'wm-1'])
     await selectOption(user, 'Resolution', 'Fit 720p')
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
     const request = encoder.transcode.mock.calls[0]?.[0]
     expect(request?.source).toBe(file)
@@ -300,7 +298,7 @@ describe('inline Video page', () => {
     await user.click(screen.getByRole('button', { name: 'Undo' }))
     expect(screen.getByRole('slider', { name: 'Fade Out' })).toHaveValue('0')
     await user.click(screen.getByRole('button', { name: 'Redo' }))
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
     expect(encoder.transcode.mock.calls[0]?.[0].motions).toEqual([
       expect.objectContaining({
@@ -321,13 +319,13 @@ describe('inline Video page', () => {
     await user.click(await screen.findByRole('button', { name: 'Add Keyframe Here' }))
     fireEvent.change(screen.getByRole('slider', { name: 'Fade In' }), { target: { value: '1' } })
     await user.click(screen.getByRole('button', { name: 'Save' }))
-    const dialog = await screen.findByRole('dialog', { name: /Save preset/i })
-    await user.type(within(dialog).getByRole('textbox', { name: /Preset name/i }), 'Portfolio')
+    const dialog = await screen.findByRole('dialog', { name: /Save watermark/i })
+    await user.type(within(dialog).getByRole('textbox', { name: /Watermark name/i }), 'Portfolio')
     await user.click(within(dialog).getByRole('button', { name: 'Save' }))
     await waitFor(() => expect(dialog).not.toBeInTheDocument())
     expect(screen.getByRole('slider', { name: 'Fade In' })).toHaveValue('1')
     expect(screen.getByRole('button', { name: 'Update Keyframe Here' })).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
     const request = encoder.transcode.mock.calls[0]?.[0]
     expect(request?.marks).toHaveLength(1)
@@ -358,7 +356,7 @@ describe('inline Video page', () => {
     expect(screen.getByRole('slider', { name: 'End' })).toHaveValue('2')
     expect(screen.queryByRole('list', { name: 'Keyframes' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled()
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
     expect(encoder.transcode.mock.calls[0]?.[0]).toMatchObject({ source: short, motions: [null] })
   })
@@ -381,7 +379,7 @@ describe('inline Video page', () => {
     vi.mocked(shareFile).mockRejectedValueOnce(new Error('Share refused'))
     await user.click(screen.getByRole('button', { name: 'Share' }))
     expect(await screen.findByText('Share refused')).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(downloads).toHaveBeenCalledWith(output, 'vacation-watermarked.webm'))
     expect(encoder.transcode).toHaveBeenCalledOnce()
   })
@@ -394,7 +392,7 @@ describe('inline Video page', () => {
     if (parent === null) throw new Error('Drop target missing')
     fireEvent.drop(parent, { dataTransfer: { files: [new File(['bad'], 'notes.txt')] } })
     expect(await screen.findByText('This file has no video track.')).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Download Video' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Export Video' })).toBeDisabled()
     await loadVideo(user)
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
@@ -405,7 +403,7 @@ describe('inline Video page', () => {
       encoder.transcode.mockReturnValueOnce(pending.promise)
       const { user, unmount } = await openVideo()
       await loadVideo(user)
-      await user.click(screen.getByRole('button', { name: 'Download Video' }))
+      await user.click(screen.getByRole('button', { name: 'Export Video' }))
       await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
       await interruptMediaExport(action, user, unmount)
       await act(async () => {
@@ -425,7 +423,7 @@ describe('inline Video page', () => {
       const resolve = vi
         .spyOn(MarkResources.prototype, 'resolve')
         .mockReturnValueOnce(resources.promise)
-      await user.click(screen.getByRole('button', { name: 'Download Video' }))
+      await user.click(screen.getByRole('button', { name: 'Export Video' }))
       await waitFor(() => expect(resolve).toHaveBeenCalledOnce())
       if (action === 'cancel') await user.click(screen.getByRole('button', { name: 'Cancel' }))
       else unmount()
@@ -441,13 +439,13 @@ describe('inline Video page', () => {
     const { user } = await openVideo()
     await loadVideo(user)
     encoder.transcode.mockRejectedValueOnce(new CancelledError())
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await screen.findByRole('alert')
     expect(downloads).not.toHaveBeenCalled()
     encoder.transcode.mockRejectedValueOnce(new Error('Encoder unavailable'))
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     expect(await screen.findByText('Encoder unavailable')).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Download Video' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(downloads).toHaveBeenCalledOnce())
   })
 })

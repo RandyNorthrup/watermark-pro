@@ -110,7 +110,7 @@ describe('offline recovery panel', () => {
     await updatePendingOperation({ ...pending, state: 'conflict', error: 'Changed elsewhere' })
     showPanel()
     await user.click(await screen.findByText('Review saved work (1)'))
-    expect(await screen.findByText(/This preset changed elsewhere/)).toBeTruthy()
+    expect(await screen.findByText(/This watermark changed elsewhere/)).toBeTruthy()
     await user.click(screen.getByRole('button', { name: 'Keep both versions' }))
     await expect
       .poll(async () => {
@@ -147,7 +147,7 @@ describe('offline recovery panel', () => {
       vi.fn(() => Promise.resolve(Response.json(preset))),
     )
     await user.click(screen.getByRole('button', { name: 'Retry' }))
-    await screen.findByText('Saved work is synchronized.')
+    await screen.findByText('Synchronized')
     expect(await pendingOperations(OFFLINE_USER)).toEqual([])
   })
 })

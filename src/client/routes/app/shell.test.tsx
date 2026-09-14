@@ -36,8 +36,8 @@ vi.mock('../../components/offline-panel', () => ({
 }))
 
 const client = fakeAuth
-/** Seven workspace tools; Overview is reserved for site managers. Account destinations live under the user. */
-const WORKSPACE_NAV_ITEM_COUNT = 7
+/** Six workspace tools; Overview is reserved for site managers. Account destinations live under the user. */
+const WORKSPACE_NAV_ITEM_COUNT = 6
 
 async function openWorkspaceSwitcher() {
   const user = userEvent.setup()
@@ -121,7 +121,7 @@ describe('application shell', () => {
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
     await user.click(await screen.findByRole('menuitem', { name: 'My workspace' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Images')
     expect(client().state.activeOrganizationId).toBe(`personal-${OWNER.id}`)
   })
 
@@ -251,7 +251,7 @@ describe('application shell', () => {
       within(tabBar)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Image', 'Library', 'Bulk', 'Gallery'])
+    ).toEqual(['Images', 'Bulk', 'Saved Watermarks', 'Watermarked Images'])
     expect(screen.queryByRole('dialog')).toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Menu' }))
@@ -261,6 +261,11 @@ describe('application shell', () => {
     ).toBeInTheDocument()
     const menuNav = within(sheet).getByRole('navigation', { name: 'Primary (menu)' })
     expect(within(menuNav).getAllByRole('link')).toHaveLength(WORKSPACE_NAV_ITEM_COUNT)
+    expect(
+      within(menuNav)
+        .getAllByRole('link')
+        .map((link) => link.textContent),
+    ).toEqual(['Images', 'Documents', 'Videos', 'Bulk', 'Saved Watermarks', 'Watermarked Images'])
     expect(within(menuNav).queryByRole('link', { name: 'Account settings' })).toBeNull()
     expect(within(menuNav).queryByRole('link', { name: 'Members' })).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Close menu' }))
@@ -275,7 +280,7 @@ describe('application shell', () => {
     const settingsNav = screen.getByRole('navigation', { name: 'Primary' })
     expect(within(settingsNav).getByRole('link', { name: 'Account settings' })).toBeInTheDocument()
     expect(within(settingsNav).getByRole('link', { name: 'Invite people' })).toBeInTheDocument()
-    expect(within(settingsNav).queryByRole('link', { name: 'Library' })).toBeNull()
+    expect(within(settingsNav).queryByRole('link', { name: 'Saved Watermarks' })).toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Menu' }))
     await screen.findByRole('dialog', { name: 'Menu' })
@@ -299,7 +304,7 @@ describe('application shell', () => {
     expect(within(adminNav).getByRole('link', { name: 'Audit trail' })).toBeInTheDocument()
     expect(within(adminNav).getByRole('link', { name: 'Health' })).toBeInTheDocument()
     expect(within(adminNav).getByRole('link', { name: 'Client errors' })).toBeInTheDocument()
-    expect(within(adminNav).queryByRole('link', { name: 'Library' })).toBeNull()
+    expect(within(adminNav).queryByRole('link', { name: 'Saved Watermarks' })).toBeNull()
     expect(screen.queryByRole('tab')).toBeNull()
 
     await user.click(within(adminNav).getByRole('link', { name: 'Health' }))

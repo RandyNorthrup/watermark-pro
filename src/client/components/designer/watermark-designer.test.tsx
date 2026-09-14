@@ -29,6 +29,10 @@ it('inserts symbols at the text selection with undo and refuses to exceed the te
   const user = userEvent.setup()
   renderApp('/app/library/new')
   const text = await screen.findByRole('textbox', { name: 'Text' })
+  const toolbar = screen.getByRole('toolbar', { name: 'Text symbols' })
+  expect(toolbar.parentElement).toBe(text.parentElement)
+  expect(text).toHaveAccessibleDescription('Up to 120 characters.')
+  expect(screen.queryByRole('link', { name: /license/i })).not.toBeInTheDocument()
   fireEvent.change(text, { target: { value: 'ABCD' } })
   if (!(text instanceof HTMLTextAreaElement)) throw new Error('Expected text editor')
   text.focus()
@@ -49,7 +53,7 @@ it('inserts symbols at the text selection with undo and refuses to exceed the te
 it('undoes form/spec changes and supports native modifier shortcuts without losing kind drafts', async () => {
   const user = userEvent.setup()
   renderApp('/app/library/new')
-  const name = await screen.findByLabelText('Preset name')
+  const name = await screen.findByLabelText('Watermark name')
   const text = screen.getByRole('textbox', { name: 'Text' })
   const initialText = (text as HTMLTextAreaElement).value
   expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled()

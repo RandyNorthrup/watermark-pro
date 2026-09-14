@@ -13,7 +13,7 @@ test('filled designer fits LTR and RTL viewports and retains keyboard radio sele
     email: `designer-layout-${testInfo.project.name}-${String(Date.now())}@example.test`,
     password: 'responsive designer password',
   })
-  await navigateTo(page, 'Library')
+  await navigateTo(page, 'Saved Watermarks')
   await page.getByRole('link', { name: en.library.newPreset, exact: true }).click()
   await page
     .getByRole('textbox', { name: en.designer.text.label, exact: true })

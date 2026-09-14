@@ -16,7 +16,6 @@ export const WORKSPACE_SURFACES = [
   { id: 'library', route: '/app/library', heading: 'library.heading' },
   { id: 'bulk', route: '/app/bulk', heading: 'bulk.heading' },
   { id: 'gallery', route: '/app/gallery', heading: 'gallery.heading' },
-  { id: 'shares', route: '/app/shares', heading: 'shares.heading' },
   { id: 'account', route: '/app/account', heading: 'accountAuth.heading' },
   { id: 'invitations', route: '/app/invitations', heading: 'siteInvites.heading' },
   { id: 'video', route: '/app/video', heading: 'video.heading' },

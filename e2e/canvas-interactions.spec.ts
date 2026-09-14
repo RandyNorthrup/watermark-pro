@@ -126,7 +126,35 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
     email: `canvas-${id}@example.test`,
     password: 'correct horse battery',
   })
-  await navigateTo(page, 'Image')
+  await navigateTo(page, 'Images')
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Primary', exact: true, includeHidden: true })
+      .locator('a'),
+  ).toHaveText(['Images', 'Documents', 'Videos', 'Bulk', 'Saved Watermarks', 'Watermarked Images'])
+  const tools = page.getByRole('tablist', { name: 'Editor tools', exact: true })
+  await expect(tools.getByRole('tab')).toHaveText([
+    'Presets',
+    'Watermark',
+    'Saved',
+    'Adjust',
+    'Resize',
+    'Crop',
+  ])
+  await expect(page.getByRole('tab', { name: 'Export', exact: true })).toHaveCount(0)
+  const toolbar = page.getByRole('button', { name: 'New', exact: true }).locator('..')
+  await expect(toolbar.getByRole('button', { name: 'Save Image', exact: true })).toBeVisible()
+  await tools.getByRole('tab', { name: 'Presets', exact: true }).click()
+  const presets = page.getByRole('tabpanel', { name: 'Presets', exact: true })
+  await expect(presets.getByRole('button', { name: /^Use / })).toHaveCount(18)
+  await expect(presets.getByRole('button', { name: 'Use Draft', exact: true })).toBeVisible()
+  await tools.getByRole('tab', { name: 'Saved', exact: true }).click()
+  await expect(
+    page
+      .getByRole('tabpanel', { name: 'Saved', exact: true })
+      .getByRole('button', { name: /^Use / }),
+  ).toHaveCount(0)
+  await tools.getByRole('tab', { name: 'Watermark', exact: true }).click()
   await page.getByLabel('Open a photo').setInputFiles({
     name: 'portrait.png',
     mimeType: 'image/png',
@@ -186,12 +214,12 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
   )
   await page.getByRole('button', { name: 'Save', exact: true }).click()
   await page
-    .getByRole('dialog', { name: 'Save preset' })
+    .getByRole('dialog', { name: 'Save watermark' })
     .getByRole('button', { name: 'Save', exact: true })
     .click()
   const response = await savedPreset
   expect(response.status()).toBe(201)
-  await page.getByRole('tab', { name: 'Presets' }).click()
+  await page.getByRole('tab', { name: 'Saved' }).click()
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(
     'Canvas live',
   )
@@ -208,9 +236,9 @@ test('preset designer moves smoothly and keeps one gesture per undo step', async
     email: `designer-${id}@example.test`,
     password: 'correct horse battery',
   })
-  await navigateTo(page, 'Library')
-  await page.getByRole('link', { name: 'New preset' }).click()
-  await page.getByLabel('Preset name').fill('Designer signature')
+  await navigateTo(page, 'Saved Watermarks')
+  await page.getByRole('link', { name: 'New watermark' }).click()
+  await page.getByLabel('Watermark name').fill('Designer signature')
   await page.getByRole('textbox', { name: 'Text', exact: true }).fill('Designer live')
   await page.getByRole('tab', { name: 'Shape', exact: true }).click()
   await expect(page.getByRole('combobox', { name: 'Shape' })).toHaveCount(0)
@@ -230,10 +258,10 @@ test('preset designer moves smoothly and keeps one gesture per undo step', async
     'Designer live',
   )
   await exerciseCanvas(page, /Watermark preview on the subject photo/)
-  await page.getByRole('button', { name: 'Save preset' }).click()
+  await page.getByRole('button', { name: 'Save watermark' }).click()
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Designer signature', exact: true }),
   ).toBeVisible()
 })

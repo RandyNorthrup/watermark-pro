@@ -202,7 +202,7 @@ function ShareDialogSession({ organizationId, photoIds, defaultTitle, trigger }:
                   {readinessMessage}
                 </p>
               )}
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-wrap justify-center gap-2">
                 <Dialog.Close asChild>
                   <Button type="button" variant="secondary">
                     {t('gallery.cancel')}
@@ -254,7 +254,7 @@ function ShareDialogSession({ organizationId, photoIds, defaultTitle, trigger }:
                 </Alert>
               )}
               {shareError === null ? null : <Alert tone="error">{shareError}</Alert>}
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-wrap justify-center gap-2">
                 <Button
                   type="button"
                   variant="secondary"

@@ -22,22 +22,22 @@ describe('guidance migration and atomic real D1 claims', () => {
     })
     const endpoint = '/api/me/guidance/claim'
     const first = await Promise.all([
-      responseJson(client.post(endpoint, { topic: 'image' })),
-      responseJson(client.post(endpoint, { topic: 'image' })),
+      responseJson(client.post(endpoint, { topic: 'tour' })),
+      responseJson(client.post(endpoint, { topic: 'tour' })),
     ])
     expect(first).toEqual(expect.arrayContaining([{ claimed: true }, { claimed: false }]))
     const claims = await services.db.query.guidanceClaim.findMany()
     expect(claims).toHaveLength(1)
     const userId = claims[0]?.userId
     if (userId === undefined) throw new Error('Expected the claimed account')
-    expect(await createDrizzleGuidanceStore(services.db).claim(userId, 'image')).toBe(false)
+    expect(await createDrizzleGuidanceStore(services.db).claim(userId, 'tour')).toBe(false)
     const other = new TestClient(app, env)
     await other.signUpAndVerify(mailbox, {
       name: 'Other Guide',
       email: 'other-guide-d1@example.test',
       password: 'correct horse battery',
     })
-    expect(await responseJson(other.post(endpoint, { topic: 'image' }))).toEqual({ claimed: true })
+    expect(await responseJson(other.post(endpoint, { topic: 'tour' }))).toEqual({ claimed: true })
     expect(await services.db.query.guidanceClaim.findMany()).toHaveLength(2)
     await env.DB.prepare('DELETE FROM user WHERE id = ?').bind(userId).run()
     const remaining = await services.db.query.guidanceClaim.findMany()

@@ -142,6 +142,73 @@ describe('sample photo', () => {
 })
 
 describe('PreviewRenderer', () => {
+  it('does not let a late sample render invalidate the first frame of a newly selected photo', async () => {
+    const sample = await fetch(SAMPLE_SCENE_PATH)
+    const photo = await logoFile()
+    const sampleReady = Promise.withResolvers<Response>()
+    const renderingPhoto = Promise.withResolvers<undefined>()
+    const finishPhoto = Promise.withResolvers<undefined>()
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementationOnce(() => sampleReady.promise)
+    const engine = new LocalEngine(offscreenBackend, document.fonts)
+    const apply = engine.apply.bind(engine)
+    const applying = vi.spyOn(engine, 'apply').mockImplementationOnce(async (input) => {
+      renderingPhoto.resolve(undefined)
+      await finishPhoto.promise
+      return await apply(input)
+    })
+    const renderer = new PreviewRenderer(() => Promise.reject(new Error('no logos')), engine)
+    const urls: string[] = []
+    try {
+      const oldSample = renderer.render([])
+      await renderer.setSubject(photo)
+      const firstPhoto = renderer.render([])
+      await renderingPhoto.promise
+      sampleReady.resolve(sample)
+      const stale = await oldSample
+      if (stale !== null) urls.push(stale.url)
+      finishPhoto.resolve(undefined)
+      const current = await firstPhoto
+      if (current !== null) urls.push(current.url)
+      expect(current).not.toBeNull()
+      expect(stale).toBeNull()
+      expect(applying).toHaveBeenCalledTimes(1)
+      expect(await decodedSize(current?.url ?? '')).toEqual({
+        width: LOGO_SIZE,
+        height: LOGO_SIZE,
+      })
+      expect(renderer.isSubjectReady).toBe(true)
+    } finally {
+      sampleReady.resolve(sample)
+      finishPhoto.resolve(undefined)
+      renderer.dispose()
+      fetcher.mockRestore()
+      applying.mockRestore()
+      for (const url of urls) URL.revokeObjectURL(url)
+    }
+  })
+
+  it('discards a pending sample render after disposal before starting engine work', async () => {
+    const sample = await fetch(SAMPLE_SCENE_PATH)
+    const sampleReady = Promise.withResolvers<Response>()
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementationOnce(() => sampleReady.promise)
+    const engine = new LocalEngine(offscreenBackend, document.fonts)
+    const applying = vi.spyOn(engine, 'apply')
+    const renderer = new PreviewRenderer(() => Promise.reject(new Error('no logos')), engine)
+    try {
+      const preview = renderer.render([])
+      renderer.dispose()
+      sampleReady.resolve(sample)
+      expect(await preview).toBeNull()
+      expect(applying).not.toHaveBeenCalled()
+      expect(renderer.isSubjectReady).toBe(false)
+    } finally {
+      sampleReady.resolve(sample)
+      renderer.dispose()
+      fetcher.mockRestore()
+      applying.mockRestore()
+    }
+  })
+
   it('shares lazy sample initialization between a first export and the first preview', async () => {
     const pending = Promise.withResolvers<Response>()
     const fetcher = vi.spyOn(globalThis, 'fetch')

@@ -21,6 +21,7 @@ interface TextEffectsProps {
 const PERCENT = 100
 const SPACING_STEP = 0.01
 const CURVE_STEP = 0.01
+const CURVE_UNIT_DEGREES = 180
 
 const EFFECT_CHOICES = [
   { value: 'solid', label: 'designer.effects.solid' },
@@ -61,7 +62,7 @@ export function TextEffects({ spec, onChange }: TextEffectsProps) {
         min={-MAX_CURVE}
         max={MAX_CURVE}
         step={CURVE_STEP}
-        format={percent}
+        format={(value) => `${String(Math.round(value * CURVE_UNIT_DEGREES))}°`}
         onChange={(curve) => {
           onChange({ ...spec, curve })
         }}

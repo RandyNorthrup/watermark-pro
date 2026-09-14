@@ -31,7 +31,7 @@ test('first photo goes from an empty library to a real watermarked export in the
   request,
 }, testInfo) => {
   await signUpAndVerify(page, request, { ...owner, email: `first-editor-${runId}@example.test` })
-  await navigateTo(page, 'Image')
+  await navigateTo(page, 'Images')
   const colour: [number, number, number] = [48, 93, 104]
   const photo = pngFixture(960, 640, colour)
   await page
@@ -48,18 +48,18 @@ test('first photo goes from an empty library to a real watermarked export in the
   )
   await designer.getByRole('button', { name: 'Save', exact: true }).click()
   await page
-    .getByRole('dialog', { name: 'Save preset' })
+    .getByRole('dialog', { name: 'Save watermark' })
     .getByRole('button', { name: 'Save', exact: true })
     .click()
   const response = await savedPreset
   expect(response.status()).toBe(201)
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page).toHaveURL(/\/app\/editor$/)
-  await page.getByRole('tab', { name: 'Presets' }).click()
+  await page.getByRole('tab', { name: 'Saved' }).click()
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(
     '© My first photo',
   )
-  await page.getByRole('tab', { name: 'Export' }).click()
+  await page.getByRole('button', { name: 'Save Image' }).click()
   await page.getByRole('combobox', { name: 'Format' }).click()
   await page.getByRole('option', { name: 'PNG' }).click()
   await expectAccessible(page)
@@ -77,10 +77,10 @@ test('first photo goes from an empty library to a real watermarked export in the
     )
       changed += 1
   expect(changed).toBeGreaterThan(100)
-  await navigateTo(page, 'Library')
+  await navigateTo(page, 'Saved Watermarks')
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: '© My first photo', exact: true }),
   ).toBeVisible()
 })
@@ -97,37 +97,37 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   test.slow()
   await createWorkspace(page, request, owner, organizationName)
 
-  await navigateTo(page, 'Library')
-  await page.getByRole('link', { name: 'New preset' }).click()
+  await navigateTo(page, 'Saved Watermarks')
+  await page.getByRole('link', { name: 'New watermark' }).click()
   await page.getByRole('textbox', { name: 'Text' }).fill('© Edie')
-  await page.getByLabel('Preset name').fill('Editor preset')
-  await page.getByRole('button', { name: 'Save preset' }).click()
-  const library = page.getByRole('region', { name: 'Watermark library', exact: true })
+  await page.getByLabel('Watermark name').fill('Editor preset')
+  await page.getByRole('button', { name: 'Save watermark' }).click()
+  const library = page.getByRole('region', { name: 'Saved Watermarks', exact: true })
   await expect(library.getByRole('link', { name: 'Editor preset', exact: true })).toBeVisible()
 
   // A QR code preset for the second layer.
-  await page.getByRole('link', { name: 'New preset' }).click()
+  await page.getByRole('link', { name: 'New watermark' }).click()
   await page.getByRole('tab', { name: 'QR code' }).click()
   await page.getByLabel('QR code content').fill('https://lumafoil.com')
-  await page.getByLabel('Preset name').fill('QR link')
+  await page.getByLabel('Watermark name').fill('QR link')
   await expect(
     page.getByRole('img', { name: 'Watermark preview on the subject photo' }),
   ).toBeVisible()
   await expectAccessible(page)
-  await page.getByRole('button', { name: 'Save preset' }).click()
+  await page.getByRole('button', { name: 'Save watermark' }).click()
   await expect(library.getByRole('link', { name: 'QR link', exact: true })).toBeVisible()
 
   await page.getByRole('link', { name: 'Open Editor preset in the editor' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   // A cold load of the editor asks for the sample scene at boot, before the
   // session and organization fetches the page waits on (PLAN.md §5.5).
   await page.reload()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   await expect(page.locator('head link[rel="preload"][as="image"]')).toHaveAttribute(
     'href',
     '/sample-scene-v2.jpg',
   )
-  await page.getByRole('tab', { name: 'Presets' }).click()
+  await page.getByRole('tab', { name: 'Saved' }).click()
   const layers = page.getByRole('list', { name: 'Layers, bottom to top' })
   await expect(layers.getByRole('button', { pressed: true })).toHaveText(/Editor preset/)
   await expectRendered(page, /Photo with the watermark/)
@@ -135,9 +135,9 @@ test('edits a photo end to end and downloads the result', async ({ page, request
 
   // A second layer: a QR code on top, adjusted, then removed again.
   await page
-    .getByRole('combobox', { name: 'Add another preset' })
+    .getByRole('combobox', { name: 'Add A Saved Watermark' })
     .selectOption({ label: 'QR link' })
-  await page.getByRole('tab', { name: 'Presets' }).click()
+  await page.getByRole('tab', { name: 'Saved' }).click()
   await expect(layers.getByRole('listitem')).toHaveCount(2)
   await expect(layers.getByRole('button', { pressed: true })).toHaveText(/QR link/)
   await expectRendered(page, /Photo with the watermark/)
@@ -178,7 +178,7 @@ test('edits a photo end to end and downloads the result', async ({ page, request
   await expectRendered(page, /Photo with the watermark/)
   await expectAccessible(page)
 
-  await page.getByRole('tab', { name: 'Export' }).click()
+  await page.getByRole('button', { name: 'Save Image' }).click()
   await page.getByRole('combobox', { name: 'Format' }).click()
   await page.getByRole('option', { name: 'PNG' }).click()
   await expectAccessible(page)
@@ -204,16 +204,16 @@ test('filters and rotates a photo, and exports the turned result', async ({ page
   }
   await createWorkspace(page, request, adjuster, `Adjust ${runId}`)
 
-  await navigateTo(page, 'Library')
-  await page.getByRole('link', { name: 'New preset' }).click()
+  await navigateTo(page, 'Saved Watermarks')
+  await page.getByRole('link', { name: 'New watermark' }).click()
   await page.getByRole('textbox', { name: 'Text' }).fill('© Ada')
-  await page.getByLabel('Preset name').fill('Ada preset')
-  await page.getByRole('button', { name: 'Save preset' }).click()
-  const library = page.getByRole('region', { name: 'Watermark library', exact: true })
+  await page.getByLabel('Watermark name').fill('Ada preset')
+  await page.getByRole('button', { name: 'Save watermark' }).click()
+  const library = page.getByRole('region', { name: 'Saved Watermarks', exact: true })
   await expect(library.getByRole('link', { name: 'Ada preset', exact: true })).toBeVisible()
 
   await page.getByRole('link', { name: 'Open Ada preset in the editor' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   await expectRendered(page, /Photo with the watermark/)
 
   // Mono greyscales the whole photo (pixel correctness is covered by the
@@ -229,7 +229,7 @@ test('filters and rotates a photo, and exports the turned result', async ({ page
   await page.getByRole('button', { name: 'Rotate right' }).click()
   await expectRendered(page, /Photo with the crop frame/)
 
-  await page.getByRole('tab', { name: 'Export' }).click()
+  await page.getByRole('button', { name: 'Save Image' }).click()
   await page.getByRole('combobox', { name: 'Format' }).click()
   await page.getByRole('option', { name: 'PNG' }).click()
   const downloadPromise = page.waitForEvent('download')

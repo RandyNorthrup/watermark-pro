@@ -65,14 +65,6 @@ export function SymbolPicker({ symbol, onChange }: SymbolPickerProps) {
       ))}
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">{t('designer.symbol.icons')}</legend>
-        <a
-          href="/stickers/ICON-LICENSE.txt"
-          target="_blank"
-          rel="noreferrer"
-          className="self-start text-xs underline"
-        >
-          {t('designer.symbol.license')}
-        </a>
         <div className="flex flex-wrap gap-1.5">
           {ICON_CATALOGUE.map((icon) => (
             <button

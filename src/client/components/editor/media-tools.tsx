@@ -1,4 +1,4 @@
-import { Eraser, FilePlus2, LibraryBig, Redo2, Stamp, Undo2 } from 'lucide-react'
+import { Eraser, FilePlus2, FolderOpen, LibraryBig, Redo2, Stamp, Undo2 } from 'lucide-react'
 import { Tabs } from 'radix-ui'
 import { type ReactNode, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -7,6 +7,7 @@ import { PresetPanel } from './preset-panel'
 import type { MediaScene } from './use-media-scene'
 import { WatermarkPanel } from './watermark-panel'
 import type { WatermarkSpec } from '../../../shared/watermark'
+import { PresetTemplates } from '../presets/preset-templates'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 
@@ -37,12 +38,13 @@ export function MediaTools({
         <Tabs.Root value={tab} onValueChange={setTab} className="flex min-w-0 flex-col gap-4">
           <Tabs.List
             aria-label={t('editor.toolsLabel')}
-            className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-surface-raised p-1"
+            className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised p-1"
           >
             {(
               [
                 { value: 'presets', label: 'editor.tabs.presets', icon: LibraryBig },
                 { value: 'watermark', label: 'editor.tabs.watermark', icon: Stamp },
+                { value: 'saved', label: 'editor.tabs.saved', icon: FolderOpen },
               ] as const
             ).map(({ value, label, icon: Icon }) => (
               <Tabs.Trigger
@@ -57,6 +59,14 @@ export function MediaTools({
             ))}
           </Tabs.List>
           <Tabs.Content value="presets" className="outline-none">
+            <PresetTemplates
+              onChoose={(template) => {
+                scene.useTemplate(template.spec)
+                setTab('watermark')
+              }}
+            />
+          </Tabs.Content>
+          <Tabs.Content value="saved" className="outline-none">
             <PresetPanel
               organizationId={organizationId}
               canCreate={canCreate}
@@ -64,10 +74,6 @@ export function MediaTools({
               activeLayerId={scene.value.activeId}
               onAddPreset={(preset) => {
                 scene.addPreset(preset)
-                setTab('watermark')
-              }}
-              onUseTemplate={(spec) => {
-                scene.useTemplate(spec)
                 setTab('watermark')
               }}
               onNewPreset={() => {
@@ -111,7 +117,7 @@ export function MediaTools({
 export function MediaEditorLayout({ scene, children }: { scene: MediaScene; children: ReactNode }) {
   return (
     <div
-      className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6"
+      className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6"
       onKeyDown={(event) => {
         if (
           event.defaultPrevented ||
@@ -134,14 +140,21 @@ export function MediaEditorLayout({ scene, children }: { scene: MediaScene; chil
 }
 
 /** Single history toolbar; continuous touch and pointer gestures each form one undo step. */
-export function MediaHistory({ scene }: { scene: MediaScene }) {
+export function MediaHistory({
+  scene,
+  exportAction,
+}: {
+  scene: MediaScene
+  exportAction: ReactNode
+}) {
   const { t } = useTranslation()
   return (
-    <div className="ms-auto flex items-center gap-1">
+    <div className="ms-auto flex flex-wrap items-center justify-center gap-1">
       <Button type="button" variant="secondary" size="sm" onClick={scene.newScene}>
         <FilePlus2 aria-hidden="true" className="size-4" />
         {t('editor.newWorkspace')}
       </Button>
+      {exportAction}
       <Button
         type="button"
         variant="ghost"

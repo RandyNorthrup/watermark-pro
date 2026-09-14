@@ -50,7 +50,7 @@ describe('library page', () => {
       requestUrl(input).endsWith('/watermarks') ? pending.promise : fetcher(input, init),
     )
     renderApp('/app/library')
-    await screen.findByRole('heading', { name: 'Watermark library' })
+    await screen.findByRole('heading', { name: 'Saved Watermarks' })
     const exportButton = screen.getByRole('button', { name: 'Export' })
     expect(exportButton).toBeDisabled()
     expect(screen.queryByText('Studio signature')).not.toBeInTheDocument()
@@ -102,14 +102,14 @@ describe('library page', () => {
       ],
     })
     renderApp('/app/library')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Watermark library')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Saved Watermarks')
     expect(await screen.findByText('“© Acme Studio” in Inter Variable')).toBeInTheDocument()
     expect(screen.getByText('bottom right')).toBeInTheDocument()
     expect(screen.getByText('Manual contrast')).toBeInTheDocument()
     expect(screen.getByText('Glyph ★')).toBeInTheDocument()
     expect(screen.getByText('Custom position')).toBeInTheDocument()
     expect(screen.getByText('Icon camera')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'New preset' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'New watermark' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Delete Corner logo' }))
     await waitFor(() => expect(screen.queryByText('Corner logo')).not.toBeInTheDocument())
@@ -120,10 +120,12 @@ describe('library page', () => {
     seedViewerWorkspace(client())
     installLibraryApi()
     renderApp('/app/library')
-    expect(await screen.findByText(/No presets yet/)).toBeInTheDocument()
+    expect(await screen.findByText(/No watermarks yet/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
-    expect(screen.queryByRole('link', { name: 'New preset' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Create the first preset' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'New watermark' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: 'Create the first watermark' }),
+    ).not.toBeInTheDocument()
   })
 
   it('explains a failed load', async () => {
@@ -131,7 +133,7 @@ describe('library page', () => {
     installLibraryApi({ failWith: 'forbidden' })
     renderApp('/app/library')
     expect(
-      await within(await screen.findByRole('region', { name: 'Watermark library' })).findByRole(
+      await within(await screen.findByRole('region', { name: 'Saved Watermarks' })).findByRole(
         'alert',
       ),
     ).toHaveTextContent('Your role does not allow this.')
@@ -192,11 +194,11 @@ describe('library page', () => {
 
     renderApp('/app/library')
     await screen.findByRole('heading', { level: 1 })
-    await user.click(screen.getByRole('button', { name: 'Import presets' }))
-    await user.upload(await screen.findByLabelText('Preset file'), file)
+    await user.click(screen.getByRole('button', { name: 'Import watermarks' }))
+    await user.upload(await screen.findByLabelText('Watermark file'), file)
 
     expect(await screen.findByText(/already exists/)).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Import 2 presets' }))
+    await user.click(screen.getByRole('button', { name: 'Import 2 watermarks' }))
 
     await waitFor(() => {
       expect(api.assets).toHaveLength(1)
@@ -216,26 +218,26 @@ describe('preset designer', () => {
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     const { router } = renderApp('/app/library/new?kind=qr')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('New QR code')
-    await user.type(screen.getByLabelText('Preset name'), 'Portfolio QR')
+    await user.type(screen.getByLabelText('Watermark name'), 'Portfolio QR')
     await user.clear(screen.getByLabelText('QR code content'))
     await user.type(screen.getByLabelText('QR code content'), 'https://example.com/portfolio')
-    await user.click(screen.getByRole('button', { name: 'Save preset' }))
+    await user.click(screen.getByRole('button', { name: 'Save watermark' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
     await user.click(await screen.findByRole('link', { name: 'New QR code' }))
     await screen.findByLabelText('QR code content')
-    await user.type(screen.getByLabelText('Preset name'), 'Contact QR')
+    await user.type(screen.getByLabelText('Watermark name'), 'Contact QR')
     await user.clear(screen.getByLabelText('QR code content'))
     await user.type(screen.getByLabelText('QR code content'), 'https://example.com/contact')
-    await user.click(screen.getByRole('button', { name: 'Save preset' }))
+    await user.click(screen.getByRole('button', { name: 'Save watermark' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
     await user.click(await screen.findByRole('button', { name: 'QR codes only' }))
     expect(
-      within(screen.getByRole('region', { name: 'Watermark library' })).getByRole('link', {
+      within(screen.getByRole('region', { name: 'Saved Watermarks' })).getByRole('link', {
         name: /^Portfolio QR/,
       }),
     ).toBeInTheDocument()
     expect(
-      within(screen.getByRole('region', { name: 'Watermark library' })).getByRole('link', {
+      within(screen.getByRole('region', { name: 'Saved Watermarks' })).getByRole('link', {
         name: /^Contact QR/,
       }),
     ).toBeInTheDocument()
@@ -246,7 +248,7 @@ describe('preset designer', () => {
         .map((preset) => (preset.spec.kind === 'qr' ? preset.spec.content : '')),
     ).toEqual(['https://example.com/portfolio', 'https://example.com/contact'])
     await user.click(
-      within(screen.getByRole('region', { name: 'Watermark library' })).getByRole('link', {
+      within(screen.getByRole('region', { name: 'Saved Watermarks' })).getByRole('link', {
         name: /^Portfolio QR/,
       }),
     )
@@ -261,7 +263,7 @@ describe('preset designer', () => {
     seedOwnerWorkspace(client())
     const api = installLibraryApi()
     const { router } = renderApp('/app/library/new')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('New preset')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('New watermark')
     expect(await screen.findByRole('img', { name: /Watermark preview/ })).toBeInTheDocument()
     expect(screen.getByText('Placed bottom right, dark ink.')).toBeInTheDocument()
 
@@ -283,10 +285,10 @@ describe('preset designer', () => {
     await user.click(screen.getByRole('radio', { name: 'Dark ink' }))
     await user.click(screen.getByRole('switch', { name: 'Repeat across the photo' }))
 
-    await user.click(screen.getByRole('button', { name: 'Save preset' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Give the preset a name')
-    await user.type(screen.getByLabelText('Preset name'), 'Tiled signature')
-    await user.click(screen.getByRole('button', { name: 'Save preset' }))
+    await user.click(screen.getByRole('button', { name: 'Save watermark' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Give the watermark a name')
+    await user.type(screen.getByLabelText('Watermark name'), 'Tiled signature')
+    await user.click(screen.getByRole('button', { name: 'Save watermark' }))
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
     expect(api.watermarks).toHaveLength(1)
@@ -301,7 +303,7 @@ describe('preset designer', () => {
       style: { tiling: { enabled: true } },
     })
     expect(
-      await within(await screen.findByRole('region', { name: 'Watermark library' })).findByText(
+      await within(await screen.findByRole('region', { name: 'Saved Watermarks' })).findByText(
         'Tiled signature',
       ),
     ).toBeInTheDocument()
@@ -349,7 +351,7 @@ describe('preset designer', () => {
     await user.click(screen.getByRole('tab', { name: 'Logo' }))
     expect(await screen.findByRole('button', { name: 'Logo Brand mark' })).toBeInTheDocument()
     expect(screen.getByText('Choose or upload a logo to see the preview.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Save preset' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Save watermark' })).toBeDisabled()
 
     const input = screen.getByLabelText('Upload a logo file')
     await user.upload(
@@ -374,7 +376,7 @@ describe('preset designer', () => {
       const latest = renderedSpecs.at(-1)
       expect(latest?.kind).toBe('image')
     })
-    expect(screen.getByRole('button', { name: 'Save preset' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Save watermark' })).toBeEnabled()
 
     await user.upload(input, new File(['not an image'], 'notes.txt', { type: 'text/plain' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('not an image the browser can read')
@@ -493,9 +495,9 @@ describe('preset designer', () => {
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     const { router, unmount } = renderApp('/app/library/wm-1')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Studio signature')
-    expect(screen.getByLabelText('Preset name')).toHaveValue('Studio signature')
-    await user.clear(screen.getByLabelText('Preset name'))
-    await user.type(screen.getByLabelText('Preset name'), 'Renamed')
+    expect(screen.getByLabelText('Watermark name')).toHaveValue('Studio signature')
+    await user.clear(screen.getByLabelText('Watermark name'))
+    await user.type(screen.getByLabelText('Watermark name'), 'Renamed')
     await user.click(screen.getByRole('button', { name: 'Save changes' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
     expect(api.watermarks[0]?.name).toBe('Renamed')
@@ -512,11 +514,11 @@ describe('preset designer', () => {
     seedViewerWorkspace(client())
     installLibraryApi()
     const { unmount } = renderApp('/app/library/new')
-    expect(await screen.findByRole('alert')).toHaveTextContent('does not allow creating presets')
+    expect(await screen.findByRole('alert')).toHaveTextContent('does not allow creating watermarks')
     unmount()
 
     renderApp('/app/library/missing')
-    expect(await screen.findByRole('alert')).toHaveTextContent('That preset no longer exists.')
+    expect(await screen.findByRole('alert')).toHaveTextContent('That watermark no longer exists.')
   })
 })
 

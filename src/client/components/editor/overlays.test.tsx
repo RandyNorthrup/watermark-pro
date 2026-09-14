@@ -213,6 +213,49 @@ describe('MarkOverlay', () => {
     expect(frame).toHaveStyle({ left: '350px', top: '175px', width: '100px', height: '50px' })
   })
 
+  it('keeps a six-pixel visual gap without changing the mark bounds, position or drag geometry', () => {
+    const onGesture = vi.fn<(gesture: MarkGesture) => void>()
+    renderOverlay(onGesture)
+    const frame = screen.getByRole('group', { name: /Watermark position/ })
+    act(() => frame.focus())
+    const decoration = frame.querySelector<HTMLElement>('[data-selection-frame]')
+    if (decoration === null) throw new Error('Missing visible selection decoration')
+    const gap = -pixelValue(decoration.style.inset) - pixelValue(decoration.style.borderWidth)
+    expect(gap).toBe(6)
+    expect(frame).toHaveStyle({ left: '350px', top: '175px', width: '100px', height: '50px' })
+    expect(frame.closest('[data-mark-overlay]')).toHaveClass('overflow-hidden')
+    expect(onGesture).not.toHaveBeenCalled()
+    fireEvent.keyDown(frame, { key: 'ArrowLeft' })
+    expect(onGesture).toHaveBeenLastCalledWith({ phase: 'commit', patch: { x: 0.79, y: 0.8 } })
+  })
+
+  it.each([0.35, 1, 2])(
+    'keeps screen-space clearance fixed at zoom %s without editing the mark',
+    (zoom) => {
+      const onGesture = vi.fn<(gesture: MarkGesture) => void>()
+      const size = { width: displaySize.width * zoom, height: displaySize.height * zoom }
+      render(
+        <MarkOverlay
+          placement={placement}
+          previewSize={previewSize}
+          displaySize={size}
+          scale={0.2}
+          rotation={0}
+          margin={MARGIN}
+          onGesture={onGesture}
+        />,
+      )
+      const frame = screen.getByRole('group', { name: /Watermark position/ })
+      act(() => frame.focus())
+      const decoration = frame.querySelector<HTMLElement>('[data-selection-frame]')
+      if (decoration === null) throw new Error('Missing visible selection decoration')
+      expect(-pixelValue(decoration.style.inset) - pixelValue(decoration.style.borderWidth)).toBe(6)
+      expect(pixelValue(frame.style.width)).toBeCloseTo(100 * zoom)
+      expect(pixelValue(frame.style.height)).toBeCloseTo(50 * zoom)
+      expect(onGesture).not.toHaveBeenCalled()
+    },
+  )
+
   it('drags to move and reports the centre as fractions', () => {
     const gestures: MarkGesture[] = []
     renderOverlay((gesture) => {

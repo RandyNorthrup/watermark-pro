@@ -75,7 +75,7 @@ describe('ExportPanel cloud save', () => {
     renderPanel(() => Promise.resolve(UPLOAD))
     for (const name of [
       'Download',
-      'Save to gallery',
+      'Save To Watermarked Images',
       'Save to Google Drive',
       'Save to Dropbox',
       'Save to OneDrive',

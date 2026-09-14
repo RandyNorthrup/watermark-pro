@@ -4,13 +4,12 @@
   },
   "shell": {
     "nav": {
-      "library": "Bibliothek",
-      "editor": "Bild",
+      "library": "Gespeicherte Wasserzeichen",
+      "editor": "Bilder",
       "bulk": "Stapel",
-      "video": "Video",
+      "video": "Videos",
       "documents": "Dokumente",
-      "gallery": "Galerie",
-      "shares": "Freigaben",
+      "gallery": "Bilder Mit Wasserzeichen",
       "members": "Mitglieder",
       "audit": "Audit-Log",
       "admin": "Admin"
@@ -112,7 +111,7 @@
   },
   "library": {
     "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um eine Wasserzeichen-Bibliothek aufzubauen.",
-    "heading": "Wasserzeichen-Bibliothek",
+    "heading": "Gespeicherte Wasserzeichen",
     "description": "Gespeicherte Wasserzeichen in {{name}}. Auf eine Datei oder einen ganzen Stapel anwenden.",
     "export": "Exportieren",
     "exportPreset": "{{name}} exportieren",
@@ -174,7 +173,7 @@
     "notAnImage": "Diese Datei ist kein Bild, das der Browser lesen kann.",
     "text": {
       "label": "Text",
-      "hint": "Bis zu {{max}} Zeichen auf bis zu {{lines}} Zeilen. Verwenden Sie „Detail einfügen“ für Platzhalter wie Datum oder Kamera, die je Foto ausgefüllt werden. {location} druckt die GPS-Position des Fotos auf das Bild.",
+      "hint": "Bis zu {{max}} Zeichen.",
       "symbols": "Textzeichen",
       "insertSymbol": "{{symbol}} einfügen",
       "insertLimit": "Der Text ist voll. Markiere Text zum Ersetzen oder entferne Zeichen."
@@ -209,15 +208,13 @@
       "weight": "Schriftstärke",
       "search": "Schriften suchen",
       "recent": "Zuletzt verwendet",
-      "license": "Schriftlizenz",
       "previewError": "Einige Schriftvorschauen konnten nicht geladen werden. Öffne die Liste mit Verbindung erneut.",
       "empty": "Keine Passenden Schriftarten"
     },
     "symbol": {
       "icons": "Icons",
       "glyphLabel": "Glyphe {{glyph}}",
-      "iconLabel": "Icon {{label}}",
-      "license": "Icon-Lizenzen"
+      "iconLabel": "Icon {{label}}"
     },
     "shape": {
       "label": "Form",
@@ -391,7 +388,6 @@
       "choose": "{{name}} auswählen",
       "previous": "Zurück",
       "next": "Weiter",
-      "license": "Fluent Emoji · MIT-Lizenz",
       "usage": "Kommerzielle Nutzung erlaubt; bewahre den Lizenzhinweis der Grafiken bei der Weitergabe auf.",
       "guide": "Lizenzhinweise für Grafiken"
     },
@@ -399,15 +395,15 @@
   },
   "editor": {
     "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Bilder zu bearbeiten.",
-    "heading": "Bild",
+    "heading": "Bilder",
     "description": "Wähle eine Vorlage, passe ihre Position an und beschneide oder skaliere auf deinem Gerät. Lade das Ergebnis herunter oder speichere es wahlweise in Galerie oder Cloud.",
     "tabs": {
-      "presets": "Voreinstellungen",
+      "presets": "Vorgaben",
       "watermark": "Wasserzeichen",
       "crop": "Zuschneiden",
       "adjust": "Anpassen",
       "resize": "Größe",
-      "export": "Export"
+      "saved": "Gespeichert"
     },
     "toolsLabel": "Editor-Werkzeuge",
     "openPhoto": "Foto öffnen",
@@ -558,7 +554,8 @@
       "rotate": "Wasserzeichen drehen",
       "resize": "Wasserzeichen skalieren"
     },
-    "newWorkspace": "Neu"
+    "newWorkspace": "Neu",
+    "exportImage": "Bild Speichern"
   },
   "bulk": {
     "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um im Stapel mit Wasserzeichen zu versehen.",
@@ -648,7 +645,7 @@
   },
   "gallery": {
     "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um eine Galerie zu führen.",
-    "heading": "Galerie",
+    "heading": "Bilder Mit Wasserzeichen",
     "description": "Mit Wasserzeichen versehene Fotos in {{name}}. Suchen, filtern, herunterladen oder löschen.",
     "usage_one": "{{count}} Foto · {{used}} von {{max}}",
     "usage_other": "{{count}} Fotos · {{used}} von {{max}}",
@@ -702,7 +699,7 @@
     "link": "Link",
     "noExpiry": "Dieser Link läuft nicht ab.",
     "expires": "Läuft {{when}} ab.",
-    "manageLinks": "Links unter „Freigaben“ verwalten.",
+    "manageLinks": "Links Verwalten: Bilder Mit Wasserzeichen.",
     "linkCopied": "Link in die Zwischenablage kopiert.",
     "linkShared": "Link geteilt.",
     "copyLink": "Link kopieren",
@@ -710,14 +707,11 @@
     "shareSyncBlocked": "Behebe die Synchronisierungsprobleme der ausgewählten Fotos, bevor du einen Link erstellst."
   },
   "shares": {
-    "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Fotos zu teilen.",
-    "noPermission": "Ihre Rolle umfasst kein Teilen.",
-    "heading": "Freigaben",
+    "heading": "Links Verwalten",
     "description": "Links, mit denen Personen außerhalb von {{name}} ausgewählte Fotos ansehen und herunterladen können. Ein Widerruf stoppt den Link sofort.",
     "loading": "Freigaben werden geladen",
     "loadErrorTitle": "Freigaben konnten nicht geladen werden",
     "empty": "Noch keine Links. Wählen Sie Fotos in der Galerie aus und klicken Sie auf „Teilen“.",
-    "openGallery": "Galerie öffnen",
     "rowCreated_one": "{{count}} Foto · erstellt {{created}}",
     "rowCreated_other": "{{count}} Fotos · erstellt {{created}}",
     "neverExpires": " · läuft nie ab",
@@ -866,7 +860,7 @@
   },
   "video": {
     "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Videos mit Wasserzeichen zu versehen.",
-    "heading": "Video-Wasserzeichen",
+    "heading": "Videos",
     "description": "Sieh dir dein Video an, platziere Wasserzeichen zu verschiedenen Zeitpunkten, füge Überblendungen hinzu und exportiere mit Ton.",
     "checkingSupport": "Video-Unterstützung wird geprüft",
     "unsupportedTitle": "Video wird in diesem Browser nicht unterstützt",
@@ -908,7 +902,7 @@
       "chooseVideo": "Öffne zuerst ein Video und füge ein gültiges Wasserzeichen hinzu.",
       "waitPreview": "Warte auf die Wasserzeichenvorschau, bevor du ein Schlüsselbild hinzufügst.",
       "changed": "Das Video oder Wasserzeichen wurde während des Exports geändert. Exportiere erneut, um die aktuellen Änderungen zu übernehmen.",
-      "download": "Video Herunterladen",
+      "download": "Video Exportieren",
       "cloudSaved": "Das Video mit Wasserzeichen wurde in deinem Cloudspeicher gespeichert."
     }
   },
@@ -929,7 +923,7 @@
       "invalidFile": "Wähle eine PDF innerhalb der zulässigen Dokumentgröße.",
       "chooseMark": "Füge vor dem Export dieses Dokuments ein gültiges Wasserzeichen hinzu.",
       "changed": "Das Dokument oder Wasserzeichen wurde während des Exports geändert. Exportiere erneut, um die aktuellen Änderungen zu übernehmen.",
-      "download": "PDF Herunterladen",
+      "download": "PDF Exportieren",
       "cloudSaved": "Die PDF mit Wasserzeichen wurde in deinem Cloudspeicher gespeichert.",
       "originalHint": "Originaltext, Vektorgrafiken, Seitengrößen und eingebettete Bilder bleiben erhalten. Nur das Wasserzeichen wird gerastert. Passwortgeschützte PDFs müssen zuerst entsperrt werden."
     }
@@ -1200,7 +1194,7 @@
     "syncing": "Gespeicherte Arbeit wird synchronisiert…",
     "disconnected": "Offline — Änderungen bleiben auf diesem Gerät.",
     "pending": "Ausstehende Änderungen: {{count}}",
-    "upToDate": "Gespeicherte Arbeit ist synchronisiert.",
+    "upToDate": "Synchronisiert",
     "syncNow": "Jetzt synchronisieren",
     "review": "Änderungen prüfen ({{count}})",
     "deletion": "Löschung",
@@ -1218,7 +1212,7 @@
     "connectOnce": "Melden Sie sich an und öffnen Sie diesen Arbeitsbereich einmal mit Internetverbindung, bevor Sie ihn offline nutzen.",
     "onlineOnly": "Konto-, Freigabe- und Mitgliederverwaltung benötigen eine Verbindung. Fotowerkzeuge und gespeicherte Vorlagen bleiben offline verfügbar.",
     "ready": "Die App-Dateien sind offline verfügbar.",
-    "preparing": "Offline-Dateien werden vorbereitet. Diesen Tab geöffnet lassen.",
+    "preparing": "Offline Wird Vorbereitet",
     "updateAvailable": "Ein Update ist bereit. Ungespeicherte Änderungen vor dem Neuladen abschließen; gespeicherte Arbeit bleibt auf diesem Gerät.",
     "reload": "Zum Aktualisieren neu laden"
   },
@@ -1315,78 +1309,6 @@
     "admin": "Administrator",
     "user": "Benutzer"
   },
-  "guidance": {
-    "dismiss": "Tipp schließen",
-    "back": "Zurück",
-    "next": "Weiter",
-    "done": "Verstanden",
-    "page": "{{current}} von {{total}}",
-    "image": {
-      "title": "Bild",
-      "first": "Öffne ein Foto. Die Originaldatei bleibt unverändert.",
-      "second": "Der Canvas-Zoom ändert nur die Ansicht. Downloads werden aus dem Originalbild erzeugt; PNG ist der verlustfreie Standard."
-    },
-    "watermark": {
-      "title": "Wasserzeichen-Werkzeuge",
-      "first": "Wähle Text, Symbol, Form, Logo oder QR-Code.",
-      "second": "Tippe auf ein Wasserzeichen, um seine Griffe anzuzeigen. Ziehe es zum Verschieben, ändere die Größe mit zwei Fingern oder drehe es mit einer Drehbewegung. Tippe an eine andere Stelle, um die Griffe auszublenden."
-    },
-    "presets": {
-      "title": "Gespeicherte Vorlagen",
-      "first": "Beginne mit Entwurf, Vertraulich oder einer anderen Vorlage, oder wähle ein gespeichertes Wasserzeichen.",
-      "second": "Beim Speichern wählst du Name und Ordner. Neu beginnt ein neues Wasserzeichen und lässt die Datei geöffnet."
-    },
-    "crop": {
-      "title": "Foto Zuschneiden",
-      "first": "Ziehe die Ränder oder wähle ein Seitenverhältnis.",
-      "second": "Zuschnitt zurücksetzen stellt das ganze Foto wieder her. Das Original bleibt unverändert."
-    },
-    "adjust": {
-      "title": "Fotoanpassungen",
-      "first": "Ändere das Aussehen mit den Schiebereglern.",
-      "second": "Jede Zurücksetzen-Taste stellt den Standardwert wieder her. Rückgängig kehrt den letzten Schritt um."
-    },
-    "resize": {
-      "title": "Ausgabegröße",
-      "first": "Behalte die Originalmaße oder wähle eine neue Größe.",
-      "second": "Die Größenänderung betrifft den Export. Zoom ändert nur die Ansicht."
-    },
-    "export": {
-      "title": "Ergebnis Speichern",
-      "first": "Lade das Ergebnis herunter, speichere es in der Galerie oder in der Cloud.",
-      "second": "Prüfe Format, Abmessungen und Qualität. Cloud-Speicherung teilt die Datei nicht; erstelle Links separat unter Gespeicherte Cloud-Dateien."
-    },
-    "library": {
-      "title": "Deine Bibliothek",
-      "first": "Finde kürzlich verwendete Vorlagen, durchsuche Wasserzeichen-Vorlagen und organisiere gespeicherte Designs in Ordnern.",
-      "second": "Suche oder wechsle die Ansicht, um eine Vorlage zu finden. Öffne sie zum Bearbeiten oder nutze sie für Bilder, Dokumente, Videos oder Stapel."
-    },
-    "gallery": {
-      "title": "Deine Galerie",
-      "first": "Finde kürzlich verwendete Fotos und organisiere gespeicherte Bilder in Ordnern dieses Arbeitsbereichs.",
-      "second": "Wähle Miniaturen, Liste oder Details. Foto prüfen sucht nach einem unsichtbaren Lumafoil-Zeichen; es beweist keine Eigentumsrechte."
-    },
-    "bulk": {
-      "title": "Stapelverarbeitung",
-      "first": "Füge Fotos, PDFs und unterstützte Videos hinzu, wähle ein gespeichertes Wasserzeichen und prüfe die Ausgabeeinstellungen.",
-      "second": "Prüfe jedes Ergebnis oder jeden Fehler. Lade ein ZIP herunter oder speichere in der Cloud; nur Fotoergebnisse können in der Galerie gespeichert werden."
-    },
-    "documents": {
-      "title": "Dokument-Wasserzeichen",
-      "first": "Öffne ein PDF, blättere durch seine Seiten und passe dein Wasserzeichen mit den Werkzeugen neben der Vorschau an.",
-      "second": "Das Wasserzeichen gilt für das gesamte Dokument. Der Export erhält die Originalseiten mit bestehendem Text, Bildern und Vektorgrafiken."
-    },
-    "video": {
-      "title": "Video-Wasserzeichen",
-      "first": "Öffne ein unterstütztes Video und bewege die Wiedergabeposition oder spiele die Vorschau ab, während du das Wasserzeichen anpasst.",
-      "second": "Füge Schlüsselbilder hinzu, um das Zeichen über die Zeit zu bewegen. Lege Anfang, Ende und Überblendungen fest und prüfe vor dem Export Ausgabe- und Audiooptionen."
-    },
-    "workspace": {
-      "title": "Arbeitsbereich-Zugriff",
-      "first": "Öffne Zugriff verwalten im Benutzermenü, um die Freigaben zu prüfen.",
-      "second": "Eigentümer können Lese- oder Bearbeitungszugriff gewähren. Diese Freigabe teilt weder andere Arbeitsbereiche noch verbundene Cloud-Konten."
-    }
-  },
   "workspaceAccess": {
     "loading": "Zugriff Wird Geladen…",
     "ownerOnly": "Nur der Eigentümer des Arbeitsbereichs kann Zugriffsrechte ändern.",
@@ -1463,7 +1385,7 @@
   "folders": {
     "heading": "Ordner",
     "rootPhoto": "Galerie",
-    "rootPreset": "Bibliothek",
+    "rootPreset": "Gespeicherte Wasserzeichen",
     "path": "Ordnerpfad",
     "new": "Neuer Ordner",
     "name": "Ordnername",
@@ -1494,7 +1416,7 @@
     "selection": "Ausgewählte Elemente: {{count}}"
   },
   "templates": {
-    "heading": "Wasserzeichen-Vorlagen",
+    "heading": "Vorgaben",
     "hint": "Übernimm ein fertiges Layout, passe es an und speichere deine eigene Voreinstellung.",
     "search": "Vorlagen Suchen",
     "category": "Vorlagenkategorie",
@@ -1526,6 +1448,81 @@
       "copyright": "Urheberrecht",
       "photoCredit": "Bildnachweis",
       "repeatingProof": "Wiederholter Korrekturabzug"
+    }
+  },
+  "tour": {
+    "invitationTitle": "Kurze Tour Starten?",
+    "invitationBody": "Entdecke die Werkzeuge in einer kurzen Tour. Speichere offene Arbeit zuerst: Die Tour besucht verschiedene Seiten. Du kannst jederzeit aufhören oder sie in den Kontoeinstellungen erneut starten.",
+    "start": "Tour Starten",
+    "decline": "Nein Danke",
+    "close": "Tour Schließen",
+    "exit": "Tour Beenden",
+    "back": "Zurück",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "progress": "Schritt {{current}} Von {{total}}",
+    "navigationError": "Die Seite konnte nicht geöffnet werden. Versuche Weiter erneut oder beende die Tour.",
+    "settingsTitle": "Hilfe Und Quellen",
+    "settingsBody": "Starte die Tour erneut, wenn du eine Auffrischung möchtest.",
+    "replay": "Produkttour Ansehen",
+    "licensesTitle": "Lizenzen Und Quellen",
+    "licensesBody": "Hinweise zu Schriften und Grafiken findest du hier. Als Emoji dargestellte Symbole verwenden die Schriften deines Geräts.",
+    "fontPackages": "Lizenzen Enthaltener Schriften",
+    "fontCatalog": "Erweiterter Schriftkatalog Und Lizenzen",
+    "stickerLicense": "Sticker-Lizenz",
+    "iconLicense": "Icon- Und Symbollizenzen",
+    "artworkUsage": "Grafiknutzung Und Exporthinweise",
+    "images": {
+      "title": "Bilder",
+      "body": "Öffne ein Foto vom Gerät, über einen Link oder aus verbundenem Cloudspeicher. Zoom, Raster und Einrasten helfen beim Platzieren. Das Original bleibt unverändert; Bearbeitung und gespeicherte Arbeit sind offline verfügbar."
+    },
+    "watermark": {
+      "title": "Wasserzeichen Erstellen",
+      "body": "Füge Text, Symbole, Formen, Sticker, Logos, Unterschriften oder QR-Codes hinzu. Ändere Schrift, Position, Farbe, Kontur, Krümmung und Stil. Ziehe, zoome und drehe auf der Arbeitsfläche; Rückgängig nimmt Änderungen zurück."
+    },
+    "presets": {
+      "title": "Enthaltene Vorgaben",
+      "body": "Vorgaben enthält mitgelieferte Designs wie Entwurf und Vertraulich. Wähle eine Grundlage und passe sie unter Wasserzeichen an. Diese Designs bleiben von deinen gespeicherten Wasserzeichen getrennt."
+    },
+    "saved": {
+      "title": "Deine Gespeicherten Designs",
+      "body": "Gespeichert öffnet Wasserzeichen dieses Arbeitsbereichs. Speichern fragt nach einem Namen; Neu beginnt ein weiteres Wasserzeichen und behält das Bild. Verwende benannte QR-Codes, Logos und Texte erneut."
+    },
+    "transform": {
+      "title": "Zuschneiden, Anpassen Und Skalieren",
+      "body": "Zuschneiden ändert den Ausschnitt, Anpassen das Bild und Skalieren die Ausgabegröße. Jeder Regler lässt sich zurücksetzen. Behalte die Originalgröße, sofern du keine andere Größe möchtest."
+    },
+    "export": {
+      "title": "Bild Exportieren",
+      "body": "Bild Speichern öffnet die Ausgabeoptionen. Lade herunter, teile, speichere unter Bilder Mit Wasserzeichen oder wähle einen Cloudordner. PNG ist der verlustfreie Standard; andere Formate und Qualität bestimmst du."
+    },
+    "documents": {
+      "title": "Dokumente",
+      "body": "Öffne eine PDF, prüfe ihre Seiten und füge Wasserzeichen mit den integrierten Werkzeugen hinzu. PDF Exportieren speichert das markierte Dokument unter Beibehaltung des ursprünglichen Seiteninhalts."
+    },
+    "videos": {
+      "title": "Videos",
+      "body": "Öffne ein unterstütztes Video und bewege dich durch die Zeitleiste. Platziere Wasserzeichen zu verschiedenen Zeiten und füge Überblendungen hinzu. Der Export wird neu kodiert; Formatunterstützung hängt vom Browser ab."
+    },
+    "bulk": {
+      "title": "Stapelverarbeitung",
+      "body": "Verarbeite Bilder, PDFs und Videos gemeinsam. Wähle ein Wasserzeichen, prüfe einzelne Ergebnisse und lade fertige Dateien als ZIP herunter. Eine fehlerhafte Datei verwirft die übrigen Ergebnisse nicht."
+    },
+    "library": {
+      "title": "Gespeicherte Wasserzeichen",
+      "body": "Ordne wiederverwendbare Designs in Ordnern. Suche, filtere, wechsle Ansichten und finde letzte Arbeiten. Designs gehören zum aktuellen Arbeitsbereich und werden nach Wiederverbindung synchronisiert."
+    },
+    "gallery": {
+      "title": "Bilder Mit Wasserzeichen",
+      "body": "Finde zuletzt gespeicherte Bilder, ordne Ordner und wechsle Ansichten. Erstelle und verwalte Freigabelinks für ausgewählte Bilder. Foto Prüfen sucht nach unsichtbaren Lumafoil-Markierungen."
+    },
+    "account": {
+      "title": "Konto Und Cloud",
+      "body": "Verwalte Anmeldemethoden und verbinde Google Drive, Dropbox oder OneDrive. Verbindungen bleiben bis zur Trennung oder zum Widerruf bestehen. Durchsuche erlaubte Ordner beim Öffnen und Speichern; Anbieterregeln gelten weiterhin."
+    },
+    "workspace": {
+      "title": "Arbeitsbereiche Und Zugriff",
+      "body": "Im Benutzermenü wechselst du Arbeitsbereiche, lädst Personen ein und verwaltest Zugriff. Eigentümer vergeben Ansichts- oder Bearbeitungsrechte. Persönliche Einladungslinks geben keine Inhalte frei. Der Synchronisierungsstatus steht unten in der Seitenleiste."
     }
   }
 }

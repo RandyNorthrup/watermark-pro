@@ -175,6 +175,7 @@ describe('error paths in the workspace', () => {
       .mocked(fetch)
       .mock.calls.filter(([, init]) => init?.method === 'POST' || init?.method === 'DELETE')
     expect(mutations.map(([input, init]) => [requestUrl(input), init?.method])).toEqual([
+      ['/api/me/guidance/claim', 'POST'],
       [`/api/orgs/${organization.id}/access/members`, 'POST'],
       [
         `/api/orgs/${organization.id}/access/members/member-${VIEWER.id}-${organization.id}`,

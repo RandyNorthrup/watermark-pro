@@ -4,12 +4,10 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { WatermarkDto } from '../../../shared/api-watermark'
-import type { WatermarkSpec } from '../../../shared/watermark'
 import { type Layer, MAX_LAYERS } from '../../editor/state'
 import { cn } from '../../lib/cn'
 import { watermarksQueryOptions } from '../../lib/library'
 import { PresetGate } from '../presets/preset-gate'
-import { PresetTemplates } from '../presets/preset-templates'
 import { Button } from '../ui/button'
 
 interface PresetPanelProps {
@@ -18,7 +16,6 @@ interface PresetPanelProps {
   layers: readonly Layer[]
   activeLayerId: string | null
   onAddPreset: (preset: WatermarkDto) => void
-  onUseTemplate?: ((spec: WatermarkSpec) => void) | undefined
   onNewPreset: () => void
   onSelectLayer: (layerId: string) => void
   onRemoveLayer: (layerId: string) => void
@@ -55,9 +52,6 @@ export function PresetPanel({ organizationId, canCreate, ...props }: PresetPanel
           <PresetPanelBody list={list} selectId={selectId} canCreate={canCreate} {...props} />
         )}
       </PresetGate>
-      {canCreate && props.onUseTemplate !== undefined ? (
-        <PresetTemplates onChoose={(template) => props.onUseTemplate?.(template.spec)} />
-      ) : null}
     </div>
   )
 }

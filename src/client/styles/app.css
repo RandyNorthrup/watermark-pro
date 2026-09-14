@@ -103,21 +103,28 @@
   --surface-raised: #fff;
   --surface-muted: #f4e9e7;
   --ink: #292329;
-  --ink-muted: #746973;
+  --ink-muted: #61515c;
   --line: #e7dfe2;
-  --control-line: #9f8c94;
-  --glass-card: #ffffffa8;
+  --control-line: #827079;
+  --glass-card: #ffffffeb;
   --glass-card-strong: #ffffffe0;
   --glass-chrome: #fffaf5b8;
   --glass-popover: #fff9f2f0;
   --glass-edge: #7d4c6352;
   --glass-highlight: #fffffffa;
   --glass-shadow: #49222f40;
-  --glass-wash-rose: #d65f8291;
-  --glass-wash-peach: #f2ad7a7d;
-  --glass-wash-mauve: #a9517070;
+  --glass-wash-rose: #d65f8220;
+  --glass-wash-peach: #f2ad7a20;
+  --glass-wash-mauve: #a9517014;
   --glass-radius: 1.5rem;
   --glass-blur: 32px;
+  --glass-sheen: #ffffff70;
+  --glass-sheen-soft: #ffffff08;
+  --action-start: #a14260;
+  --action-middle: #923550;
+  --action-end: #712c42;
+  --action-ink: #fff;
+  --focus-ring: var(--color-brand-700);
   --scrollbar-thumb: #c86b82b8;
   --scrollbar-thumb-hover: #a94965e6;
 
@@ -131,19 +138,26 @@
   --surface-raised: #211d21;
   --surface-muted: #292127;
   --ink: #f7f1f3;
-  --ink-muted: #bfafb6;
+  --ink-muted: #dfd0d8;
   --line: #43373e;
-  --control-line: #947f8a;
-  --glass-card: #2b2229a6;
-  --glass-card-strong: #2b2229e8;
-  --glass-chrome: #241b22c7;
+  --control-line: #a9959f;
+  --glass-card: #292128f0;
+  --glass-card-strong: #292128fa;
+  --glass-chrome: #241b22f2;
   --glass-popover: #2c232bf2;
   --glass-edge: #f6c6da38;
   --glass-highlight: #fff1f833;
+  --glass-sheen: #ffffff0d;
+  --glass-sheen-soft: #ffffff03;
+  --action-start: #e7b2c0;
+  --action-middle: #d994a8;
+  --action-end: #c86b82;
+  --action-ink: #2c1720;
+  --focus-ring: var(--color-brand-200);
   --glass-shadow: #080507a8;
-  --glass-wash-rose: #c9537482;
-  --glass-wash-peach: #d77f4d66;
-  --glass-wash-mauve: #8e354f70;
+  --glass-wash-rose: #c9537433;
+  --glass-wash-peach: #d77f4d26;
+  --glass-wash-mauve: #8e354f22;
   --scrollbar-thumb: #d6869dcc;
   --scrollbar-thumb-hover: #e1a6b7f2;
 
@@ -345,7 +359,7 @@
   left: -13rem;
   width: 38rem;
   height: 38rem;
-  background: linear-gradient(135deg, #c86b82bf, #f0b28ea6);
+  background: linear-gradient(135deg, #c86b8220, #f0b28e20);
   animation: glass-drift-a 22s ease-in-out infinite alternate;
 }
 
@@ -354,7 +368,7 @@
   bottom: -14rem;
   width: 34rem;
   height: 34rem;
-  background: linear-gradient(135deg, #edb185a6, #b84c6db3);
+  background: linear-gradient(135deg, #edb18520, #b84c6d20);
   animation: glass-drift-b 18s ease-in-out -7s infinite alternate;
 }
 
@@ -375,7 +389,12 @@
   border-color: var(--glass-edge);
   border-radius: var(--glass-radius);
   background-color: var(--glass-card-strong);
-  background-image: linear-gradient(135deg, #ffffff70 0%, #ffffff08 48%, #c86b8212 100%);
+  background-image: linear-gradient(
+    135deg,
+    var(--glass-sheen) 0%,
+    var(--glass-sheen-soft) 48%,
+    #c86b8208 100%
+  );
   box-shadow:
     inset 0 1px 0 var(--glass-highlight),
     inset 0 -1px 0 #6e34421f,
@@ -386,7 +405,7 @@
 .glass-chrome {
   border-color: var(--glass-edge);
   background-color: var(--glass-chrome);
-  background-image: linear-gradient(135deg, #ffffff70, transparent 55%);
+  background-image: linear-gradient(135deg, var(--glass-sheen), transparent 55%);
   box-shadow:
     inset 0 1px 0 var(--glass-highlight),
     0 16px 48px -28px var(--glass-shadow);
@@ -418,7 +437,7 @@
 
 .glass-popover {
   background-color: var(--surface-raised);
-  background-image: linear-gradient(135deg, #ffffff75, transparent 52%);
+  background-image: linear-gradient(135deg, var(--glass-sheen), transparent 52%);
   box-shadow:
     inset 0 1px 0 var(--glass-highlight),
     0 14px 40px -14px var(--glass-shadow);
@@ -426,19 +445,59 @@
 
 .glass-nav-active,
 .glass-control {
-  border-color: var(--glass-edge);
+  border-color: var(--control-line);
   background-color: var(--glass-card);
-  background-image: linear-gradient(135deg, #fff6, transparent 58%);
+  background-image: linear-gradient(135deg, var(--glass-sheen), transparent 58%);
   box-shadow:
     inset 0 1px 0 var(--glass-highlight),
     0 8px 22px -14px var(--glass-shadow);
 }
 
 .glass-action {
-  background-image: linear-gradient(135deg, #db8da2 0%, #c86b82 45%, #a94965 100%);
+  color: var(--action-ink);
+  background-color: var(--action-middle);
+  background-image: linear-gradient(
+    135deg,
+    var(--action-start) 0%,
+    var(--action-middle) 45%,
+    var(--action-end) 100%
+  );
   box-shadow:
     inset 0 1px 0 #ffffff8a,
     0 12px 28px -12px #712c4299;
+}
+
+/* Editing controls keep one surface; toolbar focus remains distinct from typing. */
+.watermark-text-input {
+  overflow: hidden;
+  border: 1px solid var(--control-line);
+  border-radius: 0.75rem;
+  background: var(--surface-raised);
+}
+
+.watermark-text-input:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Solid focus outlines remain visible across glass and selected control fills. */
+:where(a, button, input, textarea, select, [role='tab'], [role='menuitem']):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.watermark-text-input textarea:focus-visible {
+  outline: none;
+}
+
+.watermark-text-field > p[aria-hidden='true'] {
+  display: none;
+}
+
+.watermark-text-field > p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Glass fills sit outside Tailwind's layers; selected choices must override

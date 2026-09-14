@@ -87,7 +87,7 @@ describe('authenticated layout', () => {
     const privateId = `personal-${OWNER.id}`
     installLibraryApi()
     const { router } = renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Images')
     expect(router.state.location.pathname).toBe('/app/editor')
     expect(screen.queryByRole('link', { name: /Dashboard|Overview/ })).not.toBeInTheDocument()
     expect(
@@ -103,7 +103,7 @@ describe('authenticated layout', () => {
     seedOwnerWorkspace(client())
     client().state.activeOrganizationId = null
     renderApp('/app')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Images')
     expect(client().organization.setActive).toHaveBeenCalledWith({
       organizationId: `personal-${OWNER.id}`,
     })
@@ -116,7 +116,7 @@ describe('authenticated layout', () => {
     queryClient.setQueryData(activeOrganizationQueryOptions.queryKey, null)
     renderApp('/app', queryClient)
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Image'),
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Images'),
     )
     expect(screen.queryByRole('heading', { name: 'Your workspace' })).toBeNull()
   })
@@ -130,11 +130,17 @@ describe('authenticated layout', () => {
       expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Overview')
       expect(screen.queryByRole('region', { name: 'Recent work' })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: 'Tools' })).not.toBeInTheDocument()
-      expect(
-        within(screen.getByRole('navigation', { name: 'Primary' })).getByRole('link', {
-          name: 'Overview',
-        }),
-      ).toHaveAttribute('href', '/app')
+      const tools = within(screen.getByRole('navigation', { name: 'Primary' })).getAllByRole('link')
+      expect(tools.map((link) => link.textContent)).toEqual([
+        'Images',
+        'Documents',
+        'Videos',
+        'Bulk',
+        'Saved Watermarks',
+        'Watermarked Images',
+      ])
+      const homeLinks = screen.getAllByRole('link', { name: 'Lumafoil' })
+      for (const home of homeLinks) expect(home).toHaveAttribute('href', '/app')
       expect(screen.getByText('2')).toBeInTheDocument()
       expect(screen.getByText('1 pending invitation.')).toBeInTheDocument()
       expect(screen.getByText('owner')).toBeInTheDocument()
@@ -363,7 +369,7 @@ describe('new organization', () => {
     expect(screen.getByLabelText('URL identifier')).toHaveValue('northrup-photo')
     await user.click(screen.getByRole('button', { name: 'Create workspace' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Images')
     expect(
       screen.getByRole('button', { name: 'Workspace: Northrup Photo. Switch workspace' }),
     ).toBeInTheDocument()

@@ -1,9 +1,10 @@
 /** Real loopback HTTP exercises framing, cancellation and failure isolation at the SDK boundary. */
 import assert from 'node:assert/strict'
+import { randomBytes } from 'node:crypto'
 import { request as httpRequest } from 'node:http'
 import { test } from 'node:test'
 
-import { createGateBridge } from './lib/gate-http-bridge.mjs'
+import { classifyGateFailure, createGateBridge } from './lib/gate-http-bridge.mjs'
 import { loopbackRequest as request } from './lib/test-http-request.mjs'
 
 function expectedFailure() {
@@ -106,7 +107,7 @@ test('dispatcher exceptions and mislabeled encoded responses fail without killin
       diagnostic.mock.calls.map((call) => call.arguments[0]),
       [
         'Gate request failed (forwarding_failed; sdk_dispatch; unclassified).',
-        'Gate request failed (forwarding_failed; response_headers; unclassified).',
+        'Gate request failed (forwarding_failed; response_headers; response_encoding_mismatch).',
       ],
     )
   } finally {
@@ -227,6 +228,70 @@ test('foreign targets, forged Host and GET bodies are refused before SDK dispatc
     const port = Number(new URL(bridge.origin).port)
     await assert.rejects(createGateBridge(port), /EADDRINUSE/)
     await expectStatus(bridge.origin, '/valid', 200)
+  } finally {
+    await bridge.close()
+  }
+})
+
+test('finite SDK diagnostics identify nested transport, fetch-policy and I/O failures without leaking arbitrary text', async (context) => {
+  const canary = randomBytes(32).toString('hex')
+  const cases = [
+    [
+      new TypeError('fetch failed', {
+        cause: Object.assign(new Error(canary), { code: 'UND_ERR_HEADERS_TIMEOUT' }),
+      }),
+      'UND_ERR_HEADERS_TIMEOUT',
+    ],
+    [
+      Object.assign(new Error(canary), { code: 'UND_ERR_CONNECT_TIMEOUT' }),
+      'UND_ERR_CONNECT_TIMEOUT',
+    ],
+    [Object.assign(new Error(canary), { code: 'UND_ERR_BODY_TIMEOUT' }), 'UND_ERR_BODY_TIMEOUT'],
+    [
+      new TypeError('fetch failed', { cause: new Error('unexpected redirect') }),
+      'unexpected_redirect',
+    ],
+    [
+      new TypeError("'only-if-cached' can be set only with 'same-origin' mode"),
+      'invalid_cache_mode',
+    ],
+    [new TypeError('Body is unusable: Body has already been read'), 'body_already_read'],
+    [
+      new TypeError(`Cannot perform I/O on behalf of a different request. ${canary}`),
+      'cross_request_io',
+    ],
+    [new DOMException(canary, 'AbortError'), 'abort_error'],
+    [Object.assign(new TypeError(canary), { code: canary }), 'type_error'],
+  ]
+  const diagnostic = context.mock.method(console, 'error', expectedFailure)
+  const bridge = await createGateBridge(0)
+  let failure
+  bridge.ready(async () => {
+    throw failure
+  })
+  try {
+    for (const [error, classification] of cases) {
+      failure = error
+      assert.equal(classifyGateFailure(error), classification)
+      const response = await request(bridge.origin, '/diagnostic')
+      assert.equal(response.status, 502)
+      assert.equal(response.bytes.toString(), '{"error":"gate_request_failed"}')
+      const logged = diagnostic.mock.calls.at(-1).arguments
+      assert.deepEqual(logged, [
+        `Gate request failed (forwarding_failed; sdk_dispatch; ${classification}).`,
+      ])
+      assert.equal(JSON.stringify(logged).includes(canary), false)
+    }
+    const cycle = { message: canary, cause: null }
+    cycle.cause = cycle
+    assert.equal(classifyGateFailure(cycle), 'unclassified')
+    const inaccessible = Object.defineProperty({}, 'cause', {
+      get() {
+        throw new Error(canary)
+      },
+    })
+    assert.equal(classifyGateFailure(inaccessible), 'unclassified')
+    assert.equal(classifyGateFailure(canary), 'unclassified')
   } finally {
     await bridge.close()
   }

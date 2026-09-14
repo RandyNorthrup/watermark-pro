@@ -89,7 +89,11 @@ function halfAngle(glyph: MeasuredGlyph, radius: number): number {
   return Math.atan2(halfWidth, radius - halfHeight)
 }
 
-/** Reserve angular space for each whole glyph so bending cannot make neighbors collide. */
+/**
+ * Reserve angular space for each whole glyph so bending cannot make neighbors
+ * collide. The first and last sectors also stay disjoint when a full turn closes
+ * the circle; radius must account for glyph height as well as baseline advance.
+ */
 function curveRadius(glyphs: MeasuredGlyph[], gap: number, sweep: number): number {
   let low = Math.max(...glyphs.map((glyph) => (glyph.bottom - glyph.top) / 2)) + RADIUS_CLEARANCE
   const totalWidth = glyphs.reduce(

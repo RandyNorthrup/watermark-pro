@@ -175,8 +175,8 @@ describe('durable cloud connections through authenticated API', () => {
     expect(await responseStatus(client.post('/api/me/cloud/google/token', {}))).toBe(409)
   })
 
-  it.each(['refused', 'unavailable'] as const)(
-    'clears Dropbox access even when remote revocation is %s',
+  it.each(['refused', 'unavailable', 'redirected', 'accepted'] as const)(
+    'clears Dropbox access and accurately reports remote revocation when %s',
     async (failure) => {
       const { client, harness, userId } = await actor({
         DROPBOX_APP_KEY: 'fixture-dropbox-app',
@@ -199,8 +199,28 @@ describe('durable cloud connections through authenticated API', () => {
             name: { display_name: 'Cloud Owner' },
           }),
         )
-      if (failure === 'refused') fetcher.mockResolvedValueOnce(new Response(null, { status: 403 }))
-      else fetcher.mockRejectedValueOnce(new TypeError('Offline'))
+      switch (failure) {
+        case 'refused': {
+          fetcher.mockResolvedValueOnce(new Response(null, { status: 403 }))
+          break
+        }
+        case 'redirected': {
+          fetcher.mockResolvedValueOnce(
+            new Response(null, {
+              status: 307,
+              headers: { location: 'https://attacker.test/token' },
+            }),
+          )
+          break
+        }
+        case 'accepted': {
+          fetcher.mockResolvedValueOnce(new Response(null, { status: 200 }))
+          break
+        }
+        default: {
+          fetcher.mockRejectedValueOnce(new TypeError('Offline'))
+        }
+      }
       vi.stubGlobal('fetch', fetcher)
       const start = cloudConnectSchema.parse(
         await responseJson(client.post('/api/me/cloud/dropbox/connect', {})),
@@ -215,12 +235,14 @@ describe('durable cloud connections through authenticated API', () => {
       expect(connected?.status).toBe('connected')
       expect(await responseJson(client.post('/api/me/cloud/dropbox/disconnect', {}))).toEqual({
         disconnected: true,
-        providerRevoked: false,
+        providerRevoked: failure === 'accepted',
       })
       expect(fetcher.mock.calls[2]?.[0]).toBe('https://api.dropboxapi.com/2/auth/token/revoke')
       expect(fetcher.mock.calls[2]?.[1]).toMatchObject({
         headers: { Authorization: 'Bearer dropbox-access' },
+        redirect: 'manual',
       })
+      expect(fetcher).toHaveBeenCalledTimes(3)
       const disconnected = await harness.services.cloud.find(userId, 'dropbox')
       expect(disconnected?.status).toBe('disconnected')
       expect(disconnected?.refreshCipher).toBeNull()

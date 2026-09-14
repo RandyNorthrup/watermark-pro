@@ -228,17 +228,26 @@ export class PreviewRenderer {
     const isLazySamplePending =
       this.#sampleSubject !== null && this.#requestedOriginal === null && this.#subject === null
     if (!isLazySamplePending && this.#subjectRequest !== this.#readySubjectRequest) return null
-    if (this.#subject === null) {
-      await this.#ensureSampleSubject()
-    }
+    const pendingSample = this.#subject === null ? this.#ensureSampleSubject() : null
+    const subjectRequest = this.#subjectRequest
+    // Reserve ordering before a sample decode can yield to a newer photo/frame.
+    // A late sample must not claim the new subject and invalidate its first frame.
+    this.#sequence += 1
+    const ticket = this.#sequence
+    if (pendingSample !== null) await pendingSample
+    if (
+      this.#disposed ||
+      ticket !== this.#sequence ||
+      subjectRequest !== this.#subjectRequest ||
+      subjectRequest !== this.#readySubjectRequest
+    )
+      return null
     const subject = this.#subject
     if (subject === null) {
       // A newer subject request superseded this sample decode. Its render will
       // publish the next frame, so this stale frame has no result to expose.
       return null
     }
-    this.#sequence += 1
-    const ticket = this.#sequence
     const [resources, source] = await Promise.all([
       this.#resources.resolve(this.#marksFor(input, options.output), this.#seed()),
       subject.toBitmap(),
@@ -250,7 +259,7 @@ export class PreviewRenderer {
       output: PREVIEW_OUTPUT,
       ...(transform !== undefined && { transform }),
     })
-    if (this.#disposed || ticket !== this.#sequence) {
+    if (ticket !== this.#sequence) {
       return null
     }
     return {

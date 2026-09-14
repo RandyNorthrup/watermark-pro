@@ -136,18 +136,23 @@ export function OfflinePanel({
     return t('offline.upToDate')
   }
 
+  const readinessLabel = t(
+    status.isReady && preparation.isSuccess ? 'offline.ready' : 'offline.preparing',
+  )
+
   return (
     <section
       aria-label={t('offline.label')}
-      className="min-w-0 rounded-xl border border-line bg-surface-raised/50 px-3 py-2 text-sm wrap-anywhere"
+      className="min-w-0 rounded-xl border border-line bg-surface-raised/50 px-3 py-2 text-sm"
     >
       <div className="flex min-w-0 flex-col items-start gap-2">
-        <div className="min-w-0">
-          <p role="status">{statusMessage()}</p>
-          <p className="mt-0.5 text-xs leading-4 text-ink-muted">
-            {t(status.isReady && preparation.isSuccess ? 'offline.ready' : 'offline.preparing')}
-          </p>
-        </div>
+        <p
+          role="status"
+          className="w-full truncate text-xs"
+          title={`${statusMessage()} ${readinessLabel}`}
+        >
+          {statusMessage()}
+        </p>
         <Button
           className="self-center"
           variant="secondary"

@@ -55,49 +55,49 @@ test('saves multiple QR codes and a licensed sticker for reuse', async ({ page, 
     { ...owner, email: `creative-${runId}@example.test` },
     `Creative ${runId}`,
   )
-  await navigateTo(page, 'Library')
+  await navigateTo(page, 'Saved Watermarks')
   for (const [name, content] of [
     ['Portfolio QR', 'https://example.com/portfolio'],
     ['Contact QR', 'https://example.com/contact'],
   ] as const) {
     await page.getByRole('link', { name: 'New QR code' }).click()
-    await page.getByLabel('Preset name').fill(name)
+    await page.getByLabel('Watermark name').fill(name)
     await page.getByLabel('QR code content').fill(content)
     await expectPreviewRendered(page)
     await expectAccessible(page)
-    await page.getByRole('button', { name: 'Save preset' }).click()
+    await page.getByRole('button', { name: 'Save watermark' }).click()
     await expect(
       page
-        .getByRole('region', { name: 'Watermark library', exact: true })
+        .getByRole('region', { name: 'Saved Watermarks', exact: true })
         .getByRole('link', { name: name, exact: true }),
     ).toBeVisible()
   }
-  await page.getByRole('link', { name: 'New preset' }).click()
+  await page.getByRole('link', { name: 'New watermark' }).click()
   await page.getByRole('tab', { name: 'Symbol' }).click()
   await page.getByRole('searchbox', { name: 'Search stickers' }).fill('camera')
   await page.getByRole('button', { name: 'Choose Camera', exact: true }).click()
   await expectPreviewRendered(page)
   await expectAccessible(page)
-  await page.getByLabel('Preset name').fill('Camera sticker')
-  await page.getByRole('button', { name: 'Save preset' }).click()
+  await page.getByLabel('Watermark name').fill('Camera sticker')
+  await page.getByRole('button', { name: 'Save watermark' }).click()
   await page.getByRole('button', { name: 'QR codes only' }).click()
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Portfolio QR', exact: true }),
   ).toBeVisible()
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Contact QR', exact: true }),
   ).toBeVisible()
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Camera sticker', exact: true }),
   ).toHaveCount(0)
   await page
-    .getByRole('region', { name: 'Watermark library', exact: true })
+    .getByRole('region', { name: 'Saved Watermarks', exact: true })
     .getByRole('link', { name: 'Portfolio QR', exact: true })
     .click()
   await expect(page.getByLabel('QR code content')).toHaveValue('https://example.com/portfolio')
@@ -110,13 +110,13 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   test.slow()
   await createWorkspace(page, request, owner, organizationName)
 
-  await navigateTo(page, 'Library')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
-  await expect(page.getByText(/No presets yet/)).toBeVisible()
+  await navigateTo(page, 'Saved Watermarks')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Saved Watermarks')
+  await expect(page.getByText(/No watermarks yet/)).toBeVisible()
   await expectAccessible(page)
 
-  await page.getByRole('link', { name: 'New preset' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('New preset')
+  await page.getByRole('link', { name: 'New watermark' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('New watermark')
   await expectPreviewRendered(page)
   await expect(page.getByText(/^Placed .*, (light|dark) ink\.$/)).toBeVisible()
   await expectAccessible(page)
@@ -133,12 +133,12 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await expect(page.getByText('Placed bottom left, light ink.')).toBeVisible()
   await page.getByRole('tab', { name: 'Style' }).click()
   await expectAccessible(page)
-  await page.getByLabel('Preset name').fill('Script signature')
-  await page.getByRole('button', { name: 'Save preset' }).click()
+  await page.getByLabel('Watermark name').fill('Script signature')
+  await page.getByRole('button', { name: 'Save watermark' }).click()
 
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Saved Watermarks')
   const savedPreset = page
-    .getByRole('region', { name: 'Watermark library', exact: true })
+    .getByRole('region', { name: 'Saved Watermarks', exact: true })
     .getByRole('link', { name: 'Script signature', exact: true })
   await expect(savedPreset).toBeVisible()
   // A link's icon can remain visible while its text is squeezed to zero width.
@@ -147,10 +147,10 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await expect(page.getByText('bottom left')).toBeVisible()
   await expectAccessible(page)
 
-  await page.getByRole('link', { name: 'New preset' }).click()
+  await page.getByRole('link', { name: 'New watermark' }).click()
   await page.getByRole('tab', { name: 'Logo' }).click()
   await expect(page.getByText(/No logos yet/)).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Save preset' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Save watermark' })).toBeDisabled()
   await page.getByLabel('Upload a logo file').setInputFiles({
     name: 'brand-mark.png',
     mimeType: 'image/png',
@@ -165,38 +165,38 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
   await expect(page.getByText('48 × 24')).toBeVisible()
   await expectPreviewRendered(page)
   await expectAccessible(page)
-  await page.getByLabel('Preset name').fill('Corner logo')
-  await page.getByRole('button', { name: 'Save preset' }).click()
+  await page.getByLabel('Watermark name').fill('Corner logo')
+  await page.getByRole('button', { name: 'Save watermark' }).click()
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Corner logo', exact: true }),
   ).toBeVisible()
 
   await page
-    .getByRole('region', { name: 'Watermark library', exact: true })
+    .getByRole('region', { name: 'Saved Watermarks', exact: true })
     .getByRole('link', { name: 'Script signature', exact: true })
     .click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Script signature')
   await expect(page.getByRole('textbox', { name: 'Text' })).toHaveValue(`© ${organizationName}`)
   await expectPreviewRendered(page)
-  await page.getByLabel('Preset name').fill('Script signature v2')
+  await page.getByLabel('Watermark name').fill('Script signature v2')
   await page.getByRole('button', { name: 'Save changes' }).click()
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Script signature v2', exact: true }),
   ).toBeVisible()
 
   await page.getByRole('button', { name: 'Delete Script signature v2' }).click()
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Script signature v2', exact: true }),
   ).toHaveCount(0)
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Corner logo', exact: true }),
   ).toBeVisible()
 
@@ -217,14 +217,14 @@ test('a viewer can browse presets but cannot change them', async ({ browser, pag
   // commit-wait navigation (see gotoRetrying).
   await gotoRetrying(viewerPage, acceptPath)
   await viewerPage.getByRole('button', { name: 'Join Workspace' }).click()
-  await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Images')
   const joined = await expectActiveWorkspace(viewerPage, viewer, organizationName)
   expect(joined.member.role).toBe('viewer')
-  await navigateTo(viewerPage, 'Library')
-  await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Watermark library')
-  const library = viewerPage.getByRole('region', { name: 'Watermark library', exact: true })
+  await navigateTo(viewerPage, 'Saved Watermarks')
+  await expect(viewerPage.getByRole('heading', { level: 1 })).toHaveText('Saved Watermarks')
+  const library = viewerPage.getByRole('region', { name: 'Saved Watermarks', exact: true })
   await expect(library.getByRole('link', { name: 'Corner logo', exact: true })).toBeVisible()
-  await expect(viewerPage.getByRole('link', { name: 'New preset' })).toHaveCount(0)
+  await expect(viewerPage.getByRole('link', { name: 'New watermark' })).toHaveCount(0)
   await expect(viewerPage.getByRole('button', { name: /^Delete / })).toHaveCount(0)
   await expectAccessible(viewerPage)
 

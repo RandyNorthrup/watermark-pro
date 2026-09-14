@@ -49,9 +49,9 @@ export function CanvasViewControls({
     <div
       role="group"
       aria-label={t('editor.view.label')}
-      className="glass-control grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border px-3 py-2 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"
+      className="glass-control mx-auto flex w-full max-w-3xl flex-wrap items-center justify-center gap-x-4 gap-y-3 rounded-xl border px-3 py-2"
     >
-      <div className="flex min-w-0 items-end gap-1">
+      <div className="flex w-36 max-w-full min-w-0 grow items-end gap-1 sm:w-52 sm:grow-0">
         <Button
           type="button"
           variant="ghost"
@@ -98,7 +98,7 @@ export function CanvasViewControls({
           {t('editor.view.actualSize')}
         </Button>
       </div>
-      <div className="col-span-2 grid min-w-0 grid-cols-2 items-center gap-3 xl:col-span-1">
+      <div className="grid w-64 max-w-full min-w-0 grow grid-cols-2 items-center gap-3 sm:grow-0">
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between gap-2 text-xs font-medium">
             <span>{t('editor.view.grid')}</span>

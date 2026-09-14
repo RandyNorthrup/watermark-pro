@@ -36,7 +36,7 @@ async function openOwnerGallery() {
     gallery: { photos: photos(), maxBytes: 1024, uploadFailsWith: null },
   })
   renderApp('/app/gallery')
-  const gallery = await screen.findByRole('region', { name: 'Gallery' })
+  const gallery = await screen.findByRole('region', { name: 'Watermarked Images' })
   await within(gallery).findByRole('list')
   return api
 }
@@ -108,14 +108,14 @@ describe('sharing from the gallery', () => {
       gallery: { photos: photos(), maxBytes: 1024, uploadFailsWith: null },
     })
     renderApp('/app/gallery')
-    const gallery = await screen.findByRole('region', { name: 'Gallery' })
+    const gallery = await screen.findByRole('region', { name: 'Watermarked Images' })
     await within(gallery).findByRole('list')
     expect(screen.queryByRole('button', { name: /^Share/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
   })
 })
 
-describe('shares page', () => {
+describe('Manage Links from Watermarked Images', () => {
   it('lists links with their status, copies and revokes them', async () => {
     const user = setupUser()
     seedOwnerWorkspace(client())
@@ -129,37 +129,50 @@ describe('shares page', () => {
         ],
       },
     })
-    renderApp('/app/shares')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Shares')
-    const rows = await screen.findAllByRole('listitem')
+    const { router } = renderApp('/app/gallery')
+    await user.click(await screen.findByRole('button', { name: 'Manage Links' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Manage Links' })
+    expect(router.state.location.pathname).toBe('/app/gallery')
+    const rows = await within(dialog).findAllByRole('listitem')
     expect(rows).toHaveLength(3)
     expect(rows[0]).toHaveTextContent('active')
     expect(rows[1]).toHaveTextContent('expired')
     expect(rows[2]).toHaveTextContent('revoked')
-    expect(screen.getAllByRole('button', { name: /^Revoke/ })).toHaveLength(1)
+    expect(within(dialog).getAllByRole('button', { name: /^Revoke/ })).toHaveLength(1)
 
-    await user.click(screen.getByRole('button', { name: 'Copy link' }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Link copied to the clipboard.')
+    await user.click(within(dialog).getByRole('button', { name: 'Copy link' }))
+    expect(await within(dialog).findByRole('status')).toHaveTextContent(
+      'Link copied to the clipboard.',
+    )
     expect(writeText).toHaveBeenCalledWith(api.shares.shares[0]?.url)
 
-    await user.click(screen.getByRole('button', { name: 'Revoke Live link' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Revoke Live link' }))
     await waitFor(() => expect(api.shares.shares[0]?.revokedAt).not.toBeNull())
-    await waitFor(() => expect(screen.getAllByRole('listitem')[0]).toHaveTextContent('revoked'))
-    expect(screen.queryByRole('button', { name: /^Revoke/ })).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(within(dialog).getAllByRole('listitem')[0]).toHaveTextContent('revoked'),
+    )
+    expect(within(dialog).queryByRole('button', { name: /^Revoke/ })).not.toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Close' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Shares' })).not.toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/app/gallery')
   })
 
   it('shows an empty state and blocks viewers', async () => {
+    const user = setupUser()
     seedOwnerWorkspace(client())
-    const { unmount } = renderApp('/app/shares')
     installLibraryApi({ watermarks: [makeWatermark()] })
-    expect(await screen.findByText(/No links yet/)).toBeInTheDocument()
+    const { unmount } = renderApp('/app/gallery')
+    await user.click(await screen.findByRole('button', { name: 'Manage Links' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Manage Links' })
+    expect(await within(dialog).findByText(/No links yet/)).toBeInTheDocument()
     unmount()
 
     seedViewerWorkspace(client())
-    renderApp('/app/shares')
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Your role does not include sharing.',
-    )
+    renderApp('/app/gallery')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Watermarked Images')
+    expect(screen.queryByRole('button', { name: 'Manage Links' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Manage Links' })).not.toBeInTheDocument()
   })
 })
 

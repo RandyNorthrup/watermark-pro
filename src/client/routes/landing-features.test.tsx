@@ -20,7 +20,7 @@ describe('public product explanation', () => {
       '551 Unique Font Families',
       '400 Colorful Vector Stickers',
       'Create And Save QR Watermarks',
-      '18 Templates And Your Own Saved Presets',
+      '18 Presets And Your Own Saved Watermarks',
       'Video Placement And Fade Effects',
       'Preview And Watermark PDF Pages',
       'Work Offline, Sync Later',
@@ -39,6 +39,13 @@ describe('public product explanation', () => {
     )
     expect(screen.queryByRole('link', { name: 'Create account' })).toBeNull()
     expect(screen.queryByText('Built to be trusted')).toBeNull()
-    expect(screen.getByText(/A site invitation never shares your photos or presets/)).toBeVisible()
+    expect(
+      screen.getByText(/A site invitation never shares your photos or watermarks/),
+    ).toBeVisible()
+    expect(screen.getByText(/Cloud storage is in preview\./)).toBeVisible()
+    expect(
+      screen.getByText(/Browse Recent Work in thumbnail, list, or details views\./),
+    ).toBeVisible()
+    expect(screen.getByText(/reuse them in Images, Documents, Videos, or Bulk\./)).toBeVisible()
   })
 })

@@ -30,7 +30,6 @@ const DIAGNOSTIC_ROUTES = new Set([
   '/app/library/new',
   '/app/members',
   '/app/organizations/new',
-  '/app/shares',
   '/app/verify',
   '/app/video',
   '/check-email',

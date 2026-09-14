@@ -4,13 +4,12 @@
   },
   "shell": {
     "nav": {
-      "library": "Biblioteca",
-      "editor": "Imagem",
+      "library": "Marcas D’Água Salvas",
+      "editor": "Imagens",
       "bulk": "Lote",
-      "video": "Vídeo",
+      "video": "Vídeos",
       "documents": "Documentos",
-      "gallery": "Galeria",
-      "shares": "Compartilhamentos",
+      "gallery": "Imagens Com Marca D’Água",
       "members": "Membros",
       "audit": "Registro de auditoria",
       "admin": "Admin"
@@ -113,7 +112,7 @@
   },
   "library": {
     "orgRequired": "Crie um espaço de trabalho ou entre em um para montar uma biblioteca de marcas d'água.",
-    "heading": "Biblioteca de marcas d'água",
+    "heading": "Marcas D’Água Salvas",
     "description": "Marcas d’água salvas em {{name}}. Aplique a um arquivo ou a um lote inteiro.",
     "export": "Exportar",
     "exportPreset": "Exportar {{name}}",
@@ -175,7 +174,7 @@
     "notAnImage": "Esse arquivo não é uma imagem que o navegador possa ler.",
     "text": {
       "label": "Texto",
-      "hint": "Até {{max}} caracteres em até {{lines}} linhas. Use \"Inserir detalhe\" para tokens como a data ou a câmera, preenchidos em cada foto. {location} imprime a posição GPS da foto na imagem.",
+      "hint": "Até {{max}} caracteres.",
       "symbols": "Símbolos de texto",
       "insertSymbol": "Inserir {{symbol}}",
       "insertLimit": "O texto está cheio. Selecione texto para substituir ou remova caracteres."
@@ -210,15 +209,13 @@
       "weight": "Peso",
       "search": "Buscar fontes",
       "recent": "Usadas recentemente",
-      "license": "Licença da fonte",
       "previewError": "Algumas prévias de fontes não carregaram. Reabra a lista quando estiver conectado para tentar novamente.",
       "empty": "Nenhuma Fonte Correspondente"
     },
     "symbol": {
       "icons": "Ícones",
       "glyphLabel": "Glifo {{glyph}}",
-      "iconLabel": "Ícone {{label}}",
-      "license": "Licenças dos ícones"
+      "iconLabel": "Ícone {{label}}"
     },
     "shape": {
       "label": "Forma",
@@ -392,7 +389,6 @@
       "choose": "Escolher {{name}}",
       "previous": "Anterior",
       "next": "Próximo",
-      "license": "Fluent Emoji · licença MIT",
       "usage": "Uso comercial permitido; mantenha o aviso de licença da arte ao redistribuí-la.",
       "guide": "Guia de licenças da arte"
     },
@@ -400,7 +396,7 @@
   },
   "editor": {
     "orgRequired": "Crie um espaço de trabalho ou entre em um para editar imagens.",
-    "heading": "Imagem",
+    "heading": "Imagens",
     "description": "Escolha uma predefinição, ajuste a posição, recorte e redimensione no seu dispositivo. Baixe o resultado ou escolha salvar na galeria ou na nuvem.",
     "tabs": {
       "presets": "Predefinições",
@@ -408,7 +404,7 @@
       "crop": "Cortar",
       "adjust": "Ajustar",
       "resize": "Redimensionar",
-      "export": "Exportar"
+      "saved": "Salvos"
     },
     "toolsLabel": "Ferramentas do editor",
     "openPhoto": "Abrir foto",
@@ -559,7 +555,8 @@
       "rotate": "Rotacionar a marca d'água",
       "resize": "Redimensionar a marca d'água"
     },
-    "newWorkspace": "Novo"
+    "newWorkspace": "Novo",
+    "exportImage": "Salvar Imagem"
   },
   "bulk": {
     "orgRequired": "Crie um espaço de trabalho ou entre em um para aplicar marca d'água em lote.",
@@ -653,7 +650,7 @@
   },
   "gallery": {
     "orgRequired": "Crie um espaço de trabalho ou entre em um para ter uma galeria.",
-    "heading": "Galeria",
+    "heading": "Imagens Com Marca D’Água",
     "description": "Fotos com marca d’água salvas em {{name}}. Pesquise, filtre, baixe ou exclua.",
     "usage_one": "{{count}} foto · {{used}} de {{max}}",
     "usage_other": "{{count}} fotos · {{used}} de {{max}}",
@@ -708,7 +705,7 @@
     "link": "Link",
     "noExpiry": "Este link não expira.",
     "expires": "Expira {{when}}.",
-    "manageLinks": "Gerencie os links em Compartilhamentos.",
+    "manageLinks": "Gerenciar Links: Imagens Com Marca D’Água.",
     "linkCopied": "Link copiado para a área de transferência.",
     "linkShared": "Link compartilhado.",
     "copyLink": "Copiar link",
@@ -720,14 +717,11 @@
     "shareSyncBlocked": "Resolva os problemas de sincronização das fotos selecionadas antes de criar um link."
   },
   "shares": {
-    "orgRequired": "Crie um espaço de trabalho ou entre em um para compartilhar fotos.",
-    "noPermission": "Sua função não inclui compartilhamento.",
-    "heading": "Compartilhamentos",
+    "heading": "Gerenciar Links",
     "description": "Links que permitem que pessoas de fora de {{name}} vejam e baixem fotos selecionadas. Revogar um link o desativa imediatamente.",
     "loading": "Carregando compartilhamentos",
     "loadErrorTitle": "Não foi possível carregar os compartilhamentos",
     "empty": "Nenhum link ainda. Selecione fotos na galeria e escolha Compartilhar.",
-    "openGallery": "Abrir a galeria",
     "rowCreated_one": "{{count}} foto · criado {{created}}",
     "rowCreated_other": "{{count}} fotos · criado {{created}}",
     "neverExpires": " · nunca expira",
@@ -878,7 +872,7 @@
   },
   "video": {
     "orgRequired": "Crie um espaço de trabalho ou entre em um para aplicar marca d'água em vídeo.",
-    "heading": "Marca d'água em vídeo",
+    "heading": "Vídeos",
     "description": "Visualize seu vídeo, posicione marcas d’água em momentos diferentes, adicione transições graduais e exporte com áudio.",
     "checkingSupport": "Verificando o suporte a vídeo",
     "unsupportedTitle": "Vídeo não é compatível com este navegador",
@@ -920,7 +914,7 @@
       "chooseVideo": "Abra um vídeo e adicione uma marca d’água válida primeiro.",
       "waitPreview": "Aguarde a prévia da marca d’água antes de adicionar um quadro-chave.",
       "changed": "O vídeo ou a marca d’água mudou durante a exportação. Exporte novamente para usar as alterações atuais.",
-      "download": "Baixar Vídeo",
+      "download": "Exportar Vídeo",
       "cloudSaved": "O vídeo com marca d’água foi salvo no seu armazenamento em nuvem."
     }
   },
@@ -941,7 +935,7 @@
       "invalidFile": "Escolha um PDF dentro do limite de tamanho do documento.",
       "chooseMark": "Adicione uma marca d’água válida antes de exportar este documento.",
       "changed": "O documento ou a marca d’água mudou durante a exportação. Exporte novamente para usar as alterações atuais.",
-      "download": "Baixar PDF",
+      "download": "Exportar PDF",
       "cloudSaved": "O PDF com marca d’água foi salvo no seu armazenamento em nuvem.",
       "originalHint": "O texto original, as ilustrações vetoriais, as dimensões das páginas e as imagens incorporadas são preservados. Só a marca d’água é rasterizada. PDFs protegidos por senha precisam ser desbloqueados primeiro."
     }
@@ -1215,7 +1209,7 @@
     "syncing": "Sincronizando o trabalho salvo…",
     "disconnected": "Offline — as alterações ficam neste dispositivo.",
     "pending": "Alterações pendentes: {{count}}",
-    "upToDate": "O trabalho salvo está sincronizado.",
+    "upToDate": "Sincronizado",
     "syncNow": "Sincronizar agora",
     "review": "Revisar alterações ({{count}})",
     "deletion": "Exclusão",
@@ -1233,7 +1227,7 @@
     "connectOnce": "Entre e abra este espaço de trabalho uma vez com conexão antes de usá-lo offline.",
     "onlineOnly": "A administração de contas, compartilhamento e membros exige conexão. As ferramentas de fotos e predefinições salvas continuam disponíveis offline.",
     "ready": "Os arquivos do aplicativo estão prontos para uso offline.",
-    "preparing": "Preparando arquivos offline. Mantenha esta aba aberta.",
+    "preparing": "Preparando Modo Offline",
     "updateAvailable": "Uma atualização está pronta. Conclua as alterações não salvas antes de recarregar; o trabalho salvo permanece neste dispositivo.",
     "reload": "Recarregar para atualizar"
   },
@@ -1330,78 +1324,6 @@
     "admin": "Administrador",
     "user": "Usuário"
   },
-  "guidance": {
-    "dismiss": "Fechar dica",
-    "back": "Voltar",
-    "next": "Próximo",
-    "done": "Entendi",
-    "page": "{{current}} de {{total}}",
-    "image": {
-      "title": "Imagem",
-      "first": "Abra uma foto. O arquivo original permanece intacto.",
-      "second": "O zoom da tela muda apenas a visualização. Os downloads são gerados a partir da imagem original; PNG é o padrão sem perdas."
-    },
-    "watermark": {
-      "title": "Ferramentas De Marca",
-      "first": "Escolha texto, símbolo, forma, logo ou código QR.",
-      "second": "Toque na marca para mostrar suas alças. Arraste para mover, use dois dedos para redimensionar ou gire-os para rotacionar. Toque em outro lugar para ocultar as alças."
-    },
-    "presets": {
-      "title": "Predefinições Salvas",
-      "first": "Comece com Rascunho, Confidencial ou outro modelo, ou escolha uma marca d’água salva.",
-      "second": "Salvar solicita um nome e uma pasta. Novo inicia uma nova marca mantendo o arquivo aberto."
-    },
-    "crop": {
-      "title": "Recortar Foto",
-      "first": "Arraste as bordas ou escolha uma proporção.",
-      "second": "Redefinir recorte restaura a foto inteira. O original não é sobrescrito."
-    },
-    "adjust": {
-      "title": "Ajustes Da Foto",
-      "first": "Use os controles para mudar a aparência da foto.",
-      "second": "Cada redefinição restaura o valor padrão. Desfazer reverte a última alteração."
-    },
-    "resize": {
-      "title": "Tamanho De Saída",
-      "first": "Mantenha as dimensões originais ou escolha outro tamanho.",
-      "second": "Redimensionar altera a exportação. O zoom muda apenas a visualização."
-    },
-    "export": {
-      "title": "Salvar Resultado",
-      "first": "Baixe, salve na Galeria ou escolha um destino na nuvem.",
-      "second": "Confira formato, dimensões e qualidade. Salvar na nuvem não compartilha o arquivo; crie links separadamente em Arquivos salvos na nuvem."
-    },
-    "library": {
-      "title": "Sua Biblioteca",
-      "first": "Encontre predefinições recentes, explore modelos e organize os designs salvos em pastas.",
-      "second": "Pesquise ou alterne a visualização para encontrar uma predefinição. Abra para editar ou aplique em Imagem, Documentos, Vídeo ou Lotes."
-    },
-    "gallery": {
-      "title": "Sua Galeria",
-      "first": "Encontre fotos recentes e organize imagens salvas em pastas neste espaço de trabalho.",
-      "second": "Escolha miniaturas, lista ou detalhes. Verificar uma foto procura uma marca Lumafoil invisível; isso não comprova propriedade."
-    },
-    "bulk": {
-      "title": "Processamento Em Lote",
-      "first": "Adicione fotos, PDFs e vídeos compatíveis, escolha uma marca salva e confira as configurações de saída.",
-      "second": "Confira cada resultado ou erro. Baixe um ZIP ou salve na nuvem; somente resultados de fotos podem ser salvos na Galeria."
-    },
-    "documents": {
-      "title": "Marcas Em Documentos",
-      "first": "Abra um PDF, percorra suas páginas e ajuste a marca com as ferramentas ao lado da prévia.",
-      "second": "A marca se aplica ao documento inteiro. A exportação mantém as páginas originais e o texto, as imagens e a arte vetorial existentes."
-    },
-    "video": {
-      "title": "Marcas Em Vídeos",
-      "first": "Abra um vídeo compatível e navegue ou reproduza a prévia enquanto ajusta a marca.",
-      "second": "Adicione quadros-chave para mover a marca ao longo do tempo. Defina Início, Fim e transições; confira saída e áudio antes de exportar."
-    },
-    "workspace": {
-      "title": "Acesso Ao Espaço",
-      "first": "Abra Gerenciar acesso no menu do usuário para revisar o compartilhamento.",
-      "second": "Proprietários podem conceder acesso de visualização ou edição. Compartilhar este espaço não compartilha outros espaços nem as contas na nuvem conectadas de ninguém."
-    }
-  },
   "workspaceAccess": {
     "loading": "Carregando Acesso…",
     "ownerOnly": "Somente o proprietário do espaço de trabalho pode alterar o acesso.",
@@ -1479,7 +1401,7 @@
   "folders": {
     "heading": "Pastas",
     "rootPhoto": "Galeria",
-    "rootPreset": "Biblioteca",
+    "rootPreset": "Marcas D’Água Salvas",
     "path": "Caminho Da Pasta",
     "new": "Nova Pasta",
     "name": "Nome Da Pasta",
@@ -1510,7 +1432,7 @@
     "selection": "Itens Selecionados: {{count}}"
   },
   "templates": {
-    "heading": "Modelos De Marca D’Água",
+    "heading": "Predefinições",
     "hint": "Aplique um layout pronto, personalize-o e salve sua própria predefinição.",
     "search": "Buscar Modelos",
     "category": "Categoria De Modelo",
@@ -1542,6 +1464,81 @@
       "copyright": "Direitos Autorais",
       "photoCredit": "Crédito Da Foto",
       "repeatingProof": "Prova Repetida"
+    }
+  },
+  "tour": {
+    "invitationTitle": "Fazer Um Tour Rápido?",
+    "invitationBody": "Explore as ferramentas em um tour curto. Salve o trabalho pendente primeiro: o tour visita páginas diferentes. Você pode sair a qualquer momento ou repeti-lo nas configurações da conta.",
+    "start": "Iniciar Tour",
+    "decline": "Não, Obrigado",
+    "close": "Fechar Tour",
+    "exit": "Sair Do Tour",
+    "back": "Voltar",
+    "next": "Próximo",
+    "finish": "Concluir",
+    "progress": "Etapa {{current}} De {{total}}",
+    "navigationError": "Não foi possível abrir esta página. Tente Próximo novamente ou saia do tour.",
+    "settingsTitle": "Ajuda E Créditos",
+    "settingsBody": "Revise o tour guiado sempre que precisar relembrar as funções.",
+    "replay": "Ver Tour Do Produto",
+    "licensesTitle": "Licenças E Créditos",
+    "licensesBody": "Os avisos de fontes e ilustrações estão aqui. Símbolos exibidos como emoji usam as fontes instaladas no dispositivo.",
+    "fontPackages": "Licenças Das Fontes Incluídas",
+    "fontCatalog": "Catálogo Ampliado De Fontes E Licenças",
+    "stickerLicense": "Licença Dos Adesivos",
+    "iconLicense": "Licenças De Ícones E Símbolos",
+    "artworkUsage": "Uso De Ilustrações E Avisos De Exportação",
+    "images": {
+      "title": "Imagens",
+      "body": "Abra uma foto do dispositivo, de um link ou da nuvem conectada. Zoom, grade e encaixe ajudam no posicionamento. O original fica intacto; edição e trabalho salvo continuam disponíveis offline."
+    },
+    "watermark": {
+      "title": "Criar Uma Marca D’Água",
+      "body": "Adicione texto, símbolos, formas, adesivos, logotipos, assinaturas ou códigos QR. Ajuste fontes, posição, cor, contorno, curva e estilo. Arraste, pince e gire na tela; Desfazer reverte alterações."
+    },
+    "presets": {
+      "title": "Predefinições Incluídas",
+      "body": "Predefinições contém os designs incluídos, como Rascunho e Confidencial. Escolha uma base e personalize em Marca D’Água. Eles ficam separados das suas marcas salvas."
+    },
+    "saved": {
+      "title": "Seus Designs Salvos",
+      "body": "Salvos abre marcas deste espaço. Salvar pede um nome; Novo inicia outra marca mantendo a imagem. Reutilize códigos QR, logotipos e textos nomeados."
+    },
+    "transform": {
+      "title": "Cortar, Ajustar E Redimensionar",
+      "body": "Cortar altera o enquadramento; Ajustar muda a aparência; Redimensionar define as dimensões de saída. Cada controle tem redefinição. Mantenha o tamanho original, salvo se quiser outro."
+    },
+    "export": {
+      "title": "Exportar Imagem",
+      "body": "Salvar Imagem abre as opções de saída. Baixe, compartilhe, salve em Imagens Com Marca D’Água ou escolha uma pasta na nuvem. PNG é o padrão sem perdas; outros formatos e qualidades são sua escolha."
+    },
+    "documents": {
+      "title": "Documentos",
+      "body": "Abra um PDF, visualize as páginas e aplique marcas com as ferramentas integradas. Exportar PDF salva o documento marcado preservando o conteúdo original das páginas."
+    },
+    "videos": {
+      "title": "Vídeos",
+      "body": "Abra um vídeo compatível e percorra a linha do tempo. Posicione marcas em momentos diferentes e adicione fades. A exportação recodifica o vídeo; os formatos compatíveis dependem do navegador."
+    },
+    "bulk": {
+      "title": "Lote",
+      "body": "Processe imagens, PDFs e vídeos juntos. Escolha uma marca, revise cada resultado e baixe os arquivos concluídos em ZIP. Uma falha não descarta os demais resultados."
+    },
+    "library": {
+      "title": "Marcas D’Água Salvas",
+      "body": "Organize designs reutilizáveis em pastas. Pesquise, filtre, alterne visualizações e encontre trabalhos recentes. Os designs pertencem ao espaço atual e sincronizam quando a conexão volta."
+    },
+    "gallery": {
+      "title": "Imagens Com Marca D’Água",
+      "body": "Encontre imagens recentes, organize pastas e alterne visualizações. Crie e gerencie links para imagens selecionadas. Verificar Foto procura a marca invisível do Lumafoil."
+    },
+    "account": {
+      "title": "Conta E Nuvem",
+      "body": "Gerencie métodos de acesso e conecte Google Drive, Dropbox ou OneDrive. As conexões persistem até desconectar ou revogar. Navegue nas pastas permitidas ao abrir e salvar; as regras do provedor continuam valendo."
+    },
+    "workspace": {
+      "title": "Espaços E Acesso",
+      "body": "Use o menu do usuário para mudar de espaço, convidar pessoas ou Gerenciar Acesso. Proprietários concedem Visualização ou Edição. Convites pessoais não compartilham conteúdo. O status de sincronização fica no rodapé da barra lateral."
     }
   }
 }

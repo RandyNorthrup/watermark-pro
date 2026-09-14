@@ -36,7 +36,7 @@ export function LandingPage() {
   return (
     <div className="workspace-scene flex min-h-svh flex-col">
       <header
-        className="glass-chrome relative z-30 border-b border-line md:sticky md:top-0"
+        className="glass-chrome relative z-30 border-b border-line"
         style={{ backgroundColor: 'var(--surface-raised)' }}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">

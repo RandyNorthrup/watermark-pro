@@ -15,6 +15,7 @@ import { AlertDialog, Dialog } from 'radix-ui'
 import { useDeferredValue, useId, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { ManageLinksDialog } from './manage-links-dialog'
 import { ShareDialog } from './share-dialog'
 import type { PhotoDto } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
@@ -118,7 +119,10 @@ export function Gallery({ organizationId, role, folderId }: GalleryProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
+        {canShare ? (
+          <ManageLinksDialog key={organizationId} organizationId={organizationId} />
+        ) : null}
         <Link
           to="/app/verify"
           className={`${buttonVariants({ variant: 'primary', size: 'md' })} w-full sm:w-auto`}

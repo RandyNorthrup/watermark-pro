@@ -100,7 +100,7 @@ test('gallery controls keep their geometry as usage, preset options and real pho
   try {
     await page.goto('/app/gallery')
     const search = page.getByLabel('Search', { exact: true })
-    const filter = page.getByLabel('Preset', { exact: true })
+    const filter = page.getByLabel('Saved Watermark', { exact: true })
     await expect(search).toBeVisible()
     await expect(page.getByRole('button', { name: 'Select all', exact: true })).toBeDisabled()
     await settledFrame(page)

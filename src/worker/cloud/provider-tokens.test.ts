@@ -73,7 +73,7 @@ describe.each(CLOUD_PROVIDERS)('%s confidential protocol', (provider) => {
       scopes: config.scopes,
     })
     const init = fetcher.mock.calls[0]?.[1]
-    expect(init).toMatchObject({ redirect: 'error', cache: 'no-store' })
+    expect(init).toMatchObject({ redirect: 'manual', cache: 'no-store' })
     if (!(init?.body instanceof URLSearchParams)) throw new Error('Expected confidential form')
     expect(init.body.get('client_secret')).toBe(config.clientSecret)
     expect(init.body.get('code_verifier')).toBe('verifier')
@@ -96,6 +96,36 @@ describe.each(CLOUD_PROVIDERS)('%s confidential protocol', (provider) => {
       exchangeCloudTokens(config, { code: 'code', verifier: 'verifier' }),
     ).rejects.toMatchObject({ requiresReconnect: true })
   })
+
+  it.each([301, 302, 303, 307, 308])(
+    'refuses HTTP %s before reading or following its credential-bearing response',
+    async (status) => {
+      const read = vi.fn()
+      const cancel = vi.fn()
+      const body = new ReadableStream<Uint8Array>({ pull: read, cancel }, { highWaterMark: 0 })
+      const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(body, {
+          status,
+          headers: { location: 'https://attacker.test/credentials' },
+        }),
+      )
+      vi.stubGlobal('fetch', fetcher)
+      await expect(
+        exchangeCloudTokens(configuration(), {
+          code: 'private-code',
+          verifier: 'private-verifier',
+        }),
+      ).rejects.toMatchObject({
+        requiresReconnect: false,
+        message: 'The cloud provider could not complete this request.',
+      })
+      expect(fetcher).toHaveBeenCalledTimes(1)
+      expect(fetcher.mock.calls[0]?.[1]).toMatchObject({ redirect: 'manual', cache: 'no-store' })
+      expect(body.locked).toBe(false)
+      expect(read).not.toHaveBeenCalled()
+      expect(cancel).toHaveBeenCalledOnce()
+    },
+  )
 
   it('sanitizes provider failures, rejects oversized responses, and never invents a missing refresh token', async () => {
     const config = configuration()

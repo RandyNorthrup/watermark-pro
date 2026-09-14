@@ -5,6 +5,7 @@ import {
   Download,
   Eraser,
   FilePlus2,
+  FolderOpen,
   ImagePlus,
   LibraryBig,
   Link2,
@@ -109,6 +110,7 @@ import { useDesignHistory } from '../designer/use-design-history'
 import { CloudImportButtons } from '../import/cloud-import-buttons'
 import { TakePhotoButton } from '../import/take-photo-button'
 import { UrlImportDialog } from '../import/url-import-dialog'
+import { PresetTemplates } from '../presets/preset-templates'
 import { SampleScene } from '../sample-scene'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
@@ -139,17 +141,17 @@ interface EditorProps {
   embedded?: EmbeddedEditing | undefined
 }
 
-type Tool = 'presets' | 'watermark' | 'crop' | 'adjust' | 'resize' | 'export'
+type Tool = 'presets' | 'watermark' | 'saved' | 'crop' | 'adjust' | 'resize' | 'export'
 type CanvasZoomMode = 'fit' | 'custom'
 type CanvasGridStyle = CSSProperties & { '--canvas-grid-spacing': string }
 
 const TOOLS = [
   { value: 'presets', label: 'editor.tabs.presets', icon: LibraryBig },
   { value: 'watermark', label: 'editor.tabs.watermark', icon: Stamp },
-  { value: 'crop', label: 'editor.tabs.crop', icon: Crop },
+  { value: 'saved', label: 'editor.tabs.saved', icon: FolderOpen },
   { value: 'adjust', label: 'editor.tabs.adjust', icon: SlidersHorizontal },
   { value: 'resize', label: 'editor.tabs.resize', icon: Scaling },
-  { value: 'export', label: 'editor.tabs.export', icon: Download },
+  { value: 'crop', label: 'editor.tabs.crop', icon: Crop },
 ] as const satisfies readonly { value: Tool; label: string; icon: typeof Stamp }[]
 
 const ACCEPTED_PHOTO_TYPES = 'image/png,image/jpeg,image/webp,image/avif,image/gif'
@@ -446,8 +448,7 @@ function EditorSession({
     sessionRestored,
   ])
 
-  const visibleTools =
-    embedded === undefined ? TOOLS : TOOLS.filter((entry) => entry.value !== 'export')
+  const visibleTools = TOOLS
 
   // Load the preset named in the URL once the library has arrived (not embedded).
   const initialPreset = presets.data?.find((candidate) => candidate.id === initialPresetId)
@@ -839,7 +840,7 @@ function EditorSession({
   })
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6">
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6">
       <Card className="flex min-w-0 flex-col gap-3 p-3 lg:p-4">
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -916,11 +917,23 @@ function EditorSession({
               {t('editor.samplePhoto')}
             </Button>
           )}
-          <div className="ms-auto flex items-center gap-1">
+          <div className="ms-auto flex flex-wrap items-center justify-center gap-1">
             {canCreatePresets ? (
               <Button variant="secondary" size="sm" onClick={newWorkspace}>
                 <FilePlus2 aria-hidden="true" className="size-4" />
                 {t('editor.newWorkspace')}
+              </Button>
+            ) : null}
+            {embedded === undefined ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => setTool('export')}
+                aria-pressed={tool === 'export'}
+                data-guidance-topic="export"
+              >
+                <Download aria-hidden="true" className="size-4" />
+                {t('editor.exportImage')}
               </Button>
             ) : null}
             {isRendering ? <Spinner className="size-4" label={t('editor.rendering')} /> : null}
@@ -1116,17 +1129,21 @@ function EditorSession({
               ))}
             </Tabs.List>
             <Tabs.Content value="presets" className="outline-none">
+              <PresetTemplates
+                onChoose={(template) => {
+                  draft.change(template.spec)
+                  setActiveLayerId('draft')
+                  setTool('watermark')
+                }}
+              />
+            </Tabs.Content>
+            <Tabs.Content value="saved" className="outline-none">
               <PresetPanel
                 organizationId={organizationId}
                 canCreate={canCreatePresets}
                 layers={document.layers}
                 activeLayerId={activeLayer?.id ?? null}
                 onAddPreset={addPreset}
-                onUseTemplate={(spec) => {
-                  draft.change(spec)
-                  setActiveLayerId('draft')
-                  setTool('watermark')
-                }}
                 onNewPreset={() => {
                   setActiveLayerId('draft')
                   setTool('watermark')
@@ -1187,8 +1204,8 @@ function EditorSession({
                 }}
               />
             </Tabs.Content>
-            {embedded === undefined ? (
-              <Tabs.Content value="export" className="outline-none">
+            {embedded === undefined && tool === 'export' ? (
+              <section aria-label={t('editor.exportImage')} className="outline-none">
                 <ExportPanel
                   organizationId={organizationId}
                   organizationName={organizationName}
@@ -1242,7 +1259,7 @@ function EditorSession({
                     {cloudSaved}
                   </Alert>
                 )}
-              </Tabs.Content>
+              </section>
             ) : null}
           </Tabs.Root>
           {embedded === undefined ? null : (

@@ -157,6 +157,8 @@ async function templateAndFolder(page, actor, profile) {
       .getByRole('navigation', { name: 'Folder Path' })
       .getByRole('button', { name: 'Client Deliveries', exact: true }),
   ).toHaveAttribute('aria-current', 'page')
+  await page.goto('/app/editor')
+  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
   await page.getByRole('button', { name: 'Use Draft', exact: true }).click()
   await writeFile(
     `${OUTPUT}/${profile}-template-open.json`,
@@ -166,12 +168,15 @@ async function templateAndFolder(page, actor, profile) {
       2,
     ),
   )
-  await expect(page).toHaveURL((url) => url.searchParams.get('folderId') === folderId)
   await expect(page.getByRole('textbox', { name: 'Text', exact: true })).toHaveValue('DRAFT')
-  await expect(page.getByRole('textbox', { name: /Preset name/i })).toHaveValue('Draft')
-  await page.getByRole('textbox', { name: /Preset name/i }).fill('Client Draft')
-  await page.getByRole('button', { name: /^Save preset$/i }).click()
-  await expect(page).toHaveURL(/\/app\/library(?:\?|$)/)
+  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  const save = page.getByRole('dialog', { name: /^Save watermark$/i })
+  await expect(save.getByRole('textbox', { name: /Watermark name/i })).toHaveValue('DRAFT')
+  await save.getByRole('textbox', { name: /Watermark name/i }).fill('Client Draft')
+  await save.getByRole('button', { name: 'Save Location', exact: true }).click()
+  await save.getByRole('button', { name: 'Client Deliveries', exact: true }).click()
+  await save.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(save).toHaveCount(0)
   await expect
     .poll(async () => {
       const result = await fixtureJson(
@@ -180,10 +185,11 @@ async function templateAndFolder(page, actor, profile) {
       return result.watermarks.find((item) => item.name === 'Client Draft')?.folderId
     })
     .toBe(folderId)
+  await page.goto(`/app/library?folderId=${encodeURIComponent(folderId)}`)
   await expect(page).toHaveURL((url) => url.searchParams.get('folderId') === folderId)
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library' })
+      .getByRole('region', { name: 'Saved Watermarks' })
       .getByRole('link', { name: 'Client Draft', exact: true }),
   ).toBeVisible()
   await inspect(page, `${profile}-folder-template`)
@@ -209,6 +215,9 @@ async function image(page, profile) {
     const image = element.closest('[data-mark-overlay]')?.parentElement?.querySelector('img')
     const box = image?.getBoundingClientRect()
     if (box === undefined) throw new Error('Canvas image missing')
+    const selection = element.querySelector('[data-selection-frame]')
+    if (selection === null) throw new Error('Visible selection decoration missing')
+    const decoration = globalThis.getComputedStyle(selection)
     return {
       contained:
         rect.left >= box.left - 1 &&
@@ -217,9 +226,15 @@ async function image(page, profile) {
         rect.bottom <= box.bottom + 1,
       width: rect.width,
       imageWidth: box.width,
+      gap: -Number(decoration.top.slice(0, -2)) - Number(decoration.borderTopWidth.slice(0, -2)),
     }
   })
   assert.ok(geometry.contained, 'Thick stroke selection must stay inside the photo')
+  assert.equal(
+    geometry.gap,
+    6,
+    'Visible selection leaves six screen pixels outside the painted stroke',
+  )
   assert.ok(
     geometry.width > geometry.imageWidth / 3,
     'Thick stroke fixture must cover a meaningful area',
@@ -300,10 +315,7 @@ async function documentWorkflow(page, source, profile) {
   assert.ok(Math.abs(previewRatio - 1.5) < 0.02, 'Landscape PDF page must keep its aspect ratio')
   await selection(page, profile)
   await inspect(page, `${profile}-pdf-reader`)
-  const result = await download(
-    page,
-    page.getByRole('button', { name: 'Download PDF', exact: true }),
-  )
+  const result = await download(page, page.getByRole('button', { name: 'Export PDF', exact: true }))
   assert.equal(result.name, 'report-watermarked.pdf')
   const pdf = await PDFDocument.load(result.bytes)
   assert.equal(pdf.getTitle(), 'Media QA Original')
@@ -359,7 +371,7 @@ async function videoWorkflow(page, bytes, profile) {
   await inspect(page, `${profile}-video-timeline`)
   const result = await download(
     page,
-    page.getByRole('button', { name: 'Download Video', exact: true }),
+    page.getByRole('button', { name: 'Export Video', exact: true }),
   )
   const original = await videoInfo(bytes)
   const output = await videoInfo(result.bytes)

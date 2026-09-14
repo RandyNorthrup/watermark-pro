@@ -42,7 +42,7 @@ describe('landing page', () => {
     seedOwnerWorkspace(client())
     const { router } = renderApp('/')
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/editor'))
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Images')
   })
 
   it('renders a not-found page for unknown paths', async () => {

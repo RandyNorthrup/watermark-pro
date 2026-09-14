@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { offscreenBackend } from './canvas'
 import { layoutText } from './text-layout'
+import { MAX_CURVE } from '../../shared/watermark'
 
 const FONT_SIZE = 100
 const LINE_HEIGHT = 1.15
@@ -10,6 +11,43 @@ function layout(lines: string[], spacing = 0, curve = 0) {
   const ctx = offscreenBackend.createCanvas(10, 10).context
   ctx.font = `${String(FONT_SIZE)}px sans-serif`
   return layoutText(ctx, lines, spacing, curve, FONT_SIZE, LINE_HEIGHT)
+}
+
+function addInk(occupied: Uint8Array, pixels: Uint8ClampedArray): number {
+  let overlap = 0
+  for (let index = 0; index < occupied.length; index += 1) {
+    if ((pixels[index * 4 + 3] ?? 0) <= 127) continue
+    if (occupied[index] === 1) overlap += 1
+    occupied[index] = 1
+  }
+  return overlap
+}
+
+/** Native raster coverage detects collisions independently of reserved angular sectors. */
+function overlappingInk(value: ReturnType<typeof layout>, shouldCoincide = false): number {
+  const padding = 2
+  const canvas = offscreenBackend.createCanvas(
+    value.width + padding * 2,
+    value.height + padding * 2,
+  )
+  const ctx = canvas.context
+  ctx.font = `${String(FONT_SIZE)}px sans-serif`
+  ctx.textBaseline = 'alphabetic'
+  const occupied = new Uint8Array(canvas.width * canvas.height)
+  let overlap = 0
+  for (const glyph of value.glyphs) {
+    const pose = shouldCoincide ? value.glyphs[0] : glyph
+    if (pose === undefined) throw new Error('Expected a glyph pose')
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.save()
+    ctx.translate(pose.x - value.bounds.left + padding, pose.y - value.bounds.top + padding)
+    ctx.rotate(pose.rotation)
+    ctx.fillText(glyph.text, 0, 0)
+    ctx.restore()
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+    overlap += addInk(occupied, pixels)
+  }
+  return overlap
 }
 
 describe('measured text layout', () => {
@@ -41,4 +79,21 @@ describe('measured text layout', () => {
     // Tight tracking cannot force curved ink through its neighboring angular sector.
     expect(layout(['HHHHHHHH'], -0.2, 1)).toEqual(positive)
   })
+
+  it.each([-1, 1])(
+    'closes the maximum curve into a full ring without overlapping glyphs: %s',
+    (direction) => {
+      const full = layout(['HHHHHHHHHHHHHHHH'], 0, direction * MAX_CURVE)
+      const first = full.glyphs[0]
+      const last = full.glyphs.at(-1)
+      if (first === undefined || last === undefined) throw new Error('Expected ring endpoints')
+      expect(Math.abs(last.rotation - first.rotation)).toBeGreaterThan(Math.PI * 1.8)
+      expect(full.width / full.height).toBeCloseTo(1, 1)
+      expect(overlappingInk(full)).toBe(0)
+      // Deliberately superimposed glyphs must fail the same independent raster check.
+      expect(overlappingInk(full, true)).toBeGreaterThan(100)
+      const curvedWords = layout(['© Lumafoil 2026', 'CONFIDENTIAL'], 0.15, direction * MAX_CURVE)
+      expect(overlappingInk(curvedWords)).toBe(0)
+    },
+  )
 })

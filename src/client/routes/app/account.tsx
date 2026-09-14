@@ -7,12 +7,15 @@ import { useTranslation } from 'react-i18next'
 
 import { accountSearchSchema } from '../../../shared/client-search'
 import { SITE_ROLE } from '../../../shared/site-roles'
+import { requestProductTour } from '../../components/guidance/product-tour'
 import { ProviderLogo } from '../../components/provider-logo'
 import { SocialAuth } from '../../components/social-auth'
 import { Alert } from '../../components/ui/alert'
 import { Avatar } from '../../components/ui/avatar'
 import { Badge } from '../../components/ui/badge'
+import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
+import { useActiveOrganization } from '../../lib/active-organization'
 import { ApiRequestError } from '../../lib/api'
 import { authClient } from '../../lib/auth-client'
 import { describeError } from '../../lib/errors'
@@ -42,6 +45,7 @@ const CloudConnectionsCard = lazy(async () => {
 
 function AccountPage() {
   const { t } = useTranslation()
+  const organization = useActiveOrganization()
   const { session } = Route.useRouteContext()
   const { error } = Route.useSearch()
   const accounts = useQuery({
@@ -134,6 +138,76 @@ function AccountPage() {
       <Suspense fallback={null}>
         <CloudConnectionsCard key={session.user.id} userId={session.user.id} />
       </Suspense>
+      <Card className="flex flex-col gap-3 p-6">
+        <h2 className="text-xl font-semibold">{t('tour.settingsTitle')}</h2>
+        <p className="text-sm text-ink-muted">{t('tour.settingsBody')}</p>
+        <div>
+          <Button
+            variant="secondary"
+            onClick={() => requestProductTour(session.user.id, organization?.id ?? null)}
+          >
+            {t('tour.replay')}
+          </Button>
+        </div>
+        <details className="mt-2 border-t border-line pt-4">
+          <summary className="cursor-pointer text-sm font-medium">
+            {t('tour.licensesTitle')}
+          </summary>
+          <p className="mt-3 text-sm text-ink-muted">{t('tour.licensesBody')}</p>
+          <ul className="mt-3 flex flex-col gap-2 text-sm">
+            <li>
+              <a
+                href="/fonts/licenses/packages.json"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink underline"
+              >
+                {t('tour.fontPackages')}
+              </a>
+            </li>
+            <li>
+              <a
+                href="/fonts/manifest.json"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink underline"
+              >
+                {t('tour.fontCatalog')}
+              </a>
+            </li>
+            <li>
+              <a
+                href="/stickers/LICENSE.txt"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink underline"
+              >
+                {t('tour.stickerLicense')}
+              </a>
+            </li>
+            <li>
+              <a
+                href="/stickers/ICON-LICENSE.txt"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink underline"
+              >
+                {t('tour.iconLicense')}
+              </a>
+            </li>
+            <li>
+              <a
+                href="/stickers/USAGE.txt"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink underline"
+              >
+                {t('tour.artworkUsage')}
+              </a>
+            </li>
+          </ul>
+        </details>
+      </Card>
     </div>
   )
 }

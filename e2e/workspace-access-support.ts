@@ -44,6 +44,6 @@ export async function signUpFromWorkspaceEmail(
   await expectAccessible(page)
   await gotoRetrying(page, await latestLinkFor(request, person.email, '/api/auth/verify-email'))
   await expect(page).toHaveURL(/\/app\/editor\/?$/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   await prepareReturningUser(page)
 }

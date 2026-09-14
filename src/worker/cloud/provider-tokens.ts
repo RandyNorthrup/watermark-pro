@@ -57,10 +57,16 @@ async function providerJson(url: string, init: RequestInit): Promise<unknown> {
   try {
     response = await fetch(url, {
       ...init,
-      redirect: 'error',
+      // workerd rejects redirect:error before sending the request. Manual
+      // mode preserves the credential boundary; every redirect is refused below.
+      redirect: 'manual',
       cache: 'no-store',
       signal: AbortSignal.timeout(CLOUD_OAUTH.requestTimeoutMs),
     })
+    if (!response.ok && response.status < HTTP_STATUS.badRequest) {
+      await response.body?.cancel()
+      throw new CloudProviderError(false)
+    }
   } catch {
     throw new CloudProviderError(false)
   }

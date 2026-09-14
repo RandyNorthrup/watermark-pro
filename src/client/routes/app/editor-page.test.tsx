@@ -55,16 +55,16 @@ function lastSpec() {
   return renderedSpecs.at(-1)
 }
 
-/** Opens the dedicated Presets tool and returns its layer-adding picker. */
+/** Opens the dedicated Saved tool and returns its layer-adding picker. */
 async function presetSelect(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole('tab', { name: 'Presets' }))
-  return screen.getByRole('combobox', { name: /^(Preset|Add another preset)$/ })
+  await user.click(screen.getByRole('tab', { name: 'Saved' }))
+  return screen.getByRole('combobox', { name: /^(Saved Watermark|Add A Saved Watermark)$/ })
 }
 
 /** Confirms the proposed name through the actual inline preset dialog. */
 async function saveInlinePreset(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Save' }))
-  const dialog = await screen.findByRole('dialog', { name: 'Save preset' })
+  const dialog = await screen.findByRole('dialog', { name: 'Save watermark' })
   await user.click(within(dialog).getByRole('button', { name: 'Save' }))
 }
 
@@ -85,7 +85,7 @@ async function openExportCloudSave(): Promise<{ user: ReturnType<typeof userEven
   seedOwnerWorkspace(client())
   installLibraryApi({ watermarks: [makeWatermark()], publicConfig: ALL_CLOUD_CONFIG })
   renderApp('/app/editor?preset=wm-1')
-  await user.click(await screen.findByRole('tab', { name: 'Export' }))
+  await user.click(await screen.findByRole('button', { name: 'Save Image' }))
   const saveButton = await screen.findByRole('button', { name: 'Save to Google Drive' })
   await waitFor(() => expect(saveButton).toBeEnabled())
   await chooseCloudSaveDestination(user, 'Google Drive')
@@ -110,18 +110,18 @@ it('exports the visible unsaved watermark losslessly without creating a preset',
   const api = installLibraryApi()
   renderApp('/app/editor')
   await user.clear(await screen.findByRole('textbox', { name: 'Text' }))
-  await user.click(screen.getByRole('tab', { name: 'Export' }))
+  await user.click(screen.getByRole('button', { name: 'Save Image' }))
   expect(screen.getByRole('button', { name: 'Download' })).toBeDisabled()
   await user.click(screen.getByRole('tab', { name: 'Watermark' }))
   await user.type(screen.getByRole('textbox', { name: 'Text' }), 'Unsaved Signature')
-  await user.click(screen.getByRole('tab', { name: 'Export' }))
+  await user.click(screen.getByRole('button', { name: 'Save Image' }))
   await user.click(screen.getByRole('button', { name: 'Download' }))
   expect(exports.at(-1)).toMatchObject({
     specs: [{ kind: 'text', text: 'Unsaved Signature' }],
     output: { format: 'image/png', quality: 1 },
   })
   expect(api.watermarks).toHaveLength(0)
-  expect(screen.queryByRole('dialog', { name: 'Save preset' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('dialog', { name: 'Save watermark' })).not.toBeInTheDocument()
 })
 
 it('disables every export destination during photo metadata and its first frame, then exports the ready photo', async () => {
@@ -130,7 +130,7 @@ it('disables every export destination during photo metadata and its first frame,
   seedOwnerWorkspace(client())
   installLibraryApi({ watermarks: [makeWatermark()] })
   renderApp('/app/editor?preset=wm-1')
-  await user.click(await screen.findByRole('tab', { name: 'Export' }))
+  await user.click(await screen.findByRole('button', { name: 'Save Image' }))
   const download = screen.getByRole('button', { name: 'Download' })
   await waitFor(() => expect(download).toBeEnabled())
   const size = Promise.withResolvers<{ width: number; height: number }>()
@@ -147,7 +147,7 @@ it('disables every export destination during photo metadata and its first frame,
     screen.getByLabelText('Open a photo'),
     new File(['image'], 'loading.png', { type: 'image/png' }),
   )
-  for (const name of ['Download', 'Share', 'Save to gallery'])
+  for (const name of ['Download', 'Share', 'Save To Watermarked Images'])
     expect(screen.getByRole('button', { name })).toBeDisabled()
   await act(async () => {
     size.resolve({ width: 100, height: 200 })
@@ -198,7 +198,7 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor')
-    await screen.findByRole('heading', { level: 1, name: 'Image' })
+    await screen.findByRole('heading', { level: 1, name: 'Images' })
     const files = ['bulk-one.png', 'bulk-two.png'].map(
       (name) => new File(['synthetic'], name, { type: 'image/png' }),
     )
@@ -219,7 +219,7 @@ describe('editor page', () => {
       seedOwnerWorkspace(client())
       installLibraryApi({ watermarks: [makeWatermark()] })
       const view = renderApp('/app/editor')
-      await screen.findByRole('heading', { level: 1, name: 'Image' })
+      await screen.findByRole('heading', { level: 1, name: 'Images' })
       const size = Promise.withResolvers<{ width: number; height: number }>()
       const readSize = vi
         .spyOn(imageSize, 'readImageSize')
@@ -259,13 +259,13 @@ describe('editor page', () => {
     seedOwnerWorkspace(client())
     installLibraryApi({ watermarks: [makeWatermark(), makeWatermark({ id: 'wm-2', name: 'Two' })] })
     renderApp('/app/editor?preset=wm-1')
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Image')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Images')
     expect(
-      screen.getByText(/Download the result or choose a gallery or cloud save/),
+      screen.getByText(/Export the result or save it to Watermarked Images or cloud storage/),
     ).toBeInTheDocument()
     expect(screen.queryByText(/Nothing leaves your browser/)).not.toBeInTheDocument()
     // The preset from the URL is the first (and active) layer.
-    await user.click(await screen.findByRole('tab', { name: 'Presets' }))
+    await user.click(await screen.findByRole('tab', { name: 'Saved' }))
     let layers = within(await screen.findByRole('list', { name: 'Layers, bottom to top' }))
     expect(layers.getByRole('button', { pressed: true })).toHaveTextContent('Studio signature')
     await waitFor(() => expect(lastSpec()?.style.opacity).toBe(0.85))
@@ -293,7 +293,7 @@ describe('editor page', () => {
 
     // A second preset becomes a second, active layer; removing it leaves the first.
     await user.selectOptions(await presetSelect(user), 'wm-2')
-    await user.click(screen.getByRole('tab', { name: 'Presets' }))
+    await user.click(screen.getByRole('tab', { name: 'Saved' }))
     layers = within(await screen.findByRole('list', { name: 'Layers, bottom to top' }))
     expect(layers.getAllByRole('button', { pressed: true })).toHaveLength(1)
     expect(layers.getByRole('button', { pressed: true })).toHaveTextContent('Two')
@@ -331,7 +331,7 @@ describe('editor page', () => {
     )
     expect(screen.getByText('Output 320 × 320 px.')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    await user.click(screen.getByRole('button', { name: 'Save Image' }))
     await user.click(screen.getByRole('combobox', { name: 'Format' }))
     await user.click(await screen.findByRole('option', { name: 'PNG' }))
     await user.click(screen.getByRole('button', { name: 'Download' }))
@@ -410,12 +410,12 @@ describe('editor page', () => {
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor')
     await user.click(await screen.findByRole('button', { name: 'New' }))
-    await user.click(await screen.findByRole('tab', { name: 'Presets' }))
-    await screen.findByRole('combobox', { name: 'Preset' })
+    await user.click(await screen.findByRole('tab', { name: 'Saved' }))
+    await screen.findByRole('combobox', { name: 'Saved Watermark' })
     expect(
       screen.getByText('Add a watermark, then open Export to download your photo.'),
     ).toBeInTheDocument()
-    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    await user.click(screen.getByRole('button', { name: 'Save Image' }))
     expect(screen.getByRole('button', { name: 'Download' })).toBeDisabled()
 
     const input = screen.getByLabelText('Open a photo')
@@ -488,7 +488,7 @@ describe('editor page', () => {
     vi.spyOn(PreviewRenderer.prototype, 'exportFull').mockRejectedValueOnce(
       new Error('encoder exploded'),
     )
-    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    await user.click(screen.getByRole('button', { name: 'Save Image' }))
     await user.click(screen.getByRole('button', { name: 'Download' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('encoder exploded')
     expect(downloads).not.toHaveBeenCalled()
@@ -500,11 +500,11 @@ describe('editor page', () => {
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
     await screen.findByRole('textbox', { name: 'Text' })
-    await user.click(screen.getByRole('tab', { name: 'Export' }))
-    await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
-    expect(
-      await screen.findByText(/Saved sample-photo-watermarked\.png to the/),
-    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Save Image' }))
+    await user.click(screen.getByRole('button', { name: 'Save To Watermarked Images' }))
+    expect(await screen.findByText(/^Saved sample-photo-watermarked\.png to/)).toHaveTextContent(
+      'Saved sample-photo-watermarked.png to Watermarked Images.',
+    )
     expect(api.gallery.photos).toHaveLength(1)
     expect(api.gallery.photos[0]).toMatchObject({
       name: 'sample-photo-watermarked.png',
@@ -514,7 +514,7 @@ describe('editor page', () => {
     })
 
     api.gallery.uploadFailsWith = 'quotaExceeded'
-    await user.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    await user.click(screen.getByRole('button', { name: 'Save To Watermarked Images' }))
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'The limit for this workspace has been reached.',
     )
@@ -542,9 +542,11 @@ describe('editor page', () => {
     installLibraryApi({ watermarks: [makeWatermark()] })
     renderApp('/app/editor?preset=wm-1')
     await screen.findByRole('textbox', { name: 'Text' })
-    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    await user.click(screen.getByRole('button', { name: 'Save Image' }))
     expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled()
-    expect(screen.queryByRole('button', { name: 'Save to gallery' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Save To Watermarked Images' }),
+    ).not.toBeInTheDocument()
   })
 
   it('creates and applies a first watermark without leaving the uploaded photo', async () => {
@@ -553,27 +555,27 @@ describe('editor page', () => {
     const api = installLibraryApi()
     const { router } = renderApp('/app/editor')
     await screen.findByRole('textbox', { name: 'Text' })
-    await user.click(screen.getByRole('tab', { name: 'Presets' }))
-    const newPreset = screen.getByRole('button', { name: 'New preset' })
+    await user.click(screen.getByRole('tab', { name: 'Saved' }))
+    const newPreset = screen.getByRole('button', { name: 'New watermark' })
     expect(newPreset.parentElement).toHaveClass('items-center', 'text-center')
     await user.click(newPreset)
     const photo = new File(['photo fixture'], 'first-photo.png', { type: 'image/png' })
     await user.upload(screen.getByLabelText('Open a photo'), photo)
     expect(screen.queryByRole('button', { name: 'Create watermark' })).not.toBeInTheDocument()
     const designer = screen.getByRole('tabpanel', { name: 'Watermark' })
-    expect(within(designer).queryByLabelText('Preset name')).not.toBeInTheDocument()
+    expect(within(designer).queryByLabelText('Watermark name')).not.toBeInTheDocument()
     await user.clear(within(designer).getByRole('textbox', { name: 'Text' }))
     await user.type(within(designer).getByRole('textbox', { name: 'Text' }), '© My first photo')
     const save = within(designer).getByRole('button', { name: 'Save' })
     expect(save.parentElement).toHaveClass('justify-center')
     await user.click(save)
-    const naming = await screen.findByRole('dialog', { name: 'Save preset' })
+    const naming = await screen.findByRole('dialog', { name: 'Save watermark' })
     expect(api.watermarks).toHaveLength(0)
-    await user.clear(within(naming).getByLabelText('Preset name'))
+    await user.clear(within(naming).getByLabelText('Watermark name'))
     await user.click(within(naming).getByRole('button', { name: 'Save' }))
     expect(api.watermarks).toHaveLength(0)
-    expect(within(naming).getByText(/Give the preset a name/)).toBeVisible()
-    await user.type(within(naming).getByLabelText('Preset name'), 'First photo preset')
+    expect(within(naming).getByText(/Give the watermark a name/)).toBeVisible()
+    await user.type(within(naming).getByLabelText('Watermark name'), 'First photo preset')
     await user.click(within(naming).getByRole('button', { name: 'Save' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(router.state.location.pathname).toBe('/app/editor')
@@ -581,11 +583,11 @@ describe('editor page', () => {
     expect(api.watermarks[0]?.name).toBe('First photo preset')
     expect(api.watermarks[0]?.spec).toMatchObject({ kind: 'text', text: '© My first photo' })
     expect(previewSubjects.filter((subject) => subject === photo)).toHaveLength(1)
-    await user.click(screen.getByRole('tab', { name: 'Presets' }))
+    await user.click(screen.getByRole('tab', { name: 'Saved' }))
     expect(await screen.findByRole('list', { name: 'Layers, bottom to top' })).toHaveTextContent(
       'First photo preset',
     )
-    await user.click(screen.getByRole('tab', { name: 'Export' }))
+    await user.click(screen.getByRole('button', { name: 'Save Image' }))
     await user.click(await screen.findByRole('button', { name: 'Download' }))
     await waitFor(() =>
       expect(exports.at(-1)?.specs[0]).toMatchObject({ kind: 'text', text: '© My first photo' }),
@@ -605,7 +607,7 @@ describe('editor page', () => {
     await saveInlinePreset(user)
 
     await waitFor(() => expect(api.watermarks).toHaveLength(1))
-    expect(api.watermarks[0]?.name).toBe('New preset')
+    expect(api.watermarks[0]?.name).toBe('New watermark')
 
     await user.click(screen.getByRole('button', { name: 'New' }))
     expect(screen.queryByRole('group', { name: /Watermark position/ })).not.toBeInTheDocument()

@@ -34,7 +34,6 @@ const ONLINE_ONLY_PATHS = [
   '/app/invitations',
   '/app/members',
   '/app/audit',
-  '/app/shares',
   '/app/organizations',
 ]
 

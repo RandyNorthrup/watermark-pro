@@ -50,5 +50,11 @@ export async function waitForOfflineReadiness(page: Page): Promise<void> {
         ),
     )
     .toBe(true)
-  await expectOfflineStatus(page, 'App files are ready for offline use.', OFFLINE_READY_TIMEOUT_MS)
+  const view = await openOfflinePanel(page)
+  const status = view.panel.getByRole('status')
+  await expect(status).toHaveAttribute('title', /App files are ready for offline use\.$/, {
+    timeout: OFFLINE_READY_TIMEOUT_MS,
+  })
+  await expect(status).toHaveCSS('white-space', 'nowrap')
+  await view.close()
 }

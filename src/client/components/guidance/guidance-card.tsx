@@ -1,141 +1,99 @@
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { Popover } from 'radix-ui'
-import { useId, useRef, useState } from 'react'
+import { useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { GuidanceItem } from './guidance-queue'
+import { PRODUCT_TOUR_STEPS } from './product-tour'
 import { Button } from '../ui/button'
 
-const TOPIC_COPY = {
-  image: {
-    title: 'guidance.image.title',
-    first: 'guidance.image.first',
-    second: 'guidance.image.second',
-  },
-  watermark: {
-    title: 'guidance.watermark.title',
-    first: 'guidance.watermark.first',
-    second: 'guidance.watermark.second',
-  },
-  presets: {
-    title: 'guidance.presets.title',
-    first: 'guidance.presets.first',
-    second: 'guidance.presets.second',
-  },
-  crop: {
-    title: 'guidance.crop.title',
-    first: 'guidance.crop.first',
-    second: 'guidance.crop.second',
-  },
-  adjust: {
-    title: 'guidance.adjust.title',
-    first: 'guidance.adjust.first',
-    second: 'guidance.adjust.second',
-  },
-  resize: {
-    title: 'guidance.resize.title',
-    first: 'guidance.resize.first',
-    second: 'guidance.resize.second',
-  },
-  export: {
-    title: 'guidance.export.title',
-    first: 'guidance.export.first',
-    second: 'guidance.export.second',
-  },
-  library: {
-    title: 'guidance.library.title',
-    first: 'guidance.library.first',
-    second: 'guidance.library.second',
-  },
-  gallery: {
-    title: 'guidance.gallery.title',
-    first: 'guidance.gallery.first',
-    second: 'guidance.gallery.second',
-  },
-  bulk: {
-    title: 'guidance.bulk.title',
-    first: 'guidance.bulk.first',
-    second: 'guidance.bulk.second',
-  },
-  documents: {
-    title: 'guidance.documents.title',
-    first: 'guidance.documents.first',
-    second: 'guidance.documents.second',
-  },
-  video: {
-    title: 'guidance.video.title',
-    first: 'guidance.video.first',
-    second: 'guidance.video.second',
-  },
-  workspace: {
-    title: 'guidance.workspace.title',
-    first: 'guidance.workspace.first',
-    second: 'guidance.workspace.second',
-  },
-} as const
-
 const SWIPE_DISTANCE_PX = 40
-const GUIDE_PAGE_COUNT = 2
+const VIEWPORT_INSET_PX = 12
+
 interface GuidanceCardProps {
-  item: GuidanceItem
-  onDismiss: () => void
+  step: number | null
+  isMoving: boolean
+  hasError: boolean
+  onStart: () => void
+  onBack: () => void
+  onNext: () => void
+  onExit: () => void
 }
 
-/** Compact, nonmodal help leaves the tool usable and never captures a canvas gesture. */
-export function GuidanceCard({ item, onDismiss }: GuidanceCardProps) {
+/** The optional tour stays compact, exits at any point, and never captures canvas gestures. */
+export function GuidanceCard({
+  step,
+  isMoving,
+  hasError,
+  onStart,
+  onBack,
+  onNext,
+  onExit,
+}: GuidanceCardProps) {
   const { t } = useTranslation()
-  const copy = TOPIC_COPY[item.topic]
   const titleId = useId()
   const descriptionId = useId()
-  const focusRestoreRef = useRef(false)
-  const [page, setPage] = useState(0)
+  const contentRef = useRef<HTMLDivElement>(null)
   const gesture = useRef<{ id: number; x: number; y: number } | null>(null)
   const anchorRef = useRef({
-    contextElement: item.anchor ?? undefined,
-    getBoundingClientRect: () =>
-      item.anchor?.isConnected === true
-        ? item.anchor.getBoundingClientRect()
-        : new DOMRect(document.documentElement.clientWidth, 0, 0, 0),
+    getBoundingClientRect: () => {
+      const viewport = window.visualViewport
+      return new DOMRect(
+        document.documentElement.clientWidth / 2,
+        viewport?.height ?? window.innerHeight,
+        0,
+        0,
+      )
+    },
   })
-  const hasNext = page < GUIDE_PAGE_COUNT - 1
+  const item = step === null ? undefined : PRODUCT_TOUR_STEPS[step]
+  const isInvitation = item === undefined
+  const isLast = step === PRODUCT_TOUR_STEPS.length - 1
+  const next = () => {
+    if (isMoving) return
+    if (isLast) onExit()
+    else onNext()
+  }
   return (
     <Popover.Root
       open
-      onOpenChange={(isOpen) => {
-        if (!isOpen) onDismiss()
+      onOpenChange={(open) => {
+        if (!open) onExit()
       }}
     >
       <Popover.Anchor virtualRef={anchorRef} />
       <Popover.Portal>
         <Popover.Content
+          ref={contentRef}
           data-first-use-tip=""
+          data-product-tour={isInvitation ? 'invitation' : 'step'}
           aria-labelledby={titleId}
           aria-describedby={descriptionId}
-          side="bottom"
-          align="end"
-          sideOffset={8}
-          collisionPadding={12}
-          className="glass-popover z-40 flex max-h-[var(--radix-popover-content-available-height)] w-80 max-w-[calc(100vw-1.5rem)] touch-pan-y flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised p-4 text-ink shadow-card outline-none"
-          onOpenAutoFocus={(event) => event.preventDefault()}
-          onCloseAutoFocus={(event) => {
+          side="top"
+          align="center"
+          sideOffset={VIEWPORT_INSET_PX}
+          collisionPadding={VIEWPORT_INSET_PX}
+          className="glass-popover tour-card z-40 flex max-h-[calc(100dvh-1.5rem)] w-88 max-w-[calc(100vw-1.5rem)] touch-pan-y flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised p-4 text-ink shadow-card outline-none"
+          onOpenAutoFocus={(event) => {
             event.preventDefault()
-            const anchor = item.anchor
-            const active = document.activeElement
-            if (
-              focusRestoreRef.current &&
-              anchor?.isConnected === true &&
-              anchor.getClientRects().length > 0 &&
-              (active === document.body ||
-                (active instanceof Element && active.closest('[data-first-use-tip]') !== null))
-            )
-              anchor.focus({ preventScroll: true })
+            if (!isInvitation) contentRef.current?.focus({ preventScroll: true })
           }}
-          onEscapeKeyDown={() => {
-            focusRestoreRef.current = true
-          }}
+          onCloseAutoFocus={(event) => event.preventDefault()}
           onInteractOutside={(event) => event.preventDefault()}
+          onKeyDown={(event) => {
+            if (isInvitation || isMoving || event.target !== event.currentTarget) return
+            if (event.key === 'ArrowRight') {
+              event.preventDefault()
+              next()
+            }
+            if (step !== 0 && event.key === 'ArrowLeft') {
+              event.preventDefault()
+              onBack()
+            }
+          }}
           onPointerDown={(event) => {
             if (
+              isInvitation ||
+              isMoving ||
               event.pointerType !== 'touch' ||
               (event.target instanceof Element && event.target.closest('button') !== null)
             )
@@ -145,65 +103,80 @@ export function GuidanceCard({ item, onDismiss }: GuidanceCardProps) {
           onPointerUp={(event) => {
             const start = gesture.current
             gesture.current = null
-            if (start?.id !== event.pointerId) return
+            if (isMoving || start?.id !== event.pointerId) return
             const dx = event.clientX - start.x
             const dy = event.clientY - start.y
             if (Math.abs(dx) < SWIPE_DISTANCE_PX || Math.abs(dx) <= Math.abs(dy)) return
-            setPage((current) =>
-              Math.max(0, Math.min(GUIDE_PAGE_COUNT - 1, current + (dx < 0 ? 1 : -1))),
-            )
+            if (dx < 0) next()
+            else if (step !== 0) onBack()
           }}
           onPointerCancel={() => {
             gesture.current = null
           }}
         >
           <div className="flex shrink-0 items-start justify-between gap-2">
-            <h2 id={titleId} className="text-sm font-semibold">
-              {t(copy.title)}
+            <h2 id={titleId} className="text-base font-semibold">
+              {t(item?.title ?? 'tour.invitationTitle')}
             </h2>
             <Button
               variant="ghost"
               size="icon"
-              className="-me-1 -mt-1 size-7 shrink-0"
-              aria-label={t('guidance.dismiss')}
-              onClick={(event) => {
-                focusRestoreRef.current = event.detail === 0
-                onDismiss()
-              }}
+              className="-me-1 -mt-1 size-8 shrink-0"
+              aria-label={t('tour.close')}
+              onClick={onExit}
             >
-              <X className="size-4" />
+              <X aria-hidden="true" className="size-4" />
             </Button>
           </div>
           <div
-            className="min-h-0 touch-pan-y overflow-y-auto overscroll-contain"
+            className="min-h-0 touch-pan-y overflow-y-auto"
             aria-live="polite"
             aria-atomic="true"
           >
-            <p id={descriptionId} className="mt-2 text-sm leading-relaxed text-ink-muted">
-              {t(page === 0 ? copy.first : copy.second)}
+            <p id={descriptionId} className="mt-2 text-sm leading-relaxed text-ink">
+              {t(item?.body ?? 'tour.invitationBody')}
             </p>
-            <p className="mt-3 text-xs text-ink-muted">
-              {t('guidance.page', { current: page + 1, total: GUIDE_PAGE_COUNT })}
-            </p>
+            {hasError ? (
+              <p role="alert" className="mt-2 text-sm text-ink">
+                {t('tour.navigationError')}
+              </p>
+            ) : null}
+            {step === null ? null : (
+              <p className="mt-3 text-xs text-ink-muted">
+                {t('tour.progress', { current: step + 1, total: PRODUCT_TOUR_STEPS.length })}
+              </p>
+            )}
           </div>
-          <div className="mt-3 flex shrink-0 justify-between gap-2">
-            <Button size="sm" variant="ghost" disabled={page === 0} onClick={() => setPage(0)}>
-              <ChevronLeft className="size-4" />
-              {t('guidance.back')}
-            </Button>
-            <Button
-              size="sm"
-              onClick={(event) => {
-                if (hasNext) setPage(page + 1)
-                else {
-                  focusRestoreRef.current = event.detail === 0
-                  onDismiss()
-                }
-              }}
-            >
-              {t(hasNext ? 'guidance.next' : 'guidance.done')}
-              {hasNext ? <ChevronRight className="size-4" /> : null}
-            </Button>
+          <div className="mt-4 flex shrink-0 flex-wrap items-center justify-center gap-2">
+            {isInvitation ? (
+              <>
+                <Button size="sm" variant="secondary" onClick={onExit}>
+                  {t('tour.decline')}
+                </Button>
+                <Button size="sm" onClick={onStart}>
+                  {t('tour.start')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button size="sm" variant="ghost" onClick={onExit}>
+                  {t('tour.exit')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={step === 0 || isMoving}
+                  onClick={onBack}
+                >
+                  <ChevronLeft aria-hidden="true" className="size-4" />
+                  {t('tour.back')}
+                </Button>
+                <Button size="sm" isPending={isMoving} onClick={next}>
+                  {t(isLast ? 'tour.finish' : 'tour.next')}
+                  {isLast ? null : <ChevronRight aria-hidden="true" className="size-4" />}
+                </Button>
+              </>
+            )}
           </div>
         </Popover.Content>
       </Popover.Portal>

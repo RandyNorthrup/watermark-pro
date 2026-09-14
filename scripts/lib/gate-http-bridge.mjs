@@ -11,12 +11,52 @@ const UNAVAILABLE = 503
 const BODYLESS_METHODS = new Set(['GET', 'HEAD'])
 const TRANSPORT_CODES = new Set([
   'ECONNRESET',
+  'ECONNREFUSED',
+  'ETIMEDOUT',
+  'EAI_AGAIN',
+  'ENOTFOUND',
   'EPIPE',
   'ERR_INVALID_ARG_TYPE',
   'ERR_STREAM_PREMATURE_CLOSE',
+  'UND_ERR_CONNECT_TIMEOUT',
+  'UND_ERR_HEADERS_TIMEOUT',
+  'UND_ERR_BODY_TIMEOUT',
+  'UND_ERR_ABORT',
+  'UND_ERR_ABORTED',
+  'UND_ERR_CLOSED',
+  'UND_ERR_DESTROYED',
   'UND_ERR_REQ_CONTENT_LENGTH_MISMATCH',
+  'UND_ERR_RES_CONTENT_LENGTH_MISMATCH',
   'UND_ERR_SOCKET',
 ])
+
+const MAX_ERROR_DEPTH = 4
+const MESSAGE_CODES = new Map([
+  ['Network connection lost.', 'network_connection_lost'],
+  ['fetch failed', 'fetch_failed'],
+  ['unexpected redirect', 'unexpected_redirect'],
+  ["'only-if-cached' can be set only with 'same-origin' mode", 'invalid_cache_mode'],
+  ['Body is unusable: Body has already been read', 'body_already_read'],
+  ['Response body object should not be disturbed or locked', 'body_locked'],
+  [
+    'Cannot construct a Request with a Request object that has already been used.',
+    'request_already_used',
+  ],
+  ['Request with GET/HEAD method cannot have body.', 'body_forbidden_for_method'],
+  ['RequestInit: duplex option is required when sending a body.', 'duplex_required'],
+  ['The gate Worker ignored identity response encoding.', 'response_encoding_mismatch'],
+  ['Worker threw an uncaught exception', 'worker_uncaught_exception'],
+])
+const CROSS_REQUEST_IO_PREFIX = 'Cannot perform I/O on behalf of a different request.'
+
+/** Error objects can have arbitrary properties; diagnostics must remain safe even if a getter throws. */
+function errorField(error, field) {
+  try {
+    return Reflect.get(error, field)
+  } catch {
+    return
+  }
+}
 
 class GateRequestError extends Error {
   constructor(status) {
@@ -59,13 +99,38 @@ function responseHeaders(result, response) {
   if (cookies.length > 0) response.setHeader('set-cookie', cookies)
 }
 
-function failureCode(error) {
-  for (const value of [error, error?.cause]) {
-    if (typeof value?.code === 'string' && TRANSPORT_CODES.has(value.code)) return value.code
+/** Return only fixed classifications; exception messages, URLs and unknown codes never leave this boundary. */
+export function classifyGateFailure(error) {
+  const chain = []
+  const seen = new Set()
+  let current = error
+  while (
+    current !== null &&
+    (typeof current === 'object' || typeof current === 'function') &&
+    chain.length < MAX_ERROR_DEPTH &&
+    !seen.has(current)
+  ) {
+    chain.push(current)
+    seen.add(current)
+    current = errorField(current, 'cause')
+  }
+  for (const value of chain) {
+    const code = errorField(value, 'code')
+    if (TRANSPORT_CODES.has(code)) return code
+  }
+  // A nested cause is usually more specific than Undici's outer "fetch failed".
+  for (const value of chain.toReversed()) {
+    const message = errorField(value, 'message')
+    const known = MESSAGE_CODES.get(message)
+    if (known !== undefined) return known
+    if (typeof message === 'string' && message.startsWith(CROSS_REQUEST_IO_PREFIX))
+      return 'cross_request_io'
+  }
+  for (const value of chain) {
+    if (errorField(value, 'name') === 'AbortError') return 'abort_error'
+    if (errorField(value, 'name') === 'TimeoutError') return 'timeout_error'
   }
   if (error instanceof GateRequestError) return 'request_rejected'
-  if (error instanceof Error && error.message === 'Network connection lost.')
-    return 'network_connection_lost'
   if (error instanceof TypeError) return 'type_error'
   return 'unclassified'
 }
@@ -74,7 +139,7 @@ function failRequest(response, error, signal, stage) {
   const failure = signal.aborted ? 'client_disconnected' : 'forwarding_failed'
   // Only finite classifications leave this boundary; SDK error text can carry
   // request/configuration data and must never become a console diagnostic.
-  console.error(`Gate request failed (${failure}; ${stage}; ${failureCode(error)}).`)
+  console.error(`Gate request failed (${failure}; ${stage}; ${classifyGateFailure(error)}).`)
   if (response.destroyed) return
   if (response.headersSent) {
     response.destroy()

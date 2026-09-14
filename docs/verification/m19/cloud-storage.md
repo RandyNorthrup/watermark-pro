@@ -271,6 +271,64 @@ tenant-policy support or a successful live grant.
 No new dependency was added by this cloud work; obsolete browser OAuth paths
 were removed.
 
+## Live Connection Failure and Runtime Repair — 2026-09-13
+
+The live Google Drive, OneDrive personal-account and Dropbox connection journeys
+all reached their authenticated Lumafoil callbacks and displayed **Cloud
+Connection Not Completed**. Google showed the previously granted app-selected
+Drive-file permissions; Microsoft reused the approved personal account without a
+new consent prompt. Dropbox reached the new Full Dropbox application's exact
+permission request, and the owner explicitly approved that persistent grant at
+the action point. No remote QA files, folders or public links were created by
+these failed attempts. Existing photo tabs and the persisted editor draft were
+preserved; the separate Bulk task page contains only a synthetic QA image.
+
+The release owner verified that a fresh live Google attempt's encrypted PKCE
+verifier decrypts with the prepared encryption key using the canonical crypto
+implementation. A separate private real-workerd probe then isolated the shared
+failure: `redirect: 'error'` throws before the outbound provider request. Plain
+fetch, `cache: 'no-store'`, and `redirect: 'manual'` with that cache setting reach
+Google's token endpoint and return the expected `invalid_grant` response for a
+deliberately invalid authorization code. The error-mode negative control still
+fails before the provider responds. This is executable runtime evidence; the
+documented redirect enum alone did not establish support in the deployed runtime.
+The sanitized five-mode receipt is retained under ignored
+`temp/private-config/cloud-runtime-probe-result.json`. No real authorization
+codes, tokens, provider response bodies or callback URLs were logged or published,
+and no OAuth live tail was used.
+
+The server now uses manual redirects for credential exchange, provider identity
+lookups and revocation. Provider JSON requests reject every non-success response
+below HTTP 400 before reading its body, including every redirect; they never
+follow `Location`. Revocation reports a redirect as unsuccessful while still
+clearing local credentials. Browser-side transfer rules are unchanged.
+
+The new workerd regression constructs real runtime `Request` objects before
+returning synthetic provider responses. Both cases failed against the old mode:
+the successful exchange could not start, and the redirect-refusal case observed
+zero constructed requests. After the fix, the final focused command passed all
+43 tests across four files, including the existing real-D1 lifecycle tests:
+
+```sh
+node node_modules/vitest/vitest.mjs run --project unit-worker --project workers src/worker/cloud/provider-tokens.test.ts src/worker/cloud/connections.test.ts src/worker/cloud/provider-tokens.workers.test.ts src/worker/cloud/connections.workers.test.ts
+```
+
+Evidence: `temp/lumafoil-cloud-runtime-redirect-red.log` and
+`temp/lumafoil-cloud-redirect-final-tests.log`. The cases cover successful
+exchange/account identification, confidential request fields, five redirect
+statuses for each provider without body reads or follow-up requests, and
+accepted/refused/redirected/unavailable revocation. Focused ESLint and the full
+TypeScript build also passed. The native-constructor fixture is not presented as
+a live provider round trip; the independent runtime probe supplies that narrower
+outbound-fetch evidence.
+
+The repaired source still requires the combined release and successful live
+connect → browse → load → save → share → revoke journeys. A fresh Lumafoil page
+reusing a connection will prove persistence, but not by itself a refresh-token
+exchange: the canonical server reuses the encrypted access token until it is
+within 60 seconds of expiry. No production token expiry was changed to manufacture
+refresh evidence.
+
 Primary protocol references:
 [Google Web-Server OAuth](https://developers.google.com/identity/protocols/oauth2/web-server),
 [Google Token Expiration](https://developers.google.com/identity/protocols/oauth2#expiration),

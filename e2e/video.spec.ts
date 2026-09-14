@@ -48,15 +48,15 @@ async function openVideo(page: Page, request: APIRequestContext) {
     email: `video-${crypto.randomUUID()}@example.test`,
     password: 'synthetic video passphrase',
   })
-  await navigateTo(page, 'Library')
-  await page.getByRole('link', { name: 'New preset' }).click()
+  await navigateTo(page, 'Saved Watermarks')
+  await page.getByRole('link', { name: 'New watermark' }).click()
   await page.getByRole('textbox', { name: 'Text' }).fill('© Reel')
-  await page.getByLabel('Preset name').fill('Video preset')
-  await page.getByRole('button', { name: 'Save preset' }).click()
-  const library = page.getByRole('region', { name: 'Watermark library', exact: true })
+  await page.getByLabel('Watermark name').fill('Video preset')
+  await page.getByRole('button', { name: 'Save watermark' }).click()
+  const library = page.getByRole('region', { name: 'Saved Watermarks', exact: true })
   await expect(library.getByRole('link', { name: 'Video preset', exact: true })).toBeVisible()
-  await navigateTo(page, 'Video')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Video watermarking')
+  await navigateTo(page, 'Videos')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Videos')
 }
 
 async function expectUnsupported(page: Page) {
@@ -67,13 +67,13 @@ async function expectUnsupported(page: Page) {
     }),
   ).toBeVisible()
   await expect(page.getByLabel('Add a video', { exact: true })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Download Video', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Export Video', exact: true })).toHaveCount(0)
   await expect(page.getByRole('button', { name: /^Download / })).toHaveCount(0)
   await expectAccessible(page)
-  await navigateTo(page, 'Library')
+  await navigateTo(page, 'Saved Watermarks')
   await expect(
     page
-      .getByRole('region', { name: 'Watermark library', exact: true })
+      .getByRole('region', { name: 'Saved Watermarks', exact: true })
       .getByRole('link', { name: 'Video preset', exact: true }),
   ).toBeVisible()
 }
@@ -123,7 +123,7 @@ test('matches real encoding capability and produces a complete video when suppor
   const label = await supported.innerText()
   const container = label.includes('MP4') ? 'mp4' : 'webm'
   const outputName = `sample-video-watermarked.${container}`
-  const watermark = page.getByRole('button', { name: 'Download Video', exact: true })
+  const watermark = page.getByRole('button', { name: 'Export Video', exact: true })
   await expect(watermark).toBeDisabled()
   await page.getByLabel('Add a video').setInputFiles({
     name: 'broken.mp4',
@@ -160,9 +160,9 @@ test('matches real encoding capability and produces a complete video when suppor
     )
     .toBeGreaterThan(0)
   await page.getByRole('button', { name: 'Pause', exact: true }).click()
-  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
+  await page.getByRole('tab', { name: 'Saved', exact: true }).click()
   await page
-    .getByRole('combobox', { name: 'Preset', exact: true })
+    .getByRole('combobox', { name: 'Saved Watermark', exact: true })
     .selectOption({ label: 'Video preset' })
   const playhead = page.getByRole('slider', { name: 'Playhead', exact: true })
   await playhead.fill('0')

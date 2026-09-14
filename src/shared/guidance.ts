@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 /** Stable identifiers: a release must never rename a topic to revive an old tip. */
 export const GUIDANCE_TOPICS = [
+  'tour',
   'image',
   'watermark',
   'presets',

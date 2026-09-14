@@ -75,7 +75,10 @@ const REQUIRED_SURFACES = new Set([
   ...AUDIT_SURFACES.map(({ id }) => id),
   'language-menu',
   'share-dialog',
-  ...['watermark', 'crop', 'adjust', 'resize', 'export'].map((tab) => `editor-${tab}`),
+  'manage-links',
+  ...['presets', 'watermark', 'saved', 'crop', 'adjust', 'resize', 'export'].map(
+    (tab) => `editor-${tab}`,
+  ),
   ...['users', 'organizations', 'audit', 'health', 'clientErrors'].map((tab) => `admin-${tab}`),
 ])
 
@@ -401,13 +404,6 @@ async function expectSeededSurface(page, locale, name) {
         .waitFor()
       break
     }
-    case 'shares': {
-      {
-        await page.getByText('Client preview', { exact: true }).waitFor()
-        // No default
-      }
-      break
-    }
   }
 }
 
@@ -458,7 +454,7 @@ async function captureProfile(profileName) {
       await page.waitForURL('**/app/editor')
       await prepareReturningUser(context.request)
       await reloadPage(page, { waitUntil: 'networkidle' })
-      await page.getByRole('heading', { level: 1, name: 'Image' }).waitFor()
+      await page.getByRole('heading', { level: 1, name: 'Images' }).waitFor()
       for (const locale of LOCALES) {
         await chooseLocale(page, locale)
         await shoot('private-editor-empty', { locale })
@@ -509,7 +505,7 @@ async function captureProfile(profileName) {
         .getByRole('searchbox', { name: 'Search fonts', exact: true })
         .fill('Playfair Display Variable')
       await page.getByRole('option', { name: 'Playfair Display Variable', exact: true }).click()
-      await page.getByLabel('Preset name').fill('Studio signature')
+      await page.getByLabel('Watermark name').fill('Studio signature')
       await page.getByRole('img', { name: 'Watermark preview on the subject photo' }).waitFor()
       await page.waitForLoadState('networkidle')
       for (const locale of LOCALES) {
@@ -517,7 +513,7 @@ async function captureProfile(profileName) {
         await shoot('designer-new', { locale })
       }
       await chooseLocale(page, 'en')
-      await page.getByRole('button', { name: 'Save preset' }).click()
+      await page.getByRole('button', { name: 'Save watermark' }).click()
       const savedPresetLink = page
         .getByRole('region', { name: label('en', 'library.heading'), exact: true })
         .getByRole('link', { name: 'Studio signature', exact: true })
@@ -532,11 +528,11 @@ async function captureProfile(profileName) {
       await page.waitForLoadState('networkidle')
       await shoot('editor')
       // A saved photo so the gallery has content.
-      await page.getByRole('tab', { name: 'Export' }).click()
+      await page.getByRole('button', { name: 'Save Image' }).click()
       await page.getByRole('combobox', { name: 'Format', exact: true }).click()
       await page.getByRole('option', { name: 'PNG', exact: true }).click()
-      await page.getByRole('button', { name: 'Save to gallery' }).click()
-      await page.getByText(/Saved .* to the/).waitFor()
+      await page.getByRole('button', { name: 'Save To Watermarked Images' }).click()
+      await page.getByText(/Saved .* to Watermarked Images\./).waitFor()
       await page.getByRole('tab', { name: 'Crop' }).click()
       const preview = page.getByRole('img', { name: /^Photo with/ })
       const beforeCrop = await preview.getAttribute('src')
@@ -599,12 +595,16 @@ async function captureProfile(profileName) {
         await gotoPage(page, new URL(presetPath, BASE_URL).href, { waitUntil: 'networkidle' })
         await shoot('designer-edit')
         await gotoPage(page, editorUrl, { waitUntil: 'networkidle' })
-        for (const tab of ['watermark', 'crop', 'adjust', 'resize', 'export']) {
+        for (const tab of ['presets', 'watermark', 'saved', 'crop', 'adjust', 'resize']) {
           await page
             .getByRole('tab', { name: label(locale, `editor.tabs.${tab}`), exact: true })
             .click()
           await shoot(`editor-${tab}`)
         }
+        await page
+          .getByRole('button', { name: label(locale, 'editor.exportImage'), exact: true })
+          .click()
+        await shoot('editor-export', { locale })
         const menu = page.getByRole('button', { name: label(locale, 'shell.menu'), exact: true })
         if (await menu.isVisible()) {
           await menu.click()
@@ -635,6 +635,18 @@ async function captureProfile(profileName) {
           .fill('Client preview')
         await shoot('share-dialog', { locale })
         await page.keyboard.press('Escape')
+        await page
+          .getByRole('button', { name: label(locale, 'shares.heading'), exact: true })
+          .click()
+        const links = page.getByRole('dialog', {
+          name: label(locale, 'shares.heading'),
+          exact: true,
+        })
+        await links.getByText('Client preview', { exact: true }).waitFor()
+        await shoot('manage-links', { locale })
+        await links
+          .getByRole('button', { name: label(locale, 'gallery.close'), exact: true })
+          .click()
       }
       await chooseLocale(page, 'en')
       const resetPath = await createAuditReset(context.request, BASE_URL, email)

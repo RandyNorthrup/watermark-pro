@@ -133,11 +133,11 @@ it('decodes and plays real frames, paints the watermark, pauses and seeks withou
   )
   expect(screen.queryByRole('group', { name: /Watermark position/ })).toBeNull()
   await user.click(screen.getByRole('switch', { name: 'Grid' }))
-  await user.click(screen.getByRole('switch', { name: 'Snap to grid' }))
+  await user.click(screen.getByRole('switch', { name: 'Snap To Grid' }))
   fireEvent.change(screen.getByRole('slider', { name: 'Grid spacing' }), {
     target: { value: '32' },
   })
-  expect(screen.getByRole('switch', { name: 'Snap to grid' }).getAttribute('aria-checked')).toBe(
+  expect(screen.getByRole('switch', { name: 'Snap To Grid' }).getAttribute('aria-checked')).toBe(
     'true',
   )
 })

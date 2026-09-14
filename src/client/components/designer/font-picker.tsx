@@ -336,16 +336,6 @@ export function FontPicker({
             </Radix.Content>
           </Radix.Portal>
         </Radix.Root>
-        {font?.licensePath === undefined ? null : (
-          <a
-            href={font.licensePath}
-            target="_blank"
-            rel="noreferrer"
-            className="text-xs text-ink-muted underline"
-          >
-            {t('designer.font.license')}
-          </a>
-        )}
       </div>
       {weight === undefined || onWeightChange === undefined ? null : (
         <div className="flex flex-col gap-1.5">

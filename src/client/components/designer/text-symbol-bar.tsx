@@ -14,7 +14,7 @@ export function TextSymbolBar({ onInsert }: { onInsert: (symbol: string) => void
     <div
       role="toolbar"
       aria-label={t('designer.text.symbols')}
-      className="grid grid-cols-9 gap-0.5 rounded-lg border border-line bg-surface-raised p-1"
+      className="grid grid-cols-9 gap-0.5 border-t border-line bg-surface-muted p-1"
       onKeyDown={(event) => {
         const buttons = event.currentTarget.querySelectorAll<HTMLButtonElement>('button')
         if (!(event.target instanceof HTMLButtonElement)) return

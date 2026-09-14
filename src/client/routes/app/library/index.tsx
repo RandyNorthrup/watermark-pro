@@ -23,7 +23,6 @@ import { LOGO_CONTENT_TYPES } from '../../../../shared/constants'
 import type { WatermarkSpec } from '../../../../shared/watermark'
 import { FolderBrowser, MoveItemsDialog } from '../../../components/folders/folder-browser'
 import { ImportDialog } from '../../../components/presets/import-dialog'
-import { PresetTemplates } from '../../../components/presets/preset-templates'
 import { RecentWork } from '../../../components/recent-work/recent-work'
 import { Alert } from '../../../components/ui/alert'
 import { Badge } from '../../../components/ui/badge'
@@ -281,18 +280,6 @@ function LibraryPage() {
           }}
         />
       </section>
-      {canManage ? (
-        <Card>
-          <PresetTemplates
-            onChoose={(template) => {
-              void navigate({
-                to: '/app/library/new',
-                search: { template: template.id, folderId: folderId ?? undefined },
-              })
-            }}
-          />
-        </Card>
-      ) : null}
     </div>
   )
 }

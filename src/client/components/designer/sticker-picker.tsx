@@ -114,14 +114,6 @@ export function StickerPicker({ selected, onChange }: StickerPickerProps) {
           {t('designer.stickers.next')}
         </Button>
       </div>
-      <a
-        href="/stickers/LICENSE.txt"
-        target="_blank"
-        rel="noreferrer"
-        className="text-xs text-ink-muted underline"
-      >
-        {t('designer.stickers.license')}
-      </a>
     </fieldset>
   )
 }

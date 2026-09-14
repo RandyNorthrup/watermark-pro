@@ -4,13 +4,12 @@
   },
   "shell": {
     "nav": {
-      "library": "Bibliothèque",
-      "editor": "Image",
-      "bulk": "En lot",
-      "video": "Vidéo",
+      "library": "Filigranes Enregistrés",
+      "editor": "Images",
+      "bulk": "Lot",
+      "video": "Vidéos",
       "documents": "Documents",
-      "gallery": "Galerie",
-      "shares": "Partages",
+      "gallery": "Images Filigranées",
       "members": "Membres",
       "audit": "Journal d'audit",
       "admin": "Admin"
@@ -113,7 +112,7 @@
   },
   "library": {
     "orgRequired": "Créez ou rejoignez un espace de travail pour constituer une bibliothèque de filigranes.",
-    "heading": "Bibliothèque de filigranes",
+    "heading": "Filigranes Enregistrés",
     "description": "Filigranes enregistrés dans {{name}}. Appliquez-les à un fichier ou à un lot.",
     "export": "Exporter",
     "exportPreset": "Exporter {{name}}",
@@ -175,7 +174,7 @@
     "notAnImage": "Ce fichier n'est pas une image lisible par le navigateur.",
     "text": {
       "label": "Texte",
-      "hint": "Jusqu'à {{max}} caractères sur {{lines}} lignes maximum. Utilisez « Insérer un détail » pour des jetons comme la date ou l'appareil photo, remplis pour chaque photo. {location} inscrit la position GPS de la photo sur l'image.",
+      "hint": "Jusqu’à {{max}} caractères.",
       "symbols": "Symboles de texte",
       "insertSymbol": "Insérer {{symbol}}",
       "insertLimit": "Le texte est plein. Sélectionnez du texte à remplacer ou supprimez des caractères."
@@ -210,15 +209,13 @@
       "weight": "Graisse",
       "search": "Rechercher des polices",
       "recent": "Récemment utilisées",
-      "license": "Licence de la police",
       "previewError": "Certains aperçus de polices ne se sont pas chargés. Rouvrez la liste avec une connexion pour réessayer.",
       "empty": "Aucune Police Correspondante"
     },
     "symbol": {
       "icons": "Icônes",
       "glyphLabel": "Glyphe {{glyph}}",
-      "iconLabel": "Icône {{label}}",
-      "license": "Licences des icônes"
+      "iconLabel": "Icône {{label}}"
     },
     "shape": {
       "label": "Forme",
@@ -392,7 +389,6 @@
       "choose": "Choisir {{name}}",
       "previous": "Précédent",
       "next": "Suivant",
-      "license": "Fluent Emoji · licence MIT",
       "usage": "Usage commercial autorisé ; conservez la notice de licence des illustrations lors de leur redistribution.",
       "guide": "Guide des licences des illustrations"
     },
@@ -400,7 +396,7 @@
   },
   "editor": {
     "orgRequired": "Créez ou rejoignez un espace de travail pour modifier des images.",
-    "heading": "Image",
+    "heading": "Images",
     "description": "Choisissez un préréglage, placez le filigrane, recadrez et redimensionnez sur votre appareil. Téléchargez le résultat ou choisissez la galerie ou le cloud.",
     "tabs": {
       "presets": "Préréglages",
@@ -408,7 +404,7 @@
       "crop": "Recadrer",
       "adjust": "Ajuster",
       "resize": "Redimensionner",
-      "export": "Exporter"
+      "saved": "Enregistrés"
     },
     "toolsLabel": "Outils de l'éditeur",
     "openPhoto": "Ouvrir une photo",
@@ -559,7 +555,8 @@
       "rotate": "Pivoter le filigrane",
       "resize": "Redimensionner le filigrane"
     },
-    "newWorkspace": "Nouveau"
+    "newWorkspace": "Nouveau",
+    "exportImage": "Enregistrer L’image"
   },
   "bulk": {
     "orgRequired": "Créez ou rejoignez un espace de travail pour filigraner en lot.",
@@ -653,7 +650,7 @@
   },
   "gallery": {
     "orgRequired": "Créez ou rejoignez un espace de travail pour tenir une galerie.",
-    "heading": "Galerie",
+    "heading": "Images Filigranées",
     "description": "Photos filigranées enregistrées dans {{name}}. Recherchez, filtrez, téléchargez ou supprimez.",
     "usage_one": "{{count}} photo · {{used}} sur {{max}}",
     "usage_many": "{{count}} photos · {{used}} sur {{max}}",
@@ -712,7 +709,7 @@
     "link": "Lien",
     "noExpiry": "Ce lien n'expire pas.",
     "expires": "Expire {{when}}.",
-    "manageLinks": "Gérez les liens dans Partages.",
+    "manageLinks": "Gérer Les Liens: Images Filigranées.",
     "linkCopied": "Lien copié dans le presse-papiers.",
     "linkShared": "Lien partagé.",
     "copyLink": "Copier le lien",
@@ -720,14 +717,11 @@
     "shareSyncBlocked": "Résolvez les problèmes de synchronisation des photos sélectionnées avant de créer un lien."
   },
   "shares": {
-    "orgRequired": "Créez ou rejoignez un espace de travail pour partager des photos.",
-    "noPermission": "Votre rôle n'inclut pas le partage.",
-    "heading": "Partages",
+    "heading": "Gérer Les Liens",
     "description": "Des liens qui permettent à des personnes extérieures à {{name}} de voir et télécharger des photos sélectionnées. Révoquer un lien le désactive immédiatement.",
     "loading": "Chargement des partages",
     "loadErrorTitle": "Impossible de charger les partages",
     "empty": "Aucun lien pour l'instant. Sélectionnez des photos dans la galerie et choisissez Partager.",
-    "openGallery": "Ouvrir la galerie",
     "rowCreated_one": "{{count}} photo · créé le {{created}}",
     "rowCreated_many": "{{count}} photos · créé le {{created}}",
     "rowCreated_other": "{{count}} photos · créé le {{created}}",
@@ -878,7 +872,7 @@
   },
   "video": {
     "orgRequired": "Créez ou rejoignez un espace de travail pour filigraner des vidéos.",
-    "heading": "Filigrane vidéo",
+    "heading": "Vidéos",
     "description": "Prévisualisez votre vidéo, placez des filigranes à différents instants, ajoutez des fondus et exportez avec le son.",
     "checkingSupport": "Vérification de la prise en charge vidéo",
     "unsupportedTitle": "La vidéo n'est pas prise en charge dans ce navigateur",
@@ -920,7 +914,7 @@
       "chooseVideo": "Ouvrez une vidéo et ajoutez d’abord un filigrane valide.",
       "waitPreview": "Attendez l’aperçu du filigrane avant d’ajouter une image clé.",
       "changed": "La vidéo ou le filigrane a changé pendant l’exportation. Exportez à nouveau pour utiliser les modifications actuelles.",
-      "download": "Télécharger La Vidéo",
+      "download": "Exporter La Vidéo",
       "cloudSaved": "La vidéo avec filigrane a été enregistrée dans votre stockage cloud."
     }
   },
@@ -941,7 +935,7 @@
       "invalidFile": "Choisissez un PDF respectant la taille maximale des documents.",
       "chooseMark": "Ajoutez un filigrane valide avant d’exporter ce document.",
       "changed": "Le document ou le filigrane a changé pendant l’exportation. Exportez à nouveau pour utiliser les modifications actuelles.",
-      "download": "Télécharger Le PDF",
+      "download": "Exporter Le PDF",
       "cloudSaved": "Le PDF avec filigrane a été enregistré dans votre stockage cloud.",
       "originalHint": "Le texte original, les illustrations vectorielles, les dimensions des pages et les images intégrées sont conservés. Seul le filigrane est pixellisé. Les PDF protégés par mot de passe doivent d’abord être déverrouillés."
     }
@@ -1215,7 +1209,7 @@
     "syncing": "Synchronisation du travail enregistré…",
     "disconnected": "Hors ligne — les modifications restent sur cet appareil.",
     "pending": "Modifications en attente : {{count}}",
-    "upToDate": "Le travail enregistré est synchronisé.",
+    "upToDate": "Synchronisé",
     "syncNow": "Synchroniser",
     "review": "Vérifier les modifications ({{count}})",
     "deletion": "Suppression",
@@ -1233,7 +1227,7 @@
     "connectOnce": "Connectez-vous et ouvrez cet espace de travail une fois en ligne avant de l’utiliser hors ligne.",
     "onlineOnly": "La gestion du compte, du partage et des membres nécessite une connexion. Les outils photo et les préréglages enregistrés restent disponibles hors ligne.",
     "ready": "Les fichiers de l’application sont prêts pour une utilisation hors ligne.",
-    "preparing": "Préparation des fichiers hors ligne. Gardez cet onglet ouvert.",
+    "preparing": "Préparation Hors Ligne",
     "updateAvailable": "Une mise à jour est prête. Terminez les modifications non enregistrées avant de recharger ; le travail enregistré reste sur cet appareil.",
     "reload": "Recharger pour mettre à jour"
   },
@@ -1330,78 +1324,6 @@
     "admin": "Administrateur",
     "user": "Utilisateur"
   },
-  "guidance": {
-    "dismiss": "Fermer le conseil",
-    "back": "Retour",
-    "next": "Suivant",
-    "done": "Compris",
-    "page": "{{current}} sur {{total}}",
-    "image": {
-      "title": "Image",
-      "first": "Ouvrez une photo. Le fichier original reste intact.",
-      "second": "Le zoom du canevas ne change que la vue. Les téléchargements sont générés à partir de l’image originale ; PNG est le format sans perte par défaut."
-    },
-    "watermark": {
-      "title": "Outils De Filigrane",
-      "first": "Choisissez texte, symbole, forme, logo ou code QR.",
-      "second": "Touchez un filigrane pour afficher ses poignées. Faites-le glisser pour le déplacer, pincez pour le redimensionner ou tournez les doigts pour le faire pivoter. Touchez ailleurs pour masquer les poignées."
-    },
-    "presets": {
-      "title": "Préréglages Enregistrés",
-      "first": "Commencez avec Brouillon, Confidentiel ou un autre modèle, ou choisissez un filigrane enregistré.",
-      "second": "Enregistrer demande un nom et un dossier. Nouveau commence un nouveau filigrane en gardant le fichier ouvert."
-    },
-    "crop": {
-      "title": "Recadrer La Photo",
-      "first": "Faites glisser les bords ou choisissez un format.",
-      "second": "Réinitialiser le recadrage rétablit la photo entière. L’original reste intact."
-    },
-    "adjust": {
-      "title": "Réglages Photo",
-      "first": "Utilisez les curseurs pour modifier l’apparence de la photo.",
-      "second": "Chaque réinitialisation rétablit la valeur par défaut. Annuler inverse la dernière modification."
-    },
-    "resize": {
-      "title": "Dimensions De Sortie",
-      "first": "Gardez les dimensions originales ou choisissez une autre taille.",
-      "second": "Le redimensionnement change l’exportation. Le zoom change uniquement l’affichage."
-    },
-    "export": {
-      "title": "Enregistrer Le Résultat",
-      "first": "Téléchargez, enregistrez dans la galerie ou choisissez une destination cloud.",
-      "second": "Vérifiez le format, les dimensions et la qualité. Enregistrer dans le cloud ne partage pas le fichier ; créez les liens séparément dans Fichiers cloud enregistrés."
-    },
-    "library": {
-      "title": "Votre Bibliothèque",
-      "first": "Retrouvez les préréglages récents, parcourez les modèles et organisez les créations enregistrées en dossiers.",
-      "second": "Recherchez ou changez de vue pour trouver un préréglage. Ouvrez-le pour le modifier ou appliquez-le dans Image, Documents, Vidéo ou Lots."
-    },
-    "gallery": {
-      "title": "Votre Galerie",
-      "first": "Retrouvez les photos récentes et organisez les images enregistrées en dossiers dans cet espace.",
-      "second": "Choisissez miniatures, liste ou détails. Vérifier une photo recherche une marque Lumafoil invisible ; cela ne prouve pas la propriété."
-    },
-    "bulk": {
-      "title": "Traitement Par Lots",
-      "first": "Ajoutez des photos, PDF et vidéos compatibles, choisissez un filigrane enregistré et vérifiez les réglages de sortie.",
-      "second": "Vérifiez chaque résultat ou erreur. Téléchargez un ZIP ou enregistrez dans le cloud ; seuls les résultats photo peuvent être enregistrés dans la Galerie."
-    },
-    "documents": {
-      "title": "Filigranes De Documents",
-      "first": "Ouvrez un PDF, tournez ses pages et ajustez le filigrane avec les outils à côté de l’aperçu.",
-      "second": "Le filigrane s’applique à tout le document. L’export conserve les pages originales avec leur texte, leurs images et leurs illustrations vectorielles existants."
-    },
-    "video": {
-      "title": "Filigranes Vidéo",
-      "first": "Ouvrez une vidéo compatible et parcourez ou lisez l’aperçu en ajustant votre filigrane.",
-      "second": "Ajoutez des images clés pour déplacer le filigrane au fil du temps. Réglez Début, Fin et les fondus ; vérifiez les options de sortie et audio avant l’export."
-    },
-    "workspace": {
-      "title": "Accès À L’espace",
-      "first": "Ouvrez Gérer l’accès dans votre menu utilisateur pour vérifier le partage.",
-      "second": "Les propriétaires peuvent accorder un accès en lecture ou modification. Partager cet espace ne partage ni les autres espaces ni les comptes cloud connectés de quiconque."
-    }
-  },
   "workspaceAccess": {
     "loading": "Chargement Des Accès…",
     "ownerOnly": "Seul le propriétaire de l’espace de travail peut modifier les accès.",
@@ -1479,7 +1401,7 @@
   "folders": {
     "heading": "Dossiers",
     "rootPhoto": "Galerie",
-    "rootPreset": "Bibliothèque",
+    "rootPreset": "Filigranes Enregistrés",
     "path": "Chemin Du Dossier",
     "new": "Nouveau Dossier",
     "name": "Nom Du Dossier",
@@ -1510,7 +1432,7 @@
     "selection": "Éléments Sélectionnés : {{count}}"
   },
   "templates": {
-    "heading": "Modèles De Filigrane",
+    "heading": "Préréglages",
     "hint": "Appliquez une mise en page prête à l’emploi, personnalisez-la et enregistrez votre propre préréglage.",
     "search": "Rechercher Des Modèles",
     "category": "Catégorie De Modèle",
@@ -1542,6 +1464,81 @@
       "copyright": "Droits D’Auteur",
       "photoCredit": "Crédit Photo",
       "repeatingProof": "Épreuve Répétée"
+    }
+  },
+  "tour": {
+    "invitationTitle": "Faire Une Visite Rapide ?",
+    "invitationBody": "Découvrez les outils avec une courte visite. Enregistrez votre travail avant : la visite parcourt plusieurs pages. Vous pouvez quitter à tout moment ou la relancer depuis les paramètres du compte.",
+    "start": "Commencer La Visite",
+    "decline": "Non Merci",
+    "close": "Fermer La Visite",
+    "exit": "Quitter La Visite",
+    "back": "Retour",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "progress": "Étape {{current}} Sur {{total}}",
+    "navigationError": "Cette page ne peut pas être ouverte. Réessayez Suivant ou quittez la visite.",
+    "settingsTitle": "Aide Et Crédits",
+    "settingsBody": "Relancez la visite guidée pour revoir les fonctionnalités.",
+    "replay": "Voir La Visite Du Produit",
+    "licensesTitle": "Licences Et Crédits",
+    "licensesBody": "Les notices des polices et illustrations restent disponibles ici. Les symboles emoji utilisent les polices installées sur votre appareil.",
+    "fontPackages": "Licences Des Polices Incluses",
+    "fontCatalog": "Catalogue Étendu Des Polices Et Licences",
+    "stickerLicense": "Licence Des Autocollants",
+    "iconLicense": "Licences Des Icônes Et Symboles",
+    "artworkUsage": "Utilisation Des Illustrations Et Notices D’Exportation",
+    "images": {
+      "title": "Images",
+      "body": "Ouvrez une photo depuis votre appareil, un lien ou un stockage cloud connecté. Le zoom, la grille et l’alignement facilitent le placement. L’original reste intact ; la retouche et le travail enregistré restent accessibles hors ligne."
+    },
+    "watermark": {
+      "title": "Créer Un Filigrane",
+      "body": "Ajoutez texte, symboles, formes, autocollants, logo, signature ou code QR. Réglez police, position, couleur, contour, courbe et style. Glissez, pincez et pivotez sur le canevas ; Annuler revient sur les changements."
+    },
+    "presets": {
+      "title": "Préréglages Inclus",
+      "body": "Préréglages contient les modèles fournis, comme Brouillon et Confidentiel. Choisissez une base, puis personnalisez-la dans Filigrane. Ils restent séparés de vos filigranes enregistrés."
+    },
+    "saved": {
+      "title": "Vos Créations Enregistrées",
+      "body": "Enregistrés ouvre les filigranes de cet espace. Enregistrer demande un nom ; Nouveau commence un autre filigrane en conservant l’image. Réutilisez codes QR, logos et textes nommés."
+    },
+    "transform": {
+      "title": "Recadrer, Ajuster Et Redimensionner",
+      "body": "Recadrer modifie le cadrage ; Ajuster règle l’apparence ; Redimensionner définit les dimensions de sortie. Chaque curseur peut être réinitialisé. Gardez les dimensions originales sauf choix contraire."
+    },
+    "export": {
+      "title": "Exporter Une Image",
+      "body": "Enregistrer L’image ouvre les options de sortie. Téléchargez, partagez, enregistrez dans Images Filigranées ou choisissez un dossier cloud. PNG est le format sans perte par défaut ; les autres formats et qualités restent votre choix."
+    },
+    "documents": {
+      "title": "Documents",
+      "body": "Ouvrez un PDF, prévisualisez ses pages et appliquez des filigranes avec les outils intégrés. Exporter PDF enregistre le document marqué en conservant le contenu original des pages."
+    },
+    "videos": {
+      "title": "Vidéos",
+      "body": "Ouvrez une vidéo compatible et parcourez la chronologie. Placez les filigranes à différents moments et ajoutez des fondus. L’exportation réencode la vidéo ; les formats pris en charge dépendent du navigateur."
+    },
+    "bulk": {
+      "title": "Traitement Par Lots",
+      "body": "Traitez images, PDF et vidéos ensemble. Choisissez un filigrane, vérifiez chaque résultat et téléchargez les fichiers terminés dans un ZIP. Un fichier en erreur n’annule pas les autres résultats."
+    },
+    "library": {
+      "title": "Filigranes Enregistrés",
+      "body": "Classez vos créations réutilisables en dossiers. Recherchez, filtrez, changez de vue et retrouvez les travaux récents. Les créations appartiennent à l’espace actuel et se synchronisent à la reconnexion."
+    },
+    "gallery": {
+      "title": "Images Filigranées",
+      "body": "Retrouvez les images récentes, classez les dossiers et changez de vue. Créez et gérez les liens des images sélectionnées. Vérifier Une Photo recherche le filigrane invisible de Lumafoil."
+    },
+    "account": {
+      "title": "Compte Et Cloud",
+      "body": "Gérez la connexion au compte et connectez Google Drive, Dropbox ou OneDrive. Les connexions persistent jusqu’à déconnexion ou révocation. Parcourez les dossiers autorisés à l’ouverture et à l’enregistrement ; les règles du fournisseur s’appliquent."
+    },
+    "workspace": {
+      "title": "Espaces Et Accès",
+      "body": "Le menu utilisateur permet de changer d’espace, inviter des personnes ou Gérer L’Accès. Les propriétaires accordent Lecture ou Modification. Les invitations personnelles ne partagent aucun contenu. La synchronisation apparaît au bas de la barre latérale."
     }
   }
 }

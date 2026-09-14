@@ -29,7 +29,6 @@ import { Route as AppEditorRouteImport } from './routes/app/editor'
 import { Route as AppGalleryRouteImport } from './routes/app/gallery'
 import { Route as AppInvitationsRouteImport } from './routes/app/invitations'
 import { Route as AppMembersRouteImport } from './routes/app/members'
-import { Route as AppSharesRouteImport } from './routes/app/shares'
 import { Route as AppVerifyRouteImport } from './routes/app/verify'
 import { Route as AppVideoRouteImport } from './routes/app/video'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
@@ -140,11 +139,6 @@ const AppMembersRoute = AppMembersRouteImport.update({
   path: '/members',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppSharesRoute = AppSharesRouteImport.update({
-  id: '/shares',
-  path: '/shares',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppVerifyRoute = AppVerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
@@ -207,7 +201,6 @@ export interface FileRoutesByFullPath {
   '/app/gallery': typeof AppGalleryRoute
   '/app/invitations': typeof AppInvitationsRoute
   '/app/members': typeof AppMembersRoute
-  '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
   '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
@@ -237,7 +230,6 @@ export interface FileRoutesByTo {
   '/app/gallery': typeof AppGalleryRoute
   '/app/invitations': typeof AppInvitationsRoute
   '/app/members': typeof AppMembersRoute
-  '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
   '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
@@ -269,7 +261,6 @@ export interface FileRoutesById {
   '/app/gallery': typeof AppGalleryRoute
   '/app/invitations': typeof AppInvitationsRoute
   '/app/members': typeof AppMembersRoute
-  '/app/shares': typeof AppSharesRoute
   '/app/verify': typeof AppVerifyRoute
   '/app/video': typeof AppVideoRoute
   '/share/$token': typeof ShareTokenRoute
@@ -302,7 +293,6 @@ export interface FileRouteTypes {
     | '/app/gallery'
     | '/app/invitations'
     | '/app/members'
-    | '/app/shares'
     | '/app/verify'
     | '/app/video'
     | '/share/$token'
@@ -332,7 +322,6 @@ export interface FileRouteTypes {
     | '/app/gallery'
     | '/app/invitations'
     | '/app/members'
-    | '/app/shares'
     | '/app/verify'
     | '/app/video'
     | '/share/$token'
@@ -363,7 +352,6 @@ export interface FileRouteTypes {
     | '/app/gallery'
     | '/app/invitations'
     | '/app/members'
-    | '/app/shares'
     | '/app/verify'
     | '/app/video'
     | '/share/$token'
@@ -532,13 +520,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMembersRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/app/shares': {
-      id: '/app/shares'
-      path: '/shares'
-      fullPath: '/app/shares'
-      preLoaderRoute: typeof AppSharesRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/app/verify': {
       id: '/app/verify'
       path: '/verify'
@@ -608,7 +589,6 @@ interface AppRouteRouteChildren {
   AppGalleryRoute: typeof AppGalleryRoute
   AppInvitationsRoute: typeof AppInvitationsRoute
   AppMembersRoute: typeof AppMembersRoute
-  AppSharesRoute: typeof AppSharesRoute
   AppVerifyRoute: typeof AppVerifyRoute
   AppVideoRoute: typeof AppVideoRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -628,7 +608,6 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppGalleryRoute: AppGalleryRoute,
   AppInvitationsRoute: AppInvitationsRoute,
   AppMembersRoute: AppMembersRoute,
-  AppSharesRoute: AppSharesRoute,
   AppVerifyRoute: AppVerifyRoute,
   AppVideoRoute: AppVideoRoute,
   AppIndexRoute: AppIndexRoute,

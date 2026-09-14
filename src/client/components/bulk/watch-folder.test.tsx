@@ -18,7 +18,7 @@ const SETTINGS: BulkSettings = {
   adjust: IDENTITY_ADJUSTMENTS,
   border: null,
   namePattern: DEFAULT_NAME_PATTERN,
-  presetName: 'Preset',
+  presetName: 'Saved Watermark',
 }
 
 afterEach(() => {

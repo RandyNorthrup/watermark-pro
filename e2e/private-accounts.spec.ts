@@ -60,7 +60,7 @@ test('site invitations create separate private workspaces and protect account to
   await page.getByRole('button', { name: 'Create account', exact: true }).click()
   await expect(page).toHaveURL(/\/check-email/)
   await page.goto(await latestLinkFor(request, recipient.email, '/api/auth/verify-email'))
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Image')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   await prepareReturningUser(page)
   const recipientSession = await page.request.get('/api/auth/get-session')
   const recipientWorkspace = workspaceSessionSchema.parse(await recipientSession.json()).session
@@ -68,7 +68,7 @@ test('site invitations create separate private workspaces and protect account to
   expect(recipientWorkspace).not.toBe(ownerWorkspace)
   const foreignLibrary = await page.request.get(`/api/orgs/${ownerWorkspace}/watermarks`)
   expect(foreignLibrary.status()).toBe(403)
-  await navigateTo(page, 'Library')
+  await navigateTo(page, 'Saved Watermarks')
   await expect(page.getByText('Owner-only preset canary')).toHaveCount(0)
   await navigateTo(page, 'Members')
   const personalAccess = page.getByRole('dialog', { name: 'Manage Access' })

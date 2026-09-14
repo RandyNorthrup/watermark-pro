@@ -130,6 +130,9 @@ describe('curved text in exported pixels', () => {
     { curve: -1, rotation: -40, scale: 0.55, text: '© Lumafoil Sep 12, 2026' },
     { curve: 0.75, rotation: 70, scale: 0.9, text: '© Lumafoil\nSep 12, 2026' },
     { curve: -0.75, rotation: 150, scale: 0.9, text: '© Lumafoil\nSep 12, 2026' },
+    { curve: 2, rotation: 35, scale: 0.6, text: '© Lumafoil Sep 12, 2026' },
+    { curve: -2, rotation: -70, scale: 0.6, text: '© Lumafoil Sep 12, 2026' },
+    { curve: 2, rotation: 150, scale: 0.8, text: '© Lumafoil\nSep 12, 2026' },
   ])('contains transformed ink in its selection: $curve / $rotation / $scale', async (options) => {
     const source = await splitBitmap(WIDTH, HEIGHT, '#ffffff', '#ffffff')
     try {

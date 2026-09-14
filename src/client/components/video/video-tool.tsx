@@ -382,7 +382,24 @@ function VideoWorkbench({
               onError={setError}
             />
           )}
-          <MediaHistory scene={scene} />
+          <MediaHistory
+            scene={scene}
+            exportAction={
+              <Button
+                type="button"
+                size="sm"
+                disabled={video === null || specs.length === 0 || isRunning}
+                isPending={isRunning}
+                onClick={() => {
+                  void download()
+                }}
+                data-guidance-topic="export"
+              >
+                <Download aria-hidden="true" className="size-4" />
+                {t('video.timeline.download')}
+              </Button>
+            }
+          />
         </div>
         {video === null ? (
           <div className="flex min-h-[54svh] items-center justify-center rounded-xl border border-dashed border-line p-6 text-center text-sm text-ink-muted">
@@ -469,17 +486,6 @@ function VideoWorkbench({
         />
         <p className="text-xs text-ink-muted">{capability.label}</p>
         <div className="tool-section flex flex-col gap-2">
-          <Button
-            type="button"
-            disabled={video === null || specs.length === 0 || isRunning}
-            isPending={isRunning}
-            onClick={() => {
-              void download()
-            }}
-          >
-            <Download aria-hidden="true" className="size-4" />
-            {t('video.timeline.download')}
-          </Button>
           {canShareFiles(`video/${capability.container}`) ? (
             <Button
               type="button"

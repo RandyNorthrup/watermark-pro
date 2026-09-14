@@ -5,7 +5,7 @@ import type { AppContext } from '../app-context'
 import { apiErrors } from '../errors'
 import { requireSession } from '../middleware/session'
 
-/** Optional guidance is consumed before display, never replayed from a client-owned flag. */
+/** The account claims its one-time tour offer; explicit replay never resets the saved claim. */
 export const guidanceRoutes = new Hono<AppContext>().post(
   '/me/guidance/claim',
   requireSession,

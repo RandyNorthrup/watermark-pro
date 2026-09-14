@@ -1,21 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
 import { Check, Copy, Share2, XCircle } from 'lucide-react'
+import { Dialog } from 'radix-ui'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ShareDto } from '../../../shared/api'
-import { Alert } from '../../components/ui/alert'
-import { Badge } from '../../components/ui/badge'
-import { Button } from '../../components/ui/button'
-import { buttonVariants } from '../../components/ui/button-variants'
-import { Card } from '../../components/ui/card'
-import { Spinner } from '../../components/ui/spinner'
-import { useActiveOrganization } from '../../lib/active-organization'
 import { describeError } from '../../lib/errors'
 import { dateTimeFormatter } from '../../lib/format-date'
-import { readActiveMemberRole } from '../../lib/queries'
-import { canRole } from '../../lib/roles'
 import {
   copyLink,
   revokeShare,
@@ -23,11 +14,11 @@ import {
   sharesQueryKey,
   sharesQueryOptions,
 } from '../../lib/shares'
-
-export const Route = createFileRoute('/app/shares')({
-  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
-  component: SharesPage,
-})
+import { Alert } from '../ui/alert'
+import { Badge } from '../ui/badge'
+import { Button } from '../ui/button'
+import { Card } from '../ui/card'
+import { Spinner } from '../ui/spinner'
 
 type ShareStatus = 'active' | 'expired' | 'revoked'
 
@@ -48,50 +39,59 @@ function statusOf(share: ShareDto, now: number): ShareStatus {
   return 'active'
 }
 
-function SharesPage() {
+/** Manage existing image links from the image collection without a separate page. */
+export function ManageLinksDialog({ organizationId }: { organizationId: string }) {
   const { t } = useTranslation()
-  const organization = useActiveOrganization()
-  const membership = Route.useLoaderData()
-  const organizationId = organization?.id ?? ''
-  const shares = useQuery({ ...sharesQueryOptions(organizationId), enabled: organizationId !== '' })
-  // Captured once per load so the status badges are pure during render.
-  const [now] = useState(() => Date.now())
-  if (organization === null) {
-    return <Alert tone="info">{t('shares.orgRequired')}</Alert>
-  }
-  if (!canRole(membership?.role, { share: ['create'] })) {
-    return <Alert tone="error">{t('shares.noPermission')}</Alert>
-  }
+  const [isOpen, setIsOpen] = useState(false)
+  const [now, setNow] = useState(() => Date.now())
+  const shares = useQuery({ ...sharesQueryOptions(organizationId), enabled: isOpen })
   return (
-    <div className="flex flex-col gap-6">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">{t('shares.heading')}</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          {t('shares.description', { name: organization.name })}
-        </p>
-      </header>
-      {shares.isPending ? <Spinner className="size-6" label={t('shares.loading')} /> : null}
-      {shares.isError ? (
-        <Alert tone="error" title={t('shares.loadErrorTitle')}>
-          {describeError(shares.error)}
-        </Alert>
-      ) : null}
-      {shares.isSuccess && shares.data.length === 0 ? (
-        <Card className="flex flex-col items-start gap-3">
-          <p className="text-sm text-ink-muted">{t('shares.empty')}</p>
-          <Link to="/app/gallery" className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
-            {t('shares.openGallery')}
-          </Link>
-        </Card>
-      ) : null}
-      {shares.isSuccess && shares.data.length > 0 ? (
-        <ul className="flex flex-col gap-3">
-          {shares.data.map((share) => (
-            <ShareRow key={share.id} share={share} organizationId={organization.id} now={now} />
-          ))}
-        </ul>
-      ) : null}
-    </div>
+    <Dialog.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (open) setNow(Date.now())
+      }}
+    >
+      <Dialog.Trigger asChild>
+        <Button type="button" variant="secondary">
+          <Share2 aria-hidden="true" className="size-4" />
+          {t('shares.heading')}
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60" />
+        <Dialog.Content className="glass-popover app-scroll-region fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-[85svh] max-w-2xl -translate-y-1/2 flex-col gap-4 overflow-y-auto rounded-2xl border border-line p-5">
+          <Dialog.Title className="text-xl font-semibold">{t('shares.heading')}</Dialog.Title>
+          <Dialog.Description className="text-sm text-ink-muted">
+            {t('shares.description', { name: t('gallery.heading') })}
+          </Dialog.Description>
+          {shares.isPending ? <Spinner label={t('shares.loading')} /> : null}
+          {shares.isError ? (
+            <Alert tone="error" title={t('shares.loadErrorTitle')}>
+              {describeError(shares.error)}
+            </Alert>
+          ) : null}
+          {shares.isSuccess && shares.data.length === 0 ? (
+            <p className="text-sm text-ink-muted">{t('shares.empty')}</p>
+          ) : null}
+          {shares.isSuccess && shares.data.length > 0 ? (
+            <ul className="flex flex-col gap-3">
+              {shares.data.map((share) => (
+                <ShareRow key={share.id} share={share} organizationId={organizationId} now={now} />
+              ))}
+            </ul>
+          ) : null}
+          <div className="flex justify-center">
+            <Dialog.Close asChild>
+              <Button type="button" variant="secondary">
+                {t('gallery.close')}
+              </Button>
+            </Dialog.Close>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
@@ -155,7 +155,7 @@ function ShareRow({
         </div>
         <p className="truncate font-mono text-xs text-ink-muted">{share.url}</p>
         {status === 'active' ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center gap-2">
             <Button
               type="button"
               variant="secondary"

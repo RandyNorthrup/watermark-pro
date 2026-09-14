@@ -102,8 +102,8 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
     email: `metadata-${crypto.randomUUID()}@example.test`,
     password: 'synthetic metadata passphrase',
   })
-  await navigateTo(page, 'Library')
-  await page.getByRole('link', { name: 'New preset' }).click()
+  await navigateTo(page, 'Saved Watermarks')
+  await page.getByRole('link', { name: 'New watermark' }).click()
   const text = page.getByRole('textbox', { name: 'Text', exact: true })
   await text.fill('')
   await page.getByRole('button', { name: 'Insert detail', exact: true }).click()
@@ -119,13 +119,13 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
   await page.getByRole('menuitem', { name: /^ISO/ }).click()
   await expect(text).toHaveValue(TOKENS)
   await expectAccessible(page)
-  await page.getByLabel('Preset name').fill('Camera metadata stamp')
+  await page.getByLabel('Watermark name').fill('Camera metadata stamp')
   const saved = page.waitForResponse(
     (response) =>
       response.request().method() === 'POST' &&
       new URL(response.url()).pathname.endsWith('/watermarks'),
   )
-  await page.getByRole('button', { name: 'Save preset', exact: true }).click()
+  await page.getByRole('button', { name: 'Save watermark', exact: true }).click()
   const savedResponse = await saved
   const stamp = watermarkDtoSchema.parse(await savedResponse.json())
   if (stamp.spec.kind !== 'text') throw new Error('The saved token preset is not text.')
@@ -141,7 +141,7 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
     .getByRole('link', { name: 'Open Camera metadata stamp in the editor', exact: true })
     .click()
   await page.reload()
-  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
+  await page.getByRole('tab', { name: 'Saved', exact: true }).click()
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(stamp.name)
   await page
     .getByLabel('Open a photo')
@@ -150,7 +150,7 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
   await page.getByRole('tab', { name: 'Resize', exact: true }).click()
   await page.getByRole('button', { name: '50%', exact: true }).click()
   await expect(page.getByLabel('Width (px)', { exact: true })).toHaveValue('320')
-  await page.getByRole('tab', { name: 'Export', exact: true }).click()
+  await page.getByRole('button', { name: 'Save Image', exact: true }).click()
   const privateExport = await exportJpeg(page, /^Keep except location/)
   const privateFields = await exifFields(privateExport)
   expect(privateFields).toMatchObject({
@@ -176,13 +176,13 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
   expect(strippedFields.longitude).toBeUndefined()
   await expectAccessible(page)
 
-  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
+  await page.getByRole('tab', { name: 'Saved', exact: true }).click()
   // Keep one layer present while switching the comparison: an empty document
   // re-applies the preset named in this route's URL.
   await page
-    .getByRole('combobox', { name: 'Add another preset', exact: true })
+    .getByRole('combobox', { name: 'Add A Saved Watermark', exact: true })
     .selectOption(literal.id)
-  await page.getByRole('tab', { name: 'Presets', exact: true }).click()
+  await page.getByRole('tab', { name: 'Saved', exact: true }).click()
   await expect(
     page.getByRole('list', { name: 'Layers, bottom to top' }).getByRole('listitem'),
   ).toHaveCount(2)
@@ -195,7 +195,7 @@ test('stamps camera tokens and independently proves keep, GPS removal, and strip
   await expect(page.getByRole('list', { name: 'Layers, bottom to top' })).toContainText(
     literal.name,
   )
-  await page.getByRole('tab', { name: 'Export', exact: true }).click()
+  await page.getByRole('button', { name: 'Save Image', exact: true }).click()
   const control = await exportJpeg(page, /^Strip/)
   const pixels = await rasterize(stripped).removeAlpha().raw().toBuffer()
   expect(pixels.equals(await rasterize(control).removeAlpha().raw().toBuffer())).toBe(true)

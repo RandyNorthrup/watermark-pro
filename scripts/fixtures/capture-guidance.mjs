@@ -1,4 +1,4 @@
-/** Fresh-account discovery, permanent server claims, and real mobile touch behavior. */
+/** Real opt-in, route-by-route touring, replay, permanent offers and mobile touch behavior. */
 import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 
@@ -15,9 +15,24 @@ const PROFILES = {
 const selectedProfile = process.argv[2]
 if (selectedProfile !== undefined && !Object.hasOwn(PROFILES, selectedProfile))
   throw new Error('Unknown guidance QA profile')
-const ORIGIN = 'http://localhost:5273'
+const ORIGIN = process.env.APP_URL ?? 'http://localhost:5273'
 const OUTPUT = 'temp/guidance-qa'
 const reports = []
+const TOUR_STOPS = [
+  ['Images', '/app/editor'],
+  ['Create A Watermark', '/app/editor'],
+  ['Included Presets', '/app/editor'],
+  ['Your Saved Designs', '/app/editor'],
+  ['Crop, Adjust And Resize', '/app/editor'],
+  ['Save Your Image', '/app/editor'],
+  ['Documents', '/app/documents'],
+  ['Videos', '/app/video'],
+  ['Bulk', '/app/bulk'],
+  ['Saved Watermarks', '/app/library'],
+  ['Watermarked Images', '/app/gallery'],
+  ['Account And Cloud', '/app/account'],
+  ['Workspaces And Access', '/app/account'],
+]
 await mkdir(OUTPUT, { recursive: true })
 
 async function openEditor(page) {
@@ -27,7 +42,8 @@ async function openEditor(page) {
   await page.goto('/app/editor')
   const response = await claimed
   assert.equal(response.status(), 200)
-  await expect(page.getByRole('textbox', { name: 'Text', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Images', exact: true })).toBeVisible()
+  return response.json()
 }
 
 async function swipe(page, context, direction) {
@@ -63,7 +79,7 @@ async function verifySuppression(page) {
   await expect(tip).toHaveCount(0)
   await page.getByRole('searchbox', { name: /Search Fonts/i }).press('Escape')
   await expect(tip).toHaveCount(1)
-  await page.getByRole('button', { name: 'Account menu for Guidance QA' }).click()
+  await page.getByRole('button', { name: /Account Menu For Guidance QA/i }).click()
   await expect(page.getByRole('menu')).toBeVisible()
   await expect(tip).toHaveCount(0)
   await page.getByRole('menuitem', { name: /Manage Access/i }).click()
@@ -91,25 +107,45 @@ for (const [name, profile] of Object.entries(PROFILES)) {
     page.on('pageerror', (error) => {
       errors.push(error.name)
     })
-    await openEditor(page)
+    assert.deepEqual(await openEditor(page), { claimed: true })
     const tip = page.locator('[data-first-use-tip]')
     await expect(tip).toHaveCount(1)
-    await expect(tip.getByRole('heading', { name: 'Image', exact: true })).toBeVisible()
+    await expect(tip.getByRole('heading', { name: 'Take A Quick Tour?' })).toBeVisible()
+    await expect(page).toHaveURL(`${ORIGIN}/app/editor`)
+    await expect(tip.getByRole('button', { name: 'Next', exact: true })).toHaveCount(0)
+    await tip.getByRole('button', { name: 'No Thanks', exact: true }).click()
+    await expect(tip).toHaveCount(0)
+    assert.deepEqual(await openEditor(page), { claimed: false })
+    await expect(tip).toHaveCount(0)
+
+    const otherDevice = await browser.newContext({ ...profile.options, baseURL: ORIGIN })
+    await otherDevice.addCookies(cookies)
+    const otherPage = await otherDevice.newPage()
+    assert.deepEqual(await openEditor(otherPage), { claimed: false })
+    await expect(otherPage.locator('[data-first-use-tip]')).toHaveCount(0)
+    await otherDevice.close()
+
+    await page.goto('/app/account')
+    await page.getByRole('button', { name: 'View Product Tour' }).click()
+    await expect(page).toHaveURL(`${ORIGIN}/app/editor`)
+    await expect(tip.getByRole('heading', { name: 'Images', exact: true })).toBeVisible()
     await tip.getByRole('button', { name: 'Next', exact: true }).click()
-    await expect(tip).toContainText('original image')
+    await expect(tip.getByRole('heading', { name: 'Create A Watermark' })).toBeVisible()
     await tip.getByRole('button', { name: 'Back', exact: true }).click()
-    await expect(tip).toContainText('original file stays untouched')
+    await expect(tip.getByRole('heading', { name: 'Images', exact: true })).toBeVisible()
     if (name === 'android') {
       await swipe(page, context, 'next')
       try {
-        await expect(tip).toContainText('original image')
+        await expect(tip.getByRole('heading', { name: 'Create A Watermark' })).toBeVisible()
       } catch (error) {
         await page.screenshot({ path: `${OUTPUT}/android-swipe-failure.png`, fullPage: true })
         throw error
       }
       await swipe(page, context, 'back')
-      await expect(tip).toContainText('original file stays untouched')
+      await expect(tip.getByRole('heading', { name: 'Images', exact: true })).toBeVisible()
     }
+    await tip.getByRole('button', { name: 'Next', exact: true }).click()
+    await expect(tip.getByRole('heading', { name: 'Create A Watermark' })).toBeVisible()
     await verifySuppression(page)
     await page.screenshot({ path: `${OUTPUT}/${name}.png`, fullPage: true, animations: 'disabled' })
     const accessibility = await new AxeBuilder({ page })
@@ -128,27 +164,21 @@ for (const [name, profile] of Object.entries(PROFILES)) {
         geometry.width <= viewport.width &&
         geometry.height <= viewport.height,
     )
-    if (name === 'desktop') {
-      await tip.getByRole('button', { name: 'Dismiss Tip' }).focus()
-      await page.keyboard.press('Escape')
-      await expect(page.locator('nav a[href="/app/editor"]:visible').first()).toBeFocused()
-    } else {
-      await tip.getByRole('button', { name: 'Dismiss Tip' }).click()
+    for (const [heading, route] of TOUR_STOPS.slice(2)) {
+      await tip.getByRole('button', { name: 'Next', exact: true }).click()
+      await expect(tip.getByRole('heading', { name: heading, exact: true })).toBeVisible()
+      await expect(page).toHaveURL(`${ORIGIN}${route}`)
+      await expect(tip).toHaveCount(1)
     }
-    // Manage Access was queued while its modal was open; it may show only after
-    // the active Image tip is dismissed, then it is permanently consumed too.
-    await expect(tip.getByRole('heading', { name: 'Workspace Access' })).toBeVisible()
-    await tip.getByRole('button', { name: 'Dismiss Tip' }).click()
+    await tip.getByRole('button', { name: 'Finish', exact: true }).click()
     await expect(tip).toHaveCount(0)
-    await openEditor(page)
+    await page.getByRole('button', { name: 'View Product Tour' }).click()
+    await expect(tip.getByRole('heading', { name: 'Images', exact: true })).toBeVisible()
+    if (name === 'desktop') await page.keyboard.press('Escape')
+    else await tip.getByRole('button', { name: 'Exit Tour', exact: true }).click()
     await expect(tip).toHaveCount(0)
-
-    const otherDevice = await browser.newContext({ ...profile.options, baseURL: ORIGIN })
-    await otherDevice.addCookies(cookies)
-    const otherPage = await otherDevice.newPage()
-    await openEditor(otherPage)
-    await expect(otherPage.locator('[data-first-use-tip]')).toHaveCount(0)
-    await otherDevice.close()
+    assert.deepEqual(await openEditor(page), { claimed: false })
+    await expect(tip).toHaveCount(0)
 
     const second = await createAuditAccount(ORIGIN, 'Independent Guide')
     try {
@@ -156,7 +186,7 @@ for (const [name, profile] of Object.entries(PROFILES)) {
       const secondStorage = await second.context.storageState()
       await secondContext.addCookies(secondStorage.cookies)
       const secondPage = await secondContext.newPage()
-      await openEditor(secondPage)
+      assert.deepEqual(await openEditor(secondPage), { claimed: true })
       await expect(secondPage.locator('[data-first-use-tip]')).toHaveCount(1)
       if (name !== 'desktop') {
         await secondPage.setViewportSize({ width: 844, height: 390 })
@@ -184,14 +214,20 @@ for (const [name, profile] of Object.entries(PROFILES)) {
     assert.deepEqual(errors, [], `${name}: uncaught errors`)
     reports.push({
       profile: name,
-      singleTip: true,
+      explicitOptIn: true,
+      routeTour: TOUR_STOPS.length,
+      settingsReplay: true,
+      exitAtAnyStep: true,
+      singleCard: true,
       suppression: true,
       permanentAcrossDevices: true,
       accountIsolation: true,
       nativeSwipe: name === 'android',
     })
     await writeFile(`${OUTPUT}/report.json`, JSON.stringify(reports, null, 2) + '\n')
-    console.info(`${name}: first-use guidance, suppression, permanent claims and isolation passed`)
+    console.info(
+      `${name}: opt-in tour, all routes, replay, exit, mobile controls and account isolation passed`,
+    )
   } finally {
     await browser.close()
     await actor.context.dispose()

@@ -111,11 +111,11 @@ it('moves a Library preset through the actual modal and keeps new saves in the c
   )
   await user.click(screen.getByRole('button', { name: 'Open Deliveries' }))
   expect(await screen.findByRole('link', { name: 'Signature' })).toBeVisible()
-  await user.click(screen.getByRole('link', { name: /^New Preset$/i }))
+  await user.click(screen.getByRole('link', { name: /^New Watermark$/i }))
   await waitFor(() => expect(router.state.location.search).toMatchObject({ folderId: target.id }))
-  const name = await screen.findByRole('textbox', { name: /Preset Name/i })
+  const name = await screen.findByRole('textbox', { name: /Watermark Name/i })
   await user.type(name, 'Filed New Preset')
-  await user.click(screen.getByRole('button', { name: /^Save Preset$/i }))
+  await user.click(screen.getByRole('button', { name: /^Save Watermark$/i }))
   await waitFor(() =>
     expect(
       state.watermarks.some(

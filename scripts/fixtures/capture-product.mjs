@@ -2,7 +2,7 @@
 /** Capture authentic product screenshots using disposable local API fixtures and the real editor. */
 import { mkdir } from 'node:fs/promises'
 
-import { chromium } from '@playwright/test'
+import { chromium, expect } from '@playwright/test'
 import rasterize from 'sharp'
 
 import { GUIDANCE_TOPICS } from '../../src/shared/guidance.ts'
@@ -112,15 +112,18 @@ try {
     },
   })
   await page.goto(`${ORIGIN}/app/editor?preset=${preset.id}`)
+  // Wait for the selected saved design before opening its showcase photo.
+  // Navigation becoming interactive does not mean its saved designs have arrived.
+  await page.getByRole('group', { name: /Watermark position/ }).waitFor()
   const chooserPromise = page.waitForEvent('filechooser')
   await page.getByRole('button', { name: /^Open Photo$/i }).click()
   const chooser = await chooserPromise
   await chooser.setFiles('public/photography/coast-1400.webp')
   await page.getByRole('group', { name: /Watermark position/ }).waitFor()
   await page.waitForLoadState('networkidle')
-  await page
-    .getByText('App files are ready for offline use.', { exact: true })
-    .waitFor({ timeout: 90_000 })
+  await expect(
+    page.getByRole('region', { name: 'Offline work', exact: true }).getByRole('status'),
+  ).toHaveAttribute('title', /App files are ready for offline use\.$/, { timeout: 90_000 })
   await mkdir(OUTPUT, { recursive: true })
   for (const theme of ['light', 'dark']) {
     await setShowcaseTheme(theme)
@@ -195,6 +198,7 @@ try {
   })
   await setShowcaseTheme('light')
   await page.goto(`${ORIGIN}/app/editor?preset=${qr.id}`)
+  await page.getByRole('group', { name: /Watermark position/ }).waitFor()
   const qrChooserPromise = page.waitForEvent('filechooser')
   await page.getByRole('button', { name: /^Open Photo$/i }).click()
   const qrChooser = await qrChooserPromise
@@ -210,7 +214,7 @@ try {
     .webp({ quality: 95 })
     .toFile(`${OUTPUT}/qr.webp`)
   await page.getByRole('tab', { name: /^Presets$/i }).click()
-  const templates = page.getByRole('region', { name: 'Watermark Templates', exact: true })
+  const templates = page.getByRole('region', { name: 'Presets', exact: true })
   await templates.waitFor()
   await page.waitForLoadState('networkidle')
   await captureTiles(templates.getByRole('button', { name: /^Use / }), 6, 'templates')

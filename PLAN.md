@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-09-12 (M19 editor, mobile controls and workspace sharing)
+Last updated: 2026-09-13 (M19 editor organization, contrast and opt-in tour)
 
 ---
 
@@ -16,6 +16,94 @@ a private workspace and a unique invitation link. The source is available free
 on GitHub for self-hosting. Cloudflare Workers at `lumafoil.com` is the target
 production origin; full release certification retains the explicit M19 provider
 verification and owner-deferred performance boundaries.
+
+### Current M19 amendment — 2026-09-13
+
+The owner resumed work with a coordinated UI revision. These decisions supersede
+conflicting names, pinned-header behavior and automatic guidance below. Retain the
+shipped private account/workspace boundaries and all existing export behavior.
+
+| ID    | Required outcome                                                                                                                                                                                                                                                                                                      | Canonical implementation and verification                                                                                          |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| UI-01 | Selection has a visible gap outside painted text/shapes, including strokes; its padding never changes artwork/export geometry. Curve reaches a complete circle without overlapping the first/last glyphs.                                                                                                             | MarkOverlay and shared text layout; transformed native-pixel/bounds checks and gesture checks.                                     |
+| UI-02 | Images toolbar has Save Image beside New, opening the existing export settings. PDF/video toolbar actions become Export PDF/Export Video and retain their download behavior. Images tool grid is Presets, Watermark, Saved / Adjust, Resize, Crop.                                                                    | Editor, MediaTools/MediaHistory, DocumentsTool and VideoTool; toolbar action and export checks.                                    |
+| UI-03 | Presets contains only included designs formerly called templates. Saved contains user-created watermarks. Navigation order is Images, Documents, Videos, Bulk, Saved Watermarks, Watermarked Images. Remove standalone Shares page and navigation; keep public links and manage/revoke links from Watermarked Images. | Existing preset/template components, app shell, gallery and share UI; navigation, persistence and sharing journeys.                |
+| UI-04 | One compact sync-status line; character-limit-only text hint; symbol/detail toolbar attached inside the text field; centered link-modal actions and a compact centered zoom/grid bar.                                                                                                                                 | OfflinePanel, WatermarkDesigner, TextSymbolBar, ShareDialog and CanvasViewControls; narrow/wide visual checks.                     |
+| UI-05 | Header scrolls with the document on every device; tools and canvas have independent heights; font/icon/symbol licenses move to discreet account settings.                                                                                                                                                             | AppShell, shared media/editor layout and Account Settings; scroll, reflow and retained license access checks.                      |
+| UI-06 | New users opt into a guided tour that navigates features; Back/Next/Exit and swipe are available. Declining remains remembered; Account Settings can replay the tour. No automatic contextual tip swarm or real-content mutations.                                                                                    | Existing guidance claims/queue and Account Settings; account isolation, opt-in, replay, exit and navigation tests.                 |
+| UI-07 | Shared glass text, button, focus and control colors meet applicable WCAG AA contrast in actual light/dark rendering. Keep rose branding and glass depth.                                                                                                                                                              | Shared theme tokens/primitives; measured composited contrast plus axe and responsive captures, not a blanket claim from axe alone. |
+
+Readiness review: preserve existing APIs/storage identities while changing visible
+terminology. Reuse the canonical saved-watermark and included-design components;
+move existing share management instead of removing revocation. The tour consumes
+an account-bound invitation claim, not individual feature visits, and supports
+explicit replay. No dependency addition is planned. Complete the coordinated
+implementation before the aggregate verification/release, retaining failed and
+passing evidence separately. Prior cloud-account consent and performance work
+remain outside this UI batch; prior release evidence is historical for changed UI.
+
+Verification cadence: the owner explicitly requested on 2026-09-13 that the whole
+change batch be finished before checking. The in-progress aggregate check was
+stopped, and further lane checks were suspended. Complete the remaining source,
+copy and fixture changes, then run the consolidated final quality, security and
+browser/contrast checks. Any failures belong to a final correction batch, not
+repeated verification after each small edit.
+
+Cloud closure follow-up: on 2026-09-13 the owner explicitly instructed the agent
+to finish the outstanding live Google Drive, Dropbox and OneDrive checks now.
+Complete real connection, permitted-folder browsing, load/save, native sharing
+and durable credential reuse/refresh on the authorized Outlook Lumafoil account.
+Use disposable verification files and revoke/remove only those artifacts. The
+landing-page preview qualification remains provisional until that evidence is
+complete; implementation and configured credentials alone are not completion.
+This instruction resumes the provider lane alongside final UI verification and
+supersedes the earlier decision to leave provider work outside this batch.
+
+### Consolidated Completion Backlog — 2026-09-13
+
+The owner requested the total remaining scope, including checks deferred for the
+production launch. The list below consolidates current obligations; dated
+milestone notes below remain historical and do not reopen features superseded by
+the newer inline media editors or current navigation.
+
+- [ ] Close live Google Drive, Dropbox and OneDrive connect, folder, original-file
+      load/save, native share/revoke, reconnect and refresh checks. All three
+      reached provider consent but failed the callback in the deployed version.
+      A real workerd probe isolated unsupported `redirect: 'error'`; manual
+      redirect refusal succeeds at the transport boundary. Complete the runtime
+      fix and then repeat live workflows. The owner approved the exact new
+      persistent Dropbox account grant on 2026-09-13.
+- [ ] Complete the current UI-01–UI-07 release: final native tour swipe/replay
+      proof, updated product screenshots, final artifact, direct push/deployment
+      and hosted readback. Implementation and selected contrast/layout evidence
+      are recorded in `docs/verification/m19/ui-organization-2026-09-13.md`.
+- [ ] Close every final four-device E2E case and the complete English/Arabic,
+      light/dark screenshot/axe inventory. Investigate the isolated gate's SDK
+      forwarding 502s rather than weakening readiness checks or converting them
+      into passing application results.
+- [ ] Complete final quality/coverage, deliberate-failure drills, source and
+      artifact security/publication scans, and reconcile the final snapshot's
+      evidence. Previously passing runs retain their original source boundaries.
+- [ ] Finish deferred desktop/mobile Lighthouse matrices and fix remaining
+      route/timing failures against the raised budgets. Complete bulk/video
+      benchmarks, including the 60-second 1080p export timing target and an
+      actual iPhone encoding check; browser emulation is not physical-device proof.
+- [ ] Verify offline service-worker upgrade behavior across two deployments,
+      including retained pending work, reconnect, conflicts and account isolation.
+- [ ] Finish older deferred symbol refinements: full icon-catalog search,
+      one-action random-placement Shuffle, and custom character input in Symbols.
+- [ ] Finish the remaining localization follow-up: formatting must follow the
+      selected application language, and remaining English-only errors/emails
+      need their explicitly tracked localization and associated checks.
+- [ ] Publish the final release/tag and evidence after backup, deployment and
+      hosted identity/content-preservation checks. A production deployment by
+      itself does not close M19 certification.
+
+Microsoft publisher verification remains externally constrained by the missing
+verified Partner Center/MPN account; work/school tenants may require administrator
+consent. Automatic GitHub Actions and Dependabot remain intentionally disabled
+per the owner's cost decision. Local coverage and security thresholds were not
+lowered, and manual-only CI is not a feature that needs to be switched back on.
 
 ### Active goal — revised 2026-09-12
 

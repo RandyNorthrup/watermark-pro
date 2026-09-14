@@ -98,6 +98,10 @@ const ROTATION_STEP_DEGREES = 5
 const ROTATE_HANDLE_OFFSET_PX = 28
 const HANDLE_SIZE_PX = 16
 const HANDLE_HALF_PX = HANDLE_SIZE_PX / 2
+/** Screen-space clearance is decoration only; it never enters placement or export geometry. */
+const SELECTION_GAP_PX = 6
+const SELECTION_BORDER_PX = 2
+const SELECTION_OUTSET_PX = SELECTION_GAP_PX + SELECTION_BORDER_PX
 const HALF_TURN = 180
 const FULL_TURN = 360
 const RADIANS_TO_DEGREES = HALF_TURN / Math.PI
@@ -283,12 +287,15 @@ export function MarkOverlay({
   }
   const rotateHandle = handlePosition({
     x: 0,
-    y: -height / 2 - ROTATE_HANDLE_OFFSET_PX + HANDLE_HALF_PX,
+    y: -height / 2 - SELECTION_OUTSET_PX - ROTATE_HANDLE_OFFSET_PX + HANDLE_HALF_PX,
   })
-  const resizeHandle = handlePosition({ x: width / 2, y: height / 2 })
+  const resizeHandle = handlePosition({
+    x: width / 2 + SELECTION_GAP_PX + HANDLE_HALF_PX,
+    y: height / 2 + SELECTION_GAP_PX + HANDLE_HALF_PX,
+  })
   const stem = {
     x: rotateHandle.x + HANDLE_HALF_PX - width / 2,
-    y: rotateHandle.y + HANDLE_HALF_PX,
+    y: rotateHandle.y + HANDLE_HALF_PX + SELECTION_OUTSET_PX,
   }
   const stemLength = Math.max(0, Math.hypot(stem.x, stem.y) - HANDLE_HALF_PX)
 
@@ -645,18 +652,28 @@ export function MarkOverlay({
         onPointerCancel={end}
         onLostPointerCapture={end}
         onKeyDown={keyboard}
-        className={`pointer-events-auto absolute cursor-move touch-none rounded-sm outline-2 -outline-offset-2 ${areHandlesVisible ? 'outline-white/90 focus-visible:outline-brand-400' : 'outline-transparent'}`}
+        className="group pointer-events-auto absolute cursor-move touch-none rounded-sm outline-none"
         style={{
           left: centre.x - width / 2,
           top: centre.y - height / 2,
           width,
           height,
           transform: `rotate(${String(-currentRotation)}deg)`,
-          boxShadow: areHandlesVisible ? 'inset 0 0 0 1px rgb(0 0 0 / 0.6)' : 'none',
         }}
       >
         {areHandlesVisible ? (
           <>
+            <span
+              data-selection-frame=""
+              aria-hidden="true"
+              className="pointer-events-none absolute rounded-sm border-white/90 group-focus-visible:border-brand-400"
+              style={{
+                inset: -SELECTION_OUTSET_PX,
+                borderStyle: 'solid',
+                borderWidth: SELECTION_BORDER_PX,
+                boxShadow: '0 0 0 1px rgb(0 0 0 / 0.6)',
+              }}
+            />
             <button
               type="button"
               aria-label={t('editor.mark.rotate')}
@@ -679,7 +696,7 @@ export function MarkOverlay({
               aria-hidden="true"
               className="pointer-events-none absolute left-1/2 w-px bg-white/90"
               style={{
-                top: 0,
+                top: -SELECTION_OUTSET_PX,
                 height: stemLength,
                 transformOrigin: 'top center',
                 transform: `rotate(${String(Math.atan2(stem.y, stem.x) * RADIANS_TO_DEGREES - HALF_TURN / 2)}deg)`,

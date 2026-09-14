@@ -160,7 +160,24 @@ export function DocumentsTool({ organizationId, canCreatePresets = false }: Docu
               onError={setError}
             />
           )}
-          <MediaHistory scene={scene} />
+          <MediaHistory
+            scene={scene}
+            exportAction={
+              <Button
+                type="button"
+                size="sm"
+                disabled={source === null || scene.outputSpecs.length === 0 || pending}
+                isPending={pending}
+                onClick={() => {
+                  void download()
+                }}
+                data-guidance-topic="export"
+              >
+                <Download aria-hidden="true" className="size-4" />
+                {t('documents.reader.download')}
+              </Button>
+            }
+          />
         </div>
         {source === null ? (
           <div className="flex min-h-[54svh] items-center justify-center rounded-xl border border-dashed border-line p-6 text-center text-sm text-ink-muted">
@@ -179,17 +196,6 @@ export function DocumentsTool({ organizationId, canCreatePresets = false }: Docu
       </Card>
       <MediaTools organizationId={organizationId} canCreate={canCreatePresets} scene={scene}>
         <div className="tool-section flex flex-col gap-2">
-          <Button
-            type="button"
-            disabled={source === null || scene.outputSpecs.length === 0 || pending}
-            isPending={pending}
-            onClick={() => {
-              void download()
-            }}
-          >
-            <Download aria-hidden="true" className="size-4" />
-            {t('documents.reader.download')}
-          </Button>
           {canShareFiles('application/pdf') ? (
             <Button
               type="button"
