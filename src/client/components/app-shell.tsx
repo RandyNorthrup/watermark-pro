@@ -170,6 +170,7 @@ export function AppShell({ session, organization, organizations, children }: App
   const { t } = useTranslation()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const search = useRouterState({ select: (state) => state.location.search })
+  const locationHref = useRouterState({ select: (state) => state.location.href })
   const isAdminArea = pathname.startsWith(ADMIN_NAV_ITEM.to) && isPlatformAdmin(session.user)
   const adminSection = currentAdminSection(search)
   const isSettingsAreaActive = isSettingsArea(pathname)
@@ -224,10 +225,12 @@ export function AppShell({ session, organization, organizations, children }: App
         <header className="glass-chrome relative z-10 grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 border-b border-line px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:mx-4 md:mt-4 md:rounded-2xl md:border md:px-6 md:pt-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <div className="flex min-w-0 items-center gap-1 md:hidden">
             <MobileMenu
+              key={locationHref}
               userId={session.user.id}
               home={home}
               items={navItems}
               adminSection={isAdminArea ? adminSection : null}
+              pathname={pathname}
               organization={organization}
               organizations={organizations}
             />
@@ -298,10 +301,11 @@ interface NavListProps {
   items: readonly NavItem[]
   label: string
   className?: string
+  currentPathname?: string
   onNavigate?: () => void
 }
 
-function NavList({ items, label, className, onNavigate }: NavListProps) {
+function NavList({ items, label, className, currentPathname, onNavigate }: NavListProps) {
   const { t } = useTranslation()
   return (
     <nav aria-label={label} className={cn('flex flex-col gap-1', className)}>
@@ -310,7 +314,13 @@ function NavList({ items, label, className, onNavigate }: NavListProps) {
           key={to}
           to={to}
           activeOptions={{ exact }}
-          onClick={onNavigate}
+          onClick={
+            onNavigate === undefined
+              ? undefined
+              : () => {
+                  if (to === currentPathname) onNavigate()
+                }
+          }
           className={NAV_LINK_CLASS}
           activeProps={{
             className: ACTIVE_NAV_LINK_CLASS,
@@ -351,7 +361,13 @@ function AdminNavList({
             key={section}
             to="/app/admin"
             search={{ section }}
-            onClick={onNavigate}
+            onClick={
+              onNavigate === undefined
+                ? undefined
+                : () => {
+                    if (isCurrent) onNavigate()
+                  }
+            }
             aria-current={isCurrent ? 'page' : undefined}
             className={cn(NAV_LINK_CLASS, isCurrent && ACTIVE_NAV_LINK_CLASS)}
           >
@@ -394,6 +410,7 @@ function MobileMenu({
   home,
   items,
   adminSection,
+  pathname,
   organization,
   organizations,
 }: Pick<AppShellProps, 'organization' | 'organizations'> & {
@@ -401,20 +418,15 @@ function MobileMenu({
   home: '/app' | '/app/editor'
   items: readonly NavItem[]
   adminSection: AdminSection | null
+  pathname: string
 }) {
   const { t } = useTranslation()
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
-  // The sheet is open for the path it was opened on, so any navigation,
-  // including the organization switcher's, closes it without an effect.
-  const [openPathname, setOpenPathname] = useState<string | null>(null)
-  const isOpen = openPathname === pathname
+  // Keep an inactive link mounted until the router commits its destination.
+  // Synchronously closing the sheet can cancel a WebKit link navigation; the
+  // location-keyed component remounts closed after the router commits.
+  const [isOpen, setIsOpen] = useState(false)
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        setOpenPathname(open ? pathname : null)
-      }}
-    >
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button type="button" variant="ghost" size="icon" aria-label={t('shell.menu')}>
           <Menu aria-hidden="true" className="size-5" />
@@ -434,15 +446,16 @@ function MobileMenu({
           <NavList
             items={items}
             label={t('shell.primaryMenuNav')}
+            currentPathname={pathname}
             onNavigate={() => {
-              setOpenPathname(null)
+              setIsOpen(false)
             }}
           />
         ) : (
           <AdminNavList
             currentSection={adminSection}
             onNavigate={() => {
-              setOpenPathname(null)
+              setIsOpen(false)
             }}
           />
         )}

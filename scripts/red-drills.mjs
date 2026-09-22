@@ -241,6 +241,13 @@ export const DRILLS = [
     replace: "['/app/library', '/app/editor', '/app/bulk'].includes(item.to),",
     ...unitClient('src/client/routes/app/shell.test.tsx'),
   },
+  {
+    name: 'Shell: mobile menu reopens at its stale route',
+    file: 'src/client/components/app-shell.tsx',
+    find: '              key={locationHref}\n              userId={session.user.id}',
+    replace: '              userId={session.user.id}',
+    ...unitClient('src/client/routes/app/shell.test.tsx'),
+  },
   // --- M10 parity features -------------------------------------------------
   {
     name: 'Layers: only the first mark is drawn',

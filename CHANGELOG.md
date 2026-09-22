@@ -7,6 +7,13 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Fixed — 2026-09-21
+
+- Mobile menu links now remain mounted until route navigation commits, preventing
+  WebKit from cancelling the destination when the sheet closes. Email-verification
+  journeys use the existing bounded navigation retry for the same documented
+  WebKit interruption.
+
 ### Documentation — 2026-09-21
 
 - Regenerated committed Worker bindings so `DROPBOX_ACCESS_TYPE` is represented

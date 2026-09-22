@@ -4,6 +4,7 @@ import { PREVIEW_ORIGIN } from './preview'
 import {
   expect,
   expectAccessible,
+  gotoRetrying,
   latestLinkFor,
   navigateTo,
   prepareReturningUser,
@@ -59,7 +60,7 @@ test('site invitations create separate private workspaces and protect account to
   await page.getByLabel('Password', { exact: true }).fill(recipient.password)
   await page.getByRole('button', { name: 'Create account', exact: true }).click()
   await expect(page).toHaveURL(/\/check-email/)
-  await page.goto(await latestLinkFor(request, recipient.email, '/api/auth/verify-email'))
+  await gotoRetrying(page, await latestLinkFor(request, recipient.email, '/api/auth/verify-email'))
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
   await prepareReturningUser(page)
   const recipientSession = await page.request.get('/api/auth/get-session')
