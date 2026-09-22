@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-09-13 (M19 editor organization, contrast and opt-in tour)
+Last updated: 2026-09-22 (README publication and guarded release rerun)
 
 ---
 
@@ -73,6 +73,16 @@ production launch. The list below consolidates current obligations; dated
 milestone notes below remain historical and do not reopen features superseded by
 the newer inline media editors or current navigation.
 
+Guarded release checkpoint — 2026-09-22: README/status commits and the generated
+Worker binding correction are on `origin/main`; verified application source is
+`41694af`.
+Manual Deploy run `35698316774` passed canonical quality, pinned SAST and all four
+Playwright/axe device jobs after a failed-job rerun on a fresh desktop runner.
+All four complete screenshot/axe profile jobs also passed. Lighthouse passed 33
+of 36 desktop surfaces and 3 of 36 mobile surfaces. The remaining three desktop
+and 33 mobile performance failures prevented deployment, so production remains
+on source `172128c` and no `v2.0.0` tag or GitHub release was created.
+
 - [ ] Close live Google Drive, Dropbox and OneDrive connect, folder, original-file
       load/save, native share/revoke, reconnect and refresh checks. The shared
       runtime and OneDrive name/upload corrections are deployed. All three core
@@ -89,18 +99,25 @@ the newer inline media editors or current navigation.
 - [x] Close all 128 distinct four-device E2E cases across the original run and
       targeted closures. This is cumulative case closure, not a single green run.
 - [ ] Complete the English/Arabic, light/dark screenshot/axe inventory and
-      whole-app contrast/keyboard review. Investigate the isolated gate's SDK
-      forwarding 502s rather than weakening readiness checks or converting them
-      into passing application results.
+      whole-app contrast/keyboard review. Run `35698316774` passed the complete
+      desktop, tablet, phone and Android screenshot/axe profile jobs. Manual
+      whole-app contrast/keyboard closure remains open; passing axe and image
+      capture do not establish that separate review.
 - [x] Complete current source quality/coverage, deliberate-failure drills, source
       and artifact security/publication scans. The canonical quality command and
       global SAST passed after integrating the cloud and gate-transport repairs.
-      Previously passing runs retain their original source boundaries; final
-      milestone certification still depends on the remaining inventories below.
+      Hosted run `35698316774` refreshed canonical quality, generated-source and
+      SAST evidence on `41694af`; the mobile-menu regression also has a focused
+      green/red/restored-green drill. Previously passing runs retain their source
+      boundaries; final certification still depends on the inventories below.
 - [ ] Finish deferred desktop/mobile Lighthouse matrices and fix remaining
-      route/timing failures against the raised budgets. Complete bulk/video
-      benchmarks, including the 60-second 1080p export timing target and an
-      actual iPhone encoding check; browser emulation is not physical-device proof.
+      route/timing failures against the raised budgets. Run `35698316774` passed
+      33/36 desktop surfaces but failed Account, Workspace Invitation and Admin
+      Users; it passed 3/36 mobile surfaces and failed the other 33. Representative
+      mobile failures show shared boot TBT/LCP pressure; Account also has CLS.
+      Thresholds were not lowered. Complete bulk/video benchmarks, including the
+      60-second 1080p export target and an actual iPhone encoding check; browser
+      emulation is not physical-device proof.
 - [ ] Verify offline service-worker upgrade behavior across two deployments,
       including retained pending work, reconnect, conflicts and account isolation.
 - [ ] Finish older deferred symbol refinements: full icon-catalog search,

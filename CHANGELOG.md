@@ -7,6 +7,20 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Release Verification — 2026-09-22
+
+- Pushed the modern README, reconciled M19 status evidence, generated Worker
+  bindings and WebKit navigation corrections directly to `main`; current source
+  for the guarded run was `41694af`.
+- Manual Deploy run `35698316774` passed canonical quality, pinned SAST, all four
+  Playwright/axe device jobs and all four complete screenshot/axe profiles. A
+  fresh failed-job rerun replaced a transport-unstable desktop runner without
+  changing source or suppressing failures.
+- Lighthouse passed 33 of 36 desktop surfaces and 3 of 36 mobile surfaces. Three
+  desktop and 33 mobile performance failures kept the UI aggregate red, so
+  migration/deployment was skipped and no `v2.0.0` tag or GitHub release was
+  created. Budgets remain unchanged.
+
 ### Fixed — 2026-09-21
 
 - Mobile menu links now remain mounted until route navigation commits, preventing
