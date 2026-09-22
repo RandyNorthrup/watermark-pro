@@ -13,6 +13,9 @@ what was planned; superseded entries stay.
   WebKit from cancelling the destination when the sheet closes. Email-verification
   journeys use the existing bounded navigation retry for the same documented
   WebKit interruption.
+- The multi-account iPhone viewer journey now uses the existing slow-test budget
+  so hosted WebKit can finish its terminal axe scan without removing assertions,
+  retries or accessibility coverage.
 
 ### Documentation — 2026-09-21
 

@@ -207,6 +207,9 @@ test('owner designs, saves, edits and deletes presets', async ({ page, request }
 })
 
 test('a viewer can browse presets but cannot change them', async ({ browser, page, request }) => {
+  // Account sign-up, workspace admission, read-only checks and two axe scans
+  // exceed the base minute on hosted WebKit while remaining one cohesive journey.
+  test.slow()
   await signIn(page, owner, organizationName)
   const acceptPath = await inviteWorkspaceViewer(page, request, viewer)
 
