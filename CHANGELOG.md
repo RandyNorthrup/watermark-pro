@@ -9,6 +9,9 @@ what was planned; superseded entries stay.
 
 ### Documentation — 2026-09-21
 
+- Regenerated committed Worker bindings so `DROPBOX_ACCESS_TYPE` is represented
+  in `worker-configuration.d.ts`; the manual release workflow now sees the same
+  environment shape as `wrangler.jsonc`.
 - Rebuilt the README around current light/dark editor and feature images, with
   direct hosted, self-hosting, status and security paths.
 - Replaced stale release automation and broad readiness wording with current
