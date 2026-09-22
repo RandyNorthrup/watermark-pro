@@ -7,6 +7,18 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Documentation — 2026-09-21
+
+- Rebuilt the README around current light/dark editor and feature images, with
+  direct hosted, self-hosting, status and security paths.
+- Replaced stale release automation and broad readiness wording with current
+  source-backed boundaries: GitHub workflows are manual-only, cloud storage is
+  preview, video support is capability-dependent, and remaining offline, UI,
+  performance, hardware and final-tag gates stay explicit.
+- Removed volatile test totals and compressed the long feature manual into a
+  product overview, quick start, architecture, verification and documentation
+  map so future changes are less likely to leave false claims behind.
+
 ### Production Deployment — 2026-09-13
 
 - Pushed source `4c5a2ed` directly to main and deployed it to `lumafoil.com` as

@@ -1,7 +1,27 @@
 # Production Deployment — 2026-09-13
 
-Source `4c5a2ed65ed4b6425ebe40befa10db855335d54e` is deployed at
-**https://lumafoil.com** as Worker version
+## Current Cloud Corrections
+
+Source `172128c` is deployed at **https://lumafoil.com** as Worker
+`85e8de81-9b27-4eb6-82f7-01f536619c13`. It includes the optional Microsoft account
+name handling and personal OneDrive upload-session correction. The canonical
+quality command passed 2,789 unit/browser tests, 63 Worker tests, all build checks
+and unchanged coverage floors; global SAST reported zero findings. Its protected
+deployment and 12 hosted public checks passed. No migration or credential rebinding
+was required. Logs are `temp/cloud-final-deploy-success.log` and
+`temp/cloud-final-hosted-public.json`.
+
+Google Drive, Dropbox and personal OneDrive completed live connection, refresh,
+folder/file, native sharing/revocation and reconnect checks. OneDrive's
+same-filename control preserved the first file's exact bytes and created a second
+unique file; both PNGs remained 480 × 320. Temporary provider files were removed
+through recoverable deletion. The final Google native Picker wiring check is
+still in progress. See [cloud evidence](cloud-storage.md) for scope and boundaries.
+
+## Earlier Combined UI Deployment
+
+The first combined UI release used source
+`4c5a2ed65ed4b6425ebe40befa10db855335d54e` and Worker version
 `94614672-421b-4ef6-bb85-a577e6f19914`. Direct `origin/main` readback matched that
 source commit. The image toolbar action is **Save Image**, retaining its existing
 output controls. This receipt uses the operator's local date; hosted checks ran

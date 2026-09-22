@@ -74,12 +74,13 @@ milestone notes below remain historical and do not reopen features superseded by
 the newer inline media editors or current navigation.
 
 - [ ] Close live Google Drive, Dropbox and OneDrive connect, folder, original-file
-      load/save, native share/revoke, reconnect and refresh checks. All three
-      reached provider consent but failed the callback in the deployed version.
-      A real workerd probe isolated unsupported `redirect: 'error'`; manual
-      redirect refusal succeeds at the transport boundary. Complete the runtime
-      fix and then repeat live workflows. The owner approved the exact new
-      persistent Dropbox account grant on 2026-09-13.
+      load/save, native share/revoke, reconnect and refresh checks. The shared
+      runtime and OneDrive name/upload corrections are deployed. All three core
+      live workflows passed, including real refresh grants and OneDrive
+      byte-level overwrite protection. The final Google native Picker wiring
+      check remains in progress. The owner approved the exact new persistent
+      Dropbox account grant on 2026-09-13. Microsoft disconnect is local-only and
+      explicitly discloses remaining provider approval.
 - [x] Ship the current UI implementation: native tour swipe/replay proof,
       updated product screenshots, final artifact, direct push/deployment and
       hosted readback passed. Source `4c5a2ed` is live; representative contrast
@@ -91,9 +92,11 @@ the newer inline media editors or current navigation.
       whole-app contrast/keyboard review. Investigate the isolated gate's SDK
       forwarding 502s rather than weakening readiness checks or converting them
       into passing application results.
-- [ ] Complete final quality/coverage, deliberate-failure drills, source and
-      artifact security/publication scans, and reconcile the final snapshot's
-      evidence. Previously passing runs retain their original source boundaries.
+- [x] Complete current source quality/coverage, deliberate-failure drills, source
+      and artifact security/publication scans. The canonical quality command and
+      global SAST passed after integrating the cloud and gate-transport repairs.
+      Previously passing runs retain their original source boundaries; final
+      milestone certification still depends on the remaining inventories below.
 - [ ] Finish deferred desktop/mobile Lighthouse matrices and fix remaining
       route/timing failures against the raised budgets. Complete bulk/video
       benchmarks, including the 60-second 1080p export timing target and an
