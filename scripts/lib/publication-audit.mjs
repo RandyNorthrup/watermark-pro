@@ -9,6 +9,7 @@ import {
   isRetiredHistoryFinding,
   maskRetiredHistoricalSecrets,
 } from './retired-publication-secrets.mjs'
+import { scannerFailureReason } from './scanner-result.mjs'
 import {
   configuredSecretPatterns,
   findConfiguredSecrets,
@@ -216,13 +217,14 @@ async function scanWithGitleaks(root, stage, history, sourceMap, reportPath, pat
   )
   const result = spawnSync('gitleaks', args, {
     cwd: root,
-    timeout: TOOL_TIMEOUT_MS,
+    timeout: PUBLICATION_LIMITS.scannerTimeoutMs,
     maxBuffer: GIT_OUTPUT_LIMIT,
     env: childEnvironment(),
   })
-  if (result.error !== undefined || ![0, 1].includes(result.status))
+  const failure = scannerFailureReason(result)
+  if (failure !== null)
     throw new Error(
-      'Gitleaks could not complete its publication scan; scanner output was withheld to protect private values',
+      `Gitleaks could not complete its publication scan (${failure}); scanner output was withheld to protect private values`,
     )
   let findings
   try {

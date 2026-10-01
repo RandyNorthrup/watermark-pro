@@ -7,6 +7,43 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### CI/CD And Repository Protection — 2026-10-01
+
+- Added automatic PR quality/Semgrep/four-device checks and automatic main
+  deployment through the same CI plus the unchanged complete UI release audits.
+  Two current-main guards reject non-main and superseded production sources;
+  bounded jobs, serialized deployment and a parsed health response fail closed.
+- Added CODEOWNERS, a verification-focused PR template, bounded weekly Dependabot
+  updates, versioned GitHub policy and a read-only remote-drift check. Repository
+  settings now restrict Actions to reviewed full-SHA pins, require external-fork
+  approval, retain read-only tokens and restrict production to main.
+- Added regression exercises for failed/skipped/cancelled/missing device results,
+  stale/non-main releases and missing/weakened GitHub controls. Added pinned
+  actionlint to canonical quality and fixed its newly detected unused readiness
+  counter in the existing audit workflow without suppressing the rule.
+- Updated locked brace-expansion and fast-uri, and narrowly pinned Cloudflare's
+  Undici 7.29.0 requests to 7.29.1. The current npm audit reports zero findings;
+  the seven-day package-age policy and all coverage thresholds remain intact.
+- Protected main with PR/check requirements and no administrator bypass, and
+  made version-tag history immutable. Relocated both Cloudflare deployment
+  credentials into production environment secrets through a one-time encrypted
+  Actions artifact; removed repository copies and all transfer artifacts/keys.
+- Consolidated the two production-source guards into one composite after the
+  unchanged zero-duplication gate caught repeated YAML; both call sites retain
+  negative source tests.
+- Fixed the newly reproduced local publication-scan timeout: complete candidate
+  scans retain every rule/byte but receive a five-minute completion bound.
+  Scanner errors now expose only finite timeout/execution/signal/exit reasons,
+  with negative regression tests; private scanner output remains withheld.
+- Replaced dynamic regex construction in the workflow-shell test extractor
+  with numeric indentation slicing after hosted Semgrep caught the pattern.
+  The source-guard behavior assertions remain intact; no SAST rule was suppressed.
+- Reconciled the current plan, security policy, README and release runbook with
+  the owner's automatic-deployment/solo-review decisions. Older manual-only
+  entries remain historical. M19 performance and certification work remain open.
+- Corrected workflow guidance to identify production environment secrets and
+  protected-main deployments after the credential-scope and trigger changes.
+
 ### Release Verification — 2026-09-22
 
 - Pushed the modern README, reconciled M19 status evidence, generated Worker

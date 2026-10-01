@@ -156,9 +156,11 @@ peerDependencies license`, confirm the peer range against what is
       and 1440 px with a quick manual check (e2e and screenshots are deferred
       to M19) and write one sentence per screen into §8.
 8. Run required gates locally, commit (the pre-commit hook runs gitleaks and
-   lint-staged), push `main`, tag `vX.Y.Z`, and create the GitHub release from
-   the CHANGELOG entry. GitHub workflows are manual-only; deploy with
-   `npm run deploy` or explicitly dispatch the hosted deployment workflow.
+   lint-staged), open a PR to `main`, and squash-merge only after required checks
+   pass. Main merges automatically run the full guarded deployment pipeline.
+   Tag `vX.Y.Z` and create the GitHub release from the CHANGELOG entry only after
+   the milestone certification checklist is green. See `docs/ci-cd.md`; the
+   2026-10-01 policy supersedes the older direct-push/manual-only workflow.
 
 ## Repository facts you will need
 

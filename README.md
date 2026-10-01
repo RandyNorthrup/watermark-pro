@@ -159,8 +159,13 @@ docs/         Plans, evidence, operations, threat model, and screenshots
 | `npm run audit:screenshots` | English/Arabic, light/dark, responsive screenshot and axe inventory                                        |
 
 `npm run quality` is necessary but does not include every release gate. Hosted
-GitHub workflows are manual-only; local gates remain the default. Never infer a
-pass from an unexecuted command—verification receipts and open work live in
+PRs targeting `main` automatically run quality, Semgrep and the full device
+matrix. Main merges run those gates plus complete UI release audits before
+production deployment. Required PR/check protection also applies to the owner.
+Local quality needs Gitleaks 8.30.1 and actionlint 1.7.12; SAST needs
+Semgrep 1.174.0. See [CI/CD](docs/ci-cd.md) for
+repository controls and deployment boundaries. Never infer a pass from an
+unexecuted command—verification receipts and open work live in
 [PLAN.md](PLAN.md).
 
 ## Privacy and security
