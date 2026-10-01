@@ -57,7 +57,9 @@ relocation are tracked in `docs/verification/github-ci-2026-10-01.md`. Reproduci
 remote expectations are in `.github/repository-policy.json`; `github:verify` is a
 read-only administrator check, kept outside unprivileged PR CI. M19 remains open. The local Mac verification attempt hit browser/UI deadlines
 and was stopped; hosted Linux canonical quality passed in run `36909811930`,
-whose SAST failure correctly kept the overall PR red. Local failures remain
+whose SAST failure correctly kept the overall PR red. Corrected source
+`eec7319` passed full local and hosted Semgrep; exact-head device/aggregate
+receipts remain authoritative in PR #8 checks. Local failures remain
 explicitly unclosed and are not replaced with a passing local claim.
 The next product slice is shared mobile boot/LCP/TBT and Account CLS correction,
 plus the three failing desktop surfaces, followed by the unchanged full audits.

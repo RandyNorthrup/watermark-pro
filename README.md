@@ -162,7 +162,8 @@ docs/         Plans, evidence, operations, threat model, and screenshots
 PRs targeting `main` automatically run quality, Semgrep and the full device
 matrix. Main merges run those gates plus complete UI release audits before
 production deployment. Required PR/check protection also applies to the owner.
-Local quality additionally needs actionlint 1.7.12. See [CI/CD](docs/ci-cd.md) for
+Local quality needs Gitleaks 8.30.1 and actionlint 1.7.12; SAST needs
+Semgrep 1.174.0. See [CI/CD](docs/ci-cd.md) for
 repository controls and deployment boundaries. Never infer a pass from an
 unexecuted command—verification receipts and open work live in
 [PLAN.md](PLAN.md).

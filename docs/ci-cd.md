@@ -38,7 +38,8 @@ allowlist before running the new pin. Local/reusable workflows within this
 repository remain available. Gitleaks and actionlint downloads are checksum-pinned;
 Semgrep's container is digest-pinned. Checkout does not retain GitHub credentials.
 
-Tokens default to read-only and cannot approve PRs. All external fork workflow
+Main and production have administrator bypass disabled. Tokens default to
+read-only and cannot approve PRs. All external fork workflow
 runs need maintainer approval; CI uses `pull_request`, never
 `pull_request_target`. Dependabot opens bounded weekly npm/Actions PRs plus
 security-update PRs, retains exact versions and a seven-day npm cooldown, and
