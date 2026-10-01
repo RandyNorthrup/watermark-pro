@@ -41,6 +41,8 @@ what was planned; superseded entries stay.
 - Reconciled the current plan, security policy, README and release runbook with
   the owner's automatic-deployment/solo-review decisions. Older manual-only
   entries remain historical. M19 performance and certification work remain open.
+- Corrected workflow guidance to identify production environment secrets and
+  protected-main deployments after the credential-scope and trigger changes.
 
 ### Release Verification — 2026-09-22
 

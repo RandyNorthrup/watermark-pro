@@ -4,7 +4,7 @@ name: Deploy
 # Quality, generated-source, end-to-end and pinned Semgrep gates run on the
 # selected commit before migration and deployment.
 #
-# Required repository secrets:
+# Required production environment secrets:
 #   CLOUDFLARE_API_TOKEN   token with Workers Scripts, D1, R2 and Email edit rights
 #   CLOUDFLARE_ACCOUNT_ID  the account that owns watermark-pro
 # Authentication/provider/Turnstile credentials are Worker secrets managed with

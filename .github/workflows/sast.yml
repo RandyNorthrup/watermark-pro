@@ -1,6 +1,6 @@
 name: Static analysis
 
-# Called by both branch/PR CI and version-tag deployment at the caller's commit.
+# Called by PR CI and protected-main deployment at the caller's commit.
 on:
   workflow_call:
 
