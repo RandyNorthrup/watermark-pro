@@ -35,6 +35,9 @@ what was planned; superseded entries stay.
   scans retain every rule/byte but receive a five-minute completion bound.
   Scanner errors now expose only finite timeout/execution/signal/exit reasons,
   with negative regression tests; private scanner output remains withheld.
+- Replaced dynamic regex construction in the workflow-shell test extractor
+  with numeric indentation slicing after hosted Semgrep caught the pattern.
+  The source-guard behavior assertions remain intact; no SAST rule was suppressed.
 - Reconciled the current plan, security policy, README and release runbook with
   the owner's automatic-deployment/solo-review decisions. Older manual-only
   entries remain historical. M19 performance and certification work remain open.

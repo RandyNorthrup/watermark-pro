@@ -13,8 +13,11 @@ async function stepScripts(filename, name) {
   return sections.map((section) => {
     const block = /( +)run: \|\n((?: +[^\n]*\n)+)/.exec(section)
     assert.ok(block, `Missing shell for ${name}`)
-    const indentation = new RegExp(`^ {${block[1].length + 2}}`, 'gm')
-    return block[2].replaceAll(indentation, '')
+    const indentation = block[1].length + 2
+    return block[2]
+      .split('\n')
+      .map((line) => line.slice(indentation))
+      .join('\n')
   })
 }
 
