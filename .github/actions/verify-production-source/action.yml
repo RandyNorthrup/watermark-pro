@@ -1,0 +1,17 @@
+name: Verify production source
+description: Reject non-main refs and commits superseded while release gates ran.
+runs:
+  using: composite
+  steps:
+    - name: Require the current main commit
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        SOURCE_REF: ${{ github.ref }}
+        SOURCE_SHA: ${{ github.sha }}
+        SOURCE_REPOSITORY: ${{ github.repository }}
+      run: |
+        set -euo pipefail
+        test "$SOURCE_REF" = refs/heads/main
+        current_sha="$(gh api "repos/$SOURCE_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+        test "$SOURCE_SHA" = "$current_sha"

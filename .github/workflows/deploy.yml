@@ -1,6 +1,6 @@
 name: Deploy
 
-# Production deploys run only when the owner manually dispatches this workflow.
+# Production deploys follow protected main merges or an explicit main dispatch.
 # Quality, generated-source, end-to-end and pinned Semgrep gates run on the
 # selected commit before migration and deployment.
 #
@@ -11,6 +11,8 @@ name: Deploy
 # `wrangler secret put … --env production` (see docs/runbook.md).
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -21,29 +23,45 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  source:
+    name: Verify production source
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/verify-production-source
+
   gates:
-    name: Quality, SAST and all devices on the tag
+    name: CI
+    needs: source
     # Same commit, quality/SAST prerequisites, four independent device runners
     # and fail-closed aggregate as branch CI. No deployment secrets are passed.
     uses: ./.github/workflows/ci.yml
 
   ui:
-    name: Complete UI audit matrix on the tag
+    name: Complete UI audit matrix
     needs: gates
     uses: ./.github/workflows/audit-ui.yml
 
   deploy:
     name: Migrate and deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [gates, ui]
     environment:
       name: production
       url: https://lumafoil.com
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-node-gitleaks
         with:
           install-browsers: 'false'
+      # A newer main merge must not be overwritten by an older queued release.
+      - uses: ./.github/actions/verify-production-source
       - name: Build, migrate, deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -52,5 +70,5 @@ jobs:
         run: npm run deploy
       - name: Smoke-check the deployment
         run: |
-          curl --fail --silent --show-error https://lumafoil.com/api/health \
-            | grep -q '"status":"ok"'
+          curl --fail --silent --show-error --retry 3 --max-time 30 https://lumafoil.com/api/health \
+            | node --input-type=module -e 'let body = ""; for await (const chunk of process.stdin) body += chunk; if (JSON.parse(body).status !== "ok") process.exit(1)'

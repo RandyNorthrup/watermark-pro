@@ -211,8 +211,21 @@ Only the `main` branch and the latest tagged release receive fixes.
   trail with the administrator as the actor. Banned users cannot sign in and
   lose their sessions.
 - Supply chain: dependencies and licences are checked by local quality and
-  release gates. GitHub Actions, UI audits and deployment workflows require
-  manual dispatch; Dependabot and automated security fixes are disabled.
+  release gates. Pull requests automatically run canonical quality, Semgrep and
+  all four Playwright/axe devices; main merges also run full UI release audits
+  before automatic deployment. Dependabot version/security PRs require those
+  same checks and are never automatically merged.
+- Repository governance (2026-10-01): required PRs, strict current-branch quality
+  and fail-closed E2E checks from GitHub Actions, resolved conversations, linear
+  history, no ruleset bypass, and no main/version-tag deletion or force pushes.
+  Zero independent reviews is explicit for the single-owner repository.
+- Actions accept only the three reviewed full-SHA action pins; tokens default to
+  read-only, PR approval by Actions is disabled, checkout credentials are not
+  persisted, and external fork workflow runs require maintainer approval.
+  Production accepts only main; source guards reject stale or non-main releases.
+  Credentials are available only to the final deployment step, after all gates.
+  The credential relocation receipt and live control verification are in
+  [docs/verification/github-ci-2026-10-01.md](docs/verification/github-ci-2026-10-01.md).
 - The threat model in [docs/threat-model.md](docs/threat-model.md) lists the
   assets, trust boundaries, mitigations and accepted residual risks; the
   operational playbook (rollback, secret rotation, Time Travel restores,

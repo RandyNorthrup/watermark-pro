@@ -96,10 +96,13 @@ expose the new application before the required data split is complete.
 
 ### Deploy
 
-GitHub workflows do not run automatically. Run `npm run quality`, the applicable
-UI audits and hosted checks locally, then deploy from the workstation. The owner
-may manually dispatch `.github/workflows/ci.yml`, `audit-ui.yml` or `deploy.yml`
-for an additional hosted receipt. A workstation release uses:
+PRs targeting `main` run automatic CI. A protected main merge starts the same
+canonical quality, Semgrep and four-device checks, then the complete Lighthouse
+and screenshot audit matrix before production deployment. Any failure blocks
+migrations and publication. The owner may explicitly dispatch `deploy.yml` from
+main for a retry; both source guards require the current main commit.
+`docs/ci-cd.md` records repository controls and verification boundaries.
+An explicitly authorized workstation release uses:
 
 ```powershell
 npm run deploy
@@ -111,8 +114,9 @@ resolved build configuration. These steps are not a transaction across Worker
 code, D1, R2, DNS and secrets. If a later step fails, inspect which earlier steps
 completed before retrying.
 
-Manual hosted deployment requires `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` in GitHub secrets.
+Hosted deployment requires `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` in the GitHub `production` environment secrets.
+Repository copies are removed only after successful scope relocation.
 Scope credentials to the account, zone and Worker/D1/R2/email/DNS actions actually
 needed. Never publish their values or raw configuration output.
 

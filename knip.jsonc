@@ -40,7 +40,9 @@
   ],
 
   // System binaries invoked from package.json scripts that are not npm packages.
-  "ignoreBinaries": ["semgrep"],
+  // actionlint is a checksum-pinned system executable installed by CI setup;
+  // it has no npm package. Its invocation is exercised by quality.
+  "ignoreBinaries": ["semgrep", "actionlint"],
 
   "ignoreExportsUsedInFile": true,
 

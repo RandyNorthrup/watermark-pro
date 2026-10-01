@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-09-22 (README publication and guarded release rerun)
+Last updated: 2026-10-01 (automatic CI/CD and GitHub repository protection)
 
 ---
 
@@ -16,6 +16,48 @@ a private workspace and a unique invitation link. The source is available free
 on GitHub for self-hosting. Cloudflare Workers at `lumafoil.com` is the target
 production origin; full release certification retains the explicit M19 provider
 verification and owner-deferred performance boundaries.
+
+### Repository CI/CD amendment — 2026-10-01
+
+The owner requested proper CI/CD and GitHub repository protection, then explicitly
+selected automatic production deployment from `main` after every gate passes and
+required pull requests/checks without an independent reviewer. These instructions
+supersede the 2026-09-12 manual-only Actions, disabled Dependabot and direct-main
+push decisions wherever those appear in historical milestone notes. They do not
+waive any M19 certification or performance gate.
+
+Pull requests targeting `main` run canonical quality, pinned Semgrep and every
+Playwright/axe device. Main merges run the same reusable CI, the complete UI audit
+matrix, then production migration/deployment and a parsed health check. No path
+filter can silently omit a required merge check. The fail-closed device aggregate
+and quality check are required from the GitHub Actions app; the owner has no
+ruleset bypass. Main also requires linear history and resolved review threads,
+and rejects deletion/force pushes. Zero required reviewers keeps this solo-owner
+repository usable without pretending the owner can approve their own PR.
+
+Production accepts only the `main` branch. Both an early source guard and a final
+pre-deploy guard reject tags, feature refs and a commit superseded by a newer main
+merge. Deploys serialize without interrupting a migration. The original full
+Lighthouse/screenshot audits remain release blockers; the 2026-09-22 failures
+remain historical evidence, not a reason to lower thresholds.
+
+Actions are restricted to reviewed full-SHA checkout/setup-node/upload-artifact
+pins, default tokens are read-only, checkout does not persist credentials, and
+all external fork workflows need maintainer approval. Dependabot opens bounded
+weekly npm/Actions PRs and security updates; npm updates retain a seven-day
+cooldown and exact dependency declarations. Auto-merge is disabled. CODEOWNERS is
+advisory, and version tags retain immutable history. Existing secret scanning,
+push protection and private vulnerability reporting remain enabled.
+
+The two Cloudflare deployment credentials now exist only as production
+environment secrets. Encrypted transfer run `36905924740` passed; repository
+copies, isolated transfer branch/artifact and local private key were removed.
+Implementation, live settings readback, test receipts and credential-scope
+relocation are tracked in `docs/verification/github-ci-2026-10-01.md`. Reproducible
+remote expectations are in `.github/repository-policy.json`; `github:verify` is a
+read-only administrator check, kept outside unprivileged PR CI. M19 remains open.
+The next product slice is shared mobile boot/LCP/TBT and Account CLS correction,
+plus the three failing desktop surfaces, followed by the unchanged full audits.
 
 ### Current M19 amendment — 2026-09-13
 
@@ -131,9 +173,9 @@ on source `172128c` and no `v2.0.0` tag or GitHub release was created.
 
 Microsoft publisher verification remains externally constrained by the missing
 verified Partner Center/MPN account; work/school tenants may require administrator
-consent. Automatic GitHub Actions and Dependabot remain intentionally disabled
-per the owner's cost decision. Local coverage and security thresholds were not
-lowered, and manual-only CI is not a feature that needs to be switched back on.
+consent. The 2026-09-12 manual-only Actions and disabled Dependabot decisions were
+superseded by the owner's 2026-10-01 CI/CD request. Local coverage and security
+thresholds remain unchanged; the repository CI/CD amendment above is authoritative.
 
 The gate transport investigation reproduced Windows `EADDRINUSE`: SDK dispatch
 reset every static-file socket. The integrated fix pools bodyless asset/SPA
@@ -243,8 +285,8 @@ does not certify completion. Keep every remaining requirement below in scope.
    accessibility, screenshot, performance and release audits without weakening
    thresholds or representing partial checks as certification. Keep performance
    work after launch as previously authorized. Protect the public repository and
-   artifacts from secrets and sensitive operational/user data. Keep GitHub Actions
-   manual-only and Dependabot disabled; use direct main pushes. The owner
+   artifacts from secrets and sensitive operational/user data. Use protected pull requests, automatic CI and the guarded main deployment
+   pipeline authorized on 2026-10-01. The owner
    authorized two subagents on 2026-09-12 to accelerate delivery, superseding the
    earlier stop instruction. Use bounded ownership and root integration. Stop only verified
    project-owned processes and preserve unrelated projects and user edits.
@@ -431,21 +473,21 @@ earlier local results; it does not close the remaining provider/performance scop
 Each assumption is a default taken because the choice is cheap to reverse now
 and expensive to block on. If any is wrong, say so and the plan will be revised.
 
-| ID  | Assumption                                                                                                                                                                                                                                                       | Why this default                                                                                                                                                                          |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1  | Package manager is **npm 11** (lockfile v3).                                                                                                                                                                                                                     | Installed, no pnpm/yarn present.                                                                                                                                                          |
-| A2  | Release gates run locally by default. GitHub Actions workflows are manual-only; Dependabot and automated security fixes are disabled. The repository remains **public** on GitHub.                                                                               | Updated by the owner on 2026-09-12 to avoid automatic Actions usage and cost. Local gitleaks, SAST, audit, test and build commands remain release requirements.                           |
-| A3  | Frontend is a **single-page application** (no SSR).                                                                                                                                                                                                              | Authenticated tool, not a content site; SPA keeps the Worker stateless and the CSP strict.                                                                                                |
-| A4  | Image rendering runs **in the browser** (Web Worker + OffscreenCanvas), not on Cloudflare Workers.                                                                                                                                                               | Workers CPU limits make bulk raster work impractical and costly; browser rendering is free, private, and parallel. Server stores results only.                                            |
-| A5  | Authentication is **email/password plus Google and Microsoft OAuth**, self-hosted through Better Auth on D1. New identities require invitation admission; existing accounts explicitly link providers in authenticated settings.                                 | The owner added Google/Microsoft account OAuth on 2026-09-08, superseding the earlier SSO decision. Cloud-file consent uses separate registrations and scopes.                            |
-| A6  | Transactional email goes through **Cloudflare Email Sending** (the `send_email` binding) from `no-reply@lumafoil.com`, behind a provider interface. A `console` provider exists for local development and tests; the app refuses to start with it in production. | Sender subdomain chosen by the owner on 2026-09-06 (Q9) so the apex domain's mail records stay untouched.                                                                                 |
-| A7  | Fonts are **self-hosted** open-licensed families (OFL/Apache) bundled from `@fontsource` packages.                                                                                                                                                               | Keeps CSP strict (`font-src 'self'`) and avoids third-party requests from an enterprise app.                                                                                              |
-| A8  | Browser support: **evergreen browsers with OffscreenCanvas** (Chrome/Edge 69+, Firefox 105+, Safari 16.4+).                                                                                                                                                      | Required for off-main-thread rendering.                                                                                                                                                   |
-| A9  | Photo formats accepted for upload: JPEG, PNG, WebP, AVIF, GIF (first frame), HEIC where the browser can decode it.                                                                                                                                               | Browser `createImageBitmap` coverage.                                                                                                                                                     |
-| A10 | Export formats: **PNG, JPEG, WebP** in M5 (native `canvas.convertToBlob`), **AVIF** via WASM encoder as an M5 stretch item.                                                                                                                                      | Native encoders are zero-dependency; AVIF needs `@jsquash/avif`.                                                                                                                          |
-| A11 | The single origin is `https://lumafoil.com`; the `workers.dev` subdomain is disabled (`workers_dev: false`).                                                                                                                                                     | Owner supplied the domain on 2026-09-05. One origin keeps cookies, CSP, and share links unambiguous.                                                                                      |
-| A12 | The owner has approved installing any tooling the project needs on this machine ("you install whatever is needed", 2026-09-05).                                                                                                                                  | Global installs are still avoided where a local devDependency works; machine-level installs are listed in README → Requirements.                                                          |
-| A13 | Cloudflare **Workers Paid** plan ($5/month) for production, upgraded from Free on 2026-09-05.                                                                                                                                                                    | Stated by the owner. Gives 30 s CPU per request by default (raisable to 5 min with `limits.cpu_ms`), D1 and R2 paid quotas, and Email Sending. Rendering still stays in the browser (A4). |
+| ID  | Assumption                                                                                                                                                                                                                                                       | Why this default                                                                                                                                                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A1  | Package manager is **npm 11** (lockfile v3).                                                                                                                                                                                                                     | Installed, no pnpm/yarn present.                                                                                                                                                           |
+| A2  | The public GitHub repository requires PRs and passing CI, including for the owner. Main merges automatically run full release audits before production deployment; Dependabot PRs/security updates are enabled.                                                  | Owner selected automatic guarded deployment and zero required reviewers on 2026-10-01, superseding the 2026-09-12 cost decision. Local gates and unchanged M19 thresholds remain required. |
+| A3  | Frontend is a **single-page application** (no SSR).                                                                                                                                                                                                              | Authenticated tool, not a content site; SPA keeps the Worker stateless and the CSP strict.                                                                                                 |
+| A4  | Image rendering runs **in the browser** (Web Worker + OffscreenCanvas), not on Cloudflare Workers.                                                                                                                                                               | Workers CPU limits make bulk raster work impractical and costly; browser rendering is free, private, and parallel. Server stores results only.                                             |
+| A5  | Authentication is **email/password plus Google and Microsoft OAuth**, self-hosted through Better Auth on D1. New identities require invitation admission; existing accounts explicitly link providers in authenticated settings.                                 | The owner added Google/Microsoft account OAuth on 2026-09-08, superseding the earlier SSO decision. Cloud-file consent uses separate registrations and scopes.                             |
+| A6  | Transactional email goes through **Cloudflare Email Sending** (the `send_email` binding) from `no-reply@lumafoil.com`, behind a provider interface. A `console` provider exists for local development and tests; the app refuses to start with it in production. | Sender subdomain chosen by the owner on 2026-09-06 (Q9) so the apex domain's mail records stay untouched.                                                                                  |
+| A7  | Fonts are **self-hosted** open-licensed families (OFL/Apache) bundled from `@fontsource` packages.                                                                                                                                                               | Keeps CSP strict (`font-src 'self'`) and avoids third-party requests from an enterprise app.                                                                                               |
+| A8  | Browser support: **evergreen browsers with OffscreenCanvas** (Chrome/Edge 69+, Firefox 105+, Safari 16.4+).                                                                                                                                                      | Required for off-main-thread rendering.                                                                                                                                                    |
+| A9  | Photo formats accepted for upload: JPEG, PNG, WebP, AVIF, GIF (first frame), HEIC where the browser can decode it.                                                                                                                                               | Browser `createImageBitmap` coverage.                                                                                                                                                      |
+| A10 | Export formats: **PNG, JPEG, WebP** in M5 (native `canvas.convertToBlob`), **AVIF** via WASM encoder as an M5 stretch item.                                                                                                                                      | Native encoders are zero-dependency; AVIF needs `@jsquash/avif`.                                                                                                                           |
+| A11 | The single origin is `https://lumafoil.com`; the `workers.dev` subdomain is disabled (`workers_dev: false`).                                                                                                                                                     | Owner supplied the domain on 2026-09-05. One origin keeps cookies, CSP, and share links unambiguous.                                                                                       |
+| A12 | The owner has approved installing any tooling the project needs on this machine ("you install whatever is needed", 2026-09-05).                                                                                                                                  | Global installs are still avoided where a local devDependency works; machine-level installs are listed in README → Requirements.                                                           |
+| A13 | Cloudflare **Workers Paid** plan ($5/month) for production, upgraded from Free on 2026-09-05.                                                                                                                                                                    | Stated by the owner. Gives 30 s CPU per request by default (raisable to 5 min with `limits.cpu_ms`), D1 and R2 paid quotas, and Email Sending. Rendering still stays in the browser (A4).  |
 
 ---
 
@@ -528,6 +570,34 @@ Dropbox key remain for history scanning. No generic pattern or secret-bearing
 file is excluded. Server OAuth secrets remain only in ignored local variables
 and production secret storage. A separate known-secret scan checks publication
 candidates against actual configured confidential values without printing them.
+
+CI/CD tooling and security maintenance (2026-10-01): actionlint **1.7.12** is a
+system tool, not an npm dependency. CI installs its Linux AMD64 release only after
+matching SHA-256 `8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8`,
+verified against downloaded bytes and the official `rhysd/actionlint` release asset
+digest. `lint:workflows` is part of canonical quality. Knip's explicit system-binary
+entry records why there is no npm dependency; no existing rule is disabled.
+
+The current audit found high-severity Undici and brace-expansion advisories. The
+narrow `undici@7.29.0` override pins **7.29.1** for Cloudflare's exact transitive
+requests without changing jsdom's Undici 8.10.2. `npm info undici@7.29.1
+peerDependencies --json` returned no peers; publication on 2026-09-04 satisfies
+the seven-day rule. Locked brace-expansion becomes **5.0.12** (published
+2026-09-14), and fast-uri **3.1.8**; both have no peers by their exact-version
+`npm info` checks. No direct Cloudflare package was upgraded: the current plugin
+upgrade requires a different Wrangler peer, while these compatible transitive
+patches remove every current audit finding. Remove the Undici override once the
+Cloudflare packages request a patched version. Workerd, browser, coverage and
+build gates remain the compatibility evidence boundary.
+
+Publication scanner correction (2026-10-01): a metadata-only subprocess probe
+confirmed candidate Gitleaks scanning was terminated with `ETIMEDOUT` at
+120,022 ms on this Intel Mac. Its completion budget is now 300,000 ms in
+`PUBLICATION_LIMITS`; Git enumeration retains its existing 120,000 ms budget.
+No candidate, history, archive, rule or finding exception was added. Timeouts
+still fail publication, and finite failure classification is regression-tested
+without ever echoing scanner stdout/stderr. The original failed hook and scanner
+receipts are retained separately from subsequent passing evidence.
 
 ### 3.2 Quality gates
 

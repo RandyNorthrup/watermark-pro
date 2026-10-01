@@ -1,28 +1,30 @@
 name: CI
 
 on:
-  # Local quality gates are the default. Run hosted CI only when explicitly
-  # requested or from another manually started workflow.
+  pull_request:
+    branches: [main]
   workflow_dispatch:
-  # Tagged releases reuse these exact gates without receiving deployment secrets.
+  # Main deployment reuses the same gates without passing production secrets.
   workflow_call:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   quality:
     name: Quality gates
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # gitleaks scans history, so it needs more than the default shallow clone.
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-node-gitleaks
 
@@ -46,11 +48,13 @@ jobs:
         with:
           name: coverage
           path: coverage/lcov.info
+          retention-days: 7
           if-no-files-found: error
 
   e2e-device:
     name: Playwright + axe (${{ matrix.project }})
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [quality, sast]
     strategy:
       fail-fast: false
@@ -67,6 +71,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: ./.github/actions/setup-node-gitleaks
       # Every runner builds its own app and owns isolated temporary D1/R2 state.
       - name: Run every journey for this device
@@ -88,10 +93,11 @@ jobs:
           retention-days: 7
 
   e2e:
-    # Stable aggregate for manually requested release verification.
+    # Required merge check; skipped, cancelled and missing devices fail closed.
     name: End-to-end (Playwright + axe)
     if: ${{ always() }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [quality, sast, e2e-device]
     steps:
       - name: Require every device and prerequisite to succeed
