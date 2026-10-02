@@ -7,6 +7,43 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Recent credential proof — 2026-10-02 (unreleased candidate)
+
+- Added save/export guidance before the full-page credential sign-in, since its
+  navigation follows the existing session-only unfinished-edit lifecycle.
+  All twelve prompt messages include it. The preceding complete local quality
+  run passed 2,903 covered cases and 69 workerd cases, with every coverage and
+  bundle floor retained. Final wording passed focused/catalogue checks and all
+  four built browser/axe journeys; their actual captures were reviewed. Final
+  SAST passed 510 rules over 2,152 files with zero findings. Exact-commit hosted
+  canonical quality and the full 144-journey matrix remain pending.
+- Visual review of the credential prompt found mobile background text visible
+  through the glass surface. The dialog now uses an opaque theme surface;
+  screenshot evidence captures its viewport. The initial new browser journey
+  passed two of four devices; the corrected capture/layout run passed all four,
+  retaining refusal, actual sign-in, explicit retry and axe checks. All four
+  actual prompt captures were opened and reviewed. Full matrix certification
+  remains pending.
+- Added server-owned session credential proof, with a nullable migration for
+  historical sessions. Successful password/validated identity sign-in creates
+  proof; email verification, challenge completion, renewal and browser fields
+  cannot. Sensitive custom APIs and organization/admin/account-security plugin
+  mutations refuse proof older than ten minutes, absent proof or future dates.
+  Ordinary permitted editing, saving, reads and personal bootstrap remain usable.
+- Added cloud credential/connection checks and reserved the billing subtree.
+  Fresh proof never replaces role, cohort, verified-email or account binding.
+  Same-account sign-in retains a selected workspace only if membership remains;
+  a new account or revoked membership cannot inherit it.
+- Added a lazy, account-generation-bound re-sign-in dialog in all twelve locales
+  and a bounded internal return route. Denied mutations are not silently replayed.
+  Established-user fixtures use real password sign-in; verification-only negatives
+  still exercise an unproved session.
+- The initial server-focused suite passed 84 cases. Expanded tests found case
+  mismatches in new dialog-name assertions and a renewal fixture that aged only
+  `updatedAt`; the pinned auth library renews based on expiry. Corrected both,
+  retaining the negative proof assertions and forcing an actual renewal.
+  Final complete gates and production enforcement remain pending.
+
 ### Private membership and bounded admissions — 2026-10-02 (unreleased)
 
 - Added server-owned pending/public/private membership. Migration preserves

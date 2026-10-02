@@ -62,6 +62,11 @@ test('site invitations create separate private workspaces and protect account to
   await expect(page).toHaveURL(/\/check-email/)
   await gotoRetrying(page, await latestLinkFor(request, recipient.email, '/api/auth/verify-email'))
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
+  const recipientSignIn = await page.request.post('/api/auth/sign-in/email', {
+    headers: { origin: PREVIEW_ORIGIN },
+    data: { email: recipient.email, password: recipient.password },
+  })
+  expect(recipientSignIn.status()).toBe(200)
   await prepareReturningUser(page)
   const recipientSession = await page.request.get('/api/auth/get-session')
   const recipientWorkspace = workspaceSessionSchema.parse(await recipientSession.json()).session

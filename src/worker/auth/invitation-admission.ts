@@ -12,6 +12,7 @@ import type { MembershipCohort } from '../../shared/api-accounts'
 import { INVITATION_HEADER, invitationIdSchema } from '../../shared/invitation'
 import type { AccountStore } from '../account-store'
 import { contentDigest } from '../sync'
+import { enforceRecentAuthentication } from './recent-authentication'
 import { enforceSiteAdministrator } from './site-administrator'
 import { enforceAuthPrivacy } from './workspace-access'
 
@@ -42,6 +43,7 @@ export function invitationAdmission(accounts: AccountStore, canSignUpWithoutInvi
   return createAuthMiddleware(async (ctx) => {
     await enforceAuthPrivacy(ctx)
     await enforceSiteAdministrator(ctx, accounts)
+    await enforceRecentAuthentication(ctx)
     const path = ctx.path.replace(/\/$/, '')
     if (path === '/admin/impersonate-user')
       throw new APIError('FORBIDDEN', {
@@ -58,6 +60,7 @@ export function invitationAdmission(accounts: AccountStore, canSignUpWithoutInvi
       })
     }
     if (path === '/sign-in/social') {
+      await addOAuthServerContext({ credentialSignIn: true })
       const raw = ctx.headers?.get(INVITATION_HEADER)
       const token = invitationIdSchema.safeParse(raw)
       if (raw != null && !token.success) throw invitationRequired()

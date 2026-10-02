@@ -100,6 +100,12 @@
       "failed": "A verificação falhou. Recarregue esta página e tente novamente.",
       "unavailable": "A verificação está indisponível. Confira sua conexão e recarregue esta página.",
       "retry": "Tentar novamente a verificação humana"
+    },
+    "recent": {
+      "title": "Entre novamente",
+      "body": "Esta alteração sensível não foi aplicada. Entre novamente e tente outra vez. Você voltará a esta página. Salve ou exporte primeiro as edições inacabadas.",
+      "cancel": "Continuar trabalhando",
+      "signIn": "Entrar novamente"
     }
   },
   "dashboard": {

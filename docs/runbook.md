@@ -77,6 +77,18 @@ can retry normal admission. Public registration stays closed until quotas and
 billing policy are certified. Do not treat challenge success, payment or a
 workspace role as private membership or site-administration authority.
 
+The subsequent unmerged credential migration (`0019_recent-authentication.sql`)
+adds a nullable session proof. Existing sessions remain usable for ordinary
+authorized reads/saves/editing but must sign in again before invitations,
+sharing/access changes, deletions, administration, cloud credential operations
+or billing. A verified-email session or a renewed session is not fresh credential
+proof. Operators must not backfill timestamps or repair refusals by changing
+session dates. Complete the normal challenged sign-in; roles and membership
+remain server checked afterward. Same-account sign-in retains a selection only
+after current membership is checked. The dialog returns to a bounded internal
+page and never automatically retries the refused mutation. This candidate still
+requires final gates; no production enforcement is claimed.
+
 For a new database, follow [self-hosting](self-hosting.md). The first-owner tool
 creates an unverified account with global role `owner`, without generating a
 password or creating an Admin account; mailbox verification and normal recovery

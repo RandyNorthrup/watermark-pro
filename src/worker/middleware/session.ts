@@ -4,6 +4,10 @@ import { ACCOUNT_ID_HEADER, accountIdSchema } from '../../shared/account-identit
 import { MEMBERSHIP_COHORT, membershipCohortSchema } from '../../shared/api-accounts'
 import { SYNC_OPERATION_HEADER } from '../../shared/sync'
 import type { AppContext } from '../app-context'
+import {
+  hasRecentCredentialProof,
+  requiresRecentAuthentication,
+} from '../auth/recent-authentication'
 import { apiErrors } from '../errors'
 
 /** Requires a verified cookie session before exposing custom account or workspace APIs. */
@@ -28,6 +32,11 @@ export const requireSession = createMiddleware<AppContext>(async (c, next) => {
   } else if (c.req.header(SYNC_OPERATION_HEADER) !== undefined) {
     throw apiErrors.validation('Synchronization requires an account binding')
   }
+  if (
+    requiresRecentAuthentication(c.req.method, c.req.path) &&
+    !hasRecentCredentialProof(session.session)
+  )
+    throw apiErrors.recentAuthenticationRequired()
   c.set('session', session)
   await next()
 })

@@ -122,11 +122,47 @@ scanning used about seven CPU cores, but no sole-cause claim is made. Full
 Lighthouse/screenshot audits and live-provider proof remain release gates;
 no remote migration or deployment is claimed. See the private-membership receipt
 for exact source, failed attempts and completed evidence.
-Recent-authentication policy, public plan quotas, billing state and public
+Recent-authentication certification, public plan quotas, billing state and public
 landing/private-member navigation remain separate unfinished controls. Next
 implement session-bound recent credential proof, quotas and Stripe
 checkout/webhook ownership before opening public signup. M19 and video/release blockers
 stay open; no M20 work begins.
+
+### Recent credential proof implementation — 2026-10-02
+
+The next stacked M19 candidate is `codex/recent-authentication`. Migration
+`0019_recent-authentication.sql` adds a nullable session credential timestamp;
+historical sessions receive no proof. Only successful password sign-in or a
+validated identity sign-in with server-controlled OAuth state establishes proof.
+Verification, challenge completion, renewal, profile/session input and payment
+cannot advance it. The boundary rejects missing, malformed, future and expired
+proof after ten minutes while retaining ordinary permitted reads, local editing,
+save operations and personal-workspace bootstrap.
+
+Custom invitation/referral, workspace-access/share, destructive workspace and
+admin mutations and the reserved billing subtree require proof. Cloud connection,
+token and disconnect requests also require it. Auth-plugin account-security,
+organization and administrative mutations enforce the same policy; role/cohort
+and identity checks remain independent. Same-account sign-in carries forward a
+selected workspace only after checking current membership. Account changes and
+revoked membership cannot inherit that selection.
+
+Both client transports offer an account-generation-bound, lazy-loaded credential
+prompt in twelve locales. The refused operation stays unapplied; dismissing or
+signing in never retries it. The sign-in destination is a bounded internal route.
+Named established-user fixtures now explicitly present credentials rather than
+turning email verification into authorization. Dedicated negatives retain the
+verification-only session. Initial real-auth/server focused proof passed 84 cases;
+expanded focused proof passed 175 cases, real workerd/D1 integration passed, and
+the complete local quality gate passed 2,903 covered cases plus 69 workerd cases.
+All four dedicated credential journeys passed with axe and viewed opaque prompt
+captures. The final twelve-locale save/export warning postdates that complete
+quality run; it subsequently passed focused prompt/catalogue checks and all four
+fresh built credential journeys with axe and viewed final-wording captures.
+Final SAST passed 510 rules over 2,152 files with zero findings.
+Exact-commit hosted canonical quality and the expanded 144-journey
+matrix remain required. Failed
+attempts are recorded in the new receipt. No migration or production release is claimed.
 
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and
 PDF documents. The hosted service is invitation-only; each admitted user gets

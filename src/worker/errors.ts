@@ -10,6 +10,10 @@ function jsonError(status: number, error: ApiError['error'], details?: unknown):
 
 /** Typed HTTP errors so handlers never build ad-hoc error responses. */
 export const apiErrors = {
+  recentAuthenticationRequired: () =>
+    new HTTPException(HTTP_STATUS.forbidden, {
+      res: jsonError(HTTP_STATUS.forbidden, API_ERROR_CODE.recentAuthenticationRequired),
+    }),
   invitationQuotaExceeded: () =>
     new HTTPException(HTTP_STATUS.conflict, {
       res: jsonError(HTTP_STATUS.conflict, API_ERROR_CODE.invitationQuotaExceeded),

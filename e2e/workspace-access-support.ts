@@ -45,5 +45,10 @@ export async function signUpFromWorkspaceEmail(
   await gotoRetrying(page, await latestLinkFor(request, person.email, '/api/auth/verify-email'))
   await expect(page).toHaveURL(/\/app\/editor\/?$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
+  const signedIn = await page.request.post('/api/auth/sign-in/email', {
+    headers: { origin: new URL(page.url()).origin },
+    data: { email: person.email, password: person.password },
+  })
+  expect(signedIn.status()).toBe(200)
   await prepareReturningUser(page)
 }
