@@ -9,7 +9,15 @@ describe('validateEnv', () => {
       expect(validateEnv(createTestEnv({ APP_ENV: name })).APP_ENV).toBe(name)
     }
     expect(
-      validateEnv(createTestEnv({ APP_ENV: 'production', EMAIL_PROVIDER: 'cloudflare' })).APP_ENV,
+      validateEnv(
+        createTestEnv({
+          APP_ENV: 'production',
+          APP_URL: 'https://app.example.test',
+          EMAIL_PROVIDER: 'cloudflare',
+          TURNSTILE_SITE_KEY: 'production-site-key',
+          TURNSTILE_SECRET_KEY: 'production-secret-key',
+        }),
+      ).APP_ENV,
     ).toBe('production')
   })
 
@@ -58,5 +66,62 @@ describe('validateEnv', () => {
   it('caches the validated result per env object', () => {
     const raw = createTestEnv()
     expect(validateEnv(raw)).toBe(validateEnv(raw))
+  })
+
+  it('fails closed when production human verification is missing or uses dummy keys', () => {
+    const production = {
+      APP_ENV: 'production',
+      APP_URL: 'https://app.example.test',
+      EMAIL_PROVIDER: 'cloudflare',
+    }
+    expect(() => validateEnv(createTestEnv(production))).toThrow(/Production requires real/)
+    for (const testKey of [
+      '1x00000000000000000000AA',
+      '2x00000000000000000000AB',
+      '3x00000000000000000000FF',
+      '1x0000000000000000000000000000000AA',
+      '2x0000000000000000000000000000000AA',
+      '3x0000000000000000000000000000000AA',
+    ]) {
+      expect(() =>
+        validateEnv(
+          createTestEnv({
+            ...production,
+            TURNSTILE_SITE_KEY: testKey,
+            TURNSTILE_SECRET_KEY: 'production-secret-key',
+          }),
+        ),
+      ).toThrow(/Production requires real/)
+      expect(() =>
+        validateEnv(
+          createTestEnv({
+            ...production,
+            TURNSTILE_SITE_KEY: 'production-site-key',
+            TURNSTILE_SECRET_KEY: testKey,
+          }),
+        ),
+      ).toThrow(/Production requires real/)
+    }
+    expect(
+      validateEnv(
+        createTestEnv({
+          TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
+          TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA',
+        }),
+      ).APP_ENV,
+    ).toBe('test')
+  })
+
+  it('refuses insecure production origins even when real challenge keys are present', () => {
+    expect(() =>
+      validateEnv(
+        createTestEnv({
+          APP_ENV: 'production',
+          EMAIL_PROVIDER: 'cloudflare',
+          TURNSTILE_SITE_KEY: 'production-site-key',
+          TURNSTILE_SECRET_KEY: 'production-secret-key',
+        }),
+      ),
+    ).toThrow(/HTTPS/)
   })
 })

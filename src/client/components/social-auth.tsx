@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ProviderLogo } from './provider-logo'
+import { Turnstile } from './turnstile'
 import { Alert } from './ui/alert'
 import { Button } from './ui/button'
 import { loginSearchSchema } from '../../shared/client-search'
@@ -16,11 +17,14 @@ import {
   rememberInvitation,
 } from '../lib/pending-invitation'
 import { publicConfigQueryOptions } from '../lib/queries'
+import { useCaptcha } from '../lib/use-captcha'
 
 interface SocialAuthProps {
   invitation?: string | undefined
   mode?: 'sign-in' | 'link'
   callbackURL?: string | undefined
+  /** Signup shares one challenge between its email and provider entry controls. */
+  captcha?: ReturnType<typeof useCaptcha>
 }
 
 /** Provider identity and cloud-file authorization remain separate, explicit actions. */
@@ -28,9 +32,12 @@ export function SocialAuth({
   invitation,
   mode = 'sign-in',
   callbackURL = '/app',
+  captcha: sharedCaptcha,
 }: SocialAuthProps) {
   const { t } = useTranslation()
   const config = useQuery(publicConfigQueryOptions)
+  const ownCaptcha = useCaptcha()
+  const challenge = sharedCaptcha ?? ownCaptcha
   const [pending, setPending] = useState<'google' | 'microsoft' | null>(null)
   const [error, setError] = useState<string | null>(null)
   useEffect(() => {
@@ -42,6 +49,7 @@ export function SocialAuth({
     { id: 'microsoft', enabled: config.data?.microsoftAuthEnabled === true, name: 'Microsoft' },
   ] as const
   async function start(provider: 'google' | 'microsoft') {
+    if (mode === 'sign-in' && !challenge.isReady) return
     setPending(provider)
     setError(null)
     const admission = invitation ?? pendingInvitation()
@@ -62,12 +70,18 @@ export function SocialAuth({
                 errorCallbackURL: '/login',
                 requestSignUp: admission !== undefined,
               },
-              { headers: admission === undefined ? {} : { [INVITATION_HEADER]: admission } },
+              {
+                headers: {
+                  ...challenge.headers,
+                  ...(admission !== undefined && { [INVITATION_HEADER]: admission }),
+                },
+              },
             )
       setError(describeAuthError(result.error))
     } catch (error_) {
       setError(describeError(error_))
     } finally {
+      if (mode === 'sign-in') challenge.reset()
       setPending(null)
     }
   }
@@ -75,6 +89,13 @@ export function SocialAuth({
   return (
     <div className="mb-6 flex flex-col gap-3">
       {error === null ? null : <Alert tone="error">{error}</Alert>}
+      {mode === 'sign-in' && sharedCaptcha === undefined && challenge.siteKey !== null ? (
+        <Turnstile
+          key={challenge.generation}
+          siteKey={challenge.siteKey}
+          onToken={challenge.onToken}
+        />
+      ) : null}
       {providers
         .filter((provider) => provider.enabled)
         .map((provider) => (
@@ -83,7 +104,7 @@ export function SocialAuth({
             type="button"
             variant="secondary"
             isPending={pending === provider.id}
-            disabled={pending !== null}
+            disabled={pending !== null || (mode === 'sign-in' && !challenge.isReady)}
             onClick={() => void start(provider.id)}
           >
             <ProviderLogo provider={provider.id} />

@@ -18,6 +18,7 @@ const client = fakeAuth
 
 beforeEach(() => {
   installFakeAuth()
+  installLibraryApi()
 })
 
 describe('landing page', () => {
@@ -165,20 +166,26 @@ describe('check email', () => {
     const user = userEvent.setup()
     renderApp('/check-email?email=new%40example.test&invitation=known-id')
     await user.click(await screen.findByRole('button', { name: 'Resend verification email' }))
-    expect(client().sendVerificationEmail).toHaveBeenCalledWith({
-      email: 'new@example.test',
-      callbackURL: '/app',
-    })
+    expect(client().sendVerificationEmail).toHaveBeenCalledWith(
+      {
+        email: 'new@example.test',
+        callbackURL: '/app',
+      },
+      { headers: {} },
+    )
   })
   it('resends the verification email on request', async () => {
     const user = userEvent.setup()
     renderApp('/check-email?email=new%40example.test')
     await user.click(await screen.findByRole('button', { name: 'Resend verification email' }))
     expect(await screen.findByRole('status')).toHaveTextContent('on its way')
-    expect(client().sendVerificationEmail).toHaveBeenCalledWith({
-      email: 'new@example.test',
-      callbackURL: '/app',
-    })
+    expect(client().sendVerificationEmail).toHaveBeenCalledWith(
+      {
+        email: 'new@example.test',
+        callbackURL: '/app',
+      },
+      { headers: {} },
+    )
   })
 })
 

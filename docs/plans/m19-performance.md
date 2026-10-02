@@ -2,6 +2,26 @@
 
 ## Goal
 
+### Public plans and human gates — 2026-10-01
+
+The owner selected public Free and monthly USD paid subscriptions alongside the
+private cohort, with two new invitations per existing private member and two
+for each new private invitee. The proposed Free/$9 Pro/$24 three-member Team
+plans, researched costs and remaining implementation checklist are in
+[the public billing specification](public-billing.md).
+
+Human-verification implementation is isolated from the video refactor. Required
+production configuration, strict server Siteverify validation, protected client
+forms and verified/banned session checks are implemented. Focused tests and a
+real workerd/D1 admission test pass; full quality, SAST, four-device and visual
+verification remain pending. Owner-completed Cloudflare authentication restored
+resource access. The existing managed widget covers only `lumafoil.com`, and the
+production Worker already has its verification secret. No widget/key mutation or
+production deployment was performed. This is current M19 work,
+not milestone certification. Public admission/cohorts, durable two-invite limits,
+Stripe billing and paid workspace entitlements follow. The unchanged complete
+release audits remain mandatory before deployment.
+
 ### Current owner clarification — 2026-09-08
 
 Randy confirmed that offline operation **and synchronization after reconnecting**

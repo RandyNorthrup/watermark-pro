@@ -9,12 +9,14 @@ import { signInSchema } from '../../shared/validation'
 import { EmailField, PasswordField } from '../components/auth-fields'
 import { AuthLayout } from '../components/auth-layout'
 import { SocialAuth } from '../components/social-auth'
+import { Turnstile } from '../components/turnstile'
 import { Alert } from '../components/ui/alert'
 import { Button } from '../components/ui/button'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError, describeError } from '../lib/errors'
 import { activateOfflineAccount } from '../lib/offline-account'
 import { clearPendingInvitation, pendingInvitation } from '../lib/pending-invitation'
+import { useCaptcha } from '../lib/use-captcha'
 import { useFormErrors } from '../lib/use-form-errors'
 
 export const Route = createFileRoute('/login')({
@@ -34,6 +36,7 @@ function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null)
   const [needsVerification, setNeedsVerification] = useState(false)
   const { errors, validate } = useFormErrors<SignInValues>()
+  const captcha = useCaptcha()
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -41,30 +44,40 @@ function LoginPage() {
     if (parsed === null) {
       return
     }
+    if (!captcha.isReady) return
     setIsPending(true)
     setServerError(null)
     setNeedsVerification(false)
-    const result = await authClient.signIn.email({ email: parsed.email, password: parsed.password })
-    setIsPending(false)
-    if (result.error !== null) {
-      if (result.error.code === 'EMAIL_NOT_VERIFIED') {
-        setNeedsVerification(true)
-      } else {
-        setServerError(describeAuthError(result.error))
-      }
-      return
-    }
-    // Query keys are organization-scoped. A different account must never inherit
-    // the previous account's in-memory local overlays, even in a shared workspace.
     try {
-      await activateOfflineAccount(queryClient, result.data.user.id)
+      const result = await authClient.signIn.email(
+        { email: parsed.email, password: parsed.password },
+        { headers: captcha.headers },
+      )
+      if (result.error !== null) {
+        if (result.error.code === 'EMAIL_NOT_VERIFIED') {
+          setNeedsVerification(true)
+        } else {
+          setServerError(describeAuthError(result.error))
+        }
+        return
+      }
+      // Query keys are organization-scoped. A different account must never inherit
+      // the previous account's in-memory local overlays, even in a shared workspace.
+      try {
+        await activateOfflineAccount(queryClient, result.data.user.id)
+      } catch (error) {
+        setServerError(describeError(error))
+        return
+      }
+      clearPendingInvitation()
+      queryClient.clear()
+      await navigate({ to: redirect ?? '/app' })
     } catch (error) {
       setServerError(describeError(error))
-      return
+    } finally {
+      captcha.reset()
+      setIsPending(false)
     }
-    clearPendingInvitation()
-    queryClient.clear()
-    await navigate({ to: redirect ?? '/app' })
   }
 
   return (
@@ -95,7 +108,13 @@ function LoginPage() {
           )}
         </Alert>
       )}
-      <SocialAuth invitation={invitation} callbackURL={redirect} />
+      {captcha.isUnavailable ? (
+        <Alert tone="error">{t('auth.humanCheck.unavailable')}</Alert>
+      ) : null}
+      {captcha.siteKey === null ? null : (
+        <Turnstile key={captcha.generation} siteKey={captcha.siteKey} onToken={captcha.onToken} />
+      )}
+      <SocialAuth invitation={invitation} callbackURL={redirect} captcha={captcha} />
       <form
         onSubmit={(event) => void handleSubmit(event)}
         noValidate
@@ -133,7 +152,7 @@ function LoginPage() {
           <Link to="/forgot-password" className="text-sm text-ink-muted hover:text-ink">
             {t('auth.login.forgotPassword')}
           </Link>
-          <Button type="submit" isPending={isPending}>
+          <Button type="submit" isPending={isPending} disabled={!captcha.isReady}>
             {t('auth.login.submit')}
           </Button>
         </div>

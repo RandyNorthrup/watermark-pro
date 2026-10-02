@@ -199,11 +199,25 @@ Only the `main` branch and the latest tagged release receive fixes.
   2021); its maintained fork `@cantoo/pdf-lib` is the migration target if a fix
   is ever needed (PLAN.md §3.1).
 
-- Bot protection (M8): when `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
-  are configured, sign-up and password-reset requests must carry a Turnstile
-  token that the Worker verifies with Cloudflare before Better Auth runs;
-  a missing token is a 400 and a rejected one a 403. The two variables must
-  be set together or the configuration is refused.
+- Human verification (M19 implementation, certification pending): production
+  requires both real Turnstile keys and an HTTPS origin. Cloudflare's dummy keys
+  and incomplete/missing pairs fail configuration validation. Email signup, password sign-in and
+  OAuth entry use the admission action; password recovery and verification-email
+  resend use a separate action.
+  Tokens and response bytes are bounded; Siteverify has a ten-second deadline,
+  cannot redirect, sends no email, user ID or client IP, and Zod requires exact
+  boolean success. Tokens must match the configured hostname and
+  action; missing/malformed tokens are 400 and rejected tokens are 403. Provider
+  failure refuses admission. Non-production isolated fixtures may omit both keys.
+  Client controls wait for verified configuration and a solved challenge; every
+  attempted submission removes its consumed token and remounts the widget.
+  Every custom account/workspace API and privileged organization/admin plugin
+  endpoint also refuses an existing session whose email is unverified or whose
+  account remains banned. Bans, rate limits and workspace permission checks remain
+  independent. Passing a challenge never establishes real-world identity or
+  grants roles, paid entitlements, private invitation rights or another user's
+  content. The recovery endpoint's actual Better Auth route and OAuth entry now
+  use the strict credential limiter. Executable/visual certification is pending.
 - Platform administration (M8): a separate `admin` role checked server-side
   by `requirePlatformAdmin` on the organization and audit listing routes and
   by Better Auth's admin plugin on user management. Bans (with a mandatory

@@ -46,6 +46,41 @@ beforeEach(async () => {
 })
 
 describe.each(cases)('%s site management', (role) => {
+  it.each(['unverified', 'banned'] as const)(
+    'refuses an existing %s manager session before private reads or administrative changes',
+    async (state) => {
+      const manager = actors[role]
+      const context = await harness.services.auth.$context
+      const blocked = state === 'unverified' ? { emailVerified: false } : { banned: true }
+      const restored = state === 'unverified' ? { emailVerified: true } : { banned: false }
+      await context.adapter.update({
+        model: 'user',
+        where: [{ field: 'id', value: ids[role] }],
+        update: blocked,
+      })
+      expect(await responseStatus(manager.get('/api/auth/admin/list-users'))).toBe(403)
+      expect(await responseStatus(manager.get('/api/admin/account-stats'))).toBe(403)
+      expect(
+        await responseStatus(
+          manager.post('/api/auth/admin/set-role', {
+            userId: ids.user,
+            role: SITE_ROLE.admin,
+          }),
+        ),
+      ).toBe(403)
+      expect(await roleOf(actors.user)).toBe(SITE_ROLE.user)
+      const other = role === 'owner' ? actors.admin : actors.owner
+      expect(await responseStatus(other.get('/api/auth/admin/list-users'))).toBe(200)
+      await context.adapter.update({
+        model: 'user',
+        where: [{ field: 'id', value: ids[role] }],
+        update: restored,
+      })
+      expect(await responseStatus(manager.get('/api/auth/admin/list-users'))).toBe(200)
+      expect(await responseStatus(manager.get('/api/admin/account-stats'))).toBe(200)
+    },
+  )
+
   it('can read management summaries and appoint/demote a non-owner without transferring ownership', async () => {
     const manager = actors[role]
     for (const path of [

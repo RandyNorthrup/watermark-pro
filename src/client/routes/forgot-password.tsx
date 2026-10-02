@@ -3,6 +3,7 @@ import { type SubmitEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
+import { HUMAN_VERIFICATION } from '../../shared/human-verification'
 import { emailSchema } from '../../shared/validation'
 import { EmailField } from '../components/auth-fields'
 import { AuthLayout } from '../components/auth-layout'
@@ -10,7 +11,7 @@ import { Turnstile } from '../components/turnstile'
 import { Alert } from '../components/ui/alert'
 import { Button } from '../components/ui/button'
 import { authClient } from '../lib/auth-client'
-import { describeAuthError } from '../lib/errors'
+import { describeAuthError, describeError } from '../lib/errors'
 import { useCaptcha } from '../lib/use-captcha'
 import { useFormErrors } from '../lib/use-form-errors'
 
@@ -35,18 +36,22 @@ function ForgotPasswordPage() {
     if (parsed === null) {
       return
     }
+    if (!captcha.isReady) return
     setIsPending(true)
     setServerError(null)
-    const result = await authClient.requestPasswordReset(
-      { email: parsed.email, redirectTo: '/reset-password' },
-      { headers: captcha.headers },
-    )
-    setIsPending(false)
-    const failure = describeAuthError(result.error)
-    if (failure === null) {
-      setIsSent(true)
-    } else {
-      setServerError(failure)
+    try {
+      const result = await authClient.requestPasswordReset(
+        { email: parsed.email, redirectTo: '/reset-password' },
+        { headers: captcha.headers },
+      )
+      const failure = describeAuthError(result.error)
+      if (failure === null) setIsSent(true)
+      else setServerError(failure)
+    } catch (error) {
+      setServerError(describeError(error))
+    } finally {
+      captcha.reset()
+      setIsPending(false)
     }
   }
 
@@ -71,6 +76,9 @@ function ForgotPasswordPage() {
           className="flex flex-col gap-4"
         >
           {serverError === null ? null : <Alert tone="error">{serverError}</Alert>}
+          {captcha.isUnavailable ? (
+            <Alert tone="error">{t('auth.humanCheck.unavailable')}</Alert>
+          ) : null}
           <EmailField
             value={values.email}
             error={errors.email}
@@ -79,7 +87,12 @@ function ForgotPasswordPage() {
             }}
           />
           {captcha.siteKey === null ? null : (
-            <Turnstile siteKey={captcha.siteKey} onToken={captcha.onToken} />
+            <Turnstile
+              key={captcha.generation}
+              siteKey={captcha.siteKey}
+              action={HUMAN_VERIFICATION.actions.recovery}
+              onToken={captcha.onToken}
+            />
           )}
           <Button
             type="submit"

@@ -4,11 +4,69 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-01 (automatic CI/CD and GitHub repository protection)
+Last updated: 2026-10-01 (public billing decisions and human-verification implementation)
 
 ---
 
 ## 1. Product summary
+
+### Public billing and human-verification amendment — 2026-10-01
+
+The owner replaces invite-only public marketing with public Free and monthly USD
+paid subscriptions, while retaining the private cohort's existing access and
+donations. Existing private members receive two new invitations; each new private
+invitee receives two. Public accounts receive no private invitation privilege.
+Selected launch targets are Free, Pro at $9/month and Team at $24/month for three
+members, with explicit storage/member limits and cost assumptions recorded in
+`docs/plans/public-billing.md`. No Enterprise tier or simultaneous video-project
+editing is claimed. The existing Stripe CLI keys are expired/rejected; alternate
+Stripe connection and production billing provisioning remain unverified.
+
+The owner explicitly requires privacy, human checks and account trust. A separate
+`codex/public-billing` checkout keeps this implementation isolated from the video
+branch's four-device test build. Its temporary dependency links were removed
+after verifying that every entry was a symlink. An independent `npm ci` passed
+on 2026-10-01 (786 installed packages, zero audit findings). No Stripe dependency
+has been added; this checkout now owns its dependencies and complete gates.
+
+Human verification requires real production Turnstile keys and HTTPS. Signup, password sign-in and
+OAuth entry bind the admission action; recovery and verification-email resend
+bind their own action. All require
+the canonical hostname and bounded server token validation before the server Siteverify request. Provider response bytes are bounded and
+Zod requires a boolean success plus exact hostname/action. The stock plugin uses
+a truthiness check on provider success, so this narrowly scoped Better Auth
+plugin validates the complete trust boundary and uses a ten-second timeout,
+refuses redirects, and sends no user IDs, email or client IP to Siteverify. Email verification, bans, durable quotas and
+workspace roles remain independent. Client controls hold until configuration and
+challenge are ready; tokens are discarded after each attempted submission. The
+actual recovery endpoint and OAuth entry use the strict limiter. Dummy keys,
+wrong-host/action, forged/expired/replayed tokens and provider outages have
+negative tests. The first focused run passed 107 tests. A subsequent focused
+suite passed 101 tests, including strict provider responses, privacy/cancellation,
+responsive widget sizing and existing unverified/banned organization/admin
+sessions. A workerd integration test passed against real D1, proving refused
+tokens create no account and accepted admission still requires verified email.
+Browser lifecycle tests use an explicitly named provider fixture; they do not
+prove live Turnstile availability. Two-worker Vitest scheduling and serial native
+browser files preserve existing deadlines, assertions and coverage floors on
+the Intel Mac. The fourth quality attempt passed all 2,830 covered and 64 workerd
+tests, but exposed a performance-harness fixture that imposed a 100 ms bound
+instead of exercising production readiness. A focused rerun reproduced the
+failure even with already-loaded headings. These content fixtures now use the
+existing production deadline and retain wrong-screen/content/view refusals plus
+a never-completing image-decode negative. No application deadline or Lighthouse
+budget was changed. Full quality, security and browser gates are still pending.
+The expired local Cloudflare OAuth token was replaced through owner-completed
+browser authentication on 2026-10-01. Readback confirms the existing managed
+Turnstile widget is restricted to `lumafoil.com` and the production Worker already
+has `TURNSTILE_SECRET_KEY`. No duplicate widget, key rotation or production
+configuration change was needed. This resource readback does not prove a live
+challenge against the new implementation; complete executable and visual
+verification remain pending.
+Public/private admission, two-invite quotas, Stripe checkout/portal/webhooks,
+entitlements, paid collaboration and public landing remain the next parts of this
+M19 slice. No later milestone is started, and production release audits remain
+required before deployment.
 
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and
 PDF documents. The hosted service is invitation-only; each admitted user gets
