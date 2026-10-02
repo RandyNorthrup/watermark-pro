@@ -10,6 +10,24 @@ Last updated: 2026-10-02 (native encoder and playback regression verification)
 
 ## 1. Product summary
 
+### Linux WebKit codec follow-up — 2026-10-02
+
+Video candidate `c1a503a` passed hosted canonical quality and SAST, plus complete
+desktop/Android device jobs, in run `37021471203`. Both WebKit device jobs failed
+multi-clip export; the inspected iPad trace reports the AAC calibration decoded
+extent guard, with 33 other journeys passing. New canonical `test:codecs` executes
+the existing native AAC timing/lifecycle controls and a synthetic timestamp
+contract in WebKit, including the actual Linux runner. Nine local Mac cases
+passed. The contract records encoder, demuxer and decoder timing only when a
+synthetic test fails; no personal content is logged. The Linux runtime correction
+and complete final-source gates remain required, with all existing bounds intact.
+
+The independent storage-capacity source `fdd55f2` passed all seven exact-commit
+hosted jobs in run `37024827798`, draft PR #16. Creation/member limits and signed
+billing reconciliation remain the next backend slices; subscriptions are not
+active, and the separate new Lumafoil Stripe account still needs Dashboard setup.
+M19 remains open; no later milestone is started.
+
 ### Stripe account clarification — 2026-10-02
 
 The owner requires a new separate Lumafoil Stripe business account under the

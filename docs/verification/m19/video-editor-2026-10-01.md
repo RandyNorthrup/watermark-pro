@@ -295,6 +295,21 @@ pass, and CSS-injected development previews are not final built visual evidence.
 
 ## Planning status and next slice
 
+Hosted source `c1a503a` passed canonical quality (2,877 covered cases and 63
+workerd cases) and SAST (510 rules, 2,157 files, zero findings), plus complete
+desktop/Android device jobs. Both WebKit device jobs failed multi-clip export;
+the inspected iPad trace shows `AAC calibration returned an invalid decoded
+extent`, followed by the unchanged sixty-second download wait. Its other 33
+journeys passed. The gate rejected the candidate; no merge or deployment occurred.
+
+`vitest.codecs.config.ts` and canonical `npm run test:codecs` now verify WebKit's
+AAC path before complete device testing. The real synthetic timestamp contract
+captures numeric encoder/demux/decoder origin metadata on failure, alongside the
+existing exact waveform and native lifecycle controls. Nine Mac cases passed;
+Linux conformance and the runtime correction remain pending. No bounds or
+assertions were loosened. Docker's local daemon is unavailable, so the actual
+hosted Linux runner supplies the remaining platform evidence.
+
 M19 remains open. The owner added public free/paid monthly USD plans, Stripe
 billing, private two-invitation membership, shared paid workspaces and explicit
 human/trust gates during verification. This becomes the next implementation slice

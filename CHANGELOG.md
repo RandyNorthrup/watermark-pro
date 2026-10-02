@@ -7,6 +7,18 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Cross-platform AAC gate — 2026-10-02 (verification pending)
+
+- Added a separate WebKit AAC verification command to canonical testing. The
+  hosted video candidate passed quality/SAST and desktop/Android journeys, but
+  both WebKit device jobs failed multi-clip export at the calibration extent
+  guard. All other iPad journeys passed; the original bounds remain intact.
+- Added a real synthetic encoder/demux/decoder timestamp contract that compares
+  calibration with recovered signal delay. Failure diagnostics contain numeric
+  synthetic codec metadata only. Nine Mac WebKit cases passed. Linux behavior
+  and the runtime correction remain pending; this does not certify the video
+  candidate or relax a deadline, waveform assertion or coverage floor.
+
 ### Provider account clarification — 2026-10-02
 
 - Recorded the owner's separate new Lumafoil Stripe account requirement. Initial
