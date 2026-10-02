@@ -357,6 +357,20 @@ negative-offset branch became unreachable and was removed. All nine Mac cases,
 lint, full type checking and zero duplication passed. Linux waveform/native
 decoder conformance and full final-source gates remain required.
 
+Linux source `f008171` passed calibration and lifecycle controls: eight native
+cases passed, while exact four-second output/decoded-edge verification hit its
+unchanged thirty-second limit. Test-stage diagnostics now identify where it
+stalls without changing production behavior. All nine Mac cases and lint passed.
+The Linux output waveform proof and full final source certification remain open.
+
+The first stage-diagnostic publication attempt failed at the existing five-minute
+Gitleaks deadline. Mac native cases, focused lint, complete types and duplication
+checks passed, but this is not a publication pass. A normal-hook retry limits
+local Go scheduler concurrency while retaining every byte, rule and original
+deadline; no gate is bypassed.
+That retry also timed out and refused the commit. The diagnostic source remains
+unpublished, so it supplies no additional Linux-stage evidence.
+
 M19 remains open. The owner added public free/paid monthly USD plans, Stripe
 billing, private two-invitation membership, shared paid workspaces and explicit
 human/trust gates during verification. This becomes the next implementation slice

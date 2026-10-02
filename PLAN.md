@@ -285,6 +285,24 @@ explicit failed receipts, with migration/deployment skipped. Earlier failed loca
 and hosted attempts are preserved in the verification record.
 
 The current product slice is the owner's video/navigation amendment above.
+The 2026-10-02 Linux AAC candidate now passes calibration and eight of nine
+native codec controls. Its exact output-waveform case still hits the original
+thirty-second deadline, so quality and the fail-closed device aggregate remain
+red. The immediate next slice is synthetic stage diagnosis and a portable
+output correction, followed by complete final-source gates; this is not a
+certified video release and no timing or waveform threshold is relaxed.
+Three local diagnostic publication attempts were refused at the existing
+five-minute scanner deadline. Read-only process inspection identified candidate
+directory scanning rather than history scanning as the timed-out phase. Staging
+now groups distinct versions of each original path, retaining original paths,
+every byte and neutral copies while avoiding a separate complete directory tree
+per object. Scanner regressions, an unsafe-first archive collision control and
+full publication timing remain under verification; no rule or limit changed.
+The grouped-only attempt also timed out. The next candidate shares current/history
+staging only for identical original paths, bytes and scanner treatment. Retired
+historical masking remains distinct from unmasked current copies. Original object
+checks still run before deduplication, and different filenames remain separate.
+Expanded regression/copy-count controls and actual timing remain under verification.
 After it, address shared mobile boot/LCP/TBT, Account CLS, the three failing
 desktop Lighthouse surfaces and desktop/tablet screenshot failures, then rerun
 the unchanged full release audits. M19 remains open.

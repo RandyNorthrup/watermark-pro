@@ -54,9 +54,12 @@ async function isSupported() {
   return await canEncodeAudio('aac', { sampleRate: RATE, numberOfChannels: 2, bitrate: 128_000 })
 }
 const hasNativeAac = await isSupported()
+let timingStage = 'idle'
 
 describe('native AAC project timing', () => {
-  afterEach(() => {
+  afterEach((context) => {
+    if (context.task.result?.state === 'fail')
+      console.error('Synthetic AAC timing stage', timingStage)
     vi.restoreAllMocks()
   })
   it(
@@ -72,10 +75,13 @@ describe('native AAC project timing', () => {
         format: new Mp4OutputFormat({ fastStart: false }),
         target: new BufferTarget(),
       })
+      timingStage = 'prepare-calibration'
       const source = await createTimedAacSource(output, 4, new AbortController().signal)
       const reference = referencePcm()
       try {
+        timingStage = 'start-output'
         await output.start()
+        timingStage = 'encode-reference'
         for (let offset = 0; offset < FRAMES; offset += 2048) {
           const frames = Math.min(2048, FRAMES - offset)
           const data = new Float32Array(frames * 2)
@@ -83,17 +89,22 @@ describe('native AAC project timing', () => {
           data.set(reference.subarray(offset, offset + frames), frames)
           await source.add(data, frames, offset)
         }
+        timingStage = 'finish-source'
         const timing = await source.finish()
+        timingStage = 'finalize-output'
         await output.finalize()
         if (output.target.buffer === null) throw new Error('Native AAC output missing.')
+        timingStage = 'write-timing'
         const blob = finalizeAacMp4(output.target.buffer, timing)
         const input = new Input({ source: new BlobSource(blob), formats: ALL_FORMATS })
         try {
+          timingStage = 'demux-output'
           expect(await input.computeDuration()).toBeCloseTo(4, 5)
           const track = await input.getPrimaryAudioTrack()
           if (track === null) throw new Error('Native AAC track missing.')
           const decoded = new Float32Array(FRAMES)
           const samples = new AudioSampleSink(track).samples()
+          timingStage = 'decode-library'
           for await (const sample of samples) {
             try {
               const offset = Math.round(sample.timestamp * RATE)
@@ -116,6 +127,7 @@ describe('native AAC project timing', () => {
           input.dispose()
         }
         // Web Audio may expose a padded final AAC frame; it must retain every intended sample.
+        timingStage = 'decode-web-audio'
         const native = await new OfflineAudioContext(2, RATE, RATE).decodeAudioData(
           await blob.arrayBuffer(),
         )
@@ -127,6 +139,7 @@ describe('native AAC project timing', () => {
           expect(Math.abs(result.delay)).toBeLessThanOrEqual(1)
         }
       } finally {
+        timingStage += ':cleanup'
         await source.cancel()
         if (output.state !== 'finalized') await output.cancel()
       }

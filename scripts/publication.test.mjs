@@ -429,6 +429,56 @@ test('generic browser-test canary is red without a configured value and clears a
   })
 })
 
+test('identical current and historical copies share staging only after every object is inspected', async () => {
+  await fixture(async (root) => {
+    const result = await auditPublication(root)
+    assert.equal(result.status, 'pass')
+    // Three files plus the commit message retain original and neutral copies.
+    // Both trees still receive inspection, without becoming scanner files.
+    assert.equal(result.scannerCopies, 8)
+    assert.equal(result.stats.historyObjects, 6)
+    assert.equal(result.stats.files, 12)
+  })
+})
+
+test('distinct archive members with the same path never overwrite an earlier unsafe scanner copy', async () => {
+  await fixture(async (root) => {
+    const built = path.join(root, 'dist', 'client')
+    await mkdir(built, { recursive: true })
+    const canary = randomBytes(32).toString('hex')
+    const memberPath = 'src/layout-proof.txt'
+    const config = path.join(root, '.gitleaks.toml')
+    // This path-only fixture rule cannot be satisfied by a neutral copy, so
+    // accidental overwriting of the original-path copy remains distinguishable.
+    await writeFile(
+      config,
+      `${await readFile(config, 'utf8')}\n[[rules]]\nid = "publication-layout-path-proof"\ndescription = "Original path preservation control"\nregex = '''scan-layout-record:([a-f0-9]{64})'''\npath = '''(?:^|/)src/layout-proof[.]txt$'''\nsecretGroup = 1\n`,
+    )
+    await writeFile(
+      path.join(built, 'a.zip'),
+      zip({ [memberPath]: `scan-layout-record:${canary}\n` }),
+    )
+    await writeFile(
+      path.join(built, 'b.zip'),
+      zip({ [memberPath]: 'export const harmless = true\n' }),
+    )
+    const red = await auditPublication(root, 'built')
+    assert.equal(red.status, 'fail')
+    assert.ok(
+      red.findings.some(
+        (finding) =>
+          finding.check === 'gitleaks' &&
+          finding.rule === 'publication-layout-path-proof' &&
+          finding.path === `build:a.zip!${memberPath}`,
+      ),
+    )
+    assert.equal(JSON.stringify(red).includes(canary), false)
+    await rm(path.join(built, 'a.zip'))
+    const green = await auditPublication(root, 'built')
+    assert.equal(green.status, 'pass')
+  })
+})
+
 test('built output checks binary configured-value leaks and generic ZIP metadata canaries', async () => {
   await fixture(async (root) => {
     const built = path.join(root, 'dist', 'client')

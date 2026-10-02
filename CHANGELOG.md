@@ -9,6 +9,39 @@ what was planned; superseded entries stay.
 
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
+- The grouped-only publication candidate also hit the unchanged scanner deadline.
+  Staging now shares identical current/history copies only when original path,
+  bytes and scanner treatment match. Retired-history masking remains separate
+  from current unmasked copies; every original object retains its boundary checks.
+  Added scanner-copy counts and a real three-file control. Its first assertion
+  omitted commit metadata/trees; the corrected case preserves twelve inspections
+  and eight scanner copies. It passed and rejected deliberate duplicate staging;
+  source was restored exactly. Twenty safety cases also passed in the initial
+  expanded batch. Final twenty-one-case execution, lint and zero duplication passed.
+  Full publication remains pending.
+
+- A third idle-host publication attempt also timed out in the candidate directory
+  scanner. Grouped staging by each original path's version rather than creating
+  a complete directory tree for every distinct object. Original paths, distinct
+  bytes, neutral copies, archive checks, rules and deadlines remain unchanged.
+  Added an unsafe-first/clean-second ZIP member collision control. Twenty scanner
+  regressions passed, then a filename-specific strengthening passed and rejected
+  a deliberate version-zero collision; source bytes were restored exactly.
+  Final twenty-case regression execution, lint and zero duplication passed.
+  Full repository publication timing remains pending.
+
+- The stage-diagnostic commit was refused when full publication scanning hit
+  its existing five-minute scanner deadline on the local Mac. No hook, scope,
+  rule or deadline was bypassed. Its full type and zero-duplication checks passed;
+  publication is being retried with fewer local Go scanner threads.
+  The retry also hit that unchanged deadline, so the diagnostic source remains
+  unpublished; neither failed attempt is counted as successful publication.
+
+- Linux contiguous calibration passed; eight of nine native codec cases now
+  passed. The exact output waveform case hit its original thirty-second limit.
+  Added synthetic-only test-stage reporting to distinguish encode, mux and
+  decoder stalls. Nine Mac cases and lint passed; no deadline was extended.
+
 - The decoded-chunk Linux probe found duplicate and skipped timestamps; copying
   by those timestamps overwrote the early marker. Sequential decoded PCM retained
   both markers at 1,600 frames with correlations above 0.99997. Calibration now
