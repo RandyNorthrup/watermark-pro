@@ -14,8 +14,9 @@ BETTER_AUTH_SECRET=
 # EMAIL_PROVIDER=console         # console | cloudflare (console is refused in production)
 # EMAIL_FROM=no-reply@lumafoil.com
 
-# Optional Cloudflare Turnstile bot protection for sign-up and password reset.
-# Both must be set together; leave both empty to run without a challenge.
+# Cloudflare Turnstile for signup, sign-in, password reset and verification resend.
+# Both required in production. Non-production fixtures may leave both unset.
+# Production rejects Cloudflare dummy keys; restrict the widget to lumafoil.com.
 # Create a widget at https://dash.cloudflare.com/?to=/:account/turnstile with the
 # site's hostname. The site key is public (set it as a plain var in production);
 # the secret key is a Worker secret.

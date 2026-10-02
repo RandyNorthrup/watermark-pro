@@ -94,6 +94,12 @@
     "inviteOnly": {
       "title": "Invitation required",
       "body": "Lumafoil is invite-only. Open the invitation link in your email to create your account."
+    },
+    "humanCheck": {
+      "label": "Human verification",
+      "failed": "Human verification failed. Reload this page and try again.",
+      "unavailable": "Human verification is unavailable. Check your connection and reload this page.",
+      "retry": "Retry human verification"
     }
   },
   "dashboard": {
@@ -1106,7 +1112,7 @@
       "analytics": {
         "heading": "Cookies and outside services",
         "p1": "Lumafoil includes no analytics beacon or advertising cookies. Essential cookies maintain sessions; device storage holds settings, offline copies and queued changes.",
-        "p2": "When enabled, Cloudflare Turnstile checks account requests for bots; see its <turnstile>privacy notice</turnstile>. Google/Microsoft handle chosen sign-in. Google Drive, Dropbox and OneDrive receive requests through cloud features you choose; their own privacy policies apply."
+        "p2": "Cloudflare Turnstile checks signup, sign-in and account recovery for bots. Its widget contacts Cloudflare, which receives browser and network information. Our server sends only the challenge token and verification key. See its <turnstile>privacy notice</turnstile>. Google/Microsoft handle chosen sign-in. Google Drive, Dropbox and OneDrive receive requests through cloud features you choose; their own privacy policies apply."
       },
       "audit": {
         "heading": "Audit trail",

@@ -6,6 +6,7 @@ import { defineConfig } from 'vitest/config'
 import { pdfjsAssetsPlugin } from './scripts/lib/pdfjs-assets.ts'
 
 const PAGE_TEST_TIMEOUT_MS = 20_000
+const MAX_TEST_WORKERS = 2
 
 /** Coverage floors. Lowering one needs a PLAN.md §9 entry. */
 const COVERAGE_THRESHOLDS = {
@@ -17,6 +18,8 @@ const COVERAGE_THRESHOLDS = {
 
 export default defineConfig({
   test: {
+    // Bound CPU contention without changing assertions, deadlines or coverage floors.
+    maxWorkers: MAX_TEST_WORKERS,
     projects: [
       {
         plugins: [
@@ -55,6 +58,8 @@ export default defineConfig({
         optimizeDeps: { include: ['zod/mini'] },
         test: {
           name: 'browser',
+          sequence: { groupOrder: 1 },
+          fileParallelism: false,
           include: ['src/client/**/*.browser.test.ts'],
           browser: {
             enabled: true,

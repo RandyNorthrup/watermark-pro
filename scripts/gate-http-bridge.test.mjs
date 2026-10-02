@@ -312,10 +312,16 @@ test('foreign targets, forged Host and GET bodies are refused before SDK dispatc
     return new Response('valid')
   })
   try {
+    const foreignHttp = new URL('/path', bridge.origin)
+    foreignHttp.hostname = 'foreign.example'
     for (const pathname of [
       'https://foreign.example/path',
+      foreignHttp.href,
       '//foreign.example/path',
       String.raw`/\foreign.example/path`,
+      `${bridge.origin}/valid#fragment`,
+      bridge.origin.replace('http://', 'http://synthetic@') + '/valid',
+      bridge.origin.replace('http://', 'https://') + '/valid',
     ])
       await expectStatus(bridge.origin, pathname, 400)
     await expectStatus(bridge.origin, '/valid', 400, { headers: { host: 'forged.example' } })
@@ -329,6 +335,13 @@ test('foreign targets, forged Host and GET bodies are refused before SDK dispatc
     assert.equal(calls, 0)
     await expectStatus(bridge.origin, '/valid', 200)
     assert.equal(calls, 1)
+    // WebKit's CONNECT transport retains absolute-form on some redirects.
+    await expectStatus(bridge.origin, `${bridge.origin}/valid?exact=yes`, 200)
+    assert.equal(calls, 2)
+    await expectStatus(bridge.origin, `${bridge.origin}/valid`, 400, {
+      headers: { host: 'forged.example' },
+    })
+    assert.equal(calls, 2)
     const port = Number(new URL(bridge.origin).port)
     await assert.rejects(createGateBridge(port), /EADDRINUSE/)
     await expectStatus(bridge.origin, '/valid', 200)

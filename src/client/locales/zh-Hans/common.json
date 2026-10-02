@@ -94,6 +94,12 @@
     "inviteOnly": {
       "title": "需要邀请",
       "body": "Lumafoil目前仅限受邀用户使用。请打开邮件中的邀请链接创建账户。"
+    },
+    "humanCheck": {
+      "label": "人机验证",
+      "failed": "验证失败。请刷新页面后重试。",
+      "unavailable": "暂时无法进行验证。请检查网络连接并刷新页面。",
+      "retry": "重试真人验证"
     }
   },
   "dashboard": {
@@ -1092,7 +1098,7 @@
       "analytics": {
         "heading": "Cookie 与外部服务",
         "p1": "Lumafoil 不包含分析信标或广告 Cookie。必要 Cookie 用于维持会话；设备存储保存设置、离线副本和待处理修改。",
-        "p2": "启用时，Cloudflare Turnstile 会检查账号请求以防机器人；请查看其<turnstile>隐私说明</turnstile>。Google/Microsoft 处理你选择的登录方式。你选择的云功能会向 Google Drive、Dropbox 和 OneDrive 发送请求，并适用各自的隐私政策。"
+        "p2": "Cloudflare Turnstile 会在注册、登录和账户恢复时检测机器人。其组件会连接 Cloudflare，后者会接收浏览器和网络信息。我们的服务器仅发送验证令牌和验证密钥。请参阅其<turnstile>隐私声明</turnstile>。Google/Microsoft 处理你选择的登录方式。你选择的云功能会向 Google Drive、Dropbox 和 OneDrive 发送请求，并适用各自的隐私政策。"
       },
       "audit": {
         "heading": "审计追踪",

@@ -94,6 +94,12 @@
     "inviteOnly": {
       "title": "Einladung erforderlich",
       "body": "Lumafoil ist nur auf Einladung verfügbar. Öffnen Sie den Einladungslink in Ihrer E-Mail, um Ihr Konto zu erstellen."
+    },
+    "humanCheck": {
+      "label": "Menschliche Überprüfung",
+      "failed": "Die Überprüfung ist fehlgeschlagen. Lade die Seite neu und versuche es erneut.",
+      "unavailable": "Die Überprüfung ist nicht verfügbar. Prüfe deine Verbindung und lade die Seite neu.",
+      "retry": "Menschliche Überprüfung erneut versuchen"
     }
   },
   "dashboard": {
@@ -1106,7 +1112,7 @@
       "analytics": {
         "heading": "Cookies und externe Dienste",
         "p1": "Lumafoil enthält weder Analysebeacons noch Werbecookies. Notwendige Cookies erhalten Sitzungen; der Gerätespeicher hält Einstellungen, Offlinekopien und ausstehende Änderungen.",
-        "p2": "Wenn aktiviert, prüft Cloudflare Turnstile Kontoanfragen auf Bots; siehe <turnstile>Datenschutzhinweis</turnstile>. Google/Microsoft übernehmen die gewählte Anmeldung. Google Drive, Dropbox und OneDrive erhalten Anfragen über ausgewählte Cloudfunktionen; ihre eigenen Datenschutzregeln gelten."
+        "p2": "Cloudflare Turnstile prüft Registrierung, Anmeldung und Kontowiederherstellung auf Bots. Das Widget verbindet sich mit Cloudflare, das Browser- und Netzwerkinformationen erhält. Unser Server sendet nur das Challenge-Token und den Verifizierungsschlüssel. Siehe den <turnstile>Datenschutzhinweis</turnstile>. Google/Microsoft übernehmen die gewählte Anmeldung. Google Drive, Dropbox und OneDrive erhalten Anfragen über ausgewählte Cloudfunktionen; ihre eigenen Datenschutzregeln gelten."
       },
       "audit": {
         "heading": "Audit-Trail",

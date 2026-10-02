@@ -15,7 +15,7 @@ import { Button } from '../components/ui/button'
 import { Field } from '../components/ui/field'
 import { Input } from '../components/ui/input'
 import { authClient } from '../lib/auth-client'
-import { describeAuthError } from '../lib/errors'
+import { describeAuthError, describeError } from '../lib/errors'
 import { clearPendingInvitation } from '../lib/pending-invitation'
 import { useCaptcha } from '../lib/use-captcha'
 import { useFormErrors } from '../lib/use-form-errors'
@@ -42,22 +42,26 @@ function SignUpPage() {
     if (parsed === null) {
       return
     }
+    if (!captcha.isReady) return
     setIsPending(true)
     setServerError(null)
-    const result = await authClient.signUp.email(
-      {
-        ...parsed,
-        callbackURL: '/app',
-      },
-      { headers: { ...captcha.headers, [INVITATION_HEADER]: invitation ?? '' } },
-    )
-    setIsPending(false)
-    if (result.error !== null) {
-      setServerError(describeAuthError(result.error))
-      return
+    try {
+      const result = await authClient.signUp.email(
+        { ...parsed, callbackURL: '/app' },
+        { headers: { ...captcha.headers, [INVITATION_HEADER]: invitation ?? '' } },
+      )
+      if (result.error !== null) {
+        setServerError(describeAuthError(result.error))
+        return
+      }
+      clearPendingInvitation()
+      await navigate({ to: '/check-email', search: { email: parsed.email } })
+    } catch (error) {
+      setServerError(describeError(error))
+    } finally {
+      captcha.reset()
+      setIsPending(false)
     }
-    clearPendingInvitation()
-    await navigate({ to: '/check-email', search: { email: parsed.email } })
   }
 
   if (invitation === undefined) {
@@ -91,7 +95,13 @@ function SignUpPage() {
         </>
       }
     >
-      <SocialAuth invitation={invitation} />
+      {captcha.isUnavailable ? (
+        <Alert tone="error">{t('auth.humanCheck.unavailable')}</Alert>
+      ) : null}
+      {captcha.siteKey === null ? null : (
+        <Turnstile key={captcha.generation} siteKey={captcha.siteKey} onToken={captcha.onToken} />
+      )}
+      <SocialAuth invitation={invitation} captcha={captcha} />
       <form
         onSubmit={(event) => void handleSubmit(event)}
         noValidate
@@ -126,9 +136,6 @@ function SignUpPage() {
             setValues({ ...values, password })
           }}
         />
-        {captcha.siteKey === null ? null : (
-          <Turnstile siteKey={captcha.siteKey} onToken={captcha.onToken} />
-        )}
         <Button
           type="submit"
           isPending={isPending}

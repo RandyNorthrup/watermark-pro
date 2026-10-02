@@ -40,6 +40,64 @@ beforeEach(async () => {
 })
 
 describe('Better Auth workspace and account boundaries', () => {
+  it('rejects an existing unverified session before custom reads and mutations without granting access from an account binding', async () => {
+    const original = sessionSchema.parse(await responseJson(owner.get('/api/auth/get-session')))
+    const context = await harness.services.auth.$context
+    await context.adapter.update({
+      model: 'user',
+      where: [{ field: 'id', value: original.user.id }],
+      update: { emailVerified: false },
+    })
+    const endpoint = '/api/me/recent-view'
+    const headers = { [ACCOUNT_ID_HEADER]: original.user.id, 'content-type': 'application/json' }
+    for (const method of ['GET', 'PATCH']) {
+      const denied = await owner.request(endpoint, {
+        method,
+        headers,
+        ...(method === 'PATCH' && { body: JSON.stringify({ view: 'details' }) }),
+      })
+      expect(denied.status).toBe(403)
+      expect(await denied.json()).toEqual({ error: 'forbidden' })
+      expect(denied.headers.get('cache-control')).toBe('no-store')
+    }
+    for (const path of [
+      '/api/auth/organization/list',
+      '/api/auth/organization/get-full-organization',
+    ]) {
+      expect(await responseStatus(owner.get(path))).toBe(403)
+      expect(await responseStatus(other.get(path))).toBe(200)
+    }
+    expect(
+      await responseStatus(
+        owner.post('/api/auth/organization/create', {
+          name: 'Unverified fixture',
+          slug: 'unverified-fixture',
+        }),
+      ),
+    ).toBe(403)
+    await context.adapter.update({
+      model: 'user',
+      where: [{ field: 'id', value: original.user.id }],
+      update: { emailVerified: true },
+    })
+    expect(await responseJson(owner.get(endpoint))).toEqual({ view: 'thumbnails' })
+    expect(await responseStatus(owner.get('/api/auth/organization/list'))).toBe(200)
+    await context.adapter.update({
+      model: 'user',
+      where: [{ field: 'id', value: original.user.id }],
+      update: { banned: true },
+    })
+    expect(await responseStatus(owner.get(endpoint))).toBe(403)
+    expect(await responseStatus(owner.post('/api/me/workspace', {}))).toBe(403)
+    expect(await responseStatus(owner.get('/api/auth/organization/list'))).toBe(403)
+    await context.adapter.update({
+      model: 'user',
+      where: [{ field: 'id', value: original.user.id }],
+      update: { banned: false },
+    })
+    expect(await responseStatus(owner.post('/api/me/workspace', {}))).toBe(200)
+    expect(await responseStatus(other.get(endpoint))).toBe(200)
+  })
   it.each([
     'get-organization',
     'get-full-organization',
