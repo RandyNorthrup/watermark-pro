@@ -141,9 +141,8 @@ export const DRILLS = [
   {
     name: 'Uploads: photo count quota not enforced',
     file: 'src/worker/db/upload-store.ts',
-    find: "input.kind === 'photo' ? MAX_PHOTOS_PER_ORGANIZATION : MAX_LOGOS_PER_ORGANIZATION",
-    replace:
-      "input.kind === 'photo' ? MAX_PHOTOS_PER_ORGANIZATION + 1 : MAX_LOGOS_PER_ORGANIZATION",
+    find: '${uploadCount(input.organizationId, input.kind)} < ${maxCount}',
+    replace: '${uploadCount(input.organizationId, input.kind)} <= ${maxCount}',
     ...workers('src/worker/uploads.workers.test.ts'),
   },
   {
