@@ -22,6 +22,29 @@ const hasNativeAac = await canEncodeAudio('aac', {
   bitrate: AUDIO_REENCODE_BITRATE,
 })
 
+/** Independent synthetic diagnostic searches advances too; production keeps its current delay guard. */
+function signedPeaks(decoded: Float32Array) {
+  const reference = aacCalibrationSignal()
+  const policy = AAC_TIMING_POLICY
+  return policy.markers.map((marker) => {
+    const start = marker.start + policy.measuredOffset
+    const expected = reference.subarray(start, start + policy.measuredFrames)
+    const energy = expected.reduce((sum, value) => sum + value * value, 0)
+    let peak = { delay: 0, score: -1, runnerUp: -1 }
+    for (let shift = -policy.maximumDelayFrames; shift <= policy.maximumDelayFrames; shift += 1) {
+      const begin = start + shift
+      if (begin < 0 || begin + expected.length > decoded.length) continue
+      const actual = decoded.subarray(begin, begin + expected.length)
+      const product = expected.reduce((sum, value, index) => sum + value * (actual[index] ?? 0), 0)
+      const actualEnergy = actual.reduce((sum, value) => sum + value * value, 0)
+      const score = product / Math.sqrt(energy * actualEnergy || 1)
+      if (score > peak.score) peak = { delay: shift, score, runnerUp: peak.score }
+      else peak.runnerUp = Math.max(peak.runnerUp, score)
+    }
+    return peak
+  })
+}
+
 it(
   hasNativeAac
     ? 'measures native AAC packet and decoded timestamp origins from synthetic PCM'
@@ -73,6 +96,7 @@ it(
         decodedFirst: extents[0],
         decodedLast: extents.at(-1),
         decodedFrames: end,
+        signedPeaks: signedPeaks(decoded.subarray(0, end)),
       }
       try {
         const delay = measureAacDelay(decoded.subarray(0, end))

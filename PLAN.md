@@ -12,6 +12,13 @@ Last updated: 2026-10-02 (native encoder and playback regression verification)
 
 ### Linux WebKit codec follow-up — 2026-10-02
 
+The padded Linux recording on `b22e670` retained 20,480 decoded frames, resolving
+the extent shortfall, but positive-delay alignment still failed its unchanged
+correlation guard. Diagnose signed synthetic offsets before changing runtime
+timing. A separate read-only `native-codecs.yml` workflow runs that contract on
+Linux without replacing canonical quality/device checks. The local probe passed
+nine Mac cases; workflow syntax and repository policy checks passed.
+
 The corrected native probe on `eb69403` measured a 1,024-frame shortfall in the
 Linux encoder's synthetic calibration output: 15,360 decoded frames from 16,384
 submitted reference frames, with zero origin and 48 kHz configuration. Add a

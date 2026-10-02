@@ -330,6 +330,15 @@ can retain the reference, with a shortened-reference negative. All 34 pure cases
 and nine Mac WebKit cases passed, followed by lint and complete type checking.
 Hosted Linux execution and all final-source gates remain pending.
 
+Padded source `b22e670` passed static/publication gates and 2,879 covered cases,
+then its Linux codec step failed signal alignment. Its recording now had 20,480
+decoded frames at 48 kHz, so the former extent failure was resolved; the measured
+positive-delay peak still did not meet the unchanged correlation/uniqueness bar.
+The next synthetic probe searches signed offsets for diagnosis only. A separate
+read-only Linux codec workflow reduces feedback time without substituting for
+required quality/device checks. Production timing remains unchanged until that
+evidence supports a correction.
+
 M19 remains open. The owner added public free/paid monthly USD plans, Stripe
 billing, private two-invitation membership, shared paid workspaces and explicit
 human/trust gates during verification. This becomes the next implementation slice

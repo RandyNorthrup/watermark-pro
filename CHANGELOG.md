@@ -9,6 +9,12 @@ what was planned; superseded entries stay.
 
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
+- The padded Linux recording reached 20,480 decoded frames, but calibration
+  still refused an ambiguous/nonmatching positive-delay peak. Added an independent
+  signed-offset diagnostic over synthetic samples and a dedicated read-only Linux
+  codec workflow. It cannot satisfy or replace the required canonical gates.
+  Production timing, delay limits and waveform assertions remain unchanged.
+
 - The corrected Linux probe reached native execution: 16,384 submitted reference
   frames produced only 15,360 decoded frames, despite matching 48 kHz and zero
   timestamp origin. Calibration now submits 4,096 additional known silent frames.
