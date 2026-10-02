@@ -127,11 +127,16 @@ test('inline editor creates on its one live canvas and saves the exact edited dr
     password: 'correct horse battery',
   })
   await navigateTo(page, 'Images')
+  const radial = page.getByRole('button', { name: 'Open navigation', exact: true })
+  const isRadial = await radial.isVisible()
+  const menuTrigger = isRadial ? radial : page.getByRole('button', { name: 'Menu', exact: true })
+  await menuTrigger.click()
   await expect(
     page
-      .getByRole('navigation', { name: 'Primary', exact: true, includeHidden: true })
-      .locator('a'),
+      .getByRole('navigation', { name: isRadial ? 'Primary' : 'Primary (menu)', exact: true })
+      .getByRole('link'),
   ).toHaveText(['Images', 'Documents', 'Videos', 'Bulk', 'Saved Watermarks', 'Watermarked Images'])
+  await page.keyboard.press('Escape')
   const tools = page.getByRole('tablist', { name: 'Editor tools', exact: true })
   await expect(tools.getByRole('tab')).toHaveText([
     'Presets',

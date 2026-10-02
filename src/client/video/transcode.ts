@@ -16,7 +16,6 @@ import {
   AudioBufferSource,
   BlobSource,
   BufferTarget,
-  CanvasSource,
   EncodedAudioPacketSource,
   EncodedPacketSink,
   Input,
@@ -26,10 +25,11 @@ import {
   VideoSampleSink,
   WebMOutputFormat,
 } from 'mediabunny'
-import type { InputAudioTrack, InputVideoTrack, OutputFormat } from 'mediabunny'
+import type { CanvasSource, InputAudioTrack, InputVideoTrack, OutputFormat } from 'mediabunny'
 
 import { CancelledError } from './errors'
 import { context2d } from './frame'
+import { createFrameEncoder } from './frame-encoder'
 import { videoMotionSchema, videoSpecAt, type VideoMotion } from './motion'
 import type { AudioPlan, TranscodePlan, VideoContainer } from './plan'
 import { artworkLicenseNotice } from '../../shared/asset-licenses'
@@ -138,7 +138,7 @@ async function encodeFrames(
   signal: AbortSignal,
   progress: TranscodeProgress,
   motions: readonly (VideoMotion | null)[],
-): Promise<void> {
+): Promise<number> {
   const sink = new VideoSampleSink(track)
   let map: LuminanceMap | null = null
   let index = 0
@@ -162,6 +162,7 @@ async function encodeFrames(
     index += 1
     progress.onProgress?.(index, timestamp)
   }
+  return index
 }
 
 /** Transcodes one video, drawing the marks on every frame; returns the muxed file. */
@@ -186,16 +187,14 @@ export async function transcodeVideo(
   const output = new Output({ format: outputFormatFor(plan.container), target: new BufferTarget() })
   const assetNotice = artworkLicenseNotice(marks.map((mark) => mark.spec))
   if (assetNotice !== null) output.setMetadataTags({ comment: assetNotice })
-  const videoSource = new CanvasSource(canvas, {
-    codec: plan.videoCodec,
-    quality: new Quality({ bitrate: plan.bitrate }),
-  })
+  const encoder = createFrameEncoder(canvas, plan)
+  const videoSource = encoder.source
   output.addVideoTrack(videoSource)
   const audioPipe = await buildAudioPipe(input, output, plan.audio)
 
   await output.start()
   try {
-    await encodeFrames(
+    const frames = await encodeFrames(
       videoTrack,
       ctx,
       { width, height },
@@ -208,10 +207,11 @@ export async function transcodeVideo(
     videoSource.close()
     await drainAudio(audioPipe, signal)
     await output.finalize()
+    encoder.verifyFrameCount(frames)
   } catch (error) {
     // Release the encoder and every internal resource whether we were cancelled
     // or hit a real failure; then let the caller see which it was.
-    await output.cancel()
+    if (output.state !== 'finalized') await output.cancel()
     throw error
   }
   const { buffer } = output.target

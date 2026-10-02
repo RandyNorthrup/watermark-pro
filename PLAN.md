@@ -4,18 +4,195 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-01 (automatic CI/CD and GitHub repository protection)
+Last updated: 2026-10-02 (native encoder and playback regression verification)
 
 ---
 
 ## 1. Product summary
 
+### Stripe account clarification — 2026-10-02
+
+The owner requires a new separate Lumafoil Stripe business account under the
+existing owner login. A renewed CLI authorization reached an unrelated account;
+only account metadata was read, with no catalog, payments or remote secrets
+created. The official Stripe Codex plugin is installed and enabled at the owner's
+request, but new Lumafoil Dashboard authentication, account setup and connection
+remain pending. A CLI profile name is not provider account authority. Pin and
+verify the intended actual account ID and test/live mode before any provisioning.
+The public repository retains verified GitHub protections; the 2026-10-02
+readback again passed all thirteen endpoints and confirmed public visibility.
+Service credentials stay outside Git, with owner-only local access and dedicated
+restricted Worker secrets for eventual production billing. M19 remains open.
+
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and
-PDF documents. The hosted service is invitation-only; each admitted user gets
-a private workspace and a unique invitation link. The source is available free
+PDF documents. The hosted service is transitioning from private invitations to
+public Free, Pro and Team subscriptions alongside its private membership cohort.
+Each account receives a private workspace; sharing remains explicit and separate
+from admission. The source is available free
 on GitHub for self-hosting. Cloudflare Workers at `lumafoil.com` is the target
 production origin; full release certification retains the explicit M19 provider
 verification and owner-deferred performance boundaries.
+
+### Collapsible navigation amendment — 2026-10-01
+
+The owner requested that the desktop sidebar collapse into a clickable bullet
+that opens the gooey menu from Lucas Bebber's CodePen LELBEo. The rail is replaced
+by a flush-edge half-circle button and six labelled radial destinations. Only the
+bounded circle backgrounds receive the SVG filter; icons and text remain sharp.
+The owner clarified that the closed bullet must be a half circle and must not
+interfere with the canvas. Its 24 px width stays inside the 32 px wide-layout
+content margin; RTL mirrors its shape and expansion. The header retains workspace selection and persistent offline synchronization;
+phone tabs and their accessible menu sheet remain available. Radix Popover owns
+focus, Escape and outside-click dismissal. Reduced motion removes transforms,
+and route/account/workspace changes close the menu. The example's MIT notice is
+preserved in `docs/licenses/gooey-menu.txt`; no external assets or dependency are
+added. This belongs to the current M19 UI slice and requires fresh visual,
+keyboard, accessibility and four-device navigation evidence.
+
+### Video editor amendment — 2026-10-01
+
+The owner requested a DaVinci Resolve-style video workspace and explicitly chose
+full multi-clip editing, including cutting, trimming and video/audio tracks.
+Native export investigation on 2026-10-02 isolated WebKit's H.264 quality-mode
+lookahead stalling after seven rendered frames against the pinned encoder's
+bounded queue. Both native pipelines now use explicit low-latency encoding with
+emitted-frame validation: any omitted frame refuses the export. The real
+development main-thread/worker probes completed in WebKit and Chromium with all
+60 packets and exact two-second duration. Focused negative/native tests and fresh
+complete gates remain required; the AAC priming and offline/recent-media defects
+remain open. This does not certify M19 or change any existing deadline or budget.
+The corrected first-video journey passed on iPhone, iPad and Android. Desktop
+exposed a separate startup race: a stale paused synchronization effect interrupted
+the new native Play promise before state commit. Playback now records its intent
+immediately. The startup regression failed on pre-fix source and passed on final
+source, with genuine playback refusal retained as a negative. Seven focused
+preview/frame-integrity cases passed. The fresh production-build first-video
+journey now passes on all four devices, including native frame/codec/duration
+assertions and axe; full quality/SAST, multi-clip audio export, offline regressions
+and release audits remain required. A later complete type check corrected an
+unsupported test-query option.
+AAC development probes additionally measured priming and padding on both native
+engines. A container-only timing candidate failed native WebKit decoded-tail
+integrity and was rejected; it is not runtime code. The subsequent complete
+Apple edit-list/sample-group experiment restored WebKit's ending marker, but
+returned 192,448 frames (4.009333 seconds) and retained a 21.313 ms start offset,
+while Chromium returned the intended 192,000 frames. The fixed-delay experiment
+therefore does not establish correct priming for both encoders. The next timing
+slice must measure the selected encoder's delay and prove waveform alignment and
+full decoded duration, rather than rely on container metadata alone.
+No fixed platform priming assumption, codec dependency or relaxed
+duration gate is approved by this investigation.
+The subsequent candidate measures the actual selected AAC encoder with a bounded
+341 ms, two-chirp synthetic self-test at the project's existing 48 kHz stereo /
+128 kbit/s configuration. Two unambiguous correlation peaks must agree on a
+delay within 8,192 samples; malformed/ambiguous output fails explicitly. The
+calibration never uses or persists personal media. Streaming AAC retains preroll
+and silent codec-edge padding, then expresses measured priming and the intended
+duration through complete MP4 edit-list/roll-group metadata. Movie metadata stays
+after media so existing chunk offsets do not change. The strict writer checks
+packet counts, timescales, duplicate metadata and other track duration before
+mutation. Pure controls passed 33 cases; native edge/timing and lifecycle tests
+passed eight cases in each Chromium and WebKit, and ten existing Chromium
+composition cases passed. Final source gates and built four-device journeys are
+then passed on all four devices with the original duration/audio assertions and
+axe. Complete quality/SAST and the full device/release matrices remain required;
+this focused result does not certify M19.
+This is the current M19 implementation slice, ahead of the remaining performance
+corrections. The workspace uses a media pool, central composited viewer, inspector
+and full-width timeline. Two video layers and four audio lanes support actual
+source intervals, cuts, placement, picture transforms, linked camera audio,
+independent sound, track visibility/mute and one undo history with watermark edits.
+The export engine must render the edited composition and mix its audio, rather
+than export an unedited source. No placeholder clips, waveforms or inactive tools
+are permitted. Native decoding validates imported media; local project data stays
+account/workspace scoped and is cleared on an identity change. Source file,
+duration and dimension bounds remain intact; project clips and media are bounded.
+Native viewer verification uses the real stylesheet and real element geometry,
+with the already-installed Tailwind Vite plugin in the browser test project. The
+old global rectangle stub is removed because it intercepted compact-control
+clicks rather than measuring the rendered UI. Vitest runs at most two simultaneous
+workers so covered router journeys and native canvas/codec tests do not oversubscribe
+the local machine. Native browser files run serially after the Node projects:
+Vitest project pools otherwise overlap despite the worker cap, and the full Mac
+run exposed pixel-budget and sticker-decode contention. This uses documented
+`sequence.groupOrder` and `fileParallelism` behavior from
+https://vitest.dev/config/sequence.html and https://vitest.dev/config/fileparallelism.html.
+All existing assertion deadlines, performance budgets and coverage floors remain unchanged. Existing backdrop verification samples actual
+text bounds because system-font metrics differ by platform. It samples backdrop
+padding above white glyphs and checks both a disabled-backdrop control and
+untouched pixels outside the mark. Complete font catalogue loading verifies all
+family/weight pairs in batches of eight under its unchanged 20-second deadline.
+No dependency addition is planned. This implementation does not certify M19:
+quality, SAST, four-device Playwright/axe, rendered desktop/mobile review and
+complete UI release audits remain required before production publication.
+
+### Video visual polish follow-up — 2026-10-01
+
+The owner explicitly requested a mature, polished interface and comparison with
+real online and desktop editors. Official Blackmagic Resolve Edit, Adobe Premiere
+audio-workspace, Microsoft Clipchamp and VEED timeline/product screenshots were inspected.
+The adopted design uses a compact title/toolbar, one aligned editing frame,
+neutral light or graphite dark panel surfaces, a larger uninterrupted picture
+stage, restrained rose selection/action accents and teal audio clips. Existing
+app theme preferences remain authoritative. Source thumbnails are real decoded
+posters, including in timeline clips; no waveform, meter or inactive tool is
+invented. Timing and transform controls are grouped, playback/time readout sits
+on one transport row, and the playhead includes a visible ruler marker. Desktop
+controls are compact while phone controls retain their existing touch sizes.
+Inspector scroll ownership must keep every control reachable without clipping.
+Phone panel toggles retain accessible names with compact icons, and narrow timeline
+rulers reduce labelled seek points so time labels cannot collide. Audio media uses
+a compact music row rather than an empty video-shaped poster.
+Reference images remain private temporary review artifacts; documentation links
+to official sources rather than publishing their copyrighted screenshots.
+The pending quality run was explicitly stopped for this follow-up; no stopped
+run counts as a pass. Fresh built visual, axe and complete executable checks are
+required on the final polished source.
+
+### Public plans, private membership and billing amendment — 2026-10-01
+
+The owner explicitly expanded the current work to a public free/paid business
+model alongside the existing private invitation cohort. This supersedes
+invite-only public signup and marketing wherever historical notes require them.
+Existing private members retain their current access and receive two new site
+invitations each; every new private invitee receives two invitations. Private
+membership is not advertised on the public site and retains the donation button.
+Public free and paid accounts do not automatically gain private invitation rights.
+Site invitations continue to create separate private accounts, not membership in
+the inviter's workspace.
+
+The owner selected USD and monthly subscriptions only. The 2026-10-02
+clarification requires a new separate Lumafoil Stripe account under the existing
+owner login. Competitive research must compare the actual current feature set,
+monthly rather than annual teaser prices, storage/processing costs, Stripe fees,
+free/private usage and operating-cost reserves before selecting public plans.
+The selected launch model is Free, Pro at $9/month and Team at $24/month for three
+members. Native tools remain available on Free; paid value is bounded photo/gallery
+storage and an explicit shared workspace. There is no Enterprise tier without
+implemented enterprise controls. Current competitive sources, storage allowances,
+US illustrative unit costs, unverified account-rate assumptions and certification
+requirements are recorded in [the public billing specification](docs/plans/public-billing.md).
+These are selected implementation targets, not shipped subscriptions or a net-profit
+guarantee. Paid collaboration must define billing ownership, seats,
+explicit workspace grants and downgrade behavior without weakening tenant isolation.
+Public landing, signup, billing and legal/privacy copy must describe implemented
+public plans without disclosing the private invitation cohort.
+
+The owner specifically requires privacy, abuse prevention and human/trust gates.
+Public admission and sensitive auth paths must verify Cloudflare Turnstile on the
+server, require verified email and enforce bounded rate/usage limits. Challenge
+completion does not grant workspace access or private invite rights. Stripe
+Checkout/portal operations must derive customer, plan, price and workspace from
+server-owned state; verified, idempotent webhooks govern entitlements. Tests must
+cover forged/replayed/out-of-order payment events, quota races, role checks,
+cross-account/workspace access and public/private admission separation. Sensitive
+billing/admin actions need explicit authorization and appropriate reauthentication.
+No production card data, secret keys or full webhook bodies belong in logs or chat.
+
+The existing video/navigation batch is completed and verified first. This billing,
+public-admission, collaboration and trust/security work is the next implementation
+slice inside M19, followed by the remaining performance/release certification
+obligations. Production still requires every unchanged CI and UI release gate.
 
 ### Repository CI/CD amendment — 2026-10-01
 
@@ -55,14 +232,20 @@ copies, isolated transfer branch/artifact and local private key were removed.
 Implementation, live settings readback, test receipts and credential-scope
 relocation are tracked in `docs/verification/github-ci-2026-10-01.md`. Reproducible
 remote expectations are in `.github/repository-policy.json`; `github:verify` is a
-read-only administrator check, kept outside unprivileged PR CI. M19 remains open. The local Mac verification attempt hit browser/UI deadlines
-and was stopped; hosted Linux canonical quality passed in run `36909811930`,
-whose SAST failure correctly kept the overall PR red. Corrected source
-`eec7319` passed full local and hosted Semgrep; exact-head device/aggregate
-receipts remain authoritative in PR #8 checks. Local failures remain
-explicitly unclosed and are not replaced with a passing local claim.
-The next product slice is shared mobile boot/LCP/TBT and Account CLS correction,
-plus the three failing desktop surfaces, followed by the unchanged full audits.
+read-only administrator check, kept outside unprivileged PR CI. PR #8 merged as
+`1811a4a` after all seven checks passed in run `36917006139`. Its automatic main
+pipeline `36922734241` passed canonical quality, SAST and every Playwright/axe
+device, then correctly refused production deployment: Lighthouse passed 33/36
+desktop and 2/36 mobile surfaces; phone/Android screenshot profiles passed while
+desktop/tablet profiles failed. Desktop could not find the Arabic recent-photo
+fixture; tablet could not reach the valid password-reset form. These remain
+explicit failed receipts, with migration/deployment skipped. Earlier failed local
+and hosted attempts are preserved in the verification record.
+
+The current product slice is the owner's video/navigation amendment above.
+After it, address shared mobile boot/LCP/TBT, Account CLS, the three failing
+desktop Lighthouse surfaces and desktop/tablet screenshot failures, then rerun
+the unchanged full release audits. M19 remains open.
 
 ### Current M19 amendment — 2026-09-13
 

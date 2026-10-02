@@ -37,8 +37,12 @@ function formatFor(codec: VideoCodec): OutputFormat {
 }
 
 /** A grey background with a blue square marching along the top, well clear of a bottom-right mark. */
-function paintFrame(ctx: OffscreenCanvasRenderingContext2D, index: number): void {
-  ctx.fillStyle = '#808080'
+function paintFrame(
+  ctx: OffscreenCanvasRenderingContext2D,
+  index: number,
+  background = '#808080',
+): void {
+  ctx.fillStyle = background
   ctx.fillRect(0, 0, CLIP_WIDTH, CLIP_HEIGHT)
   ctx.fillStyle = '#3060c0'
   ctx.fillRect((index * SQUARE_STEP) % (CLIP_WIDTH - SQUARE), 0, SQUARE, SQUARE)
@@ -58,7 +62,7 @@ export interface TestClip {
 }
 
 /** A short moving-square clip, video only. */
-export async function encodeTestClip(): Promise<TestClip> {
+export async function encodeTestClip(background = '#808080'): Promise<TestClip> {
   const codec = await getFirstEncodableVideoCodec(['avc', 'vp9', 'vp8', 'av1'], {
     width: CLIP_WIDTH,
     height: CLIP_HEIGHT,
@@ -76,7 +80,7 @@ export async function encodeTestClip(): Promise<TestClip> {
   output.addVideoTrack(source)
   await output.start()
   for (let index = 0; index < CLIP_FRAMES; index += 1) {
-    paintFrame(ctx, index)
+    paintFrame(ctx, index, background)
     await source.add(index * FRAME_DURATION, FRAME_DURATION)
   }
   await output.finalize()

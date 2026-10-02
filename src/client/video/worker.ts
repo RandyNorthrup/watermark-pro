@@ -10,6 +10,7 @@
  * single asserted scope, the way `main.tsx` reaches the launch-queue globals.
  */
 import { CancelledError } from './errors'
+import { transcodeProject } from './project-transcode'
 import type { TranscodeStartMessage, VideoWorkerRequest, VideoWorkerResponse } from './protocol'
 import { transcodeVideo } from './transcode'
 import { FontLoader } from '../engine/fonts'
@@ -42,20 +43,22 @@ async function handle(message: TranscodeStartMessage): Promise<void> {
   active.controller = jobController
   try {
     await fonts.ensure(message.fonts)
-    const blob = await transcodeVideo(
-      {
-        source: message.source,
-        marks: message.marks,
-        plan: message.plan,
-        signal: jobController.signal,
-        motions: message.motions,
+    const request = {
+      source: message.source,
+      marks: message.marks,
+      plan: message.plan,
+      signal: jobController.signal,
+      motions: message.motions,
+    }
+    const callbacks = {
+      onProgress: (frames: number, timestamp: number) => {
+        reply({ type: 'progress', id: message.id, frames, timestamp })
       },
-      {
-        onProgress: (frames, timestamp) => {
-          reply({ type: 'progress', id: message.id, frames, timestamp })
-        },
-      },
-    )
+    }
+    const blob =
+      message.composition === undefined
+        ? await transcodeVideo(request, callbacks)
+        : await transcodeProject({ ...request, ...message.composition }, callbacks)
     reply({ type: 'done', id: message.id, blob })
   } catch (error) {
     if (error instanceof CancelledError) {

@@ -227,7 +227,21 @@ async function captureNormalGlass(page, context, browserType, colorScheme, shoot
   }
 }
 
-/** Reaches a destination the way a user of this layout would: sidebar, tab bar, or the menu sheet. */
+/** Filters translated links by their route so matching admin/workspace labels stay distinct. */
+async function followVisibleDestination(scope, destinationLabel, expectedHref) {
+  const destinations = await scope.getByRole('link', { name: destinationLabel, exact: true }).all()
+  for (const destination of destinations) {
+    const isMatchesDestination =
+      expectedHref === undefined || (await destination.getAttribute('href')) === expectedHref
+    if (isMatchesDestination && (await destination.isVisible())) {
+      await destination.click()
+      return true
+    }
+  }
+  return false
+}
+
+/** Reaches a destination the way a user of this layout would: radial menu, tab bar, or the menu sheet. */
 async function navigateTo(page, destinationLabel, expectedHref) {
   const locale = await page.locator('html').getAttribute('lang')
   if (!LOCALES.includes(locale)) throw new Error('Unsupported navigation locale')
@@ -237,17 +251,19 @@ async function navigateTo(page, destinationLabel, expectedHref) {
   })
   if (await access.isVisible())
     await access.getByRole('button', { name: label(locale, 'gallery.close'), exact: true }).click()
-  const links = await page
-    .getByRole('navigation')
-    .getByRole('link', { name: destinationLabel, exact: true })
-    .all()
-  for (const link of links) {
-    const isMatchesDestination =
-      expectedHref === undefined || (await link.getAttribute('href')) === expectedHref
-    if (isMatchesDestination && (await link.isVisible())) {
-      await link.click()
+  if (await followVisibleDestination(page.getByRole('navigation'), destinationLabel, expectedHref))
+    return
+  const radial = page.getByRole('button', {
+    name: label(locale, 'shell.openNavigation'),
+    exact: true,
+  })
+  if (await radial.isVisible()) {
+    await radial.click()
+    if (
+      await followVisibleDestination(page.getByRole('navigation'), destinationLabel, expectedHref)
+    )
       return
-    }
+    await page.keyboard.press('Escape')
   }
   // The active navigation is authoritative: translated Admin and workspace
   // labels can coincide, while the account menu targets a different section.
@@ -256,17 +272,9 @@ async function navigateTo(page, destinationLabel, expectedHref) {
   if (await menu.isVisible()) {
     await menu.click()
     const dialog = page.getByRole('dialog', { name: menuLabel, exact: true })
-    const destinations = await dialog
-      .getByRole('link', { name: destinationLabel, exact: true })
-      .all()
-    for (const destination of destinations) {
-      const isMatchesDestination =
-        expectedHref === undefined || (await destination.getAttribute('href')) === expectedHref
-      if (isMatchesDestination && (await destination.isVisible())) {
-        await destination.click()
-        await expect(dialog).toHaveCount(0)
-        return
-      }
+    if (await followVisibleDestination(dialog, destinationLabel, expectedHref)) {
+      await expect(dialog).toHaveCount(0)
+      return
     }
     await dialog
       .getByRole('button', { name: label(locale, 'shell.closeMenu'), exact: true })

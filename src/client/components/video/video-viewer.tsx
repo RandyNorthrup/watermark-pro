@@ -1,16 +1,28 @@
 import { Pause, Play } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+  type Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { VIDEO_PREVIEW_MAX_SIDE } from '../../../shared/constants'
+import { ProjectPreview, type ProjectPlaybackHandle } from './project-preview'
+import { VIDEO_PREVIEW_MAX_SIDE, VIDEO_PROJECT_LIMITS } from '../../../shared/constants'
+import type { VideoProject } from '../../../shared/video-project'
 import type { LuminanceMap } from '../../engine/analysis'
 import { contextOf } from '../../engine/canvas'
 import type { Size } from '../../engine/layout'
 import { composeMark, type MarkOutcome } from '../../engine/pipeline'
 import { describeError } from '../../lib/errors'
 import { specForPhoto } from '../../lib/spec-tokens'
-import { VIDEO_MOTION_LIMITS, videoSpecAt } from '../../video/motion'
+import { videoSpecAt } from '../../video/motion'
 import type { VideoProbe } from '../../video/probe'
+import type { ProjectMediaAsset } from '../../video/project-media'
 import { videoTimeLabel } from '../../video/time'
 import { MarkOverlay, type MarkGesture } from '../editor/mark-overlay'
 import { MediaViewport } from '../editor/media-viewport'
@@ -18,11 +30,13 @@ import { useMediaMarks } from '../editor/use-media-marks'
 import type { MediaScene } from '../editor/use-media-scene'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
-import { SliderField } from '../ui/slider-field'
+import { RangeSlider } from '../ui/slider-field'
 
 interface VideoViewerProps {
   organizationId: string
-  url: string
+  project: VideoProject
+  mediaAssets: readonly ProjectMediaAsset[]
+  playbackRef?: Ref<ProjectPlaybackHandle>
   file: File
   outputSize: Size
   probe: VideoProbe
@@ -32,12 +46,15 @@ interface VideoViewerProps {
   onTime: (time: number) => void
   onPlacements: (placements: MarkOutcome[]) => void
   onGesture: (id: string, gesture: MarkGesture) => void
+  onSelectMark?: () => void
 }
 
 /** Native playback beneath a transparent mark canvas; no video decode/PNG round trip during interaction. */
 export function VideoViewer({
   organizationId,
-  url,
+  project,
+  mediaAssets,
+  playbackRef,
   file,
   outputSize,
   probe,
@@ -47,14 +64,24 @@ export function VideoViewer({
   onTime,
   onPlacements,
   onGesture,
+  onSelectMark,
 }: VideoViewerProps) {
   const { t } = useTranslation()
-  const [video, setVideo] = useState<HTMLVideoElement | null>(null)
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const attachVideo = useCallback((element: HTMLVideoElement | null) => {
-    videoRef.current = element
-    setVideo(element)
-  }, [])
+  const playback = useRef<ProjectPlaybackHandle | null>(null)
+  useImperativeHandle(
+    playbackRef,
+    () => ({
+      async toggle() {
+        if (playback.current === null) throw new Error('Video preview is not ready.')
+        await playback.current.toggle()
+      },
+      seek(value) {
+        if (playback.current === null) throw new Error('Video preview is not ready.')
+        playback.current.seek(value)
+      },
+    }),
+    [],
+  )
   const rasterSize = useMemo(() => {
     const factor = Math.min(1, VIDEO_PREVIEW_MAX_SIDE / Math.max(probe.width, probe.height))
     return { width: Math.round(probe.width * factor), height: Math.round(probe.height * factor) }
@@ -93,7 +120,7 @@ export function VideoViewer({
           },
         })),
       )
-      if (video?.paused !== false)
+      if (!isPlaying)
         setOutcomes((previous) =>
           JSON.stringify(previous) === JSON.stringify(next) ? previous : next,
         )
@@ -107,82 +134,42 @@ export function VideoViewer({
     resources.marks,
     scene.renderLayers,
     scene.value.animations,
-    video,
+    isPlaying,
   ])
 
   useEffect(() => {
-    if (video === null || !isPlaying) return
-    let isActive = true
-    let frame = 0
-    let previousTime = -1
-    const paint = () => {
-      if (!isActive) return
-      if (video.currentTime !== previousTime) {
-        draw.current?.(video.currentTime)
-        previousTime = video.currentTime
-      }
-      frame = requestAnimationFrame(paint)
-    }
-    frame = requestAnimationFrame(paint)
-    return () => {
-      isActive = false
-      cancelAnimationFrame(frame)
-    }
-  }, [video, isPlaying])
-
-  useEffect(() => {
-    const element = videoRef.current
-    if (
-      element === null ||
-      !element.paused ||
-      Math.abs(element.currentTime - time) < 1 / VIDEO_MOTION_LIMITS.timePrecision
-    )
-      return
-    element.currentTime = time
-  }, [video, time])
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => draw.current?.(video?.currentTime ?? time))
+    if (isPlaying) return
+    const frame = requestAnimationFrame(() => draw.current?.(time))
     return () => cancelAnimationFrame(frame)
-  }, [canvas, map, probe, resources.marks, scene.value.animations, time, video])
+  }, [canvas, isPlaying, map, probe, resources.marks, scene.value.animations, time])
+
+  const onFrame = useCallback((timestamp: number) => draw.current?.(timestamp), [])
+  const onPlaybackError = useCallback((error: unknown) => setError(describeError(error)), [])
 
   async function togglePlayback() {
-    if (video === null) return
     try {
-      if (video.paused) await video.play()
-      else video.pause()
       setError(null)
+      if (playback.current === null) throw new Error('Video preview is not ready.')
+      await playback.current.toggle()
     } catch (error) {
       setError(describeError(error))
     }
   }
 
   return (
-    <div className="flex min-w-0 flex-col gap-3">
-      <MediaViewport size={probe}>
+    <div className="studio-player">
+      <MediaViewport size={probe} compactControls>
         {({ displaySize, gridSpacing }) => (
           <>
-            <video
-              ref={attachVideo}
-              src={url}
-              playsInline
-              preload="metadata"
-              aria-label={t('video.previewAlt')}
-              width={probe.width}
-              height={probe.height}
-              draggable={false}
-              onDragStart={(event) => event.preventDefault()}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => {
-                setIsPlaying(false)
-                if (video !== null) onTime(video.currentTime)
-              }}
-              onTimeUpdate={() => {
-                if (video !== null) onTime(video.currentTime)
-              }}
-              onEnded={() => setIsPlaying(false)}
-              onError={() => setError(t('video.timeline.playbackFailed'))}
-              className="block h-full w-full max-w-none"
+            <ProjectPreview
+              project={project}
+              assets={mediaAssets}
+              time={time}
+              onTime={onTime}
+              onFrame={onFrame}
+              onPlaying={setIsPlaying}
+              onError={onPlaybackError}
+              playbackRef={playback}
             />
             <canvas
               ref={setCanvas}
@@ -209,7 +196,10 @@ export function VideoViewer({
                       margin={spec.style.margin}
                       gridSpacing={gridSpacing}
                       active={layer.id === scene.value.activeId}
-                      onSelect={() => scene.select(layer.id)}
+                      onSelect={() => {
+                        scene.select(layer.id)
+                        onSelectMark?.()
+                      }}
                       onGesture={(gesture) => onGesture(layer.id, gesture)}
                     />
                   )
@@ -217,10 +207,10 @@ export function VideoViewer({
           </>
         )}
       </MediaViewport>
-      <div className="flex items-end gap-3">
+      <div className="studio-transport">
         <Button
           type="button"
-          variant="secondary"
+          variant="ghost"
           size="icon"
           aria-label={t(isPlaying ? 'video.timeline.pause' : 'video.timeline.play')}
           onClick={() => {
@@ -233,19 +223,22 @@ export function VideoViewer({
             <Play aria-hidden="true" className="size-4" />
           )}
         </Button>
-        <SliderField
+        <RangeSlider
           label={t('video.timeline.playhead')}
-          className="flex-1"
           value={time}
           min={0}
           max={probe.durationSeconds}
-          step={0.01}
-          format={videoTimeLabel}
+          step={VIDEO_PROJECT_LIMITS.timeStep}
           onChange={(value) => {
-            video?.pause()
-            onTime(value)
+            playback.current?.seek(value)
           }}
         />
+        <output className="studio-timecode" dir="ltr">
+          {t('video.studio.timeReadout', {
+            current: videoTimeLabel(time),
+            total: videoTimeLabel(probe.durationSeconds),
+          })}
+        </output>
       </div>
       {error === null ? null : <Alert tone="error">{error}</Alert>}
       {resources.error === null ? null : <Alert tone="error">{resources.error}</Alert>}

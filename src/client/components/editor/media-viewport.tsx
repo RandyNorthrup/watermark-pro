@@ -1,4 +1,5 @@
 import { type CSSProperties, type ReactNode, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CanvasViewControls } from './canvas-view-controls'
 import { useCanvasGestures } from './use-canvas-gestures'
@@ -20,10 +21,12 @@ export function MediaViewport({
   size,
   children,
   isReady = true,
+  compactControls = false,
 }: {
   size: Size
   children: (geometry: ViewGeometry) => ReactNode
   isReady?: boolean
+  compactControls?: boolean
 }) {
   const [viewport, setViewport] = useState<HTMLDivElement | null>(null)
   const viewportSize = useElementSize(viewport)
@@ -42,12 +45,30 @@ export function MediaViewport({
   const gridStyle: CSSProperties & { '--canvas-grid-spacing': string } = {
     '--canvas-grid-spacing': `${String((spacing * scale) / 100)}px`,
   }
+  const controls = (
+    <CanvasViewControls
+      zoom={scale}
+      isFit={zoom === null}
+      isGridVisible={grid}
+      isSnappingToGrid={snap}
+      gridSpacing={spacing}
+      onZoomChange={setZoom}
+      onFit={() => setZoom(null)}
+      onActualSize={() => setZoom(DEFAULT_CANVAS_ZOOM_PERCENT)}
+      onGridVisibilityChange={setGrid}
+      onGridSnapChange={(isEnabled) => {
+        setSnap(isEnabled)
+        if (isEnabled) setGrid(true)
+      }}
+      onGridSpacingChange={setSpacing}
+    />
+  )
   return (
     <>
       <div
         ref={setViewport}
         {...(isReady ? gestures : {})}
-        className="app-scroll-region h-[54svh] min-h-64 touch-none overflow-auto overscroll-contain rounded-xl border border-line bg-surface-raised lg:h-[calc(100svh-19rem)]"
+        className="media-viewport app-scroll-region h-[54svh] min-h-64 touch-none overflow-auto overscroll-contain rounded-xl border border-line bg-surface-raised lg:h-[calc(100svh-19rem)]"
       >
         <div className="grid min-h-full w-max min-w-full place-items-center">
           <div data-canvas-content="" className="relative shrink-0" style={displaySize}>
@@ -63,23 +84,22 @@ export function MediaViewport({
         </div>
       </div>
       {isReady ? (
-        <CanvasViewControls
-          zoom={scale}
-          isFit={zoom === null}
-          isGridVisible={grid}
-          isSnappingToGrid={snap}
-          gridSpacing={spacing}
-          onZoomChange={setZoom}
-          onFit={() => setZoom(null)}
-          onActualSize={() => setZoom(DEFAULT_CANVAS_ZOOM_PERCENT)}
-          onGridVisibilityChange={setGrid}
-          onGridSnapChange={(value) => {
-            setSnap(value)
-            if (value) setGrid(true)
-          }}
-          onGridSpacingChange={setSpacing}
-        />
+        compactControls ? (
+          <CompactCanvasControls>{controls}</CompactCanvasControls>
+        ) : (
+          controls
+        )
       ) : null}
     </>
+  )
+}
+
+function CompactCanvasControls({ children }: { children: ReactNode }) {
+  const { t } = useTranslation()
+  return (
+    <details className="studio-view-controls">
+      <summary>{t('editor.view.label')}</summary>
+      {children}
+    </details>
   )
 }

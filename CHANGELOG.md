@@ -7,6 +7,197 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Provider account clarification — 2026-10-02
+
+- Recorded the owner's separate new Lumafoil Stripe account requirement. Initial
+  renewed CLI authentication reached an unrelated account and read account
+  metadata only; no products, prices, payments or remote secrets were created.
+- Installed and verified the official Stripe Codex plugin at the owner's request.
+  Installation does not establish a Lumafoil connection; Dashboard setup remains
+  pending. Verified owner-only local service-credential permissions and reran the
+  thirteen-endpoint GitHub policy check successfully; the repository remains public.
+- Recorded the interrupted complete video quality attempt and its two observed
+  existing twenty-second UI test failures without assigning a passing result.
+
+### Measured AAC timeline timing — 2026-10-02 (unreleased candidate)
+
+- Reproduced both complete-run UI deadline cases in isolation without failures.
+  Their URL/signature fixtures now exercise real paste input while retaining
+  typed names and every original assertion/deadline; both focused cases passed.
+  Complete final-source certification remains pending.
+
+- Added bounded, synthetic encoder calibration for edited stereo AAC. Two
+  spectrally distinct chirps must identify the same unambiguous sample delay;
+  silence, inconsistent timing and ambiguous peaks refuse export. No platform
+  delay constant or personal-media fingerprint is stored.
+- Timeline AAC preserves encoder preroll, includes silent leading/trailing
+  samples for codec edge stability and forwards bounded packets through the
+  installed library's documented API. MP4 output writes explicit edit-list and
+  roll sample-group metadata after media, preserving existing chunk offsets.
+  Invalid timing, packet counts, duplicate metadata and another track's
+  truncation are rejected. No codec dependency or tolerance was changed.
+- The focused pure calibration/container batch passed 33 cases. Real Chromium
+  composition verification passed ten existing cases plus five timing cases;
+  expanded native lifecycle tests then passed all eight in each Chromium and
+  WebKit. The real four-second output retained its exact timeline and both
+  decoded chirp edges in the library and native Web Audio decoders. Complete
+  type and focused lint checks subsequently passed. The fresh built multi-clip
+  cut/trim/audio/export journey passed all four devices in 4.6 minutes, keeping
+  the original duration/audio assertions and axe. Complete quality, final SAST,
+  full device matrix and release certification remain pending; earlier failures
+  remain recorded below.
+
+### Native video encoder backpressure correction — 2026-10-02 (unreleased)
+
+- Additional native AAC probes isolated encoder priming and padding. A
+  development MP4 timing candidate passed duration metadata but truncated native
+  WebKit decoded audio. It was rejected and never added to the runtime; AAC
+  timing and complete M19 certification remain open. Apple format documentation
+  requires complete sample-group structures as well as an edit list for explicit
+  priming. The fuller experiment restored WebKit's ending marker but retained
+  a 21.313 ms start offset and returned 192,448 rather than 192,000 decoded
+  frames. Chromium retained the full intended four seconds. The temporary
+  experiment is not a portable runtime correction; timing remains open.
+- Isolated the WebKit export stall with real native codecs: a two-second H.264
+  fixture stopped after seven rendered frames/eight queued encodes in both the
+  main-thread and dedicated-worker pipelines. Chromium completed the same
+  fixture. Native quality-mode lookahead conflicts with the pinned encoder's
+  bounded queue; this is separate from the outstanding AAC priming defect.
+- Both video pipelines now use explicit low-latency encoding at the selected
+  codec/bitrate/resolution. They count emitted packets after finalization and
+  refuse an export if any submitted frame is missing, rather than treating the
+  encoder's permitted low-latency frame omission as success.
+- The corrected development pipeline completed all four native probes
+  (WebKit/Chromium, main-thread/worker), each with 60 packets and exact two-second
+  duration. Added real-encoder negative cases that omit one submitted frame;
+  all 17 focused native cases passed, including both omission negatives. Lint
+  diagnostics were corrected without suppressions. Complete gates remain pending. No
+  codec dependency, duration tolerance or application deadline was changed.
+- Production-build single-video journeys passed on iPhone, iPad and Android.
+  Desktop timed out before export because an older paused preview effect
+  interrupted a new native Play request. Preview now records playback intent
+  synchronously before state commits; stale effects respect that intent. Its
+  startup regression was confirmed failing on pre-fix source and passing on
+  corrected source; a genuine native refusal still reports failure. Focused
+  preview/frame-integrity verification passed seven cases. The fresh built
+  single-video journey then passed all four devices with original native
+  codec/frame/duration assertions and axe. Complete multi-clip/audio, offline
+  and release gates remain required.
+- Fresh type checking found an unsupported Testing Library `exact` option in
+  the earlier durable-save regression. Removed it while retaining the exact
+  string accessible-name match; the corrected complete type check passed.
+- Fresh quality caught a separate lint-invalid `void` fixture type in that
+  durable-save regression. It now resolves explicit `undefined`; the pending
+  refresh behavior and original assertions remain intact. That failed quality
+  attempt is not counted as a pass.
+
+
+### Verification corrections — 2026-10-01
+
+- Final video/navigation quality and SAST gates passed. The complete four-device
+  E2E run executed 136 tests and failed 17; certification remains pending.
+- Corrected malformed HTML range test values and selected the watermark inspector
+  after asynchronous native-media import completed.
+- Preset saves now publish the durably saved DTO immediately and refresh queries
+  in the background. A stalled subsequent network read no longer leaves an offline
+  save in the designer. Its regression and existing designer tests passed (5).
+- The local gate now accepts exact-origin HTTP absolute-form requests used by
+  WebKit CONNECT redirect traffic. Foreign origins, forged Host, credentials,
+  fragments and forbidden GET bodies remain refused; 15 transport tests pass.
+- The focused four-device rerun passed seven of 16 tests. Chromium native AAC
+  duration padding, WebKit export deadlines and three WebKit offline/recent-media
+  failures remain unresolved. The final corrections still need fresh full quality
+  and SAST; the earlier passing receipts describe their earlier source only.
+
+
+
+### Public Plans and Trust Design — 2026-10-01
+
+- Recorded the owner's public signup, monthly USD, private two-invitation cohort
+  and Stripe decisions. Added an implementation/certification specification for
+  Free, $9 Pro and $24 three-member Team, based on current monthly competitor
+  prices and explicit infrastructure, billing and support-cost assumptions.
+- Inspected the existing human-verification path: email verification and rate
+  limits are already enforced; optional Turnstile must become mandatory for
+  production admission/recovery and validate hostname/action. The new plan records
+  negative cases for admission, quota races, payment events and tenant access.
+- Verified that the local Stripe CLI's test key is expired and its live key is
+  rejected. An alternate Stripe connection was offered. No products, prices or
+  live billing configuration have been created, and the design is not a shipped
+  monetization or trust feature.
+
+### Workspace Navigation — 2026-10-01
+
+- Replaced the desktop sidebar with a flush-edge half-circle navigation button and
+  labelled gooey radial links. Moved workspace selection and persistent offline
+  controls into the header while retaining phone tabs and the existing sheet.
+- Preserved Lucas Bebber's MIT notice, kept sharp icons outside the SVG filter,
+  and added translated open/close names and reduced-motion behavior. Visual and
+  accessibility verification remain in progress. Fixed a visual check that
+  exposed the filtered circle covering the close icon; the sharp close control
+  now lives above the filter. Pending offline counts remain visible in the header.
+- Applied the owner's follow-up: the closed bullet is a 24 × 48 px half circle
+  flush against the viewport edge, clear of the canvas. RTL mirrors its shape and
+  expansion; a geometry assertion prevents renewed canvas overlap.
+- Corrected duplicate sibling keys exposed during the full quality run: header
+  synchronization state now has its own key prefix, distinct from account menus.
+- Updated owner/admin navigation assertions to open the deliberately collapsed
+  menu before inspecting its destinations. Bound Vitest to two simultaneous
+  workers after the Intel Mac full run hit existing UI/native deadlines under
+  contention; assertion deadlines, performance budgets and coverage floors remain unchanged.
+
+### Video Editor Refactor — 2026-10-01
+
+- Implemented the owner-requested multi-clip editor refactor with validated timeline
+  intervals, two video layers, four audio lanes, linked camera audio and shared
+  undo state. Added real split/trim/move/unlink operations with negative tests.
+- Added a browser-worker composition path and bounded streaming audio mixer;
+  imported media is identified through native demuxing instead of declared MIME.
+  Native importer, composition, mixer, preview and viewer verification passed all
+  20 focused real-browser tests. Complete quality, four-device and visual
+  verification remain in progress.
+- Extended explicit audio-encoder refusal to untouched camera clips when their
+  audio cannot be copied to the target container. Compatible source audio still
+  uses packet copying; sharing tests now prove preserved Opus instead of dropped AAC.
+- Repaired native viewer verification after the compact controls exposed a
+  global rectangle stub intercepting summary clicks. Browser tests now load the
+  real stylesheet through the already-installed Tailwind plugin and use actual
+  element geometry; no timeout, rule or assertion was relaxed.
+- Corrected existing browser verification exposed by the complete Mac run:
+  backdrop padding is measured above the actual glyph bounds instead of an
+  assumed system-font rectangle. Disabled-backdrop and untouched-region negative
+  assertions distinguish painted background from white glyph pixels.
+  Complete catalogue loading uses eight concurrent faces while checking every
+  family/weight under the unchanged 20-second deadline.
+- Applied the owner's visual-polish follow-up after inspecting official Resolve,
+  Premiere, Clipchamp and VEED workspace images. Added a compact unified editing frame,
+  neutral light/graphite dark surfaces, a larger picture stage, grouped timing
+  and transform controls, a single transport/timecode row and actual source
+  posters in timeline clips. Inspector controls retain independent scrolling;
+  phones keep touch-sized controls and the existing half-circle canvas clearance.
+- Fixed two defects exposed by actual light/dark visual review: media cards no
+  longer shrink and clip their add controls, and viewer stage styling now targets
+  its dedicated viewport rather than every touch-enabled watermark handle.
+  Added real media-reuse/undo and transparent-overlay regressions.
+- Corrected the phone review findings: panel toggles use compact, named icons,
+  narrow rulers retain three non-overlapping seek labels, and audio media cards
+  use a compact music row. Added a rendered ruler collision assertion across
+  the configured Playwright devices.
+- Replaced raw schema-error arrays on rejected clip edits with translated guidance
+  describing overlap and timeline bounds. The negative regression also proves
+  validation details are not rendered and the original clip remains intact.
+- Corrected strict lint findings without suppressions: inspector grouping derives
+  its boundary from timing fields, and rendered ruler bounds use the typed
+  Playwright locator API rather than DOM types unavailable in the Node harness.
+- Separated native-browser verification from simultaneous Node project pools
+  after the complete Mac run exposed large-image timing and sticker-decode
+  contention. Browser files run serially after Node suites through documented
+  Vitest sequencing; no test, deadline, budget or coverage threshold was removed.
+- The separated full covered run passed all 2,834 tests and 63 workerd tests.
+  Its later shared-control inventory exposed two inline range inputs; both now
+  use the existing slider primitive's compact native RangeSlider. No inventory
+  rule or allowlist was relaxed; the focused inventory check passes.
+
 ### CI/CD And Repository Protection — 2026-10-01
 
 - Added automatic PR quality/Semgrep/four-device checks and automatic main

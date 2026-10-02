@@ -35,7 +35,7 @@ export function OfflinePanel({
 }: {
   userId: string
   organizationId?: string | undefined
-  /** The persistent sidebar owns synchronization; the phone sheet shares its state and controls. */
+  /** The persistent header owns synchronization; the phone sheet shares its state and controls. */
   shouldManageSync?: boolean
 }) {
   const { t } = useTranslation()
