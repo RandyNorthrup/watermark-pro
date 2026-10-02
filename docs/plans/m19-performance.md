@@ -13,8 +13,10 @@ plans, researched costs and remaining implementation checklist are in
 Human-verification implementation is isolated from the video refactor. Required
 production configuration, strict server Siteverify validation, protected client
 forms and verified/banned session checks are implemented. Focused tests and a
-real workerd/D1 admission test pass; full quality, SAST, four-device and visual
-verification remain pending. Owner-completed Cloudflare authentication restored
+real workerd/D1 admission test pass. Runtime source `b908155` passed hosted full
+quality/SAST and all 136 four-device Playwright/axe journeys on 2026-10-02. Eight
+local challenge cases and viewed device/English/Arabic/light/dark captures also
+passed; the stopped duplicate local quality run is not a passing receipt. Owner-completed Cloudflare authentication restored
 resource access. The existing managed widget covers only `lumafoil.com`, and the
 production Worker already has its verification secret. No widget/key mutation or
 production deployment was performed. This is current M19 work,

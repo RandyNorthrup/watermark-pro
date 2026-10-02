@@ -7,6 +7,25 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Human verification evidence — 2026-10-02
+
+- Pushed runtime source `b908155` in draft PR #12. Hosted run `36976426895`
+  passed canonical quality, exact-source SAST and all 136 four-device
+  Playwright/axe journeys. Quality included 2,830 covered tests, all coverage
+  floors, 64 workerd tests, script checks and production build. SAST ran 510
+  rules across 2,135 targets with zero findings.
+- Stopped the duplicate local quality process tree after verifying its ownership
+  and the hosted pass. It exited 130 during covered tests; no local full-quality
+  pass is claimed. Earlier local lint/native/fixture failures remain recorded.
+- Passed eight local challenge lifecycle/configuration-failure cases with axe,
+  reviewed all four widget-fixture captures and actual English desktop/Arabic
+  phone auth renders in light/dark, and found no clipping or browser errors.
+  Named fixtures do not prove live provider verification.
+- Reviewed planning: M19 remains open. Public/private cohort admission, atomic
+  two-invite grants, Stripe ownership/webhooks/entitlements and paid workspace
+  policies are the next slice. Video regressions, live provider verification
+  and unchanged Lighthouse/screenshot release audits still block deployment.
+
 ### Human verification follow-up — 2026-10-01
 
 - Added human challenges to password sign-in and verification-email resend, shared

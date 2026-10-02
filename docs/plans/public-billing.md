@@ -1,8 +1,9 @@
 # Public plans, private membership and trust gates — M19
 
-Status: design and research completed on 2026-10-01; implementation pending the
-current video/navigation batch. This specification does not claim that public
-registration, subscriptions or the additional trust gates have shipped.
+Status: design and research completed on 2026-10-01. Human-verification runtime
+source `b908155` passed full quality, SAST and four-device browser gates on
+2026-10-02 in draft PR #12. Cohort, quota and payment implementation remains open;
+public registration and subscriptions have not shipped.
 
 ## Owner decisions
 
@@ -108,7 +109,8 @@ with notice rather than silently changing existing subscriptions.
 The current server already requires email verification and has credential/API
 rate limiting. The isolated human-verification implementation now requires real
 production keys, hostname/action validation and fail-closed provider handling;
-complete gates remain outstanding. Owner-completed Cloudflare login restored
+full implementation quality, SAST, four-device Playwright/axe and viewed auth
+UI checks passed on 2026-10-02. Owner-completed Cloudflare login restored
 access to the existing managed `lumafoil.com` widget and confirmed the production
 verification secret name; no new widget, key or deployment was needed. A live
 challenge against the new implementation remains unverified. The
@@ -199,8 +201,12 @@ deletion; content deletion and financial retention must be distinguished clearly
 - [ ] Enforce plan quotas atomically on uploads, asset writes, offline replay,
       shared workspace creation, member acceptance and competing requests.
 - [ ] Enforce two new private admissions, including reusable links and race tests.
-- [ ] Make production human verification mandatory with hostname/action checks,
-      social state binding, consumed-token refresh and provider-failure negatives.
+- [x] Implement production human verification with hostname/action checks,
+      social state binding, consumed-token refresh and provider-failure negatives;
+      source `b908155` passed full quality, SAST and four-device browser gates.
+- [ ] Verify live Turnstile challenges against the new implementation after all
+      deployment gates pass. Existing widget and Worker secret-name readback
+      confirms resources, not successful new-code live admission.
 - [ ] Implement owner-only Checkout/portal, signed idempotent webhook processing,
       initial-payment checks and ordered authoritative reconciliation.
 - [ ] Update public landing/signup/pricing/account pages and all twelve locales;
@@ -214,5 +220,9 @@ deletion; content deletion and financial retention must be distinguished clearly
       renewal, cancellation, failed payment and tenant-isolation behavior.
 - [ ] Pass all M19 Lighthouse/screenshot release gates before production deploy.
 
-This slice follows the current video/navigation verification within M19. It does
-not begin a new milestone or remove existing release blockers.
+Human-verification implementation checks are complete for runtime source
+`b908155`; its draft PR remains unmerged. Next implement server-owned public/private
+cohorts and atomic two-new-invitation grants, then plan quotas and payment state.
+Stripe account authentication remains unconfirmed; no catalog or charge has been
+created. Video/navigation regressions and full M19 release audits remain open.
+No later milestone is started.

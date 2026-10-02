@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-01 (public billing decisions and human-verification implementation)
+Last updated: 2026-10-02 (human-verification gates and next public-billing slice)
 
 ---
 
@@ -55,14 +55,20 @@ instead of exercising production readiness. A focused rerun reproduced the
 failure even with already-loaded headings. These content fixtures now use the
 existing production deadline and retain wrong-screen/content/view refusals plus
 a never-completing image-decode negative. No application deadline or Lighthouse
-budget was changed. Full quality, security and browser gates are still pending.
+budget was changed. Runtime source `b908155` passed all seven hosted checks in
+run `36976426895`: canonical quality, exact-source SAST and 136 Playwright/axe
+journeys across all four devices. Local challenge verification passed eight
+cases; all four fixture captures and English/Arabic light/dark auth renders
+were viewed. The duplicate local quality run was stopped after hosted quality
+passed and is not reported as a local pass. The verification receipt is
+`docs/verification/m19/human-verification-2026-10-01.md`.
 The expired local Cloudflare OAuth token was replaced through owner-completed
 browser authentication on 2026-10-01. Readback confirms the existing managed
 Turnstile widget is restricted to `lumafoil.com` and the production Worker already
 has `TURNSTILE_SECRET_KEY`. No duplicate widget, key rotation or production
 configuration change was needed. This resource readback does not prove a live
-challenge against the new implementation; complete executable and visual
-verification remain pending.
+challenge against the new implementation; new-code live provider verification remains pending.
+No production deployment or M19 certification is claimed.
 Public/private admission, two-invite quotas, Stripe checkout/portal/webhooks,
 entitlements, paid collaboration and public landing remain the next parts of this
 M19 slice. No later milestone is started, and production release audits remain

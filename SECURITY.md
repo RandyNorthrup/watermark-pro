@@ -199,7 +199,7 @@ Only the `main` branch and the latest tagged release receive fixes.
   2021); its maintained fork `@cantoo/pdf-lib` is the migration target if a fix
   is ever needed (PLAN.md §3.1).
 
-- Human verification (M19 implementation, certification pending): production
+- Human verification (M19 implementation verified; live-provider/release certification pending): production
   requires both real Turnstile keys and an HTTPS origin. Cloudflare's dummy keys
   and incomplete/missing pairs fail configuration validation. Email signup, password sign-in and
   OAuth entry use the admission action; password recovery and verification-email
@@ -217,7 +217,10 @@ Only the `main` branch and the latest tagged release receive fixes.
   independent. Passing a challenge never establishes real-world identity or
   grants roles, paid entitlements, private invitation rights or another user's
   content. The recovery endpoint's actual Better Auth route and OAuth entry now
-  use the strict credential limiter. Executable/visual certification is pending.
+  use the strict credential limiter. Runtime source `b908155` passed full hosted
+  quality, SAST and the 136-journey four-device Playwright/axe matrix; local
+  challenge cases and viewed English/Arabic light/dark auth captures passed.
+  Live-provider verification and complete M19 release certification remain open.
 - Platform administration (M8): a separate `admin` role checked server-side
   by `requirePlatformAdmin` on the organization and audit listing routes and
   by Better Auth's admin plugin on user management. Bans (with a mandatory
