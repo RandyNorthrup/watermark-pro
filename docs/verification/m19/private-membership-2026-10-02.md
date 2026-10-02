@@ -56,6 +56,17 @@ email unverified; it requires the current migrated schema.
   ESLint's earlier fix. Formatting was corrected; a fresh complete gate is
   running. Full quality, exact-source SAST, full four-device Playwright/axe and
   viewed quota-error captures remain required before declaring this slice done.
+- Hosted run `36986924310` passed exact-source SAST but stopped quality at one
+  real-auth owner-bootstrap fixture: it lacked the private cohort initialized by
+  the already-tested operator SQL. Other covered tests passed (2,840/2,841) and
+  all global floors passed (92.49 statements, 85.34 branches, 92.33 functions,
+  93.44 lines). The browser matrix correctly stayed blocked. The fixture now
+  matches production bootstrap; a fresh complete run is required. The duplicate
+  local canonical run had cleared all source gates and publication/audit, then
+  was explicitly interrupted during covered tests after the same hosted failure
+  was identified. Its exit 130 is not a local full-quality pass. Initial-owner
+  SQLite/migration regression now passes all seven cases; its earlier member
+  fixture schema edit was corrected without changing application permissions.
 - The invitation browser journey now exercises two child reservations, a third
   refusal, the actual budget response, axe and a device screenshot. Its new
   assertions and screenshots are still awaiting execution/review.

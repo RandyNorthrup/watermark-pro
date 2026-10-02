@@ -28,6 +28,11 @@ what was planned; superseded entries stay.
 - Corrected initial-owner bootstrap for the new pending-by-default schema: it
   explicitly grants private membership while preserving mandatory email
   verification. The real full-migration bootstrap test protects this path.
+- Full hosted coverage found that the separate real-auth owner-bootstrap
+  fixture still omitted the newly explicit private membership. Corrected that
+  fixture to match the tested production bootstrap SQL; pending accounts remain
+  refused. The failing run passed the other 2,840 covered tests and all coverage
+  floors, but correctly blocked the browser matrix and is not a quality pass.
 - Added an own-account budget response and distinct quota-conflict error so a
   spent lifetime allowance is not reported as a temporary email-rate limit.
   Extended the real invitation journey to exercise two reservations, refusal of
