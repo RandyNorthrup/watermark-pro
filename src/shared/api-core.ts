@@ -20,6 +20,7 @@ export const apiErrorSchema = z.object({
     API_ERROR_CODE.payloadTooLarge,
     API_ERROR_CODE.unsupportedMedia,
     API_ERROR_CODE.quotaExceeded,
+    API_ERROR_CODE.invitationQuotaExceeded,
     API_ERROR_CODE.unsupportedUrl,
   ]),
   details: z.unknown().optional(),

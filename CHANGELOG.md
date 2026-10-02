@@ -7,6 +7,62 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Private membership and bounded admissions — 2026-10-02 (unreleased)
+
+- Added server-owned pending/public/private membership. Migration preserves
+  historical private accounts and workspace grants. New private admission
+  consumes its email-bound offer and activates its role/cohort transactionally;
+  revocation races leave the candidate pending, even after email verification.
+  Client cohort fields cannot grant private membership.
+- Public accounts cannot list, issue, revoke or rotate private invitations/links,
+  regardless of workspace role. Pending accounts cannot reach custom workspace
+  APIs or privileged auth-plugin endpoints. Production public signup stays closed.
+- Added a lifetime grant of two new successful admissions, shared by targeted
+  email invites and reusable links. Pending offers reserve capacity; unused
+  revocation/expiry releases it. Accepted spend survives recipient deletion and
+  rotation. The send-rate budget remains independent.
+- Migration retains the two oldest live pending offers per inviter, revoking
+  excess reservations without removing admitted users or workspace access.
+  Historical accepted offers do not consume the new grant. Link rotation/revoke
+  now also revokes its unused email reservations, freeing their slots.
+- Corrected initial-owner bootstrap for the new pending-by-default schema: it
+  explicitly grants private membership while preserving mandatory email
+  verification. The real full-migration bootstrap test protects this path.
+- Full hosted coverage found that the separate real-auth owner-bootstrap
+  fixture still omitted the newly explicit private membership. Corrected that
+  fixture to match the tested production bootstrap SQL; pending accounts remain
+  refused. The failing run passed the other 2,840 covered tests and all coverage
+  floors, but correctly blocked the browser matrix and is not a quality pass.
+- Local browser verification timed out within the unchanged 60-second journey
+  limit. Split quota/refusal/revocation proof into its own real journey while
+  preserving the existing account/workspace isolation assertions and all
+  deadlines. No case, role, device or accessibility assertion was removed.
+- Added an own-account budget response and distinct quota-conflict error so a
+  spent lifetime allowance is not reported as a temporary email-rate limit.
+  The separate real quota journey exercises two reservations, refusal of a
+  third, unused revocation and replacement. It passed locally with axe on all
+  four devices; all four quota-error captures were opened and reviewed. The
+  existing iPad isolation journey timed out at its final denial screen, leaving
+  the local expanded batch at 7/8. An isolated recheck also timed out before the
+  Members dialog while the independent publication scanner consumed about seven
+  CPU cores. Both failures remain recorded; browser deadlines were not changed.
+- Hosted run `36989072536` passed all seven gates for source `e83ae04`:
+  canonical quality (2,841 covered tests, unchanged global floors, 68 workerd
+  tests, script checks and build), SAST (510 rules, 2,141 files, zero findings)
+  and all 136 existing Playwright/axe cases. Desktop sharing and iPad isolation
+  used the existing retry and remain recorded as flaky. The new separate quota
+  journey still needs the expanded 140-case hosted matrix. No deployment or
+  full M19 certification is claimed.
+- Expanded exact-source workflow `36992631513` passed every gate for `08834df`:
+  2,841 covered tests, unchanged floors, 68 workerd tests, complete script/build
+  gates, zero-finding SAST and all 140 Playwright/axe cases. All four devices
+  passed private isolation and quota/refusal/revocation/replacement. The iPhone
+  gallery journey passed on the existing retry and is recorded as flaky.
+  Membership verification is complete; public signup, recent authentication,
+  plan quotas, payments, public navigation and complete M19 release audits remain
+  unfinished. The next recent-authentication requirements explicitly distinguish
+  credential presentation from email verification and session renewal.
+
 ### Human verification evidence — 2026-10-02
 
 - Pushed runtime source `b908155` in draft PR #12. Hosted run `36976426895`

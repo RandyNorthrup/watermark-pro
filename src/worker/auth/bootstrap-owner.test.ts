@@ -16,6 +16,7 @@ it('an operator-created first owner must verify the mailbox and can then choose 
       email,
       emailVerified: false,
       role: 'owner',
+      membershipCohort: 'private',
       createdAt: new Date(),
       updatedAt: new Date(),
     },

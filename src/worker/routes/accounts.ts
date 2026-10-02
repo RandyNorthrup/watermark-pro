@@ -3,6 +3,8 @@ import { Hono } from 'hono'
 
 import {
   accountStatsSchema,
+  MEMBERSHIP_COHORT,
+  privateInvitationBudgetSchema,
   privateWorkspaceSchema,
   SITE_INVITATION_POLICY,
   siteInvitationDtoSchema,
@@ -42,6 +44,15 @@ function invitationDto(record: SiteInvitationRecord): SiteInvitationDto {
 }
 
 export const accountRoutes = new Hono<AppContext>()
+  .get('/me/private-invitation-budget', requireSession, async (c) => {
+    const user = c.get('session').user
+    if (user.membershipCohort !== MEMBERSHIP_COHORT.private) throw apiErrors.forbidden()
+    return c.json(
+      privateInvitationBudgetSchema.parse(
+        await c.get('services').accounts.invitationBudget(user.id),
+      ),
+    )
+  })
   .post('/me/bootstrap', requireSession, async (c) => {
     const parsed = bootstrapRequestSchema.safeParse(
       await readJsonBody(c.req.raw, BOOTSTRAP_REQUEST_BYTES),
@@ -50,6 +61,8 @@ export const accountRoutes = new Hono<AppContext>()
     return c.json(await bootstrapAccount(c.get('services'), c.get('session'), c.req.raw.headers))
   })
   .get('/me/invitations', requireSession, async (c) => {
+    if (c.get('session').user.membershipCohort !== MEMBERSHIP_COHORT.private)
+      throw apiErrors.forbidden()
     const records = await c.get('services').accounts.listInvitations(c.get('session').user.id)
     return c.json(
       siteInvitationListSchema.parse({
@@ -61,6 +74,7 @@ export const accountRoutes = new Hono<AppContext>()
   .post('/me/invitations', requireSession, async (c) => {
     const { accounts, audit, email, config } = c.get('services')
     const inviter = c.get('session').user
+    if (inviter.membershipCohort !== MEMBERSHIP_COHORT.private) throw apiErrors.forbidden()
     if (!inviter.emailVerified) throw apiErrors.forbidden()
     const input = siteInvitationRequestSchema.safeParse(
       await readJsonBody(c.req.raw, SITE_INVITATION_POLICY.requestBytes),
@@ -85,8 +99,11 @@ export const accountRoutes = new Hono<AppContext>()
       acceptedUserId: null,
       revokedAt: null,
     }
-    if (!(await accounts.createInvitation(record)))
+    if (!(await accounts.createInvitation(record))) {
+      const budget = await accounts.invitationBudget(inviter.id)
+      if (budget.available === 0) throw apiErrors.invitationQuotaExceeded()
       throw apiErrors.rateLimited(SITE_INVITATION_POLICY.sendWindowSeconds)
+    }
     try {
       await email.send(
         siteInvitationEmail(
@@ -114,6 +131,7 @@ export const accountRoutes = new Hono<AppContext>()
     if (!id.success) throw apiErrors.validation(id.error.issues)
     const { accounts, audit } = c.get('services')
     const inviter = c.get('session').user
+    if (inviter.membershipCohort !== MEMBERSHIP_COHORT.private) throw apiErrors.forbidden()
     if (!(await accounts.revokeInvitation(inviter.id, id.data))) throw apiErrors.notFound()
     await audit.append({
       actorUserId: inviter.id,

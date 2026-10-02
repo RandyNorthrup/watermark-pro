@@ -221,6 +221,19 @@ Only the `main` branch and the latest tagged release receive fixes.
   quality, SAST and the 136-journey four-device Playwright/axe matrix; local
   challenge cases and viewed English/Arabic light/dark auth captures passed.
   Live-provider verification and complete M19 release certification remain open.
+- Private membership (M19, final gates pending): server-owned membership is
+  independent of payment and workspace/site roles. Historical accounts retain
+  their cohort and grants; new rows remain pending until server admission. A
+  revoked-during-creation invitation cannot activate a pending account through
+  later email verification. Public accounts have no private invitation rights;
+  both API and D1 inviter eligibility enforce the cohort, verification and ban.
+  Two new admissions are reserved atomically across targeted/reusable requests;
+  accepted spend survives recipient deletion and token/link changes. The cutover
+  retains at most two oldest live promises per inviter and revokes excess
+  pending promises. Historical accepted invitations are excluded from new spend.
+  Unused rotation/revocation releases reservations; independent rate limits
+  continue to bound repeated mail/link operations. Production public signup and
+  billing entitlement enforcement have not yet launched.
 - Platform administration (M8): a separate `admin` role checked server-side
   by `requirePlatformAdmin` on the organization and audit listing routes and
   by Better Auth's admin plugin on user management. Bans (with a mandatory

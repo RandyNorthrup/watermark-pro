@@ -133,7 +133,7 @@ describe('reusable private referral links', () => {
       harness.services.accounts.pendingInvitation(hash, OTHER.email.toUpperCase()),
     ])
     expect(repeated[0]?.id).toBe(repeated[1]?.id)
-    for (let index = 1; index < SITE_INVITATION_POLICY.referralsPerDay; index++)
+    for (let index = 1; index < SITE_INVITATION_POLICY.newAdmissions; index++)
       expect(
         await harness.services.accounts.pendingInvitation(
           hash,
@@ -147,9 +147,12 @@ describe('reusable private referral links', () => {
       await responseJson(owner.post('/api/me/referral-link/rotate', {})),
     )
     const rotatedHash = await invitationTokenHash(tokenFrom(rotated.url))
+    // Rotation revokes unused reservations, preserving the lifetime spent
+    // budget while releasing capacity from links that can no longer redeem.
+    expect(await harness.services.accounts.pendingInvitation(hash, OTHER.email)).toBeNull()
     expect(
       await harness.services.accounts.pendingInvitation(rotatedHash, 'over-limit@example.test'),
-    ).toBeNull()
+    ).not.toBeNull()
   })
   it('denies anonymous link management and cross-account mutation attempts', async () => {
     const { harness, owner } = await fixture()

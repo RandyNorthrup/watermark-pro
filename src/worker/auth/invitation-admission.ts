@@ -8,6 +8,7 @@ import {
 } from 'better-auth/api'
 import { z } from 'zod'
 
+import type { MembershipCohort } from '../../shared/api-accounts'
 import { INVITATION_HEADER, invitationIdSchema } from '../../shared/invitation'
 import type { AccountStore } from '../account-store'
 import { contentDigest } from '../sync'
@@ -30,7 +31,9 @@ async function admissionHash(headers: Headers | undefined): Promise<string | nul
   const state = await getOAuthState()
   const serverContext = oauthAdmissionSchema.safeParse(state?.serverContext)
   if (serverContext.success) return serverContext.data.admissionHash
-  const token = invitationIdSchema.safeParse(headers?.get(INVITATION_HEADER))
+  const raw = headers?.get(INVITATION_HEADER)
+  const token = invitationIdSchema.safeParse(raw)
+  if (raw != null && !token.success) throw invitationRequired()
   return token.success ? await invitationTokenHash(token.data) : null
 }
 
@@ -55,14 +58,17 @@ export function invitationAdmission(accounts: AccountStore, canSignUpWithoutInvi
       })
     }
     if (path === '/sign-in/social') {
-      const token = invitationIdSchema.safeParse(ctx.headers?.get(INVITATION_HEADER))
+      const raw = ctx.headers?.get(INVITATION_HEADER)
+      const token = invitationIdSchema.safeParse(raw)
+      if (raw != null && !token.success) throw invitationRequired()
       if (token.success)
         await addOAuthServerContext({ admissionHash: await invitationTokenHash(token.data) })
       return
     }
-    if (canSignUpWithoutInvitation || path !== '/sign-up/email') return
+    if (path !== '/sign-up/email') return
     const body = admissionSchema.safeParse(ctx.body)
     const hash = await admissionHash(ctx.headers)
+    if (hash === null && canSignUpWithoutInvitation) return
     if (
       hash === null ||
       !body.success ||
@@ -102,10 +108,10 @@ export function validateAccountAdmission(
           }
       }
     }
-    if (canSignUpWithoutInvitation || source.action !== 'create-user' || source.method === 'admin')
-      return
+    if (source.action !== 'create-user' || source.method === 'admin') return
     const body = admissionSchema.safeParse(user)
     const hash = await admissionHash(context.headers)
+    if (hash === null && canSignUpWithoutInvitation) return
     if (
       hash === null ||
       !body.success ||
@@ -124,9 +130,11 @@ export async function acceptSiteAdmission(
   accounts: AccountStore,
   headers: Headers | undefined,
   user: { id: string; email: string },
+  uninvitedCohort: Exclude<MembershipCohort, 'pending'>,
 ): Promise<void> {
   const hash = await admissionHash(headers)
-  if (hash !== null) await accounts.acceptInvitation(hash, user.email, user.id)
+  if (hash === null) await accounts.activateAccount(user.id, uninvitedCohort)
+  else if (!(await accounts.acceptInvitation(hash, user.email, user.id))) throw invitationRequired()
 }
 
 function invitationRequired(): APIError {

@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-02 (human-verification gates and next public-billing slice)
+Last updated: 2026-10-02 (verified private membership and expanded invitation gates)
 
 ---
 
@@ -73,6 +73,60 @@ Public/private admission, two-invite quotas, Stripe checkout/portal/webhooks,
 entitlements, paid collaboration and public landing remain the next parts of this
 M19 slice. No later milestone is started, and production release audits remain
 required before deployment.
+
+### Private membership implementation — 2026-10-02
+
+The next M19 admission slice is isolated on `codex/private-admissions`, stacked
+on the verified human-control source and its result documentation. It introduces
+a server-owned `membership_cohort`: historical accounts migrate to `private`,
+new rows start `pending`, and only server admission activates them. Valid private
+admission atomically consumes its invitation and grants its cohort/site role.
+An invitation revoked during creation leaves an unadmitted account pending;
+even later email verification cannot unlock custom or organization/admin APIs.
+Client signup/profile fields cannot select a cohort. Public accounts have no
+private invitation/list/referral privileges regardless of workspace role.
+The existing console-mailbox/test-only uninvited bypass creates disposable
+private fixtures; it does not enable public production registration.
+
+Migration `0018_private-membership.sql` preserves all historical identities,
+verification states, content, explicit workspace grants and accepted invitations.
+Historical accepted admissions use grant version 0 and do not spend the new
+allowance. At cutover, up to two live pending invitations per sender are retained
+oldest-first (creation time, then ID) and reserve the two-new-admission allowance;
+excess pending promises are revoked and can be reissued after capacity is freed.
+Expired/revoked promises are not revived. Reusable links continue to work within
+the same allowance. Accepted version-1 admissions remain spent after recipient
+deletion, expiry or link rotation. Rotation/revocation releases unused referral
+reservations; send/abuse rate budgets remain independent and cannot be reset by
+revoking/issuing repeatedly. One conditional D1 insert reserves capacity across
+competing email and reusable-link requests. The own-account budget API exposes
+used/reserved/available counts; exhausting capacity has a distinct conflict code,
+without a misleading retry-after deadline.
+
+Hosted run `36989072536` passed canonical quality for `e83ae04`: 2,841 covered
+tests, unchanged coverage floors, 68 workerd tests, script checks and build.
+SAST passed 510 rules on 2,141 files with zero findings. All 136 existing browser
+journeys ultimately passed; desktop sharing and iPad private isolation required
+the existing retry and remain recorded as flaky. The new separate quota journey
+passed locally with axe on all four devices; its actual quota-error screenshots
+were opened and reviewed. Expanded workflow `36992631513` passed all seven
+gates for `08834df`, including all 140 browser/axe cases, canonical quality
+(2,841 covered tests, 68 workerd tests, unchanged floors and complete build)
+and zero-finding SAST. The iPhone gallery case used the existing retry; private
+isolation and quota/refusal/revocation/replacement passed on all four devices.
+This admission slice is verified, with the prior failed attempts retained in
+its receipt. The initial local expanded batch was 7/8,
+with existing iPad isolation timing out at its final denial screen. An isolated
+iPad recheck also timed out before the Members dialog; concurrent publication
+scanning used about seven CPU cores, but no sole-cause claim is made. Full
+Lighthouse/screenshot audits and live-provider proof remain release gates;
+no remote migration or deployment is claimed. See the private-membership receipt
+for exact source, failed attempts and completed evidence.
+Recent-authentication policy, public plan quotas, billing state and public
+landing/private-member navigation remain separate unfinished controls. Next
+implement session-bound recent credential proof, quotas and Stripe
+checkout/webhook ownership before opening public signup. M19 and video/release blockers
+stay open; no M20 work begins.
 
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and
 PDF documents. The hosted service is invitation-only; each admitted user gets

@@ -6,7 +6,7 @@ import { test } from 'node:test'
 import { ownerInsert, ownerSelection } from './bootstrap-owner.mjs'
 
 const SCHEMA =
-  'CREATE TABLE user (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, email_verified INTEGER NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, role TEXT)'
+  "CREATE TABLE user (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, email_verified INTEGER NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, role TEXT, membership_cohort TEXT NOT NULL DEFAULT 'pending')"
 
 test('initial owner starts unverified without password or token material, and the gate refuses repeat bootstrap', () => {
   const db = new DatabaseSync(':memory:')
@@ -30,6 +30,7 @@ test('initial owner starts unverified without password or token material, and th
     assert.equal(row.email, 'owner@example.test')
     assert.equal(row.email_verified, 0)
     assert.equal(row.role, 'owner')
+    assert.equal(row.membership_cohort, 'private')
     assert.equal(row.name, "Owner O'Connor")
     assert.equal(Object.hasOwn(row, 'password'), false)
     assert.equal(Object.hasOwn(row, 'token'), false)
@@ -60,15 +61,9 @@ test('explicit owner selection requires verification and preserves accounts and 
       "CREATE TABLE content (id TEXT PRIMARY KEY, value TEXT); INSERT INTO content VALUES ('canary', 'keep this content')",
     )
     db.prepare(ownerInsert({ email: 'first@example.test', name: 'First' }, 'first-user').sql).all()
-    db.prepare('INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?)').run(
-      'chosen-user',
-      'Chosen',
-      'chosen@example.test',
-      0,
-      1,
-      1,
-      'user',
-    )
+    db.prepare(
+      'INSERT INTO user (id,name,email,email_verified,created_at,updated_at,role) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    ).run('chosen-user', 'Chosen', 'chosen@example.test', 0, 1, 1, 'user')
     assert.deepEqual(db.prepare(ownerSelection('chosen-user').sql).all(), [])
     assert.equal(db.prepare("SELECT role FROM user WHERE id = 'first-user'").get().role, 'owner')
     db.exec("UPDATE user SET email_verified = 1 WHERE id = 'chosen-user'")
@@ -94,12 +89,9 @@ test('selection leaves exactly one global owner and ordinary users while preserv
     const roles = ['owner', 'admin', 'admin,user', 'owner,user', null, 'viewer', 'user']
     for (const [index, role] of roles.entries()) {
       const id = `user-${index}`
-      db.prepare('INSERT INTO user VALUES (?, ?, ?, 1, 1000, 2000, ?)').run(
-        id,
-        `Name ${index}`,
-        `${id}@example.test`,
-        role,
-      )
+      db.prepare(
+        'INSERT INTO user (id,name,email,email_verified,created_at,updated_at,role) VALUES (?, ?, ?, 1, 1000, 2000, ?)',
+      ).run(id, `Name ${index}`, `${id}@example.test`, role)
       db.prepare('INSERT INTO member VALUES (?, ?, ?)').run(
         id,
         'workspace',
@@ -149,9 +141,18 @@ test('fresh bootstrap works with all real migrations and cannot transfer the res
     assert.equal(db.prepare(created.sql).all().length, 1)
     assert.equal(db.prepare('SELECT user_id FROM site_owner').get().user_id, 'anchored-owner')
     assert.equal(db.prepare('SELECT role FROM user').get().role, 'owner')
+    assert.equal(
+      db.prepare('SELECT membership_cohort FROM user').get().membership_cohort,
+      'private',
+    )
     assert.equal(db.prepare('SELECT email_verified FROM user').get().email_verified, 0)
     db.exec(
       "INSERT INTO user (id,name,email,email_verified,created_at,updated_at,role) VALUES ('other-user','Other','other@example.test',1,1000,1000,'user')",
+    )
+    assert.equal(
+      db.prepare("SELECT membership_cohort FROM user WHERE id='other-user'").get()
+        .membership_cohort,
+      'pending',
     )
     const before = db.prepare('SELECT id,role FROM user ORDER BY id').all()
     assert.throws(() => db.prepare(ownerSelection('other-user').sql).all(), /owner/i)
