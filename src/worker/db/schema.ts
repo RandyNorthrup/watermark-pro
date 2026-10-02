@@ -29,6 +29,7 @@ import type {
   CloudProvider,
 } from '../../shared/cloud-connections'
 import type { GuidanceTopic } from '../../shared/guidance'
+import type { WorkspacePlanRecord } from '../../shared/plans'
 import type { RecentActivity, RecentView } from '../../shared/recent-work'
 import type { AssignableSiteRole } from '../../shared/site-roles'
 import type { WatermarkSpec } from '../../shared/watermark'
@@ -153,6 +154,44 @@ export const organization = sqliteTable(
     metadata: text('metadata'),
   },
   (table) => [uniqueIndex('organization_slug_unique').on(table.slug)],
+)
+
+/** Capacity belongs to a server-owned workspace grant, independently of private admission. */
+export const workspacePlan = sqliteTable(
+  'workspace_plan',
+  {
+    organizationId: text('organization_id')
+      .primaryKey()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    kind: text('kind').$type<WorkspacePlanRecord['kind']>().notNull(),
+    basePlan: text('base_plan').$type<WorkspacePlanRecord['basePlan']>().notNull(),
+    baseMemberLimit: integer('base_member_limit').notNull(),
+    paidPlan: text('paid_plan').$type<WorkspacePlanRecord['paidPlan']>(),
+    paidThrough: integer('paid_through', { mode: 'timestamp_ms' }),
+    paidAccessSuspended: integer('paid_access_suspended', { mode: 'boolean' })
+      .default(false)
+      .notNull(),
+    revision: integer('revision').default(0).notNull(),
+  },
+  (table) => [
+    check('workspace_plan_kind', sql`${table.kind} IN ('personal', 'shared')`),
+    check('workspace_plan_base', sql`${table.basePlan} IN ('free', 'private', 'legacy')`),
+    check('workspace_plan_members', sql`${table.baseMemberLimit} >= 1`),
+    check(
+      'workspace_plan_paid',
+      sql`${table.paidPlan} IS NULL OR ${table.paidPlan} IN ('pro', 'team')`,
+    ),
+    check('workspace_plan_suspended', sql`${table.paidAccessSuspended} IN (0, 1)`),
+    check('workspace_plan_revision', sql`${table.revision} >= 0`),
+    check(
+      'workspace_plan_personal',
+      sql`${table.kind} <> 'personal' OR ${table.baseMemberLimit} = 1`,
+    ),
+    check(
+      'workspace_plan_paid_kind',
+      sql`${table.paidPlan} IS NULL OR (${table.paidPlan} = 'pro' AND ${table.kind} = 'personal') OR (${table.paidPlan} = 'team' AND ${table.kind} = 'shared')`,
+    ),
+  ],
 )
 
 export const member = sqliteTable(

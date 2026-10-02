@@ -7,8 +7,27 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Workspace capacity — 2026-10-02 (unverified candidate)
+
+- Added explicit server plan records, historical-grant migration and member-only
+  capacity projection. Public plan limits remain separate from private access,
+  invitations, roles and organization metadata.
+- Upload admission and metadata commit now read live paid-period/suspension
+  authority inside their D1 conditions. Audit and completion are fenced by the
+  actual reservation-bound insert; pending cleanup continues to consume quota.
+- Added plan, authenticated role/tenant, concurrency, downgrade and recovery
+  regression cases. Focused shared/Node cases, real D1 admission and actual
+  migration checks passed. Canonical static/publication/dependency gates cleared;
+  2,925 covered cases passed with floors retained, while a cron fixture lacked
+  its new explicit plan record. Fixed that fixture and its twelve focused cases
+  passed. Complete final-source canonical/SAST certification remains pending.
+  No subscriptions, production migration or public launch occurred.
+
 ### Recent credential proof — 2026-10-02 (unreleased candidate)
 
+- Updated the implementation receipt, checklist and operations status after all
+  exact-commit gates passed. Corrected the threat model's obsolete tag-deployment
+  description to the current main-only, fully gated production policy.
 - Added save/export guidance before the full-page credential sign-in, since its
   navigation follows the existing session-only unfinished-edit lifecycle.
   All twelve prompt messages include it. The preceding complete local quality
@@ -16,7 +35,9 @@ what was planned; superseded entries stay.
   bundle floor retained. Final wording passed focused/catalogue checks and all
   four built browser/axe journeys; their actual captures were reviewed. Final
   SAST passed 510 rules over 2,152 files with zero findings. Exact-commit hosted
-  canonical quality and the full 144-journey matrix remain pending.
+  canonical quality and the full 144-journey matrix then passed for runtime
+  `77f6a9a` in CI `37009328785`. Three unrelated journeys used existing retries;
+  all new credential journeys passed first attempts. No merge or deployment occurred.
 - Visual review of the credential prompt found mobile background text visible
   through the glass surface. The dialog now uses an opaque theme surface;
   screenshot evidence captures its viewport. The initial new browser journey

@@ -5,6 +5,7 @@ import { createMemoryAuditStore } from './memory-audit-store'
 import { createMemoryCloudStore } from './memory-cloud-store'
 import { createMemoryFolderStore } from './memory-folder-store'
 import { createMemoryGuidanceStore } from './memory-guidance-store'
+import { createMemoryPlanStore } from './memory-plan-store'
 import { createMemoryRecentStore } from './memory-recent-store'
 import {
   createMemoryAssetStore,
@@ -73,6 +74,7 @@ export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
 }
 
 export interface TestHarness {
+  plans: ReturnType<typeof createMemoryPlanStore>
   app: ReturnType<typeof createApp>
   env: TestEnv
   services: Services
@@ -142,12 +144,20 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     invitation: [],
   }
   const accounts = createMemoryAccountStore(tables)
+  const plans = createMemoryPlanStore(tables, accounts)
   const workspaceAccess = createMemoryWorkspaceAccessStore(tables, audit)
   const assets = createMemoryAssetStore()
   const photos = createMemoryPhotoStore()
   const organizations = createMemoryOrganizationStore(tables)
   const watermarks = createMemoryWatermarkStore(audit)
-  const uploads = createMemoryUploadStore({ assets, photos, organizations, audit, watermarks })
+  const uploads = createMemoryUploadStore({
+    assets,
+    photos,
+    organizations,
+    audit,
+    watermarks,
+    plans,
+  })
   const auth = createAuth({
     database: memoryAdapter(tables),
     secret: config.BETTER_AUTH_SECRET,
@@ -171,6 +181,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
   })
   const objects = createMemoryObjectStore()
   const services: Services = {
+    plans,
     config,
     db: notABinding(),
     auth,
@@ -196,5 +207,5 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     devMailbox: mailbox,
   }
   const app = createApp({ resolveServices: () => services })
-  return { app, env, services, mailbox, audit, objects }
+  return { app, env, services, mailbox, audit, objects, plans }
 }

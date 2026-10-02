@@ -4,11 +4,30 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-02 (verified private membership and expanded invitation gates)
+Last updated: 2026-10-02 (credential-proof certification and workspace-capacity implementation)
 
 ---
 
 ## 1. Product summary
+
+### Workspace-capacity slice — 2026-10-02 (verification pending)
+
+`codex/plan-entitlements` starts the next M19 billing foundation on certified
+credential-proof runtime `77f6a9a`. Shared plan records and migration `0020`
+separate Free, private/historical and time-bounded paid workspace capacity.
+Authorized members see limits without billing identifiers or private admission
+state. Upload admission reads authority inside the D1 write, and commit rechecks
+expiry/suspension before metadata, audit and lease completion. Historical data
+and grants are retained; no production migration or payment activation occurred.
+The current implementation and unexecuted test status are recorded in
+`docs/verification/m19/workspace-capacity-2026-10-02.md`.
+
+Working private-sharing assumption, pending the owner's optional clarification:
+keep one new shared workspace with three members for a private member. Existing
+shared workspaces and grants remain. Public Free/Pro users need Team for new
+shared workspaces. Storage-capacity verification comes first; atomic creation and
+seat limits, then signed subscription reconciliation and checkout/portal are the
+next slices. M19 remains open; no later milestone is started.
 
 ### Public billing and human-verification amendment — 2026-10-01
 
@@ -19,8 +38,13 @@ invitee receives two. Public accounts receive no private invitation privilege.
 Selected launch targets are Free, Pro at $9/month and Team at $24/month for three
 members, with explicit storage/member limits and cost assumptions recorded in
 `docs/plans/public-billing.md`. No Enterprise tier or simultaneous video-project
-editing is claimed. The existing Stripe CLI keys are expired/rejected; alternate
-Stripe connection and production billing provisioning remain unverified.
+editing is claimed. On 2026-10-02 the owner clarified that this requires a new
+Lumafoil Stripe account under the existing owner login. The first renewed CLI
+authorization selected an unrelated account; no products, prices, payments or
+remote secrets were created there. The official Stripe Codex plugin is installed
+and enabled, but Lumafoil Dashboard authentication, account creation/verification
+and production billing provisioning remain pending. Local CLI profile names are
+not provider account authority; pin and verify the actual intended account/mode.
 
 The owner explicitly requires privacy, human checks and account trust. A separate
 `codex/public-billing` checkout keeps this implementation isolated from the video
@@ -160,8 +184,10 @@ captures. The final twelve-locale save/export warning postdates that complete
 quality run; it subsequently passed focused prompt/catalogue checks and all four
 fresh built credential journeys with axe and viewed final-wording captures.
 Final SAST passed 510 rules over 2,152 files with zero findings.
-Exact-commit hosted canonical quality and the expanded 144-journey
-matrix remain required. Failed
+Runtime `77f6a9a` then passed all seven jobs in exact-commit CI `37009328785`:
+hosted canonical quality, SAST and the full 144-journey device matrix. Three
+unrelated journeys used existing retries; credential/private controls passed
+first attempts. Implementation certification is complete for this head. Failed
 attempts are recorded in the new receipt. No migration or production release is claimed.
 
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and

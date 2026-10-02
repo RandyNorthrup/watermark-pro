@@ -106,6 +106,16 @@ describe('default worker handler', () => {
 
   it('awaits both the health record and durable abandoned-upload cleanup on the cron trigger', async () => {
     const harness = createTestHarness()
+    harness.plans.seed({
+      organizationId: 'cron-workspace',
+      kind: 'shared',
+      basePlan: 'free',
+      baseMemberLimit: 1,
+      paidPlan: null,
+      paidThrough: null,
+      paidAccessSuspended: false,
+      revision: 0,
+    })
     vi.spyOn(serviceContainer, 'getServices').mockReturnValue(harness.services)
     const key = 'org/cron-workspace/abandoned-upload'
     await harness.objects.put(key, new Uint8Array([1]).buffer, 'image/png')

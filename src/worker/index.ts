@@ -36,6 +36,7 @@ import { recentWorkRoutes } from './routes/recent-work'
 import { referralRoutes } from './routes/referrals'
 import { shareRoutes } from './routes/shares'
 import { workspaceAccessRoutes } from './routes/workspace-access'
+import { workspaceCapacityRoutes } from './routes/workspace-capacity'
 import { getServices, type Services } from './services'
 import { cleanupUploads } from './upload-lifecycle'
 
@@ -128,6 +129,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
 
   app.route('/api', referralRoutes)
   app.route('/api', workspaceAccessRoutes)
+  app.route('/api', workspaceCapacityRoutes)
   app.route('/api', cloudConnectionRoutes)
   app.route('/api', folderRoutes)
   app.route('/api', guidanceRoutes)

@@ -11,6 +11,7 @@ import {
   uploadReservation,
   user,
   workspaceFolder,
+  workspacePlan,
 } from './db/schema'
 import { getServices } from './services'
 import { cleanupUploads, persistUpload } from './upload-lifecycle'
@@ -20,6 +21,7 @@ import {
   MAX_PHOTOS_PER_ORGANIZATION,
   MAX_STORAGE_BYTES_PER_ORGANIZATION,
 } from '../shared/constants'
+import { PUBLIC_PLANS } from '../shared/plans'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC } from '../shared/watermark'
 
 const services = getServices(env)
@@ -32,6 +34,7 @@ beforeAll(async () => {
     name: 'Upload fixture',
     email: 'uploads@example.test',
     emailVerified: true,
+    membershipCohort: 'private',
     createdAt: new Date(),
     updatedAt: new Date(),
   })
@@ -131,6 +134,134 @@ async function seedCount(kind: 'photo' | 'logo', count: number) {
 }
 
 describe('atomic D1 upload admission and R2 recovery', () => {
+  it('reads only explicit workspace authority and refuses a missing plan', async () => {
+    expect(await services.plans.get(organizationId)).toMatchObject({
+      organizationId,
+      kind: 'shared',
+      basePlan: 'private',
+      baseMemberLimit: 3,
+      paidPlan: null,
+      paidThrough: null,
+      paidAccessSuspended: false,
+      revision: 0,
+    })
+    await expect(services.plans.get('unknown-workspace')).rejects.toMatchObject({ status: 403 })
+  })
+  it.each(['photo', 'logo'] as const)(
+    'admits only one final public Free %s slot under concurrent requests',
+    async (kind) => {
+      await services.db
+        .update(workspacePlan)
+        .set({ basePlan: 'free', baseMemberLimit: 1 })
+        .where(eq(workspacePlan.organizationId, organizationId))
+      await seedCount(
+        kind,
+        (kind === 'photo' ? PUBLIC_PLANS.free.photos : PUBLIC_PLANS.free.logos) - 1,
+      )
+      const attempts = Array.from({ length: 4 }, () => upload(kind))
+      const results = await Promise.all(
+        attempts.map((item) => services.uploads.reserve(item.reservation)),
+      )
+      expect(results.filter((result) => result === 'reserved')).toHaveLength(1)
+      expect(results.filter((result) => result === 'quota')).toHaveLength(3)
+      const accepted = attempts.find((_, index) => results[index] === 'reserved')
+      if (accepted === undefined) throw new Error('Expected one accepted upload')
+      expect(
+        await services.uploads.commit(accepted.reservation, accepted.record, accepted.audit),
+      ).toBe(true)
+      const audit = await services.db
+        .select()
+        .from(auditLog)
+        .where(eq(auditLog.targetId, accepted.reservation.uploadId))
+      expect(audit).toHaveLength(1)
+      const receipt = await services.db
+        .select()
+        .from(uploadReservation)
+        .where(eq(uploadReservation.id, accepted.reservation.id))
+      expect(receipt[0]?.status).toBe('committed')
+      expect(await services.uploads.reserve(upload(kind).reservation)).toBe('quota')
+    },
+  )
+  it.each(['pro', 'team'] as const)(
+    'uses verified %s capacity above the private byte allowance',
+    async (paidPlan) => {
+      await services.db
+        .update(workspacePlan)
+        .set({
+          kind: paidPlan === 'pro' ? 'personal' : 'shared',
+          baseMemberLimit: 1,
+          paidPlan,
+          paidThrough: new Date(Date.now() + UPLOAD_POLICY.leaseMs),
+        })
+        .where(eq(workspacePlan.organizationId, organizationId))
+      const capacity = PUBLIC_PLANS[paidPlan].storageBytes
+      const item = upload('photo', capacity)
+      expect(await services.uploads.reserve(item.reservation)).toBe('reserved')
+      expect(await services.uploads.commit(item.reservation, item.record, item.audit)).toBe(true)
+      const usage = await services.uploads.usage(organizationId)
+      expect(usage.bytes).toBe(capacity)
+      expect(await services.uploads.reserve(upload('logo').reservation)).toBe('quota')
+    },
+  )
+  it.each(['expired', 'suspended', 'removed'] as const)(
+    'refuses metadata, audit and completion when paid authority is %s after admission',
+    async (change) => {
+      await services.db
+        .update(workspacePlan)
+        .set({
+          basePlan: 'free',
+          kind: 'personal',
+          baseMemberLimit: 1,
+          paidPlan: 'pro',
+          paidThrough: new Date(Date.now() + UPLOAD_POLICY.leaseMs),
+        })
+        .where(eq(workspacePlan.organizationId, organizationId))
+      const item = upload('photo', PUBLIC_PLANS.free.storageBytes + 1)
+      expect(await services.uploads.reserve(item.reservation)).toBe('reserved')
+      if (change === 'removed')
+        await services.db
+          .delete(workspacePlan)
+          .where(eq(workspacePlan.organizationId, organizationId))
+      else
+        await services.db
+          .update(workspacePlan)
+          .set(change === 'expired' ? { paidThrough: new Date(0) } : { paidAccessSuspended: true })
+          .where(eq(workspacePlan.organizationId, organizationId))
+      await expect(
+        services.uploads.commit(item.reservation, item.record, item.audit),
+      ).rejects.toMatchObject({ status: 400 })
+      expect(await services.photos.find(organizationId, item.reservation.uploadId)).toBeNull()
+      expect(
+        await services.db
+          .select()
+          .from(auditLog)
+          .where(eq(auditLog.targetId, item.reservation.uploadId)),
+      ).toEqual([])
+      const receipt = await services.db
+        .select()
+        .from(uploadReservation)
+        .where(eq(uploadReservation.id, item.reservation.id))
+      expect(receipt[0]?.status).toBe('pending')
+      await services.uploads.abandon(item.reservation.id)
+      const retained = await services.uploads.usage(organizationId)
+      expect(retained.bytes).toBe(item.reservation.bytes)
+      await services.uploads.release(item.reservation.id)
+      const released = await services.uploads.usage(organizationId)
+      expect(released.bytes).toBe(0)
+    },
+  )
+  it('rejects public Free byte overflow while retaining cleanup liability', async () => {
+    await services.db
+      .update(workspacePlan)
+      .set({ basePlan: 'free', baseMemberLimit: 1 })
+      .where(eq(workspacePlan.organizationId, organizationId))
+    const item = upload('photo', PUBLIC_PLANS.free.storageBytes)
+    expect(await services.uploads.reserve(item.reservation)).toBe('reserved')
+    await services.uploads.abandon(item.reservation.id)
+    expect(await services.uploads.reserve(upload('logo').reservation)).toBe('quota')
+    await services.uploads.release(item.reservation.id)
+    expect(await services.uploads.reserve(upload('logo').reservation)).toBe('reserved')
+  })
   it('rejects a folder removed after reservation without committing photo metadata or audit', async () => {
     const folderId = crypto.randomUUID()
     await services.db.insert(workspaceFolder).values({
