@@ -5,9 +5,10 @@ import { Unzip, UnzipInflate } from 'fflate'
 
 const MIB = 1024 * 1024
 export const PUBLICATION_LIMITS = {
-  // Full history/neutral-name copies exceeded two minutes on the Intel Mac.
-  // Keep every byte/rule in scope; a timed-out scan still fails publication.
-  scannerTimeoutMs: 300_000,
+  // The full candidate scan repeatedly exceeded five minutes on the Intel Mac
+  // after duplicate work was reduced. Allocate bounded scan time, never skip
+  // bytes or rules; exhaustion still rejects publication.
+  scannerTimeoutMs: 600_000,
   candidateBytes: 512 * MIB,
   fileBytes: 128 * MIB,
   zipBytes: 32 * MIB,

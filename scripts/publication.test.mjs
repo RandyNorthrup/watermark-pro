@@ -62,7 +62,9 @@ async function fixture(run) {
   }
 }
 function scannerCanary() {
-  return 'test_' + randomBytes(32).toString('hex')
+  // Balanced entropy exceeds the pinned generic rule's 3.5-bit threshold;
+  // restricted letters avoid its dictionary stopwords (random hex can hit them).
+  return 'test_' + 'b6a204973815'.repeat(8)
 }
 
 function googleCanary() {

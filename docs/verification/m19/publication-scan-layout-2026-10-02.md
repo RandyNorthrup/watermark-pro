@@ -47,3 +47,34 @@ Deliberately restoring duplicate current/history staging made that control fail
 batch passed twenty safety cases and failed only the metadata-count assertion.
 Final execution passed all twenty-one cases; lint and zero duplication passed.
 Full repository publication timing remains under verification.
+
+Full source publication subsequently passed in the normal commit hook for
+`c5d1d3baa95c1f3c2bc525fb2d9a179567c216af`: 15,019 candidate/object checks,
+12,580 scanner copies and 183 archive entries. Five revoked-key occurrences were
+masked only in historical copies; one exact immutable historical finding was
+accepted. No configured private values were available in this checkout, so this
+receipt establishes pattern/path/archive/history scanning, not comparison against
+live production credentials. The unchanged scanner deadline and hooks passed.
+The source was pushed; canonical CI and Linux AAC stage diagnosis are pending.
+
+Subsequent diagnostic publication still timed out at 300,000 ms, including an
+isolated attempt with no other owned scan running. On 2026-10-02 the scanner's
+bounded processing allocation becomes 600,000 ms. Earlier unchanged-deadline
+receipts remain accurate for their source; this later candidate has a documented
+resource allocation change. It does not change byte/archive bounds, rules,
+original-object inspection, retired-history exception boundaries or rejection
+on timeout. No application, native waveform, device or UI performance deadline
+is increased. Final candidate regressions and full scan execution remain pending.
+
+The first allocation-change batch passed twenty-one cases and missed one random
+generic canary in a historical ZIP; an isolated rerun with a new value passed.
+The pinned [Gitleaks 8.30.1 generic rule](https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml#L563)
+uses a 3.5-bit entropy threshold and substring stopwords. A stopword collision is
+consistent with the observed random failure, but the removed original fixture
+prevents proving that specific cause. The test helper now produces a balanced,
+deterministic synthetic value with restricted letters, keeping the same negative
+historical-entry assertion and all production rules. This scope control does not
+claim generic heuristics recognize every possible unknown secret; configured-value
+comparison, forbidden paths and provider patterns remain separate safeguards.
+Final execution passed all twenty-two scanner/timeout cases and lint. Complete
+repository scanning under the new bounded allocation remains pending.

@@ -363,6 +363,16 @@ unchanged thirty-second limit. Test-stage diagnostics now identify where it
 stalls without changing production behavior. All nine Mac cases and lint passed.
 The Linux output waveform proof and full final source certification remain open.
 
+Hosted `c5d1d3b` stage diagnostics located the thirty-second timeout in
+`decode-library`; calibration, encoding, mux finalization and exact demuxed
+duration completed. The next probe retains all assertions but checks native Web
+Audio waveform first, then records only synthetic decoder packet timestamps,
+counts and queue sizes using an unchanged pass-through native decode call.
+Its corrected native-property capture passed all nine Mac cases, lint, full types
+and zero duplication. Linux execution remains pending. Local SAST applied 510 rules to 2,161 targets and
+reported zero findings, but rule timeouts occurred in test/generated files;
+that is not a clean complete SAST certification.
+
 The first stage-diagnostic publication attempt failed at the existing five-minute
 Gitleaks deadline. Mac native cases, focused lint, complete types and duplication
 checks passed, but this is not a publication pass. A normal-hook retry limits

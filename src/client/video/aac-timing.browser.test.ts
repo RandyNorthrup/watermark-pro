@@ -55,12 +55,59 @@ async function isSupported() {
 }
 const hasNativeAac = await isSupported()
 let timingStage = 'idle'
+interface SyntheticDecoderProbe {
+  decoder: AudioDecoder
+  stage: string
+  firstTimestamp: number
+  lastTimestamp: number
+  packets: number
+}
+const decoderProbes: SyntheticDecoderProbe[] = []
+function isNativeDecode(
+  value: unknown,
+): value is (this: AudioDecoder, chunk: EncodedAudioChunk) => void {
+  return typeof value === 'function'
+}
+function observeSyntheticDecoder() {
+  const decode: unknown = Object.getOwnPropertyDescriptor(AudioDecoder.prototype, 'decode')?.value
+  if (!isNativeDecode(decode))
+    throw new Error('Synthetic decoder probe lost native implementation.')
+  const spy = vi.spyOn(AudioDecoder.prototype, 'decode')
+  const probes = new WeakMap<AudioDecoder, SyntheticDecoderProbe>()
+  spy.mockImplementation(function (this: AudioDecoder, chunk: EncodedAudioChunk) {
+    let probe = probes.get(this)
+    if (probe === undefined) {
+      probe = {
+        decoder: this,
+        stage: timingStage,
+        firstTimestamp: chunk.timestamp,
+        lastTimestamp: chunk.timestamp,
+        packets: 0,
+      }
+      probes.set(this, probe)
+      decoderProbes.push(probe)
+    }
+    probe.lastTimestamp = chunk.timestamp
+    probe.packets += 1
+    decode.call(this, chunk)
+  })
+}
 
 describe('native AAC project timing', () => {
   afterEach((context) => {
-    if (context.task.result?.state === 'fail')
+    if (context.task.result?.state === 'fail') {
       console.error('Synthetic AAC timing stage', timingStage)
+      console.error(
+        'Synthetic AAC decoder queues',
+        decoderProbes.map(({ decoder, ...probe }) => ({
+          ...probe,
+          state: decoder.state,
+          queue: decoder.decodeQueueSize,
+        })),
+      )
+    }
     vi.restoreAllMocks()
+    decoderProbes.length = 0
   })
   it(
     hasNativeAac
@@ -71,6 +118,7 @@ describe('native AAC project timing', () => {
         await expect(calibrateAacEncoder(new AbortController().signal)).rejects.toThrow()
         return
       }
+      observeSyntheticDecoder()
       const output = new Output({
         format: new Mp4OutputFormat({ fastStart: false }),
         target: new BufferTarget(),
@@ -102,6 +150,18 @@ describe('native AAC project timing', () => {
           expect(await input.computeDuration()).toBeCloseTo(4, 5)
           const track = await input.getPrimaryAudioTrack()
           if (track === null) throw new Error('Native AAC track missing.')
+          // Verify container/native playback before a sample iterator can stall.
+          timingStage = 'decode-web-audio'
+          const native = await new OfflineAudioContext(2, RATE, RATE).decodeAudioData(
+            await blob.arrayBuffer(),
+          )
+          expect(native.length).toBeGreaterThanOrEqual(FRAMES)
+          expect(native.length).toBeLessThan(FRAMES + 1024)
+          for (const start of MARKERS) {
+            const result = alignment(native.getChannelData(0), reference, start)
+            expect(result.score).toBeGreaterThan(0.9)
+            expect(Math.abs(result.delay)).toBeLessThanOrEqual(1)
+          }
           const decoded = new Float32Array(FRAMES)
           const samples = new AudioSampleSink(track).samples()
           timingStage = 'decode-library'
@@ -125,18 +185,6 @@ describe('native AAC project timing', () => {
           }
         } finally {
           input.dispose()
-        }
-        // Web Audio may expose a padded final AAC frame; it must retain every intended sample.
-        timingStage = 'decode-web-audio'
-        const native = await new OfflineAudioContext(2, RATE, RATE).decodeAudioData(
-          await blob.arrayBuffer(),
-        )
-        expect(native.length).toBeGreaterThanOrEqual(FRAMES)
-        expect(native.length).toBeLessThan(FRAMES + 1024)
-        for (const start of MARKERS) {
-          const result = alignment(native.getChannelData(0), reference, start)
-          expect(result.score).toBeGreaterThan(0.9)
-          expect(Math.abs(result.delay)).toBeLessThanOrEqual(1)
         }
       } finally {
         timingStage += ':cleanup'

@@ -9,6 +9,41 @@ what was planned; superseded entries stay.
 
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
+- Isolated diagnostic publication again exceeded the five-minute scanner cap.
+  Increased its bounded processing allocation to ten minutes after reducing
+  duplicate copies by about a third. Finding rules, original object/path checks,
+  byte/archive bounds and timeout rejection remain; application/UI deadlines and
+  coverage floors are unchanged. Final execution remains pending.
+- The expanded scanner batch passed twenty-one cases but missed one randomly
+  generated generic canary in a historical ZIP. A fresh isolated rerun passed.
+  The pinned generic rule has substring stopwords and an entropy threshold;
+  the removed original fixture prevents proving its exact missed-value cause.
+  The synthetic generic canary is now deterministic with balanced entropy and
+  restricted letters, preserving the same history/path assertions and production
+  rules. All twenty-two scanner/timeout cases and lint then passed; complete
+  repository publication remains pending.
+
+- Published stage diagnostics located the Linux timeout in library decoded-sample
+  iteration; encoding, mux finalization and exact demuxed duration completed.
+  The next synthetic probe runs the unchanged native Web Audio waveform checks
+  before iteration and records pass-through decoder queue/timestamp counts only.
+  No native call, waveform assertion or deadline is altered. Local SAST returned
+  zero findings across 510 applied rules/2,161 targets but reported rule timeouts;
+  it is not recorded as clean complete certification.
+  The first pass-through probe refused execution because browser-mode Vitest
+  did not expose the original spy implementation. Native capture now checks the
+  public property descriptor and retains explicit receiver calls; no lint
+  suppression or native behavior change was added. Fresh execution passed all
+  nine Mac native cases, lint, full types and zero duplication. Linux remains pending.
+  Its first publication attempt hit the unchanged scanner deadline. The separate
+  owned billing quality process resumed automatically and rejected its interrupted
+  timed scan. Both failed attempts remain recorded; no process remains paused.
+
+- Full normal publication passed for `c5d1d3b`: 15,019 candidate/object checks,
+  12,580 scanner copies and 183 archive entries, with unchanged rules/deadline.
+  The checkout had no configured private values for live-value comparison.
+  Pushed the diagnostic source; canonical CI and Linux codec diagnosis are running.
+
 - The grouped-only publication candidate also hit the unchanged scanner deadline.
   Staging now shares identical current/history copies only when original path,
   bytes and scanner treatment match. Retired-history masking remains separate

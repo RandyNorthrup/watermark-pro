@@ -303,6 +303,24 @@ staging only for identical original paths, bytes and scanner treatment. Retired
 historical masking remains distinct from unmasked current copies. Original object
 checks still run before deduplication, and different filenames remain separate.
 Expanded regression/copy-count controls and actual timing remain under verification.
+The final scanner candidate passed all twenty-one regressions, both deliberate
+negative drills and the complete normal commit hook. Source `c5d1d3b` passed
+15,019 candidate/object checks with 12,580 scanner copies and 183 archive entries;
+no rules, original-object scope or deadline changed. Its canonical hosted CI and
+Linux AAC stage diagnostic are running. The portable output correction remains
+the next video slice; M19 is not certified by publication alone.
+Hosted stage evidence now locates the remaining timeout in library sample
+iteration after encoding, mux and exact duration checks completed. The next
+synthetic queue/timestamp probe runs unchanged native waveform assertions first,
+then the library assertions, without changing native calls or deadlines. Local
+SAST had zero findings but rule timeouts; complete certification remains pending.
+The five-minute publication scanner allocation remained unreliable in subsequent
+isolated runs after copy work was reduced from roughly 18,346 files to 12,580.
+On 2026-10-02 its bounded allocation is raised to 600,000 ms. This changes a
+security scanner's available processing time, not a finding/coverage threshold,
+application deadline or UI performance budget. Original object/path checks,
+all rules, current/history separation and byte/archive bounds remain. Exhaustion
+still rejects publication; complete final-source execution is required.
 After it, address shared mobile boot/LCP/TBT, Account CLS, the three failing
 desktop Lighthouse surfaces and desktop/tablet screenshot failures, then rerun
 the unchanged full release audits. M19 remains open.
@@ -846,6 +864,24 @@ No candidate, history, archive, rule or finding exception was added. Timeouts
 still fail publication, and finite failure classification is regression-tested
 without ever echoing scanner stdout/stderr. The original failed hook and scanner
 receipts are retained separately from subsequent passing evidence.
+
+Publication allocation and deduplication (2026-10-02): scanner staging now
+shares only identical paths/bytes with identical treatment, preserving separate
+retired-history masking and every original-object check. A full normal hook
+passed 15,019 object/candidate checks using 12,580 scanner copies. Subsequent
+isolated runs still exhausted 300,000 ms, so the scanner allocation becomes
+600,000 ms. Git enumeration stays at 120,000 ms; file, candidate, ZIP expansion
+and depth bounds, finding rules and timeout rejection remain. This resource
+allocation is separate from the unchanged application, native waveform, UI
+performance and coverage thresholds. Twenty-one safety/performance regressions
+and two restored-source negative drills passed before the allocation change;
+expanded final execution and complete repository scanning remain required.
+The allocation-change batch exposed one random generic-canary miss; a fresh
+isolated rerun passed. The pinned detector has substring stopwords and an entropy
+threshold, so the test scope control now uses a deterministic balanced canary
+without changing production rules. The original failed value was removed with
+its fixture, leaving stopword collision an inference. Complete twenty-two-case
+execution and repository scanning remain required before publication.
 
 ### 3.2 Quality gates
 
