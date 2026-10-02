@@ -7,6 +7,32 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Private membership and bounded admissions — 2026-10-02 (unreleased)
+
+- Added server-owned pending/public/private membership. Migration preserves
+  historical private accounts and workspace grants. New private admission
+  consumes its email-bound offer and activates its role/cohort transactionally;
+  revocation races leave the candidate pending, even after email verification.
+  Client cohort fields cannot grant private membership.
+- Public accounts cannot list, issue, revoke or rotate private invitations/links,
+  regardless of workspace role. Pending accounts cannot reach custom workspace
+  APIs or privileged auth-plugin endpoints. Production public signup stays closed.
+- Added a lifetime grant of two new successful admissions, shared by targeted
+  email invites and reusable links. Pending offers reserve capacity; unused
+  revocation/expiry releases it. Accepted spend survives recipient deletion and
+  rotation. The send-rate budget remains independent.
+- Migration retains the two oldest live pending offers per inviter, revoking
+  excess reservations without removing admitted users or workspace access.
+  Historical accepted offers do not consume the new grant. Link rotation/revoke
+  now also revokes its unused email reservations, freeing their slots.
+- Corrected initial-owner bootstrap for the new pending-by-default schema: it
+  explicitly grants private membership while preserving mandatory email
+  verification. The real full-migration bootstrap test protects this path.
+- Added an own-account budget response and distinct quota-conflict error so a
+  spent lifetime allowance is not reported as a temporary email-rate limit.
+  Extended the real invitation journey to exercise two reservations, refusal of
+  a third, axe and a device screenshot. Final certification remains pending.
+
 ### Human verification evidence — 2026-10-02
 
 - Pushed runtime source `b908155` in draft PR #12. Hosted run `36976426895`

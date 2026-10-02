@@ -74,6 +74,45 @@ entitlements, paid collaboration and public landing remain the next parts of thi
 M19 slice. No later milestone is started, and production release audits remain
 required before deployment.
 
+### Private membership implementation — 2026-10-02
+
+The next M19 admission slice is isolated on `codex/private-admissions`, stacked
+on the verified human-control source and its result documentation. It introduces
+a server-owned `membership_cohort`: historical accounts migrate to `private`,
+new rows start `pending`, and only server admission activates them. Valid private
+admission atomically consumes its invitation and grants its cohort/site role.
+An invitation revoked during creation leaves an unadmitted account pending;
+even later email verification cannot unlock custom or organization/admin APIs.
+Client signup/profile fields cannot select a cohort. Public accounts have no
+private invitation/list/referral privileges regardless of workspace role.
+The existing console-mailbox/test-only uninvited bypass creates disposable
+private fixtures; it does not enable public production registration.
+
+Migration `0018_private-membership.sql` preserves all historical identities,
+verification states, content, explicit workspace grants and accepted invitations.
+Historical accepted admissions use grant version 0 and do not spend the new
+allowance. At cutover, up to two live pending invitations per sender are retained
+oldest-first (creation time, then ID) and reserve the two-new-admission allowance;
+excess pending promises are revoked and can be reissued after capacity is freed.
+Expired/revoked promises are not revived. Reusable links continue to work within
+the same allowance. Accepted version-1 admissions remain spent after recipient
+deletion, expiry or link rotation. Rotation/revocation releases unused referral
+reservations; send/abuse rate budgets remain independent and cannot be reset by
+revoking/issuing repeatedly. One conditional D1 insert reserves capacity across
+competing email and reusable-link requests. The own-account budget API exposes
+used/reserved/available counts; exhausting capacity has a distinct conflict code,
+without a misleading retry-after deadline.
+
+Initial focused tests passed 72 cases; ten new real-auth regression cases and two
+real legacy-SQLite migration cases passed before the final budget changes. Final
+focused/binding checks, canonical quality, SAST and four-device browser/visual
+verification are running or pending; no final gate pass or deployment is claimed.
+Recent-authentication policy, public plan quotas, billing state and public
+landing/private-member navigation remain separate unfinished controls. Finish
+and certify this slice before opening public signup, then implement quotas and
+Stripe checkout/webhook ownership. M19 and the existing video/release blockers
+stay open; no M20 work begins.
+
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and
 PDF documents. The hosted service is invitation-only; each admitted user gets
 a private workspace and a unique invitation link. The source is available free

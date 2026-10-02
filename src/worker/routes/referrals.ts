@@ -1,7 +1,7 @@
 /** Owners receive only their referral URL and aggregate acceptance count. */
 import { type Context, Hono } from 'hono'
 
-import { referralLinkSchema } from '../../shared/api-accounts'
+import { MEMBERSHIP_COHORT, referralLinkSchema } from '../../shared/api-accounts'
 import { HTTP_STATUS } from '../../shared/constants'
 import type { AppContext } from '../app-context'
 import { invitationTokenHash } from '../auth/invitation-admission'
@@ -12,6 +12,7 @@ import { referralToken } from '../referral'
 async function linkResponse(c: Context<AppContext>, shouldReplace: boolean) {
   const { accounts, audit, config } = c.get('services')
   const user = c.get('session').user
+  if (user.membershipCohort !== MEMBERSHIP_COHORT.private) throw apiErrors.forbidden()
   if (!user.emailVerified) throw apiErrors.forbidden()
   let link = await accounts.findReferralLink(user.id)
   if (link === null || shouldReplace) {
@@ -52,6 +53,7 @@ export const referralRoutes = new Hono<AppContext>()
   .post('/me/referral-link/rotate', requireSession, async (c) => await linkResponse(c, true))
   .delete('/me/referral-link', requireSession, async (c) => {
     const user = c.get('session').user
+    if (user.membershipCohort !== MEMBERSHIP_COHORT.private) throw apiErrors.forbidden()
     const { accounts, audit } = c.get('services')
     await accounts.revokeReferralLink(user.id)
     await audit.append({

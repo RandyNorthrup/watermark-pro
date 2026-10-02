@@ -204,10 +204,18 @@ describe('site invitations and private workspaces', () => {
     expect(
       await responseStatus(client.request(`/api/me/invitations/${first.id}`, { method: 'DELETE' })),
     ).toBe(404)
-    for (let index = 1; index < SITE_INVITATION_POLICY.sendsPerWindow; index++)
-      expect(await responseStatus(client.post('/api/me/invitations', { email: OTHER.email }))).toBe(
-        201,
-      )
+    // Revocation releases the two-admission reservation, but cannot reset the
+    // independent mail budget by repeatedly issuing and revoking a token.
+    for (let index = 1; index < SITE_INVITATION_POLICY.sendsPerWindow; index++) {
+      const response = await client.post('/api/me/invitations', { email: OTHER.email })
+      expect(response.status).toBe(201)
+      const invitation = siteInvitationDtoSchema.parse(await response.json())
+      expect(
+        await responseStatus(
+          client.request(`/api/me/invitations/${invitation.id}`, { method: 'DELETE' }),
+        ),
+      ).toBe(204)
+    }
     const limited = await client.post('/api/me/invitations', { email: OTHER.email })
     expect(limited.status).toBe(429)
     expect(limited.headers.get('retry-after')).toBe(

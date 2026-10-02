@@ -15,7 +15,6 @@ import { adminAc, userAc } from 'better-auth/plugins/admin/access'
 import { organization } from 'better-auth/plugins/organization'
 import { z } from 'zod'
 
-import type { AccountStore } from '../account-store'
 import { humanVerificationPlugins } from './human-verification'
 import {
   acceptSiteAdmission,
@@ -24,6 +23,7 @@ import {
 } from './invitation-admission'
 import { authenticationLogger } from './logger'
 import { accountSocialProviders, type AccountOAuthConfiguration } from './social-providers'
+import { MEMBERSHIP_COHORT, membershipCohortSchema } from '../../shared/api-accounts'
 import {
   APP_NAME,
   AUTH_COOKIE_PREFIX,
@@ -40,10 +40,11 @@ import { LOCALE_CODES } from '../../shared/locales'
 import { accessControl, roles } from '../../shared/permissions'
 import { SITE_ROLE } from '../../shared/site-roles'
 import { newOrganizationSchema } from '../../shared/validation'
+import { WORKSPACE_ACCESS_POLICY } from '../../shared/workspace-access'
+import type { AccountStore } from '../account-store'
 import type { AuditStore } from '../audit'
 import type { RateLimitStorage } from './rate-limit'
 import { invitationEmail, resetPasswordEmail, verificationEmail } from './templates'
-import { WORKSPACE_ACCESS_POLICY } from '../../shared/workspace-access'
 import type { EmailSender } from '../email/sender'
 import type { WorkspaceAccessStore } from '../workspace-access-store'
 
@@ -133,6 +134,13 @@ export function buildAuthOptions(deps: AuthDependencies) {
         deps.canSignUpWithoutInvitation === true,
       ),
       additionalFields: {
+        membershipCohort: {
+          type: 'string',
+          required: true,
+          input: false,
+          defaultValue: MEMBERSHIP_COHORT.pending,
+          validator: { input: membershipCohortSchema },
+        },
         // Nullable until the user picks a language; the validator rejects any
         // code outside SUPPORTED_LOCALES before it reaches the database.
         locale: {
@@ -204,9 +212,21 @@ export function buildAuthOptions(deps: AuthDependencies) {
           },
         },
         create: {
-          before: (user) => Promise.resolve({ data: { ...user, image: null } }),
+          before: (user) =>
+            Promise.resolve({
+              data: { ...user, image: null, membershipCohort: MEMBERSHIP_COHORT.pending },
+            }),
           after: async (user, context) => {
-            await acceptSiteAdmission(deps.accounts, context?.headers, user)
+            await acceptSiteAdmission(
+              deps.accounts,
+              context?.headers,
+              user,
+              // The existing bypass admits disposable private fixtures only.
+              // Public launch uses a separate policy after quotas are certified.
+              deps.canSignUpWithoutInvitation === true
+                ? MEMBERSHIP_COHORT.private
+                : MEMBERSHIP_COHORT.public,
+            )
             await deps.audit.append({
               actorUserId: user.id,
               actorName: user.name,

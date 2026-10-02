@@ -18,6 +18,11 @@ import {
 } from 'drizzle-orm/sqlite-core'
 import type { AnySQLiteColumn } from 'drizzle-orm/sqlite-core'
 
+import {
+  MEMBERSHIP_COHORT,
+  SITE_INVITATION_POLICY,
+  type MembershipCohort,
+} from '../../shared/api-accounts'
 import type {
   CloudAttemptState,
   CloudConnectionState,
@@ -52,6 +57,10 @@ export const user = sqliteTable(
     createdAt: createdAtColumn(),
     updatedAt: updatedAtColumn({ hasInsertDefault: true }),
     role: text('role'),
+    membershipCohort: text('membership_cohort')
+      .$type<MembershipCohort>()
+      .default(MEMBERSHIP_COHORT.pending)
+      .notNull(),
     banned: integer('banned', { mode: 'boolean' }).default(false),
     banReason: text('ban_reason'),
     banExpires: integer('ban_expires', { mode: 'timestamp_ms' }),
@@ -419,6 +428,7 @@ export const siteInvitation = sqliteTable(
     role: text('role').$type<AssignableSiteRole>().notNull().default('user'),
     tokenHash: text('token_hash').notNull(),
     referralId: text('referral_id').references(() => referralLink.id, { onDelete: 'set null' }),
+    grantVersion: integer('grant_version').default(SITE_INVITATION_POLICY.grantVersion).notNull(),
     createdAt: createdAtColumn(),
     expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
     acceptedAt: integer('accepted_at', { mode: 'timestamp_ms' }),
@@ -428,6 +438,13 @@ export const siteInvitation = sqliteTable(
   (table) => [
     uniqueIndex('site_invitation_token_unique').on(table.tokenHash),
     index('site_invitation_inviter_idx').on(table.inviterId),
+    index('site_invitation_grant_idx').on(
+      table.inviterId,
+      table.grantVersion,
+      table.acceptedAt,
+      table.revokedAt,
+      table.expiresAt,
+    ),
   ],
 )
 

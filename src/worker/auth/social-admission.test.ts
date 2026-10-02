@@ -110,6 +110,7 @@ async function legacyFixture(
     forceAllowId: true,
     data: {
       id: LEGACY_USER_ID,
+      membershipCohort: 'private',
       name: PERSON.name,
       email: PERSON.email,
       emailVerified: isLocalEmailVerified,

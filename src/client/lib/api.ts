@@ -16,6 +16,8 @@ const ERROR_MESSAGES: Partial<Record<string, string>> = {
   [API_ERROR_CODE.payloadTooLarge]: 'That file is too large.',
   [API_ERROR_CODE.unsupportedMedia]: 'That file type is not supported.',
   [API_ERROR_CODE.quotaExceeded]: 'The limit for this workspace has been reached.',
+  [API_ERROR_CODE.invitationQuotaExceeded]:
+    'Your two private invitations are reserved or used. Revoke an unused invitation to free a slot.',
 }
 
 const ACCOUNT_API_PREFIXES = ['/api/orgs', '/api/me', '/api/admin']

@@ -13,6 +13,7 @@ export async function seedInviter(harness: TestHarness, id: string): Promise<voi
       emailVerified: true,
       banned: false,
       role: 'user',
+      membershipCohort: 'private',
       createdAt: new Date(),
       updatedAt: new Date(),
     },

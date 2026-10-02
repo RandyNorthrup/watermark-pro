@@ -18,7 +18,7 @@ const workspaceSessionSchema = z.object({ session: z.object({ activeOrganization
 test('site invitations create separate private workspaces and protect account totals', async ({
   page,
   request,
-}) => {
+}, testInfo) => {
   const suffix = crypto.randomUUID()
   const owner = {
     name: 'Private Owner',
@@ -81,6 +81,26 @@ test('site invitations create separate private workspaces and protect account to
   await expect(page.getByLabel('Invitation link')).not.toHaveValue(ownerReferral)
   const forbiddenStats = await page.request.get('/api/admin/account-stats')
   expect(forbiddenStats.status()).toBe(403)
+  for (const index of [1, 2]) {
+    await page
+      .getByLabel('Email address')
+      .fill(`private-child-${String(index)}-${suffix}@example.test`)
+    await page.getByRole('button', { name: 'Send invitation', exact: true }).click()
+    await expect(page.getByText('Invitation sent. It expires in seven days.')).toBeVisible()
+  }
+  await page.getByLabel('Email address').fill(`private-child-overflow-${suffix}@example.test`)
+  await page.getByRole('button', { name: 'Send invitation', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText(
+    'Your two private invitations are reserved or used. Revoke an unused invitation to free a slot.',
+  )
+  const budget = await page.request.get('/api/me/private-invitation-budget')
+  expect(budget.status()).toBe(200)
+  expect(await budget.json()).toEqual({ limit: 2, used: 0, reserved: 2, available: 0 })
+  await expectAccessible(page)
+  await page.screenshot({
+    path: testInfo.outputPath('private-invitation-limit.png'),
+    fullPage: true,
+  })
   await page.goto('/app/admin')
   await expect(page.getByRole('alert')).toContainText('Only the site owner or an admin')
   await expect(page.getByText('Registered accounts', { exact: true })).toHaveCount(0)

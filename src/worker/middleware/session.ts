@@ -1,6 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 
 import { ACCOUNT_ID_HEADER, accountIdSchema } from '../../shared/account-identity'
+import { MEMBERSHIP_COHORT, membershipCohortSchema } from '../../shared/api-accounts'
 import { SYNC_OPERATION_HEADER } from '../../shared/sync'
 import type { AppContext } from '../app-context'
 import { apiErrors } from '../errors'
@@ -17,6 +18,8 @@ export const requireSession = createMiddleware<AppContext>(async (c, next) => {
     throw apiErrors.unauthenticated()
   }
   if (!session.user.emailVerified || session.user.banned === true) throw apiErrors.forbidden()
+  const cohort = membershipCohortSchema.safeParse(session.user.membershipCohort)
+  if (!cohort.success || cohort.data === MEMBERSHIP_COHORT.pending) throw apiErrors.forbidden()
   const expectedAccount = c.req.header(ACCOUNT_ID_HEADER)
   if (expectedAccount !== undefined) {
     const parsed = accountIdSchema.safeParse(expectedAccount)

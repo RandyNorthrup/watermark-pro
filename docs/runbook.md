@@ -57,6 +57,26 @@ Site invitations create separate private accounts, never membership in the
 inviter's workspace. Collaboration is a separate explicit operation. Exactly
 one anchored global Owner exists; workspace ownership does not grant that role.
 
+The unmerged M19 membership cutover (`0018_private-membership.sql`) preserves
+historical private accounts, content and explicit workspace grants. Historical
+accepted invitations do not spend the new grant. Up to two oldest live pending
+promises per inviter survive; excess pending promises are revoked. Review those
+pending rows before an eventual gated deployment and tell affected members to
+reissue only after a reserved slot is freed. Reusable links share the two-new-
+admission budget; accepted spend is permanent even after recipient deletion or
+rotation. The own-account budget distinguishes used, reserved and available.
+
+New rows default to pending. The initial-owner bootstrap explicitly selects
+private membership, while keeping its email unverified until the normal mailbox
+flow. Run that tool only after all current migrations; the historical owner
+selection path remains a distinct reviewed procedure. A signup whose invitation
+is revoked during creation stays pending and receives no workspace access even
+if email verification later succeeds. Do not activate such rows with blanket SQL:
+the intended invitation/identity must be reviewed, and a removed unadmitted row
+can retry normal admission. Public registration stays closed until quotas and
+billing policy are certified. Do not treat challenge success, payment or a
+workspace role as private membership or site-administration authority.
+
 For a new database, follow [self-hosting](self-hosting.md). The first-owner tool
 creates an unverified account with global role `owner`, without generating a
 password or creating an Admin account; mailbox verification and normal recovery

@@ -2,7 +2,8 @@
 
 Status: design and research completed on 2026-10-01. Human-verification runtime
 source `b908155` passed full quality, SAST and four-device browser gates on
-2026-10-02 in draft PR #12. Cohort, quota and payment implementation remains open;
+2026-10-02 in draft PR #12. Private cohort/two-invite implementation is under final verification; paid
+quota and payment implementation remains open;
 public registration and subscriptions have not shipped.
 
 ## Owner decisions
@@ -197,10 +198,15 @@ deletion; content deletion and financial retention must be distinguished clearly
 - [ ] Read back intended Stripe account, mode, fees, charges and payout capability;
       create/reuse exact products/prices, portal settings and webhook endpoint.
 - [ ] Add migration and server-owned public/private cohort and billing state;
-      preserve historical accounts, explicit grants and storage access.
+      preserve historical accounts, explicit grants and storage access. Cohort
+      migration/code now exists on `codex/private-admissions`; billing state and
+      complete certification remain unfinished.
 - [ ] Enforce plan quotas atomically on uploads, asset writes, offline replay,
       shared workspace creation, member acceptance and competing requests.
-- [ ] Enforce two new private admissions, including reusable links and race tests.
+- [ ] Certify implemented two-new-admission controls, including reusable links,
+      concurrency, revocation/expiry, historical spend and recipient deletion.
+      Cutover retains at most two oldest live pending offers per issuer and
+      revokes excess pending offers, while preserving historical admitted access.
 - [x] Implement production human verification with hostname/action checks,
       social state binding, consumed-token refresh and provider-failure negatives;
       source `b908155` passed full quality, SAST and four-device browser gates.
@@ -221,8 +227,9 @@ deletion; content deletion and financial retention must be distinguished clearly
 - [ ] Pass all M19 Lighthouse/screenshot release gates before production deploy.
 
 Human-verification implementation checks are complete for runtime source
-`b908155`; its draft PR remains unmerged. Next implement server-owned public/private
-cohorts and atomic two-new-invitation grants, then plan quotas and payment state.
+`b908155`; its draft PR remains unmerged. Private/public cohort boundaries and atomic two-new-invitation grants are
+implemented on `codex/private-admissions`, with final gates pending. Finish
+certification, then implement recent authentication, plan quotas and payment state.
 Stripe account authentication remains unconfirmed; no catalog or charge has been
 created. Video/navigation regressions and full M19 release audits remain open.
 No later milestone is started.

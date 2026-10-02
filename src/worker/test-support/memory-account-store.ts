@@ -1,4 +1,9 @@
-import { SITE_INVITATION_POLICY } from '../../shared/api-accounts'
+import {
+  MEMBERSHIP_COHORT,
+  privateInvitationBudgetSchema,
+  SITE_INVITATION_POLICY,
+  type MembershipCohort,
+} from '../../shared/api-accounts'
 import { canManageSite, SITE_ROLE, type AssignableSiteRole } from '../../shared/site-roles'
 import type { AccountStore, ReferralLinkRecord, SiteInvitationRecord } from '../account-store'
 import { referralAdmissionHash } from '../referral'
@@ -10,6 +15,7 @@ interface AccountTables {
     role?: string | null
     emailVerified?: boolean
     banned?: boolean | null
+    membershipCohort?: MembershipCohort
   }[]
   organization: { id: string; name: string; slug: string; createdAt: Date }[]
   member: { id: string; organizationId: string; userId: string; role: string; createdAt: Date }[]
@@ -29,6 +35,7 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
     tables.user.some(
       (user) =>
         user.id === id &&
+        user.membershipCohort === MEMBERSHIP_COHORT.private &&
         user.emailVerified === true &&
         user.banned !== true &&
         (role === SITE_ROLE.user ||
@@ -41,12 +48,57 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
     record.revokedAt === null &&
     record.expiresAt.getTime() > Date.now() &&
     canInvite(record.inviterId, record.role)
+  const hasCapacity = (id: string) =>
+    invitations
+      .values()
+      .filter(
+        (record) =>
+          record.inviterId === id &&
+          record.grantVersion === SITE_INVITATION_POLICY.grantVersion &&
+          (record.acceptedAt !== null ||
+            (record.revokedAt === null && record.expiresAt.getTime() > Date.now())),
+      )
+      .toArray().length < SITE_INVITATION_POLICY.newAdmissions
   return {
+    activateAccount(userId, cohort) {
+      const candidate = tables.user.find(
+        (user) => user.id === userId && user.membershipCohort === MEMBERSHIP_COHORT.pending,
+      )
+      if (candidate === undefined) throw new Error('Account admission was not activated')
+      candidate.membershipCohort = cohort
+      return Promise.resolve()
+    },
     siteOwnerId() {
       return Promise.resolve(ownerId())
     },
+    invitationBudget(inviterId) {
+      const records = invitations
+        .values()
+        .filter(
+          (record) =>
+            record.inviterId === inviterId &&
+            record.grantVersion === SITE_INVITATION_POLICY.grantVersion,
+        )
+        .toArray()
+      const used = records.filter((record) => record.acceptedAt !== null).length
+      const reserved = records.filter(
+        (record) =>
+          record.acceptedAt === null &&
+          record.revokedAt === null &&
+          record.expiresAt.getTime() > Date.now(),
+      ).length
+      return Promise.resolve(
+        privateInvitationBudgetSchema.parse({
+          limit: SITE_INVITATION_POLICY.newAdmissions,
+          used,
+          reserved,
+          available: SITE_INVITATION_POLICY.newAdmissions - used - reserved,
+        }),
+      )
+    },
     createInvitation(record) {
-      if (!canInvite(record.inviterId, record.role)) return Promise.resolve(false)
+      if (!canInvite(record.inviterId, record.role) || !hasCapacity(record.inviterId))
+        return Promise.resolve(false)
       const recent = invitations
         .values()
         .filter(
@@ -57,7 +109,7 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
         )
         .toArray()
       if (recent.length >= SITE_INVITATION_POLICY.sendsPerWindow) return Promise.resolve(false)
-      invitations.set(record.id, record)
+      invitations.set(record.id, { ...record, grantVersion: SITE_INVITATION_POLICY.grantVersion })
       return Promise.resolve(true)
     },
     listInvitations(inviterId) {
@@ -94,6 +146,7 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
       if (existing !== undefined && isPending(existing)) return existing
       if (existing !== undefined && (existing.acceptedAt !== null || existing.revokedAt !== null))
         return null
+      if (!hasCapacity(link.userId)) return null
       const recent = invitations
         .values()
         .filter(
@@ -111,6 +164,7 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
         role: SITE_ROLE.user,
         tokenHash: reservedHash,
         referralId: link.id,
+        grantVersion: SITE_INVITATION_POLICY.grantVersion,
         createdAt: new Date(),
         expiresAt: new Date(Date.now() + SITE_INVITATION_POLICY.expiresInMs),
         acceptedAt: null,
@@ -134,15 +188,18 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
         const invitee = tables.user.find(
           (user) =>
             user.id === userId &&
+            user.membershipCohort === MEMBERSHIP_COHORT.pending &&
             user.email?.toLowerCase() === email.toLowerCase() &&
             (user.role ?? SITE_ROLE.user) === SITE_ROLE.user,
         )
-        if (invitee === undefined) return
+        if (invitee === undefined) return false
         invitee.role = record.role
+        invitee.membershipCohort = MEMBERSHIP_COHORT.private
         record.acceptedAt = new Date()
         record.acceptedUserId = userId
+        return true
       }
-      return
+      return false
     },
     revokeInvitation(inviterId, id) {
       const record = invitations.get(id)
@@ -200,6 +257,16 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
       return Promise.resolve(referralLinks.get(userId) ?? null)
     },
     saveReferralLink(record, shouldReplace) {
+      if (shouldReplace) {
+        for (const admission of invitations.values())
+          if (
+            admission.inviterId === record.userId &&
+            admission.referralId != null &&
+            admission.acceptedAt === null &&
+            admission.revokedAt === null
+          )
+            admission.revokedAt = new Date()
+      }
       if (shouldReplace || !referralLinks.has(record.userId))
         referralLinks.set(record.userId, record)
       const saved = referralLinks.get(record.userId)
@@ -209,6 +276,14 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
     revokeReferralLink(userId) {
       const record = referralLinks.get(userId)
       if (record !== undefined) record.revokedAt = new Date()
+      for (const admission of invitations.values())
+        if (
+          admission.inviterId === userId &&
+          admission.referralId != null &&
+          admission.acceptedAt === null &&
+          admission.revokedAt === null
+        )
+          admission.revokedAt = new Date()
       return Promise.resolve()
     },
     referralAcceptedAccounts(userId) {
