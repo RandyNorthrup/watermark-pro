@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { aacCalibrationSignal, measureAacDelay } from './aac-calibration-signal'
+import { AAC_TIMING_POLICY } from '../../shared/constants'
 
 function delayed(frames: number): Float32Array {
   const original = aacCalibrationSignal()
@@ -16,8 +17,20 @@ describe('measured AAC priming', () => {
   it('rejects silence rather than assuming an encoder delay', () => {
     expect(() => measureAacDelay(new Float32Array(16_384))).toThrow('unambiguous')
   })
-  it.each([1, 16_383, 25_601])('rejects invalid decoded extent %i', (frames) => {
+  it.each([1, 16_383, 29_697])('rejects invalid decoded extent %i', (frames) => {
     expect(() => measureAacDelay(new Float32Array(frames))).toThrow('extent')
+  })
+  it('retains the complete reference when the encoder omits a final padding packet', () => {
+    const policy = AAC_TIMING_POLICY
+    const delay = 1024
+    const decoded = new Float32Array(
+      policy.calibrationFrames + policy.calibrationPaddingFrames + delay - policy.packetFrames,
+    )
+    decoded.set(aacCalibrationSignal(), delay)
+    expect(measureAacDelay(decoded)).toBe(delay)
+    expect(() => measureAacDelay(decoded.subarray(0, policy.calibrationFrames - 1))).toThrow(
+      'extent',
+    )
   })
   it('rejects markers with different delays', () => {
     const signal = aacCalibrationSignal()

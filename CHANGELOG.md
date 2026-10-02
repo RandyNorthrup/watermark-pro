@@ -9,6 +9,14 @@ what was planned; superseded entries stay.
 
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
+- The corrected Linux probe reached native execution: 16,384 submitted reference
+  frames produced only 15,360 decoded frames, despite matching 48 kHz and zero
+  timestamp origin. Calibration now submits 4,096 additional known silent frames.
+  Its maximum decoded window grows only by that generated padding; minimum
+  reference extent, 8,192-frame delay bound and exact waveform controls remain.
+  The candidate passed 34 pure controls, nine Mac WebKit cases, lint and full
+  type checking. Hosted Linux and complete final-source gates remain pending.
+
 - Corrected duplicate synthetic PCM encoding in the first probe: the hosted
   attempt stopped at the zero-duplication gate before codec execution. Runtime
   calibration and its contract now share bounded recording setup, including

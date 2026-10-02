@@ -40,7 +40,10 @@ it(
       if (track === null) throw new Error('Synthetic AAC track missing')
       const firstPacket = await new EncodedPacketSink(track).getFirstPacket()
       const maximum =
-        reference.length + AAC_TIMING_POLICY.maximumDelayFrames + AAC_TIMING_POLICY.packetFrames
+        reference.length +
+        AAC_TIMING_POLICY.calibrationPaddingFrames +
+        AAC_TIMING_POLICY.maximumDelayFrames +
+        AAC_TIMING_POLICY.packetFrames
       const decoded = new Float32Array(maximum)
       const extents: { offset: number; frames: number; rate: number }[] = []
       let origin: number | undefined

@@ -33,7 +33,11 @@ export interface AacCalibrationRecording {
 /** Encode the shared calibration fixture with the exact project AAC configuration. */
 export async function encodeAacCalibration(signal: AbortSignal): Promise<AacCalibrationRecording> {
   check(signal)
-  const reference = aacCalibrationSignal()
+  const signalPcm = aacCalibrationSignal()
+  // Some native encoders omit their final buffered block at flush. Known silent
+  // padding protects the entire reference; its minimum decoded extent stays fixed.
+  const reference = new Float32Array(signalPcm.length + AAC_TIMING_POLICY.calibrationPaddingFrames)
+  reference.set(signalPcm)
   const { channels, sampleRate, audioChunkFrames } = VIDEO_PROJECT_LIMITS
   const target = new BufferTarget()
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: false }), target })
@@ -105,7 +109,10 @@ export async function calibrateAacEncoder(signal: AbortSignal): Promise<number> 
     )
       throw new Error('AAC calibration returned an unexpected audio configuration.')
     const maximumFrames =
-      reference.length + AAC_TIMING_POLICY.maximumDelayFrames + AAC_TIMING_POLICY.packetFrames
+      reference.length +
+      AAC_TIMING_POLICY.calibrationPaddingFrames +
+      AAC_TIMING_POLICY.maximumDelayFrames +
+      AAC_TIMING_POLICY.packetFrames
     const decoded = new Float32Array(maximumFrames)
     let end = 0
     const samples = new AudioSampleSink(track).samples()

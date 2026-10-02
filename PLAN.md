@@ -12,6 +12,15 @@ Last updated: 2026-10-02 (native encoder and playback regression verification)
 
 ### Linux WebKit codec follow-up — 2026-10-02
 
+The corrected native probe on `eb69403` measured a 1,024-frame shortfall in the
+Linux encoder's synthetic calibration output: 15,360 decoded frames from 16,384
+submitted reference frames, with zero origin and 48 kHz configuration. Add a
+bounded 4,096-frame silent calibration pad, about 85 ms, before flush. The decoded
+cap includes only those additionally generated frames; the complete-reference
+minimum, measured-delay bound, project duration and waveform thresholds remain.
+This candidate passed 34 pure controls and nine Mac WebKit cases, lint and full
+types; it still requires hosted Linux and complete final-source certification.
+
 Video candidate `c1a503a` passed hosted canonical quality and SAST, plus complete
 desktop/Android device jobs, in run `37021471203`. Both WebKit device jobs failed
 multi-clip export; the inspected iPad trace reports the AAC calibration decoded

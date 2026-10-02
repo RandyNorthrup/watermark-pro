@@ -326,6 +326,7 @@ export const AUDIO_REENCODE_BITRATE = 128_000
 /** Synthetic AAC self-test bounds; two different chirps identify delay without inspecting user media. */
 export const AAC_TIMING_POLICY = {
   calibrationFrames: 16_384,
+  calibrationPaddingFrames: 4096,
   calibrationBytes: 65_536,
   maximumDelayFrames: 8192,
   packetFrames: 1024,

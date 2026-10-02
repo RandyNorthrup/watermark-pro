@@ -22,7 +22,11 @@ export function measureAacDelay(decoded: Float32Array): number {
   const policy = AAC_TIMING_POLICY
   if (
     decoded.length < policy.calibrationFrames ||
-    decoded.length > policy.calibrationFrames + policy.maximumDelayFrames + policy.packetFrames
+    decoded.length >
+      policy.calibrationFrames +
+        policy.calibrationPaddingFrames +
+        policy.maximumDelayFrames +
+        policy.packetFrames
   )
     throw new Error('AAC calibration returned an invalid decoded extent.')
   const reference = aacCalibrationSignal()

@@ -317,6 +317,19 @@ also records finite native packet origins. Nine Mac WebKit cases and the zero-
 clone gate passed after extraction. This failed head supplies no Linux waveform
 or calibration-origin proof; the remaining hosted probe is still required.
 
+The shared head `eb69403` then passed all static/publication gates and 2,878
+covered cases, before the new WebKit codec step failed five of nine cases. Its
+synthetic contract recorded encoder/demux origins zero, 48 kHz decoded samples,
+and only 15,360 decoded frames after 16,384 reference inputs. The unchanged minimum
+extent check correctly refused that recording. The candidate encoder now submits
+4,096 additional known silent calibration frames (about 85 ms), preserving the
+entire original reference. The decoder window expands by exactly that submitted
+padding; neither minimum extent, maximum measured delay, project duration nor
+waveform tolerance is reduced. A new pure case proves bounded end-padding loss
+can retain the reference, with a shortened-reference negative. All 34 pure cases
+and nine Mac WebKit cases passed, followed by lint and complete type checking.
+Hosted Linux execution and all final-source gates remain pending.
+
 M19 remains open. The owner added public free/paid monthly USD plans, Stripe
 billing, private two-invitation membership, shared paid workspaces and explicit
 human/trust gates during verification. This becomes the next implementation slice
