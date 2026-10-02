@@ -78,7 +78,11 @@ email unverified; it requires the current migrated schema.
   message wraps legibly and the revoke controls remain available. The existing
   isolation journey passed on three devices; its local iPad run reached the
   final administration-denial screen but exceeded the unchanged 60-second
-  deadline. An isolated iPad recheck is pending; the failed batch was 7/8.
+  deadline. The failed batch was 7/8. An isolated iPad recheck also timed out,
+  this time before the Members dialog opened; it is a failure, not a pass.
+  The commit's independent publication scanner was concurrently using about
+  seven CPU cores during that recheck. That observed contention is recorded
+  without claiming it is the only cause. Browser deadlines remain unchanged.
 - [Hosted run 36989072536](https://github.com/RandyNorthrup/watermark-pro/actions/runs/36989072536)
   completed all seven gates for exact source `e83ae047e972f6de9b248d432b47837b11dec189`.
   Canonical quality passed 2,841 covered tests and all existing global floors
@@ -94,6 +98,20 @@ email unverified; it requires the current migrated schema.
   unknown-cohort/child-budget assertions. A duplicate local canonical process
   was interrupted at exit 130 after the hosted quality pass was confirmed;
   no local full-quality pass is claimed.
+- Source `08834dff577e336f505016850a229cbf2549fd20` adds the separate quota
+  journey and result documentation. Commit hooks passed formatting, lint and
+  publication scanning. The expanded canonical workflow completed successfully as
+  [36992631513](https://github.com/RandyNorthrup/watermark-pro/actions/runs/36992631513);
+  all seven exact-source gates passed. Canonical quality passed 2,841 covered
+  tests, unchanged global floors (92.50 statements, 85.35 branches, 92.33
+  functions, 93.44 lines), 68 workerd tests, all script/publication/audit gates
+  and production build. SAST passed 510 rules on 2,141 files with zero findings.
+  All 140 expanded Playwright/axe cases ultimately passed: desktop, Android and
+  iPad passed 35 each on their first attempts; iPhone passed 34 immediately and
+  its gallery save/search/download/delete case passed on the existing retry.
+  That unrelated gallery case remains recorded as flaky. Private isolation and
+  quota/refusal/revocation/replacement passed on all four devices. Local iPad
+  failures above remain failures and are not relabeled as passes.
 
 The parent human-control runtime passed all seven checks and 136 browser
 journeys; those results do not certify these later membership changes. Detailed
@@ -102,8 +120,9 @@ real customer content appear in this receipt.
 
 ## Planning status
 
-M19 remains open. Finish the expanded matrix's complete gates and record the
-isolated iPad recheck. Next implement recent authentication, plan quotas and billing state,
+The private-membership slice's source, binding, browser and viewed-capture gates
+are complete for `08834df`. M19 remains open. Next implement recent authentication,
+plan quotas and billing state,
 then verified Stripe Checkout/portal/webhooks and public marketing/navigation.
 Stripe browser authentication is unconfirmed; no product, price, endpoint or
 charge has been created. Existing video export/offline regressions and complete

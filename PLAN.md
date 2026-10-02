@@ -109,16 +109,23 @@ SAST passed 510 rules on 2,141 files with zero findings. All 136 existing browse
 journeys ultimately passed; desktop sharing and iPad private isolation required
 the existing retry and remain recorded as flaky. The new separate quota journey
 passed locally with axe on all four devices; its actual quota-error screenshots
-were opened and reviewed. The expanded 140-case hosted matrix and an isolated
-local iPad recheck are still required. The initial local expanded batch was 7/8,
-with existing iPad isolation timing out at its final denial screen. Full
+were opened and reviewed. Expanded workflow `36992631513` passed all seven
+gates for `08834df`, including all 140 browser/axe cases, canonical quality
+(2,841 covered tests, 68 workerd tests, unchanged floors and complete build)
+and zero-finding SAST. The iPhone gallery case used the existing retry; private
+isolation and quota/refusal/revocation/replacement passed on all four devices.
+This admission slice is verified, with the prior failed attempts retained in
+its receipt. The initial local expanded batch was 7/8,
+with existing iPad isolation timing out at its final denial screen. An isolated
+iPad recheck also timed out before the Members dialog; concurrent publication
+scanning used about seven CPU cores, but no sole-cause claim is made. Full
 Lighthouse/screenshot audits and live-provider proof remain release gates;
 no remote migration or deployment is claimed. See the private-membership receipt
 for exact source, failed attempts and completed evidence.
 Recent-authentication policy, public plan quotas, billing state and public
-landing/private-member navigation remain separate unfinished controls. Finish
-and certify this slice before opening public signup, then implement quotas and
-Stripe checkout/webhook ownership. M19 and the existing video/release blockers
+landing/private-member navigation remain separate unfinished controls. Next
+implement session-bound recent credential proof, quotas and Stripe
+checkout/webhook ownership before opening public signup. M19 and video/release blockers
 stay open; no M20 work begins.
 
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and

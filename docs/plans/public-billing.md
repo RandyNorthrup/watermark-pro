@@ -154,6 +154,43 @@ it does not establish a real-world identity, prevent all abuse or prove trust.
 Do not add invasive fingerprinting, identity-document collection or broad email
 provider bans to the launch flow without a concrete need and privacy review.
 
+## Recent authentication requirements
+
+The next security slice uses a ten-minute server-owned credential proof tied to
+the current session and account. Password sign-in and validated identity-provider
+sign-in may establish that proof. Challenge completion, email verification,
+session renewal, payment, profile updates and client timestamps cannot establish
+or extend it. Sessions without proof retain ordinary permitted reads and editing,
+but sensitive actions require signing in again through the existing challenged
+email/OAuth flow. A new sign-in must preserve the application's account/offline
+binding checks and must not silently replay a sensitive mutation.
+
+Do not implement this as an age check on `createdAt` alone. The pinned Better
+Auth source creates sessions during email verification, including for an already
+registered identity; creation time therefore is not sufficient evidence of recent
+credential presentation. Server session extension fields must have `input: false`
+and receive their values only from trusted authentication hooks. Historical
+sessions start without proof, and renewal must preserve rather than advance it.
+Reject absent, malformed, future and expired proof with a specific typed error.
+The policy must cover both custom APIs and the organization/admin plugin seams,
+including private invitation issue/rotation, new workspace members/access links,
+membership/role changes, billing ownership, account/workspace deletion and site
+administrative mutations. Cancellation/revocation must not restore old proof.
+
+The implementation must ship real-auth positive and negative tests for these
+paths, proof forgery through session/profile input, email-verification replay,
+session renewal, account changes, provider failure and server expiry. The UI must
+explain why a new sign-in is needed and offer a bounded internal return path.
+Sensitive operations remain server role/cohort checked after reauthentication;
+freshness alone is never an access grant.
+
+Source verification on 2026-10-02: [Better Auth session freshness and updates](https://better-auth.com/docs/concepts/session-management),
+[server database hooks and additional fields](https://better-auth.com/docs/concepts/database),
+the pinned `node_modules/better-auth/dist/api/routes/email-verification.mjs` and
+`session.mjs`, and [OWASP authentication guidance](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html).
+This section specifies pending implementation; no recent-authentication control
+is claimed as shipped or certified.
+
 ## Billing and tenant security
 
 Checkout and portal endpoints require a verified signed-in workspace owner,
@@ -197,13 +234,18 @@ deletion; content deletion and financial retention must be distinguished clearly
 
 - [ ] Read back intended Stripe account, mode, fees, charges and payout capability;
       create/reuse exact products/prices, portal settings and webhook endpoint.
-- [ ] Add migration and server-owned public/private cohort and billing state;
-      preserve historical accounts, explicit grants and storage access. Cohort
-      migration/code now exists on `codex/private-admissions`; billing state and
-      complete certification remain unfinished.
+- [x] Add migration and server-owned pending/public/private cohort; preserve
+      historical accounts, explicit grants and storage access. Source `08834df`
+      passed all seven gates in workflow `36992631513`, including 140 browser
+      cases and real-auth/D1/legacy-migration tests. Migration remains undeployed.
+- [ ] Add authoritative billing state and entitlement reconciliation, separate
+      from private membership and explicit workspace access.
 - [ ] Enforce plan quotas atomically on uploads, asset writes, offline replay,
       shared workspace creation, member acceptance and competing requests.
-- [ ] Certify implemented two-new-admission controls, including reusable links,
+- [ ] Implement and certify session-bound recent credential proof, protecting
+      sensitive custom APIs and auth-plugin seams; email verification, renewal
+      and client session updates cannot refresh the proof.
+- [x] Certify implemented two-new-admission controls, including reusable links,
       concurrency, revocation/expiry, historical spend and recipient deletion.
       Cutover retains at most two oldest live pending offers per issuer and
       revokes excess pending offers, while preserving historical admitted access.
@@ -228,8 +270,9 @@ deletion; content deletion and financial retention must be distinguished clearly
 
 Human-verification implementation checks are complete for runtime source
 `b908155`; its draft PR remains unmerged. Private/public cohort boundaries and atomic two-new-invitation grants are
-implemented on `codex/private-admissions`, with final gates pending. Finish
-certification, then implement recent authentication, plan quotas and payment state.
+verified for `08834df` in workflow `36992631513`. All 140 browser/axe cases
+ultimately passed; the unrelated iPhone gallery case used the existing retry.
+Next implement recent authentication, plan quotas and payment state.
 Stripe account authentication remains unconfirmed; no catalog or charge has been
 created. Video/navigation regressions and full M19 release audits remain open.
 No later milestone is started.

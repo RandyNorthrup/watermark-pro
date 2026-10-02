@@ -43,7 +43,9 @@ what was planned; superseded entries stay.
   third, unused revocation and replacement. It passed locally with axe on all
   four devices; all four quota-error captures were opened and reviewed. The
   existing iPad isolation journey timed out at its final denial screen, leaving
-  the local expanded batch at 7/8; an isolated recheck remains pending.
+  the local expanded batch at 7/8. An isolated recheck also timed out before the
+  Members dialog while the independent publication scanner consumed about seven
+  CPU cores. Both failures remain recorded; browser deadlines were not changed.
 - Hosted run `36989072536` passed all seven gates for source `e83ae04`:
   canonical quality (2,841 covered tests, unchanged global floors, 68 workerd
   tests, script checks and build), SAST (510 rules, 2,141 files, zero findings)
@@ -51,6 +53,15 @@ what was planned; superseded entries stay.
   used the existing retry and remain recorded as flaky. The new separate quota
   journey still needs the expanded 140-case hosted matrix. No deployment or
   full M19 certification is claimed.
+- Expanded exact-source workflow `36992631513` passed every gate for `08834df`:
+  2,841 covered tests, unchanged floors, 68 workerd tests, complete script/build
+  gates, zero-finding SAST and all 140 Playwright/axe cases. All four devices
+  passed private isolation and quota/refusal/revocation/replacement. The iPhone
+  gallery journey passed on the existing retry and is recorded as flaky.
+  Membership verification is complete; public signup, recent authentication,
+  plan quotas, payments, public navigation and complete M19 release audits remain
+  unfinished. The next recent-authentication requirements explicitly distinguish
+  credential presentation from email verification and session renewal.
 
 ### Human verification evidence — 2026-10-02
 
