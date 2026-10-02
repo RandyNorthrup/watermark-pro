@@ -310,6 +310,13 @@ Linux conformance and the runtime correction remain pending. No bounds or
 assertions were loosened. Docker's local daemon is unavailable, so the actual
 hosted Linux runner supplies the remaining platform evidence.
 
+The first added-gate head `5c2f3c3` stopped at duplication detection before codec
+execution: its probe repeated nineteen lines of synthetic encoding preparation.
+That was corrected by sharing the bounded calibration recording function, which
+also records finite native packet origins. Nine Mac WebKit cases and the zero-
+clone gate passed after extraction. This failed head supplies no Linux waveform
+or calibration-origin proof; the remaining hosted probe is still required.
+
 M19 remains open. The owner added public free/paid monthly USD plans, Stripe
 billing, private two-invitation membership, shared paid workspaces and explicit
 human/trust gates during verification. This becomes the next implementation slice

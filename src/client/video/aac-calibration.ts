@@ -23,16 +23,30 @@ function check(signal: AbortSignal) {
   if (signal.aborted) throw new CancelledError()
 }
 
-/** Encode and decode a bounded synthetic signal with the exact project AAC configuration. */
-export async function calibrateAacEncoder(signal: AbortSignal): Promise<number> {
+/** Bounded synthetic recording and native timestamp origins, independent of personal media. */
+export interface AacCalibrationRecording {
+  buffer: ArrayBuffer
+  firstPacketFrame: number
+  lastPacketFrame: number
+}
+
+/** Encode the shared calibration fixture with the exact project AAC configuration. */
+export async function encodeAacCalibration(signal: AbortSignal): Promise<AacCalibrationRecording> {
   check(signal)
   const reference = aacCalibrationSignal()
   const { channels, sampleRate, audioChunkFrames } = VIDEO_PROJECT_LIMITS
   const target = new BufferTarget()
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: false }), target })
+  let firstPacketFrame: number | undefined
+  let lastPacketFrame: number | undefined
   const source = new AudioSampleSource({
     codec: 'aac',
     quality: new Quality({ bitrate: AUDIO_REENCODE_BITRATE }),
+    onEncodedPacket(packet) {
+      const frame = Math.round(packet.timestamp * sampleRate)
+      firstPacketFrame ??= frame
+      lastPacketFrame = frame
+    },
   })
   output.addAudioTrack(source)
   try {
@@ -66,6 +80,21 @@ export async function calibrateAacEncoder(signal: AbortSignal): Promise<number> 
   const { buffer } = target
   if (buffer === null || buffer.byteLength > AAC_TIMING_POLICY.calibrationBytes)
     throw new Error('AAC calibration did not produce a bounded encoded signal.')
+  if (
+    firstPacketFrame === undefined ||
+    lastPacketFrame === undefined ||
+    !Number.isFinite(firstPacketFrame) ||
+    !Number.isFinite(lastPacketFrame)
+  )
+    throw new Error('AAC calibration did not produce valid packet timing.')
+  return { buffer, firstPacketFrame, lastPacketFrame }
+}
+
+/** Decode the shared recording and measure its synthetic signal's bounded native encoder delay. */
+export async function calibrateAacEncoder(signal: AbortSignal): Promise<number> {
+  const { buffer } = await encodeAacCalibration(signal)
+  const reference = aacCalibrationSignal()
+  const { channels, sampleRate } = VIDEO_PROJECT_LIMITS
   const input = new Input({ source: new BufferSource(buffer), formats: ALL_FORMATS })
   try {
     const track = await input.getPrimaryAudioTrack()

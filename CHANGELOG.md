@@ -9,6 +9,12 @@ what was planned; superseded entries stay.
 
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
+- Corrected duplicate synthetic PCM encoding in the first probe: the hosted
+  attempt stopped at the zero-duplication gate before codec execution. Runtime
+  calibration and its contract now share bounded recording setup, including
+  finite native packet timing. Nine Mac cases and the zero-clone check passed;
+  the Linux probe still needs execution.
+
 - Added a separate WebKit AAC verification command to canonical testing. The
   hosted video candidate passed quality/SAST and desktop/Android journeys, but
   both WebKit device jobs failed multi-clip export at the calibration extent
