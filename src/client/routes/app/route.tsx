@@ -10,6 +10,7 @@ import { useEffect, useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { AppShell } from '../../components/app-shell'
+import { RecentAuthenticationNotice } from '../../components/recent-authentication-notice'
 import { Alert } from '../../components/ui/alert'
 import { ActiveOrganizationContext } from '../../lib/active-organization'
 import { describeError } from '../../lib/errors'
@@ -118,6 +119,7 @@ function AppLayout() {
         organization={displayedOrganization}
         organizations={organizations}
       >
+        <RecentAuthenticationNotice userId={session.user.id} />
         {selectionRequired ? (
           <Alert tone="info">{t('shell.chooseOrganization')}</Alert>
         ) : (

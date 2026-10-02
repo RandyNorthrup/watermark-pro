@@ -9,7 +9,7 @@
  */
 import type { BetterAuthOptions } from 'better-auth'
 import type { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { APIError, createAuthMiddleware } from 'better-auth/api'
+import { APIError, createAuthMiddleware, getSessionFromCtx } from 'better-auth/api'
 import { admin } from 'better-auth/plugins/admin'
 import { adminAc, userAc } from 'better-auth/plugins/admin/access'
 import { organization } from 'better-auth/plugins/organization'
@@ -22,6 +22,7 @@ import {
   validateAccountAdmission,
 } from './invitation-admission'
 import { authenticationLogger } from './logger'
+import { credentialProofForNewSession } from './recent-authentication'
 import { accountSocialProviders, type AccountOAuthConfiguration } from './social-providers'
 import { MEMBERSHIP_COHORT, membershipCohortSchema } from '../../shared/api-accounts'
 import {
@@ -174,6 +175,9 @@ export function buildAuthOptions(deps: AuthDependencies) {
     session: {
       expiresIn: SESSION_EXPIRES_IN_SECONDS,
       updateAge: SESSION_UPDATE_AGE_SECONDS,
+      additionalFields: {
+        credentialVerifiedAt: { type: 'date', required: false, input: false },
+      },
     },
     rateLimit: {
       enabled: deps.rateLimitEnabled,
@@ -195,6 +199,30 @@ export function buildAuthOptions(deps: AuthDependencies) {
       },
     },
     databaseHooks: {
+      session: {
+        create: {
+          before: async (session, context) => {
+            const credentialVerifiedAt = await credentialProofForNewSession(context?.path)
+            const previous =
+              context != null && credentialVerifiedAt !== null
+                ? await getSessionFromCtx(context)
+                : null
+            const selection: unknown = previous?.session['activeOrganizationId']
+            let activeOrganizationId: string | null = null
+            if (typeof selection === 'string' && previous?.user.id === session.userId) {
+              const membership = await context?.context.adapter.findOne({
+                model: 'member',
+                where: [
+                  { field: 'organizationId', value: selection },
+                  { field: 'userId', value: session.userId },
+                ],
+              })
+              if (membership != null) activeOrganizationId = selection
+            }
+            return { data: { ...session, credentialVerifiedAt, activeOrganizationId } }
+          },
+        },
+      },
       // Identity tokens are used during callback verification only. Better Auth's
       // encryptOAuthTokens protects access/refresh tokens but does not transform
       // every idToken write path, so do not persist identity-token claims at all.

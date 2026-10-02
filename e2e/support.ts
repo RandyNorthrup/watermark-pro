@@ -227,6 +227,13 @@ export async function signUpAndVerify(page: Page, request: APIRequestContext, pe
   // Every verified account starts in a separate personal workspace.
   await expect(page).toHaveURL(/\/app\/editor\/?$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Images')
+  // Verification creates an unproved session. These established-user fixtures
+  // explicitly present their password before exercising sensitive features.
+  const signedIn = await page.request.post('/api/auth/sign-in/email', {
+    headers: { origin: PREVIEW_ORIGIN },
+    data: { email: person.email, password: person.password },
+  })
+  expect(signedIn.status()).toBe(200)
   await prepareReturningUser(page)
 }
 

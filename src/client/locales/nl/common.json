@@ -100,6 +100,12 @@
       "failed": "De verificatie is mislukt. Herlaad deze pagina en probeer opnieuw.",
       "unavailable": "De verificatie is niet beschikbaar. Controleer je verbinding en herlaad deze pagina.",
       "retry": "Menselijke verificatie opnieuw proberen"
+    },
+    "recent": {
+      "title": "Meld je opnieuw aan",
+      "body": "Deze gevoelige wijziging is niet toegepast. Meld je opnieuw aan en probeer het daarna nog eens. Je keert terug naar deze pagina. Sla onvoltooide bewerkingen eerst op of exporteer ze.",
+      "cancel": "Verder werken",
+      "signIn": "Opnieuw aanmelden"
     }
   },
   "dashboard": {

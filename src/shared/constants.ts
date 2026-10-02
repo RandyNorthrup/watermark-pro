@@ -50,6 +50,13 @@ export const PASSWORD_MAX_LENGTH = 128
 export const SESSION_EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
 export const SESSION_UPDATE_AGE_SECONDS = 60 * 60 * 24
 
+/** Sensitive changes require credentials checked in this session within ten minutes. */
+export const RECENT_AUTHENTICATION_WINDOW_MS = 10 * 60 * 1000
+/** Better Auth's envelope has a separate uppercase namespace from custom API errors. */
+export const AUTH_RECENT_AUTHENTICATION_REQUIRED = 'RECENT_AUTHENTICATION_REQUIRED'
+/** Bound internal destinations retained across a new credential sign-in. */
+export const MAX_AUTH_REDIRECT_LENGTH = 2048
+
 /** Lifetime of email verification, password reset, and invitation tokens, in seconds. */
 export const VERIFICATION_TOKEN_TTL_SECONDS = 60 * 60
 export const INVITATION_TTL_SECONDS = 60 * 60 * 24 * 7
@@ -185,6 +192,7 @@ export const API_ERROR_CODE = {
   unsupportedMedia: 'unsupported_media_type',
   quotaExceeded: 'quota_exceeded',
   invitationQuotaExceeded: 'invitation_quota_exceeded',
+  recentAuthenticationRequired: 'recent_authentication_required',
   unsupportedUrl: 'unsupported_url',
 } as const
 

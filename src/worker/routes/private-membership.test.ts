@@ -216,6 +216,7 @@ describe('server-owned private membership', () => {
         await responseJson(client.get('/api/auth/get-session')),
       )
       expect(admittedSession.user.membershipCohort).toBe('private')
+      await client.signIn({ ...OTHER, email })
       expect(
         await responseStatus(client.post('/api/me/invitations', { email: `child-${email}` })),
       ).toBe(201)

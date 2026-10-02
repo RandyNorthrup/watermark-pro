@@ -100,6 +100,12 @@
       "failed": "Die Überprüfung ist fehlgeschlagen. Lade die Seite neu und versuche es erneut.",
       "unavailable": "Die Überprüfung ist nicht verfügbar. Prüfe deine Verbindung und lade die Seite neu.",
       "retry": "Menschliche Überprüfung erneut versuchen"
+    },
+    "recent": {
+      "title": "Erneut anmelden",
+      "body": "Diese sensible Änderung wurde nicht angewendet. Melde dich erneut an und versuche es danach noch einmal. Du kehrst zu dieser Seite zurück. Speichere oder exportiere unfertige Änderungen zuerst.",
+      "cancel": "Weiterarbeiten",
+      "signIn": "Erneut anmelden"
     }
   },
   "dashboard": {

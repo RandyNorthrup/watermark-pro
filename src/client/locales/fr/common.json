@@ -100,6 +100,12 @@
       "failed": "La vérification a échoué. Rechargez cette page et réessayez.",
       "unavailable": "La vérification est indisponible. Vérifiez votre connexion et rechargez cette page.",
       "retry": "Réessayer la vérification humaine"
+    },
+    "recent": {
+      "title": "Reconnectez-vous",
+      "body": "Cette modification sensible n’a pas été appliquée. Reconnectez-vous, puis réessayez. Vous reviendrez sur cette page. Enregistrez ou exportez d’abord les modifications inachevées.",
+      "cancel": "Continuer à travailler",
+      "signIn": "Se reconnecter"
     }
   },
   "dashboard": {

@@ -45,6 +45,7 @@ async function verifiedInvitedUser(harness: TestHarness, token: string) {
   ).toBe(200)
   const url = findLink(harness.mailbox, OTHER.email, '/api/auth/verify-email')
   expect(await responseStatus(client.get(url))).toBeLessThan(400)
+  await client.signIn(OTHER)
   return client
 }
 
@@ -103,6 +104,7 @@ describe('site invitations and private workspaces', () => {
       ),
     ).toBe(200)
     await owner.get(findLink(harness.mailbox, OWNER.email, '/api/auth/verify-email'))
+    await owner.signIn(OWNER)
     const reserved = await owner.post('/api/auth/organization/create', {
       name: 'Reserved fixture',
       slug: 'personal-someone',

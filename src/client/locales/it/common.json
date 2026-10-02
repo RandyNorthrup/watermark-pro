@@ -100,6 +100,12 @@
       "failed": "La verifica non è riuscita. Ricarica questa pagina e riprova.",
       "unavailable": "La verifica non è disponibile. Controlla la connessione e ricarica questa pagina.",
       "retry": "Riprova la verifica umana"
+    },
+    "recent": {
+      "title": "Accedi di nuovo",
+      "body": "Questa modifica sensibile non è stata applicata. Accedi di nuovo, poi riprova. Tornerai a questa pagina. Salva o esporta prima le modifiche non completate.",
+      "cancel": "Continua a lavorare",
+      "signIn": "Accedi di nuovo"
     }
   },
   "dashboard": {

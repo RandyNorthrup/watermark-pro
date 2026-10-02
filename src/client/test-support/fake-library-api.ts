@@ -46,6 +46,7 @@ const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
   unsupportedMedia: HTTP_STATUS.unsupportedMediaType,
   quotaExceeded: HTTP_STATUS.badRequest,
   invitationQuotaExceeded: HTTP_STATUS.conflict,
+  recentAuthenticationRequired: HTTP_STATUS.forbidden,
   unsupportedUrl: HTTP_STATUS.badRequest,
 }
 

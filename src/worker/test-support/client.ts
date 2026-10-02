@@ -73,7 +73,8 @@ export class TestClient {
 
   /**
    * Full sign-up: register, then follow the verification link from the
-   * mailbox, which also signs the user in.
+   * mailbox, then prove the fixture password with the real sign-in endpoint.
+   * Verification alone deliberately does not authorize sensitive mutations.
    */
   async signUpAndVerify(
     mailbox: DevMailbox,
@@ -88,6 +89,13 @@ export class TestClient {
     if (verify.status >= HTTP_STATUS.badRequest) {
       throw new Error(`verification failed: ${String(verify.status)} ${await verify.text()}`)
     }
+    await this.signIn(user)
+  }
+
+  /** Establishes server-owned credential proof using an actual password check. */
+  async signIn(user: { email: string; password: string }): Promise<void> {
+    const response = await this.post('/api/auth/sign-in/email', user)
+    if (!response.ok) throw new Error(`fixture sign-in failed: ${String(response.status)}`)
   }
 
   /** Creates an organization through Better Auth and returns its id. */
