@@ -68,6 +68,8 @@ it(
         AAC_TIMING_POLICY.maximumDelayFrames +
         AAC_TIMING_POLICY.packetFrames
       const decoded = new Float32Array(maximum)
+      const sequential = new Float32Array(maximum)
+      let sequentialEnd = 0
       const extents: { offset: number; frames: number; rate: number }[] = []
       let origin: number | undefined
       let end = 0
@@ -83,6 +85,9 @@ it(
           const plane = new Float32Array(sample.numberOfFrames)
           sample.copyTo(plane, { planeIndex: 0, format: 'f32-planar' })
           decoded.set(plane, begin)
+          expect(sequentialEnd + plane.length).toBeLessThanOrEqual(maximum)
+          sequential.set(plane, sequentialEnd)
+          sequentialEnd += plane.length
           end = Math.max(end, begin + sample.numberOfFrames)
         } finally {
           sample.close()
@@ -97,6 +102,9 @@ it(
         decodedLast: extents.at(-1),
         decodedFrames: end,
         signedPeaks: signedPeaks(decoded.subarray(0, end)),
+        sequentialFrames: sequentialEnd,
+        sequentialPeaks: signedPeaks(sequential.subarray(0, sequentialEnd)),
+        decodedExtents: extents,
       }
       try {
         const delay = measureAacDelay(decoded.subarray(0, end))

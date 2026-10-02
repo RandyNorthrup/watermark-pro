@@ -339,6 +339,14 @@ read-only Linux codec workflow reduces feedback time without substituting for
 required quality/device checks. Production timing remains unchanged until that
 evidence supports a correction.
 
+Signed Linux probe `c7e1cd4` found a strong later-marker peak at 576 frames
+(correlation 0.99997), while the early marker peaked only at 0.20769. One valid
+marker is insufficient to establish delay. The next synthetic contract therefore
+records every decoded chunk extent and compares sequential sample placement with
+the timestamp-based placement. No user samples are logged; production timing and
+the two-marker requirement remain unchanged. Nine Mac cases, lint, full types and
+zero duplication passed for this probe expansion.
+
 M19 remains open. The owner added public free/paid monthly USD plans, Stripe
 billing, private two-invitation membership, shared paid workspaces and explicit
 human/trust gates during verification. This becomes the next implementation slice

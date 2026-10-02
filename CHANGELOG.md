@@ -9,6 +9,12 @@ what was planned; superseded entries stay.
 
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
+- Linux signed diagnostics found the later calibration marker at 576 frames
+  with 0.99997 correlation, while the first marker had no credible match. Added
+  synthetic-only decoder chunk extents and sequential-versus-timestamp placement
+  diagnostics; production delay and waveform checks remain unchanged. Nine Mac
+  cases, lint, types and duplication checks passed for the expanded probe.
+
 - The padded Linux recording reached 20,480 decoded frames, but calibration
   still refused an ambiguous/nonmatching positive-delay peak. Added an independent
   signed-offset diagnostic over synthetic samples and a dedicated read-only Linux
