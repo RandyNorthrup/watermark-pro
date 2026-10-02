@@ -107,7 +107,7 @@ it(
         decodedExtents: extents,
       }
       try {
-        const delay = measureAacDelay(decoded.subarray(0, end))
+        const delay = measureAacDelay(sequential.subarray(0, sequentialEnd))
         expect(delay).toBeGreaterThanOrEqual(0)
         expect(delay).toBeLessThanOrEqual(AAC_TIMING_POLICY.maximumDelayFrames)
         expect(await calibrateAacEncoder(new AbortController().signal)).toBe(delay)

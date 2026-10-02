@@ -12,6 +12,14 @@ Last updated: 2026-10-02 (native encoder and playback regression verification)
 
 ### Linux WebKit codec follow-up — 2026-10-02
 
+The decoder chunk probe on `9485baa` showed duplicate/skipped timestamps;
+placing PCM by those values overwrote the first marker. Sequential samples
+preserved both markers at a measured 1,600-frame delay with correlations above
+0.99997. Assemble the known contiguous calibration in decode order, preserving
+sample-rate, extent, measured-delay and two-marker requirements. Nine Mac cases,
+lint, full types and zero duplication passed; Linux waveform and final complete
+gates remain pending.
+
 The padded Linux recording on `b22e670` retained 20,480 decoded frames, resolving
 the extent shortfall, but positive-delay alignment still failed its unchanged
 correlation guard. Diagnose signed synthetic offsets before changing runtime

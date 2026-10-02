@@ -347,6 +347,16 @@ the timestamp-based placement. No user samples are logged; production timing and
 the two-marker requirement remain unchanged. Nine Mac cases, lint, full types and
 zero duplication passed for this probe expansion.
 
+Probe `9485baa` identified the actual Linux mismatch: decoded chunk timestamps
+repeat at zero and 6,144 frames and skip intervening positions. Timestamp placement
+overwrote PCM. The same complete samples in decode order preserved both markers
+at 1,600 frames, with correlations 0.99998 and 0.99997. Production calibration now
+assembles its known contiguous synthetic signal in that order, retaining exact
+rate and generated-extent checks and the unchanged two-marker/delay guards. The
+negative-offset branch became unreachable and was removed. All nine Mac cases,
+lint, full type checking and zero duplication passed. Linux waveform/native
+decoder conformance and full final-source gates remain required.
+
 M19 remains open. The owner added public free/paid monthly USD plans, Stripe
 billing, private two-invitation membership, shared paid workspaces and explicit
 human/trust gates during verification. This becomes the next implementation slice

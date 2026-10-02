@@ -9,6 +9,14 @@ what was planned; superseded entries stay.
 
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
+- The decoded-chunk Linux probe found duplicate and skipped timestamps; copying
+  by those timestamps overwrote the early marker. Sequential decoded PCM retained
+  both markers at 1,600 frames with correlations above 0.99997. Calibration now
+  collects the known contiguous synthetic stream in decode order. Rate, extent,
+  delay and two-marker/waveform controls remain intact; unreachable negative-offset
+  logic was removed. Nine Mac cases, lint, full types and duplication checks passed.
+  Linux waveform and full final-source certification remain pending.
+
 - Linux signed diagnostics found the later calibration marker at 576 frames
   with 0.99997 correlation, while the first marker had no credible match. Added
   synthetic-only decoder chunk extents and sequential-versus-timestamp placement

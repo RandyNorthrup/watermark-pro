@@ -119,12 +119,10 @@ export async function calibrateAacEncoder(signal: AbortSignal): Promise<number> 
     for await (const sample of samples) {
       try {
         check(signal)
-        const offset = Math.round(sample.timestamp * sampleRate)
-        if (
-          sample.sampleRate !== sampleRate ||
-          offset < 0 ||
-          offset + sample.numberOfFrames > maximumFrames
-        )
+        // This synthetic stream is contiguous. WebKit/GStreamer can duplicate or
+        // skip output timestamps while its decoded PCM remains complete and ordered.
+        const offset = end
+        if (sample.sampleRate !== sampleRate || offset + sample.numberOfFrames > maximumFrames)
           throw new Error('AAC calibration returned an invalid decoded extent.')
         const plane = decoded.subarray(offset, offset + sample.numberOfFrames)
         sample.copyTo(plane, { planeIndex: 0, format: 'f32-planar' })
