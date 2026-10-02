@@ -53,9 +53,8 @@ email unverified; it requires the current migrated schema.
 - Type checking caught a missing new-code mapping in the named fake API and an
   unproven array index in a test; both were corrected without a suppression.
 - The first canonical quality attempt stopped at Worker-test formatting after
-  ESLint's earlier fix. Formatting was corrected; a fresh complete gate is
-  running. Full quality, exact-source SAST, full four-device Playwright/axe and
-  viewed quota-error captures remain required before declaring this slice done.
+  ESLint's earlier fix. Formatting and a subsequent lint diagnostic were
+  corrected without changing the gates.
 - Hosted run `36986924310` passed exact-source SAST but stopped quality at one
   real-auth owner-bootstrap fixture: it lacked the private cohort initialized by
   the already-tested operator SQL. Other covered tests passed (2,840/2,841) and
@@ -67,9 +66,34 @@ email unverified; it requires the current migrated schema.
   was identified. Its exit 130 is not a local full-quality pass. Initial-owner
   SQLite/migration regression now passes all seven cases; its earlier member
   fixture schema edit was corrected without changing application permissions.
+- Initial local four-device browser run failed at existing 60-second journey
+  deadlines; desktop reached and captured the actual quota refusal. Those are
+  failures, not browser passes. Quota/refusal/revocation now has its own real
+  journey, preserving all existing isolation assertions and deadlines. The full
+  matrix now has 35 journeys per device (140 total), pending hosted execution.
 - The invitation browser journey now exercises two child reservations, a third
-  refusal, the actual budget response, axe and a device screenshot. Its new
-  assertions and screenshots are still awaiting execution/review.
+  refusal, the actual budget response, revocation and a successful replacement.
+  The separate local journey passed with axe on desktop Chrome, iPhone, iPad
+  and Android. All four quota-error screenshots were opened and reviewed; the
+  message wraps legibly and the revoke controls remain available. The existing
+  isolation journey passed on three devices; its local iPad run reached the
+  final administration-denial screen but exceeded the unchanged 60-second
+  deadline. An isolated iPad recheck is pending; the failed batch was 7/8.
+- [Hosted run 36989072536](https://github.com/RandyNorthrup/watermark-pro/actions/runs/36989072536)
+  completed all seven gates for exact source `e83ae047e972f6de9b248d432b47837b11dec189`.
+  Canonical quality passed 2,841 covered tests and all existing global floors
+  (92.49 statements, 85.34 branches, 92.33 functions, 93.44 lines), 68 workerd
+  tests, script checks, publication/audit and production build. Exact-source
+  SAST ran 510 rules on 2,141 files with zero findings. All 136 existing browser
+  journeys ultimately passed with axe: iPhone/Android passed 34 each on their
+  first attempts; desktop sharing and iPad private isolation passed on the
+  workflow's existing retry. Those two cases are recorded as flaky, not as
+  first-attempt passes. This run predates the new separate quota journey.
+- Local exact-source SAST also passed 510 rules on 2,141 targets with zero
+  findings. Focused owner/cohort rechecks passed 12 cases after the final
+  unknown-cohort/child-budget assertions. A duplicate local canonical process
+  was interrupted at exit 130 after the hosted quality pass was confirmed;
+  no local full-quality pass is claimed.
 
 The parent human-control runtime passed all seven checks and 136 browser
 journeys; those results do not certify these later membership changes. Detailed
@@ -78,8 +102,8 @@ real customer content appear in this receipt.
 
 ## Planning status
 
-M19 remains open. Finish this slice's complete gates and review its real device
-captures. Next implement recent authentication, plan quotas and billing state,
+M19 remains open. Finish the expanded matrix's complete gates and record the
+isolated iPad recheck. Next implement recent authentication, plan quotas and billing state,
 then verified Stripe Checkout/portal/webhooks and public marketing/navigation.
 Stripe browser authentication is unconfirmed; no product, price, endpoint or
 charge has been created. Existing video export/offline regressions and complete

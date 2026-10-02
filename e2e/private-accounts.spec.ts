@@ -18,7 +18,7 @@ const workspaceSessionSchema = z.object({ session: z.object({ activeOrganization
 test('site invitations create separate private workspaces and protect account totals', async ({
   page,
   request,
-}, testInfo) => {
+}) => {
   const suffix = crypto.randomUUID()
   const owner = {
     name: 'Private Owner',
@@ -81,6 +81,24 @@ test('site invitations create separate private workspaces and protect account to
   await expect(page.getByLabel('Invitation link')).not.toHaveValue(ownerReferral)
   const forbiddenStats = await page.request.get('/api/admin/account-stats')
   expect(forbiddenStats.status()).toBe(403)
+  await page.goto('/app/admin')
+  await expect(page.getByRole('alert')).toContainText('Only the site owner or an admin')
+  await expect(page.getByText('Registered accounts', { exact: true })).toHaveCount(0)
+  await expectAccessible(page)
+})
+
+test('private invitation slots are bounded and unused revocation permits a replacement', async ({
+  page,
+  request,
+}, testInfo) => {
+  const suffix = crypto.randomUUID()
+  const actor = {
+    name: 'Private quota fixture',
+    email: `private-quota-${suffix}@example.test`,
+    password: 'a private quota fixture passphrase',
+  }
+  await signUpAndVerify(page, request, actor)
+  await navigateTo(page, 'Invite people')
   for (const index of [1, 2]) {
     await page
       .getByLabel('Email address')
@@ -101,8 +119,23 @@ test('site invitations create separate private workspaces and protect account to
     path: testInfo.outputPath('private-invitation-limit.png'),
     fullPage: true,
   })
-  await page.goto('/app/admin')
-  await expect(page.getByRole('alert')).toContainText('Only the site owner or an admin')
-  await expect(page.getByText('Registered accounts', { exact: true })).toHaveCount(0)
+
+  await page
+    .getByRole('button', {
+      name: `Revoke invitation to private-child-1-${suffix}@example.test`,
+      exact: true,
+    })
+    .click()
+  const reservedRow = page
+    .getByRole('listitem')
+    .filter({ hasText: `private-child-1-${suffix}@example.test` })
+  await expect(reservedRow).toContainText('Revoked')
+  const released = await page.request.get('/api/me/private-invitation-budget')
+  expect(await released.json()).toEqual({ limit: 2, used: 0, reserved: 1, available: 1 })
+  await page.getByRole('button', { name: 'Send invitation', exact: true }).click()
+  await expect(page.getByText('Invitation sent. It expires in seven days.')).toBeVisible()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  const replacement = await page.request.get('/api/me/private-invitation-budget')
+  expect(await replacement.json()).toEqual({ limit: 2, used: 0, reserved: 2, available: 0 })
   await expectAccessible(page)
 })

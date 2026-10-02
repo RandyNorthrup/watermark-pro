@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-02 (human-verification gates and next public-billing slice)
+Last updated: 2026-10-02 (verified private membership and expanded invitation gates)
 
 ---
 
@@ -103,10 +103,18 @@ competing email and reusable-link requests. The own-account budget API exposes
 used/reserved/available counts; exhausting capacity has a distinct conflict code,
 without a misleading retry-after deadline.
 
-Initial focused tests passed 72 cases; ten new real-auth regression cases and two
-real legacy-SQLite migration cases passed before the final budget changes. Final
-focused/binding checks, canonical quality, SAST and four-device browser/visual
-verification are running or pending; no final gate pass or deployment is claimed.
+Hosted run `36989072536` passed canonical quality for `e83ae04`: 2,841 covered
+tests, unchanged coverage floors, 68 workerd tests, script checks and build.
+SAST passed 510 rules on 2,141 files with zero findings. All 136 existing browser
+journeys ultimately passed; desktop sharing and iPad private isolation required
+the existing retry and remain recorded as flaky. The new separate quota journey
+passed locally with axe on all four devices; its actual quota-error screenshots
+were opened and reviewed. The expanded 140-case hosted matrix and an isolated
+local iPad recheck are still required. The initial local expanded batch was 7/8,
+with existing iPad isolation timing out at its final denial screen. Full
+Lighthouse/screenshot audits and live-provider proof remain release gates;
+no remote migration or deployment is claimed. See the private-membership receipt
+for exact source, failed attempts and completed evidence.
 Recent-authentication policy, public plan quotas, billing state and public
 landing/private-member navigation remain separate unfinished controls. Finish
 and certify this slice before opening public signup, then implement quotas and

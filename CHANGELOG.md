@@ -33,10 +33,24 @@ what was planned; superseded entries stay.
   fixture to match the tested production bootstrap SQL; pending accounts remain
   refused. The failing run passed the other 2,840 covered tests and all coverage
   floors, but correctly blocked the browser matrix and is not a quality pass.
+- Local browser verification timed out within the unchanged 60-second journey
+  limit. Split quota/refusal/revocation proof into its own real journey while
+  preserving the existing account/workspace isolation assertions and all
+  deadlines. No case, role, device or accessibility assertion was removed.
 - Added an own-account budget response and distinct quota-conflict error so a
   spent lifetime allowance is not reported as a temporary email-rate limit.
-  Extended the real invitation journey to exercise two reservations, refusal of
-  a third, axe and a device screenshot. Final certification remains pending.
+  The separate real quota journey exercises two reservations, refusal of a
+  third, unused revocation and replacement. It passed locally with axe on all
+  four devices; all four quota-error captures were opened and reviewed. The
+  existing iPad isolation journey timed out at its final denial screen, leaving
+  the local expanded batch at 7/8; an isolated recheck remains pending.
+- Hosted run `36989072536` passed all seven gates for source `e83ae04`:
+  canonical quality (2,841 covered tests, unchanged global floors, 68 workerd
+  tests, script checks and build), SAST (510 rules, 2,141 files, zero findings)
+  and all 136 existing Playwright/axe cases. Desktop sharing and iPad isolation
+  used the existing retry and remain recorded as flaky. The new separate quota
+  journey still needs the expanded 140-case hosted matrix. No deployment or
+  full M19 certification is claimed.
 
 ### Human verification evidence — 2026-10-02
 
