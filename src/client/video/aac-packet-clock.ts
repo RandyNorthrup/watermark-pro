@@ -2,10 +2,8 @@ import type { EncodedPacket } from 'mediabunny'
 
 import { AAC_TIMING_POLICY, MAX_VIDEO_SECONDS, VIDEO_PROJECT_LIMITS } from '../../shared/constants'
 
-/** Give AAC-LC frames a coded clock; native durations may describe known submitted PCM blocks. */
-export function createAacPacketClock(
-  submittedPcmFrames: ReadonlySet<number> = new Set(),
-): (packet: EncodedPacket) => EncodedPacket {
+/** Give AAC-LC frames a coded clock while refusing unexplained native durations and gaps. */
+export function createAacPacketClock(): (packet: EncodedPacket) => EncodedPacket {
   const { sampleRate } = VIDEO_PROJECT_LIMITS
   const { packetFrames, leadFrames, tailFrames, maximumDelayFrames } = AAC_TIMING_POLICY
   const maximumFrames =
@@ -18,9 +16,7 @@ export function createAacPacketClock(
     if (
       !Number.isSafeInteger(nativeFrames) ||
       nativeFrames < 0 ||
-      (durationFrames !== 0 &&
-        durationFrames !== packetFrames &&
-        !submittedPcmFrames.has(durationFrames)) ||
+      (durationFrames !== 0 && durationFrames !== packetFrames) ||
       frames >= maximumFrames
     )
       throw Object.assign(new Error('AAC encoder returned invalid frame timing.'), {

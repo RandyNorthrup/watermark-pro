@@ -38,7 +38,8 @@ export async function encodeAacCalibration(signal: AbortSignal): Promise<AacCali
   // padding protects the entire reference; its minimum decoded extent stays fixed.
   const reference = new Float32Array(signalPcm.length + AAC_TIMING_POLICY.calibrationPaddingFrames)
   reference.set(signalPcm)
-  const { channels, sampleRate, audioChunkFrames } = VIDEO_PROJECT_LIMITS
+  const { channels, sampleRate } = VIDEO_PROJECT_LIMITS
+  const { packetFrames } = AAC_TIMING_POLICY
   const target = new BufferTarget()
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: false }), target })
   let firstPacketFrame: number | undefined
@@ -55,9 +56,9 @@ export async function encodeAacCalibration(signal: AbortSignal): Promise<AacCali
   output.addAudioTrack(source)
   try {
     await output.start()
-    for (let offset = 0; offset < reference.length; offset += audioChunkFrames) {
+    for (let offset = 0; offset < reference.length; offset += packetFrames) {
       check(signal)
-      const frames = Math.min(audioChunkFrames, reference.length - offset)
+      const frames = Math.min(packetFrames, reference.length - offset)
       const data = new Float32Array(frames * channels)
       for (let channel = 0; channel < channels; channel += 1)
         data.set(reference.subarray(offset, offset + frames), channel * frames)

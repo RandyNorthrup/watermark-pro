@@ -11,6 +11,7 @@ import type { EncodedPacket } from 'mediabunny'
 
 import { calibrateAacEncoder } from './aac-calibration'
 import { createAacPacketClock } from './aac-packet-clock'
+import { aacPcmBlocks } from './aac-pcm'
 import { CancelledError } from './errors'
 import {
   AAC_TIMING_POLICY,
@@ -55,8 +56,7 @@ export async function createTimedAacSource(
   let encodedEnd = 0
   let nextOffset = 0
   let tailUsed = 0
-  const submittedPcmFrames = new Set<number>()
-  const normalizePacket = createAacPacketClock(submittedPcmFrames)
+  const normalizePacket = createAacPacketClock()
   function checkWriting() {
     if (failure.error !== null) throw failure.error
   }
@@ -100,25 +100,27 @@ export async function createTimedAacSource(
   })
   encoding.addAudioTrack(source)
   async function block(data: Float32Array, offset: number) {
-    if (signal.aborted) throw new CancelledError()
-    checkWriting()
-    const sample = new AudioSample({
-      data,
-      format: 'f32-planar',
-      sampleRate,
-      numberOfChannels: channels,
-      timestamp: offset / sampleRate,
-    })
-    try {
-      // Linux WebKit can attach the PCM input block's extent to an AAC access unit.
-      // Accept only extents we actually submitted; the coded duration stays 1,024.
-      submittedPcmFrames.add(data.length / channels)
-      await source.add(sample)
-    } finally {
-      sample.close()
+    // WebKit/GStreamer reports the latest PCM input timing for emitted packets.
+    // One AAC-LC access unit per input prevents a block's repeated metadata from
+    // describing several distinct packets. Calibration uses the same boundary.
+    for (const input of aacPcmBlocks(data, offset)) {
+      if (signal.aborted) throw new CancelledError()
+      checkWriting()
+      const sample = new AudioSample({
+        data: input.data,
+        format: 'f32-planar',
+        sampleRate,
+        numberOfChannels: channels,
+        timestamp: input.offset / sampleRate,
+      })
+      try {
+        await source.add(sample)
+      } finally {
+        sample.close()
+      }
+      await writing
+      checkWriting()
     }
-    await writing
-    checkWriting()
   }
   let isStarted = false
   return {
@@ -154,10 +156,11 @@ export async function createTimedAacSource(
     },
     async finish() {
       if (nextOffset !== total) throw new Error('AAC input is missing project samples.')
-      await block(
-        new Float32Array((policy.tailFrames - tailUsed) * channels),
-        total + policy.leadFrames + tailUsed,
-      )
+      const remainingTail = policy.tailFrames - tailUsed
+      // The final project block already consumes its alignment silence. Drop
+      // only a redundant partial silent tail unit, keeping the existing cap.
+      const alignedTail = remainingTail - (remainingTail % policy.packetFrames)
+      await block(new Float32Array(alignedTail * channels), total + policy.leadFrames + tailUsed)
       source.close()
       await encoding.finalize()
       await writing

@@ -1,5 +1,42 @@
 # Multi-clip video workspace and navigation verification — 2026-10-01
 
+## Access-unit PCM submission candidate — 2026-10-02
+
+Exact Linux source `e5b1845`, native run `37096011816`, passed eight of nine
+cases. The remaining waveform journey rejected a third native packet with
+expected frame 1,024, reported frame zero and measured offset 1,024. Accepting
+submitted block durations alone did not establish a valid packet clock.
+
+The WebKit/GStreamer encoder implementation forwards the most recently submitted
+PCM timestamp and duration with every emitted encoded frame rather than reading
+the encoded buffer's timing. This explains why a 4,096-frame input can attach one
+block's metadata to several AAC access units. The next candidate submits project
+PCM and the synthetic calibration in 1,024-frame AAC-LC units. Planar channel
+samples retain their order and source offsets; existing final-block/tail padding
+and measured encoder delay remain. The temporary submitted-duration acceptance
+was removed, restoring strict unknown-duration rejection. A real native contract
+now checks the submitted block shape in addition to all existing presentation,
+coded-padding, decoded-frame and waveform assertions. Verification is pending;
+no platform delay, deadline, waveform tolerance or release gate is changed.
+
+Focused verification passed 53 pure cases, all nine Mac native cases, targeted
+lint and complete TypeScript checks. The first native run rejected the final
+512-frame silent tail through the new submission-shape assertion. The encoder
+now omits only that redundant partial silent tail unit within the existing
+4,096-frame cap; required encoded extent and every waveform assertion remain.
+The initial fixture spy also failed lint/type checking for an unbound receiver;
+public-descriptor capture with an explicit receiver type corrected it without a
+suppression. Hosted Linux execution and complete final-source gates remain
+required before certification. A deliberate restoration of the old project and
+calibration producers made the new native submission-shape assertion fail with
+`expected false to be true`; candidate files were then restored byte-for-byte.
+
+Primary implementation reference:
+[WebKit AudioEncoderGStreamer.cpp](https://github.com/WebKit/WebKit/blob/main/Source/WebCore/platform/audio/gstreamer/AudioEncoderGStreamer.cpp),
+`GStreamerInternalAudioEncoder::encode` and its encoded-output callback, reviewed
+2026-10-02. This source explains the observed metadata; hosted execution still
+must establish the candidate's portable result.
+
 ## Native input-duration diagnosis — 2026-10-02
 
 Published diagnostic `597b177` passed its normal hook with 15,135 object/candidate

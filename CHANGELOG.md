@@ -7,6 +7,21 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+- Exact native Linux run `37096011816` passed eight of nine cases on `e5b1845`;
+  repeated metadata at the third packet still rejected the waveform journey.
+  Reviewed WebKit's producer-metadata implementation and changed the candidate
+  to submit project/calibration PCM in 1,024-frame AAC-LC units. Distinct planar
+  channels and offsets are preserved; the temporary larger-duration acceptance
+  was removed. Added channel/order controls and a real native submission-shape
+  assertion. Complete verification remains pending with every original output,
+  waveform and deadline requirement intact. The first native shape check exposed
+  a redundant 512-frame silent tail. Omitting only that partial silent unit kept
+  the existing cap and passed 53 pure cases, all nine Mac native cases, targeted
+  lint and corrected full types. The initial spy's receiver lint/type failures
+  were corrected with typed public-descriptor capture, without a suppression.
+  Restoring the old producers deliberately failed the new native shape control;
+  candidate files were restored byte-for-byte afterward.
+
 - Published numeric AAC diagnosis `597b177` after the normal scanner hook passed.
   Linux run `37095074935` reports a 4,096-frame native duration at frame zero,
   matching the submitted PCM lead block. The next candidate recognizes only

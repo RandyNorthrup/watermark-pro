@@ -1,6 +1,7 @@
 import {
   ALL_FORMATS,
   AudioSampleSink,
+  AudioSampleSource,
   BlobSource,
   BufferTarget,
   EncodedAudioPacketSource,
@@ -9,6 +10,7 @@ import {
   Mp4OutputFormat,
   Output,
 } from 'mediabunny'
+import type { AudioSample } from 'mediabunny'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { calibrateAacEncoder } from './aac-calibration'
@@ -94,6 +96,11 @@ function isNativeDecode(
 ): value is (this: AudioDecoder, chunk: EncodedAudioChunk) => void {
   return typeof value === 'function'
 }
+function isNativeAdd(
+  value: unknown,
+): value is (this: AudioSampleSource, sample: AudioSample) => Promise<void> {
+  return typeof value === 'function'
+}
 function observeSyntheticDecoder() {
   const decode: unknown = Object.getOwnPropertyDescriptor(AudioDecoder.prototype, 'decode')?.value
   if (!isNativeDecode(decode))
@@ -145,6 +152,19 @@ describe('native AAC project timing', () => {
         return
       }
       observeSyntheticDecoder()
+      const submittedFrames: number[] = []
+      const addSample: unknown = Object.getOwnPropertyDescriptor(
+        AudioSampleSource.prototype,
+        'add',
+      )?.value
+      if (!isNativeAdd(addSample)) throw new Error('Synthetic encoder probe lost implementation.')
+      vi.spyOn(AudioSampleSource.prototype, 'add').mockImplementation(function (
+        this: AudioSampleSource,
+        sample,
+      ) {
+        submittedFrames.push(sample.numberOfFrames)
+        return addSample.call(this, sample)
+      })
       const output = new Output({
         format: new Mp4OutputFormat({ fastStart: false }),
         target: new BufferTarget(),
@@ -165,6 +185,10 @@ describe('native AAC project timing', () => {
         }
         timingStage = 'finish-source'
         const timing = await source.finish()
+        expect(submittedFrames.length).toBeGreaterThan(0)
+        expect(submittedFrames.every((frames) => frames === AAC_TIMING_POLICY.packetFrames)).toBe(
+          true,
+        )
         timingStage = 'finalize-output'
         await output.finalize()
         if (output.target.buffer === null) throw new Error('Native AAC output missing.')
