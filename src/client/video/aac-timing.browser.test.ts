@@ -231,6 +231,10 @@ describe('native AAC project timing', () => {
             expectedFrame: error.expectedFrame,
             nativeFrame: error.nativeFrame,
             nativeOffset: error.nativeOffset,
+            ...('durationFrames' in error &&
+              typeof error.durationFrames === 'number' && {
+                durationFrames: error.durationFrames,
+              }),
           })
         throw error
       } finally {

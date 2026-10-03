@@ -1,5 +1,23 @@
 # Multi-clip video workspace and navigation verification — 2026-10-01
 
+## Recovery checkpoint — 2026-10-02
+
+Latest published source `00f316a` failed Linux invalid-frame validation before
+waveform assertions. Its canonical hosted run passed 2,895 covered cases but
+failed two of nine native cases; skipped device jobs do not constitute a pass.
+The local diagnostic retains the generic error while attaching only numeric
+expected/native frame, offset and duration fields for synthetic test capture.
+Its new negative control verifies these values without weakening rejection. A
+deliberate return to the old generic-only throw made that regression fail; the
+runtime source was restored byte-for-byte afterward.
+Recovery verification passed forty pure clock/container cases, all nine Mac
+native cases, targeted ESLint and full TypeScript checks. The first diagnostic
+lint run rejected a conditional spread; the corrected code passed without a
+suppression. Linux numeric diagnosis and complete final-source gates remain
+pending. This change makes no visual styling change; the earlier viewed visual
+receipts below remain evidence for their own source, not new release certification.
+See [release blockers](release-blockers-2026-10-02.md) for current M19 priorities.
+
 ## Scope and certification boundary
 
 This receipt covers the owner-requested Resolve-style multi-clip editor, its native

@@ -7,6 +7,36 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Delivery checkpoint — 2026-10-02 (release blocked)
+
+- Executed canonical quality on the video diagnostic: static and full publication
+  passed (15,126 candidate/object checks, 12,692 scanner copies, 183 archive
+  entries), then required audit rejected seven high findings before tests/build.
+  Production-only audit returned zero findings; no configured private values
+  were available for comparison. This is a failed quality receipt. Read-only
+  GitHub checks confirmed active branch/tag rulesets and scanning protections.
+
+- Refreshed completed hosted results rather than leaving verification marked
+  running. Video source `00f316a` passed 2,895 covered cases but failed two Linux
+  native AAC cases. Member source `c8fccc4` stopped at the full dependency audit;
+  its static/publication and SAST jobs passed, but devices did not execute.
+- Verified the newly reviewed high `braces` advisory, latest registry release
+  3.0.3 and continued dependency in latest Stylelint 17.16.0. The full audit has
+  seven high findings from that advisory; production-only audit has zero.
+  No dependency downgrade, audit waiver or weakened check was applied.
+- M19 remains open. Recorded separate outstanding Linux codec, member-capacity,
+  Lumafoil account setup and launch gates in the release-blocker receipt.
+
+- Hosted complete-clock source `00f316a` failed native Linux frame validation
+  before waveform verification, including its forwarding-failure control.
+  Added numeric invalid-frame fields to the synthetic failure capture; no
+  production message, input, waveform bound or native call is relaxed. Recovery verification passed forty pure clock/container cases, nine Mac native
+  cases, targeted lint and full types. The first diagnostic lint run rejected
+  a conditional spread; its correction passed without a rule waiver. Returning
+  to the prior generic-only throw made the new regression fail as expected;
+  runtime source was restored byte-for-byte. Hosted
+  numeric diagnosis and complete final-source gates remain pending.
+
 ### Complete AAC coded-clock candidate — 2026-10-02 (verification pending)
 
 - Added a bounded AAC-LC packet clock with full 1,024-sample coded durations,

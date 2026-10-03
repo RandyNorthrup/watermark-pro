@@ -10,7 +10,47 @@ Last updated: 2026-10-02 (native encoder and playback regression verification)
 
 ## 1. Product summary
 
+### Current release blockers — 2026-10-02
+
+M19 remains open. Neither the video candidate nor member-capacity candidate is
+certified for release. The latest completed hosted results supersede earlier
+statements that verification was running:
+
+- Video `00f316a`, run `37084055936`: 2,895 covered cases passed, but Linux
+  WebKit native AAC verification failed two of nine cases at invalid frame
+  timing. SAST passed; device jobs were skipped and the aggregate failed.
+- Member capacity `c8fccc4`, run `37085396339`: static/publication gates passed,
+  then the full dependency audit rejected seven high findings caused by one
+  newly reviewed `braces` advisory. SAST passed; device jobs were skipped and
+  the aggregate failed. The earlier legacy-fixture correction passed eleven
+  focused D1 cases but is not complete final-source certification.
+- `braces` 3.0.3 remains the latest registry release. Advisory
+  GHSA-vfj7-8cjw-p6xm lists no patched version; latest Stylelint 17.16.0 still
+  depends on micromatch 4.0.8 and therefore the affected package. No package,
+  audit threshold, rule, override or exception was changed. A production-only
+  audit passed with zero findings, but does not replace the required full audit.
+- Stripe CLI authorization remains attached to the unrelated AppBag account.
+  Separate Lumafoil Dashboard authentication/account setup is pending; there
+  have been no unrelated-account catalog or payment writes.
+
+Recovery canonical quality executed on both checkouts: all static/publication
+checks passed, then the full audit failed before tests/build. Neither failed run
+is certification. The focused diagnostic has forty pure and nine Mac native
+passes, but Linux timing correction remains required.
+
+Next slice: resolve the full dependency-audit blocker with a verified patched
+release or compatible replacement that preserves CSS checks; obtain exact Linux
+AAC failure values and certify its runtime correction. Then finish member gates,
+workspace creation/operation limits and signed billing reconciliation. Public
+signup, production migrations and deployment stay gated. Evidence and the
+ordered remainder are in `docs/verification/m19/release-blockers-2026-10-02.md`.
+
 ### AAC coded-clock correction — 2026-10-02 (candidate)
+
+Recovery verification of the numeric invalid-frame diagnostic passed forty pure
+clock/container cases, nine Mac WebKit native cases, targeted lint and full types.
+A new negative test verifies the generic refusal and exact synthetic frame fields.
+This is diagnostic evidence only; Linux correction remains outstanding.
 
 Hosted `015b3a4` native Web Audio decoded 193,536 frames for a 192,000-frame
 project, before library iteration began; the unchanged upper bound rejected it.

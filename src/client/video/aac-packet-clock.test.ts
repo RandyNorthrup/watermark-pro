@@ -34,6 +34,19 @@ describe('complete AAC coded-frame clock', () => {
   it('derives the AAC-LC frame duration when native chunk duration is unspecified', () => {
     expect(createAacPacketClock()(packet(0, 0)).duration).toBe(FRAME / RATE)
   })
+  it('reports numeric invalid-frame context while retaining the generic failure', () => {
+    const normalize = createAacPacketClock()
+    normalize(packet(0))
+    expect(() => normalize(packet(FRAME, FRAME - 1))).toThrow(
+      expect.objectContaining({
+        message: 'AAC encoder returned invalid frame timing.',
+        expectedFrame: FRAME,
+        nativeFrame: FRAME,
+        nativeOffset: 0,
+        durationFrames: FRAME - 1,
+      }),
+    )
+  })
   it('measures a shortened initial interval while keeping later frames complete', () => {
     const normalize = createAacPacketClock()
     const firstInterval = FRAME / 2

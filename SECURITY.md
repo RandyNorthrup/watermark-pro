@@ -17,6 +17,19 @@ an acknowledgement within three business days.
 
 Only the `main` branch and the latest tagged release receive fixes.
 
+## Current release blocker — 2026-10-02
+
+The required full dependency audit rejects GHSA-vfj7-8cjw-p6xm
+([GitHub advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)), a stack-exhaustion
+availability vulnerability affecting `braces` through 3.0.3. The installed path is
+Stylelint 17.15.0 → micromatch 4.0.8 → braces 3.0.3. At verification, the latest
+braces registry release was still 3.0.3, no patched version was listed, and latest
+Stylelint 17.16.0 still depended on micromatch 4.0.8. These are development-tool
+findings; a separate production-only audit returned zero findings. That narrower
+result does not satisfy or replace the full release gate. No advisory waiver,
+forced downgrade or dependency substitution has been applied. See the
+[release-blocker receipt](docs/verification/m19/release-blockers-2026-10-02.md).
+
 ## Controls in place
 
 - Bulk CSV reports escape delimiters/quotes and prefix spreadsheet-like text

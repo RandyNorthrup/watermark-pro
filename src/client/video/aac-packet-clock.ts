@@ -19,7 +19,12 @@ export function createAacPacketClock(): (packet: EncodedPacket) => EncodedPacket
       (durationFrames !== 0 && durationFrames !== packetFrames) ||
       frames >= maximumFrames
     )
-      throw new Error('AAC encoder returned invalid frame timing.')
+      throw Object.assign(new Error('AAC encoder returned invalid frame timing.'), {
+        expectedFrame: frames - nativeOffset,
+        nativeFrame: nativeFrames,
+        nativeOffset,
+        durationFrames,
+      })
     // Native priming can shorten the first interval, including repeating zero.
     // Measure that one interval; later missing or repeated frames still refuse.
     if (frames === packetFrames && nativeFrames <= packetFrames)
