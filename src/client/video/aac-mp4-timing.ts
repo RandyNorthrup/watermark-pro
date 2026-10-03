@@ -138,6 +138,14 @@ export function finalizeAacMp4(buffer: ArrayBuffer, timing: AacTiming): Blob {
     throw new Error('AAC track already has sample groups.')
   if (field(one(tableChildren, 'stsz'), MP4.sampleCount) !== timing.packets)
     throw new Error('AAC packet count does not match the sample table.')
+  const codedFrames = timing.packets * AAC_TIMING_POLICY.packetFrames
+  const wantedFrames = timing.primingFrames + timing.durationFrames
+  if (
+    field(mediaHeader, MP4.movieDuration) !== codedFrames ||
+    codedFrames < wantedFrames ||
+    codedFrames - wantedFrames >= AAC_TIMING_POLICY.packetFrames
+  )
+    throw new Error('AAC media duration does not preserve complete coded frames.')
   for (const videoTrack of tracks) {
     if (videoTrack === track) continue
     const videoHeader = one(children(videoTrack), 'tkhd')

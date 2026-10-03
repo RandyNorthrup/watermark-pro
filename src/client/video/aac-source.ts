@@ -10,6 +10,7 @@ import {
 import type { EncodedPacket } from 'mediabunny'
 
 import { calibrateAacEncoder } from './aac-calibration'
+import { createAacPacketClock } from './aac-packet-clock'
 import { CancelledError } from './errors'
 import {
   AAC_TIMING_POLICY,
@@ -53,6 +54,8 @@ export async function createTimedAacSource(
   let packets = 0
   let encodedEnd = 0
   let nextOffset = 0
+  let tailUsed = 0
+  const normalizePacket = createAacPacketClock()
   function checkWriting() {
     if (failure.error !== null) throw failure.error
   }
@@ -76,14 +79,18 @@ export async function createTimedAacSource(
     codec: 'aac',
     quality: new Quality({ bitrate: AUDIO_REENCODE_BITRATE }),
     onEncodedPacket(packet, metadata) {
-      if (packet.timestamp >= end) return
-      const corrected = packet.clone({
-        duration: Math.min(packet.duration, end - packet.timestamp),
-      })
-      packets += 1
-      encodedEnd = corrected.timestamp + corrected.duration
-      // The library bounds its native queue; each PCM add also awaits this forwarding queue.
-      writing = forward(writing, corrected, metadata)
+      if (failure.error !== null) return
+      try {
+        const corrected = normalizePacket(packet)
+        if (corrected.timestamp >= end) return
+        packets += 1
+        encodedEnd = corrected.timestamp + corrected.duration
+        // Coded AAC frames stay complete; the edit list clips the exact timeline.
+        writing = forward(writing, corrected, metadata)
+      } catch (error: unknown) {
+        failure.error =
+          error instanceof Error ? error : new Error('AAC frame timing failed.', { cause: error })
+      }
     },
   })
   const encoding = new Output({
@@ -126,17 +133,37 @@ export async function createTimedAacSource(
         isStarted = true
         await block(new Float32Array(policy.leadFrames * channels), 0)
       }
-      await block(data, offset + policy.leadFrames)
+      if (offset + frames === total && frames % policy.packetFrames !== 0) {
+        tailUsed = policy.packetFrames - (frames % policy.packetFrames)
+        const paddedFrames = frames + tailUsed
+        const padded = new Float32Array(paddedFrames * channels)
+        for (let channel = 0; channel < channels; channel += 1)
+          padded.set(
+            data.subarray(channel * frames, (channel + 1) * frames),
+            channel * paddedFrames,
+          )
+        // Move existing silent tail samples into the final partial PCM block,
+        // preventing native timestamp resynchronization mid-coded-frame.
+        await block(padded, offset + policy.leadFrames)
+      } else await block(data, offset + policy.leadFrames)
       nextOffset += frames
     },
     async finish() {
       if (nextOffset !== total) throw new Error('AAC input is missing project samples.')
-      await block(new Float32Array(policy.tailFrames * channels), total + policy.leadFrames)
+      await block(
+        new Float32Array((policy.tailFrames - tailUsed) * channels),
+        total + policy.leadFrames + tailUsed,
+      )
       source.close()
       await encoding.finalize()
       await writing
       checkWriting()
-      if (packets === 0 || Math.abs(encodedEnd - end) > 1 / sampleRate)
+      const encodedFrames = Math.round(encodedEnd * sampleRate)
+      if (
+        packets === 0 ||
+        encodedFrames < total + primingFrames ||
+        encodedFrames - total - primingFrames >= policy.packetFrames
+      )
         throw new Error('AAC encoder omitted the end of the project audio.')
       destination.close()
       return { primingFrames, durationFrames: total, sampleRate, packets }

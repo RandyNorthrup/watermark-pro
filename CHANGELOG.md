@@ -7,6 +7,33 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Complete AAC coded-clock candidate — 2026-10-02 (verification pending)
+
+- Added a bounded AAC-LC packet clock with full 1,024-sample coded durations,
+  preserving bytes and rejecting missing/repeated later frames. A single
+  shortened initial native interval is measured without a platform delay constant.
+  MP4 timing now requires complete coded-frame duration with less than one frame
+  of tail padding; its edit list retains the exact intended presentation interval.
+- The first pure clock/container batch passed 38 cases and lint. Both initial
+  native attempts rejected unexplained cadence; no gate was weakened. Added
+  numeric local timing error fields for synthetic diagnosis while retaining its
+  generic message; automatic error reporting still omits arbitrary fields.
+  Expanded unit and native verification remain pending.
+- Numeric native diagnosis placed the discontinuity at the transition from a
+  half-frame final user block to silent tail. The encoder input now moves existing
+  declared tail silence into that block; total padding budget and user samples
+  remain. Native execution then reached packet-duration validation: complete AAC
+  frames extend coded media to 4.009333 seconds while presentation remains four.
+  The contract now asserts exact presentation metadata and separately bounds
+  coded padding below one frame, retaining native decoded-frame and waveform
+  limits. This corrects a coded-versus-presentation conflation, not an output
+  duration waiver. Final native execution remains pending.
+  The installed library's metadata getter also exposes coded extent. Exact
+  presentation is now checked through the native media element, with separate
+  coded-padding and unchanged decoded-frame/waveform controls. All nine final
+  Mac native cases, corrected full types, lint and zero duplication passed.
+  Hosted Linux and complete final-source certification remain pending.
+
 ### Cross-platform AAC gate — 2026-10-02 (verification pending)
 
 - Isolated diagnostic publication again exceeded the five-minute scanner cap.

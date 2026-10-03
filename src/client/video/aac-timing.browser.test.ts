@@ -15,6 +15,7 @@ import { calibrateAacEncoder } from './aac-calibration'
 import { finalizeAacMp4 } from './aac-mp4-timing'
 import { createTimedAacSource } from './aac-source'
 import { CancelledError } from './errors'
+import { AAC_TIMING_POLICY } from '../../shared/constants'
 
 const NATIVE_TIMEOUT = 30_000
 const RATE = 48_000
@@ -63,6 +64,31 @@ interface SyntheticDecoderProbe {
   packets: number
 }
 const decoderProbes: SyntheticDecoderProbe[] = []
+async function nativePresentationDuration(blob: Blob): Promise<number> {
+  const audio = new Audio()
+  const url = URL.createObjectURL(blob)
+  const controller = new AbortController()
+  try {
+    return await new Promise<number>((resolve, reject) => {
+      audio.addEventListener('loadedmetadata', () => resolve(audio.duration), {
+        once: true,
+        signal: controller.signal,
+      })
+      audio.addEventListener(
+        'error',
+        () => reject(new Error('Native AAC presentation metadata unavailable.')),
+        { once: true, signal: controller.signal },
+      )
+      audio.preload = 'metadata'
+      audio.src = url
+    })
+  } finally {
+    controller.abort()
+    audio.removeAttribute('src')
+    audio.load()
+    URL.revokeObjectURL(url)
+  }
+}
 function isNativeDecode(
   value: unknown,
 ): value is (this: AudioDecoder, chunk: EncodedAudioChunk) => void {
@@ -147,7 +173,12 @@ describe('native AAC project timing', () => {
         const input = new Input({ source: new BlobSource(blob), formats: ALL_FORMATS })
         try {
           timingStage = 'demux-output'
-          expect(await input.computeDuration()).toBeCloseTo(4, 5)
+          // Whole AAC packets include sub-frame coded padding; presentation is
+          // defined by the movie/edit-list duration, not the last coded sample.
+          expect(await nativePresentationDuration(blob)).toBeCloseTo(4, 5)
+          const codedDuration = await input.computeDuration()
+          expect(codedDuration).toBeGreaterThanOrEqual(4)
+          expect(codedDuration).toBeLessThan(4 + AAC_TIMING_POLICY.packetFrames / RATE)
           const track = await input.getPrimaryAudioTrack()
           if (track === null) throw new Error('Native AAC track missing.')
           // Verify container/native playback before a sample iterator can stall.
@@ -186,6 +217,22 @@ describe('native AAC project timing', () => {
         } finally {
           input.dispose()
         }
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          'expectedFrame' in error &&
+          typeof error.expectedFrame === 'number' &&
+          'nativeFrame' in error &&
+          typeof error.nativeFrame === 'number' &&
+          'nativeOffset' in error &&
+          typeof error.nativeOffset === 'number'
+        )
+          console.error('Synthetic AAC packet cadence', {
+            expectedFrame: error.expectedFrame,
+            nativeFrame: error.nativeFrame,
+            nativeOffset: error.nativeOffset,
+          })
+        throw error
       } finally {
         timingStage += ':cleanup'
         await source.cancel()

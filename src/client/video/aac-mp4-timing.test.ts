@@ -43,6 +43,7 @@ function fixture(
     duplicateAudio?: boolean
     videoDuration?: number
     shortHeader?: boolean
+    mediaDuration?: number
   } = {},
 ): ArrayBuffer {
   const header = fields(
@@ -62,7 +63,10 @@ function fixture(
       fields('tkhd', 32, { 28: duration }),
       box(
         'mdia',
-        fields('mdhd', 28, { 20: options.sampleRate ?? 48_000 }),
+        fields('mdhd', 28, {
+          20: options.sampleRate ?? 48_000,
+          24: options.mediaDuration ?? 194 * 1024,
+        }),
         fields('hdlr', 24, { 16: handler }),
         box('minf', table),
       ),
@@ -121,6 +125,8 @@ describe('bounded AAC container timing', () => {
     [{ duplicateAudio: true }, 'one MP4 trak'],
     [{ videoDuration: 4500 }, 'truncate'],
     [{ shortHeader: true }, 'timing field'],
+    [{ mediaDuration: 0 }, 'coded frames'],
+    [{ mediaDuration: 198_208 }, 'coded frames'],
   ] as const)('refuses malformed or incompatible timing %j', (options, message) => {
     const buffer = fixture(options)
     const before = new Uint8Array(buffer).slice()

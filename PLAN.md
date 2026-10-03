@@ -10,6 +10,31 @@ Last updated: 2026-10-02 (native encoder and playback regression verification)
 
 ## 1. Product summary
 
+### AAC coded-clock correction — 2026-10-02 (candidate)
+
+Hosted `015b3a4` native Web Audio decoded 193,536 frames for a 192,000-frame
+project, before library iteration began; the unchanged upper bound rejected it.
+The next candidate preserves complete 1,024-sample AAC-LC coded frames and uses
+the edit list for the exact presentation interval. It bounds correction of the
+initial native timing interval and rejects unexplained later cadence. Pure
+clock/container verification passed 38 cases and lint, but native cadence still
+rejected in two attempts. Numeric local timing details are under diagnosis;
+no waveform or presentation bound is relaxed. Billing quality is running
+uninterrupted in its separate checkout. Both slices remain inside open M19.
+Native diagnosis identified a half-frame input boundary before silent tail.
+Align that final PCM block using already-budgeted tail silence. Preserve whole
+AAC coded-frame durations and exact movie/edit-list presentation duration;
+assert those two clocks separately. The earlier packet-end equality conflated
+coded padding with presentation and forced a partial coded frame. Exact
+presentation, decoded-frame and waveform requirements remain; coded padding is
+explicitly less than one AAC frame. Complete native verification is pending.
+Final Mac execution passed all nine native cases with exact presentation checked
+through the native media element; the installed library reports coded-track
+extent even in its metadata getter. The explicit coded-padding bound, native
+decoded-frame bounds and both waveform edges remain. Thirty-nine pure controls,
+corrected full types, lint and zero duplication passed. Hosted Linux and all
+complete final-source gates remain required before certification.
+
 ### Linux WebKit codec follow-up — 2026-10-02
 
 The decoder chunk probe on `9485baa` showed duplicate/skipped timestamps;

@@ -363,6 +363,18 @@ unchanged thirty-second limit. Test-stage diagnostics now identify where it
 stalls without changing production behavior. All nine Mac cases and lint passed.
 The Linux output waveform proof and full final source certification remain open.
 
+The complete-coded-frame candidate now normalizes bounded AAC frame timing,
+preserves full codec frame durations and uses the edit list for exact presentation.
+Numeric native diagnosis found a timestamp resynchronization when a half-frame
+final user block met silent tail. Moving already-budgeted silence into that block
+preserves user samples and total tail extent. Unexpected later cadence still
+rejects export. The movie presentation clock is checked through the native media
+element; the installed library's getters expose coded-track extent. Coded padding
+is separately below one frame, and native decoded-frame/correlation/edge limits
+remain. Final Mac verification passed nine native cases, thirty-nine pure controls,
+corrected types, lint and zero duplication. Hosted Linux and full final-source
+certification remain pending; earlier failed candidates above/below are retained.
+
 Hosted `c5d1d3b` stage diagnostics located the thirty-second timeout in
 `decode-library`; calibration, encoding, mux finalization and exact demuxed
 duration completed. The next probe retains all assertions but checks native Web
