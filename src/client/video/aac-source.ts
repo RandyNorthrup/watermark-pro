@@ -55,7 +55,8 @@ export async function createTimedAacSource(
   let encodedEnd = 0
   let nextOffset = 0
   let tailUsed = 0
-  const normalizePacket = createAacPacketClock()
+  const submittedPcmFrames = new Set<number>()
+  const normalizePacket = createAacPacketClock(submittedPcmFrames)
   function checkWriting() {
     if (failure.error !== null) throw failure.error
   }
@@ -109,6 +110,9 @@ export async function createTimedAacSource(
       timestamp: offset / sampleRate,
     })
     try {
+      // Linux WebKit can attach the PCM input block's extent to an AAC access unit.
+      // Accept only extents we actually submitted; the coded duration stays 1,024.
+      submittedPcmFrames.add(data.length / channels)
       await source.add(sample)
     } finally {
       sample.close()

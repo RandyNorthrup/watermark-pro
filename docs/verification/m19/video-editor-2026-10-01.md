@@ -1,5 +1,21 @@
 # Multi-clip video workspace and navigation verification — 2026-10-01
 
+## Native input-duration diagnosis — 2026-10-02
+
+Published diagnostic `597b177` passed its normal hook with 15,135 object/candidate
+checks, 12,688 scanner copies and 183 archive entries; no configured private
+values were available. Linux run `37095074935` failed before the first waveform
+check at expected/native frame zero and duration 4,096 frames. That matches the
+actual submitted silent PCM lead block, rather than the AAC-LC access-unit size.
+The runtime candidate registers actual submitted PCM block lengths before encoder
+submission, then accepts those native metadata extents while retaining complete
+1,024-frame coded durations. Unknown durations and unexplained timestamp gaps
+still refuse. No encoded extent, presentation duration, native decoded-frame,
+correlation, edge alignment or timeout assertion changed. Verification remains
+pending; no portable certification is claimed. Forty-one unit cases, nine Mac
+native cases, targeted lint and full types passed. An initial literal-only
+fixture set type was corrected to `Set<number>` without a suppression.
+
 ## Recovery checkpoint — 2026-10-02
 
 Latest published source `00f316a` failed Linux invalid-frame validation before

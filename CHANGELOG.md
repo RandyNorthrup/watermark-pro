@@ -7,6 +7,17 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+- Published numeric AAC diagnosis `597b177` after the normal scanner hook passed.
+  Linux run `37095074935` reports a 4,096-frame native duration at frame zero,
+  matching the submitted PCM lead block. The next candidate recognizes only
+  durations belonging to actually submitted input blocks while preserving
+  complete 1,024-frame AAC coded durations, bytes, cadence rejection and all
+  presentation/waveform checks. Forty-one unit cases, nine Mac native cases,
+  targeted lint and corrected full types passed. The test set first inferred a
+  literal-only element type; explicit `Set<number>` corrected that compile error.
+  Linux and complete certification are pending; the failed diagnostic
+  run remains evidence, not certification.
+
 ### Delivery checkpoint — 2026-10-02 (release blocked)
 
 - Executed canonical quality on the video diagnostic: static and full publication

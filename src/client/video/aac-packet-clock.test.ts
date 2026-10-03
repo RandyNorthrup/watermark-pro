@@ -34,6 +34,18 @@ describe('complete AAC coded-frame clock', () => {
   it('derives the AAC-LC frame duration when native chunk duration is unspecified', () => {
     expect(createAacPacketClock()(packet(0, 0)).duration).toBe(FRAME / RATE)
   })
+  it('normalizes a known PCM input extent while refusing an unsubmitted duration', () => {
+    const inputFrames = new Set<number>([AAC_TIMING_POLICY.leadFrames])
+    const normalize = createAacPacketClock(inputFrames)
+    const original = packet(0, AAC_TIMING_POLICY.leadFrames)
+    const corrected = normalize(original)
+    expect(corrected.duration).toBe(FRAME / RATE)
+    expect(corrected.data).toEqual(original.data)
+    expect(() => normalize(packet(FRAME, FRAME * 2))).toThrow('invalid')
+    inputFrames.add(FRAME * 2)
+    expect(normalize(packet(FRAME, FRAME * 2)).duration).toBe(FRAME / RATE)
+    expect(normalize(packet(FRAME * 2, 0)).timestamp).toBe((FRAME * 2) / RATE)
+  })
   it('reports numeric invalid-frame context while retaining the generic failure', () => {
     const normalize = createAacPacketClock()
     normalize(packet(0))

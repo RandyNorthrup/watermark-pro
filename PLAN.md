@@ -47,6 +47,21 @@ ordered remainder are in `docs/verification/m19/release-blockers-2026-10-02.md`.
 
 ### AAC coded-clock correction — 2026-10-02 (candidate)
 
+Numeric hosted diagnosis on `597b177`, run `37095074935`, places rejection at
+frame zero: native timestamp zero, duration 4,096 frames. The submitted silent
+lead block is exactly 4,096 PCM frames. The next runtime candidate recognizes
+only reported durations matching actual submitted PCM blocks, alongside AAC-LC
+coded duration or unspecified duration; every corrected coded packet remains
+1,024 frames. Unregistered durations and native timestamp gaps still refuse.
+Final encoded extent, edit-list duration and both native/library waveform edge
+assertions remain unchanged. Focused verification passed forty-one unit cases,
+nine Mac native cases, targeted lint and full types. The test input set initially
+inferred a literal-only type; explicit `Set<number>` corrected that compile
+failure without a suppression. Complete verification is required before calling
+this Linux-compatible; the published diagnostic passed its normal scanner hook
+with 15,135 checks, 12,688 copies and 183 archive entries, with no configured
+private values available for comparison.
+
 Recovery verification of the numeric invalid-frame diagnostic passed forty pure
 clock/container cases, nine Mac WebKit native cases, targeted lint and full types.
 A new negative test verifies the generic refusal and exact synthetic frame fields.
