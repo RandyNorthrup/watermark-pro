@@ -29,6 +29,25 @@ machine-wide instructions from this repository.
   passing when it was never executed is the single failure this project is
   designed to prevent.
 
+## Failed CI and implementation reassessment
+
+- After three failed CI runs on a PR, stop the incremental patch/push loop.
+  Review the complete change, its interfaces, latest failures, upstream behavior
+  and whether the tests prove the requested behavior. This applies to the current
+  video PR immediately; changing a commit does not reset the failure count.
+- Before another CI attempt, record the proven root cause, unnecessary complexity
+  to remove, one coherent corrective change and its regression proof in the
+  verification receipt. For a CI-only failure, document the matching reproduction
+  and why the next attempt tests that cause. Do not repeat a known external gate
+  failure while its dependency or external state is unchanged.
+- Prefer existing interfaces and one authority for each state. Add an abstraction
+  only when it removes real duplication or protects a named invariant. Test the
+  actual integration and meaningful negative cases instead of duplicating the
+  implementation in a simulated model.
+- Parallel agents may investigate independent boundaries. Freeze feature expansion
+  when shared contracts diverge; agree the contract and verify combined source
+  before adding another layer or reporting readiness.
+
 ## Code standards (enforced by the gates)
 
 - **Constants:** no unexplained magic numbers, strings, booleans, or timeouts.

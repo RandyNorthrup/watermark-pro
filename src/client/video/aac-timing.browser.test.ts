@@ -233,6 +233,12 @@ describe('native AAC project timing', () => {
               sample.close()
             }
           }
+          expect(decoderProbes.some((probe) => probe.stage === 'decode-library')).toBe(true)
+          expect(
+            decoderProbes
+              .filter((probe) => probe.stage === 'decode-library')
+              .every((probe) => probe.firstTimestamp >= 0),
+          ).toBe(true)
           for (const start of MARKERS) {
             const result = alignment(decoded, reference, start)
             expect(result.score).toBeGreaterThan(0.9)

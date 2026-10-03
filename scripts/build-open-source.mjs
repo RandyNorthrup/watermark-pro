@@ -22,6 +22,7 @@ const entries = {}
 for (const filename of ['LICENSE', 'README.md', 'package.json']) {
   entries[filename] = await readFile(path.join(root, filename))
 }
+entries['LUMAFOIL-PATCH.mjs'] = await readFile('scripts/lib/mediabunny-patch.mjs')
 const source = path.join(root, 'src')
 const sourceEntries = await readdir(source, { recursive: true, withFileTypes: true })
 for (const entry of sourceEntries) {

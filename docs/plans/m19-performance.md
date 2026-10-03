@@ -46,6 +46,20 @@ The isolated billing worktree has verified human challenges and private
 two-admission controls, with recent credential proof under exact-commit
 certification. Those stacked changes are not integrated or deployed here.
 
+### Portable AAC verification checkpoint — 2026-10-02
+
+M19 remains open. Exact access-unit source `496bc2e` passed strict Linux encoding,
+exact native presentation and both native decoded waveform edges. Library AAC
+iteration still hit its unchanged deadline because negative preroll selects
+GStreamer's reverse segment. Whole-path reassessment removed the custom decoder and chose a guarded correction
+at the SDK's existing native decode boundary. Original presentation, queues,
+capability and lifecycle remain under the existing SDK, with every output
+assertion retained. Native Mac/Linux,
+complete quality/SAST/devices and final Lighthouse/screenshots remain required.
+The required full dependency audit is separately blocked by the unpatched
+`braces` advisory. No later milestone, main merge or deployment is authorized by
+focused success. See the [video receipt](../verification/m19/video-editor-2026-10-01.md).
+
 ### Current owner clarification — 2026-09-08
 
 Randy confirmed that offline operation **and synchronization after reconnecting**

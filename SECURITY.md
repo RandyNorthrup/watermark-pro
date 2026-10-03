@@ -132,7 +132,11 @@ forced downgrade or dependency substitution has been applied. See the
   compares configured private values against original bytes and does not trust
   generic repository ignore files. One revoked historical Picker key has an
   exact immutable finding/digest exception; current and built copies receive no
-  exception. See [the retirement record](docs/verification/m19/picker-key-rotation.md).
+  exception. The aggregate candidate cap charges only the existing exact
+  original-path/byte/historical-treatment dedup identity; raw occurrence bytes
+  remain reported. Every original path/private-value/file-size/LFS check and all
+  history/archive bounds remain enforced before or alongside that sharing.
+  See [the retirement record](docs/verification/m19/picker-key-rotation.md).
 - Dependency vulnerability audit in CI at the `high` level.
 - Static analysis with semgrep (`p/default`, `p/typescript`, `p/react`,
   `p/secrets`) locally and in CI.
@@ -208,7 +212,13 @@ forced downgrade or dependency substitution has been applied. See the
   mixed in bounded chunks rather than loading complete source PCM. Edited audible
   tracks are refused when their target encoder is unavailable. Sources, project
   state and pending outputs retain account/workspace-generation guards and are
-  disposed on a new project, identity change or unmount.
+  disposed on a new project, identity change or unmount. Native audio decoding retains
+  the stock SDK capability/queue/error/flush/close authority. A guarded downstream
+  correction translates negative native input timestamps while its existing
+  output handler restores presentation. Installation/build/native gates check
+  exact original package/lock provenance and source hashes; unknown vendor source
+  fails explicitly. This remains an unmerged candidate pending complete native/
+  Linux and release verification.
 - PDF watermarking (M17) runs entirely in the browser: `pdf-lib` parses the
   chosen documents' untrusted bytes in the page, while PDF.js supplies a
   dedicated local parsing/rendering worker. There is no upload unless the user

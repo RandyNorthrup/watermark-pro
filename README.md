@@ -91,7 +91,9 @@ changed.
   source files stay in the current local session; reload or identity changes
   clear them. Native decoding/encoding capabilities determine accepted formats
   and export support. Edited audible tracks require an audio encoder; an
-  unavailable encoder produces an explicit error.
+  unavailable encoder produces an explicit error. Current cross-platform AAC
+  certification remains open; [native verification evidence](docs/verification/m19/video-editor-2026-10-01.md)
+  records the passing native waveform checks and remaining library-decoder gate.
 - **Accessibility:** responsive controls, keyboard paths, axe checks, and
   light/dark themes exist. Lumafoil does not claim complete WCAG certification
   while the current full UI matrix and contrast review remain open.

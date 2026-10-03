@@ -1,5 +1,119 @@
 # Multi-clip video workspace and navigation verification — 2026-10-01
 
+## Publication byte accounting correction — 2026-10-03
+
+The first normal isolated commit hook passed staged formatting/lint, then refused
+publication at the existing 512 MiB candidate budget. No commit, push, workflow
+retry or bypass occurred. Exact source accounting was 151,633,001 working bytes,
+151,633,001 index bytes and 228,875,807 reachable-history bytes: 532,141,809 raw
+bytes before archive expansion, only 4,729,103 bytes below the 536,870,912-byte cap.
+The largest inputs were committed historical screenshots, not removable temporary
+artifacts. Deleting user evidence or history was not an appropriate correction.
+
+Root review confirmed the scanner already shares staging/archive work only for
+the exact original-path, SHA-256 and historical masking-treatment identity. Its
+aggregate byte counter charged repeated working/index/history occurrences before
+that existing dedup. The correction retains raw `stats.bytes`, adds reported
+`uniqueCandidateBytes` and enforces the unchanged 512 MiB cap after the same dedup
+key. Every original file-size, path, private-value and LFS inspection still runs
+before dedup; full refs/history scanning, Git-output/object bounds, scanner rules/
+deadlines and all ZIP entry/expansion/depth/ratio/CRC controls remain unchanged.
+Different bytes, paths and current-versus-retired treatment cannot share a charge.
+
+The first expanded execution passed 24 actual scanner/budget controls and lint.
+An additional exact identity treatment negative was added; final execution passed
+all twenty-five scanner/budget controls, lint and zero duplication. Normal hook
+publication remains pending. A distinct unique byte above the real
+unchanged aggregate cap is still rejected. The budget helper tests use actual
+numeric limits without allocating a fake 512 MiB artifact or changing production
+configuration. CLI receipts now report both raw and unique candidate byte totals,
+so the denominator change is explicit rather than disguised as a larger limit.
+
+## Final local correction proof — 2026-10-03
+
+Root review approved one coherent correction at the existing SDK decode boundary.
+The isolated branch `codex/native-aac-clock-correction` starts from published
+`496bc2e`; PR #15 and its failure counter/history remain unchanged. No automatic
+known-blocked canonical audit retry is being created. The optimized-dependency
+guard now inspects cached `mediabunny.js` boundaries: changed vendor bytes and
+stock/unknown compiled graphs invalidate the local Vite cache; already-corrected
+verified graphs are preserved. Eleven delivery controls and targeted lint passed.
+The final actual-SDK Mac execution passed all eighteen native cases in 4.11 seconds,
+including all original output/waveform/lifecycle assertions and page/Worker input,
+gap and refusal cases.
+
+The controlled baseline reconstructed the exact original npm ESM digest and
+loaded its fresh compiled graph. All six executed mono/stereo/gap checks in both
+page and Worker failed their forward-clock assertions: mono reported −23,219 µs
+and stereo −21,333 µs rather than zero. The corrected ESM was restored byte-for-byte
+and the stock graph removed. The first label filter selected no cases; that
+attempt explicitly rejected its own result and supplies no regression proof.
+The corrected filter's executed failures establish the negative control.
+
+Normal publication and exact-commit Linux native-only execution are next. Neither
+focused local success nor the eventual diagnostic workflow substitutes for full
+quality, SAST, all-device and release audits. The separate dependency-audit blocker
+remains unchanged; M19 stays open.
+
+## Guarded SDK native-clock correction — 2026-10-02 (local candidate)
+
+PR #15 exceeded three failed CI attempts. The owner required a whole-path review
+before another retry; the repository workflow now records that rule without
+resetting failure history. Source `496bc2e`, Linux run `37096833170`, already
+passed strict access-unit encoding, exact presentation and native decoded extent/
+both waveform edges. The remaining failure was library iteration after 41
+packets beginning at −118,666 microseconds, with native queue zero. WebKit's
+negative timestamp path selects reverse decoding; the short positive calibration
+could not reproduce that boundary.
+
+The reassessment rejected the uncommitted custom decoder: 130 production lines,
+325 simulated-decoder test lines, global registration/configuration cache and
+another queue/lifecycle authority. Those files and all preparation callsites were
+removed. The chosen correction changes one existing native SDK decode call in
+both its shipped ESM and corresponding TypeScript source. It sends a forward
+native timestamp derived from the original first packet, while preserving
+`expectedFirstTimestamp`; the existing SDK output handler restores presentation.
+Its capability, zero-frame handling, queues, errors, flush and close remain the
+single authority. Browser, dedicated Worker and Node imports resolve the same
+pinned ESM entry. No platform delay, metadata workaround, dependency addition,
+version fabrication, feature reduction or gate relaxation is introduced.
+
+The original mediabunny 1.55.6 npm tarball was downloaded read-only and its SHA-512
+integrity matched the existing lock. Original package/ESM/source SHA-256 values
+also matched installed bytes. The Node-only installer checks exact package/lock
+pins, tarball provenance, installed manifest, actual ESM entrypoints and every
+original or already-corrected file digest before writing. Unknown source refuses
+explicitly without modifying another file. `npm ci` applies it through postinstall;
+build, canonical tests and native codec checks reverify it. Both source and
+compiled changes preserve line count and the upstream MPL notice. There is no
+untracked manual node_modules fix or new publisher/fork infrastructure.
+
+Fresh `npm ci` completed successfully in 25 seconds and its postinstall corrected
+both pinned files. The installer reported the existing seven high audit findings
+and npm's dependency-install-script review warnings; neither was waived or counted
+as a security gate pass. The first native attempt caught an old optimized Vite
+bundle despite corrected file hashes. The guard invalidates stale compiled graphs even when vendor files are already
+corrected, while preserving verified corrected optimized graphs. Eleven delivery controls passed again, including both cache
+states. Final install/native execution passed eighteen Mac cases: ten actual SDK
+page/Worker cases covering real mono 44.1 kHz, stereo 48 kHz, a timestamp gap,
+cancellation and native-call error propagation, plus the eight unchanged exact
+output/native-and-library waveform/lifecycle cases. Original packet origins were
+negative, native input origins zero, returned sample origins restored, timestamp
+deltas/gaps preserved and native decoders closed. Full types passed; fixture/
+observer lint details were corrected without suppressions. A redundant signed-
+offset/double-placement calibration diagnostic was removed; all independent output
+assertions remain. Linux, complete current-source gates and root review before
+publication remain required.
+
+The corresponding-source archive reads the patched TypeScript and now includes
+the installer/provenance file; the source offer identifies the downstream change
+without fabricating a dependency version. Original MPL notices remain.
+
+Primary references:
+[WebKit's decoder boundary](https://github.com/WebKit/WebKit/blob/main/Source/WebCore/platform/audio/gstreamer/AudioDecoderGStreamer.cpp)
+and [the original SDK release](https://www.npmjs.com/package/mediabunny/v/1.55.6).
+Patch metadata and both before/after hashes live in `scripts/lib/mediabunny-patch.mjs`.
+
 ## Access-unit PCM submission candidate — 2026-10-02
 
 Exact Linux source `e5b1845`, native run `37096011816`, passed eight of nine

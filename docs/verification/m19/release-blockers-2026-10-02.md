@@ -15,6 +15,20 @@ occurred in this checkpoint. Dates use the owner's America/Los_Angeles timezone.
 Both failed runs skipped device jobs and failed the required aggregate. Neither
 candidate has a green complete final-source receipt.
 
+## Latest video checkpoint
+
+Published `496bc2e` supersedes the earlier video row for current status.
+[Canonical run 37096836621](https://github.com/RandyNorthrup/watermark-pro/actions/runs/37096836621)
+passed static/publication (15,159 checks, 12,718 copies, 183 archive entries;
+zero configured private values) and SAST, then full audit rejected seven high
+findings before tests/build. Device jobs were skipped and the aggregate failed.
+[Native Linux run 37096833170](https://github.com/RandyNorthrup/watermark-pro/actions/runs/37096833170)
+passed strict packet/PCM timing, exact native presentation, native decoded extent
+and both waveform edges, then timed out at the original thirty-second library
+iteration deadline. Eight of nine native cases passed. The custom bridge was removed after whole-path reassessment. The guarded SDK
+boundary correction still requires fresh install/native main/Worker proof,
+root review and Linux verification before complete-source certification. No output, waveform or gate bound changed.
+
 ## Dependency evidence
 
 On 2026-10-02, registry reads reported latest `braces` 3.0.3 and Stylelint 17.16.0.
@@ -46,7 +60,8 @@ were provisioned in the unrelated account.
 
 1. Obtain a patched dependency release or verified compatible replacement that
    preserves CSS validation; restore the required full audit.
-2. Capture numeric Linux AAC frame timing and correct the bounded encoder clock.
+2. Certify the forward native AAC decoder clock on Linux, preserving the SDK's
+   complete waveform iteration after strict access-unit encoding.
    Retain exact presentation, decoded-frame and two-edge waveform assertions;
    Mac native success is insufficient for portable certification.
 3. Complete exact-source member-capacity quality, SAST and all four device jobs.

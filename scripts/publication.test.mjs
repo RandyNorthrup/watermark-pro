@@ -8,7 +8,11 @@ import { test } from 'node:test'
 
 import { zipSync } from 'fflate'
 
-import { auditPublication } from './lib/publication-audit.mjs'
+import {
+  auditPublication,
+  chargeUniqueCandidateBytes,
+  publicationCandidateFingerprint,
+} from './lib/publication-audit.mjs'
 import {
   isRetiredHistoryFinding,
   maskRetiredHistoricalSecrets,
@@ -440,7 +444,56 @@ test('identical current and historical copies share staging only after every obj
     assert.equal(result.scannerCopies, 8)
     assert.equal(result.stats.historyObjects, 6)
     assert.equal(result.stats.files, 12)
+    const currentFiles = ['.gitleaks.toml', '.gitignore', 'src/sample.browser.test.ts']
+    const current = await Promise.all(currentFiles.map((name) => readFile(path.join(root, name))))
+    const repeated = current.reduce((total, bytes) => total + bytes.length, 0) * 2
+    assert.equal(result.stats.bytes - result.stats.uniqueCandidateBytes, repeated)
   })
+})
+
+test('different paths and changed bytes are distinct candidate charges', async () => {
+  await fixture(async (root) => {
+    const baseline = await auditPublication(root)
+    const original = await readFile(path.join(root, 'src/sample.browser.test.ts'))
+    await writeFile(path.join(root, 'src/other.browser.test.ts'), original)
+    const otherPath = await auditPublication(root)
+    assert.equal(
+      otherPath.stats.uniqueCandidateBytes - baseline.stats.uniqueCandidateBytes,
+      original.length,
+    )
+    const changed = Buffer.from('export const changed = true\n')
+    await writeFile(path.join(root, 'src/sample.browser.test.ts'), changed)
+    const differentBytes = await auditPublication(root)
+    assert.equal(
+      differentBytes.stats.uniqueCandidateBytes - otherPath.stats.uniqueCandidateBytes,
+      changed.length,
+    )
+    assert.equal(differentBytes.stats.files - otherPath.stats.files, 0)
+  })
+})
+
+test('distinct unique candidate bytes still reject above the unchanged aggregate cap', () => {
+  const stats = { uniqueCandidateBytes: 0 }
+  for (
+    let count = 0;
+    count < PUBLICATION_LIMITS.candidateBytes / PUBLICATION_LIMITS.fileBytes;
+    count += 1
+  )
+    chargeUniqueCandidateBytes(stats, PUBLICATION_LIMITS.fileBytes)
+  assert.equal(stats.uniqueCandidateBytes, PUBLICATION_LIMITS.candidateBytes)
+  assert.throws(() => chargeUniqueCandidateBytes(stats, 1), /Publication byte budget exceeded/u)
+})
+
+test('identical bytes never merge different paths or historical masking treatment', () => {
+  const bytes = Buffer.from('synthetic original publication bytes')
+  const original = publicationCandidateFingerprint('src/example.ts', bytes, 0)
+  assert.equal(publicationCandidateFingerprint('src/example.ts', Buffer.from(bytes), 0), original)
+  assert.notEqual(publicationCandidateFingerprint('src/other.ts', bytes, 0), original)
+  assert.notEqual(publicationCandidateFingerprint('src/example.ts', bytes, 1), original)
+  assert.notEqual(
+    publicationCandidateFingerprint('src/example.ts', Buffer.from('changed bytes'), 0),
+    original,
+  )
 })
 
 test('distinct archive members with the same path never overwrite an earlier unsafe scanner copy', async () => {

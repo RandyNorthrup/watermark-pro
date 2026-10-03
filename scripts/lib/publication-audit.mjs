@@ -28,6 +28,18 @@ const TOOL_TIMEOUT_MS = 120_000
 const ENV_EXAMPLES = new Set(['.env.example', '.dev.vars.example'])
 const LFS_PREFIX = 'version https://git-lfs.github.com/spec/v1'
 
+/** Enforce the unchanged aggregate cap for candidates admitted by the exact existing dedup key. */
+export function chargeUniqueCandidateBytes(stats, bytes) {
+  stats.uniqueCandidateBytes += bytes
+  if (stats.uniqueCandidateBytes > PUBLICATION_LIMITS.candidateBytes)
+    throw new Error('Publication byte budget exceeded')
+}
+
+/** Keep the existing scanner identity: original path, original bytes and historical masking treatment. */
+export function publicationCandidateFingerprint(filename, bytes, maskedOccurrences) {
+  return `${maskedOccurrences === 0 ? 'unmasked' : 'retired-history'}:${filename}:${createHash('sha256').update(bytes).digest('hex')}`
+}
+
 function isPrivateVariable(name) {
   return SECRET_NAME.test(name) || SECRET_KEYS.has(name)
 }
@@ -289,6 +301,7 @@ export async function auditPublication(root, mode = 'source') {
   const stats = {
     files: 0,
     bytes: 0,
+    uniqueCandidateBytes: 0,
     archiveEntries: 0,
     expandedBytes: 0,
     historyObjects: 0,
@@ -308,10 +321,7 @@ export async function auditPublication(root, mode = 'source') {
   ) {
     stats.files += 1
     stats.bytes += bytes.length
-    if (
-      bytes.length > PUBLICATION_LIMITS.fileBytes ||
-      stats.bytes > PUBLICATION_LIMITS.candidateBytes
-    )
+    if (bytes.length > PUBLICATION_LIMITS.fileBytes)
       throw new Error('Publication byte budget exceeded')
     let problem
     try {
@@ -335,8 +345,11 @@ export async function auditPublication(root, mode = 'source') {
     // Only identical paths and bytes with identical scanner treatment can share
     // a copy. A retired-history exception must never suppress a current file.
     const scannerCopy = maskRetiredHistoricalSecrets(bytes, origin)
-    const fingerprint = `${scannerCopy.occurrences === 0 ? 'unmasked' : 'retired-history'}:${filename}:${createHash('sha256').update(bytes).digest('hex')}`
+    const fingerprint = publicationCandidateFingerprint(filename, bytes, scannerCopy.occurrences)
     if (seen.has(fingerprint)) return
+    // The bounded staging/ZIP work already shares only exact path/byte/treatment
+    // copies. Charge that work once; retain raw bytes and all occurrence checks.
+    chargeUniqueCandidateBytes(stats, bytes.length)
     seen.add(fingerprint)
     if (shouldStage && problem !== 'Unsafe publication path' && names.length === 0) {
       stats.retiredHistoryMaskedOccurrences += scannerCopy.occurrences

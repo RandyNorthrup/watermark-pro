@@ -7,6 +7,44 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+- The normal isolated correction hook passed formatting/lint but rejected its
+  unchanged 512 MiB publication byte budget before a commit. Exact raw working,
+  index and history inputs already totaled 532,141,809 bytes before ZIP expansion.
+  Root reviewed the existing exact path/byte/masking dedup and corrected aggregate
+  accounting: raw counts remain reported; the same fixed cap charges only unique
+  candidates admitted by that existing key. Original occurrence checks, full
+  history, per-file/archive controls and scanner rules remain. Added positive
+  duplicate and negative distinct-path/byte/treatment/real-cap controls; no limit
+  raise, history deletion, source exclusion or hook bypass occurred.
+
+- Root-reviewed SDK correction passed eighteen final Mac native cases on 2026-10-03.
+  The exact stock npm artifact deliberately failed six executed page/Worker
+  mono/stereo/gap forward-clock assertions; corrected bytes were restored exactly.
+  An initial filter selected zero tests and was rejected, not counted as proof.
+  Preserved already-corrected optimized SDK graphs while still invalidating stock/
+  unknown graphs; eleven delivery controls and lint passed. Prepared an isolated
+  correction branch from `496bc2e` without changing PR #15's failure history or
+  repeating the unchanged canonical audit blocker. Linux/publication remain next.
+
+- Reassessed the complete video change after more than three failed PR runs.
+  Removed the uncommitted 130-line custom decoder, its 325-line simulated harness
+  and global registration/cache/queue/lifecycle duplication. The replacement
+  changes the existing SDK native decode call, preserving original presentation
+  timestamps and stock capability/queue/error/flush/close handling.
+- Verified the original mediabunny 1.55.6 npm artifact against its locked SHA-512
+  integrity and installed manifest/source SHA-256 hashes. Added a Node-only,
+  fail-closed postinstall patch with exact pin, entrypoint and before/after source
+  verification; build/tests/native commands reverify it. Eleven delivery controls
+  passed. Fresh npm ci reapplied both corrected files successfully. An initial
+  native check found stale optimized SDK code despite matching source hashes;
+  verification now invalidates stale/unknown local SDK graphs while preserving
+  already-verified corrected caches. Eighteen
+  real Mac page/Worker/output cases then passed, covering mono 44.1 kHz, stereo
+  48 kHz, gaps, cancellation/errors and all original waveform bounds. Removed
+  the redundant calibration mirror/offset diagnostic. Preserved the patched MPL
+  source offer and original version. Linux/root review/full gates remain pending;
+  no subsequent push/CI retry or unchanged full-audit rerun occurred.
+
 - Exact native Linux run `37096011816` passed eight of nine cases on `e5b1845`;
   repeated metadata at the third packet still rejected the waveform journey.
   Reviewed WebKit's producer-metadata implementation and changed the candidate

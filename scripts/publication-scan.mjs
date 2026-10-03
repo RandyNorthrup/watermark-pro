@@ -22,7 +22,7 @@ try {
   const report = args.includes('--report') ? args[args.indexOf('--report') + 1] : undefined
   if (report !== undefined) await writeFile(report, JSON.stringify(result, null, 2) + '\n')
   console.info(
-    `Publication ${result.mode}: ${result.status}; ${result.stats.files} candidate/object checks, ${result.scannerCopies} scanner copies, ${result.stats.archiveEntries} archive entries, ${result.stats.configuredSecrets} private values compared; ${result.stats.retiredHistoryMaskedOccurrences} revoked-key occurrences masked in historical scan copies, ${result.stats.retiredHistoryFindings} exact revoked historical findings accepted.`,
+    `Publication ${result.mode}: ${result.status}; ${result.stats.files} candidate/object checks, ${result.scannerCopies} scanner copies, ${result.stats.bytes} raw bytes, ${result.stats.uniqueCandidateBytes} unique candidate bytes, ${result.stats.archiveEntries} archive entries, ${result.stats.configuredSecrets} private values compared; ${result.stats.retiredHistoryMaskedOccurrences} revoked-key occurrences masked in historical scan copies, ${result.stats.retiredHistoryFindings} exact revoked historical findings accepted.`,
   )
   for (const finding of result.findings) console.error(JSON.stringify(finding))
   if (result.status !== 'pass') process.exitCode = 1
