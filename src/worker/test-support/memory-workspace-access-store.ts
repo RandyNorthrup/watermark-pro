@@ -1,5 +1,7 @@
+import { workspaceCapacity } from '../../shared/plans'
 import { WORKSPACE_ACCESS_POLICY, workspaceAccessSchema } from '../../shared/workspace-access'
 import type { AuditRecord } from '../audit'
+import type { PlanStore } from '../plan-store'
 import type { WorkspaceAccessLink, WorkspaceAccessStore } from '../workspace-access-store'
 
 interface AccessTables {
@@ -18,6 +20,7 @@ interface AccessTables {
 export function createMemoryWorkspaceAccessStore(
   tables: AccessTables,
   audit: { records: AuditRecord[] },
+  plans: PlanStore,
 ): WorkspaceAccessStore {
   const links = new Map<string, WorkspaceAccessLink>()
   const canSend = (actorId: string) =>
@@ -107,15 +110,17 @@ export function createMemoryWorkspaceAccessStore(
             eligibleUser(entry.id) !== undefined,
         ),
       ),
-    add(organizationId, ownerId, email, role) {
+    async add(organizationId, ownerId, email, role) {
+      const maximum = workspaceCapacity(await plans.get(organizationId)).members
       const account = tables.user.find((entry) => entry.email?.toLowerCase() === email)
       if (
         !isOwner(organizationId, ownerId) ||
         account?.id === undefined ||
         eligibleUser(account.id) === undefined ||
-        membership(organizationId, account.id) !== undefined
+        membership(organizationId, account.id) !== undefined ||
+        tables.member.filter((entry) => entry.organizationId === organizationId).length >= maximum
       )
-        return Promise.resolve(false)
+        return false
       tables.member.push({
         id: crypto.randomUUID(),
         organizationId,
@@ -123,7 +128,7 @@ export function createMemoryWorkspaceAccessStore(
         role,
         createdAt: new Date(),
       })
-      return Promise.resolve(true)
+      return true
     },
     change(organizationId, ownerId, memberId, role) {
       const row = tables.member.find(
@@ -201,10 +206,18 @@ export function createMemoryWorkspaceAccessStore(
             },
       )
     },
-    accept(tokenHash, userId) {
+    async accept(tokenHash, userId) {
+      const candidate = validLink(tokenHash, userId)
+      if (candidate === undefined) return null
+      const maximum = workspaceCapacity(await plans.get(candidate.organizationId)).members
       const link = validLink(tokenHash, userId)
-      if (link === undefined) return Promise.resolve(null)
-      if (membership(link.organizationId, userId) === undefined)
+      if (link === undefined) return null
+      if (membership(link.organizationId, userId) === undefined) {
+        if (
+          tables.member.filter((entry) => entry.organizationId === link.organizationId).length >=
+          maximum
+        )
+          return null
         tables.member.push({
           id: crypto.randomUUID(),
           organizationId: link.organizationId,
@@ -212,8 +225,9 @@ export function createMemoryWorkspaceAccessStore(
           role: link.role,
           createdAt: new Date(),
         })
+      }
       if (link.email !== null) link.acceptedUserId = userId
-      return Promise.resolve(link.organizationId)
+      return link.organizationId
     },
   }
 }

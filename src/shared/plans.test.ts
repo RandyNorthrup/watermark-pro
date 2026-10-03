@@ -16,12 +16,34 @@ const free: WorkspacePlanRecord = {
   kind: 'personal',
   basePlan: 'free',
   baseMemberLimit: 1,
+  retainedMemberLimit: 1,
   paidPlan: null,
   paidThrough: null,
   paidAccessSuspended: false,
   revision: 0,
 }
 describe('authoritative workspace capacity', () => {
+  it('keeps bounded primary collaboration for private members independently of Pro billing', () => {
+    const privatePrimary = { ...free, basePlan: 'private' as const }
+    expect(workspaceCapacity(privatePrimary, NOW).members).toBe(3)
+    expect(
+      workspaceCapacity({ ...privatePrimary, paidPlan: 'pro', paidThrough: new Date(NOW + 1) }, NOW)
+        .members,
+    ).toBe(3)
+    expect(workspaceCapacity(free, NOW).members).toBe(1)
+  })
+  it('retains an explicit historical roster through paid renewal, expiry and suspension', () => {
+    const historical = {
+      ...free,
+      kind: 'shared' as const,
+      basePlan: 'legacy' as const,
+      retainedMemberLimit: 7,
+    }
+    const paid = { ...historical, paidPlan: 'team' as const, paidThrough: new Date(NOW + 1) }
+    expect(workspaceCapacity(paid, NOW).members).toBe(7)
+    expect(workspaceCapacity(paid, NOW + 1).members).toBe(7)
+    expect(workspaceCapacity({ ...paid, paidAccessSuspended: true }, NOW).members).toBe(7)
+  })
   it('keeps the researched monthly catalog separate from effective limits', () => {
     expect([
       PUBLIC_PLANS.free.monthlyUsd,
@@ -29,6 +51,15 @@ describe('authoritative workspace capacity', () => {
       PUBLIC_PLANS.team.monthlyUsd,
     ]).toEqual([0, 9, 24])
     expect(workspaceCapacity(free, NOW)).not.toHaveProperty('monthlyUsd')
+  })
+  it('public shared fallback ignores a stale private allowance but retains an explicit historical roster', () => {
+    const publicShared = { ...free, kind: 'shared' as const, baseMemberLimit: 3 }
+    expect(workspaceCapacity(publicShared, NOW).members).toBe(1)
+    expect(workspaceCapacity({ ...publicShared, retainedMemberLimit: 4 }, NOW).members).toBe(4)
+    expect(
+      workspaceCapacity({ ...publicShared, paidPlan: 'team', paidThrough: new Date(NOW + 1) }, NOW)
+        .members,
+    ).toBe(3)
   })
   it('uses bounded public Free capacity rather than private limits', () => {
     expect(workspaceCapacity(free, NOW)).toMatchObject({
@@ -78,6 +109,7 @@ describe('authoritative workspace capacity', () => {
     { basePlan: 'admin' },
     { paidThrough: '2026-11-02' },
     { revision: -1 },
+    { retainedMemberLimit: 0 },
     { browserTrusted: true },
   ])('rejects malformed or incompatible server records %j', (invalid) => {
     expect(workspacePlanRecordSchema.safeParse({ ...free, ...invalid }).success).toBe(false)

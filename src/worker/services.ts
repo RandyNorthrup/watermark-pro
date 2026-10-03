@@ -124,6 +124,7 @@ export function buildServices(config: ValidatedEnv): Services {
     appUrl: config.APP_URL,
     email,
     accounts,
+    plans,
     reserveWorkspaceInvitation: async (organizationId, actorId, invitationId) =>
       await workspaceAccess.reserveInvitationEmail(organizationId, actorId, invitationId),
     hasWorkspaceContent: async (organizationId) => await uploads.hasContent(organizationId),
