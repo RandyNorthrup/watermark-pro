@@ -17,6 +17,19 @@ an acknowledgement within three business days.
 
 Only the `main` branch and the latest tagged release receive fixes.
 
+## Current release blocker — 2026-10-02
+
+The required full dependency audit rejects GHSA-vfj7-8cjw-p6xm
+([GitHub advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)), a stack-exhaustion
+availability vulnerability affecting `braces` through 3.0.3. The installed path is
+Stylelint 17.15.0 → micromatch 4.0.8 → braces 3.0.3. At verification, the latest
+braces registry release was still 3.0.3, no patched version was listed, and latest
+Stylelint 17.16.0 still depended on micromatch 4.0.8. These are development-tool
+findings; a separate production-only audit returned zero findings. That narrower
+result does not satisfy or replace the full release gate. No advisory waiver,
+forced downgrade or dependency substitution has been applied. See the
+[release-blocker receipt](docs/verification/m19/release-blockers-2026-10-02.md).
+
 ## Controls in place
 
 - Bulk CSV reports escape delimiters/quotes and prefix spreadsheet-like text
@@ -187,6 +200,15 @@ Only the `main` branch and the latest tagged release receive fixes.
   (`MAX_VIDEO_BYTES`, `MAX_VIDEO_SECONDS`, `MAX_VIDEO_SIDE`) are enforced from
   the file's metadata before any frame is decoded, and the watermarked file is
   downloaded through a same-origin object URL; the gallery does not store videos.
+  Multi-clip projects are Zod-validated, bounded to 32 source assets and 64 clips,
+  two video/four audio tracks and ten minutes of timeline duration. Aggregate
+  source bytes retain the 2 GiB cap. Native demuxing and decoding determine media
+  kind and source bounds, regardless of claimed MIME or extension. Worker export
+  rechecks source identities, dimensions, duration and decode support; audio is
+  mixed in bounded chunks rather than loading complete source PCM. Edited audible
+  tracks are refused when their target encoder is unavailable. Sources, project
+  state and pending outputs retain account/workspace-generation guards and are
+  disposed on a new project, identity change or unmount.
 - PDF watermarking (M17) runs entirely in the browser: `pdf-lib` parses the
   chosen documents' untrusted bytes in the page, while PDF.js supplies a
   dedicated local parsing/rendering worker. There is no upload unless the user

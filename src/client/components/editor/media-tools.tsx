@@ -19,6 +19,7 @@ export function MediaTools({
   children,
   activeSpec,
   onSpecChange,
+  embedded = false,
 }: {
   organizationId: string
   canCreate: boolean
@@ -26,14 +27,23 @@ export function MediaTools({
   children: ReactNode
   activeSpec?: WatermarkSpec | undefined
   onSpecChange?: ((spec: WatermarkSpec) => void) | undefined
+  embedded?: boolean
 }) {
   const { t } = useTranslation()
   const [tab, setTab] = useState('watermark')
   return (
-    <Card className="min-w-0 overflow-hidden p-0">
+    <Card
+      className={
+        embedded ? 'min-w-0 border-0 bg-transparent p-0 shadow-none' : 'min-w-0 overflow-hidden p-0'
+      }
+    >
       <div
         data-toolbox-scroll=""
-        className="app-scroll-region flex max-h-[75svh] flex-col gap-4 overflow-y-auto overscroll-y-auto p-4 lg:max-h-[calc(100svh-8rem)]"
+        className={
+          embedded
+            ? 'flex min-w-0 flex-col gap-4'
+            : 'app-scroll-region flex max-h-[75svh] flex-col gap-4 overflow-y-auto overscroll-y-auto p-4 lg:max-h-[calc(100svh-8rem)]'
+        }
       >
         <Tabs.Root value={tab} onValueChange={setTab} className="flex min-w-0 flex-col gap-4">
           <Tabs.List
@@ -114,10 +124,18 @@ export function MediaTools({
 }
 
 /** Common layout and history shortcuts keep document and video editing behavior aligned. */
-export function MediaEditorLayout({ scene, children }: { scene: MediaScene; children: ReactNode }) {
+export function MediaEditorLayout({
+  scene,
+  children,
+  className = 'grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6',
+}: {
+  scene: MediaScene
+  children: ReactNode
+  className?: string
+}) {
   return (
     <div
-      className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-6"
+      className={className}
       onKeyDown={(event) => {
         if (
           event.defaultPrevented ||
@@ -143,14 +161,16 @@ export function MediaEditorLayout({ scene, children }: { scene: MediaScene; chil
 export function MediaHistory({
   scene,
   exportAction,
+  onNew = scene.newScene,
 }: {
   scene: MediaScene
   exportAction: ReactNode
+  onNew?: () => void
 }) {
   const { t } = useTranslation()
   return (
     <div className="ms-auto flex flex-wrap items-center justify-center gap-1">
-      <Button type="button" variant="secondary" size="sm" onClick={scene.newScene}>
+      <Button type="button" variant="secondary" size="sm" onClick={onNew}>
         <FilePlus2 aria-hidden="true" className="size-4" />
         {t('editor.newWorkspace')}
       </Button>

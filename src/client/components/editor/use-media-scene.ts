@@ -1,6 +1,7 @@
 /** Shared watermark state for the inline document and video editors. */
 import type { MarkGesture } from './mark-overlay'
 import type { WatermarkDto } from '../../../shared/api-watermark'
+import type { VideoProject } from '../../../shared/video-project'
 import { type WatermarkSpec, watermarkSpecSchema } from '../../../shared/watermark'
 import { createLayer, type Layer, MAX_LAYERS } from '../../editor/state'
 import { blankSpec, withPlacement, withStyle } from '../../lib/spec-edit'
@@ -12,10 +13,11 @@ interface MediaSceneState {
   draft: WatermarkSpec
   activeId: string | null
   animations: Record<string, VideoMotion>
+  project: VideoProject | null
 }
 
 function emptyScene(): MediaSceneState {
-  return { layers: [], draft: blankSpec(), activeId: 'draft', animations: {} }
+  return { layers: [], draft: blankSpec(), activeId: 'draft', animations: {}, project: null }
 }
 
 /** One history includes preset edits, canvas transforms, timing and keyframes. */
@@ -116,7 +118,7 @@ export function useMediaScene(canCreate: boolean) {
           Object.entries(value.animations).filter(([id]) => id !== 'draft'),
         ),
       }),
-    clear: () => change({ ...emptyScene(), activeId: null }),
+    clear: () => change({ ...emptyScene(), activeId: null, project: value.project }),
     newScene: () => history.reset(emptyScene()),
     // A replacement source keeps watermark styles, but old clip timestamps and
     // undo entries must not restore intervals outside the new video's duration.

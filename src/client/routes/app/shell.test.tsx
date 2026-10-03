@@ -65,7 +65,7 @@ afterEach(() => {
 })
 
 describe('application shell', () => {
-  it('places one sync owner in the sidebar and shared controls at the bottom of the phone menu', async () => {
+  it('places one persistent sync owner in the header and shared controls at the bottom of the phone menu', async () => {
     seedOwnerWorkspace(client())
     const { data: session } = await client().getSession()
     if (session === null) throw new Error('Expected signed-in session')
@@ -88,8 +88,8 @@ describe('application shell', () => {
         <RouterProvider router={router} />
       </QueryClientProvider>,
     )
-    const sidebar = await screen.findByRole('complementary')
-    expect(await within(sidebar).findByRole('region', { name: 'Offline work' })).toHaveAttribute(
+    const header = await screen.findByRole('banner')
+    expect(await within(header).findByRole('region', { name: 'Offline work' })).toHaveAttribute(
       'data-sync-owner',
       'true',
     )
@@ -281,11 +281,13 @@ describe('application shell', () => {
     await user.click(screen.getByRole('button', { name: `Account menu for ${OWNER.name}` }))
     await user.click(await screen.findByRole('menuitem', { name: 'Account settings' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/account'))
+    await user.click(screen.getByRole('button', { name: 'Open navigation' }))
     const settingsNav = screen.getByRole('navigation', { name: 'Primary' })
     expect(within(settingsNav).getByRole('link', { name: 'Account settings' })).toBeInTheDocument()
     expect(within(settingsNav).getByRole('link', { name: 'Invite people' })).toBeInTheDocument()
     expect(within(settingsNav).queryByRole('link', { name: 'Saved Watermarks' })).toBeNull()
 
+    await user.keyboard('{Escape}')
     await user.click(screen.getByRole('button', { name: 'Menu' }))
     await screen.findByRole('dialog', { name: 'Menu' })
     await user.click(screen.getByRole('button', { name: 'Close menu' }))
@@ -299,6 +301,7 @@ describe('application shell', () => {
     const { router } = renderApp('/app/admin')
     await screen.findByRole('heading', { level: 1, name: 'Administration' })
 
+    await user.click(screen.getByRole('button', { name: 'Open navigation' }))
     const adminNav = screen.getByRole('navigation', { name: 'Administration sections' })
     expect(within(adminNav).getByRole('link', { name: 'Users' })).toHaveAttribute(
       'aria-current',
@@ -313,10 +316,13 @@ describe('application shell', () => {
 
     await user.click(within(adminNav).getByRole('link', { name: 'Health' }))
     await waitFor(() => expect(router.state.location.search).toEqual({ section: 'health' }))
-    expect(within(adminNav).getByRole('link', { name: 'Health' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
+    await user.click(screen.getByRole('button', { name: 'Open navigation' }))
+    expect(
+      within(screen.getByRole('navigation', { name: 'Administration sections' })).getByRole(
+        'link',
+        { name: 'Health' },
+      ),
+    ).toHaveAttribute('aria-current', 'page')
   })
 
   it('shows the layout error boundary when the organization cannot be loaded', async () => {

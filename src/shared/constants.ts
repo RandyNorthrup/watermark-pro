@@ -270,6 +270,29 @@ export const MAX_VIDEO_SECONDS = 600
 export const MAX_VIDEO_SIDE = 3840
 /** Display-only mark raster; encoded video always uses the selected original/output resolution. */
 export const VIDEO_PREVIEW_MAX_SIDE = 1440
+/** Browser-local editing and streaming composition bounds; source limits still apply. */
+export const VIDEO_PROJECT_LIMITS = {
+  timeEpsilon: Number.EPSILON * MAX_VIDEO_SECONDS,
+  assets: 32,
+  clips: 64,
+  videoTracks: 2,
+  audioTracks: 4,
+  framesPerSecond: 30,
+  sampleRate: 48_000,
+  channels: 2,
+  audioChunkFrames: 2048,
+  timeStep: 0.01,
+  previewUpdateMilliseconds: 50,
+  millisecondsPerSecond: 1000,
+  defaultWidth: 1920,
+  defaultHeight: 1080,
+  identityCharacters: 128,
+  nameCharacters: 120,
+  rulerDivisions: 5,
+  maximumZoom: 8,
+  minimumScale: 0.1,
+  maximumScale: 2,
+} as const
 /**
  * Encoder codec preference, best first (docs/plans/m17 "Codec choice"): H.264 in
  * MP4, then HEVC in MP4 (Safari), then VP9 and AV1 in WebM. The first the running
@@ -278,6 +301,8 @@ export const VIDEO_PREVIEW_MAX_SIDE = 1440
  * no browser-only dependency.
  */
 export const VIDEO_CODEC_PREFERENCE = ['avc', 'hevc', 'vp9', 'av1'] as const
+/** WebKit quality lookahead stalls the bounded encoder queue; exports verify every emitted frame. */
+export const VIDEO_ENCODER_LATENCY_MODE = 'realtime'
 /** Audio encoder preference: AAC for MP4, Opus for WebM. */
 export const AUDIO_CODEC_PREFERENCE = ['aac', 'opus'] as const
 /** Which container each video codec is muxed into. */
@@ -298,6 +323,27 @@ export const VIDEO_BITRATE_REFERENCE_PIXELS = 1920 * 1080
 export const VIDEO_FIT_HEIGHTS = { '1080p': 1080, '720p': 720 } as const
 /** Bitrate for re-encoded audio when it cannot be copied through, in bits per second. */
 export const AUDIO_REENCODE_BITRATE = 128_000
+/** Synthetic AAC self-test bounds; two different chirps identify delay without inspecting user media. */
+export const AAC_TIMING_POLICY = {
+  calibrationFrames: 16_384,
+  calibrationPaddingFrames: 4096,
+  calibrationBytes: 65_536,
+  maximumDelayFrames: 8192,
+  packetFrames: 1024,
+  markerFrames: 2048,
+  markers: [
+    { start: 4096, frequency: 1000 },
+    { start: 10_240, frequency: 9000 },
+  ],
+  sweepHertz: 6000,
+  amplitude: 0.5,
+  measuredOffset: 512,
+  measuredFrames: 1024,
+  minimumCorrelation: 0.9,
+  minimumPeakGap: 0.02,
+  leadFrames: 4096,
+  tailFrames: 4096,
+} as const
 
 /**
  * PDF watermarking (M17). pdf-lib parses and writes each document in the browser;
@@ -317,3 +363,15 @@ export const PDF_PRODUCER = 'Lumafoil'
 export const EMAIL_MAX_LENGTH = 254
 export const MAX_AUTH_ERROR_LENGTH = 200
 export const MAX_ACCOUNT_ID_LENGTH = 128
+
+/** Bounded SVG goo and radial geometry adapted from Lucas Bebber's MIT-licensed menu. */
+export const GOOEY_NAVIGATION = {
+  radiusPixels: 148,
+  arcRadians: (Math.PI * 5) / 6,
+  initialMilliseconds: 240,
+  staggerMilliseconds: 55,
+  sideOffsetPixels: -24,
+  collisionPaddingPixels: 16,
+  blurPixels: 8,
+  alphaMatrix: '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7',
+} as const

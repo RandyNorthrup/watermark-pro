@@ -2,6 +2,50 @@
 
 ## Goal
 
+### Current UI slice — 2026-10-01
+
+The owner requested a Resolve-style multi-clip video editor and a collapsible
+sidebar that opens Lucas Bebber's gooey navigation. Both changes belong to M19;
+no later milestone is started. The video project model, native importer,
+streaming worker renderer/mixer and editing workspace are implemented. The wide
+sidebar is replaced by a half-circle radial button with header workspace/offline controls;
+phone tabs and sheet remain accessible. Targeted editing, shell and keyboard
+regressions pass; complete source, native browser, four-device, security and visual
+checks remain in progress. The owner also requested visual comparison with online
+and desktop video editors and a mature polish pass. Official Resolve, Premiere
+Clipchamp and VEED screenshots inform the unified frame, neutral panel surfaces,
+viewer emphasis and compact controls. A quality run was stopped explicitly for
+this follow-up; fresh built desktop/phone/light/dark/RTL review remains required.
+The owner subsequently added public Free/paid plans, monthly USD Stripe billing,
+a private two-invitation cohort, paid shared workspaces and explicit human/trust
+gates. That becomes the next implementation slice after this UI batch, inside M19.
+The remaining Lighthouse route/timing corrections and release certification still
+follow and remain production blockers. The owner decisions are recorded in PLAN.md.
+The selected Free/$9 Pro/$24 three-member Team model, explicit cost assumptions,
+human-verification controls and uncompleted implementation checklist are in
+[the public billing specification](public-billing.md).
+
+Verification update on 2026-10-02: real native probes isolated and corrected
+WebKit video-encoder backpressure, and the startup playback regression was
+confirmed red before its synchronous-intent correction. The fresh built
+single-video journey passed all four devices with native frame/codec/duration
+assertions and axe. Complete final quality, SAST, multi-clip export, offline and
+release audits remain open. Native AAC timing experiments are temporary only:
+complete Apple edit-list/sample-group metadata restored WebKit's ending marker,
+but left start alignment and decoded-frame-count differences. A portable timing
+correction must measure the selected encoder and prove decoded waveform/content,
+rather than relax the original duration gate. See the
+[video implementation receipt](../verification/m19/video-editor-2026-10-01.md).
+The subsequent runtime candidate uses bounded synthetic AAC calibration,
+explicit preroll/edit metadata and codec-edge padding. Pure negatives passed 33
+cases, and native timing/lifecycle proof passed eight cases in each Chromium and
+WebKit. Exact timeline duration and both decoded edges are covered; complete
+source and built four-device gates are still required before the AAC defect is
+certified closed.
+The isolated billing worktree has verified human challenges and private
+two-admission controls, with recent credential proof under exact-commit
+certification. Those stacked changes are not integrated or deployed here.
+
 ### Current owner clarification — 2026-09-08
 
 Randy confirmed that offline operation **and synchronization after reconnecting**
