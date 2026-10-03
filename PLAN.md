@@ -10,6 +10,14 @@ Last updated: 2026-10-02 (credential-proof certification and workspace-capacity 
 
 ## 1. Product summary
 
+Hosted member source `b616cd0` passed all 2,931 covered cases: statements 92.56%,
+branches 85.46%, functions 92.38% and lines 93.50%. Its D1 stage passed eighty
+cases and failed two legacy account-isolation fixtures at the member quota guard.
+Those named fixtures now seed their historical two-member plan grant before the
+old roster, rather than constructing it as a new pending/public workspace. The
+original migration/rollback assertions remain; corrected execution and complete
+final-source hosted gates are required before certification.
+
 The uninterrupted member quality run passed static/publication gates, then
 covered testing passed 2,913 cases and failed seventeen. The failed files all
 passed isolated verification without source/assertion changes: nine folder

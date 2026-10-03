@@ -7,6 +7,12 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+- Hosted source `b616cd0` passed all 2,931 covered cases and retained coverage
+  floors, but two D1 legacy account-isolation fixtures failed the new seat guard.
+  Their setup now explicitly seeds the historical two-member grant before
+  inserting that old roster. This keeps production admission strict and retains
+  the original migration/rollback assertions. Corrected D1 execution is pending.
+
 - Added real-auth Node capacity negatives for a distinct fourth account: direct
   grant and bearer acceptance both refuse, current members retain reads and no
   successful acceptance audit is written. All twelve access cases passed.
