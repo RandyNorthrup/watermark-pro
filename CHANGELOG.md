@@ -7,7 +7,83 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
-### Workspace capacity — 2026-10-02 (unverified candidate)
+- Hosted source `b616cd0` passed all 2,931 covered cases and retained coverage
+  floors, but two D1 legacy account-isolation fixtures failed the new seat guard.
+  Their setup now explicitly seeds the historical two-member grant before
+  inserting that old roster. This keeps production admission strict and retains
+  the original migration/rollback assertions. Corrected D1 execution is pending.
+
+- Added real-auth Node capacity negatives for a distinct fourth account: direct
+  grant and bearer acceptance both refuse, current members retain reads and no
+  successful acceptance audit is written. All twelve access cases passed.
+  Local SAST applied 510 rules to 2,167 targets with zero findings but runtime
+  schema/generated-type rule timeouts; clean complete hosted certification remains required.
+
+- Uninterrupted canonical quality passed publication and all static gates, then
+  covered testing passed 2,913 cases and failed 17. The failed files were rerun
+  without source/assertion changes: all nine folder cases and all 91 selected UI
+  cases passed in isolation. The full failed receipt remains; source is not
+  certified until complete final-source gates pass.
+
+- Applied the verified `015b3a4` scanner allocation and deterministic canary
+  control. The original source passed full normal publication with 15,037
+  candidate/object checks and 12,596 scanner copies. Its bounded allocation is
+  ten minutes; finding rules, original-object checks, byte/archive bounds and
+  rejection on exhaustion remain. Member final-source quality is rerunning without pauses.
+
+- Canonical member quality stopped at formatting in the changed memory workspace
+  fixture. Applied Prettier to that file and restarted the unchanged canonical
+  command; the failed attempt is not counted as a pass.
+  The next attempt passed format, lint, CSS/workflows, types, dead-code,
+  catalogue, cycle and duplication checks, then its timed publication scan was
+  interrupted by resource coordination and rejected. The owned process resumed
+  and exited. That run is not clean certification; an uninterrupted rerun remains required.
+
+- Applied the verified publication scanner correction from `c5d1d3b` after
+  confirming all three scanner files had identical prior baselines. Original
+  object/path checks, distinct masked-history treatment and limits remain. That
+  source passed twenty-one regressions, both deliberate negative drills and its
+  full normal commit hook. Billing final-source quality remains under verification.
+
+- Added a pending real-D1 auth acceptance rollback/retry test and expanded actual
+  seat-migration fixtures for historical primary rosters, denied extra seats and
+  replacement after removal. Inspection found rollback already implemented in
+  the pinned auth library; no dependency patch was made. Matched JavaScript public
+  fallback to atomic SQL when a stale private base allowance remains, with a new
+  negative seat and positive retained-roster control. The first D1 run exposed
+  cross-test sender-budget consumption; isolated the new fixture rather than
+  changing that assertion. Expanded checks passed forty Node/shared cases,
+  eight real D1 access cases and four actual migration cases. Full gates remain pending.
+- Added a further real-endpoint bearer race with three distinct accounts and
+  three independent URLs competing for one remaining seat. It requires exactly
+  one admitted member, one accepted receipt and one success audit; two denied
+  links stay unaccepted. The first run correctly admitted one account and denied
+  two but failed a receipt assertion because its untargeted links are intentionally
+  reusable. The corrected fixture uses email-bound invitations and an independent
+  sender; all nine D1 access cases then passed. Runtime link semantics were retained.
+
+### Member capacity — 2026-10-02 (verification pending)
+
+- Added live member limits to direct grants, bearer acceptance and auth-plugin
+  prechecks, plus a D1 INSERT guard for concurrent admission. Successful bearer
+  acceptance now requires actual membership; failed inserts cannot report success.
+- Existing tests exposed private primary workspace collaboration. Corrected the
+  earlier solo-primary assumption, retaining a three-member private grant and
+  explicit larger historical rosters through renewal/downgrade. Public personal
+  workspaces remain solo. No existing memberships are removed.
+- Focused Node/shared checks passed 35 cases; real D1 access checks passed seven,
+  and combined upload/access integration passed 33. Lint, types and duplication
+  checks passed. Complete canonical/SAST/device certification remains pending;
+  creation limits and compatibility invitation race recovery remain outstanding.
+
+### Workspace capacity — 2026-10-02 (implementation gates passed; unreleased)
+
+- Exact source `fdd55f2` passed all seven hosted jobs in run `37024827798`,
+  including canonical quality, SAST, 2,926 covered cases, 78 workerd cases and
+  all 144 browser/axe journeys. One Android journey used existing retries.
+  Coverage floors remained intact. This certifies storage authority and quota
+  enforcement; creation/member limits, Stripe reconciliation and release remain
+  separate outstanding work. No merge, production migration or deployment occurred.
 
 - Added explicit server plan records, historical-grant migration and member-only
   capacity projection. Public plan limits remain separate from private access,

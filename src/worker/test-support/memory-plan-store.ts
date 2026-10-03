@@ -33,6 +33,10 @@ export function createMemoryPlanStore(tables: PlanTables, accounts: AccountStore
       const record = workspacePlanRecordSchema.parse({
         organizationId,
         kind: isPersonal ? 'personal' : 'shared',
+        retainedMemberLimit: Math.max(
+          1,
+          tables.member.filter((item) => item.organizationId === organizationId).length,
+        ),
         basePlan: person.membershipCohort === 'private' ? 'private' : 'free',
         baseMemberLimit:
           isPersonal || person.membershipCohort !== 'private'

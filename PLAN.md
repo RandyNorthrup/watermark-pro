@@ -10,7 +10,64 @@ Last updated: 2026-10-02 (credential-proof certification and workspace-capacity 
 
 ## 1. Product summary
 
-### Workspace-capacity slice — 2026-10-02 (verification pending)
+Hosted member source `b616cd0` passed all 2,931 covered cases: statements 92.56%,
+branches 85.46%, functions 92.38% and lines 93.50%. Its D1 stage passed eighty
+cases and failed two legacy account-isolation fixtures at the member quota guard.
+Those named fixtures now seed their historical two-member plan grant before the
+old roster, rather than constructing it as a new pending/public workspace. The
+original migration/rollback assertions remain; corrected execution and complete
+final-source hosted gates are required before certification.
+
+The uninterrupted member quality run passed static/publication gates, then
+covered testing passed 2,913 cases and failed seventeen. The failed files all
+passed isolated verification without source/assertion changes: nine folder
+cases and ninety-one UI cases. Complete final-source hosted gates are the next
+certification step; this partial/failed local run does not close the slice.
+
+### Member capacity slice — 2026-10-02 (verification pending)
+
+On `codex/workspace-seat-limits`, retain historical rosters separately from public
+plan seat allowances, with live expiry/suspension checks inside direct grants and
+link acceptance. Migration `0021` fences all member INSERTs in D1, including auth
+plugin compatibility paths. API prechecks use the same server plan authority.
+Existing memberships are not removed on downgrade, and failed admission cannot
+return an accepted link without actual membership.
+
+Testing exposed that existing private members share their primary workspace via
+custom access routes, although the compatibility auth plugin forbids personal
+sharing. Preserve that existing private primary collaboration with a bounded
+three-member grant, and preserve larger actual historical rosters through an
+explicit retained limit. Public personal workspaces still have one member. This
+corrects the earlier assumption that every private primary workspace was solo;
+it does not implicitly share a public personal workspace. Creation limits and
+the compatibility invitation acceptance race still require certification before
+public launch. Focused Node/shared and D1 checks passed; full gates remain pending.
+The pinned auth library already restores pending invitation status after failed
+member creation. A deterministic D1 capacity-loss and retry test now verifies
+that existing behavior rather than proposing a speculative dependency patch;
+expanded execution passed forty Node/shared cases, eight D1 access cases and four
+actual migration cases. An initial fixture budget collision was corrected with
+an independent inviter, preserving the existing assertions. Complete gates remain
+pending. Public fallback now matches atomic SQL by ignoring a stale private base
+allowance while preserving the separate retained-roster grant.
+The further three-account email-bound bearer race also passed, with exactly one
+member/receipt/audit admitted to the final seat and two denied accounts. Nine D1
+access cases pass. Its first untargeted-link fixture was corrected because those
+links intentionally remain reusable; no runtime semantics were changed to make
+the assertion pass. Full final-source gates remain required.
+Publication scanner files now include the tested `c5d1d3b` correction, with prior
+baseline equality verified before copying. It shares only identical paths/bytes
+with identical scanner treatment and keeps retired-history exceptions separate
+from current candidates. Original-source full publication passed with 15,019
+object/candidate checks and 12,580 scanner copies. Billing final-source canonical
+quality is being executed; this does not certify the member slice or launch.
+Scanner allocation/control files now include verified `015b3a4`: the source
+passed full normal publication with 15,037 candidate/object checks and 12,596
+copies under the documented ten-minute scanner allocation. Finding rules and
+original-object/byte/archive checks remain. The interrupted local quality run is
+not certified; a new full run will remain uninterrupted.
+
+### Workspace-capacity slice — 2026-10-02 (implementation gates passed)
 
 `codex/plan-entitlements` starts the next M19 billing foundation on certified
 credential-proof runtime `77f6a9a`. Shared plan records and migration `0020`
@@ -19,7 +76,10 @@ Authorized members see limits without billing identifiers or private admission
 state. Upload admission reads authority inside the D1 write, and commit rechecks
 expiry/suspension before metadata, audit and lease completion. Historical data
 and grants are retained; no production migration or payment activation occurred.
-The current implementation and unexecuted test status are recorded in
+Source `fdd55f2` passed all seven exact-commit hosted jobs in run `37024827798`:
+2,926 covered cases, 78 workerd cases, retained coverage floors, SAST and all
+144 device journeys. One Android journey used existing retries. The implementation
+receipt and earlier failed attempts are recorded in
 `docs/verification/m19/workspace-capacity-2026-10-02.md`.
 
 Working private-sharing assumption, pending the owner's optional clarification:

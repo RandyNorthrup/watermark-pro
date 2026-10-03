@@ -2,6 +2,7 @@ import { and, desc, eq, sql, type SQL, type SQLWrapper } from 'drizzle-orm'
 import { SQLiteSyncDialect } from 'drizzle-orm/sqlite-core'
 
 import type { Database } from './client'
+import { workspaceSeatAvailableSql } from './plan-capacity'
 import { member, organization, user, workspaceAccessLink } from './schema'
 import {
   WORKSPACE_ACCESS_POLICY,
@@ -125,6 +126,7 @@ export function createDrizzleWorkspaceAccessStore(db: Database): WorkspaceAccess
                   SELECT ${memberId}, ${organizationId}, id, ${role}, ${Date.now()} FROM user
                   WHERE lower(email) = ${email} AND ${eligibleUser(user.id)} AND ${owner(organizationId, ownerId)}
                   AND NOT EXISTS (SELECT 1 FROM member WHERE organization_id = ${organizationId} AND user_id = user.id)
+                  AND ${workspaceSeatAvailableSql(organizationId)}
                   RETURNING id
         `,
         organizationId,
@@ -245,6 +247,7 @@ export function createDrizzleWorkspaceAccessStore(db: Database): WorkspaceAccess
                     SELECT ${crypto.randomUUID()}, organization_id, ${userId}, role, ${Date.now()} FROM workspace_access_link
                     WHERE token_hash = ${tokenHash} AND ${validLink(userId)} AND NOT EXISTS
                     (SELECT 1 FROM member WHERE organization_id = workspace_access_link.organization_id AND user_id = ${userId})
+                    AND ${workspaceSeatAvailableSql(sql`workspace_access_link.organization_id`)}
         `),
         prepare(
           accessAudit(
@@ -256,7 +259,9 @@ export function createDrizzleWorkspaceAccessStore(db: Database): WorkspaceAccess
         ),
         prepare(sql`
           UPDATE workspace_access_link SET accepted_user_id = CASE WHEN email IS NULL THEN NULL ELSE ${userId} END
-                    WHERE token_hash = ${tokenHash} AND ${validLink(userId)} RETURNING organization_id AS organizationId
+                    WHERE token_hash = ${tokenHash} AND ${validLink(userId)}
+                    AND EXISTS (SELECT 1 FROM member WHERE organization_id = workspace_access_link.organization_id AND user_id = ${userId})
+                    RETURNING organization_id AS organizationId
         `),
       ])
       const row = results[2]?.results[0]
