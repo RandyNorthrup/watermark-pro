@@ -1,0 +1,146 @@
+{
+  "representation": "Common observation values and exact measurement variants are stored once; each original context points to its variant. Expansion restores all eight original observations.",
+  "originalSerializedSha256": "a5be19a8d46898b950ac4444f7d1ab92c51b2980c806aa11343a0d87296e84e8",
+  "definitions": {},
+  "data": {
+    "date": "2026-10-03",
+    "source": "actual installed guarded mediabunny 1.55.6; no product/assertion change",
+    "synthetic_capture_controls": 2,
+    "actual_observations": [
+      {
+        "engine": "chromium",
+        "context": "page",
+        "fixture": "nongap",
+        "measurement": "chromium-nongap"
+      },
+      {
+        "engine": "chromium",
+        "context": "page",
+        "fixture": "gap",
+        "measurement": "chromium-gap"
+      },
+      {
+        "engine": "chromium",
+        "context": "Worker",
+        "fixture": "nongap",
+        "measurement": "chromium-nongap"
+      },
+      {
+        "engine": "chromium",
+        "context": "Worker",
+        "fixture": "gap",
+        "measurement": "chromium-gap"
+      },
+      {
+        "engine": "webkit",
+        "context": "page",
+        "fixture": "nongap",
+        "measurement": "webkit-nongap"
+      },
+      {
+        "engine": "webkit",
+        "context": "page",
+        "fixture": "gap",
+        "measurement": "webkit-gap"
+      },
+      {
+        "engine": "webkit",
+        "context": "Worker",
+        "fixture": "nongap",
+        "measurement": "webkit-nongap"
+      },
+      {
+        "engine": "webkit",
+        "context": "Worker",
+        "fixture": "gap",
+        "measurement": "webkit-gap"
+      }
+    ],
+    "private_raw_log_sha256": "c3a7ddd6e7a24cc2935e00b3fc2d604b2666e5ccb7b8c7a6c210e7b1fd9fb7a4",
+    "certified": false,
+    "measurement_semantics": {
+      "input_and_native_delta_seconds": true,
+      "native_output_timestamp_and_duration": "AudioData microseconds divided by 1e6, before SDK restoration",
+      "native_frames": "Sum of AudioData.numberOfFrames, independent of silent presentation extent",
+      "pcm": "ceil(Input.computeDuration * sampleRate), positioned by SDK sample timestamp, clipped at pre-zero/tail"
+    },
+    "commonObservationValues": {
+      "originalFirst": -0.023219954648526078,
+      "nativeFirst": 0,
+      "decodedFirst": -0.023219954648526078,
+      "packetCount": 174,
+      "nativeOutputCount": 174,
+      "nativeFrames": 178176,
+      "nativeMaxDuration": 0.023219,
+      "naturalSilentRms": 0,
+      "error": null,
+      "closed": true
+    },
+    "measurementVariants": {
+      "chromium-nongap": {
+        "maxOriginalDelta": 0.02321995464852611,
+        "maxNativeDelta": 0.02322000000000024,
+        "maxPacketDuration": 0.023219954648526078,
+        "maximumGap": 5.551115123125783e-17,
+        "nativeMaximumGap": 1.000000000240392e-6,
+        "activeRms": 0.1765127549729846,
+        "insertedGapRms": 0.17673613249943526,
+        "postGapRms": 0.17677919559863509,
+        "finalToneRms": 0.17673842421699423,
+        "measurement_windows_seconds": {
+          "insertedGapRms": [2.2, 2.4],
+          "postGapRms": [3.2, 3.4],
+          "finalToneRms": [3.6, 3.8]
+        }
+      },
+      "chromium-gap": {
+        "maxOriginalDelta": 1.023219954648526,
+        "maxNativeDelta": 1.0232189999999997,
+        "maxPacketDuration": 1.023219954648526,
+        "maximumGap": 5.551115123125783e-17,
+        "nativeMaximumGap": 1.000000000240392e-6,
+        "activeRms": 0.1765127549729846,
+        "insertedGapRms": 0.17673613249943526,
+        "postGapRms": 0.17677919559863509,
+        "finalToneRms": 0,
+        "measurement_windows_seconds": {
+          "insertedGapRms": [2.2, 2.4],
+          "postGapRms": [3.2, 3.4],
+          "finalToneRms": [4.2, 4.4]
+        }
+      },
+      "webkit-nongap": {
+        "maxOriginalDelta": 0.02321995464852611,
+        "maxNativeDelta": 0.02322000000000024,
+        "maxPacketDuration": 0.023219954648526078,
+        "maximumGap": 5.551115123125783e-17,
+        "nativeMaximumGap": 1.000000000240392e-6,
+        "activeRms": 0.17651275778177547,
+        "insertedGapRms": 0.17673613118582027,
+        "postGapRms": 0.17677919247599377,
+        "finalToneRms": 0.1767384244445244,
+        "measurement_windows_seconds": {
+          "insertedGapRms": [2.2, 2.4],
+          "postGapRms": [3.2, 3.4],
+          "finalToneRms": [3.6, 3.8]
+        }
+      },
+      "webkit-gap": {
+        "maxOriginalDelta": 1.023219954648526,
+        "maxNativeDelta": 1.0232189999999997,
+        "maxPacketDuration": 1.023219954648526,
+        "maximumGap": 1,
+        "nativeMaximumGap": 0.9999999999999997,
+        "activeRms": 0.17651275778177547,
+        "insertedGapRms": 0,
+        "postGapRms": 0.17673613118582027,
+        "finalToneRms": 0.17677919247599377,
+        "measurement_windows_seconds": {
+          "insertedGapRms": [2.2, 2.4],
+          "postGapRms": [3.2, 3.4],
+          "finalToneRms": [4.2, 4.4]
+        }
+      }
+    }
+  }
+}

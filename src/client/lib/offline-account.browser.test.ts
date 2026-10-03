@@ -32,10 +32,13 @@ vi.mock('./offline-database', async (importOriginal) => {
   const original = await importOriginal<typeof OfflineDatabase>()
   return {
     ...original,
-    async clearOfflineAccountData(userId: string) {
+    async clearOfflineAccountData(
+      userId: string,
+      policy: Parameters<typeof original.clearOfflineAccountData>[1],
+    ) {
       delayedCleanup.started = true
       await delayedCleanup.wait
-      return await original.clearOfflineAccountData(userId)
+      return await original.clearOfflineAccountData(userId, policy)
     },
   }
 })
@@ -170,6 +173,31 @@ it('account-scoped cleanup preserves another owner and their active marker', asy
     userId: OTHER_USER,
     value: 'other account canary',
   })
+})
+
+it('confirmed account deletion erases its pending saves while preserving another account', async () => {
+  const client = new QueryClient()
+  setOfflineUser(OFFLINE_USER)
+  await cachePrivateRecord()
+  await commitOfflineChange(offlineOperation({ kind: 'preset-create', preset: offlinePreset() }))
+  const otherKey = offlineRecordKey(OTHER_USER, OFFLINE_ORG, 'private')
+  await cacheOfflineRecord({
+    key: otherKey,
+    userId: OTHER_USER,
+    organizationId: OFFLINE_ORG,
+    value: 'other account canary',
+  })
+  await commitOfflineChange({
+    ...offlineOperation({ kind: 'preset-create', preset: offlinePreset() }),
+    userId: OTHER_USER,
+  })
+  expect(await offlineOperations(OFFLINE_USER)).toHaveLength(1)
+  await clearOfflineAccount(client, OFFLINE_USER, 'erase-all')
+  expect(currentOfflineUser()).toBeNull()
+  expect(await readOfflineRecord(CACHE_KEY)).toBeNull()
+  expect(await offlineOperations(OFFLINE_USER)).toEqual([])
+  expect(await offlineOperations(OTHER_USER)).toHaveLength(1)
+  expect(await readOfflineRecord(otherKey)).toMatchObject({ value: 'other account canary' })
 })
 
 it('a delayed old sign-out response cannot lock or erase an already active different account', async () => {

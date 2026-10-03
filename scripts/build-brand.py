@@ -79,7 +79,7 @@ def main():
         body += f'<defs><clipPath id="preview"><rect x="{image_x}" y="{image_y}" width="{image_width}" height="{image_height}" rx="14"/></clipPath></defs>'
         body += f'<image href="data:image/webp;base64,{screenshot}" x="{image_x}" y="{image_y}" width="{image_width}" height="{image_height}" clip-path="url(#preview)"/>'
         (OUTPUT / f'{name}.svg').write_text(svg(body,width,height,'Lumafoil: watermark photos, videos, and PDFs'),encoding='utf-8')
-    tokens = {'brand':'Lumafoil','domain':'https://lumafoil.com','access':'invite-only','colours':{'rose':ROSE,'action':DEEP_ROSE,'ink':INK,'paper':'#fbf9f7','white':'#ffffff','muted':'#746973','dark':'#191619'},'type':{'family':'Inter Variable','wordmarkWeight':650,'bodyWeight':400,'controlWeight':600},'geometry':{'markViewBox':'0 0 64 64','path':MARK_PATH},'fontSource':{'package':'@fontsource-variable/inter','license':'OFL-1.1','version':json.loads((FONT_ROOT/'package.json').read_text(encoding='utf-8'))['version']}}
+    tokens = {'brand':'Lumafoil','domain':'https://lumafoil.com','access':'registration-gated public plans','colours':{'rose':ROSE,'action':DEEP_ROSE,'ink':INK,'paper':'#fbf9f7','white':'#ffffff','muted':'#746973','dark':'#191619'},'type':{'family':'Inter Variable','wordmarkWeight':650,'bodyWeight':400,'controlWeight':600},'geometry':{'markViewBox':'0 0 64 64','path':MARK_PATH},'fontSource':{'package':'@fontsource-variable/inter','license':'OFL-1.1','version':json.loads((FONT_ROOT/'package.json').read_text(encoding='utf-8'))['version']}}
     (OUTPUT / 'tokens.json').write_text(json.dumps(tokens,indent=2)+'\n',encoding='utf-8')
     print('Generated outlined logos, wordmarks, symbol variants, favicon and brand tokens.')
 

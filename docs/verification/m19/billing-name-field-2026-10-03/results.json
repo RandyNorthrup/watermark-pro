@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-03",
+  "projects": ["desktop-en-light", "phone-ar-dark"],
+  "journeys_passed": 2,
+  "axe_violations": 0,
+  "closed_scope_overflow": 0,
+  "real_auth_and_worker": true,
+  "financial_overview": "named schema-validated fixture representing previously verified real-D1 retained closed/open states",
+  "provider_calls_or_payments": false,
+  "states": [
+    "closed/orphan name required; filled name enables checkout",
+    "open fixed reserved name; input absent and resume available"
+  ],
+  "root_viewed_all_four": true,
+  "images": [
+    {
+      "path": "docs/verification/m19/billing-name-field-2026-10-03/desktop-en-light-closed-team-field.png",
+      "sha256": "4299e52fe94290d3473e9830677ed001d4c47e1d0e65478505f577f89d917926",
+      "bytes": 60279
+    },
+    {
+      "path": "docs/verification/m19/billing-name-field-2026-10-03/desktop-en-light-open-team-fixed.png",
+      "sha256": "26d83ef4e1de9dfe47a22feb82c3ac1d60383c4cbfe94fd4b7c983ed10c8af6e",
+      "bytes": 50725
+    },
+    {
+      "path": "docs/verification/m19/billing-name-field-2026-10-03/phone-ar-dark-closed-team-field.png",
+      "sha256": "fab23cecd693b5c86676eb26de76453f3dd37315b581db255c303c1062f64522",
+      "bytes": 413202
+    },
+    {
+      "path": "docs/verification/m19/billing-name-field-2026-10-03/phone-ar-dark-open-team-fixed.png",
+      "sha256": "b14acd32d1d808afa6fa81705353a2876f8505efb088d28be6595c1960f6da2e",
+      "bytes": 337865
+    }
+  ]
+}

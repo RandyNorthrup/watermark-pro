@@ -58,6 +58,7 @@
     // entry here is validated by src/worker/env.ts on the first request an
     // isolate handles.
     "APP_ENV": "development",
+    "PUBLIC_SIGNUP_ENABLED": "false",
     "APP_URL": "http://localhost:5273",
     "EMAIL_PROVIDER": "console",
     "EMAIL_FROM": "no-reply@lumafoil.com",
@@ -151,6 +152,7 @@
       },
       "vars": {
         "APP_ENV": "production",
+        "PUBLIC_SIGNUP_ENABLED": "false",
         "APP_URL": "https://lumafoil.com",
         "EMAIL_PROVIDER": "cloudflare",
         "EMAIL_FROM": "no-reply@lumafoil.com",

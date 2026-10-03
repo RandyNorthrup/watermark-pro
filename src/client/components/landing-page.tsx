@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { BrandMark } from './brand-mark'
 import { LandingFeatures } from './landing-features'
 import { LanguageMenu } from './language-menu'
+import { PlanPricing } from './plan-pricing'
 import { ProviderLogo } from './provider-logo'
 import { ThemeToggle } from './theme-toggle'
 import { APP_SOURCE_URL } from '../../shared/constants'
@@ -48,6 +49,12 @@ export function LandingPage() {
             >
               {t('landing.featuresNav')}
             </a>
+            <a
+              href="#pricing"
+              className="hidden min-h-11 items-center text-sm font-medium text-ink-muted hover:text-ink sm:inline-flex"
+            >
+              {t('pricing.nav')}
+            </a>
             <span data-prerender="language-menu">
               <LanguageMenu />
             </span>
@@ -65,7 +72,7 @@ export function LandingPage() {
         <section className="mx-auto max-w-7xl px-5 pt-12 sm:px-8 sm:pt-16 lg:pt-20">
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
             <p className="glass-control rounded-full border px-4 py-2 text-sm font-semibold text-brand-700 dark:text-brand-200">
-              {t('auth.inviteOnly.title')}
+              {t('pricing.heroTag')}
             </p>
             <h1 className="text-[clamp(2.4rem,4.8vw,4.2rem)] leading-[1.1] font-semibold tracking-[-0.04em] text-balance">
               {t('landing.heroTitleStart')}{' '}
@@ -77,7 +84,7 @@ export function LandingPage() {
               {t('landing.heroBody')}
             </p>
             <p className="max-w-xl text-sm leading-6 text-ink-muted">
-              {t('landing.inviteHosting')}{' '}
+              {t('pricing.hosting')}{' '}
               <a
                 href={APP_SOURCE_URL}
                 className="font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 hover:decoration-current dark:text-brand-300"
@@ -86,10 +93,10 @@ export function LandingPage() {
               </a>
             </p>
             <Link
-              to="/login"
+              to="/signup"
               className="glass-action mt-1 inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-brand-600 px-7 py-3 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5 hover:bg-brand-700"
             >
-              {t('landing.signIn')}
+              {t('pricing.start')}
               <ArrowRight aria-hidden="true" className="size-4 rtl:-scale-x-100" />
             </Link>
             <p className="flex items-center justify-center gap-2 text-xs text-ink-muted">
@@ -125,6 +132,7 @@ export function LandingPage() {
           </figure>
         </section>
         <LandingFeatures />
+        <PlanPricing />
         <section
           aria-labelledby="workflow-heading"
           className="glass-panel mx-auto mb-16 grid max-w-7xl gap-10 border px-7 py-10 sm:px-10 lg:grid-cols-[1fr_1.3fr] lg:gap-24 lg:px-14 lg:py-14"

@@ -33,6 +33,7 @@ const SIGNED_IN_PATHS = new Set([
   '/revoke-other-sessions',
   '/sign-out',
   '/delete-user',
+  '/delete-user/callback',
 ])
 const activeWorkspaceSchema = z.object({ activeOrganizationId: z.nullish(accountIdSchema) })
 const OWNER_MUTATION_PATHS = new Set([

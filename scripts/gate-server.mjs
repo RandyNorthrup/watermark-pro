@@ -13,7 +13,7 @@ process.env.CLOUDFLARE_INCLUDE_PROCESS_ENV = 'false'
 
 let gate
 try {
-  gate = await startGateServer()
+  gate = await startGateServer({ captureStaticFailures: true })
   console.info(
     `Isolated gate server: ${gate.origin}; ephemeral D1/R2; developer QA state preserved.`,
   )

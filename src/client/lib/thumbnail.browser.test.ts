@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { createThumbnail, THUMBNAIL_MAX_SIDE } from './thumbnail'
+import { createThumbnail } from './thumbnail'
+import { THUMBNAIL_MAX_SIDE } from '../../shared/constants'
 import { drawStrokes, exportGeometry, strokeBounds } from '../editor/signature'
 import { offscreenBackend } from '../engine/canvas'
 

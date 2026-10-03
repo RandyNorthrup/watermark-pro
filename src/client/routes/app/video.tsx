@@ -20,10 +20,10 @@ function VideoPage() {
     return <Alert tone="info">{t('video.orgRequired')}</Alert>
   }
   return (
-    <div className="flex flex-col gap-6">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">{t('video.heading')}</h1>
-        <p className="mt-1 text-sm text-ink-muted">{t('video.description')}</p>
+    <div className="flex flex-col gap-3">
+      <header className="studio-page-heading">
+        <h1 className="text-xl font-semibold tracking-tight">{t('video.heading')}</h1>
+        <p className="text-xs text-ink-muted">{t('video.description')}</p>
       </header>
       <VideoTool
         organizationId={organization.id}

@@ -8,9 +8,21 @@ import {
 } from './plans'
 
 const NOW = Date.UTC(2026, 9, 2)
-const FREE_CAPACITY = { storageBytes: 524_288_000, photos: 100, logos: 10, members: 1 }
-const PRO_CAPACITY = { storageBytes: 10_737_418_240, photos: 10_000, logos: 50, members: 1 }
-const TEAM_CAPACITY = { storageBytes: 26_843_545_600, photos: 10_000, logos: 100, members: 3 }
+const FREE_CAPACITY = { storageBytes: 524_288_000, photos: 100, logos: 10, presets: 20, members: 1 }
+const PRO_CAPACITY = {
+  storageBytes: 10_737_418_240,
+  photos: 10_000,
+  logos: 50,
+  presets: 1000,
+  members: 1,
+}
+const TEAM_CAPACITY = {
+  storageBytes: 26_843_545_600,
+  photos: 10_000,
+  logos: 100,
+  presets: 2000,
+  members: 3,
+}
 const free: WorkspacePlanRecord = {
   organizationId: 'plan-fixture',
   kind: 'personal',
@@ -66,6 +78,7 @@ describe('authoritative workspace capacity', () => {
       storageBytes: 524_288_000,
       photos: 100,
       logos: 10,
+      presets: 20,
       members: 1,
     })
     expect(workspaceCapacity(free, NOW).photos).not.toBe(10_000)
@@ -75,7 +88,13 @@ describe('authoritative workspace capacity', () => {
     (basePlan) => {
       expect(
         workspaceCapacity({ ...free, kind: 'shared', basePlan, baseMemberLimit: 5 }, NOW),
-      ).toEqual({ storageBytes: 2_147_483_648, photos: 10_000, logos: 50, members: 5 })
+      ).toEqual({
+        storageBytes: 2_147_483_648,
+        photos: 10_000,
+        logos: 50,
+        presets: 1000,
+        members: 5,
+      })
     },
   )
   it('applies paid personal Pro only through a current nonsuspended paid period', () => {
@@ -99,6 +118,7 @@ describe('authoritative workspace capacity', () => {
       storageBytes: 2_147_483_648,
       photos: 10_000,
       logos: 50,
+      presets: 1000,
       members: 3,
     })
   })

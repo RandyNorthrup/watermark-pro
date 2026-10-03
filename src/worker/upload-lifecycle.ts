@@ -65,7 +65,11 @@ export async function persistUpload(
   }
   try {
     const writes = await Promise.allSettled(
-      parts.map(async (part) => await services.objects.put(part.key, part.bytes, part.contentType)),
+      parts.map(async (part) => {
+        const etag = await services.objects.preparePut(part.key)
+        if (!(await services.uploads.isLeaseWritable(reservation))) throw apiErrors.retryLater()
+        await services.objects.put(part.key, part.bytes, part.contentType, etag)
+      }),
     )
     if (writes.some((result) => result.status === 'rejected')) throw apiErrors.retryLater()
     if (!(await services.uploads.commit(reservation, record, entry))) throw apiErrors.retryLater()

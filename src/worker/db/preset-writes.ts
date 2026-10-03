@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import type { Database } from './client'
 import { folderDestination, workspaceWriter } from './folder-guards'
+import { workspaceCapacitySql } from './plan-capacity'
 import { watermark } from './schema'
 import { watermarkSpecSchema } from '../../shared/watermark'
 import type { AuditEntry } from '../audit'
@@ -72,7 +73,9 @@ export function createPresetWriter(db: Database) {
         sql`
           INSERT INTO watermark (id, organization_id, name, spec, created_by, created_at, updated_at, folder_id, folder_revision)
                   SELECT ${input.id}, ${input.organizationId}, ${input.name}, ${JSON.stringify(input.spec)}, ${input.createdBy}, ${now}, ${now}, ${input.folderId ?? null}, 0
-                  WHERE ${permission(input.organizationId, audit)} AND ${folderDestination(input.organizationId, 'preset', input.folderId ?? null)} RETURNING *
+                  WHERE ${permission(input.organizationId, audit)} AND ${folderDestination(input.organizationId, 'preset', input.folderId ?? null)}
+                    AND (SELECT COUNT(*) FROM watermark WHERE organization_id = ${input.organizationId})
+                      < ${workspaceCapacitySql(input.organizationId, 'presets', now)} RETURNING *
         `,
         audit,
       )

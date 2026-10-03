@@ -19,6 +19,44 @@ interface SliderFieldProps {
   resetLabel?: string | undefined
 }
 
+type RangeSliderProps = Pick<
+  SliderFieldProps,
+  'label' | 'value' | 'min' | 'max' | 'step' | 'onChange' | 'disabled' | 'className'
+> & { id?: string | undefined }
+
+/** Shared native range for compact transports and labelled fields, with the same themed fill. */
+export function RangeSlider({
+  id,
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+  disabled,
+  className,
+}: RangeSliderProps) {
+  const progress = max === min ? 0 : Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))
+  const rangeStyle: CSSProperties & { '--range-progress': string } = {
+    '--range-progress': `${String(progress)}%`,
+  }
+  return (
+    <input
+      id={id}
+      type="range"
+      aria-label={label}
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      disabled={disabled ?? false}
+      onChange={(event) => onChange(Number(event.currentTarget.value))}
+      className={cn('app-range', className)}
+      style={rangeStyle}
+    />
+  )
+}
+
 /** Labelled range input with a live readout; the native control keeps keyboard and screen-reader semantics. */
 export function SliderField({
   label,
@@ -34,10 +72,6 @@ export function SliderField({
   resetLabel,
 }: SliderFieldProps) {
   const id = useId()
-  const progress = max === min ? 0 : Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))
-  const rangeStyle: CSSProperties & { '--range-progress': string } = {
-    '--range-progress': `${String(progress)}%`,
-  }
   return (
     <div className={cn('flex min-w-0 flex-col gap-1', className)}>
       <div className="flex min-h-6 items-center justify-between gap-2 text-sm">
@@ -65,19 +99,15 @@ export function SliderField({
           </output>
         </div>
       </div>
-      <input
+      <RangeSlider
         id={id}
-        type="range"
+        label={label}
         min={min}
         max={max}
         step={step}
         value={value}
-        disabled={disabled ?? false}
-        onChange={(event) => {
-          onChange(Number(event.currentTarget.value))
-        }}
-        className="app-range"
-        style={rangeStyle}
+        disabled={disabled}
+        onChange={onChange}
       />
     </div>
   )

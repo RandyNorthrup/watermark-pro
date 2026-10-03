@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { playwright } from '@vitest/browser-playwright'
@@ -6,6 +7,8 @@ import { defineConfig } from 'vitest/config'
 import { pdfjsAssetsPlugin } from './scripts/lib/pdfjs-assets.ts'
 
 const PAGE_TEST_TIMEOUT_MS = 20_000
+// Native codec/canvas work and covered router journeys share the same machine.
+// Bound simultaneous workers instead of relaxing their existing deadlines.
 const MAX_TEST_WORKERS = 2
 
 /** Coverage floors. Lowering one needs a PLAN.md §9 entry. */
@@ -18,7 +21,6 @@ const COVERAGE_THRESHOLDS = {
 
 export default defineConfig({
   test: {
-    // Bound CPU contention without changing assertions, deadlines or coverage floors.
     maxWorkers: MAX_TEST_WORKERS,
     projects: [
       {
@@ -54,10 +56,12 @@ export default defineConfig({
       {
         // Canvas rendering, encoding and the Web Worker run in a real
         // Chromium; jsdom has no 2D context worth testing against.
-        plugins: [pdfjsAssetsPlugin()],
+        plugins: [pdfjsAssetsPlugin(), tailwindcss()],
         optimizeDeps: { include: ['zod/mini'] },
         test: {
           name: 'browser',
+          // Project pools otherwise overlap even with the worker cap above.
+          // Native pixel/codec budgets need a quiet browser after the Node suites.
           sequence: { groupOrder: 1 },
           fileParallelism: false,
           include: ['src/client/**/*.browser.test.ts'],

@@ -130,6 +130,7 @@ describe('authenticated layout', () => {
       expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Overview')
       expect(screen.queryByRole('region', { name: 'Recent work' })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: 'Tools' })).not.toBeInTheDocument()
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Open navigation' }))
       const tools = within(screen.getByRole('navigation', { name: 'Primary' })).getAllByRole('link')
       expect(tools.map((link) => link.textContent)).toEqual([
         'Images',

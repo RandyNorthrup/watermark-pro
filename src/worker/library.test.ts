@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { API_BODY_LIMITS } from './middleware/body-limit'
 import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
+import { GIF_IMAGE as GIF_BYTES, LOGO_PNG as PNG_BYTES } from './test-support/image-fixtures'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
 import { ACCOUNT_ID_HEADER } from '../shared/account-identity'
 import { assetDtoSchema, assetListResponseSchema } from '../shared/api'
@@ -32,9 +33,6 @@ const outsider = {
   password: 'outsiders long password',
 }
 
-/** Smallest valid PNG signature followed by padding; the route only sniffs the prefix. */
-const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0])
-const GIF_BYTES = new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0, 0, 0, 0, 0, 0])
 const TEXT_BYTES = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>')
 
 let harness: TestHarness

@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 
+import { CLOUD_OPERATION_POLICY } from '../../shared/cloud-operations'
 import { HTTP_STATUS } from '../../shared/constants'
 import {
   DEFAULT_RECENT_VIEW,
@@ -79,25 +80,33 @@ export const recentWorkRoutes = new Hono<AppContext>()
     await recents.removeMany(userId, organizationId, missing)
     return c.json(recentWorkResponseSchema.parse({ items: items.slice(0, RECENT_WORK_LIMIT) }))
   })
-  .post('/orgs/:orgId/recent-work', requireSession, readWorkspacePermission, async (c) => {
-    const parsed = recentActivitySchema.safeParse(await readBody(c.req.raw))
-    if (!parsed.success) throw apiErrors.validation(parsed.error.issues)
-    const usedAt = new Date(parsed.data.usedAt)
-    if (usedAt.getTime() < 0 || usedAt.getTime() > Date.now() + MAX_RECENT_CLOCK_SKEW_MS)
-      throw apiErrors.validation('Invalid recent activity timestamp')
-    const { recents, photos, watermarks } = c.get('services')
-    const organizationId = c.req.param('orgId')
-    const record =
-      parsed.data.kind === 'photo'
-        ? await photos.find(organizationId, parsed.data.resourceId)
-        : await watermarks.find(organizationId, parsed.data.resourceId)
-    if (record === null) throw apiErrors.notFound()
-    await recents.record({
-      userId: c.get('session').user.id,
-      organizationId,
-      kind: parsed.data.kind,
-      resourceId: parsed.data.resourceId,
-      usedAt,
-    })
-    return c.body(null, HTTP_STATUS.noContent)
-  })
+  .post(
+    '/orgs/:orgId/recent-work',
+    requireSession,
+    requirePermission(
+      { photo: ['read'], watermark: ['read'] },
+      CLOUD_OPERATION_POLICY.weights.write,
+    ),
+    async (c) => {
+      const parsed = recentActivitySchema.safeParse(await readBody(c.req.raw))
+      if (!parsed.success) throw apiErrors.validation(parsed.error.issues)
+      const usedAt = new Date(parsed.data.usedAt)
+      if (usedAt.getTime() < 0 || usedAt.getTime() > Date.now() + MAX_RECENT_CLOCK_SKEW_MS)
+        throw apiErrors.validation('Invalid recent activity timestamp')
+      const { recents, photos, watermarks } = c.get('services')
+      const organizationId = c.req.param('orgId')
+      const record =
+        parsed.data.kind === 'photo'
+          ? await photos.find(organizationId, parsed.data.resourceId)
+          : await watermarks.find(organizationId, parsed.data.resourceId)
+      if (record === null) throw apiErrors.notFound()
+      await recents.record({
+        userId: c.get('session').user.id,
+        organizationId,
+        kind: parsed.data.kind,
+        resourceId: parsed.data.resourceId,
+        usedAt,
+      })
+      return c.body(null, HTTP_STATUS.noContent)
+    },
+  )

@@ -10,6 +10,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { createApp } from './index'
 import { getServices } from './services'
+import { SMALL_PNG as PNG_BYTES, TEN_PNG } from './test-support/image-fixtures'
 import {
   assetDtoSchema,
   photoDtoSchema,
@@ -33,7 +34,6 @@ const owner = {
   email: 'lena@example.test',
   password: 'a perfectly fine passphrase',
 }
-const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4])
 
 function mailbox() {
   const { devMailbox } = getServices(env)
@@ -85,7 +85,7 @@ describe('library over D1 and R2', () => {
 
   it('stores logo bytes in R2 and blocks deletion while a preset references them', async () => {
     const form = new FormData()
-    form.append('file', new File([PNG_BYTES], 'mark.png', { type: 'image/png' }))
+    form.append('file', new File([TEN_PNG], 'mark.png', { type: 'image/png' }))
     form.append('name', 'Mark')
     form.append('width', '10')
     form.append('height', '10')
@@ -100,11 +100,11 @@ describe('library over D1 and R2', () => {
     if (record === null) throw new Error('Missing uploaded logo metadata')
     const stored = await env.BUCKET.get(record.key)
     expect(stored?.httpMetadata?.contentType).toBe('image/png')
-    expect(new Uint8Array((await stored?.arrayBuffer()) ?? new ArrayBuffer(0))).toEqual(PNG_BYTES)
+    expect(new Uint8Array((await stored?.arrayBuffer()) ?? new ArrayBuffer(0))).toEqual(TEN_PNG)
 
     const served = await client.get(`/api/orgs/${organizationId}/assets/${asset.id}/file`)
     expect(served.status).toBe(HTTP_STATUS.ok)
-    expect(served.headers.get('content-length')).toBe(String(PNG_BYTES.byteLength))
+    expect(served.headers.get('content-length')).toBe(String(TEN_PNG.byteLength))
 
     const preset = await client.post(`/api/orgs/${organizationId}/watermarks`, {
       name: 'Logo preset',

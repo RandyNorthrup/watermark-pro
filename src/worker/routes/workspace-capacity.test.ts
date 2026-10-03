@@ -45,6 +45,7 @@ describe('member-visible authoritative workspace capacity', () => {
           storageBytes: PRIVATE_PLAN_CAPACITY.storageBytes,
           photos: PRIVATE_PLAN_CAPACITY.photos,
           logos: PRIVATE_PLAN_CAPACITY.logos,
+          presets: PRIVATE_PLAN_CAPACITY.presets,
           members: PRIVATE_PLAN_CAPACITY.sharedMembers,
         })
       expect(
@@ -65,6 +66,7 @@ describe('member-visible authoritative workspace capacity', () => {
       storageBytes: PUBLIC_PLANS.team.storageBytes,
       photos: PUBLIC_PLANS.team.photos,
       logos: PUBLIC_PLANS.team.logos,
+      presets: PUBLIC_PLANS.team.presets,
       members: PUBLIC_PLANS.team.members,
     })
     harness.plans.seed({ ...record, basePlan: 'free', baseMemberLimit: 1 })
@@ -72,6 +74,7 @@ describe('member-visible authoritative workspace capacity', () => {
       storageBytes: PUBLIC_PLANS.free.storageBytes,
       photos: PUBLIC_PLANS.free.photos,
       logos: PUBLIC_PLANS.free.logos,
+      presets: PUBLIC_PLANS.free.presets,
       members: PUBLIC_PLANS.free.members,
     })
     const usage = await responseJson(owner.get(`/api/orgs/${organizationId}/photos/usage`))

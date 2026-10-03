@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-03",
+  "source": "codex/lumafoil-integration uncommitted merged candidate before operation/image/billing-review deltas",
+  "global": {
+    "exit_code": 1,
+    "files_passed": 285,
+    "files_failed": 3,
+    "tests_passed": 3203,
+    "tests_failed": 6,
+    "coverage_percent": {
+      "statements": 92.71,
+      "branches": 85.76,
+      "functions": 92.63,
+      "lines": 93.79
+    },
+    "coverage_floors_passed": true,
+    "chain_stopped_before_codecs_workers_scripts_and_build": true
+  },
+  "failures": {
+    "legal_pages": 2,
+    "admin_config_projection": 2,
+    "aac_timestamp_gap_chromium_page_worker": 2
+  },
+  "contract_corrections": {
+    "exit_code": 0,
+    "files_passed": 2,
+    "tests_passed": 10,
+    "format_and_scoped_lint_passed": true,
+    "full_typecheck_passed": true
+  },
+  "logs": {
+    "global": {
+      "private_local_path": "/tmp/lumafoil-integrated-global-tests.log",
+      "bytes": 46738,
+      "sha256": "65163a297db178bf9a34821a852595437eb3647d36cd760aa80d03d244b9d8c1"
+    },
+    "contract_corrections": {
+      "private_local_path": "/tmp/lumafoil-contract-corrections.log",
+      "bytes": 245,
+      "sha256": "5c17736e5b0a3cba91dd1f1c63d595b4056b6ceccc0fc2c947cd3ff8cb32894d"
+    }
+  },
+  "m19_certified": false,
+  "separate_core_scripts": {
+    "tests_passed": 55,
+    "tests_failed": 0,
+    "exit_code": 0,
+    "scope": "SDK patch, CI/GitHub policy and owner/cohort/workspace migration/bootstrap controls",
+    "log_sha256": "6546ad2472c34e10ac5683d89fce01db05a84212d2f30b218792c037f7a18ad6"
+  }
+}

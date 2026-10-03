@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import type { TFunction } from 'i18next'
 import { KeyRound } from 'lucide-react'
 import { lazy, Suspense } from 'react'
@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next'
 
 import { accountSearchSchema } from '../../../shared/client-search'
 import { SITE_ROLE } from '../../../shared/site-roles'
+import { AccountPlanCard } from '../../components/account-plan-card'
+import { AccountRemovalCard } from '../../components/account-removal-card'
 import { requestProductTour } from '../../components/guidance/product-tour'
 import { ProviderLogo } from '../../components/provider-logo'
 import { SocialAuth } from '../../components/social-auth'
@@ -19,6 +21,7 @@ import { useActiveOrganization } from '../../lib/active-organization'
 import { ApiRequestError } from '../../lib/api'
 import { authClient } from '../../lib/auth-client'
 import { describeError } from '../../lib/errors'
+import { currentOfflineUser } from '../../lib/offline-context'
 
 export const Route = createFileRoute('/app/account')({
   validateSearch: accountSearchSchema,
@@ -45,9 +48,11 @@ const CloudConnectionsCard = lazy(async () => {
 
 function AccountPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const router = useRouter()
   const organization = useActiveOrganization()
   const { session } = Route.useRouteContext()
-  const { error } = Route.useSearch()
+  const { error, billing, billingPlan } = Route.useSearch()
   const accounts = useQuery({
     queryKey: ['linked-accounts', session.user.id],
     queryFn: async () => {
@@ -100,6 +105,9 @@ function AccountPage() {
               </dt>
               <dd className="mt-2">
                 <Badge>{siteRoleName(session.user.role, t)}</Badge>
+                {session.user.emailVerified && session.user.membershipCohort === 'private' ? (
+                  <Badge>{t('pricing.privateMember')}</Badge>
+                ) : null}
               </dd>
             </div>
           </dl>
@@ -135,9 +143,28 @@ function AccountPage() {
           <SocialAuth mode="link" />
         </Card>
       </div>
+      {organization === null ? null : (
+        <AccountPlanCard
+          key={`${session.user.id}:${organization.id}`}
+          userId={session.user.id}
+          organizationId={organization.id}
+          billingReturn={billing}
+          billingPlan={billingPlan}
+        />
+      )}
       <Suspense fallback={null}>
         <CloudConnectionsCard key={session.user.id} userId={session.user.id} />
       </Suspense>
+      <AccountRemovalCard
+        key={session.user.id}
+        userId={session.user.id}
+        email={session.user.email}
+        isProtectedOwner={session.user.role === SITE_ROLE.owner}
+        onRemoved={async () => {
+          if (currentOfflineUser() === null && router.state.location.pathname === '/app/account')
+            await navigate({ to: '/login' })
+        }}
+      />
       <Card className="flex flex-col gap-3 p-6">
         <h2 className="text-xl font-semibold">{t('tour.settingsTitle')}</h2>
         <p className="text-sm text-ink-muted">{t('tour.settingsBody')}</p>

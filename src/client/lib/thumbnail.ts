@@ -1,8 +1,7 @@
 import { mainThreadBackend } from './canvas-backend'
+import { THUMBNAIL_MAX_SIDE } from '../../shared/constants'
 import type { Size } from '../engine/layout'
 
-/** Longest side of gallery thumbnails; small enough for a grid, big enough to recognise. */
-export const THUMBNAIL_MAX_SIDE = 400
 const THUMBNAIL_QUALITY = 0.82
 
 export interface Thumbnail extends Size {

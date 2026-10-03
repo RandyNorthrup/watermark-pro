@@ -36,7 +36,9 @@
     "manageAccess": "Manage Access",
     "supportPrompt": "If Lumafoil helps, please consider donating.",
     "donate": "Donate",
-    "supportPayPal": "Donate with PayPal (opens a new tab)"
+    "supportPayPal": "Donate with PayPal (opens a new tab)",
+    "openNavigation": "Open navigation",
+    "closeNavigation": "Close navigation"
   },
   "auth": {
     "backToSignIn": "Back to sign in",
@@ -90,10 +92,6 @@
       "roleLabel": "Role:",
       "decline": "Decline",
       "accept": "Accept invitation"
-    },
-    "inviteOnly": {
-      "title": "Invitation required",
-      "body": "Lumafoil is invite-only. Open the invitation link in your email to create your account."
     },
     "humanCheck": {
       "label": "Human verification",
@@ -873,12 +871,11 @@
   "video": {
     "orgRequired": "Create or join a workspace to watermark video.",
     "heading": "Videos",
-    "description": "Preview your video, place watermarks at different timestamps, add fades, and export with audio.",
+    "description": "Cut and trim multiple clips on video and audio tracks. Preview your edit, add watermarks and export on your device.",
     "checkingSupport": "Checking video support",
     "unsupportedTitle": "Video is not supported in this browser",
     "unsupportedBody": "Your browser cannot encode video. Chrome, Edge or Safari 17 and later can.",
     "addVideo": "Add a video",
-    "dropHint": "Drop one video here, or",
     "transcodingProgress": "Transcoding progress",
     "progress": {},
     "cancel": "Cancel",
@@ -895,7 +892,6 @@
       "fit1080p": "Fit 1080p",
       "fit720p": "Fit 720p"
     },
-    "previewAlt": "The watermark on a frame of the video",
     "timeline": {
       "heading": "Timing And Motion",
       "play": "Play",
@@ -910,12 +906,48 @@
       "updateKeyframe": "Update Keyframe Here",
       "removeKeyframe": "Remove Keyframe At {{time}}",
       "hint": "Add a keyframe, move to another time, then drag, resize or rotate the mark. Lumafoil creates the movement between keyframes.",
-      "playbackFailed": "This browser could not play the selected video.",
       "chooseVideo": "Open a video and add a valid watermark first.",
       "waitPreview": "Wait for the watermark preview before adding a keyframe.",
       "changed": "The video or watermark changed during export. Export again to use the current edits.",
       "download": "Export Video",
       "cloudSaved": "The watermarked video was saved to your cloud storage."
+    },
+    "studio": {
+      "mediaPool": "Media pool",
+      "inspector": "Inspector",
+      "clip": "Clip",
+      "timeline": "Timeline",
+      "output": "Output",
+      "importMedia": "Import media",
+      "emptyMedia": "Import video or audio to build your edit.",
+      "emptyTimeline": "Add video clips to start your timeline.",
+      "projectName": "Project",
+      "untitled": "Untitled project",
+      "sourceIn": "Source in (s)",
+      "sourceOut": "Source out (s)",
+      "track": "Track",
+      "split": "Split at playhead",
+      "removeClip": "Remove clip",
+      "unlink": "Unlink audio",
+      "volume": "Volume",
+      "showTrack": "Show {{track}}",
+      "hideTrack": "Hide {{track}}",
+      "muteTrack": "Mute {{track}}",
+      "unmuteTrack": "Unmute {{track}}",
+      "addClip": "Add {{name}} to {{track}}",
+      "trimIn": "Trim start of {{name}} on {{track}}",
+      "trimOut": "Trim end of {{name}} on {{track}}",
+      "zoom": "Timeline zoom",
+      "localSession": "Files stay on this device. This editing session is not saved after closing the page.",
+      "frameRate": "Edited timeline: {{fps}} fps",
+      "sourceBounds": "Media limit exceeded, or trim extends outside its source.",
+      "selectClip": "Select a clip in the timeline to edit it.",
+      "timeReadout": "{{current}} / {{total}}",
+      "pictureMeta": "{{width}} × {{height}} · {{format}}",
+      "audioRequired": "Audio encoder required. Mute tracks or use a compatible browser.",
+      "timing": "Timing",
+      "transform": "Transform",
+      "invalidEdit": "That edit would overlap another clip or exceed the timeline limits. Choose a different start time, source interval, or track."
     }
   },
   "documents": {
@@ -1054,7 +1086,7 @@
       },
       "sharing": {
         "title": "Share Photos Or A Workspace",
-        "body": "Create expiring, revocable links for selected photos and manage them in Watermarked Images. Workspace owners can grant View or Edit access through a link, email invitation, or direct addition of an existing user. Workspace access is separate from an invitation to join Lumafoil."
+        "body": "Each account has its own workspace. Your photos and presets stay separate unless you explicitly share them. Workspace access requires a grant from its owner."
       },
       "offline": {
         "title": "Work Offline, Sync Later",
@@ -1062,7 +1094,7 @@
       },
       "privacy": {
         "title": "Your Account, Your Workspace",
-        "body": "New users need a site invitation and receive a separate private workspace. A site invitation never shares your photos or watermarks. Sharing a workspace requires an explicit access grant from its owner."
+        "body": "Each account has its own workspace. Your photos and presets stay separate unless you explicitly share them. Workspace access requires a grant from its owner."
       },
       "languages": {
         "title": "12 Interface Languages",
@@ -1077,7 +1109,6 @@
         "body": "Cloud storage is in preview. Connect Google Drive, Dropbox, or OneDrive to open permitted files, choose export folders, and create provider sharing links. Saved connections can be reused, but your provider may request authorization again. Google Drive shows files and folders selected or created with Lumafoil. Microsoft work or school accounts may need administrator approval."
       }
     },
-    "inviteHosting": "Lumafoil is invitation-only. Want to self-host?",
     "selfHost": "Get the source code free on GitHub.",
     "featuresNav": "Features"
   },
@@ -1107,13 +1138,17 @@
       },
       "sharing": {
         "heading": "Sharing links",
-        "p1": "Anyone with a Lumafoil gallery link can view its selected saved photos until the link expires or is revoked. A site invitation creates access to a separate private account; it does not share the inviter’s workspace or content.",
+        "p1": "Anyone with a gallery link can view its selected saved photos until it expires or is revoked. Workspace access requires an explicit grant from its owner.",
         "p2": "Cloud providers’ own links follow their permissions and revocation rules. Revoking a link cannot recall downloads or copies already made."
       },
       "account": {
         "heading": "Your account",
-        "p1": "New accounts require an invitation and a verified email. Sign in with a password or configured Google/Microsoft sign-in. Existing accounts need no new invitation. Adding another sign-in method requires authenticated account linking.",
-        "p2": "Sessions use HttpOnly, SameSite=Lax cookies, marked Secure on HTTPS. Password-reset links expire after an hour and revoke other server sessions when used."
+        "p1": "Account registration depends on current availability and requires a verified email. Sign in with a password or configured Google/Microsoft sign-in. Adding another sign-in method requires authenticated account linking.",
+        "p2": "Sessions use HttpOnly, SameSite=Lax cookies, marked Secure on HTTPS. Password-reset links expire after an hour and revoke other server sessions when used. Authorized account removal starts by revoking links and removing cloud metadata only for your verified sole-owner personal workspace. Its stored files enter background cleanup and may remain while retries finish. Collaborative or ambiguous workspaces, audit records and billing receipts are preserved. Removing an account does not erase downloaded files, copies on other devices or provider backups. Account settings also clears this account’s local saves on the current device after confirmed removal. If confirmation fails after cleanup is staged, personal links and metadata may already be removed while your account remains; retry account removal."
+      },
+      "billing": {
+        "heading": "Payments",
+        "p1": "If you use paid-plan Checkout or the billing portal, Stripe hosts those pages and processes the payment details you enter there. Lumafoil stores Stripe customer, Checkout, subscription and invoice IDs, payment-event receipts, subscription status and paid-through dates, linked to your account and billed workspace. We send billing references and the selected plan to Stripe, but no photos, videos, documents, logos or saved watermark content. Lumafoil does not collect or store full card numbers."
       },
       "analytics": {
         "heading": "Cookies and outside services",
@@ -1144,7 +1179,7 @@
       },
       "account": {
         "heading": "Your account",
-        "p1": "Access is currently by invitation. A verified email is required; password and configured Google/Microsoft sign-in are available. Keep your credentials and provider account secure; you are responsible for use of your account.",
+        "p1": "Account registration depends on current availability. A verified email is required; password and configured Google/Microsoft sign-in are available. Keep your credentials and provider account secure; you are responsible for use of your account.",
         "p2": "Sign-out needs a connection and resolved pending edits; it clears this browser’s offline app data. Password reset revokes other server sessions. Disconnected devices can retain local copies until they reconnect or their browser data is cleared."
       },
       "content": {
@@ -1159,7 +1194,7 @@
       },
       "teams": {
         "heading": "Private workspaces and collaboration",
-        "p1": "Each account starts with a private workspace. Site invitations do not share the inviter’s content. A workspace owner can explicitly grant View or Edit access to that workspace. This shares no other workspace and grants no site administration rights."
+        "p1": "Each account has its own workspace. Your photos and presets stay separate unless you explicitly share them. Workspace access requires a grant from its owner."
       },
       "availability": {
         "heading": "Availability, warranty, and changes",
@@ -1534,7 +1569,67 @@
     },
     "workspace": {
       "title": "Workspaces And Access",
-      "body": "Use the user menu to switch workspaces, invite people or Manage Access. Workspace owners grant View or Edit access. Personal invitation links admit new users without sharing your content. Sync status lives at the bottom of the sidebar."
+      "body": "Use the user menu to switch workspaces or Manage Access. Workspace owners grant View or Edit access. Other workspaces stay private. Sync status shows whether this device has changes waiting to upload."
     }
+  },
+  "pricing": {
+    "nav": "Pricing",
+    "heroTag": "Your work. Your watermark.",
+    "hosting": "Prefer to self-host?",
+    "eyebrow": "Monthly plans · USD",
+    "heading": "Start free. Make room for more.",
+    "intro": "Photo, PDF and video tools on every plan. Paid plans add photo storage and controlled sharing.",
+    "free": "Free",
+    "pro": "Pro",
+    "team": "Team",
+    "freeBody": "For your first projects and a small gallery.",
+    "proBody": "For a growing photo library and brand assets.",
+    "teamBody": "For a shared workspace with clear access rights.",
+    "monthly": "USD / month",
+    "freeStorage": "500 MiB photo storage",
+    "proStorage": "10 GiB photo storage",
+    "teamStorage": "25 GiB photo storage",
+    "freePhotos": "100 saved photos",
+    "paidPhotos": "10,000 saved photos",
+    "freeLogos": "10 logo assets",
+    "proLogos": "50 logo assets",
+    "teamLogos": "100 logo assets",
+    "personal": "One personal workspace",
+    "teamPeople": "Three people, including the owner",
+    "teamSharing": "Shared gallery and presets",
+    "start": "Get started",
+    "soon": "Subscriptions opening soon",
+    "scope": "Local exports remain available on every plan within device and file limits. Team covers one shared workspace; personal workspaces keep their own plans. Video projects stay on this device and are not saved to cloud storage.",
+    "closedTitle": "Registration opens soon",
+    "closedBody": "New account registration is currently closed. You can still sign in to an existing account.",
+    "accountHeading": "Workspace plan",
+    "allowance": "Current cloud allowance",
+    "manage": "Manage subscription",
+    "upgrade": "Choose Pro",
+    "createTeam": "Create a Team workspace",
+    "sharedName": "New shared workspace name",
+    "privateMember": "Private member",
+    "storageAmount": "{{value}} MiB",
+    "redirectNotice": "You will leave Lumafoil to open billing. Save or export unfinished work first.",
+    "refreshNotice": "Refresh payment status to check the current plan.",
+    "resume": "Resume checkout",
+    "cancelCheckout": "Cancel checkout",
+    "refresh": "Refresh payment status"
+  },
+  "accountRemoval": {
+    "heading": "Delete account",
+    "description": "Delete your account and personal cloud content. Shared workspace content and required payment/security records remain.",
+    "ownerProtected": "The site owner account is protected.",
+    "action": "Delete account",
+    "title": "Delete your Lumafoil account?",
+    "consequences": "Subscriptions are canceled before removal. Personal sharing stops and files are queued for cleanup. Shared content and payment/security records remain. Unsynced saves on this device are discarded. This cannot be undone. If confirmation fails, some personal content or links may already be removed.",
+    "confirmLabel": "Confirm your email",
+    "confirmHint": "Enter your account email exactly to confirm.",
+    "confirm": "Delete permanently",
+    "unconfirmed": "Removal was not confirmed. Your device data has not been erased.",
+    "cleanupHeading": "Deleted account cleanup",
+    "cleanupPending": "Clearing this account’s saved data from this device.",
+    "cleanupFailed": "Device cleanup did not finish. Retry to erase remaining local saves for the deleted account.",
+    "cleanupRetry": "Retry device cleanup"
   }
 }

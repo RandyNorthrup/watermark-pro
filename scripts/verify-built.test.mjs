@@ -9,6 +9,7 @@ import { runInNewContext } from 'node:vm'
 import { unzipSync } from 'fflate'
 import { JSDOM } from 'jsdom'
 
+import { forbiddenPublicationPath } from './publication-policy.mjs'
 import { SUPPORTED_LOCALES } from '../src/shared/locales.ts'
 
 const client = path.resolve(process.env.LUMAFOIL_CLIENT_DIR ?? 'dist/client')
@@ -184,6 +185,21 @@ test('bundled software ships its licenses and the pinned media source offer', ()
   assert.ok(offer.includes(filename))
   const archive = readFileSync(path.join(client, 'open-source', filename))
   const files = unzipSync(archive)
+  for (const name of Object.keys(files)) assert.equal(forbiddenPublicationPath(name), null)
+  assert.notEqual(forbiddenPublicationPath('dist/private-build.js'), null)
+  const seedPath = 'docs/licenses/mediabunny-1.55.6-sdk-patch.json'
+  assert.deepEqual(Buffer.from(files[seedPath]), readFileSync(seedPath))
+  const seed = JSON.parse(Buffer.from(files[seedPath]).toString('utf8'))
+  for (const file of seed.files) {
+    const source = Buffer.from(file.afterSource)
+    assert.equal(createHash('sha256').update(source).digest('hex'), file.after)
+    assert.deepEqual(source, readFileSync(path.join('node_modules/mediabunny', file.name)))
+    if (!file.name.startsWith('dist/')) assert.deepEqual(Buffer.from(files[file.name]), source)
+  }
+  for (const [name, source] of Object.entries(seed.sharedPreferredSource)) {
+    if (name !== 'shared/aac-misc.ts')
+      assert.equal(Buffer.from(files[name]).toString('utf8'), source.source)
+  }
   for (const name of ['LICENSE', 'src/index.ts']) {
     assert.ok(files[name], `The corresponding source archive is missing ${name}`)
     assert.deepEqual(

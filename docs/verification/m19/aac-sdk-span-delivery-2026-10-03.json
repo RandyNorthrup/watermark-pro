@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-03",
+  "status": "isolated guarded candidate; root integration pending",
+  "head": "c8fccc4f6e32459768043961963324331c52925c",
+  "seedManifestSha256": "dcf385d2cdb14d0ed03b0a720d48f711c18287c5ce019e2dfdee1fb6c18fb194",
+  "sdkVersion": "1.55.6",
+  "upstreamGitHead": "6319bf2eee41c1143c3de02d35347cf31d6de53e",
+  "runtimeAddedLines": 86,
+  "patchedArtifacts": [
+    {
+      "name": "src/media-sink.ts",
+      "before": "dbc9db3cebfcface758393fad0db575be6d20bb853c796e6fc526375d288b958",
+      "legacy": "6f841afa6a1e24bf8baade2aa17edf1c49132b92fb79dcdda2b37789250260b4",
+      "after": "92cd685df0c925eb0df1b685fc8e809bd2400bce0d73a34ecd2921280cd60684"
+    },
+    {
+      "name": "dist/modules/src/media-sink.js",
+      "before": "baa7893468c9cb6ca3158dfeda66b6d920941743602c1e2b952f40a2ed8567b1",
+      "legacy": "bb7892eb4c70a4a7b9b1ec66a6658fa7ab03fabf4648622e174c7dac8ba542a5",
+      "after": "d0dad02817097aa0f8032f29f6cd826302d6c6de14cf213cbf4c263a20714147"
+    },
+    {
+      "name": "shared/aac-misc.ts",
+      "before": null,
+      "legacy": null,
+      "after": "9cb07ab82d9f4dc8cabe4bfa0831ff74557721fea638ee0e0b29a862bbdcf069"
+    },
+    {
+      "name": "dist/modules/shared/aac-misc.js",
+      "before": "c8dac38aee86b0950475da4a1e195a215a4828c2080268d22573babb581e60b2",
+      "legacy": null,
+      "after": "fec5a4ae7fe5bcb75d6941ea1a69e8aa6c22e21deb6e5ffdf02e558b5286f298"
+    },
+    {
+      "name": "dist/modules/shared/aac-misc.d.ts",
+      "before": "d4a24793d90e06c5e761f579ba5e70376bf937cdea1ed44064f0f01efcd9b65c",
+      "legacy": null,
+      "after": "2986642b3d9d23dcb7ae5935335fa4e92d7a22197508177cecbc13455ee3e77b"
+    },
+    {
+      "name": "dist/modules/shared/aac-misc.d.ts.map",
+      "before": "859336320e13b4853df07ad092e1ef44856b2217b08d1df5183e7faaf3771723",
+      "legacy": null,
+      "after": "1d85408208889ae2f7c2346000e8f2e6b13973c4220b4a1588253766eec5b870"
+    },
+    {
+      "name": "dist/modules/src/media-sink.d.ts.map",
+      "before": "01a8a807a0ba58bfe1806a9d56d94f88e57e6d9d015f11e17ec0849dad8eedf7",
+      "legacy": null,
+      "after": "8359d3ec3db8dbeb5957f73afc86de5d3ec08fdf382e032dff126d2c7f4bf60e"
+    }
+  ],
+  "preferredSourceSeedSha256": "29c063279f55b9d958dd658551724565e1fd9368140088e8640409c39c72f7f1",
+  "sourceOffer": {
+    "entries": 83,
+    "sha256": "38c368991835d0f237e77cd1fd21c6c6713e75a02c895750b8de98c7d5b41cfa",
+    "deterministicRepeat": true,
+    "transitiveSharedModules": 5
+  },
+  "proof": {
+    "vendorPassed": 34,
+    "originalNativePassed": 18,
+    "canonicalBothEngineNativePassed": 20,
+    "allNativeSkipped": 0,
+    "projectTypecheckPassed": true,
+    "scopedLintPassed": true,
+    "coldInstallPassed": true,
+    "coldPostinstallArtifacts": 7,
+    "actualWarmCacheFilesPreserved": 12,
+    "metadataParserSharedTypesPassed": true,
+    "wholeUpstreamSourceDiagnostics": "stock/patched exact same four asyncDispose diagnostics; not a passing full upstream typecheck"
+  },
+  "sourceDiagnostics": {
+    "stock": {
+      "$ref": "../../licenses/mediabunny-1.55.6-sdk-patch.json#/sourceDiagnostics/stock"
+    },
+    "patched": {
+      "$ref": "../../licenses/mediabunny-1.55.6-sdk-patch.json#/sourceDiagnostics/patched"
+    },
+    "status": "four unchanged upstream async-disposal source errors; parser/shared strict check passes; no whole-SDK typecheck pass claimed"
+  },
+  "logs": {
+    "coldInstall": {
+      "path": "/tmp/lumafoil-aac-cold-install.log",
+      "sha256": "a034e1cecc82c4ecdcb2f829b266040d58c26af31989b5a7e57e5b92f9922dc5"
+    },
+    "native18": {
+      "path": "/tmp/lumafoil-aac-guarded-native18.log",
+      "sha256": "807afe33eff0d7e4804ac6168d281d368ae5ae1d5543b4c40514b5ae4bfe5562"
+    },
+    "canonical20": {
+      "path": "/tmp/lumafoil-aac-guarded-canonical20.log",
+      "sha256": "60fc3514273ac37ec1d930f62f43c05654ed85ca3f500c85379cc8c1153ff701"
+    },
+    "sourceDiagnostics": {
+      "path": "/tmp/lumafoil-aac-preferred-types-public-api.log",
+      "sha256": "c21b0e4d9edb355dcc12a7a1d9d46eeb7c9a2adb8f3c6e5f602228de0b3cb19e"
+    }
+  },
+  "limitations": [
+    "native evidence only named LC44.1/48k fixtures",
+    "metadata960/HE not native codec certification",
+    "implicitSBR/priming/ADTS/coarse-clock provenance unproven",
+    "known seven high dev-tool findings unwaived",
+    "combinedquality/e2e/sast/UIcertification not claimed"
+  ],
+  "originalSerializedSha256": "f0290f820a469c6434bb035314cb3ab883a4371494b3325925ed3a7f301d8386",
+  "integratedSourceOffer": {
+    "entries": 78,
+    "sha256": "37fa15a7da54917a0e77840846d4c5229f29533a94309b7716d02f1ddce33dc8",
+    "compiledArtifactDelivery": "All seven exact corrected files reconstructed from checked offline source seed; no generated dist archive directories."
+  }
+}

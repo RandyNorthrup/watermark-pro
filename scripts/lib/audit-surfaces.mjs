@@ -2,7 +2,7 @@
 export const PUBLIC_SURFACES = [
   { id: 'home', route: '/', heading: ['landing.heroTitleStart', 'landing.heroTitleEnd'] },
   { id: 'login', route: '/login', heading: 'auth.login.title' },
-  { id: 'signup-invitation-required', route: '/signup', heading: 'auth.inviteOnly.title' },
+  { id: 'signup-closed', route: '/signup', heading: 'pricing.closedTitle' },
   { id: 'forgot-password', route: '/forgot-password', heading: 'auth.forgotPassword.title' },
   { id: 'privacy', route: '/privacy', heading: 'legal.privacy.title' },
   { id: 'terms', route: '/terms', heading: 'legal.terms.title' },

@@ -1,6 +1,6 @@
 /** Real loopback HTTP exercises framing, cancellation and failure isolation at the SDK boundary. */
 import assert from 'node:assert/strict'
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { request as httpRequest } from 'node:http'
 import { test } from 'node:test'
 
@@ -15,6 +15,126 @@ import { loopbackRequest as request } from './lib/test-http-request.mjs'
 function expectedFailure() {
   // Intentional client aborts and gateway failures are asserted through their result and signal.
 }
+
+test('optional static 500 capture preserves bytes and reports only bounded classifications and digests', async (context) => {
+  const logger = context.mock.method(console, 'error', expectedFailure)
+  const bridge = await createGateBridge(0, { captureStaticFailures: true })
+  const canary = randomBytes(32).toString('hex')
+  const payload = Buffer.from(
+    `Error: Network connection lost.\nCookie: ${canary}\n    at AssetWorkerInner.fetch (/private/${canary}/assets.worker.js:1:2)`,
+  )
+  const large = Buffer.from(canary.repeat(100))
+  bridge.ready(
+    async (url) =>
+      new Response(url.pathname.endsWith('large.js') ? large : payload, {
+        status: url.pathname.endsWith('success.js') ? 200 : 500,
+        headers: { 'content-security-policy': "default-src 'none'" },
+      }),
+  )
+  try {
+    const response = await request(bridge.origin, '/assets/failure.js')
+    assert.equal(response.status, 500)
+    assert.deepEqual(response.bytes, payload)
+    assert.equal(response.headers['content-security-policy'], "default-src 'none'")
+    assert.deepEqual(JSON.parse(logger.mock.calls[0].arguments[1]), {
+      classification: 'network_connection_lost',
+      stackHop: 'sdk_assets',
+      bytes: payload.length,
+      capturedBytes: payload.length,
+      complete: true,
+      truncated: false,
+      digest: createHash('sha256').update(payload).digest('hex'),
+    })
+    for (const pathname of ['/assets/success.js', '/api/failure'])
+      await request(bridge.origin, pathname)
+    for (const pathname of ['/api/auth/sign-in/email', '/api/auth/delete-user']) {
+      const authFailure = await request(
+        bridge.origin,
+        pathname,
+        { method: 'POST', headers: { 'content-type': 'application/json', cookie: canary } },
+        JSON.stringify({ password: canary, token: canary }),
+      )
+      assert.equal(authFailure.status, 500)
+      assert.deepEqual(authFailure.bytes, payload)
+    }
+    assert.equal(logger.mock.calls.length, 1)
+    const truncated = await request(bridge.origin, '/assets/large.js')
+    assert.deepEqual(truncated.bytes, large)
+    assert.deepEqual(JSON.parse(logger.mock.calls[1].arguments[1]), {
+      classification: 'unclassified',
+      stackHop: 'unknown',
+      bytes: large.length,
+      capturedBytes: 4096,
+      complete: true,
+      truncated: true,
+      digest: createHash('sha256').update(large.subarray(0, 4096)).digest('hex'),
+    })
+    assert.equal(JSON.stringify(logger.mock.calls).includes(canary), false)
+  } finally {
+    await bridge.close()
+  }
+})
+
+test('static stack hints accept only anchored known frame/module pairs without exposing canary paths', async (context) => {
+  const logger = context.mock.method(console, 'error', expectedFailure)
+  const bridge = await createGateBridge(0, { captureStaticFailures: true })
+  const canary = randomBytes(32).toString('hex')
+  const cases = [
+    [`    at fetch (file:///private/${canary}/gate-router-worker.mjs:14:1)`, 'gate_router'],
+    [`    at async Object.fetch (/private/${canary}/gate-router-worker.mjs:14:1)`, 'gate_router'],
+    [`    at RouterOuterEntrypoint.fetch (/private/${canary}/router.worker.js:1:2)`, 'sdk_router'],
+    [
+      `    at async RouterInnerEntrypoint.fetch (/private/${canary}/router.worker.js:1:2)`,
+      'sdk_router',
+    ],
+    [`    at AssetWorkerOuter.fetch (/private/${canary}/assets.worker.js:1:2)`, 'sdk_assets'],
+    [`    at async AssetWorkerInner.fetch (/private/${canary}/assets.worker.js:1:2)`, 'sdk_assets'],
+    [`Cookie: ${canary}; router.worker.js`, 'unknown'],
+    [`    at ${canary}.fetch (/private/router.worker.js:1:2)`, 'unknown'],
+    [`    at RouterInnerEntrypoint.fetch (/private/not-router.worker.js:1:2)`, 'unknown'],
+    [`    at AssetWorkerInner.fetch (/private/assets.worker.js:1:2) token=${canary}`, 'unknown'],
+    [`    at AssetWorkerInner.fetch (/private/assets.worker.js?token=${canary}:1:2)`, 'unknown'],
+    [`    at fetch (/private/${canary}/unlisted-worker.js:1:2)`, 'unknown'],
+    [`    at AssetWorkerInner.fetch (/private/${canary}/router.worker.js:1:2)`, 'unknown'],
+    [
+      `    at RouterInnerEntrypoint.fetch (/private/${canary}/gate-router-worker.mjs:1:2)`,
+      'unknown',
+    ],
+  ]
+  let payload
+  bridge.ready(async () => new Response(payload, { status: 500 }))
+  try {
+    for (const [frame, expected] of cases) {
+      payload = Buffer.from(`Error: Network connection lost.\n${frame}\nToken: ${canary}`)
+      const response = await request(bridge.origin, '/assets/failure.js')
+      assert.equal(response.status, 500)
+      assert.deepEqual(response.bytes, payload)
+      const diagnostic = JSON.parse(logger.mock.calls.at(-1).arguments[1])
+      assert.deepEqual(diagnostic, {
+        classification: 'network_connection_lost',
+        stackHop: expected,
+        bytes: payload.length,
+        capturedBytes: payload.length,
+        complete: true,
+        truncated: false,
+        digest: createHash('sha256').update(payload).digest('hex'),
+      })
+      assert.equal(JSON.stringify(logger.mock.calls).includes(canary), false)
+    }
+    payload = Buffer.from(`Error: Network connection lost.
+${'x'.repeat(4096)}
+    at AssetWorkerInner.fetch (/private/${canary}/assets.worker.js:1:2)`)
+    const beyondCapture = await request(bridge.origin, '/assets/failure.js')
+    assert.deepEqual(beyondCapture.bytes, payload)
+    const bounded = JSON.parse(logger.mock.calls.at(-1).arguments[1])
+    assert.equal(bounded.stackHop, 'unknown')
+    assert.equal(bounded.capturedBytes, 4096)
+    assert.equal(bounded.truncated, true)
+    assert.equal(JSON.stringify(logger.mock.calls).includes(canary), false)
+  } finally {
+    await bridge.close()
+  }
+})
 
 test('native listener restores trusted URL and preserves Origin, account, bytes and cookies while stripping forged routing headers', async () => {
   const bridge = await createGateBridge(0)

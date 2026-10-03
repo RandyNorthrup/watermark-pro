@@ -5,12 +5,15 @@ import {
   APIError,
   createAuthMiddleware,
   getOAuthState,
+  getSessionFromCtx,
 } from 'better-auth/api'
 import { z } from 'zod'
 
-import type { MembershipCohort } from '../../shared/api-accounts'
+import { MEMBERSHIP_COHORT, type MembershipCohort } from '../../shared/api-accounts'
+import { billingRemovalRequestSchema } from '../../shared/billing'
 import { INVITATION_HEADER, invitationIdSchema } from '../../shared/invitation'
 import type { AccountStore } from '../account-store'
+import type { PublicAdmissionStore } from '../public-admission-store'
 import { contentDigest } from '../sync'
 import { enforceRecentAuthentication } from './recent-authentication'
 import { enforceSiteAdministrator } from './site-administrator'
@@ -39,13 +42,27 @@ async function admissionHash(headers: Headers | undefined): Promise<string | nul
 }
 
 /** Early rejection limits email signup work; OAuth keeps only a hash in server-controlled state. */
-export function invitationAdmission(accounts: AccountStore, canSignUpWithoutInvitation: boolean) {
+export function invitationAdmission(
+  accounts: AccountStore,
+  canSignUpWithoutInvitation: boolean,
+  publicSignup?: PublicAdmissionStore,
+  closeBillingForDeletion?: (userId: string) => Promise<void>,
+) {
   return createAuthMiddleware(async (ctx) => {
     await enforceAuthPrivacy(ctx)
     await enforceSiteAdministrator(ctx, accounts)
     await enforceRecentAuthentication(ctx)
     const path = ctx.path.replace(/\/$/, '')
-    if (path === '/admin/impersonate-user')
+    if (path === '/admin/remove-user') {
+      const session = await getSessionFromCtx(ctx)
+      if (session === null) return
+      const target = billingRemovalRequestSchema.safeParse(ctx.body)
+      if (!target.success || target.data.userId === session.user.id) throw new APIError('FORBIDDEN')
+      if ((await ctx.context.internalAdapter.findUserById(target.data.userId)) === null)
+        throw new APIError('NOT_FOUND')
+      if (closeBillingForDeletion === undefined) throw new APIError('SERVICE_UNAVAILABLE')
+      await closeBillingForDeletion(target.data.userId)
+    } else if (path === '/admin/impersonate-user')
       throw new APIError('FORBIDDEN', {
         code: 'IMPERSONATION_DISABLED',
         message: 'Account impersonation is disabled.',
@@ -70,14 +87,14 @@ export function invitationAdmission(accounts: AccountStore, canSignUpWithoutInvi
     }
     if (path !== '/sign-up/email') return
     const body = admissionSchema.safeParse(ctx.body)
-    const hash = await admissionHash(ctx.headers)
-    if (hash === null && canSignUpWithoutInvitation) return
-    if (
-      hash === null ||
-      !body.success ||
-      (await accounts.pendingInvitation(hash, body.data.email)) === null
+    if (!body.success) throw invitationRequired()
+    await authorizeAccountCreation(
+      accounts,
+      ctx.headers,
+      body.data.email,
+      canSignUpWithoutInvitation,
+      publicSignup !== undefined,
     )
-      throw invitationRequired()
   })
 }
 
@@ -85,6 +102,7 @@ export function invitationAdmission(accounts: AccountStore, canSignUpWithoutInvi
 export function validateAccountAdmission(
   accounts: AccountStore,
   canSignUpWithoutInvitation: boolean,
+  publicSignup?: PublicAdmissionStore,
 ): UserValidator {
   return async ({ user, source }, context) => {
     if (source.method === 'oauth' && source.action === 'link-account') {
@@ -113,17 +131,23 @@ export function validateAccountAdmission(
     }
     if (source.action !== 'create-user' || source.method === 'admin') return
     const body = admissionSchema.safeParse(user)
-    const hash = await admissionHash(context.headers)
-    if (hash === null && canSignUpWithoutInvitation) return
-    if (
-      hash === null ||
-      !body.success ||
-      (await accounts.pendingInvitation(hash, body.data.email)) === null
-    )
+    if (!body.success)
       return {
         error: 'INVITATION_REQUIRED',
         errorDescription: 'A valid invitation is required to create an account.',
       }
+    try {
+      await authorizeAccountCreation(
+        accounts,
+        context.headers,
+        body.data.email,
+        canSignUpWithoutInvitation,
+        publicSignup !== undefined,
+      )
+    } catch (error) {
+      if (!(error instanceof APIError)) throw error
+      return { error: error.body?.code ?? 'INVITATION_REQUIRED', errorDescription: error.message }
+    }
     return
   }
 }
@@ -134,10 +158,44 @@ export async function acceptSiteAdmission(
   headers: Headers | undefined,
   user: { id: string; email: string },
   uninvitedCohort: Exclude<MembershipCohort, 'pending'>,
+  publicSignup?: PublicAdmissionStore,
 ): Promise<void> {
   const hash = await admissionHash(headers)
-  if (hash === null) await accounts.activateAccount(user.id, uninvitedCohort)
-  else if (!(await accounts.acceptInvitation(hash, user.email, user.id))) throw invitationRequired()
+  if (hash === null) {
+    if (
+      publicSignup !== undefined &&
+      !(await publicSignup.activate(user.email.toLowerCase(), user.id))
+    )
+      throw publicAdmissionUnavailable()
+    if (publicSignup === undefined) await accounts.activateAccount(user.id, uninvitedCohort)
+  } else if (!(await accounts.acceptInvitation(hash, user.email, user.id)))
+    throw invitationRequired()
+}
+
+/** Validate policy and supplied invitations; only the actual adapter creation reserves public capacity. */
+export async function authorizeAccountCreation(
+  accounts: AccountStore,
+  headers: Headers | undefined,
+  email: string,
+  canUseFixtureSignup: boolean,
+  isPublicSignupEnabled: boolean,
+): Promise<Exclude<MembershipCohort, 'pending'>> {
+  const hash = await admissionHash(headers)
+  if (hash !== null) {
+    if ((await accounts.pendingInvitation(hash, email.toLowerCase())) === null)
+      throw invitationRequired()
+    return MEMBERSHIP_COHORT.private
+  }
+  if (isPublicSignupEnabled) return MEMBERSHIP_COHORT.public
+  if (canUseFixtureSignup) return MEMBERSHIP_COHORT.private
+  throw invitationRequired()
+}
+
+export function publicAdmissionUnavailable(): APIError {
+  return new APIError('TOO_MANY_REQUESTS', {
+    code: 'PUBLIC_SIGNUP_UNAVAILABLE',
+    message: 'New account registration is temporarily unavailable. Please try again later.',
+  })
 }
 
 function invitationRequired(): APIError {

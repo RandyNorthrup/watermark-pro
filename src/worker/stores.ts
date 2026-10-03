@@ -20,6 +20,8 @@ export interface WatermarkRecord {
 }
 
 export interface WatermarkStore {
+  /** Indexed count for quota admission without loading every stored specification. */
+  countForOrganization(organizationId: string): Promise<number>
   listForOrganization(organizationId: string): Promise<WatermarkRecord[]>
   find(organizationId: string, id: string): Promise<WatermarkRecord | null>
   findMany(organizationId: string, ids: readonly string[]): Promise<WatermarkRecord[]>
@@ -79,7 +81,10 @@ export interface StoredObject {
 
 /** Binary storage keyed by path; R2 in production. */
 export interface ObjectStore {
-  put(key: string, body: ArrayBuffer, contentType: string): Promise<void>
+  /** Claim a fresh per-lease key without replacing an existing payload. */
+  preparePut(key: string): Promise<string>
+  /** Payload writes require the prior object's ETag; cleanup deletion invalidates it. */
+  put(key: string, body: ArrayBuffer, contentType: string, etag: string): Promise<void>
   get(key: string): Promise<StoredObject | null>
   delete(key: string): Promise<void>
 }

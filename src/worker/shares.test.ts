@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { NEVER_EXPIRES, signShareToken } from './share-token'
 import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
+import { SMALL_PNG as PNG_BYTES } from './test-support/image-fixtures'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
 import {
   photoDtoSchema,
@@ -26,7 +27,6 @@ const viewer = {
   email: 'vera@example.test',
   password: 'viewers long password',
 }
-const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4])
 const SECONDS_PER_DAY = 86_400
 
 async function statusOf(client: TestClient, path: string): Promise<number> {
@@ -194,12 +194,13 @@ describe('share links', () => {
     form.append('file', new File([PNG_BYTES], 'p.png', { type: 'image/png' }))
     form.append('thumbnail', new File([PNG_BYTES], 't.png', { type: 'image/png' }))
     form.append('name', 'P')
-    form.append('width', '1')
-    form.append('height', '1')
+    form.append('width', '20')
+    form.append('height', '10')
     const uploaded = await client.request(`/api/orgs/${orgId}/photos`, {
       method: 'POST',
       body: form,
     })
+    expect(uploaded.status).toBe(HTTP_STATUS.created)
     const photoId = photoDtoSchema.parse(await uploaded.json()).id
     const created = await client.post(`/api/orgs/${orgId}/shares`, {
       title: 'T',

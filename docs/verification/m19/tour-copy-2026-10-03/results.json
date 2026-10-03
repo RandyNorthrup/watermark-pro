@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-03",
+  "source_boundary": "Fresh built root tour-copy source before later billing-review integration; billing provider unconfigured, real private named fixture account",
+  "actual_browser_journeys_passed": 2,
+  "axe_violations": 0,
+  "horizontal_overflow": 0,
+  "all_thirteen_tour_steps_visited": true,
+  "private_admission_copy_absent_from_tour": true,
+  "privately_admitted_fixture_retains_own_badge_and_donation": true,
+  "billing_name_field_rendering_proof": false,
+  "m19_certified": false,
+  "frames": [
+    {
+      "path": "docs/verification/m19/tour-copy-2026-10-03/workspace-tour-desktop-en-light.png",
+      "sha256": "3248a1e160ee685cb7dfe2d31a39c77a39a9f95861e6510095db6a7dd8437658",
+      "bytes": 629400,
+      "root_viewed": true
+    },
+    {
+      "path": "docs/verification/m19/tour-copy-2026-10-03/workspace-tour-phone-ar-dark.png",
+      "sha256": "9d76c067d2c2411c2fc5b15ecf3572451cc0e9945c4d480d690966dc888a3c23",
+      "bytes": 5302360,
+      "root_viewed": true
+    }
+  ]
+}

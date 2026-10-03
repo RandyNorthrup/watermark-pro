@@ -12,12 +12,18 @@ export async function openOfflinePanel(page: Page): Promise<{
   const menu = page.getByRole('button', { name: 'Menu', exact: true })
   const isPhoneMenu = await menu.isVisible()
   if (isPhoneMenu) await menu.click()
+  else await page.locator('header details.workspace-sync > summary').click()
   const panel = page.getByRole('region', { name: 'Offline work', exact: true })
   await expect(panel).toBeVisible()
   return {
     panel,
     close: async () => {
-      if (!isPhoneMenu) return
+      if (!isPhoneMenu) {
+        const controls = page.locator('header details.workspace-sync')
+        if ((await controls.getAttribute('open')) !== null)
+          await controls.locator('summary').click()
+        return
+      }
       await page.getByRole('button', { name: 'Close menu' }).click()
       await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
     },

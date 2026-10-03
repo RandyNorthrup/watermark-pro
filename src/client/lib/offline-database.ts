@@ -237,12 +237,17 @@ export async function clearOfflineDatabase(): Promise<void> {
   })
 }
 
-/** Remove only the exiting account; a new save from another tab must survive sign-out. */
+/** Scope cleanup to one account; only confirmed deletion discards its pending saves. */
 export async function clearOfflineAccountData(
   userId: string,
+  policy: 'preserve-pending' | 'erase-all' = 'preserve-pending',
 ): Promise<{ hasPendingWork: boolean }> {
   let hasPendingWork = false
   await write((transaction) => {
+    if (policy === 'erase-all') {
+      eraseAccountRows(transaction, userId)
+      return
+    }
     const outbox = transaction.objectStore(OUTBOX).openCursor()
     outbox.addEventListener('success', () => {
       const cursor = outbox.result

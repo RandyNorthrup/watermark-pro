@@ -42,13 +42,18 @@ function SignUpPage() {
     if (parsed === null) {
       return
     }
-    if (!captcha.isReady) return
+    if (!captcha.isReady || (invitation === undefined && !captcha.publicSignupEnabled)) return
     setIsPending(true)
     setServerError(null)
     try {
       const result = await authClient.signUp.email(
         { ...parsed, callbackURL: '/app' },
-        { headers: { ...captcha.headers, [INVITATION_HEADER]: invitation ?? '' } },
+        {
+          headers: {
+            ...captcha.headers,
+            ...(invitation !== undefined && { [INVITATION_HEADER]: invitation }),
+          },
+        },
       )
       if (result.error !== null) {
         setServerError(describeAuthError(result.error))
@@ -64,9 +69,9 @@ function SignUpPage() {
     }
   }
 
-  if (invitation === undefined) {
+  if (invitation === undefined && !captcha.publicSignupEnabled) {
     return (
-      <AuthLayout title={t('auth.inviteOnly.title')} description={t('auth.inviteOnly.body')}>
+      <AuthLayout title={t('pricing.closedTitle')} description={t('pricing.closedBody')}>
         <Link
           to="/login"
           search={{ invitation }}

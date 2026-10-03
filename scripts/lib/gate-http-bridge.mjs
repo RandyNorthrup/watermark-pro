@@ -1,6 +1,7 @@
 /** Loopback HTTP transport for the SDK harness; each client owns only its request lifetime. */
+import { createHash } from 'node:crypto'
 import { createServer } from 'node:http'
-import { Readable } from 'node:stream'
+import { Readable, Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 
 import { forwardedHeaders } from './compressing-proxy.mjs'
@@ -9,6 +10,7 @@ const BAD_REQUEST = 400
 const BAD_GATEWAY = 502
 const UNAVAILABLE = 503
 const BODYLESS_METHODS = new Set(['GET', 'HEAD'])
+const STATIC_FAILURE_CAPTURE_BYTES = 4 * 1024
 const TRANSPORT_CODES = new Set([
   'ECONNRESET',
   'ECONNREFUSED',
@@ -201,8 +203,63 @@ function failRequest(response, error, signal, stage) {
   response.end('{"error":"gate_request_failed"}')
 }
 
+/** The first known frame is a presence hint, never the inferred throwing hop. */
+function staticStackHop(captured) {
+  for (const frame of captured.toString('utf8').split('\n').slice(1)) {
+    const match =
+      /^\s+at (?:async )?((?:Object\.)?fetch|Router(?:Outer|Inner)Entrypoint\.fetch|AssetWorker(?:Outer|Inner)\.fetch) \((?:[^()\r\n]*\/)?(gate-router-worker\.mjs|router\.worker\.js|assets\.worker\.js):\d+:\d+\)$/.exec(
+        frame,
+      )
+    if (match === null) continue
+    const [, method, module] = match
+    if (module === 'gate-router-worker.mjs' && (method === 'fetch' || method === 'Object.fetch'))
+      return 'gate_router'
+    if (module === 'router.worker.js' && method.startsWith('Router')) return 'sdk_router'
+    if (module === 'assets.worker.js' && method.startsWith('AssetWorker')) return 'sdk_assets'
+  }
+  return 'unknown'
+}
+
+function staticFailureCapture() {
+  const prefix = []
+  let bytes = 0
+  let capturedBytes = 0
+  return {
+    stream: new Transform({
+      transform(chunk, _encoding, callback) {
+        bytes += chunk.length
+        const remaining = STATIC_FAILURE_CAPTURE_BYTES - capturedBytes
+        if (remaining > 0) {
+          const captured = Buffer.from(chunk.subarray(0, remaining))
+          prefix.push(captured)
+          capturedBytes += captured.length
+        }
+        callback(null, chunk)
+      },
+    }),
+    report(isComplete) {
+      const captured = Buffer.concat(prefix)
+      const firstLine = captured.toString('utf8').split('\n', 1)[0]
+      const message = firstLine.replace(/^(?:TypeError|Error): /, '')
+      const error = firstLine.startsWith('TypeError:') ? new TypeError(message) : new Error(message)
+      console.error(
+        'Gate static asset failure',
+        JSON.stringify({
+          classification: classifyGateFailure(error),
+          stackHop: staticStackHop(captured),
+          bytes,
+          capturedBytes,
+          complete: isComplete,
+          truncated: bytes > capturedBytes,
+          digest: createHash('sha256').update(captured).digest('hex'),
+        }),
+      )
+    },
+  }
+}
+
 /** Reserve a loopback port; requests fail with 503 until the migrated SDK dispatcher is ready. */
-export async function createGateBridge(port) {
+export async function createGateBridge(port, { captureStaticFailures = false } = {}) {
   const state = { dispatch: null, origin: '' }
   const controllers = new Set()
   const server = createServer(async (request, response) => {
@@ -239,8 +296,19 @@ export async function createGateBridge(port) {
       responseHeaders(result, response)
       response.writeHead(result.status, result.statusText)
       stage = 'response_stream'
-      if (result.body === null) response.end()
-      else await pipeline(Readable.fromWeb(result.body), response)
+      const capture =
+        captureStaticFailures && result.status === 500 && url.pathname.startsWith('/assets/')
+          ? staticFailureCapture()
+          : undefined
+      let isComplete = false
+      try {
+        if (result.body === null) response.end()
+        else if (capture === undefined) await pipeline(Readable.fromWeb(result.body), response)
+        else await pipeline(Readable.fromWeb(result.body), capture.stream, response)
+        isComplete = true
+      } finally {
+        capture?.report(isComplete)
+      }
     } catch (error) {
       failRequest(response, error, controller.signal, stage)
     } finally {

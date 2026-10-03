@@ -8,6 +8,8 @@ const displayUserSchema = z.object({
   name: z.string(),
   email: z.string(),
   emailVerified: z.boolean(),
+  /** Only the signed-in account's cohort is retained; missing older snapshots grant no private UI. */
+  membershipCohort: z.optional(z.enum(['pending', 'public', 'private'])),
   image: nullishString,
   role: nullishString,
 })

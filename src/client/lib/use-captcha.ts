@@ -25,6 +25,7 @@ export function useCaptcha() {
     setGeneration((current) => current + 1)
   }, [])
   return {
+    publicSignupEnabled: config.data?.publicSignupEnabled === true,
     siteKey,
     onToken,
     generation,

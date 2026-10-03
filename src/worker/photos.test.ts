@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
+import {
+  GIF_IMAGE as GIF_BYTES,
+  PHOTO_JPEG as JPEG_BYTES,
+  PHOTO_PNG as PNG_BYTES,
+  THUMBNAIL_JPEG,
+} from './test-support/image-fixtures'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
 import { ACCOUNT_ID_HEADER } from '../shared/account-identity'
 import {
@@ -34,10 +40,6 @@ const viewer = {
   password: 'viewers long password',
 }
 
-const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0])
-const JPEG_BYTES = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0, 0, 0, 0, 0])
-const GIF_BYTES = new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0, 0, 0, 0, 0, 0])
-
 let harness: TestHarness
 let ownerClient: TestClient
 let organizationId: string
@@ -50,7 +52,7 @@ function base(path = ''): string {
 function photoForm(name: string, bytes: Uint8Array = PNG_BYTES, presetId?: string): FormData {
   const form = new FormData()
   form.append('file', new File([bytes], `${name}.bin`, { type: 'application/octet-stream' }))
-  form.append('thumbnail', new File([JPEG_BYTES], 'thumb.jpg', { type: 'image/jpeg' }))
+  form.append('thumbnail', new File([THUMBNAIL_JPEG], 'thumb.jpg', { type: 'image/jpeg' }))
   form.append('name', name)
   form.append('width', '4000')
   form.append('height', '3000')
@@ -154,7 +156,7 @@ describe('photo storage', () => {
     const usage = await ownerClient.get(base('/photos/usage'))
     expect(storageUsageSchema.parse(await usage.json())).toEqual({
       count: 1,
-      bytes: PNG_BYTES.byteLength + JPEG_BYTES.byteLength,
+      bytes: PNG_BYTES.byteLength + THUMBNAIL_JPEG.byteLength,
       maxCount: MAX_PHOTOS_PER_ORGANIZATION,
       maxBytes: MAX_STORAGE_BYTES_PER_ORGANIZATION,
     })

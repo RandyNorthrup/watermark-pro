@@ -103,6 +103,10 @@ export async function createOfflineProxy(upstreamOrigin) {
     incoming.pipe(forwarded)
   })
   server.on('connection', (socket) => {
+    if (state.disconnected) {
+      socket.destroy()
+      return
+    }
     sockets.add(socket)
     socket.once('close', () => sockets.delete(socket))
   })

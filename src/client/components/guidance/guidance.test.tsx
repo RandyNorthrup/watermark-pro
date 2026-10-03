@@ -193,6 +193,9 @@ describe('opt-in product tour', () => {
       expect(navigate).toHaveBeenCalledWith({ to: route })
     }
     for (const click of tools.values()) expect(click).toHaveBeenCalled()
+    const workspaceTip = screen.getByRole('dialog', { name: 'Workspaces And Access' })
+    expect(workspaceTip).toHaveTextContent('Other workspaces stay private')
+    expect(workspaceTip).not.toHaveTextContent(/Personal invitation links|admit new users/i)
     await userEvent.click(screen.getByRole('button', { name: 'Finish' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(fetch).toHaveBeenCalledTimes(1)

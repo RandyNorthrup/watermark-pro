@@ -58,6 +58,7 @@ const SENSITIVE_ACCOUNT_PATHS = new Set([
   '/change-password',
   '/set-password',
   '/delete-user',
+  '/delete-user/callback',
   '/get-access-token',
   '/refresh-token',
 ])

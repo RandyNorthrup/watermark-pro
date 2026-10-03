@@ -144,7 +144,7 @@ export async function prepareLighthouseSurfaces(origin, surfaces) {
       switch (surface.id) {
         case 'home':
         case 'login':
-        case 'signup-invitation-required':
+        case 'signup-closed':
         case 'forgot-password':
         case 'privacy':
         case 'terms': {

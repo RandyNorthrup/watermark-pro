@@ -14,14 +14,18 @@ import { secureHeaders } from 'hono/secure-headers'
 
 import type { AppContext } from './app-context'
 import { EnvValidationError } from './env'
+import { apiErrors } from './errors'
 import type { ApiError, HealthResponse } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '../shared/constants'
 import { authenticationDiagnostic } from './auth/logger'
+import { isWorkspaceCreationQuotaFailure } from './auth/workspace-creation'
+import { retryBannedBilling } from './billing-lifecycle'
 import { limitApiRequestBody } from './middleware/body-limit'
 import { requireSameOrigin } from './middleware/same-origin'
 import { accountRoutes } from './routes/accounts'
 import { adminRoutes } from './routes/admin'
 import { auditRoutes } from './routes/audit'
+import { billingRoutes } from './routes/billing'
 import { clientErrorRoutes } from './routes/client-errors'
 import { cloudConnectionRoutes } from './routes/cloud-connections'
 import { devRoutes } from './routes/dev'
@@ -128,6 +132,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
   })
 
   app.route('/api', referralRoutes)
+  app.route('/api', billingRoutes)
   app.route('/api', workspaceAccessRoutes)
   app.route('/api', workspaceCapacityRoutes)
   app.route('/api', cloudConnectionRoutes)
@@ -156,6 +161,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
     if (error instanceof HTTPException) {
       return error.getResponse()
     }
+    if (isWorkspaceCreationQuotaFailure(error)) return apiErrors.conflict().getResponse()
     if (error instanceof EnvValidationError) {
       console.error(error.message)
       const body: ApiError = { error: API_ERROR_CODE.invalidConfiguration }
@@ -224,5 +230,6 @@ export default {
   scheduled(_event, env, ctx) {
     ctx.waitUntil(runHealthCheck(env))
     ctx.waitUntil(cleanupUploads(getServices(env)))
+    ctx.waitUntil(retryBannedBilling(getServices(env).billing))
   },
 } satisfies ExportedHandler<Env>

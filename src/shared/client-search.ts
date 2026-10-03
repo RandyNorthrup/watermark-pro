@@ -7,7 +7,11 @@ import { invitationIdSchema } from './invitation'
 const authCallbackErrorSchema = z.optional(z.string().check(z.maxLength(MAX_AUTH_ERROR_LENGTH)))
 /** URL parsers strip these bytes anywhere in a URL; reject them before origin checks. */
 const REDIRECT_STRIPPED_CHARACTERS = ['\r', '\n', '\t'] as const
-export const accountSearchSchema = z.object({ error: authCallbackErrorSchema })
+export const accountSearchSchema = z.object({
+  error: authCallbackErrorSchema,
+  billing: z.optional(z.enum(['returned', 'managed', 'cancelled'])),
+  billingPlan: z.optional(z.enum(['pro', 'team'])),
+})
 const redirectSchema = z.string().check(
   z.maxLength(MAX_AUTH_REDIRECT_LENGTH),
   z.startsWith('/'),

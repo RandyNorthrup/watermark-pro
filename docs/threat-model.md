@@ -115,6 +115,52 @@ in workflow `37009328785`; full release certification and deployment remain open
 | Member reaching platform administration | `requirePlatformAdmin` checks the Better Auth `admin` role; the admin plugin enforces the same on its own endpoints | `admin.test.ts`                      |
 | Banned user continuing                  | Better Auth rejects sign-in for banned users and revokes sessions on ban                                            | `admin.test.ts`                      |
 
+### Subscription authority and signed provider events (candidate)
+
+Attackers may forge plan/customer/price/return inputs, reuse another tenant's
+Checkout, replay a signed event, submit an old event after a renewal, race two
+handlers, or delete/demote the only payer who can cancel a subscription. Strict
+shared product-intent schemas, verified payer/recent-proof checks and current
+ownership when a workspace exists refuse client authority. Account/mode readback and per-workspace customer bindings
+keep an unrelated business or workspace outside billing authority. Portal price
+updates are disabled because Pro personal and Team shared ownership are distinct.
+
+The webhook's exact POST is authenticated by a bounded raw signature rather than
+browser origin. Five-minute past/future windows, raw-byte caps and rejection of
+Connect/organization contexts close spoofing/replay seams. Durable receipts track
+event IDs, while current provider objects and fenced exclusive leases handle
+reordering and concurrent stale responses. D1 commits subscription, new paid
+workspace, owner, quotas and receipt together. A banned payer's event records
+financial state while retaining suspended access and never creating a Team.
+Actual succeeded current-period payments are checked through invoice/intent/charge
+linkage. Refunds and unresolved/lost disputes suspend paid capacity. Paid expiry
+is rechecked inside existing writes, preserving content and independent grants.
+
+Deletion/ownership triggers retain an authenticated cancellation path while
+billing can charge. Before self/admin deletion, an existing banned-field marker
+quiesces new financial operations before any credential row is removed. Existing
+leases and live user checks reject in-flight work across that boundary. Closure
+expires Checkout or cancels the server-bound subscription, verifies terminal
+chargeability, then permits auth deletion. Failure restores only the exact marker,
+so concurrent moderation cannot be undone and password rows remain recoverable.
+
+Security ban commits paid suspension before attempting provider closure. Delayed
+signed events cannot grant or provision for banned users. Existing banned +
+chargeable authority is the cron retry signal; no new job table exists. Provider
+outage can delay cancellation but cannot release deletion protection or orphan
+the financial payer. A local deletion failure after provider closure may retain
+the temporary marker and requires verified operator recovery. The current delta
+still needs final-source proof; these controls do not certify complete privacy.
+
+Validated payer transfer and financial retention/deletion remain pre-launch work.
+Root created the separate verified Lumafoil account and test catalog/portal on
+2026-10-03. Isolated actual test-mode gateway proof now verifies hosted Pro
+payment, linked paid-period state, identity negatives, refund/cancellation and six
+provider-signed event types. Full application-to-provider-to-D1 lifecycle, portal
+interaction and business activation remain pending. Named provider fixtures are
+not evidence of live availability; the actual gateway receipt does not certify
+application entitlements or production readiness.
+
 ## Accepted residual risks
 
 - **Platform request enrichment** can expose bearer values carried in URL paths.
@@ -126,8 +172,13 @@ in workflow `37009328785`; full release certification and deployment remain open
   Applying this configuration to production is a separate release check; it
   does not remove historical provider records or sanitize operator captures.
 
-- **Client-reported image dimensions** are stored for display; the Worker
-  never decodes images, so a client could misreport them. Impact: cosmetic.
+- **Encoded image payload corruption** remains possible after valid dimension
+  fields. The isolated M19 candidate derives stored PNG/JPEG/WebP display dimensions
+  from encoded headers and genuine JPEG orientation, rejects contradictory claims
+  and applies actual side bounds. This removes client authority over dimension
+  metadata; it does not decode compressed pixels, validate every container field
+  or guarantee complete image validity. Actual near-limit runtime/memory and
+  combined source verification remain required before release certification.
 - **Share links are bearer tokens**: anyone holding the URL can view until it
   expires or is revoked. This is the feature; expiry defaults to seven days in
   the UI and revocation is immediate.

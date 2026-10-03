@@ -86,8 +86,8 @@ function LoginPage() {
       description={t('auth.login.description')}
       footer={
         <>
-          {t(invitation === undefined ? 'auth.inviteOnly.body' : 'auth.login.footerPrompt')}{' '}
-          {invitation === undefined ? null : (
+          {t('auth.login.footerPrompt')}{' '}
+          {invitation === undefined && !captcha.publicSignupEnabled ? null : (
             <Link
               to="/signup"
               search={{ invitation }}

@@ -91,14 +91,20 @@ async function removeOwnedDirectory(directory, parent) {
 }
 
 /** Uses the installed supported SDK; migrations finish before any browser request can reach the Worker. */
-export async function startGateServer({ root: requestedRoot = process.cwd(), port = 5273 } = {}) {
+export async function startGateServer({
+  root: requestedRoot = process.cwd(),
+  storageRoot: requestedStorageRoot = requestedRoot,
+  captureStaticFailures = false,
+  port = 5273,
+} = {}) {
   if (!Number.isSafeInteger(port) || port < 0 || port > PORT_LIMIT)
     throw new Error('Gate port must be an integer from zero through 65535.')
   const root = await realpath(requestedRoot)
+  const storageRoot = await realpath(requestedStorageRoot)
   const built = await builtConfiguration(root)
-  const parentPath = path.join(root, 'temp/lumafoil-gates')
+  const parentPath = path.join(storageRoot, 'temp/lumafoil-gates')
   await mkdir(parentPath, { recursive: true })
-  const parent = await inside(root, parentPath, 'Gate storage')
+  const parent = await inside(storageRoot, parentPath, 'Gate storage')
   const directory = await mkdtemp(path.join(parent, GATE_PREFIX))
   let bridge
   let harness
@@ -117,7 +123,7 @@ export async function startGateServer({ root: requestedRoot = process.cwd(), por
     return closing
   }
   try {
-    bridge = await createGateBridge(port)
+    bridge = await createGateBridge(port, { captureStaticFailures })
     const configPath = path.join(directory, 'wrangler.json')
     const config = {
       ...built,
@@ -198,7 +204,15 @@ export async function startGateServer({ root: requestedRoot = process.cwd(), por
       throw new Error('The built gate Worker did not report healthy isolated test state.')
     bridge.ready(dispatch)
     console.info('Gate startup: built Worker healthy; HTTP bridge ready.')
-    return { origin: bridge.origin, close, worker, directory }
+    return {
+      origin: bridge.origin,
+      close,
+      worker,
+      directory,
+      router,
+      getLogs: harness.getLogs,
+      clearLogs: harness.clearLogs,
+    }
   } catch (error) {
     console.error('Gate startup failed; closing its owned local resources.')
     try {

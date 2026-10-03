@@ -2,6 +2,7 @@ import { createMiddleware } from 'hono/factory'
 
 import type { PermissionRequest } from '../../shared/permissions'
 import type { AppContext } from '../app-context'
+import { operationUnitsForPermission, spendMemberOperations } from '../cloud-operations'
 import { apiErrors } from '../errors'
 
 /**
@@ -11,7 +12,10 @@ import { apiErrors } from '../errors'
  * who is not a member of the organization gets the same 403 as one with an
  * insufficient role, so the response does not reveal organization existence.
  */
-export function requirePermission(permissions: PermissionRequest) {
+export function requirePermission(
+  permissions: PermissionRequest,
+  units = operationUnitsForPermission(permissions),
+) {
   return createMiddleware<AppContext>(async (c, next) => {
     const organizationId = c.req.param('orgId')
     if (organizationId === undefined || organizationId === '') {
@@ -32,6 +36,7 @@ export function requirePermission(permissions: PermissionRequest) {
     if (!isAllowed) {
       throw apiErrors.forbidden()
     }
+    if (units > 0) await spendMemberOperations(c, permissions, units)
     await next()
   })
 }

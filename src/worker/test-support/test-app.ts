@@ -1,11 +1,14 @@
 import { memoryAdapter } from 'better-auth/adapters/memory'
+import { APIError } from 'better-auth/api'
 
+import { closeAccountBilling, prepareBillingDeletion } from '../billing-lifecycle'
 import { createMemoryAccountStore } from './memory-account-store'
 import { createMemoryAuditStore } from './memory-audit-store'
 import { createMemoryCloudStore } from './memory-cloud-store'
 import { createMemoryFolderStore } from './memory-folder-store'
 import { createMemoryGuidanceStore } from './memory-guidance-store'
 import { createMemoryPlanStore } from './memory-plan-store'
+import { createMemoryPublicAdmissionStore } from './memory-public-admission-store'
 import { createMemoryRecentStore } from './memory-recent-store'
 import {
   createMemoryAssetStore,
@@ -20,6 +23,7 @@ import {
 import { createMemoryUploadStore } from './memory-upload-store'
 import { createMemoryWorkspaceAccessStore } from './memory-workspace-access-store'
 import { createAuth } from '../auth/auth'
+import type { DatabaseAdapter } from '../auth/options'
 import { type RateLimitStorage, unlimitedRateLimitStorage } from '../auth/rate-limit'
 import type { AccountOAuthConfiguration } from '../auth/social-providers'
 import { createConsoleEmailSender, type DevMailbox } from '../email/console'
@@ -58,6 +62,7 @@ export type TestEnv = Env & {
 export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
   return {
     APP_ENV: 'test',
+    PUBLIC_SIGNUP_ENABLED: 'false',
     APP_URL: TEST_APP_URL,
     BETTER_AUTH_SECRET: TEST_SECRET,
     EMAIL_PROVIDER: 'console',
@@ -75,6 +80,7 @@ export function createTestEnv(overrides: Partial<TestEnv> = {}): TestEnv {
 
 export interface TestHarness {
   plans: ReturnType<typeof createMemoryPlanStore>
+  billingTasks: Promise<void>[]
   app: ReturnType<typeof createApp>
   env: TestEnv
   services: Services
@@ -84,6 +90,9 @@ export interface TestHarness {
 }
 
 export interface TestHarnessOptions {
+  /** Fail the actual memory adapter user insertion once, through the real auth transaction. */
+  userCreationFailure?: 'api' | 'unexpected'
+  publicSignup?: boolean
   cloudConnections?:
     | Partial<
         Pick<
@@ -124,6 +133,7 @@ export interface TestHarnessOptions {
 
 export function createTestHarness(options: TestHarnessOptions = {}): TestHarness {
   const env = createTestEnv({
+    PUBLIC_SIGNUP_ENABLED: options.publicSignup === true ? 'true' : 'false',
     ...(options.captcha !== undefined && {
       TURNSTILE_SITE_KEY: options.captcha.siteKey,
       TURNSTILE_SECRET_KEY: options.captcha.secretKey,
@@ -144,6 +154,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     invitation: [],
   }
   const accounts = createMemoryAccountStore(tables)
+  const publicAdmissions = createMemoryPublicAdmissionStore(tables, config.BETTER_AUTH_SECRET)
   const plans = createMemoryPlanStore(tables, accounts)
   const workspaceAccess = createMemoryWorkspaceAccessStore(tables, audit, plans)
   const assets = createMemoryAssetStore()
@@ -158,13 +169,44 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     watermarks,
     plans,
   })
+  const memoryDatabase = memoryAdapter(tables)
+  let hasCreationFailure = options.userCreationFailure !== undefined
+  const database: DatabaseAdapter = (configuration) => {
+    const adapter = memoryDatabase(configuration)
+    type TransactionAdapter = Omit<typeof adapter, 'transaction'>
+    const failInsertion = (target: TransactionAdapter): TransactionAdapter => ({
+      ...target,
+      create: async <T extends Record<string, unknown>, R = T>(input: {
+        model: string
+        data: Omit<T, 'id'>
+        select?: string[] | undefined
+        forceAllowId?: boolean | undefined
+      }): Promise<R> => {
+        if (hasCreationFailure && input.model === 'user') {
+          hasCreationFailure = false
+          if (options.userCreationFailure === 'api') throw new APIError('CONFLICT')
+          throw new Error('PRIVATE_ADAPTER_FAILURE_CANARY')
+        }
+        return await target.create<T, R>(input)
+      },
+    })
+    return {
+      ...failInsertion(adapter),
+      transaction: async (callback) =>
+        await adapter.transaction(
+          async (transaction) => await callback(failInsertion(transaction)),
+        ),
+    }
+  }
+  const billingTasks: Promise<void>[] = []
   const auth = createAuth({
-    database: memoryAdapter(tables),
+    database,
     secret: config.BETTER_AUTH_SECRET,
     appUrl: config.APP_URL,
     email: mailbox,
     accounts,
     plans,
+    publicSignup: options.publicSignup === true ? publicAdmissions : undefined,
     reserveWorkspaceInvitation: async (organizationId, actorId, invitationId) =>
       await workspaceAccess.reserveInvitationEmail(organizationId, actorId, invitationId),
     accountOAuth: options.accountOAuth,
@@ -172,7 +214,20 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     audit,
     rateLimit: unlimitedRateLimitStorage,
     rateLimitEnabled: false,
-    canSignUpWithoutInvitation: options.invitationOnly !== true,
+    canSignUpWithoutInvitation: options.publicSignup !== true && options.invitationOnly !== true,
+    closeBillingForDeletion: async (userId) => await prepareBillingDeletion(services, userId),
+    closeBillingAfterBan: (userId) => {
+      billingTasks.push(
+        (async () => {
+          try {
+            await closeAccountBilling(services.billing, userId)
+          } catch {
+            // The named fixture retains failed closure for explicit retry assertions.
+          }
+        })(),
+      )
+      return Promise.resolve()
+    },
     ...(options.captcha !== undefined && {
       captcha: {
         secretKey: options.captcha.secretKey,
@@ -182,6 +237,28 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
   })
   const objects = createMemoryObjectStore()
   const services: Services = {
+    billing: {
+      store: {
+        reserve: () => Promise.reject(new Error('No billing boundary fixture.')),
+        get: () => Promise.resolve(null),
+        forOrganization: () => Promise.resolve(null),
+        forOwner: () => Promise.resolve(null),
+        bannedChargeable: () => Promise.resolve([]),
+        isActivePayer: () => Promise.resolve(true),
+        personal: () => Promise.resolve(null),
+        workspace: () => Promise.resolve(null),
+        replace: () => Promise.reject(new Error('No billing boundary fixture.')),
+        bindCustomer: () => Promise.reject(new Error('No billing boundary fixture.')),
+        bindCheckout: () => Promise.reject(new Error('No billing boundary fixture.')),
+        claimEvent: () => Promise.reject(new Error('No billing boundary fixture.')),
+        finishIgnoredEvent: () => Promise.reject(new Error('No billing boundary fixture.')),
+        acquire: () => Promise.reject(new Error('No billing boundary fixture.')),
+        release: () => Promise.reject(new Error('No billing boundary fixture.')),
+        reconcile: () => Promise.reject(new Error('No billing boundary fixture.')),
+      },
+      provider: undefined,
+    },
+    publicAdmissions,
     plans,
     config,
     db: notABinding(),
@@ -208,5 +285,5 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     devMailbox: mailbox,
   }
   const app = createApp({ resolveServices: () => services })
-  return { app, env, services, mailbox, audit, objects, plans }
+  return { app, env, services, mailbox, audit, objects, plans, billingTasks }
 }

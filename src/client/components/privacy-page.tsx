@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { LegalPage, type LegalSection } from './legal-page'
 
-const LAST_UPDATED = '2026-10-01'
+const LAST_UPDATED = '2026-10-03'
 
 export function PrivacyPage() {
   const { t } = useTranslation()
@@ -26,6 +26,10 @@ export function PrivacyPage() {
     {
       heading: t('legal.privacy.account.heading'),
       paragraphs: [t('legal.privacy.account.p1'), t('legal.privacy.account.p2')],
+    },
+    {
+      heading: t('legal.privacy.billing.heading'),
+      paragraphs: [t('legal.privacy.billing.p1')],
     },
     {
       heading: t('legal.privacy.analytics.heading'),

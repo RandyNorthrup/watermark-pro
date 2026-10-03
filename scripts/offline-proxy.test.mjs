@@ -1,6 +1,8 @@
 /** Real HTTP and CONNECT traffic proves outage scope, byte preservation and same-port recovery. */
 import assert from 'node:assert/strict'
+import { once } from 'node:events'
 import { createServer } from 'node:http'
+import { connect } from 'node:net'
 import { test } from 'node:test'
 
 import { expect, request } from '@playwright/test'
@@ -68,6 +70,52 @@ test('exact-origin forwarding preserves raw POST bytes, Origin, cookie and separ
     assert.equal(received[0].headers.cookie, 'session=synthetic')
     assert.deepEqual(received[0].bytes, payload)
   } finally {
+    await proxy.close()
+    await upstream.close()
+  }
+})
+
+// Match the existing gate stream-observation failure budget; no delay produces the result.
+const RAW_SOCKET_CLOSE_TIMEOUT_MS = 5000
+
+function expectSocketClose(socket) {
+  return new Promise((resolve, reject) => {
+    socket.setTimeout(RAW_SOCKET_CLOSE_TIMEOUT_MS)
+    socket.once('timeout', () => reject(new Error('Disconnected proxy kept a raw socket open.')))
+    socket.once('error', () => {
+      // A reset may accompany immediate refusal; actual close is still required.
+    })
+    socket.once('close', () => {
+      socket.setTimeout(0)
+      resolve()
+    })
+  })
+}
+
+test('disconnected proxy closes newly accepted raw TCP before any HTTP bytes while connected sockets remain usable', async () => {
+  const upstream = await upstreamServer((_incoming, outgoing) => outgoing.end('real gate'))
+  const proxy = await createOfflineProxy(upstream.origin)
+  const address = new URL(proxy.origin)
+  const connected = connect({ host: address.hostname, port: Number(address.port) })
+  let disconnected
+  try {
+    await once(connected, 'connect')
+    const control = await through(proxy.origin, `${upstream.origin}/health`)
+    assert.equal(control.status, 200)
+    assert.equal(control.bytes.toString(), 'real gate')
+    // This unparsed connection survives a complete real forwarding round trip.
+    assert.equal(connected.destroyed, false)
+    const connectedClose = expectSocketClose(connected)
+    const before = proxy.forwardedRequests
+    proxy.setDisconnected(true)
+    await connectedClose
+    disconnected = connect({ host: address.hostname, port: Number(address.port) })
+    await expectSocketClose(disconnected)
+    assert.equal(disconnected.destroyed, true)
+    assert.equal(proxy.forwardedRequests, before)
+  } finally {
+    connected.destroy()
+    disconnected?.destroy()
     await proxy.close()
     await upstream.close()
   }

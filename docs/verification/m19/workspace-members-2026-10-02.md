@@ -76,3 +76,12 @@ existing membership remains readable and no acceptance audit is produced.
 Local SAST applied 510 rules to 2,167 targets and found zero issues, but timed
 out on rules in the schema/generated declarations. This is not recorded as
 clean complete security certification; exact-source hosted gates remain required.
+
+Hosted member source `b616cd0` passed all 2,931 covered cases with unchanged
+coverage floors, but failed two historical account-cutover fixtures. Their
+corrected setup seeds the old two-member capacity before the roster; all eleven
+focused cutover/access D1 cases passed. Follow-up `c8fccc4` passed static/publication
+and hosted SAST, but the full audit rejected the newly reviewed braces advisory;
+devices were skipped. Recovery canonical quality independently reached the same
+audit failure after all static/publication gates. See
+[release blockers](release-blockers-2026-10-02.md); member certification is pending.

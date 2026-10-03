@@ -11,6 +11,7 @@ import type {
   WatermarkStore,
 } from '../stores'
 import type { Database } from './client'
+import { apiErrors } from '../errors'
 import { createPresetWriter } from './preset-writes'
 import { asset, photo, share, watermark } from './schema'
 
@@ -18,6 +19,14 @@ import { asset, photo, share, watermark } from './schema'
 export function createDrizzleWatermarkStore(db: Database): WatermarkStore {
   const writer = createPresetWriter(db)
   return {
+    async countForOrganization(organizationId) {
+      const [row] = await db
+        .select({ total: count() })
+        .from(watermark)
+        .where(eq(watermark.organizationId, organizationId))
+      if (row === undefined) throw new Error('Preset usage is unavailable')
+      return row.total
+    },
     async findMany(organizationId, ids) {
       if (ids.length === 0) return []
       return await db
@@ -122,8 +131,19 @@ export function createDrizzleAssetStore(db: Database): AssetStore {
 /** R2-backed object store. */
 export function createR2ObjectStore(bucket: R2Bucket): ObjectStore {
   return {
-    async put(key, body, contentType) {
-      await bucket.put(key, body, { httpMetadata: { contentType } })
+    async preparePut(key) {
+      const marker = await bucket.put(key, new Uint8Array(), {
+        onlyIf: new Headers({ 'If-None-Match': '*' }),
+      })
+      if (marker === null) throw apiErrors.retryLater()
+      return marker.etag
+    },
+    async put(key, body, contentType, etag) {
+      const saved = await bucket.put(key, body, {
+        httpMetadata: { contentType },
+        onlyIf: { etagMatches: etag },
+      })
+      if (saved === null) throw apiErrors.retryLater()
     },
     async get(key) {
       const object = await bucket.get(key)

@@ -23,13 +23,14 @@ import {
   SITE_INVITATION_POLICY,
   type MembershipCohort,
 } from '../../shared/api-accounts'
+import type { BillingAuthority } from '../../shared/billing'
 import type {
   CloudAttemptState,
   CloudConnectionState,
   CloudProvider,
 } from '../../shared/cloud-connections'
 import type { GuidanceTopic } from '../../shared/guidance'
-import type { WorkspacePlanRecord } from '../../shared/plans'
+import type { WorkspaceCreationKind, WorkspacePlanRecord } from '../../shared/plans'
 import type { RecentActivity, RecentView } from '../../shared/recent-work'
 import type { AssignableSiteRole } from '../../shared/site-roles'
 import type { WatermarkSpec } from '../../shared/watermark'
@@ -152,6 +153,8 @@ export const organization = sqliteTable(
     logo: text('logo'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
     metadata: text('metadata'),
+    creationOwnerId: text('creation_owner_id').references(() => user.id, { onDelete: 'set null' }),
+    creationKind: text('creation_kind').$type<WorkspaceCreationKind>().notNull().default('shared'),
   },
   (table) => [uniqueIndex('organization_slug_unique').on(table.slug)],
 )
@@ -173,6 +176,8 @@ export const workspacePlan = sqliteTable(
       .default(false)
       .notNull(),
     revision: integer('revision').default(0).notNull(),
+    operationMonth: integer('operation_month').default(0).notNull(),
+    operationUnits: integer('operation_units').default(0).notNull(),
   },
   (table) => [
     check('workspace_plan_kind', sql`${table.kind} IN ('personal', 'shared')`),
@@ -195,6 +200,82 @@ export const workspacePlan = sqliteTable(
     check(
       'workspace_plan_paid_kind',
       sql`${table.paidPlan} IS NULL OR (${table.paidPlan} = 'pro' AND ${table.kind} = 'personal') OR (${table.paidPlan} = 'team' AND ${table.kind} = 'shared')`,
+    ),
+  ],
+)
+
+/** Stripe identifiers are server-only; capacity projections never return these tables. */
+export const billingWorkspace = sqliteTable(
+  'billing_workspace',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .unique()
+      .references(() => organization.id, { onDelete: 'set null' }),
+    ownerId: text('owner_id').references(() => user.id, { onDelete: 'set null' }),
+    accountId: text('account_id').notNull(),
+    liveMode: integer('live_mode', { mode: 'boolean' }).notNull(),
+    plan: text('plan').$type<BillingAuthority['plan']>().notNull(),
+    requestId: text('request_id').unique().notNull(),
+    newWorkspaceName: text('new_workspace_name'),
+    customerId: text('customer_id').unique(),
+    checkoutSessionId: text('checkout_session_id').unique(),
+    checkoutExpiresAt: integer('checkout_expires_at', { mode: 'timestamp_ms' }).notNull(),
+    checkoutState: text('checkout_state')
+      .$type<BillingAuthority['checkoutState']>()
+      .default('none')
+      .notNull(),
+    chargeable: integer('chargeable', { mode: 'boolean' }).default(true).notNull(),
+    subscriptionId: text('subscription_id').unique(),
+    subscriptionStatus: text('subscription_status').default('none').notNull(),
+    paidThrough: integer('paid_through', { mode: 'timestamp_ms' }),
+    suspended: integer('suspended', { mode: 'boolean' }).default(true).notNull(),
+    cancelAtPeriodEnd: integer('cancel_at_period_end', { mode: 'boolean' })
+      .default(false)
+      .notNull(),
+    invoiceId: text('invoice_id'),
+    revision: integer('revision').default(0).notNull(),
+    leaseToken: text('lease_token'),
+    leaseUntil: integer('lease_until', { mode: 'timestamp_ms' }),
+  },
+  (table) => [
+    uniqueIndex('billing_one_team_per_payer')
+      .on(table.ownerId)
+      .where(sql`${table.plan} = 'team' AND ${table.ownerId} IS NOT NULL`),
+    check('billing_workspace_mode', sql`${table.liveMode} IN (0, 1)`),
+    check('billing_workspace_plan', sql`${table.plan} IN ('pro', 'team')`),
+    check('billing_workspace_suspended', sql`${table.suspended} IN (0, 1)`),
+    check('billing_workspace_cancel', sql`${table.cancelAtPeriodEnd} IN (0, 1)`),
+    check('billing_workspace_revision', sql`${table.revision} >= 0`),
+    check(
+      'billing_workspace_new_kind',
+      sql`${table.newWorkspaceName} IS NULL OR ${table.plan} = 'team'`,
+    ),
+  ],
+)
+
+/** Signed event IDs are durable receipts; second-level provider timestamps never order updates. */
+export const billingEvent = sqliteTable(
+  'billing_event',
+  {
+    id: text('id').primaryKey(),
+    accountId: text('account_id').notNull(),
+    liveMode: integer('live_mode', { mode: 'boolean' }).notNull(),
+    eventType: text('event_type').notNull(),
+    objectId: text('object_id').notNull(),
+    authorityId: text('authority_id').references(() => billingWorkspace.id),
+    subscriptionId: text('subscription_id'),
+    invoiceId: text('invoice_id'),
+    providerCreated: integer('provider_created').notNull(),
+    receivedAt: integer('received_at', { mode: 'timestamp_ms' }).notNull(),
+    completedAt: integer('completed_at', { mode: 'timestamp_ms' }),
+    outcome: text('outcome').$type<'reconciled' | 'ignored'>(),
+  },
+  (table) => [
+    check('billing_event_mode', sql`${table.liveMode} IN (0, 1)`),
+    check(
+      'billing_event_outcome',
+      sql`${table.outcome} IS NULL OR ${table.outcome} IN ('reconciled', 'ignored')`,
     ),
   ],
 )
@@ -491,6 +572,18 @@ export const siteInvitation = sqliteTable(
       table.expiresAt,
     ),
   ],
+)
+
+/** Bounded public admission stores a purpose-bound email key, never the original email or address. */
+export const publicAdmission = sqliteTable(
+  'public_admission',
+  {
+    emailHash: text('email_hash').primaryKey(),
+    userId: text('user_id').notNull().unique(),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+    consumedAt: integer('consumed_at', { mode: 'timestamp_ms' }),
+  },
+  (table) => [check('public_admission_hash_length', sql`length(${table.emailHash}) = 64`)],
 )
 
 /** One default personal workspace per account, private unless its owner explicitly grants access. */

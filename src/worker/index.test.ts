@@ -1,3 +1,4 @@
+import { HTTPException } from 'hono/http-exception'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import handler, { createApp, runHealthCheck } from './index'
@@ -119,7 +120,8 @@ describe('default worker handler', () => {
     })
     vi.spyOn(serviceContainer, 'getServices').mockReturnValue(harness.services)
     const key = 'org/cron-workspace/abandoned-upload'
-    await harness.objects.put(key, new Uint8Array([1]).buffer, 'image/png')
+    const etag = await harness.objects.preparePut(key)
+    await harness.objects.put(key, new Uint8Array([1]).buffer, 'image/png', etag)
     expect(
       await harness.services.uploads.reserve({
         id: 'cron-lease',
@@ -151,7 +153,7 @@ describe('default worker handler', () => {
       },
     } as unknown as ScheduledController
     handler.scheduled(controller, harness.env, ctx)
-    expect(pending).toHaveLength(2)
+    expect(pending).toHaveLength(3)
     await Promise.all(pending)
     expect(await harness.services.observability.listHealthChecks()).toMatchObject([
       { ok: true, detail: null },
@@ -257,6 +259,41 @@ describe('error handling', () => {
     })
     expect(await response.text()).not.toContain('secret internal detail')
     expect(consoleError).toHaveBeenCalled()
+    expect(JSON.stringify(consoleError.mock.calls)).not.toContain('secret internal detail')
     consoleError.mockRestore()
+  })
+
+  it('maps the durable workspace quota failure to conflict without exposing driver details', async () => {
+    const consoleError = silenceConsoleError()
+    const { services, env } = createTestHarness()
+    const app = createApp({ resolveServices: () => services })
+    app.get('/api/creation-failure', () => {
+      throw new Error('PRIVATE_DRIVER_DETAIL', {
+        cause: new Error('D1_ERROR: workspace_creation_quota'),
+      })
+    })
+
+    const response = await app.request('/api/creation-failure', {}, env)
+
+    expect(response.status).toBe(HTTP_STATUS.conflict)
+    expect(apiErrorSchema.parse(await response.json())).toEqual({ error: API_ERROR_CODE.conflict })
+    expect(response.headers.get('content-security-policy')).toContain("default-src 'none'")
+    expect(consoleError).not.toHaveBeenCalled()
+  })
+
+  it('preserves a deliberate HTTP status even when its cause includes a quota marker', async () => {
+    const { services, env } = createTestHarness()
+    const app = createApp({ resolveServices: () => services })
+    app.get('/api/deliberate-failure', () => {
+      throw new HTTPException(HTTP_STATUS.forbidden, {
+        res: new Response('Deliberate refusal', { status: HTTP_STATUS.forbidden }),
+        cause: new Error('D1_ERROR: workspace_creation_quota'),
+      })
+    })
+
+    const response = await app.request('/api/deliberate-failure', {}, env)
+
+    expect(response.status).toBe(HTTP_STATUS.forbidden)
+    expect(await response.text()).toBe('Deliberate refusal')
   })
 })

@@ -57,6 +57,20 @@ function deletionReceipt(
   `
 }
 
+function finalizeRetiredPersonal(organizationId: string): SQL {
+  return sql`
+    DELETE FROM organization WHERE id = ${organizationId}
+          AND creation_kind = 'personal' AND creation_owner_id IS NULL
+          AND EXISTS (SELECT 1 FROM workspace_plan WHERE organization_id = ${organizationId} AND kind = 'personal')
+        AND NOT EXISTS (SELECT 1 FROM private_workspace WHERE organization_id = ${organizationId})
+        AND NOT EXISTS (SELECT 1 FROM member WHERE organization_id = ${organizationId})
+        AND NOT EXISTS (SELECT 1 FROM photo WHERE organization_id = ${organizationId})
+        AND NOT EXISTS (SELECT 1 FROM asset WHERE organization_id = ${organizationId})
+        AND NOT EXISTS (SELECT 1 FROM watermark WHERE organization_id = ${organizationId})
+        AND NOT EXISTS (SELECT 1 FROM upload_reservation WHERE organization_id = ${organizationId} AND status IN ('pending', 'cleanup'))
+  `
+}
+
 /** D1 serializes quota admission and commits metadata/audit/reservation release as a batch. */
 export function createDrizzleUploadStore(db: Database): UploadStore {
   const dialect = new SQLiteSyncDialect()
@@ -90,7 +104,87 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
       )
     return pending
   }
+
   return {
+    async stagePersonalDeletion(userId) {
+      const [scope] = await db.all<{
+        id: string
+        creationKind: string
+        creator: string | null
+        kind: string | null
+        isOwner: number
+        members: number
+        otherOwner: number
+        banned: number
+      }>(sql`
+        SELECT o.id, o.creation_kind AS creationKind, o.creation_owner_id AS creator, p.kind,
+          EXISTS (SELECT 1 FROM member WHERE organization_id=o.id AND user_id=${userId} AND role='owner') AS isOwner,
+          (SELECT COUNT(*) FROM member WHERE organization_id=o.id) AS members,
+          EXISTS (SELECT 1 FROM member WHERE organization_id=o.id AND user_id<>${userId} AND role='owner') AS otherOwner,
+          coalesce(u.banned,0) AS banned FROM private_workspace w
+        JOIN organization o ON o.id=w.organization_id JOIN user u ON u.id=w.user_id
+        LEFT JOIN workspace_plan p ON p.organization_id=o.id WHERE w.user_id=${userId}
+      `)
+      if (scope?.creationKind !== 'personal' || scope.members > 1 || scope.otherOwner === 1) return
+      if (
+        scope.kind !== 'personal' ||
+        scope.isOwner !== 1 ||
+        scope.members !== 1 ||
+        scope.banned !== 1 ||
+        (scope.creator !== null && scope.creator !== userId)
+      )
+        throw apiErrors.forbidden()
+      const id = scope.id,
+        now = Date.now()
+      const eligible = sql`
+        EXISTS (SELECT 1 FROM private_workspace w JOIN organization o ON o.id=w.organization_id
+                JOIN workspace_plan p ON p.organization_id=o.id JOIN user u ON u.id=w.user_id
+                WHERE w.user_id=${userId} AND o.id=${id} AND o.creation_kind='personal' AND p.kind='personal'
+                  AND (o.creation_owner_id=${userId} OR o.creation_owner_id IS NULL) AND u.banned=1
+                  AND EXISTS (SELECT 1 FROM member WHERE organization_id=${id} AND user_id=${userId} AND role='owner')
+                  AND (SELECT COUNT(*) FROM member WHERE organization_id=${id})=1
+                  AND NOT EXISTS (SELECT 1 FROM photo WHERE organization_id=${id} AND (instr(key,'org/'||${id}||'/')<>1 OR instr(thumbnail_key,'org/'||${id}||'/')<>1))
+                  AND NOT EXISTS (SELECT 1 FROM asset WHERE organization_id=${id} AND instr(key,'org/'||${id}||'/')<>1)
+                  AND NOT EXISTS (SELECT 1 FROM upload_reservation r WHERE organization_id=${id} AND status IN ('pending','cleanup')
+                    AND (kind NOT IN ('photo','logo') OR json_valid(keys)<>1 OR json_type(keys)<>'array'
+                      OR json_array_length(keys)<>CASE WHEN kind='photo' THEN 2 ELSE 1 END
+                      OR EXISTS (SELECT 1 FROM json_each(r.keys) WHERE type<>'text' OR instr(value,'org/'||${id}||'/')<>1))))
+      `
+      const result = await batch([
+        auditInsert(
+          {
+            organizationId: id,
+            action: 'account.personal-content.staged',
+            targetType: 'user',
+            targetId: userId,
+          },
+          eligible,
+        ),
+        sql`
+          INSERT INTO upload_reservation (id,organization_id,upload_id,kind,user_id,fingerprint,keys,bytes,status,expires_at)
+                    SELECT lower(hex(randomblob(${UPLOAD_POLICY.receiptEntropyBytes}))),${id},id,'photo',${userId},'deletion',json_array(key,thumbnail_key),size+thumbnail_size,'cleanup',${now} FROM photo WHERE organization_id=${id} AND ${eligible}
+                    UNION ALL SELECT lower(hex(randomblob(${UPLOAD_POLICY.receiptEntropyBytes}))),${id},id,'logo',${userId},'deletion',json_array(key),size,'cleanup',${now} FROM asset WHERE organization_id=${id} AND ${eligible}
+        `,
+        sql`UPDATE upload_reservation SET status='deleted' WHERE organization_id=${id} AND status='committed' AND ${eligible}`,
+        sql`
+          INSERT INTO upload_reservation (id,organization_id,upload_id,kind,user_id,fingerprint,keys,bytes,status,expires_at)
+                    SELECT lower(hex(randomblob(${UPLOAD_POLICY.receiptEntropyBytes}))),${id},p.id,'photo',${userId},'deletion','[]',0,'deleted',0 FROM photo p WHERE p.organization_id=${id} AND ${eligible}
+                      AND p.id NOT IN (SELECT upload_id FROM upload_reservation WHERE organization_id=${id} AND kind='photo' AND status='deleted')
+                    UNION ALL SELECT lower(hex(randomblob(${UPLOAD_POLICY.receiptEntropyBytes}))),${id},a.id,'logo',${userId},'deletion','[]',0,'deleted',0 FROM asset a WHERE a.organization_id=${id} AND ${eligible}
+                      AND a.id NOT IN (SELECT upload_id FROM upload_reservation WHERE organization_id=${id} AND kind='logo' AND status='deleted')
+        `,
+        sql`UPDATE share SET revoked_at=${now} WHERE organization_id=${id} AND revoked_at IS NULL AND ${eligible}`,
+        sql`UPDATE upload_reservation SET status='cleanup' WHERE organization_id=${id} AND status='pending' AND ${eligible}`,
+        sql`DELETE FROM watermark WHERE organization_id=${id} AND ${eligible}`,
+        sql`DELETE FROM photo WHERE organization_id=${id} AND ${eligible}`,
+        sql`DELETE FROM asset WHERE organization_id=${id} AND ${eligible}`,
+        sql`
+          DELETE FROM organization WHERE id=${id} AND ${eligible}
+                    AND NOT EXISTS (SELECT 1 FROM upload_reservation WHERE organization_id=${id} AND status IN ('pending','cleanup'))
+        `,
+      ])
+      if (result[0]?.meta.changes !== 1) throw apiErrors.retryLater()
+    },
     async hasContent(organizationId) {
       const [row] = await db.all<{
         hasContent: number
@@ -106,6 +200,7 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
     async reserve(input) {
       const records = input.kind === 'photo' ? photo : asset
       const now = Date.now()
+      const permission = workspaceWriter(input.organizationId, input.userId)
       const maxCount = workspaceCapacitySql(
         input.organizationId,
         input.kind === 'photo' ? 'photos' : 'logos',
@@ -116,13 +211,15 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
       }>(sql`
         INSERT INTO upload_reservation (id, organization_id, upload_id, kind, user_id, fingerprint, keys, bytes, status, expires_at)
                 SELECT ${input.id}, ${input.organizationId}, ${input.uploadId}, ${input.kind}, ${input.userId}, ${input.fingerprint}, ${JSON.stringify(input.keys)}, ${input.bytes}, 'pending', ${input.expiresAt.getTime()}
-                WHERE NOT EXISTS (SELECT 1 FROM ${records} WHERE organization_id = ${input.organizationId} AND id = ${input.uploadId})
+                WHERE ${permission} AND NOT EXISTS (SELECT 1 FROM ${records} WHERE organization_id = ${input.organizationId} AND id = ${input.uploadId})
                 AND NOT EXISTS (SELECT 1 FROM upload_reservation WHERE organization_id = ${input.organizationId} AND kind = ${input.kind} AND upload_id = ${input.uploadId} AND status IN ('committed', 'deleted'))
                 AND ${uploadCount(input.organizationId, input.kind)} < ${maxCount}
                 AND ${usageBytes(input.organizationId)} + ${input.bytes} <= ${workspaceCapacitySql(input.organizationId, 'storageBytes', now)}
                 ON CONFLICT DO NOTHING RETURNING id
       `)
       if (rows.length > 0) return 'reserved'
+      const writer = await db.all(sql`SELECT 1 WHERE ${permission}`)
+      if (writer.length === 0) throw apiErrors.forbidden()
       const pending = await pendingFor(input)
       if (pending !== undefined)
         return pending.userId === input.userId && pending.fingerprint === input.fingerprint
@@ -136,6 +233,17 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
         sql`SELECT id FROM upload_reservation WHERE organization_id = ${input.organizationId} AND kind = ${input.kind} AND upload_id = ${input.uploadId} AND status IN ('committed', 'deleted')`,
       )
       return receipt.length > 0 ? 'deleted' : 'quota'
+    },
+    async isLeaseWritable(input) {
+      const rows = await db.all(sql`
+        SELECT id FROM upload_reservation WHERE id = ${input.id}
+          AND organization_id = ${input.organizationId} AND user_id = ${input.userId}
+          AND upload_id = ${input.uploadId} AND kind = ${input.kind}
+          AND fingerprint = ${input.fingerprint} AND keys = ${JSON.stringify(input.keys)}
+          AND status = 'pending' AND expires_at > ${Date.now()}
+          AND ${workspaceWriter(input.organizationId, input.userId)}
+      `)
+      return rows.length === 1
     },
     async commit(input, record, audit) {
       const destination =
@@ -228,9 +336,15 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
       return rows.map((row) => ticket(row))
     },
     async release(id) {
-      await db
-        .delete(uploadReservation)
+      const [released] = await db
+        .select({ organizationId: uploadReservation.organizationId })
+        .from(uploadReservation)
         .where(and(eq(uploadReservation.id, id), eq(uploadReservation.status, 'cleanup')))
+      if (released !== undefined)
+        await batch([
+          sql`DELETE FROM upload_reservation WHERE id=${id} AND organization_id=${released.organizationId} AND status='cleanup'`,
+          finalizeRetiredPersonal(released.organizationId),
+        ])
     },
     async deletePhotos(organizationId, ids, audit) {
       const selected = and(eq(photo.organizationId, organizationId), inArray(photo.id, [...ids]))

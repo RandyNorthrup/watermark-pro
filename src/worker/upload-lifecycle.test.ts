@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { AuditEntry } from './audit'
+import { joinAsMember, signUpOwner, TestClient } from './test-support/client'
+import { LOGO_PNG } from './test-support/image-fixtures'
 import { createTestHarness } from './test-support/test-app'
 import { cleanupUploads, persistUpload } from './upload-lifecycle'
 import { UPLOAD_POLICY, type UploadRecord, type UploadReservation } from './upload-store'
@@ -82,6 +84,50 @@ function fixture(kind: 'photo' | 'logo' = 'photo') {
 }
 
 describe('upload lifecycle failures and recovery', () => {
+  it.each(['owner', 'admin', 'editor', 'viewer', 'non-member', 'anonymous'] as const)(
+    'retains real-auth upload authority before object initialization for %s',
+    async (role) => {
+      const harness = createTestHarness()
+      const { client: owner, organizationId } = await signUpOwner(
+        harness,
+        {
+          name: 'Producer owner',
+          email: 'producer-owner@example.test',
+          password: 'a producer owner passphrase',
+        },
+        { name: 'Producer role workspace', slug: 'producer-roles' },
+      )
+      const guest = {
+        name: 'Producer guest',
+        email: 'producer-guest@example.test',
+        password: 'a producer guest passphrase',
+      }
+      let actor = owner
+      if (role === 'anonymous' || role === 'non-member') {
+        actor = new TestClient(harness.app, harness.env)
+        if (role === 'non-member') await actor.signUpAndVerify(harness.mailbox, guest)
+      } else if (role !== 'owner')
+        actor = await joinAsMember(harness, owner, organizationId, guest, role)
+      const prepare = vi.spyOn(harness.objects, 'preparePut')
+      const form = new FormData()
+      form.append('file', new File([LOGO_PNG], 'genuine-logo.png', { type: 'image/png' }))
+      form.append('name', 'Producer role logo')
+      form.append('width', '64')
+      form.append('height', '32')
+      // Fully encoded bytes avoid Undici's lazy File producer racing an intentional early authorization refusal.
+      const multipart = new Response(form)
+      const body = await multipart.arrayBuffer()
+      const response = await actor.request(`/api/orgs/${organizationId}/assets`, {
+        method: 'POST',
+        headers: multipart.headers,
+        body,
+      })
+      const canWrite = ['owner', 'admin', 'editor'].includes(role)
+      const refused = role === 'anonymous' ? 401 : 403
+      expect(response.status).toBe(canWrite ? 201 : refused)
+      expect(prepare).toHaveBeenCalledTimes(canWrite ? 1 : 0)
+    },
+  )
   it.each(['expired', 'suspended'] as const)(
     'cleans written objects when a paid grant becomes %s before commit',
     async (change) => {
@@ -157,8 +203,8 @@ describe('upload lifecycle failures and recovery', () => {
   it('waits for both writes to settle and cleans objects even when R2 lost one acknowledgment', async () => {
     const f = fixture()
     const original = f.objects.put.bind(f.objects)
-    vi.spyOn(f.objects, 'put').mockImplementation(async (key, bytes, contentType) => {
-      await original(key, bytes, contentType)
+    vi.spyOn(f.objects, 'put').mockImplementation(async (key, bytes, contentType, etag) => {
+      await original(key, bytes, contentType, etag)
       if (key === f.reservation.keys[0]) throw new Error('Lost acknowledgment')
     })
     await expect(f.save()).rejects.toMatchObject({ status: 503 })

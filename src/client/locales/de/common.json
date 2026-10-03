@@ -36,7 +36,9 @@
     "manageAccess": "Zugriff verwalten",
     "supportPrompt": "Wenn Lumafoil hilft, freuen wir uns über eine Spende.",
     "donate": "Spenden",
-    "supportPayPal": "Mit PayPal spenden (neuer Tab)"
+    "supportPayPal": "Mit PayPal spenden (neuer Tab)",
+    "openNavigation": "Navigation öffnen",
+    "closeNavigation": "Navigation schließen"
   },
   "auth": {
     "backToSignIn": "Zurück zur Anmeldung",
@@ -90,10 +92,6 @@
       "roleLabel": "Rolle:",
       "decline": "Ablehnen",
       "accept": "Einladung annehmen"
-    },
-    "inviteOnly": {
-      "title": "Einladung erforderlich",
-      "body": "Lumafoil ist nur auf Einladung verfügbar. Öffnen Sie den Einladungslink in Ihrer E-Mail, um Ihr Konto zu erstellen."
     },
     "humanCheck": {
       "label": "Menschliche Überprüfung",
@@ -873,12 +871,11 @@
   "video": {
     "orgRequired": "Erstellen Sie einen Arbeitsbereich oder treten Sie einem bei, um Videos mit Wasserzeichen zu versehen.",
     "heading": "Videos",
-    "description": "Sieh dir dein Video an, platziere Wasserzeichen zu verschiedenen Zeitpunkten, füge Überblendungen hinzu und exportiere mit Ton.",
+    "description": "Schneide mehrere Clips auf Video- und Audiospuren. Sieh die Vorschau, füge Wasserzeichen hinzu und exportiere auf deinem Gerät.",
     "checkingSupport": "Video-Unterstützung wird geprüft",
     "unsupportedTitle": "Video wird in diesem Browser nicht unterstützt",
     "unsupportedBody": "Ihr Browser kann kein Video codieren. Chrome, Edge oder Safari 17 und neuer können es.",
     "addVideo": "Video hinzufügen",
-    "dropHint": "Ein Video hier ablegen, oder",
     "transcodingProgress": "Transkodierungsfortschritt",
     "progress": {},
     "cancel": "Abbrechen",
@@ -895,7 +892,6 @@
       "fit1080p": "Auf 1080p",
       "fit720p": "Auf 720p"
     },
-    "previewAlt": "Das Wasserzeichen auf einem Bild des Videos",
     "timeline": {
       "heading": "Zeit Und Bewegung",
       "play": "Abspielen",
@@ -910,12 +906,48 @@
       "updateKeyframe": "Schlüsselbild Hier Aktualisieren",
       "removeKeyframe": "Schlüsselbild Bei {{time}} Entfernen",
       "hint": "Füge ein Schlüsselbild hinzu, gehe zu einer anderen Zeit und verschiebe, skaliere oder drehe das Wasserzeichen. Lumafoil erzeugt die Bewegung zwischen den Schlüsselbildern.",
-      "playbackFailed": "Dieser Browser konnte das ausgewählte Video nicht abspielen.",
       "chooseVideo": "Öffne zuerst ein Video und füge ein gültiges Wasserzeichen hinzu.",
       "waitPreview": "Warte auf die Wasserzeichenvorschau, bevor du ein Schlüsselbild hinzufügst.",
       "changed": "Das Video oder Wasserzeichen wurde während des Exports geändert. Exportiere erneut, um die aktuellen Änderungen zu übernehmen.",
       "download": "Video Exportieren",
       "cloudSaved": "Das Video mit Wasserzeichen wurde in deinem Cloudspeicher gespeichert."
+    },
+    "studio": {
+      "mediaPool": "Medienpool",
+      "inspector": "Inspektor",
+      "clip": "Clip",
+      "timeline": "Zeitleiste",
+      "output": "Ausgabe",
+      "importMedia": "Medien importieren",
+      "emptyMedia": "Importiere Video oder Audio für deinen Schnitt.",
+      "emptyTimeline": "Füge Videoclips hinzu, um zu beginnen.",
+      "projectName": "Projekt",
+      "untitled": "Unbenanntes Projekt",
+      "sourceIn": "Quellanfang (s)",
+      "sourceOut": "Quellende (s)",
+      "track": "Spur",
+      "split": "Am Abspielkopf teilen",
+      "removeClip": "Clip entfernen",
+      "unlink": "Audio entkoppeln",
+      "volume": "Lautstärke",
+      "showTrack": "{{track}} anzeigen",
+      "hideTrack": "{{track}} ausblenden",
+      "muteTrack": "{{track}} stummschalten",
+      "unmuteTrack": "{{track}} aktivieren",
+      "addClip": "{{name}} zu {{track}} hinzufügen",
+      "trimIn": "Anfang von {{name}} auf {{track}} kürzen",
+      "trimOut": "Ende von {{name}} auf {{track}} kürzen",
+      "zoom": "Zeitleistenzoom",
+      "localSession": "Dateien bleiben auf diesem Gerät. Diese Sitzung wird nach dem Schließen der Seite nicht gespeichert.",
+      "frameRate": "Bearbeitete Zeitleiste: {{fps}} fps",
+      "sourceBounds": "Medienlimit überschritten oder Schnitt außerhalb der Quelle.",
+      "selectClip": "Wähle einen Clip in der Zeitleiste zum Bearbeiten.",
+      "timeReadout": "{{current}} / {{total}}",
+      "pictureMeta": "{{width}} × {{height}} · {{format}}",
+      "audioRequired": "Audio-Encoder erforderlich. Spuren stummschalten oder einen kompatiblen Browser verwenden.",
+      "timing": "Zeitbereich",
+      "transform": "Transformation",
+      "invalidEdit": "Diese Änderung würde einen anderen Clip überlappen oder die Zeitleistengrenzen überschreiten. Wähle eine andere Startzeit, einen anderen Quellbereich oder eine andere Spur."
     }
   },
   "documents": {
@@ -1054,7 +1086,7 @@
       },
       "sharing": {
         "title": "Fotos oder einen Arbeitsbereich teilen",
-        "body": "Erstelle ablaufende, widerrufbare Galerielinks für ausgewählte Fotos. Eigentümer können per Link, E-Mail-Einladung oder direktem Hinzufügen vorhandener Nutzer Lese- oder Bearbeitungszugriff auf ihren Arbeitsbereich gewähren. Dieser Zugriff ist von einer Einladung zu Lumafoil getrennt."
+        "body": "Jedes Konto hat einen eigenen Arbeitsbereich. Fotos und Vorlagen bleiben getrennt, bis du sie ausdrücklich teilst. Zugriff erfordert die Freigabe des Eigentümers."
       },
       "offline": {
         "title": "Offline arbeiten, später synchronisieren",
@@ -1062,7 +1094,7 @@
       },
       "privacy": {
         "title": "Dein Konto, dein Arbeitsbereich",
-        "body": "Neue Nutzer benötigen eine Einladung zur Website und erhalten einen eigenen privaten Arbeitsbereich. Eine Website-Einladung teilt niemals deine Fotos oder Vorlagen. Die Freigabe eines Arbeitsbereichs erfordert eine ausdrückliche Zugriffsberechtigung durch dessen Eigentümer."
+        "body": "Jedes Konto hat einen eigenen Arbeitsbereich. Fotos und Vorlagen bleiben getrennt, bis du sie ausdrücklich teilst. Zugriff erfordert die Freigabe des Eigentümers."
       },
       "languages": {
         "title": "12 Oberflächensprachen",
@@ -1077,7 +1109,6 @@
         "body": "Verbinde Google Drive, Dropbox oder OneDrive, um Dateien zu öffnen, Exportordner zu wählen und Freigabelinks des Anbieters zu erstellen. Verbindungen bleiben gespeichert, bis du sie trennst oder der Anbieter erneut eine Autorisierung verlangt. Google Drive ist auf Dateien und Ordner beschränkt, die du mit Lumafoil auswählst oder erstellst. Geschäfts- oder Schulkonten benötigen möglicherweise die Genehmigung deiner Microsoft-Administration."
       }
     },
-    "inviteHosting": "Lumafoil ist nur auf Einladung zugänglich. Möchtest du es selbst hosten?",
     "selfHost": "Den Quellcode gibt es kostenlos auf GitHub.",
     "featuresNav": "Funktionen"
   },
@@ -1107,13 +1138,17 @@
       },
       "sharing": {
         "heading": "Freigabelinks",
-        "p1": "Jeder mit einem Lumafoil-Galerielink kann die ausgewählten gespeicherten Fotos bis zum Ablauf oder Widerruf sehen. Eine Websiteeinladung öffnet ein eigenes privates Konto; sie teilt weder Arbeitsbereich noch Inhalte der einladenden Person.",
+        "p1": "Wer einen Galerielink besitzt, kann die ausgewählten Fotos bis zum Ablauf oder Widerruf sehen. Zugriff auf einen Arbeitsbereich erfordert die ausdrückliche Freigabe des Eigentümers.",
         "p2": "Links von Cloudanbietern folgen deren Berechtigungs- und Widerrufsregeln. Ein Widerruf holt bereits angefertigte Downloads oder Kopien nicht zurück."
       },
       "account": {
         "heading": "Ihr Konto",
-        "p1": "Neue Konten benötigen eine Einladung und eine bestätigte E-Mail-Adresse. Melde dich mit Passwort oder eingerichtetem Google-/Microsoft-Zugang an. Bestehende Konten brauchen keine neue Einladung. Weitere Anmeldemethoden müssen im angemeldeten Konto verknüpft werden.",
-        "p2": "Sitzungen verwenden HttpOnly- und SameSite=Lax-Cookies, bei HTTPS mit Secure. Passwort-Reset-Links laufen nach einer Stunde ab und widerrufen bei Verwendung andere Serversitzungen."
+        "p1": "Die Registrierung hängt von der aktuellen Verfügbarkeit ab und erfordert eine bestätigte E-Mail-Adresse. Melde dich mit Passwort oder eingerichtetem Google/Microsoft-Zugang an. Weitere Anmeldemethoden müssen im angemeldeten Konto verknüpft werden.",
+        "p2": "Sitzungen verwenden HttpOnly- und SameSite=Lax-Cookies, bei HTTPS mit Secure. Passwort-Reset-Links laufen nach einer Stunde ab und widerrufen bei Verwendung andere Serversitzungen. Die autorisierte Kontolöschung beginnt mit dem Widerruf von Links und dem Entfernen von Cloud-Metadaten nur für deinen nachweislich allein besessenen persönlichen Arbeitsbereich. Gespeicherte Dateien werden im Hintergrund bereinigt und können bis zum Abschluss weiterer Versuche bestehen bleiben. Gemeinsame oder nicht eindeutig zugeordnete Arbeitsbereiche, Prüfprotokolle und Zahlungsbelege bleiben erhalten. Eine Kontolöschung entfernt keine heruntergeladenen Dateien, Kopien auf anderen Geräten oder Backups des Anbieters. Die Kontoeinstellungen löschen nach bestätigter Entfernung auch die lokalen Daten dieses Kontos auf dem aktuellen Gerät. Wenn die Bestätigung nach dem Einreihen der Bereinigung fehlschlägt, können persönliche Links und Metadaten bereits entfernt sein, während dein Konto bestehen bleibt; versuche die Kontolöschung erneut."
+      },
+      "billing": {
+        "heading": "Zahlungen",
+        "p1": "Wenn du Checkout für einen kostenpflichtigen Tarif oder das Abrechnungsportal nutzt, hostet Stripe diese Seiten und verarbeitet die dort eingegebenen Zahlungsdaten. Lumafoil speichert Stripe-IDs für Kunden, Checkout, Abonnements und Rechnungen, Zahlungsereignisse, den Abonnementstatus und Enddaten bezahlter Zeiträume, verknüpft mit deinem Konto und dem abgerechneten Arbeitsbereich. Wir senden Abrechnungsreferenzen und den gewählten Tarif an Stripe, aber keine Fotos, Videos, Dokumente, Logos oder Inhalte gespeicherter Wasserzeichen. Lumafoil erhebt oder speichert keine vollständigen Kartennummern."
       },
       "analytics": {
         "heading": "Cookies und externe Dienste",
@@ -1144,7 +1179,7 @@
       },
       "account": {
         "heading": "Ihr Konto",
-        "p1": "Der Zugang erfolgt derzeit per Einladung und erfordert eine bestätigte E-Mail-Adresse. Passwort und konfigurierte Google-/Microsoft-Anmeldung sind verfügbar. Schütze deine Zugangsdaten und dein Anbieterkonto; du bist für die Nutzung deines Kontos verantwortlich.",
+        "p1": "Die Registrierung hängt von der Verfügbarkeit ab. Eine bestätigte E-Mail-Adresse ist erforderlich; Passwort und eingerichtete Google/Microsoft-Anmeldung sind verfügbar. Schütze deine Zugangsdaten und dein Anbieterkonto; du bist für die Kontonutzung verantwortlich.",
         "p2": "Abmelden erfordert eine Verbindung und geklärte ausstehende Änderungen; Offline-Appdaten dieses Browsers werden gelöscht. Passwort-Reset widerruft andere Serversitzungen. Getrennte Geräte können lokale Kopien behalten, bis sie sich verbinden oder ihre Browserdaten gelöscht werden."
       },
       "content": {
@@ -1159,7 +1194,7 @@
       },
       "teams": {
         "heading": "Private Arbeitsbereiche und Zusammenarbeit",
-        "p1": "Jedes Konto beginnt mit einem privaten Arbeitsbereich. Websiteeinladungen teilen keine Inhalte der einladenden Person. Der Eigentümer eines Arbeitsbereichs kann ausdrücklich die Berechtigung Ansehen oder Bearbeiten für diesen Arbeitsbereich erteilen. Dadurch werden weder andere Arbeitsbereiche geteilt noch Website-Administratorrechte gewährt."
+        "p1": "Jedes Konto hat einen eigenen Arbeitsbereich. Fotos und Vorlagen bleiben getrennt, bis du sie ausdrücklich teilst. Zugriff erfordert die Freigabe des Eigentümers."
       },
       "availability": {
         "heading": "Verfügbarkeit, Gewährleistung und Änderungen",
@@ -1534,7 +1569,67 @@
     },
     "workspace": {
       "title": "Arbeitsbereiche Und Zugriff",
-      "body": "Im Benutzermenü wechselst du Arbeitsbereiche, lädst Personen ein und verwaltest Zugriff. Eigentümer vergeben Ansichts- oder Bearbeitungsrechte. Persönliche Einladungslinks geben keine Inhalte frei. Der Synchronisierungsstatus steht unten in der Seitenleiste."
+      "body": "Wechsle Arbeitsbereiche oder verwalte den Zugriff im Benutzermenü. Eigentümer vergeben Ansichts- oder Bearbeitungsrechte. Andere Arbeitsbereiche bleiben privat. Der Synchronisierungsstatus zeigt, ob Änderungen auf diesem Gerät auf das Hochladen warten."
     }
+  },
+  "pricing": {
+    "nav": "Preise",
+    "heroTag": "Deine Arbeit. Dein Wasserzeichen.",
+    "hosting": "Lieber selbst hosten?",
+    "eyebrow": "Monatliche Tarife · USD",
+    "heading": "Kostenlos starten. Mehr Platz schaffen.",
+    "intro": "Foto-, PDF- und Videowerkzeuge in jedem Tarif. Bezahltarife ergänzen Fotospeicher und kontrolliertes Teilen.",
+    "free": "Kostenlos",
+    "pro": "Pro",
+    "team": "Team",
+    "freeBody": "Für erste Projekte und eine kleine Galerie.",
+    "proBody": "Für eine wachsende Fotobibliothek und Markenmaterialien.",
+    "teamBody": "Für einen gemeinsamen Arbeitsbereich mit klaren Rechten.",
+    "monthly": "USD / Monat",
+    "freeStorage": "500 MiB Fotospeicher",
+    "proStorage": "10 GiB Fotospeicher",
+    "teamStorage": "25 GiB Fotospeicher",
+    "freePhotos": "100 gespeicherte Fotos",
+    "paidPhotos": "10.000 gespeicherte Fotos",
+    "freeLogos": "10 Logos",
+    "proLogos": "50 Logos",
+    "teamLogos": "100 Logos",
+    "personal": "Ein persönlicher Arbeitsbereich",
+    "teamPeople": "Drei Personen einschließlich Eigentümer",
+    "teamSharing": "Gemeinsame Galerie und Vorlagen",
+    "start": "Loslegen",
+    "soon": "Abos bald verfügbar",
+    "scope": "Lokale Exporte bleiben in jedem Tarif innerhalb der Geräte- und Dateigrenzen verfügbar. Team umfasst einen gemeinsamen Arbeitsbereich; persönliche Bereiche behalten ihren eigenen Tarif. Videoprojekte bleiben auf diesem Gerät und werden nicht in der Cloud gespeichert.",
+    "closedTitle": "Registrierung öffnet bald",
+    "closedBody": "Neue Konten können derzeit nicht registriert werden. Du kannst dich weiterhin mit einem bestehenden Konto anmelden.",
+    "accountHeading": "Arbeitsbereichstarif",
+    "allowance": "Aktuelles Cloud-Kontingent",
+    "manage": "Abo verwalten",
+    "upgrade": "Pro wählen",
+    "createTeam": "Team-Arbeitsbereich erstellen",
+    "sharedName": "Name des neuen gemeinsamen Arbeitsbereichs",
+    "privateMember": "Privates Mitglied",
+    "storageAmount": "{{value}} MiB",
+    "redirectNotice": "Du verlässt Lumafoil zur Abrechnung. Speichere oder exportiere vorher unfertige Arbeiten.",
+    "refreshNotice": "Aktualisiere den Zahlungsstatus, um den aktuellen Tarif zu prüfen.",
+    "resume": "Zahlung fortsetzen",
+    "cancelCheckout": "Zahlung abbrechen",
+    "refresh": "Zahlungsstatus aktualisieren"
+  },
+  "accountRemoval": {
+    "heading": "Konto löschen",
+    "description": "Lösche dein Konto und persönliche Cloud-Inhalte. Geteilte Arbeitsbereiche und erforderliche Zahlungs- und Sicherheitsdaten bleiben erhalten.",
+    "ownerProtected": "Das Konto des Website-Eigentümers ist geschützt.",
+    "action": "Konto löschen",
+    "title": "Dein Lumafoil-Konto löschen?",
+    "consequences": "Abonnements werden vor der Löschung gekündigt. Persönliche Freigaben enden, Dateien werden zur Bereinigung vorgemerkt. Geteilte Inhalte sowie Zahlungs- und Sicherheitsdaten bleiben erhalten. Nicht synchronisierte Änderungen auf diesem Gerät werden verworfen. Dies kann nicht rückgängig gemacht werden. Wenn die Bestätigung fehlschlägt, können einige persönliche Inhalte oder Links bereits entfernt sein.",
+    "confirmLabel": "E-Mail bestätigen",
+    "confirmHint": "Gib deine Konto-E-Mail zur Bestätigung genau ein.",
+    "confirm": "Dauerhaft löschen",
+    "unconfirmed": "Die Löschung wurde nicht bestätigt. Deine Gerätedaten wurden nicht gelöscht.",
+    "cleanupHeading": "Bereinigung des gelöschten Kontos",
+    "cleanupPending": "Die gespeicherten Daten dieses Kontos werden von diesem Gerät gelöscht.",
+    "cleanupFailed": "Die Gerätebereinigung wurde nicht abgeschlossen. Versuche erneut, die verbleibenden lokalen Daten des gelöschten Kontos zu löschen.",
+    "cleanupRetry": "Gerätebereinigung wiederholen"
   }
 }

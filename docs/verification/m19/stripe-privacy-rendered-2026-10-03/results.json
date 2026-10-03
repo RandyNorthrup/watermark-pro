@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-03",
+  "source_boundary": "Merged billing/budget/image/privacy source before code-clone/storage/AAC corrections",
+  "actual_browser_journeys_passed": 2,
+  "axe_violations": 0,
+  "horizontal_overflow": 0,
+  "root_viewed_both_payment_sections": true,
+  "real_provider_payment_claimed": false,
+  "frames": [
+    {
+      "project": "desktop-en-light",
+      "path": "docs/verification/m19/stripe-privacy-rendered-2026-10-03/desktop-en-light.png",
+      "sha256": "7fdb0c86f06bf4d837000f16728df366e7d5f8970529e07a1655cbfb1640c66b",
+      "bytes": 144500
+    },
+    {
+      "project": "phone-ar-dark",
+      "path": "docs/verification/m19/stripe-privacy-rendered-2026-10-03/phone-ar-dark.png",
+      "sha256": "1252b35084f3a3f286c2a100d03f05c6e3219d481a5e2ef95ace3a24f71ea7be",
+      "bytes": 796535
+    }
+  ]
+}

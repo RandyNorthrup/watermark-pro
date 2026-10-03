@@ -17,6 +17,7 @@ import {
   PencilRuler,
   Plus,
   ScrollText,
+  RefreshCw,
   ShieldCheck,
   Stamp,
   Users,
@@ -26,6 +27,7 @@ import { lazy, type ReactNode, Suspense, useState, useSyncExternalStore } from '
 import { useTranslation } from 'react-i18next'
 
 import { BrandMark } from './brand-mark'
+import { GooeyNavigation } from './gooey-navigation'
 import { LanguageMenu } from './language-menu'
 import { SupportPrompt } from './support-prompt'
 import { ThemeToggle } from './theme-toggle'
@@ -149,7 +151,14 @@ function navItemsFor(session: SessionData, pathname: string): readonly NavItem[]
   const back = canManageSite
     ? { ...OVERVIEW_NAV_ITEM, icon: ArrowLeft }
     : BACK_TO_WORKSPACE_NAV_ITEM
-  const settings: readonly NavItem[] = [back, ...SETTINGS_NAV_ITEMS]
+  const settings: readonly NavItem[] = [
+    back,
+    ...SETTINGS_NAV_ITEMS.filter(
+      (item) =>
+        item.to !== '/app/invitations' ||
+        (session.user.emailVerified && session.user.membershipCohort === 'private'),
+    ),
+  ]
   return canManageSite ? [...settings, ADMIN_NAV_ITEM] : settings
 }
 
@@ -161,8 +170,8 @@ interface AppShellProps {
 }
 
 /**
- * Authenticated chrome. Wide screens: a sidebar with the organization
- * switcher and every destination. Phones: a compact top bar, a bottom tab
+ * Authenticated chrome. Wide screens: a floating gooey navigation button,
+ * header workspace switcher and persistent sync controls. Phones: a bottom tab
  * bar with the four tools, and a "More" sheet for the rest. Both layouts
  * respect the device's safe areas.
  */
@@ -173,7 +182,12 @@ export function AppShell({ session, organization, organizations, children }: App
   const locationHref = useRouterState({ select: (state) => state.location.href })
   const isAdminArea = pathname.startsWith(ADMIN_NAV_ITEM.to) && isPlatformAdmin(session.user)
   const adminSection = currentAdminSection(search)
-  const isSettingsAreaActive = isSettingsArea(pathname)
+  const syncStatus = useSyncExternalStore(subscribeOfflineStatus, offlineStatus)
+  const syncMessage =
+    syncStatus.pending > 0
+      ? t('offline.pending', { count: syncStatus.pending })
+      : t('offline.upToDate')
+  const syncReadout = syncStatus.isOnline ? syncMessage : t('offline.disconnected')
   const home = isPlatformAdmin(session.user) ? '/app' : '/app/editor'
   const navItems = navItemsFor(session, pathname)
   const currentItem = navItems.find((item) =>
@@ -191,36 +205,45 @@ export function AppShell({ session, organization, organizations, children }: App
       >
         {t('shell.skipToContent')}
       </a>
-      <aside className="glass-chrome sticky top-4 my-4 ms-4 hidden h-[calc(100svh-2rem)] w-60 shrink-0 flex-col overflow-y-auto rounded-3xl border border-line px-4 py-6 md:flex">
-        <BrandMark to={home} className="px-2 py-1" />
-        {isSettingsAreaActive ? (
-          <Link
-            to="/app/account"
-            className="glass-control mt-6 flex min-w-0 items-center gap-3 rounded-2xl border p-3"
-          >
-            <Avatar name={session.user.name} image={session.user.image} className="size-11" />
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-semibold">{session.user.name}</span>
-              <span className="block truncate text-xs text-ink-muted">{session.user.email}</span>
-            </span>
-          </Link>
-        ) : null}
-        <div className={isSettingsAreaActive ? 'mt-4' : 'mt-6'}>
-          <OrganizationSwitcher
-            organization={organization}
-            organizations={organizations}
-            home={home}
-          />
-        </div>
-        {isAdminArea ? (
-          <AdminNavList currentSection={adminSection} className="mt-7" />
-        ) : (
-          <NavList items={navItems} label={t('shell.primaryNav')} className="mt-7" />
-        )}
-        <div className="mt-auto pt-6">
-          <WorkspaceSync userId={session.user.id} organizationId={organization?.id} />
-        </div>
-      </aside>
+      <GooeyNavigation
+        key={`${session.user.id}:${organization?.id ?? ''}:${locationHref}`}
+        label={t(isAdminArea ? 'admin.sectionsLabel' : 'shell.primaryNav')}
+        items={
+          isAdminArea
+            ? [
+                {
+                  id: 'account',
+                  isCurrent: false,
+                  label: t('accountAuth.heading'),
+                  icon: ArrowLeft,
+                  renderLink: (props) => <Link to="/app/account" {...props} />,
+                },
+                ...ADMIN_SECTION_NAV_ITEMS.map(({ section, label, icon }) => ({
+                  id: section,
+                  isCurrent: section === adminSection,
+                  label: t(label),
+                  icon,
+                  renderLink: (props: { className: string; children: ReactNode }) => (
+                    <Link
+                      to="/app/admin"
+                      search={{ section }}
+                      aria-current={section === adminSection ? 'page' : undefined}
+                      {...props}
+                    />
+                  ),
+                })),
+              ]
+            : navItems.map(({ to, label, icon, exact }) => ({
+                id: to,
+                isCurrent: exact ? pathname === to : pathname.startsWith(to),
+                label: t(label),
+                icon,
+                renderLink: (props: { className: string; children: ReactNode }) => (
+                  <Link to={to} activeOptions={{ exact }} {...props} />
+                ),
+              }))
+        }
+      />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="glass-chrome relative z-10 grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 border-b border-line px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:mx-4 md:mt-4 md:rounded-2xl md:border md:px-6 md:pt-3 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <div className="flex min-w-0 items-center gap-1 md:hidden">
@@ -237,16 +260,44 @@ export function AppShell({ session, organization, organizations, children }: App
             <BrandMark to={home} />
           </div>
           <div className="hidden min-w-0 items-center gap-3 text-sm md:flex">
-            <span className="truncate text-ink-muted">
-              {isSettingsAreaActive ? session.user.name : organization?.name}
-            </span>
-            <span aria-hidden="true" className="h-3.5 w-px rotate-[18deg] bg-control-line/65" />
-            <span className="font-medium">
+            <BrandMark to={home} />
+            <div className="max-w-64 min-w-0">
+              <OrganizationSwitcher
+                organization={organization}
+                organizations={organizations}
+                home={home}
+              />
+            </div>
+            <span className="hidden truncate font-medium xl:block">
               {currentLabel === undefined ? null : t(currentLabel)}
             </span>
           </div>
-          <SupportPrompt />
+          {session.user.emailVerified && session.user.membershipCohort === 'private' ? (
+            <SupportPrompt />
+          ) : null}
           <div className="col-start-2 row-start-1 ms-auto flex items-center gap-2 lg:col-start-3">
+            <details
+              key={`sync:${session.user.id}:${organization?.id ?? ''}`}
+              className="workspace-sync hidden md:block"
+            >
+              <summary
+                aria-label={t('offline.label')}
+                className="glass-control relative flex size-11 cursor-pointer items-center justify-center rounded-xl border"
+              >
+                <RefreshCw aria-hidden="true" className="size-4" />
+                {syncStatus.pending > 0 ? (
+                  <span className="absolute -end-1 -top-1 rounded-full bg-brand-700 px-1 text-xs font-semibold text-white">
+                    {syncStatus.pending}
+                  </span>
+                ) : null}
+                <span role="status" className="sr-only">
+                  {syncReadout}
+                </span>
+              </summary>
+              <div className="glass-popover absolute end-4 top-full mt-2 max-h-[70svh] w-72 overflow-y-auto rounded-xl border border-line p-3">
+                <WorkspaceSync userId={session.user.id} organizationId={organization?.id} />
+              </div>
+            </details>
             <LanguageMenu />
             <ThemeToggle />
             <UserMenu
@@ -627,10 +678,12 @@ function UserMenu({
             <CircleUserRound aria-hidden="true" className="size-4" />
             {t('accountAuth.heading')}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => void navigate({ to: '/app/invitations' })}>
-            <UserPlus aria-hidden="true" className="size-4" />
-            {t('siteInvites.heading')}
-          </DropdownMenuItem>
+          {session.user.emailVerified && session.user.membershipCohort === 'private' ? (
+            <DropdownMenuItem onSelect={() => void navigate({ to: '/app/invitations' })}>
+              <UserPlus aria-hidden="true" className="size-4" />
+              {t('siteInvites.heading')}
+            </DropdownMenuItem>
+          ) : null}
           <DropdownMenuSeparator />
           {organization === null ? null : (
             <DropdownMenuLabel>{organization.name}</DropdownMenuLabel>

@@ -29,6 +29,7 @@ export const PUBLIC_PLANS = {
     storageBytes: PLAN_CONFIGURATION.freeStorageMiB * BYTES_PER_MEGABYTE,
     photos: 100,
     logos: 10,
+    presets: 20,
     members: 1,
   },
   pro: {
@@ -39,6 +40,7 @@ export const PUBLIC_PLANS = {
       BYTES_PER_MEGABYTE,
     photos: 10_000,
     logos: 50,
+    presets: 1000,
     members: 1,
   },
   team: {
@@ -49,6 +51,7 @@ export const PUBLIC_PLANS = {
       BYTES_PER_MEGABYTE,
     photos: 10_000,
     logos: 100,
+    presets: 2000,
     members: 3,
   },
 } as const
@@ -58,9 +61,20 @@ export const PRIVATE_PLAN_CAPACITY = {
   storageBytes: MAX_STORAGE_BYTES_PER_ORGANIZATION,
   photos: MAX_PHOTOS_PER_ORGANIZATION,
   logos: MAX_LOGOS_PER_ORGANIZATION,
+  presets: 1000,
   sharedMembers: 3,
   sharedWorkspaces: 1,
 } as const
+
+/** Server-owned creation provenance is immutable across client metadata and membership changes. */
+export const WORKSPACE_CREATION_KIND = {
+  personal: 'personal',
+  shared: 'shared',
+  historical: 'historical',
+  paid: 'paid',
+} as const
+export type WorkspaceCreationKind =
+  (typeof WORKSPACE_CREATION_KIND)[keyof typeof WORKSPACE_CREATION_KIND]
 
 const WORKSPACE_BASE_PLAN = { free: 'free', private: 'private', legacy: 'legacy' } as const
 const workspaceBasePlanSchema = z.enum(WORKSPACE_BASE_PLAN)
@@ -97,6 +111,7 @@ export interface WorkspaceCapacity {
   storageBytes: number
   photos: number
   logos: number
+  presets: number
   members: number
 }
 /** Member-visible limits disclose no billing identifiers or another person's cohort. */
@@ -105,6 +120,7 @@ export const workspaceCapacitySchema = z
     storageBytes: z.number().int().nonnegative(),
     photos: z.number().int().nonnegative(),
     logos: z.number().int().nonnegative(),
+    presets: z.number().int().nonnegative(),
     members: z.number().int().positive(),
   })
   .strict()
@@ -113,6 +129,7 @@ function limits(plan: WorkspaceCapacity): WorkspaceCapacity {
     storageBytes: plan.storageBytes,
     photos: plan.photos,
     logos: plan.logos,
+    presets: plan.presets,
     members: plan.members,
   }
 }
@@ -145,6 +162,7 @@ export function workspaceCapacity(
     storageBytes: PRIVATE_PLAN_CAPACITY.storageBytes,
     photos: PRIVATE_PLAN_CAPACITY.photos,
     logos: PRIVATE_PLAN_CAPACITY.logos,
+    presets: PRIVATE_PLAN_CAPACITY.presets,
     members: baseMembers,
   }
 }

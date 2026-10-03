@@ -2,6 +2,23 @@
 
 ## Goal
 
+### Integrated editor and public plans — 2026-10-03
+
+The owner requested a Resolve-style multi-clip editor and Lucas Bebber-inspired
+gooey navigation. Current source provides media pool, viewer, inspector,
+cutting/trimming, video/audio tracks and an outside-canvas half-circle handle.
+Official Resolve, Premiere, Clipchamp and VEED references informed the neutral
+workspace, compact controls and viewer emphasis. This source is integrated with
+public Free/Pro/Team, private-cohort gates, payment lifecycle and preset limits.
+
+Isolated `4ca0d8c` passed all 18 Linux WebKit codec cases in workflow 37107837587,
+retaining original presentation and native/library waveform controls. Combined
+types/lint/CSS and focused editor/shell controls pass. Fresh rendered editor/
+gutter, global coverage/security/four-device/Lighthouse/screenshot gates remain.
+The audit still rejects braces; public signup/live billing remain closed.
+See [source integration](../verification/m19/video-source-integration-2026-10-03.md)
+and [public billing](public-billing.md). M19 is not certified.
+
 ### Public plans and human gates — 2026-10-01
 
 The owner selected public Free and monthly USD paid subscriptions alongside the

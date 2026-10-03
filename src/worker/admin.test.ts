@@ -210,6 +210,8 @@ describe('platform administration', () => {
     // Cloud-import pickers are unconfigured in the default harness, so every
     // picker field is null; only the Turnstile key changes between the cases.
     const noCloudPickers = {
+      publicSignupEnabled: false,
+      billingEnabled: false,
       googleAuthEnabled: false,
       microsoftAuthEnabled: false,
       googleOAuthClientId: null,
@@ -251,6 +253,8 @@ describe('platform administration', () => {
     const response = await new TestClient(configured.app, configured.env).get('/api/config')
     expect(publicConfigSchema.parse(await response.json())).toEqual({
       turnstileSiteKey: null,
+      publicSignupEnabled: false,
+      billingEnabled: false,
       googleOAuthClientId: 'google-client',
       googleAuthEnabled: false,
       microsoftAuthEnabled: false,

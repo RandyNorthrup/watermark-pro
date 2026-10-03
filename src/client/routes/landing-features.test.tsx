@@ -29,7 +29,7 @@ describe('public product explanation', () => {
     ]) {
       expect(screen.getByRole('heading', { name })).toBeVisible()
     }
-    expect(screen.getByText('Lumafoil is invitation-only. Want to self-host?')).toBeVisible()
+    expect(screen.getByText('Prefer to self-host?')).toBeVisible()
     expect(
       screen.getByRole('link', { name: 'Get the source code free on GitHub.' }),
     ).toHaveAttribute('href', 'https://github.com/RandyNorthrup/watermark-pro')
@@ -39,9 +39,12 @@ describe('public product explanation', () => {
     )
     expect(screen.queryByRole('link', { name: 'Create account' })).toBeNull()
     expect(screen.queryByText('Built to be trusted')).toBeNull()
-    expect(
-      screen.getByText(/A site invitation never shares your photos or watermarks/),
-    ).toBeVisible()
+    expect(screen.getAllByText(/Each account has its own workspace/)[0]).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Start free. Make room for more.' })).toBeVisible()
+    expect(screen.getByText('$9')).toBeVisible()
+    expect(screen.getByText('$24')).toBeVisible()
+    expect(screen.getByText('Three people, including the owner')).toBeVisible()
+    expect(screen.queryByText(/invitation-only/i)).toBeNull()
     expect(screen.getByText(/Cloud storage is in preview\./)).toBeVisible()
     expect(
       screen.getByText(/Browse Recent Work in thumbnail, list, or details views\./),

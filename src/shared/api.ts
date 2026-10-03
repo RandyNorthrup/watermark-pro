@@ -13,6 +13,8 @@ import {
   CLIENT_ERROR_MAX_SOURCE_LENGTH,
   MAX_BULK_DELETE,
   MAX_CURSOR_LENGTH,
+  MAX_EXIF_ORIENTATION,
+  MAX_LOGO_SIDE,
   MAX_PHOTO_NAME_LENGTH,
   MAX_PHOTO_SIDE,
   MAX_SHARE_PHOTOS,
@@ -79,11 +81,22 @@ export type AssetDto = z.infer<typeof assetDtoSchema>
 
 export const assetListResponseSchema = z.object({ assets: z.array(assetDtoSchema) })
 
-/** Form fields accompanying an upload; dimensions are client-reported. */
+/** Trusted dimension fields from an encoded image header, before any display-axis rotation. */
+export const encodedImageDimensionsSchema = z.object({
+  width: z.number().int().positive().max(MAX_PHOTO_SIDE),
+  height: z.number().int().positive().max(MAX_PHOTO_SIDE),
+})
+
+export type ImageDimensions = z.infer<typeof encodedImageDimensionsSchema>
+
+/** EXIF has eight defined display orientations; no client value supplies this field. */
+export const imageOrientationSchema = z.number().int().min(1).max(MAX_EXIF_ORIENTATION)
+
+/** Upload claims must match the display dimensions derived from immutable encoded bytes. */
 export const assetUploadFieldsSchema = z.object({
   name: z.string().trim().min(1).max(MAX_PRESET_NAME_LENGTH),
-  width: z.coerce.number().int().positive(),
-  height: z.coerce.number().int().positive(),
+  width: z.coerce.number().int().positive().max(MAX_LOGO_SIDE),
+  height: z.coerce.number().int().positive().max(MAX_LOGO_SIDE),
 })
 
 export const photoDtoSchema = z.object({
@@ -119,7 +132,7 @@ export const photoListQuerySchema = z.object({
   folderId: z.union([folderIdSchema, z.literal('root')]).optional(),
 })
 
-/** Form fields accompanying a photo upload; dimensions are client-reported. */
+/** Upload claims must match the display dimensions derived from immutable encoded bytes. */
 export const photoUploadFieldsSchema = z.object({
   name: z.string().trim().min(1).max(MAX_PHOTO_NAME_LENGTH),
   width: z.coerce.number().int().positive().max(MAX_PHOTO_SIDE),

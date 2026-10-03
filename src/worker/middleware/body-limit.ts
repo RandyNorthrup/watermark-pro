@@ -1,6 +1,7 @@
 /** Count bytes while the actual consumer reads, without buffering a second copy of uploads. */
 import { createMiddleware } from 'hono/factory'
 
+import { BILLING_POLICY } from '../../shared/billing'
 import { MAX_LOGO_BYTES, MAX_PHOTO_BYTES, MAX_THUMBNAIL_BYTES } from '../../shared/constants'
 import type { AppContext } from '../app-context'
 import { apiErrors } from '../errors'
@@ -12,6 +13,8 @@ export const API_BODY_LIMITS = {
 
 /** Multipart allowances apply only to the two upload routes, never to authentication. */
 export function requestBodyLimit(method: string, pathname: string): number {
+  if (method === 'POST' && pathname === BILLING_POLICY.webhookPath)
+    return BILLING_POLICY.webhookBytes
   if (method === 'POST' && /^\/api\/orgs\/[^/]+\/photos$/.test(pathname)) {
     return MAX_PHOTO_BYTES + MAX_THUMBNAIL_BYTES + API_BODY_LIMITS.multipartOverhead
   }

@@ -13,6 +13,7 @@ import {
   shareDtoSchema,
   shareListResponseSchema,
 } from '../../shared/api'
+import { CLOUD_OPERATION_POLICY } from '../../shared/cloud-operations'
 import {
   API_RATE_LIMIT,
   HTTP_STATUS,
@@ -99,7 +100,8 @@ function streamPublic(stored: StoredObject, record: PhotoRecord, contentType: st
   })
 }
 
-async function sharedPhoto(c: Context<AppContext>): Promise<PhotoRecord> {
+async function sharedPhoto(c: Context<AppContext>) {
+  await limitPublic(c)
   const record = await resolveShare(c)
   const photoId = c.req.param('photoId')
   if (photoId === undefined || !record.photoIds.includes(photoId)) {
@@ -109,6 +111,14 @@ async function sharedPhoto(c: Context<AppContext>): Promise<PhotoRecord> {
   if (photo === null) {
     throw apiErrors.notFound()
   }
+  await c.get('services').plans.spendOperations({
+    kind: 'share',
+    organizationId: record.organizationId,
+    shareId: record.id,
+    expiresAt: record.expiresAt,
+    photoId: photo.id,
+    units: CLOUD_OPERATION_POLICY.weights.read,
+  })
   return photo
 }
 
@@ -116,7 +126,7 @@ export const shareRoutes = new Hono<AppContext>()
   .get(
     '/orgs/:orgId/shares',
     requireSession,
-    requirePermission({ share: ['create'] }),
+    requirePermission({ share: ['create'] }, CLOUD_OPERATION_POLICY.weights.read),
     async (c) => {
       const records = await c.get('services').shares.listForOrganization(c.req.param('orgId'))
       const shares = await Promise.all(records.map((record) => toDto(c, record)))
@@ -197,6 +207,13 @@ export const shareRoutes = new Hono<AppContext>()
   .get('/share/:token', async (c) => {
     await limitPublic(c)
     const record = await resolveShare(c)
+    await c.get('services').plans.spendOperations({
+      kind: 'share',
+      organizationId: record.organizationId,
+      shareId: record.id,
+      expiresAt: record.expiresAt,
+      units: CLOUD_OPERATION_POLICY.weights.read,
+    })
     const photos = await c.get('services').photos.findMany(record.organizationId, record.photoIds)
     const byId = new Map(photos.map((photo) => [photo.id, photo]))
     const body = publicShareSchema.parse({
@@ -224,7 +241,6 @@ export const shareRoutes = new Hono<AppContext>()
     return c.json(body, HTTP_STATUS.ok)
   })
   .get('/share/:token/photos/:photoId/file', async (c) => {
-    await limitPublic(c)
     const photo = await sharedPhoto(c)
     const stored = await c.get('services').objects.get(photo.key)
     if (stored === null) {
@@ -233,7 +249,6 @@ export const shareRoutes = new Hono<AppContext>()
     return streamPublic(stored, photo, photo.contentType)
   })
   .get('/share/:token/photos/:photoId/thumbnail', async (c) => {
-    await limitPublic(c)
     const photo = await sharedPhoto(c)
     const stored = await c.get('services').objects.get(photo.thumbnailKey)
     if (stored === null) {

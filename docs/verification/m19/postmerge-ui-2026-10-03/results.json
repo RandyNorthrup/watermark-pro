@@ -1,0 +1,165 @@
+{
+  "date": "2026-10-03",
+  "source": "Fresh merged video/public/lifecycle/preset source with corrected Photos caption",
+  "canonicalBuild": {
+    "passed": true,
+    "initialAppGzipKb": 138.9,
+    "maximumAppGzipKb": 140
+  },
+  "journeys": 4,
+  "axeChecks": 20,
+  "axeViolations": 0,
+  "horizontalOverflowCases": 0,
+  "privateFixture": {
+    "membershipCohort": "private",
+    "emailVerified": true,
+    "presets": 1000,
+    "invitationBudgetHttpStatus": 200
+  },
+  "publicLanding": {
+    "privateInvitationOrDonationLinks": 0
+  },
+  "realLocalMedia": {
+    "inputs": "Existing e2e sample-video.mp4 twice and sample-audio.wav",
+    "splitPlayheadSeconds": 0.5,
+    "trimmedSourceOutSeconds": 0.25,
+    "videoIntervals": 3,
+    "audioTrack": "A3",
+    "audioGain": 0.5
+  },
+  "navigation": {
+    "desktopPrimaryLinks": 6,
+    "collapsedMediaAndInspector": true,
+    "measuredTriggerOutsideRenderedCanvasLTRandRTL": true,
+    "phoneExistingMenuVideoLinkClicked": true
+  },
+  "limits": [
+    "Scoped UI/import/editing proof; full release/native export/performance certification remains open",
+    "Original static HTTP 500 cause remains unproven"
+  ],
+  "captures": [
+    {
+      "project": "desktop-ar-dark",
+      "frame": "account",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-ar-dark/account.png",
+      "sha256": "f7d6215427d78ba3d0a484068a1f259b2c66d49764188c88579a489c2883b632",
+      "bytes": 575017
+    },
+    {
+      "project": "desktop-ar-dark",
+      "frame": "editor",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-ar-dark/editor.png",
+      "sha256": "8a4aaec3f153a520ba1f368ac9fb79853967bbdf96327d4b920acaf1ae3d31ab",
+      "bytes": 208479
+    },
+    {
+      "project": "desktop-ar-dark",
+      "frame": "navigation",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-ar-dark/navigation.png",
+      "sha256": "7389c27e0aeacc43d0c0605f57872056771c85a2fa347dac8ccec4c0d91417dc",
+      "bytes": 208550,
+      "repositoryFile": "navigation-desktop-ar-dark.png"
+    },
+    {
+      "project": "desktop-ar-dark",
+      "frame": "collapsed",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-ar-dark/collapsed.png",
+      "sha256": "163e51b5f1e5d35d0fbcc60d61c70cb68b4f0c1333f966718819619bd2afc80b",
+      "bytes": 186965
+    },
+    {
+      "project": "desktop-en-light",
+      "frame": "account",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-en-light/account.png",
+      "sha256": "957d1efaf797a767403945273034bdb3201d2e94093ff77332838acaf777a098",
+      "bytes": 589898,
+      "repositoryFile": "account-desktop-en-light.png"
+    },
+    {
+      "project": "desktop-en-light",
+      "frame": "editor",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-en-light/editor.png",
+      "sha256": "5eed2461cfa203414d3ded2dab856e5e482991ef4bc6c28b84d873282d958730",
+      "bytes": 216432,
+      "repositoryFile": "editor-desktop-en-light.png"
+    },
+    {
+      "project": "desktop-en-light",
+      "frame": "navigation",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-en-light/navigation.png",
+      "sha256": "a41b15837bbbde756b98ea9e352722afbc9a6d8e703c6ae6f7118cb9e9a2df09",
+      "bytes": 213889
+    },
+    {
+      "project": "desktop-en-light",
+      "frame": "collapsed",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-desktop-en-light/collapsed.png",
+      "sha256": "c2f406af314f2fbf88f172a5dc9372ec0311021cdd1dfd70118701fbe9d26f49",
+      "bytes": 190761
+    },
+    {
+      "project": "phone-ar-dark",
+      "frame": "account",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-ar-dark/account.png",
+      "sha256": "0818fcc844fbdc38b342bf12deaed86d1c34eab1b99636c0a6a9a14f65c5a65c",
+      "bytes": 5412914
+    },
+    {
+      "project": "phone-ar-dark",
+      "frame": "editor",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-ar-dark/editor.png",
+      "sha256": "20a934b68cc194d9bb96588fd49128fdc1446965738627f0cd7b88571640f869",
+      "bytes": 2347521,
+      "repositoryFile": "editor-phone-ar-dark.png"
+    },
+    {
+      "project": "phone-ar-dark",
+      "frame": "navigation",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-ar-dark/navigation.png",
+      "sha256": "a98191fc9ab637be54f55a0261485725cd5f58c6cb1411e1820b0bfad50a72d1",
+      "bytes": 1477995
+    },
+    {
+      "project": "phone-ar-dark",
+      "frame": "collapsed",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-ar-dark/collapsed.png",
+      "sha256": "a0b8bfb3118d3f09ca368ef2864285349bd2e7c97f9ef4c94fd54a22fef07516",
+      "bytes": 1629158
+    },
+    {
+      "project": "phone-en-light",
+      "frame": "account",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-en-light/account.png",
+      "sha256": "0b4a02d049af666ef783743c29dad719806d55db82123ea17c42846c62f1c575",
+      "bytes": 6389473
+    },
+    {
+      "project": "phone-en-light",
+      "frame": "editor",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-en-light/editor.png",
+      "sha256": "126a3a97d77c44e6c85c26d30233f08501d27028c09d646377536bbde4dc6370",
+      "bytes": 2344265
+    },
+    {
+      "project": "phone-en-light",
+      "frame": "navigation",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-en-light/navigation.png",
+      "sha256": "9622fc1b6c03703b8244991e9d83c92cc77d10c5c88ea0dd37f2fb35c3ef9c9f",
+      "bytes": 1552455
+    },
+    {
+      "project": "phone-en-light",
+      "frame": "collapsed",
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-postmerge-ui/results/render-postmerge-actual-ac-5e168-eo-and-collapsed-navigation-phone-en-light/collapsed.png",
+      "sha256": "cf1dda46c736eda9f602f370fc72d5bf62de0a05f9d00f5454a54a5aed943bbe",
+      "bytes": 1787494
+    }
+  ],
+  "previewObservation": {
+    "classification": "Original desktop PNG pixel inspection disproved the earlier narrow-preview observation; no runtime correction made.",
+    "measurementFile": "preview-geometry.json",
+    "originalHashesVerified": true,
+    "focusedReproductionCases": 1,
+    "focusedStates": 6
+  }
+}

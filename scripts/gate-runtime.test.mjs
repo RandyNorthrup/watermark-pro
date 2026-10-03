@@ -1,13 +1,31 @@
 /** Real SDK startup checks use disposable built fixtures and isolated D1/R2 state. */
 import assert from 'node:assert/strict'
-import { mkdir, mkdtemp, readFile, readdir, realpath, rm, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
+import { cp, mkdir, mkdtemp, readFile, readdir, realpath, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { test } from 'node:test'
 
+import { classifyGateFailure } from './lib/gate-http-bridge.mjs'
 import { GATE_WORKER_PATTERNS } from './lib/gate-routing.mjs'
 import { startGateServer } from './lib/gate-runtime.mjs'
 
 const STREAM_OBSERVATION_TIMEOUT_MS = 5000
+const STATIC_FAN_OUT = {
+  assets: 8,
+  bytes: 2 * 1024 * 1024,
+  requests: 24,
+  rounds: 3,
+  maximumInventoryEntries: 3000,
+}
+
+const bodyHash = (body) => createHash('sha256').update(body).digest('hex')
+
+function staticFailureDiagnostic(error) {
+  const message = typeof error === 'string' ? error.split('\n', 1)[0] : undefined
+  return classifyGateFailure(
+    message === undefined ? error : new Error(message.replace(/^(?:TypeError|Error): /, '')),
+  )
+}
 
 const FIXTURE_WORKER = `export default {
   async fetch(request, env) {
@@ -51,6 +69,7 @@ const FIXTURE_WORKER = `export default {
 }`
 
 async function fixture(context, { invalidMigration = false } = {}) {
+  await mkdir('temp', { recursive: true })
   const parent = await realpath('temp')
   const root = await mkdtemp(path.join(parent, 'lumafoil-gate-fixture-'))
   context.after(async () => {
@@ -226,6 +245,151 @@ test('SDK gate uses real migrations, R2 and rate bindings with test-only configu
     await readFile(path.join(root, '.dev.vars'), 'utf8'),
     'GOOGLE_AUTH_CLIENT_SECRET=synthetic-parent-canary\n',
   )
+})
+
+test('native and direct SDK asset fan-out remain isolated from aborts and rejected bodies', async (context) => {
+  context.mock.method(console, 'error', () => {
+    // Expected client aborts are classified below, never printed with request details.
+  })
+  const { root } = await fixture(context)
+  const payload = Buffer.alloc(STATIC_FAN_OUT.bytes, 'named static fixture')
+  const source = process.env.LUMAFOIL_GATE_ASSET_SOURCE
+  let assets
+  if (source === undefined) {
+    const assetDirectory = path.join(root, 'dist/client/assets')
+    await mkdir(assetDirectory)
+    assets = Array.from({ length: STATIC_FAN_OUT.assets }, (_, index) => ({
+      pathname: `/assets/fan-out-${index}.bin`,
+      digest: bodyHash(payload),
+      bytes: payload.length,
+    }))
+    await Promise.all(
+      assets.map(
+        async (asset) => await writeFile(path.join(root, 'dist/client', asset.pathname), payload),
+      ),
+    )
+  } else {
+    const directory = await realpath(source)
+    const manifest = await readFile(path.join(directory, 'offline-manifest.json'))
+    const inventory = JSON.parse(manifest)
+    assert.ok(
+      Array.isArray(inventory) && inventory.length <= STATIC_FAN_OUT.maximumInventoryEntries,
+    )
+    assets = []
+    for (const pathname of inventory) {
+      assert.ok(
+        typeof pathname === 'string' && pathname.startsWith('/') && !pathname.includes('..'),
+      )
+      const filename = pathname === '/offline-shell' ? 'offline-shell.html' : pathname.slice(1)
+      const bytes = await readFile(path.join(directory, filename))
+      assets.push({ pathname, digest: bodyHash(bytes), bytes: bytes.length })
+    }
+    await cp(directory, path.join(root, 'dist/client'), { recursive: true })
+    context.diagnostic(
+      JSON.stringify({
+        inventoryEntries: assets.length,
+        inventoryBytes: assets.reduce((total, asset) => total + asset.bytes, 0),
+        inventoryDigest: bodyHash(manifest),
+      }),
+    )
+  }
+  const batches =
+    source === undefined
+      ? Array.from({ length: STATIC_FAN_OUT.rounds }, () =>
+          Array.from(
+            { length: STATIC_FAN_OUT.requests },
+            (_, index) => assets[index % assets.length],
+          ),
+        )
+      : Array.from({ length: Math.ceil(assets.length / STATIC_FAN_OUT.requests) }, (_, index) =>
+          assets.slice(index * STATIC_FAN_OUT.requests, (index + 1) * STATIC_FAN_OUT.requests),
+        )
+  const gate = await startGateServer({ root, port: 0 })
+  const transports = {
+    native: async (pathname, init) => await fetch(gate.origin + pathname, init),
+    direct: async (pathname, init) => await gate.router.fetch(gate.origin + pathname, init),
+  }
+  const failures = []
+  try {
+    for (const [transport, dispatch] of Object.entries(transports)) {
+      gate.clearLogs()
+      for (const [round, batch] of batches.entries()) {
+        const outcomes = await Promise.allSettled(
+          batch.map(async (asset, index) => {
+            const controller = new AbortController()
+            const response = await dispatch(asset.pathname, {
+              headers: { 'accept-encoding': 'identity' },
+              redirect: 'manual',
+              signal: controller.signal,
+            })
+            if (response.status !== 200) {
+              const body = await response.text()
+              return {
+                status: response.status,
+                error: staticFailureDiagnostic(body),
+                bodyDigest: bodyHash(body),
+                bodyBytes: Buffer.byteLength(body),
+              }
+            }
+            if (index % 2 === 0) {
+              const reader = response.body.getReader()
+              const first = await reader.read()
+              assert.equal(first.done, false)
+              controller.abort()
+              try {
+                await reader.cancel()
+              } catch {
+                // Either abort or reader cancellation owns this one response lifetime.
+              }
+              return { status: response.status, aborted: true }
+            }
+            const bytes = Buffer.from(await response.arrayBuffer())
+            assert.equal(bodyHash(bytes), asset.digest)
+            return { status: response.status, aborted: false }
+          }),
+        )
+        const results = outcomes.map((outcome) =>
+          outcome.status === 'fulfilled'
+            ? outcome.value
+            : { status: null, error: staticFailureDiagnostic(outcome.reason) },
+        )
+        const errors = gate
+          .getLogs()
+          .filter((entry) => entry.level === 'error')
+          .map((entry) => staticFailureDiagnostic(entry.message))
+        context.diagnostic(JSON.stringify({ transport, round, results, errors }))
+        failures.push(...results.filter((result) => result.status !== 200))
+      }
+      // Actual gate policy sends API/body traffic directly through the SDK in both modes.
+      const refused = await gate.router.fetch(gate.origin + '/api/deny', {
+        method: 'POST',
+        headers: { 'accept-encoding': 'identity' },
+        body: payload,
+      })
+      assert.equal(refused.status, 403)
+      await refused.text()
+      const after = await dispatch(assets[0].pathname, {
+        headers: { 'accept-encoding': 'identity' },
+      })
+      if (after.status === 200) {
+        const bytes = Buffer.from(await after.arrayBuffer())
+        assert.equal(bodyHash(bytes), assets[0].digest)
+      } else {
+        const body = await after.text()
+        const failure = {
+          status: after.status,
+          error: staticFailureDiagnostic(body),
+          bodyDigest: bodyHash(body),
+          bodyBytes: Buffer.byteLength(body),
+        }
+        context.diagnostic(JSON.stringify({ transport, afterBodyRejection: failure }))
+        failures.push(failure)
+      }
+    }
+    assert.equal(failures.length, 0, 'Static transport failures require triage')
+  } finally {
+    await gate.close()
+  }
 })
 
 test('malformed or escaping build configuration fails before a gate can start', async (context) => {

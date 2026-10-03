@@ -2,6 +2,7 @@ import { Hono, type Context } from 'hono'
 import type { ZodType } from 'zod'
 
 import { accountIdSchema } from '../../shared/account-identity'
+import { CLOUD_OPERATION_POLICY } from '../../shared/cloud-operations'
 import { HTTP_STATUS } from '../../shared/constants'
 import {
   contentMoveSchema,
@@ -15,8 +16,10 @@ import {
   folderWriteResultSchema,
 } from '../../shared/folders'
 import type { AppContext } from '../app-context'
+import { spendMemberOperations } from '../cloud-operations'
 import { apiErrors } from '../errors'
 import type { FolderWriteContext, FolderWriteOutcome } from '../folder-store'
+import { requirePermission } from '../middleware/permission'
 import { requireSession } from '../middleware/session'
 import { readJsonBody } from '../request-body'
 import { payloadFingerprint, syncOperationId } from '../sync'
@@ -64,53 +67,84 @@ function response(c: Context<AppContext>, result: FolderWriteOutcome) {
 }
 
 export const folderRoutes = new Hono<AppContext>()
-  .get('/orgs/:orgId/folders', requireSession, async (c) => {
-    const query = folderListQuerySchema.safeParse(c.req.query())
-    if (!query.success) throw apiErrors.validation(query.error.issues)
-    const folders = await c
-      .get('services')
-      .folders.list(workspaceId(c), c.get('session').user.id, query.data.kind)
-    if (folders === null) throw apiErrors.forbidden()
-    return c.json(folderListSchema.parse({ folders }))
-  })
-  .post('/orgs/:orgId/folders', requireSession, async (c) => {
-    const input = await readBody(c, folderCreateSchema)
-    return response(
-      c,
-      await c.get('services').folders.create(await writeContext(c, 'create', input), input),
-    )
-  })
-  .put('/orgs/:orgId/folders/:id', requireSession, async (c) => {
-    const input = await readBody(c, folderUpdateSchema)
-    const id = targetId(c)
-    return response(
-      c,
-      await c
+  .get(
+    '/orgs/:orgId/folders',
+    requireSession,
+    requirePermission({ watermark: ['read'] }),
+    async (c) => {
+      const query = folderListQuerySchema.safeParse(c.req.query())
+      if (!query.success) throw apiErrors.validation(query.error.issues)
+      const folders = await c
         .get('services')
-        .folders.update(await writeContext(c, 'update', { id, ...input }), id, input),
-    )
-  })
-  .delete('/orgs/:orgId/folders/:id', requireSession, async (c) => {
-    const input = await readBody(c, folderDeleteSchema)
-    const id = targetId(c)
-    return response(
-      c,
-      await c
-        .get('services')
-        .folders.delete(
-          await writeContext(c, 'delete', { id, ...input }),
-          id,
-          input.expectedRevision,
-          input.expectedVersionId,
-        ),
-    )
-  })
-  .post('/orgs/:orgId/folders/move-content', requireSession, async (c) => {
-    const input = await readBody(c, contentMoveSchema)
-    return response(
-      c,
-      await c
-        .get('services')
-        .folders.moveContent(await writeContext(c, 'move-content', input), input),
-    )
-  })
+        .folders.list(workspaceId(c), c.get('session').user.id, query.data.kind)
+      if (folders === null) throw apiErrors.forbidden()
+      return c.json(folderListSchema.parse({ folders }))
+    },
+  )
+  .post(
+    '/orgs/:orgId/folders',
+    requireSession,
+    requirePermission({ watermark: ['create'] }),
+    async (c) => {
+      const input = await readBody(c, folderCreateSchema)
+      return response(
+        c,
+        await c.get('services').folders.create(await writeContext(c, 'create', input), input),
+      )
+    },
+  )
+  .put(
+    '/orgs/:orgId/folders/:id',
+    requireSession,
+    requirePermission({ watermark: ['update'] }),
+    async (c) => {
+      const input = await readBody(c, folderUpdateSchema)
+      const id = targetId(c)
+      return response(
+        c,
+        await c
+          .get('services')
+          .folders.update(await writeContext(c, 'update', { id, ...input }), id, input),
+      )
+    },
+  )
+  .delete(
+    '/orgs/:orgId/folders/:id',
+    requireSession,
+    requirePermission({ watermark: ['delete'] }),
+    async (c) => {
+      const input = await readBody(c, folderDeleteSchema)
+      const id = targetId(c)
+      return response(
+        c,
+        await c
+          .get('services')
+          .folders.delete(
+            await writeContext(c, 'delete', { id, ...input }),
+            id,
+            input.expectedRevision,
+            input.expectedVersionId,
+          ),
+      )
+    },
+  )
+  .post(
+    '/orgs/:orgId/folders/move-content',
+    requireSession,
+    requirePermission({ watermark: ['update'] }, 0),
+    async (c) => {
+      const input = await readBody(c, contentMoveSchema)
+      await spendMemberOperations(
+        c,
+        { watermark: ['update'] },
+        CLOUD_OPERATION_POLICY.weights.read +
+          CLOUD_OPERATION_POLICY.weights.write * input.items.length,
+      )
+      return response(
+        c,
+        await c
+          .get('services')
+          .folders.moveContent(await writeContext(c, 'move-content', input), input),
+      )
+    },
+  )

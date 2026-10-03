@@ -18,6 +18,8 @@ interface PlanTables {
 export function createMemoryPlanStore(tables: PlanTables, accounts: AccountStore) {
   const records = new Map<string, WorkspacePlanRecord>()
   const store: PlanStore = {
+    // Permission dispatch tests stub this boundary; only actual D1 tests fulfill monthly counters.
+    spendOperations: () => Promise.resolve(),
     async get(organizationId) {
       const saved = records.get(organizationId)
       if (saved !== undefined) return structuredClone(saved)

@@ -9,9 +9,13 @@ import type { AccountStore } from './account-store'
 import type { AuditStore } from './audit'
 import { type Auth, createAuth } from './auth/auth'
 import { createBindingRateLimitStorage, type RateLimitStorage } from './auth/rate-limit'
+import { closeAccountBilling, prepareBillingDeletion } from './billing-lifecycle'
+import type { BillingStore } from './billing-store'
 import type { CloudStore } from './cloud-store'
 import { createDrizzleAccountStore } from './db/account-store'
 import { createDrizzleAuditStore } from './db/audit-store'
+import { createD1BillingStore } from './db/billing-store'
+import { stripeConfigurationSchema, type StripeConfiguration } from '../shared/billing'
 import { createDatabase, type Database } from './db/client'
 import { createDrizzleCloudStore } from './db/cloud-store'
 import { createDrizzleFolderStore } from './db/folder-store'
@@ -26,6 +30,7 @@ import {
 import { createDrizzleObservabilityStore } from './db/observability-store'
 import { createDrizzleOrganizationStore } from './db/organization-store'
 import { createDrizzlePlanStore } from './db/plan-store'
+import { createDrizzlePublicAdmissionStore } from './db/public-admission-store'
 import { createDrizzleRecentStore } from './db/recent-store'
 import * as schema from './db/schema'
 import { createDrizzleUploadStore } from './db/upload-store'
@@ -38,6 +43,7 @@ import { validateEnv, type ValidatedEnv } from './env'
 import type { FolderStore } from './folder-store'
 import type { GuidanceStore } from './guidance-store'
 import type { PlanStore } from './plan-store'
+import type { PublicAdmissionStore } from './public-admission-store'
 import type { RecentStore } from './recent-store'
 import type {
   AssetStore,
@@ -49,10 +55,16 @@ import type {
   UserStore,
   WatermarkStore,
 } from './stores'
+import { createStripeGateway, type StripeGateway } from './stripe-gateway'
 import type { UploadStore } from './upload-store'
 import type { WorkspaceAccessStore } from './workspace-access-store'
 
 export interface Services {
+  billing: {
+    store: BillingStore
+    provider: { config: StripeConfiguration; gateway: StripeGateway } | undefined
+  }
+  publicAdmissions: PublicAdmissionStore
   plans: PlanStore
   uploads: UploadStore
   config: ValidatedEnv
@@ -114,6 +126,7 @@ export function buildServices(config: ValidatedEnv): Services {
   const audit = createDrizzleAuditStore(db)
   const accounts = createDrizzleAccountStore(db)
   const plans = createDrizzlePlanStore(db)
+  const publicAdmissions = createDrizzlePublicAdmissionStore(db, config.BETTER_AUTH_SECRET)
   const workspaceAccess = createDrizzleWorkspaceAccessStore(db)
   const uploads = createDrizzleUploadStore(db)
   const { email, devMailbox } = createEmailSender(config)
@@ -125,6 +138,7 @@ export function buildServices(config: ValidatedEnv): Services {
     email,
     accounts,
     plans,
+    publicSignup: config.PUBLIC_SIGNUP_ENABLED ? publicAdmissions : undefined,
     reserveWorkspaceInvitation: async (organizationId, actorId, invitationId) =>
       await workspaceAccess.reserveInvitationEmail(organizationId, actorId, invitationId),
     hasWorkspaceContent: async (organizationId) => await uploads.hasContent(organizationId),
@@ -150,12 +164,48 @@ export function buildServices(config: ValidatedEnv): Services {
     rateLimitEnabled: true,
     // The console mailbox cannot be enabled in production (env.ts). This keeps
     // disposable local test users possible without opening production admission.
-    canSignUpWithoutInvitation: config.APP_ENV !== 'production' && devMailbox !== undefined,
+    canSignUpWithoutInvitation:
+      !config.PUBLIC_SIGNUP_ENABLED && config.APP_ENV !== 'production' && devMailbox !== undefined,
+    closeBillingForDeletion: async (userId) => await prepareBillingDeletion(services, userId),
+    closeBillingAfterBan: async (userId) => {
+      const task = (async () => {
+        try {
+          await closeAccountBilling(services.billing, userId)
+        } catch {
+          // Existing chargeable authority remains locked for the scheduled retry.
+        }
+      })()
+      const { waitUntil } = await import('cloudflare:workers')
+      waitUntil(task)
+    },
     ...(config.TURNSTILE_SECRET_KEY !== undefined && {
       captcha: { secretKey: config.TURNSTILE_SECRET_KEY },
     }),
   })
-  return {
+  const stripeConfig =
+    config.STRIPE_ACCOUNT_ID === undefined
+      ? undefined
+      : stripeConfigurationSchema.parse({
+          accountId: config.STRIPE_ACCOUNT_ID,
+          liveMode: config.STRIPE_MODE === 'live',
+          secretKey: config.STRIPE_SECRET_KEY,
+          webhookSecret: config.STRIPE_WEBHOOK_SECRET,
+          proPriceId: config.STRIPE_PRO_PRICE_ID,
+          teamPriceId: config.STRIPE_TEAM_PRICE_ID,
+          portalConfigurationId: config.STRIPE_PORTAL_CONFIGURATION_ID,
+        })
+  const services: Services = {
+    billing: {
+      store: createD1BillingStore(config.DB),
+      provider:
+        stripeConfig === undefined
+          ? undefined
+          : {
+              config: stripeConfig,
+              gateway: createStripeGateway(stripeConfig),
+            },
+    },
+    publicAdmissions,
     config,
     db,
     auth,
@@ -184,6 +234,7 @@ export function buildServices(config: ValidatedEnv): Services {
     },
     devMailbox,
   }
+  return services
 }
 
 /**

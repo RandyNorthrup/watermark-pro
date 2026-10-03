@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-03",
+  "reports": {
+    "deletionWithRecovery": {
+      "expected": 2,
+      "unexpected": 0,
+      "skipped": 0,
+      "sha256": "5dcfa7927d357290f1d3f5aea5838bb6886e0a40d96c9274d14eb690f374a4d2"
+    },
+    "privacy": {
+      "expected": 2,
+      "unexpected": 0,
+      "skipped": 0,
+      "sha256": "cb4999e3d5e7801f15c3e769f0b3922085573be55f900804d0040073cbf424d3"
+    }
+  },
+  "scope": "Built actual auth/upload/share/delete/session/credential flow; only local IndexedDB failure is a named descriptor-restored fixture. No Stripe payment/provider claim. Both projects axe zero; privacy overflow zero.",
+  "images": [
+    {
+      "file": "desktop-en-light-account-removal-confirmation.png",
+      "bytes": 41044,
+      "sha256": "3e9ca91f43c5c37d5f9eb2e6b905ca19a1a32d68254cf3afb4c8924e9ba580b6"
+    },
+    {
+      "file": "desktop-en-light-device-cleanup-failure.png",
+      "bytes": 13975,
+      "sha256": "e8ba809f4607352ff5a9a1453af11fc132f3f3fac0a5272114a0386e412fb988"
+    },
+    {
+      "file": "desktop-en-light-privacy-account.png",
+      "bytes": 290246,
+      "sha256": "775a960b6b612772b938bac87c82eb2c1dbce879d1328c51a06a8a3095861884"
+    },
+    {
+      "file": "phone-ar-dark-account-removal-confirmation.png",
+      "bytes": 209780,
+      "sha256": "6d64ab4bda7332498d6d077e7860c254127214dd2711c9d41ec8d513ab6961ae"
+    },
+    {
+      "file": "phone-ar-dark-device-cleanup-failure.png",
+      "bytes": 65650,
+      "sha256": "bd0d419569ab29fb7771868617e3334927fcc0a783a3dbbb5f4f3a7088538bd5"
+    },
+    {
+      "file": "phone-ar-dark-privacy-account.png",
+      "bytes": 1615863,
+      "sha256": "bf67def0725f6ce882ffc982a3e001bf7073a73b9a8d2d083202ea5aba98c2c9"
+    }
+  ]
+}

@@ -17,7 +17,30 @@ an acknowledgement within three business days.
 
 Only the `main` branch and the latest tagged release receive fixes.
 
+## Current release blocker — 2026-10-02
+
+The required full dependency audit rejects GHSA-vfj7-8cjw-p6xm
+([GitHub advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)), a stack-exhaustion
+availability vulnerability affecting `braces` through 3.0.3. The installed path is
+Stylelint 17.15.0 → micromatch 4.0.8 → braces 3.0.3. At verification, the latest
+braces registry release was still 3.0.3, no patched version was listed, and latest
+Stylelint 17.16.0 still depended on micromatch 4.0.8. These are development-tool
+findings; a separate production-only audit returned zero findings. That narrower
+result does not satisfy or replace the full release gate. No advisory waiver,
+forced downgrade or dependency substitution has been applied. See the
+[release-blocker receipt](docs/verification/m19/release-blockers-2026-10-02.md).
+
 ## Controls in place
+
+- Public signup is an independent explicit release switch, disabled by default.
+  Enabling it requires real Turnstile keys even outside production; email
+  verification, identity attestation, bans and recent credential proof retain
+  their existing authority. Durable public reservations precede creation and
+  activation, store purpose-bound HMAC email keys, and bound rolling-day spending
+  and public-account population. Accepted spending cannot be released by deleting
+  an account. Failed activation remains pending; a supplied invalid private
+  invitation never falls back to public admission. Migration `0024`, complete
+  combined-source verification and launch approval remain outstanding.
 
 - Bulk CSV reports escape delimiters/quotes and prefix spreadsheet-like text
   values so imported file names, preset names and error strings are not emitted
@@ -33,7 +56,7 @@ Only the `main` branch and the latest tagged release receive fixes.
   restrictions. Cloud authorization callback responses use the stricter `no-referrer` policy.
 - Same-origin guard on every state-changing API request, plus Hono's CSRF
   check for form bodies and Better Auth's own origin checks.
-- Invitation-only signup with mandatory verified email. Google and Microsoft
+- Default-closed public signup and private invitation signup both require verified email. Google and Microsoft
   identity sign-in are separate from cloud-file connections; existing accounts
   do not need another invitation. Additional sign-in methods require explicit
   authenticated linking. Passwords use a 12-to-128-character policy; reset tokens
@@ -119,7 +142,11 @@ Only the `main` branch and the latest tagged release receive fixes.
   compares configured private values against original bytes and does not trust
   generic repository ignore files. One revoked historical Picker key has an
   exact immutable finding/digest exception; current and built copies receive no
-  exception. See [the retirement record](docs/verification/m19/picker-key-rotation.md).
+  exception. The aggregate candidate cap charges only the existing exact
+  original-path/byte/historical-treatment dedup identity; raw occurrence bytes
+  remain reported. Every original path/private-value/file-size/LFS check and all
+  history/archive bounds remain enforced before or alongside that sharing.
+  See [the retirement record](docs/verification/m19/picker-key-rotation.md).
 - Dependency vulnerability audit in CI at the `high` level.
 - Static analysis with semgrep (`p/default`, `p/typescript`, `p/react`,
   `p/secrets`) locally and in CI.
@@ -187,6 +214,25 @@ Only the `main` branch and the latest tagged release receive fixes.
   (`MAX_VIDEO_BYTES`, `MAX_VIDEO_SECONDS`, `MAX_VIDEO_SIDE`) are enforced from
   the file's metadata before any frame is decoded, and the watermarked file is
   downloaded through a same-origin object URL; the gallery does not store videos.
+  Multi-clip projects are Zod-validated, bounded to 32 source assets and 64 clips,
+  two video/four audio tracks and ten minutes of timeline duration. Aggregate
+  source bytes retain the 2 GiB cap. Native demuxing and decoding determine media
+  kind and source bounds, regardless of claimed MIME or extension. Worker export
+  rechecks source identities, dimensions, duration and decode support; audio is
+  mixed in bounded chunks rather than loading complete source PCM. Edited audible
+  tracks are refused when their target encoder is unavailable. Sources, project
+  state and pending outputs retain account/workspace-generation guards and are
+  disposed on a new project, identity change or unmount. Native audio decoding retains
+  the stock SDK capability/queue/error/flush/close authority. A guarded downstream
+  correction translates negative native input timestamps and maps actual decoded
+  frames onto codec-derived packet spans, preserving explicit presentation gaps.
+  Unknown frame provenance, unexpected rates, surplus or unexplained discarded
+  frames fail explicitly. The normal guard validates the complete seven-artifact
+  pristine/prior/corrected state before any write; mixed states reject. Complete
+  preferred source and reconstructable generated bytes are published in the
+  pinned MPL offer. Native original 18, both-engine canonical 20 and 58 finite
+  guard/span contracts pass. Physical proof is limited to named LC fixtures;
+  final Linux, full device and release certification remain required.
 - PDF watermarking (M17) runs entirely in the browser: `pdf-lib` parses the
   chosen documents' untrusted bytes in the page, while PDF.js supplies a
   dedicated local parsing/rendering worker. There is no upload unless the user
@@ -240,8 +286,19 @@ Only the `main` branch and the latest tagged release receive fixes.
   state. Upload quota admission reads current authority inside the D1 write;
   commit rechecks it before metadata/audit/completion. Downgrade retains stored
   data, and outstanding cleanup continues to consume capacity. Metadata or
-  client plan names cannot activate paid access. Seat/creation gates and signed
-  payment reconciliation remain unimplemented; public signup stays closed.
+  client plan names cannot activate paid access. Member admission now has a live-plan/D1 candidate under verification;
+  creation gates now have a server/D1 candidate under verification. Signed
+  payment reconciliation remains under implementation.
+  Public signup stays closed.
+- Workspace creation (M19 candidate under verification): immutable server-only
+  provenance binds private creation to its original account, independently of
+  role transfers and untrusted metadata. Existing workspaces and grants survive
+  migration. New personal preparation is identity-bound and idempotent; private
+  shared creation requires live verified, unbanned private admission and one
+  unused slot. The organization INSERT trigger fences concurrent requests.
+  New historical/paid claims are refused until trusted billing provisioning is
+  installed; no client paid flag or price can activate access. A quota race
+  returns a neutral conflict without a creation audit. Complete gates remain open.
 - Recent credential proof (M19 implementation gates passed; release/deployment pending):
   a server session field with `input: false` records successful password or
   validated identity sign-in. Nullable migration leaves old sessions unproved.
@@ -282,9 +339,102 @@ Only the `main` branch and the latest tagged release receive fixes.
   operational playbook (rollback, secret rotation, Time Travel restores,
   bans, share revocation) is in [docs/runbook.md](docs/runbook.md).
 
+### Stripe billing candidate boundary
+
+The unreleased backend verifies actual owning Stripe account/mode before
+provider effects. Checkout/portal require a verified unbanned original payer
+and recent server-owned credential proof, plus current owner membership when
+the workspace exists. Pre-workspace financial recovery grants no content access. The exact
+signed webhook POST is the sole new same-origin exception: raw bytes are bounded
+to 64 KiB and verified with a five-minute signature window in both directions,
+with foreign modes/Connect contexts refused. Durable event IDs, exclusive fenced
+leases and atomic D1 reconciliation prevent replay or stale concurrent writes.
+Actual invoice/payment/charge linkage is required before paid capacity; redirects
+and writable metadata grant nothing. Active/pending chargeable billing fences
+payer removal and deletion until provider-confirmed closure. The candidate self/
+admin deletion path quiesces through a server-only marker in the existing banned
+field before Better Auth removes credential rows; provider failure retains
+credentials and restores only that exact marker, never a concurrent moderation
+ban. Nullable historical ban state is compared and verified live before closure.
+Provider-confirmed closed authority permits final deletion even across a later
+webhook/cron lease; every financial acquire/commit requires a live bound owner,
+and removed-owner events become ignored receipts. Security bans suspend paid access immediately, attempt background provider
+closure and retain chargeable authority for existing cron retry. Delayed events
+cannot grant or provision for a banned payer. Seventeen isolated actual D1 cases
+passed; complete integrated/provider gates remain open. An outage may delay
+remote cancellation. Failed removal retains paid suspension until explicit
+provider reconciliation, which is covered by the recovery case. Content grants remain tenant
+scoped and independent of payment/private admission. Complete gates and provider
+sandbox/account verification remain pending; no billing production activation is
+claimed. See `docs/plans/stripe-subscriptions.md`.
+
 ## Handling secrets
 
 Local secrets go in `.dev.vars` (git-ignored). Production secrets are set with
 `wrangler secret put`. `.dev.vars.example` lists every variable the Worker
 reads. Never commit a real value; the pre-commit hook will reject known secret
 shapes, but the hook is a safety net, not permission.
+
+### Monthly ordinary-cloud admission candidate
+
+The unreleased migration 0026 adds only workspace month/units and one dedicated
+site month/units singleton. One current-role/share-authorized workspace update
+and trigger-based site debit either succeed together or roll back together. UTC
+rollover cannot erase the site aggregate through account/workspace replacement;
+its direct deletion and INSERT OR REPLACE are refused. Immutable site-owner
+schema/guards remain unchanged. Live role, verified admission, ban, paid expiry
+and signed share tenant/photo/expiry/revocation are rechecked before mutation.
+Existing explicit published shares are not implicitly revoked by creator bans.
+
+Deletion, revocation, auth and financial closure remain governed by existing
+authorization and stay usable when ordinary allowance is exhausted. Provisional
+product quotas are not a complete invoice limit, per-actor fairness or net-profit
+proof. Exempt/denied traffic, per-request CPU, unpaged/retained data and provider
+costs still need independent bounds and policy. Isolated actual D1 proof passed
+13 cases; combined security/release certification remains required. Public launch
+and production payment flags remain closed. See
+[the operation boundary](docs/plans/cloud-operations.md).
+
+### Encoded upload metadata candidate
+
+Unreleased stored PNG/JPEG/WebP admission derives MIME and encoded header
+dimensions and reconciles genuine EXIF display orientation before digest/quota/R2.
+Validated client claims must match those display dimensions. Photo/logo side
+limits are 8,192; generated thumbnail longest side is 400. Existing actual byte
+limits remain. This proves dimension-bearing headers, not full pixel decoding or
+complete compressed-payload validity. Four actual Worker module cases and 91
+selected Node cases pass; full multipart/hash/concurrent CPU/memory and final
+combined gates remain required. Existing delayed-producer cleanup was separately
+found insufficient; no physical-erasure claim follows from metadata validation.
+
+### Conditional payload storage candidate
+
+Existing fresh per-lease R2 keys now use conditional empty initialization and
+mandatory ETag-matched payload writes. A null conditional write is a typed failure.
+Actual pending lease identity/keys, expiry and current writer are rechecked before
+payload; reservation itself also requires the current writer. Independent cleanup
+deletion invalidates that ETag, preventing a late producer from recreating payload
+after its recovery pointer has gone. No unconditional ObjectStore escape remains.
+
+Actual isolated R2/D1 proof passes 37 cases, including a started stream paused
+while marker deletion completes, then null write and final absence. Original
+physical red is retained. Late empty initialization can leave only an opaque empty
+key, and interruption tests simulate ordering rather than an actual isolate kill.
+Extra initialization PUTs are part of cost accounting. Compact account cleanup
+now stages proven sole-owner personal metadata/links in one atomic D1 batch,
+retains its organization until durable physical recovery drains, and preserves
+collaborative/ambiguous scopes plus financial/audit records. Malformed or foreign
+reservation keys fail closed. Provider/staging failures retain credentials; lost
+acknowledgement may leave already-staged metadata while the account remains.
+The actual isolated D1/R2 pool passes 16 cases, including late producer absence.
+
+Self-service controls retain server identity/origin/recent-proof/owner gates and
+require explicit email confirmation. Confirmed deletion erases only this account's
+local cache/outbox; other-account data remains. A generic root notice makes failed
+device cleanup visible after login and retries only the captured account's local
+erasure. Its acknowledgement is transient across reload. Actual desktop and
+Arabic-phone built failure/retry flows pass axe and were visually reviewed. This
+does not promise immediate all-byte erasure, downloaded/other-device/provider
+copy deletion, an invoice cap or complete privacy/release certification. Full
+combined gates, multipart/hash/concurrent-memory and retention/headroom policies
+remain open.

@@ -21,9 +21,11 @@ import { requireSession } from '../middleware/session'
 
 export const adminRoutes = new Hono<AppContext>()
   .get('/config', (c) => {
-    const { config } = c.get('services')
+    const { config, billing } = c.get('services')
     return c.json(
       publicConfigSchema.parse({
+        publicSignupEnabled: config.PUBLIC_SIGNUP_ENABLED,
+        billingEnabled: billing.provider !== undefined,
         googleAuthEnabled: config.GOOGLE_AUTH_CLIENT_ID !== undefined,
         microsoftAuthEnabled: config.MICROSOFT_AUTH_CLIENT_ID !== undefined,
         turnstileSiteKey: config.TURNSTILE_SITE_KEY ?? null,

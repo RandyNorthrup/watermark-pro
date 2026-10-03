@@ -1,0 +1,579 @@
+{
+  "representation": "Repeated geometry uses JSON pointers. Each state/hash identity merges its expanded details; expansion restores every original captured value.",
+  "originalSerializedSha256": "425f47b77979ff6c1ffa9ea02422d302d4a2513d0fb818f69656f7d3abfd0cf6",
+  "definitions": {
+    "observation-bbaaac13eea82f1e2fb0": {
+      "width": "208.828px",
+      "height": "156.625px",
+      "left": "0px",
+      "right": "0px",
+      "direction": "ltr",
+      "transform": "none",
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "overflow": "visible",
+      "position": "relative",
+      "clipPath": "none",
+      "opacity": "1"
+    },
+    "observation-29bf6d85b19aa3f43932": {
+      "width": "208.828px",
+      "height": "156.625px",
+      "left": "0px",
+      "right": "0px",
+      "direction": "ltr",
+      "transform": "none",
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "overflow": "hidden",
+      "position": "absolute",
+      "clipPath": "none",
+      "opacity": "1"
+    },
+    "observation-cac8a145a4ef24badd5d": {
+      "width": "208.828px",
+      "height": "156.625px",
+      "left": "0px",
+      "right": "0px",
+      "direction": "ltr",
+      "transform": "none",
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "overflow": "clip",
+      "position": "absolute",
+      "clipPath": "none",
+      "opacity": "1"
+    },
+    "observation-8ff2442a302783a55546": {
+      "videoWidth": 320,
+      "videoHeight": 240,
+      "readyState": 4,
+      "currentTime": 0,
+      "canvasWidth": 320,
+      "canvasHeight": 240
+    },
+    "observation-056a567524b29f5beff5": {
+      "label": "first.mp4",
+      "currentTime": 0,
+      "readyState": 4,
+      "seeking": false,
+      "rect": {
+        "x": 535.578125,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "opacity": "1",
+        "clipPath": "none",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "objectFit": "contain"
+      }
+    },
+    "observation-b24cbd4dab04eb1b42cf": {
+      "rect": {
+        "x": 535.578125,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "$ref": "#/definitions/observation-bbaaac13eea82f1e2fb0"
+      }
+    },
+    "observation-37d60527c1d8755cc6d3": {
+      "rect": {
+        "x": 535.578125,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "$ref": "#/definitions/observation-29bf6d85b19aa3f43932"
+      }
+    },
+    "observation-1d0db55cde2c95de1f2e": {
+      "rect": {
+        "x": 535.578125,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "$ref": "#/definitions/observation-cac8a145a4ef24badd5d"
+      }
+    },
+    "observation-4a6622d1ff7c89272a38": {
+      "width": "208.828px",
+      "height": "156.625px",
+      "left": "0px",
+      "right": "0px",
+      "direction": "rtl",
+      "transform": "none",
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "overflow": "visible",
+      "position": "relative",
+      "clipPath": "none",
+      "opacity": "1"
+    },
+    "observation-e4b3504cae4891fab907": {
+      "width": "208.828px",
+      "height": "156.625px",
+      "left": "0px",
+      "right": "0px",
+      "direction": "rtl",
+      "transform": "none",
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "overflow": "hidden",
+      "position": "absolute",
+      "clipPath": "none",
+      "opacity": "1"
+    },
+    "observation-7bca7c2eacc1b2a69433": {
+      "width": "208.828px",
+      "height": "156.625px",
+      "left": "0px",
+      "right": "0px",
+      "direction": "rtl",
+      "transform": "none",
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "overflow": "clip",
+      "position": "absolute",
+      "clipPath": "none",
+      "opacity": "1"
+    },
+    "observation-0568227ae91d4b4c50fb": {
+      "label": "first.mp4",
+      "currentTime": 0,
+      "readyState": 4,
+      "seeking": false,
+      "rect": {
+        "x": 535.59375,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "opacity": "1",
+        "clipPath": "none",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "objectFit": "contain"
+      }
+    },
+    "observation-37cedca231dfa3fbf900": {
+      "rect": {
+        "x": 535.59375,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "$ref": "#/definitions/observation-4a6622d1ff7c89272a38"
+      }
+    },
+    "observation-94f62fc31d45e968184b": {
+      "rect": {
+        "x": 535.59375,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "$ref": "#/definitions/observation-e4b3504cae4891fab907"
+      }
+    },
+    "observation-0d13812398dafa681ec5": {
+      "rect": {
+        "x": 535.59375,
+        "y": 261,
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "css": {
+        "$ref": "#/definitions/observation-7bca7c2eacc1b2a69433"
+      }
+    },
+    "geometry-c3908726c993a1779b92": {
+      "bounds": {
+        "x": 496,
+        "y": 261,
+        "width": 208,
+        "height": 156
+      },
+      "redPixelCount": 31548,
+      "requestedTimeLabel": "0.000 s / 4.000 s",
+      "requestedFirstSourceTime": 0,
+      "nativeLayers": [
+        {
+          "label": "first.mp4",
+          "currentTime": 0,
+          "readyState": 4,
+          "seeking": false,
+          "rect": {
+            "x": 495.578125,
+            "y": 261,
+            "width": 208.828125,
+            "height": 156.625
+          },
+          "css": {
+            "opacity": "1",
+            "clipPath": "none",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)",
+            "objectFit": "contain"
+          }
+        }
+      ],
+      "content": {
+        "rect": {
+          "x": 495.578125,
+          "y": 261,
+          "width": 208.828125,
+          "height": 156.625
+        },
+        "css": {
+          "$ref": "#/definitions/observation-bbaaac13eea82f1e2fb0"
+        }
+      },
+      "mediaParent": {
+        "rect": {
+          "x": 495.578125,
+          "y": 261,
+          "width": 208.828125,
+          "height": 156.625
+        },
+        "css": {
+          "$ref": "#/definitions/observation-29bf6d85b19aa3f43932"
+        }
+      },
+      "canvas": {
+        "rect": {
+          "x": 495.578125,
+          "y": 261,
+          "width": 208.828125,
+          "height": 156.625
+        },
+        "css": {
+          "$ref": "#/definitions/observation-cac8a145a4ef24badd5d"
+        }
+      },
+      "bitmap": {
+        "$ref": "#/definitions/observation-8ff2442a302783a55546"
+      },
+      "overlayAlphaBounds": {
+        "x": 240,
+        "y": 219,
+        "width": 71,
+        "height": 12
+      }
+    },
+    "geometry-88ed71a50ad47682b940": {
+      "bounds": {
+        "x": 536,
+        "y": 261,
+        "width": 208,
+        "height": 156
+      },
+      "redPixelCount": 31548,
+      "requestedTimeLabel": "0.000 s / 4.000 s",
+      "requestedFirstSourceTime": 0,
+      "nativeLayers": [
+        {
+          "$ref": "#/definitions/observation-056a567524b29f5beff5"
+        }
+      ],
+      "content": {
+        "$ref": "#/definitions/observation-b24cbd4dab04eb1b42cf"
+      },
+      "mediaParent": {
+        "$ref": "#/definitions/observation-37d60527c1d8755cc6d3"
+      },
+      "canvas": {
+        "$ref": "#/definitions/observation-1d0db55cde2c95de1f2e"
+      },
+      "bitmap": {
+        "$ref": "#/definitions/observation-8ff2442a302783a55546"
+      },
+      "overlayAlphaBounds": {
+        "x": 240,
+        "y": 219,
+        "width": 71,
+        "height": 12
+      }
+    },
+    "geometry-f2d8499d94f5c63940b4": {
+      "bounds": {
+        "x": 576,
+        "y": 261,
+        "width": 208,
+        "height": 156
+      },
+      "redPixelCount": 31565,
+      "requestedTimeLabel": "0.000 s / 4.000 s",
+      "requestedFirstSourceTime": 0,
+      "nativeLayers": [
+        {
+          "label": "first.mp4",
+          "currentTime": 0,
+          "readyState": 4,
+          "seeking": false,
+          "rect": {
+            "x": 575.59375,
+            "y": 261,
+            "width": 208.828125,
+            "height": 156.625
+          },
+          "css": {
+            "opacity": "1",
+            "clipPath": "none",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)",
+            "objectFit": "contain"
+          }
+        }
+      ],
+      "content": {
+        "rect": {
+          "x": 575.59375,
+          "y": 261,
+          "width": 208.828125,
+          "height": 156.625
+        },
+        "css": {
+          "$ref": "#/definitions/observation-4a6622d1ff7c89272a38"
+        }
+      },
+      "mediaParent": {
+        "rect": {
+          "x": 575.59375,
+          "y": 261,
+          "width": 208.828125,
+          "height": 156.625
+        },
+        "css": {
+          "$ref": "#/definitions/observation-e4b3504cae4891fab907"
+        }
+      },
+      "canvas": {
+        "rect": {
+          "x": 575.59375,
+          "y": 261,
+          "width": 208.828125,
+          "height": 156.625
+        },
+        "css": {
+          "$ref": "#/definitions/observation-7bca7c2eacc1b2a69433"
+        }
+      },
+      "bitmap": {
+        "$ref": "#/definitions/observation-8ff2442a302783a55546"
+      },
+      "overlayAlphaBounds": {
+        "x": 239,
+        "y": 219,
+        "width": 72,
+        "height": 12
+      }
+    },
+    "geometry-05078512f011d44a6df9": {
+      "bounds": {
+        "x": 536,
+        "y": 261,
+        "width": 208,
+        "height": 156
+      },
+      "redPixelCount": 31564,
+      "requestedTimeLabel": "0.000 s / 4.000 s",
+      "requestedFirstSourceTime": 0,
+      "nativeLayers": [
+        {
+          "$ref": "#/definitions/observation-0568227ae91d4b4c50fb"
+        }
+      ],
+      "content": {
+        "$ref": "#/definitions/observation-37cedca231dfa3fbf900"
+      },
+      "mediaParent": {
+        "$ref": "#/definitions/observation-94f62fc31d45e968184b"
+      },
+      "canvas": {
+        "$ref": "#/definitions/observation-0d13812398dafa681ec5"
+      },
+      "bitmap": {
+        "$ref": "#/definitions/observation-8ff2442a302783a55546"
+      },
+      "overlayAlphaBounds": {
+        "x": 239,
+        "y": 219,
+        "width": 72,
+        "height": 12
+      }
+    }
+  },
+  "data": {
+    "date": "2026-10-03",
+    "classification": "Earlier narrow-preview observation is disproved by the stored original PNG pixels; no runtime defect or source fix is established.",
+    "method": {
+      "tool": "Installed sharp 0.35.4, read-only RGBA inspection",
+      "redThreshold": {
+        "redGreaterThan": 180,
+        "greenLessThan": 100,
+        "blueLessThan": 100
+      },
+      "originalViewerRegion": {
+        "x": 300,
+        "y": 237,
+        "width": 600,
+        "height": 205
+      },
+      "focusedViewerRegion": "Measured data-canvas-content DOM rectangle; integer interior pixels only",
+      "limitations": "Pixel extent confirms this red fixture rectangle, not general compositing or release certification."
+    },
+    "originalDesktopFrames": [
+      {
+        "project": "desktop-ar-dark",
+        "frame": "editor",
+        "sha256": "8a4aaec3f153a520ba1f368ac9fb79853967bbdf96327d4b920acaf1ae3d31ab",
+        "bounds": {
+          "x": 576,
+          "y": 261,
+          "width": 208,
+          "height": 157
+        },
+        "redPixelCount": 31773
+      },
+      {
+        "project": "desktop-ar-dark",
+        "frame": "navigation",
+        "sha256": "7389c27e0aeacc43d0c0605f57872056771c85a2fa347dac8ccec4c0d91417dc",
+        "bounds": {
+          "x": 536,
+          "y": 261,
+          "width": 208,
+          "height": 157
+        },
+        "redPixelCount": 31772
+      },
+      {
+        "project": "desktop-ar-dark",
+        "frame": "collapsed",
+        "sha256": "163e51b5f1e5d35d0fbcc60d61c70cb68b4f0c1333f966718819619bd2afc80b",
+        "bounds": {
+          "x": 536,
+          "y": 261,
+          "width": 208,
+          "height": 157
+        },
+        "redPixelCount": 31772
+      },
+      {
+        "project": "desktop-en-light",
+        "frame": "editor",
+        "sha256": "5eed2461cfa203414d3ded2dab856e5e482991ef4bc6c28b84d873282d958730",
+        "bounds": {
+          "x": 496,
+          "y": 261,
+          "width": 208,
+          "height": 157
+        },
+        "redPixelCount": 31756
+      },
+      {
+        "project": "desktop-en-light",
+        "frame": "navigation",
+        "sha256": "a41b15837bbbde756b98ea9e352722afbc9a6d8e703c6ae6f7118cb9e9a2df09",
+        "bounds": {
+          "x": 536,
+          "y": 261,
+          "width": 208,
+          "height": 157
+        },
+        "redPixelCount": 31756
+      },
+      {
+        "project": "desktop-en-light",
+        "frame": "collapsed",
+        "sha256": "c2f406af314f2fbf88f172a5dc9372ec0311021cdd1dfd70118701fbe9d26f49",
+        "bounds": {
+          "x": 536,
+          "y": 261,
+          "width": 208,
+          "height": 157
+        },
+        "redPixelCount": 31756
+      }
+    ],
+    "focusedProbe": {
+      "result": "1 passed (14.5s)",
+      "handle": 83485,
+      "inputs": "Existing sample-video.mp4 twice; split at 0.5, source-out 0.25; existing sample-audio.wav, gain0.5",
+      "states": [
+        {
+          "state": "ltr-expanded",
+          "sha256": "7da817ac3903a83b0e451da2937f726b485bd5aefbc3a1871b3e959ee104f349",
+          "details": {
+            "$ref": "#/definitions/geometry-c3908726c993a1779b92"
+          }
+        },
+        {
+          "state": "ltr-collapsed",
+          "sha256": "f4d8a0ae1cb111ac270753564e94e3e947b8bea5f404211d64b711b3c847fe68",
+          "details": {
+            "$ref": "#/definitions/geometry-88ed71a50ad47682b940"
+          }
+        },
+        {
+          "state": "ltr-menu",
+          "sha256": "8d78f7159c05d1809e72c2ce9a741de2fd2ab14e8270e32ecc1445f96f020556",
+          "details": {
+            "$ref": "#/definitions/geometry-88ed71a50ad47682b940"
+          }
+        },
+        {
+          "state": "rtl-expanded",
+          "sha256": "029ed19cc6366295621ba033ba4a55d5cd28ef4f0fa92ca37cef038519a581ed",
+          "details": {
+            "$ref": "#/definitions/geometry-f2d8499d94f5c63940b4"
+          }
+        },
+        {
+          "state": "rtl-collapsed",
+          "sha256": "a0a33b9c2e24355777692f2886c46a5f02b71d8b98efd6b3a20fe9a1eb196f7a",
+          "details": {
+            "$ref": "#/definitions/geometry-05078512f011d44a6df9"
+          }
+        },
+        {
+          "state": "rtl-menu",
+          "sha256": "a4a95d3a5b58dc3775080a9ead5bbd010554fa735cfbae67510f3dd6ef4722f1",
+          "details": {
+            "$ref": "#/definitions/geometry-05078512f011d44a6df9"
+          }
+        }
+      ],
+      "localGeometryFile": "temp/lumafoil-postmerge-ui/preview-repro/preview-repro-actual-RTL-p-4c703-re-and-after-panel-collapse-desktop-en-light/geometry.json",
+      "geometrySha256": "94a63be30fe871e3b8dab67d04af7e14548349e483063f9a58b8b0fef068cfb8",
+      "nativeReadiness": "readyState >= 2 and !seeking, with no added delay"
+    },
+    "previousSingleClipProbe": {
+      "result": "1 passed",
+      "handle": 94308,
+      "states": 6,
+      "videoSource": {
+        "width": 320,
+        "height": 240
+      },
+      "content": {
+        "width": 208.828125,
+        "height": 156.625
+      },
+      "redExtent": {
+        "width": 208,
+        "height": 157
+      },
+      "limitation": "Single-clip probe only; exact original multi-clip probe above supplies edit-state proof."
+    },
+    "sourceChanged": false
+  }
+}

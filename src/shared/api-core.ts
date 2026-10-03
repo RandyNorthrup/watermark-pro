@@ -49,6 +49,8 @@ export type AuditListResponse = z.infer<typeof auditListResponseSchema>
 
 /** Configuration the browser may know before signing in. */
 export const publicConfigSchema = z.object({
+  publicSignupEnabled: z.boolean().default(false),
+  billingEnabled: z.boolean().default(false),
   googleAuthEnabled: z.boolean().default(false),
   microsoftAuthEnabled: z.boolean().default(false),
   /** Turnstile site key when bot protection is enabled; null otherwise. */

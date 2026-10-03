@@ -1,5 +1,21 @@
 # Publication scan staging — 2026-10-02
 
+## Subsequent exact-source accounting proof — 2026-10-03
+
+The normal hook for isolated video `4ca0d8c` passed 15,371 candidate/object checks,
+12,800 copies, 540,338,732 raw bytes, 240,882,181 distinct inspected bytes and 323
+archive entries. No configured live private values were available; pattern/path/
+archive and the unchanged exact retired-history policy ran.
+
+The old aggregate charged repeated working/index/history bytes before existing
+filename/hash/treatment dedup despite already sharing their scanner copy.
+Accounting preserves raw bytes and charges the unchanged 512 MiB distinct cap
+after that same dedup. Every occurrence still gets file/path/private-value/LFS
+checks first. Git output, all refs/history and ZIP bounds remain unchanged.
+Exact identity and changed-name/bytes/treatment/cap negative controls passed
+before the normal hook. No budget increase, allowlist or exception was added.
+This source is now integrated; final combined publication remains required.
+
 Status: candidate under verification on `codex/resolve-video-editor`. Four normal
 commit attempts refused publication at the unchanged five-minute Gitleaks scanner
 deadline. Thread-limited and idle-host retries did not produce passing receipts.

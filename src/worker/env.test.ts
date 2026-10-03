@@ -4,6 +4,33 @@ import { EnvValidationError, validateEnv } from './env'
 import { createTestEnv } from './test-support/test-app'
 
 describe('validateEnv', () => {
+  it('keeps public signup closed by default, rejects malformed flags, and requires real challenge keys when opened', () => {
+    expect(validateEnv(createTestEnv()).PUBLIC_SIGNUP_ENABLED).toBe(false)
+    expect(() => validateEnv(createTestEnv({ PUBLIC_SIGNUP_ENABLED: 'yes' }))).toThrow(
+      /PUBLIC_SIGNUP_ENABLED/,
+    )
+    expect(() => validateEnv(createTestEnv({ PUBLIC_SIGNUP_ENABLED: 'true' }))).toThrow(
+      /public signup/,
+    )
+    expect(() =>
+      validateEnv(
+        createTestEnv({
+          PUBLIC_SIGNUP_ENABLED: 'true',
+          TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
+          TURNSTILE_SECRET_KEY: 'fixture-key',
+        }),
+      ),
+    ).toThrow(/public signup/)
+    expect(
+      validateEnv(
+        createTestEnv({
+          PUBLIC_SIGNUP_ENABLED: 'true',
+          TURNSTILE_SITE_KEY: 'real-site',
+          TURNSTILE_SECRET_KEY: 'real-secret',
+        }),
+      ).PUBLIC_SIGNUP_ENABLED,
+    ).toBe(true)
+  })
   it('accepts every documented environment name', () => {
     for (const name of ['development', 'test', 'staging']) {
       expect(validateEnv(createTestEnv({ APP_ENV: name })).APP_ENV).toBe(name)

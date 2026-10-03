@@ -1,0 +1,211 @@
+{
+  "date": "2026-10-03",
+  "source": "Integrated public/preset/billing UI before video merge and before photo-label correction",
+  "scope": "Actual built pages and real verified private fixture; configured billing false",
+  "actualPrivatePresets": 1000,
+  "publicPresetLimits": {
+    "free": 20,
+    "pro": 1000,
+    "team": 2000
+  },
+  "arabic": {
+    "documentLang": "ar",
+    "numberLocale": "ar",
+    "numberingSystem": "latn"
+  },
+  "captures": [
+    {
+      "scope": "pricing",
+      "device": "desktop",
+      "locale": "en",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "ed73bd8590d3dae9abe4809d0ea9170c3d933447be16177bb2f48ed963d1b734",
+      "bytes": 503154,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-desktop-en-light.png",
+      "originalRepositoryFile": "pricing-desktop-en-light.png"
+    },
+    {
+      "scope": "pricing",
+      "device": "desktop",
+      "locale": "en",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "974b660c84615a1948b6ad08a871214d55113b1956a32b0c94936d83b2426bbb",
+      "bytes": 532826,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-desktop-en-dark.png",
+      "originalRepositoryFile": "pricing-desktop-en-dark.png"
+    },
+    {
+      "scope": "pricing",
+      "device": "desktop",
+      "locale": "ar",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "f81145e456e3e3a6085c4e9a8f1080b731ce65b36a1cdd7803ee1deb402710c0",
+      "bytes": 461883,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-desktop-ar-light.png",
+      "originalRepositoryFile": "pricing-desktop-ar-light.png"
+    },
+    {
+      "scope": "pricing",
+      "device": "desktop",
+      "locale": "ar",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "78273767d679f84dc236bcac43ba24edf02bf6ac6a9a8d0e416de2fbb6d68217",
+      "bytes": 483517,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-desktop-ar-dark.png",
+      "originalRepositoryFile": "pricing-desktop-ar-dark.png"
+    },
+    {
+      "scope": "account",
+      "device": "desktop",
+      "locale": "en",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "1501cbba98086fb7bed576425a9a1b92dd0eb43264ac399bbe8735ee483a3de7",
+      "bytes": 669333,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-desktop-en-light.png",
+      "originalRepositoryFile": "account-desktop-en-light.png"
+    },
+    {
+      "scope": "account",
+      "device": "desktop",
+      "locale": "en",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "e0a31e6b27ec9679f992a14dce34e30cb09e11406b94ac1442c943130c4da1de",
+      "bytes": 694970,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-desktop-en-dark.png",
+      "originalRepositoryFile": "account-desktop-en-dark.png"
+    },
+    {
+      "scope": "account",
+      "device": "desktop",
+      "locale": "ar",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "63383d241e8ca7645ddec72becaf0eb5bb4c83e585917e8f5889cccb7bbbb67c",
+      "bytes": 646306,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-desktop-ar-light.png",
+      "originalRepositoryFile": "account-desktop-ar-light.png"
+    },
+    {
+      "scope": "account",
+      "device": "desktop",
+      "locale": "ar",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "5e845f213226cb5837ace35055fcd0e21a647fd40d83957b47b07d76b2317dfc",
+      "bytes": 650991,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-desktop-ar-dark.png",
+      "originalRepositoryFile": "account-desktop-ar-dark.png"
+    },
+    {
+      "scope": "pricing",
+      "device": "phone",
+      "locale": "en",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "01fe6a3eb40c5f59fe3ce52e3fd64e73cbc2d08df3edcc483789e0b0e7e35810",
+      "bytes": 3452312,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-phone-en-light.png",
+      "originalRepositoryFile": "pricing-phone-en-light.png"
+    },
+    {
+      "scope": "pricing",
+      "device": "phone",
+      "locale": "en",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "19b978b6f036c9081ca1ecb89317ba2bcc55808164276efbab257d3ca2ac22ef",
+      "bytes": 4126684,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-phone-en-dark.png",
+      "originalRepositoryFile": "pricing-phone-en-dark.png"
+    },
+    {
+      "scope": "pricing",
+      "device": "phone",
+      "locale": "ar",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "798c8b6af001a07dd7557e4cfe3f2975218d406660065e352cdd39c034a53695",
+      "bytes": 3274133,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-phone-ar-light.png",
+      "originalRepositoryFile": "pricing-phone-ar-light.png"
+    },
+    {
+      "scope": "pricing",
+      "device": "phone",
+      "locale": "ar",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "99b7c27f2c44b88a8553667eb84a635e892cf7525066c31817dbe623457e568e",
+      "bytes": 3406649,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/pricing-phone-ar-dark.png",
+      "originalRepositoryFile": "pricing-phone-ar-dark.png"
+    },
+    {
+      "scope": "account",
+      "device": "phone",
+      "locale": "en",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "fd042aa59921efb32ec36608614bc9de2fc591c1ab12f3ebf70b20ac9b5e0eb1",
+      "bytes": 6390941,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-phone-en-light.png",
+      "originalRepositoryFile": "account-phone-en-light.png"
+    },
+    {
+      "scope": "account",
+      "device": "phone",
+      "locale": "en",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "483541cecb1433e32753f61ddb21f0d92ef8a5b4a04bef750e8b145d1f54ec01",
+      "bytes": 5822208,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-phone-en-dark.png",
+      "originalRepositoryFile": "account-phone-en-dark.png"
+    },
+    {
+      "scope": "account",
+      "device": "phone",
+      "locale": "ar",
+      "appearance": "light",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "a2fdf682d2ae952e208cfa8e14481fb027660f35cfe11afa52dbf1aceb917193",
+      "bytes": 5869297,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-phone-ar-light.png",
+      "originalRepositoryFile": "account-phone-ar-light.png"
+    },
+    {
+      "scope": "account",
+      "device": "phone",
+      "locale": "ar",
+      "appearance": "dark",
+      "violations": [],
+      "overflow": 0,
+      "sha256": "37af64bb65f6be6580de12aa209087790ffebf3749261cd31da1c6090a43f6eb",
+      "bytes": 5416461,
+      "localFile": "/Users/user/Documents/GitHub/watermark-pro-integration/temp/lumafoil-ui-verify/archived-reviewable/account-phone-ar-dark.png",
+      "originalRepositoryFile": "account-phone-ar-dark.png"
+    }
+  ],
+  "repositoryImagesMovedToOwnedTemp": true
+}

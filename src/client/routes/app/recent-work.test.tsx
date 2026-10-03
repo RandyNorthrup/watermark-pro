@@ -185,8 +185,9 @@ describe('recent work in Library and Gallery', () => {
     const viewer = await screen.findByRole('dialog', { name: 'Private saved photo.jpg' })
     expect(within(viewer).getByRole('link', { name: 'Download' })).toHaveAttribute(
       'href',
-      '/api/orgs/org-1/photos/photo-1/file',
+      'blob:test-preview',
     )
+    expect(within(viewer).getByRole('img')).toHaveAttribute('src', 'blob:test-preview')
     await user.click(within(viewer).getByRole('button', { name: 'Delete' }))
     await waitFor(() => expect(api.gallery.photos).toHaveLength(0))
     await waitFor(() =>

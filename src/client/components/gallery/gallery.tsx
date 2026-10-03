@@ -449,6 +449,8 @@ function DeleteDialog({ count, isPending, onConfirm }: DeleteDialogProps) {
 
 interface LightboxProps {
   organizationId: string
+  /** Already authorized original bytes from this open action; URL ownership stays in the viewer. */
+  original?: Blob | undefined
   photo: PhotoDto | null
   canDelete: boolean
   canShare: boolean
@@ -459,6 +461,7 @@ interface LightboxProps {
 
 export function GalleryLightbox({
   organizationId,
+  original,
   photo,
   canDelete,
   canShare,
@@ -470,6 +473,7 @@ export function GalleryLightbox({
   const photoUrl = useWorkspaceMedia(
     organizationId,
     photo === null ? null : photoFileUrl(organizationId, photo.id),
+    original,
   )
   return (
     <Dialog.Root

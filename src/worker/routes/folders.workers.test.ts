@@ -14,7 +14,9 @@ import { auditLog, member, photo, watermark, workspaceFolder } from '../db/schem
 import { createApp } from '../index'
 import { getServices } from '../services'
 import { TestClient } from '../test-support/client'
+import { PHOTO_PNG, THUMBNAIL_PNG } from '../test-support/image-fixtures'
 import { responseJson, responseStatus } from '../test-support/response'
+import { createRetainedWorkspaceFixture } from '../test-support/retained-workspace-fixture'
 
 const ownerAccount = {
   name: 'D1 Folder Owner',
@@ -39,7 +41,12 @@ describe('folder transactions in real D1', () => {
     userId = sessionSchema.parse(await responseJson(client.get('/api/auth/get-session'))).user.id
   })
   async function workspace() {
-    const id = await client.createOrganization('Folders', `folders-${crypto.randomUUID()}`)
+    const id = await createRetainedWorkspaceFixture(
+      getServices(env).db,
+      userId,
+      'Folders',
+      'folders',
+    )
     return { id, path: `/api/orgs/${id}/folders` }
   }
   async function create(
@@ -168,10 +175,10 @@ describe('folder transactions in real D1', () => {
   it('stores original photo bytes in the chosen folder and filters root separately', async () => {
     const current = await workspace()
     const target = await create(current.path, 'Deliveries', null, 'photo')
-    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4])
+    const bytes = PHOTO_PNG
     const form = new FormData()
     form.append('file', new File([bytes], 'original.png', { type: 'image/png' }))
-    form.append('thumbnail', new File([bytes], 'thumbnail.png', { type: 'image/png' }))
+    form.append('thumbnail', new File([THUMBNAIL_PNG], 'thumbnail.png', { type: 'image/png' }))
     form.append('name', 'Original')
     form.append('width', '4000')
     form.append('height', '3000')

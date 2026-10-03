@@ -1,0 +1,155 @@
+{
+  "date": "2026-10-03",
+  "branch": "codex/lumafoil-integration",
+  "source": "approved lifecycle delta with exact snapshot/c8 three-way ancestors",
+  "paths": [
+    {
+      "path": "migrations/0023_stripe_billing.sql",
+      "beforeSha256": "644c8a013bcd55d6cbd9ac5c087bf0426fab2c3cb959089195db768712f92f7d",
+      "afterSha256": "b0cc4d3fc04536bae16c4ce47a48045d9afa0b7f0b33f1c751032aa8f0ffa308",
+      "lines": 132
+    },
+    {
+      "path": "src/shared/billing.ts",
+      "beforeSha256": "ac6474317205a86392e45ad2a5958a889a9b0ee4419d062a52cbf0898d5409bc",
+      "afterSha256": "efc5d95d994dd186d8f91529a049e8f1fa61941fce7c7767207561eaae4a37d0",
+      "lines": 87
+    },
+    {
+      "path": "src/worker/auth/invitation-admission.ts",
+      "beforeSha256": "ae47acc2ad2e1668828a6bf2fe00b196715b596d70e04f7bc1f5d7cb4e21cba2",
+      "afterSha256": "af58274f9bb2cc07211deabfae5f7285468909db6cb9401c817bd68d9dc4cc6b",
+      "lines": 206
+    },
+    {
+      "path": "src/worker/auth/options.ts",
+      "beforeSha256": "e209b2d55b816b24afc96b1e7036f67711cd0f167d2047f1d91cc4019eaa217d",
+      "afterSha256": "7aa70fadef0e5b2753c2f33173500a5e1b9035213b1b3984d5f4735f06af2aa9",
+      "lines": 610
+    },
+    {
+      "path": "src/worker/auth/recent-authentication.ts",
+      "beforeSha256": "1bf578e76f65779f7096076d1a010de285bf1ac5f21ce8a07e9ebc4d744bbdf5",
+      "afterSha256": "8260abc6a73ee16558e8b597ce4ad3df67dc49b0b203976df5853d5b299f9681",
+      "lines": 99
+    },
+    {
+      "path": "src/worker/auth/workspace-access.ts",
+      "beforeSha256": "5ff484ddefd040c528fac611d0f545a923392b3204482a0b1af27b0a0f91fc0a",
+      "afterSha256": "36dda0660be38b4edddf23e42c1b7bd14068e6367aeb12fad34fef9321f53b28",
+      "lines": 164
+    },
+    {
+      "path": "src/worker/billing-lifecycle.test.ts",
+      "beforeSha256": null,
+      "afterSha256": "708b0b0661c993a2c1f2fdc9da71941a6aafe6259edd3b2904bc8390f46a87bd",
+      "lines": 249
+    },
+    {
+      "path": "src/worker/billing-lifecycle.ts",
+      "beforeSha256": null,
+      "afterSha256": "548c9407bb954bb2873231c2ecc4e0336967e00c2df9d9895e67d9d5b72244ad",
+      "lines": 95
+    },
+    {
+      "path": "src/worker/billing-store.ts",
+      "beforeSha256": "2070053d37562310f69db6daefae18a4bbf57f00193b89d57ff6957bda1bb8e5",
+      "afterSha256": "90467f1544fe855613cf269fb0c000970e6bc427f979cd618031b8de3b652f66",
+      "lines": 64
+    },
+    {
+      "path": "src/worker/db/billing-store.ts",
+      "beforeSha256": "e83fa718e5c7a25ceb485b854c2c024f4f6541d8df70db521b928cc994744fc3",
+      "afterSha256": "52ef7370fe18f933b6385ef57dbe50a3b27a4fbf5ce93b376e32222a280d10b7",
+      "lines": 341
+    },
+    {
+      "path": "src/worker/index.test.ts",
+      "beforeSha256": "e7afd37c756e204eb9967619cb6b8e0a382972c17fd33f08fd895b5c48414014",
+      "afterSha256": "8008688f8df6d527bbb8b704ec15f23fe46ed3c3243e086817eef903cf066f0e",
+      "lines": 298
+    },
+    {
+      "path": "src/worker/index.ts",
+      "beforeSha256": "b0c88bc7e939625190c30bdcb932d9eac89d4f53219f1d1bdf8d97bf85b172c2",
+      "afterSha256": "9a3c4583229046988fbc9c11f99ef7d03619039b91adf30e5ee7350dd9152fdf",
+      "lines": 235
+    },
+    {
+      "path": "src/worker/routes/billing.test.ts",
+      "beforeSha256": "222f779995c50a7802953e0db9a89d169c50ddf5a391b07f1e9c0d9581a150e7",
+      "afterSha256": "d69b5e3765a0ed4d885874d5b6ebda1cc378b87344ef820108ab0fd0dcea30e6",
+      "lines": 340
+    },
+    {
+      "path": "src/worker/routes/billing.ts",
+      "beforeSha256": "62cfb9f8ece26e9b23e6f918c6682f2be1dc6f12acfc80b6509a1354276418e7",
+      "afterSha256": "98bb7fbc8318928d74d483bbeb4502dbd5cef12328023f5f60df8dcd0570d77b",
+      "lines": 283
+    },
+    {
+      "path": "src/worker/routes/billing.workers.test.ts",
+      "beforeSha256": "b8398299ce39d55f7e8d06d052089832e17892973963438f32e2bc018f971669",
+      "afterSha256": "8d75752d40c69094348065a26e4cc23aab326f5af0ca8a592fb548254ea711a0",
+      "lines": 836
+    },
+    {
+      "path": "src/worker/services.ts",
+      "beforeSha256": "261398eafe7a1576ec3dbd5f40d8c5274e79e62515e189c941f3e27e704db9d7",
+      "afterSha256": "5f0c49ed8e2d7dea47f5b4d03e61710ce7ac76d4b35d5bcb58cf936c7ce9a992",
+      "lines": 253
+    },
+    {
+      "path": "src/worker/stripe-gateway.ts",
+      "beforeSha256": "af9ece5ba353819c6d39da2ead4891a1b74be22c5bd1f6505c1b98ee0a1d1724",
+      "afterSha256": "8d12a3898d5bba017374b6482086e447593a92f115b4401998e4596039d82b21",
+      "lines": 518
+    },
+    {
+      "path": "src/worker/test-support/stripe-fixture.ts",
+      "beforeSha256": "48de9a27213c9b1e25d92eeb7dc3485b8ca00206a6ed125bdf9c5394849cd442",
+      "afterSha256": "adf04c5aa223dc31836b9d84eeae5a14271c2e591e094e6aecd624ffd124f9b1",
+      "lines": 313
+    },
+    {
+      "path": "src/worker/test-support/test-app.ts",
+      "beforeSha256": "007ebd08fe5d4e57d5b7f3daa19ca74701fc0da561f75ce67fe268e079690bda",
+      "afterSha256": "1871ff0ef7f7334d71ccaabef3b64c99744187e0451d4843b720771a778c8849",
+      "lines": 289
+    },
+    {
+      "path": "docs/plans/stripe-subscriptions.md",
+      "beforeSha256": "a193d14281c5176345b038048ad09247336bd7fd9fb369618d5e633d0dd19650",
+      "afterSha256": "e48086d0cf0470f9e6afbee32c177b441bbea18a3ebd20476f1b2a376a747fa7",
+      "lines": 164
+    },
+    {
+      "path": "docs/verification/m19/stripe-lifecycle-integration-2026-10-03.md",
+      "beforeSha256": null,
+      "afterSha256": "e4a6cadabeb3dcbdbd711f1a64baeba5bdc8634c5eef76839099266491299db3"
+    }
+  ],
+  "ownChecks": {
+    "selectedNodeShared": 185,
+    "sourceScopedESLint": "passed",
+    "firstTypes": "failed in root preset files",
+    "firstSelectedUI": "28 passed, 1 failed old locale key",
+    "firstCombinedD1": "30 passed, 1 old projection expectation failed",
+    "finalCombinedD1": 31
+  },
+  "rootReportedChecks": {
+    "fullTypesAndPresetLint": "handle68657 passed",
+    "currentUI": 13,
+    "publicProjectionFixtureLintFormat": "handle16338 passed"
+  },
+  "logs": {
+    "/tmp/lumafoil-lifecycle-integration-node.log": "84bce4c8414e3fc0ea59e932a7629462c145b66cf652bdc8e0846f41854e4ef7",
+    "/tmp/lumafoil-lifecycle-integration-types.log": "02167c5c166758f885ecff83027f8eefe534733d24c7e4eaf3affeb80ac603a1",
+    "/tmp/lumafoil-lifecycle-integration-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/lumafoil-lifecycle-integration-plans-ui.log": "cfd123e6b2d090f0f4ddcc87dc6d10fef6eac237850a2f886c49a8a889d9f928",
+    "/tmp/lumafoil-lifecycle-integration-workers.log": "5c59bd095ee9d04c6774b763adfb82133355532fdff1ecbb0acc1df2a49e0a3b",
+    "/tmp/lumafoil-lifecycle-integration-workers-final.log": "592feac5b4a0235adbe03c4480fc41311f989afff0415c9b8c889f5c635b1bb7",
+    "/tmp/lumafoil-lifecycle-integration-docformat.log": "09494d568d6c45312713bd696e4119c09b66258478dd75f48cce9d27f32c69b6"
+  },
+  "scope": "No shared/plans, preset implementation/tests/UI, migration 0025, PLAN or CHANGELOG edits. Root owns those paths. No provider write, CI, commit, push or deployment. Runtime frozen for browser diagnostics. M19 open."
+}

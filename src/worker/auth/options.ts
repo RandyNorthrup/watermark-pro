@@ -7,6 +7,7 @@
  * generator with stub dependencies, so the D1 schema can never drift from
  * the runtime configuration.
  */
+import { tryGetCurrentAuthEndpointContext } from '@better-auth/core/context'
 import type { BetterAuthOptions } from 'better-auth'
 import type { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware, getSessionFromCtx } from 'better-auth/api'
@@ -19,6 +20,8 @@ import { humanVerificationPlugins } from './human-verification'
 import {
   acceptSiteAdmission,
   invitationAdmission,
+  authorizeAccountCreation,
+  publicAdmissionUnavailable,
   validateAccountAdmission,
 } from './invitation-admission'
 import { authenticationLogger } from './logger'
@@ -41,7 +44,7 @@ import {
 } from '../../shared/constants'
 import { LOCALE_CODES } from '../../shared/locales'
 import { accessControl, roles } from '../../shared/permissions'
-import { workspaceCapacity } from '../../shared/plans'
+import { WORKSPACE_CREATION_KIND, workspaceCapacity } from '../../shared/plans'
 import { SITE_ROLE } from '../../shared/site-roles'
 import { newOrganizationSchema } from '../../shared/validation'
 import { WORKSPACE_ACCESS_POLICY } from '../../shared/workspace-access'
@@ -49,6 +52,7 @@ import type { AccountStore } from '../account-store'
 import type { AuditStore } from '../audit'
 import type { EmailSender } from '../email/sender'
 import type { PlanStore } from '../plan-store'
+import type { PublicAdmissionStore } from '../public-admission-store'
 import type { WorkspaceAccessStore } from '../workspace-access-store'
 
 /** Adapter factory shape shared by every Better Auth adapter package. */
@@ -93,12 +97,90 @@ export interface AuthDependencies {
   rateLimitEnabled: boolean
   /** Explicit fixture bootstrap only; production always uses invitation admission. */
   canSignUpWithoutInvitation?: boolean | undefined
+  /** Separate public policy: an actual durable reservation is mandatory before creating a user. */
+  publicSignup?: PublicAdmissionStore | undefined
   /** CLI schema generation does not send email; runtime construction supplies the durable guard. */
   reserveWorkspaceInvitation?: WorkspaceAccessStore['reserveInvitationEmail']
+  /** Runs only after auth has verified self deletion or authorized administrative removal. */
+  closeBillingForDeletion?: (userId: string) => Promise<void>
+  /** Registers background closure after the security ban is already persisted. */
+  closeBillingAfterBan?: (userId: string) => Promise<void>
 }
 
 export function buildAuthOptions(deps: AuthDependencies) {
   const appOrigin = new URL(deps.appUrl)
+  type TransactionAdapter = Omit<ReturnType<DatabaseAdapter>, 'transaction'>
+  interface Hold {
+    email: string
+    userId: string
+  }
+  const admissionIdentity = z.object({ email: z.email() })
+  function guardedAdapter(adapter: TransactionAdapter, holds: Hold[] = []): TransactionAdapter {
+    return {
+      ...adapter,
+      create: async <T extends Record<string, unknown>, R = T>(input: {
+        model: string
+        data: Omit<T, 'id'>
+        select?: string[] | undefined
+        forceAllowId?: boolean | undefined
+      }): Promise<R> => {
+        const context = tryGetCurrentAuthEndpointContext()
+        if (context == null || input.model !== 'user') return await adapter.create<T, R>(input)
+        const { email } = admissionIdentity.parse(input.data)
+        const cohort = await authorizeAccountCreation(
+          deps.accounts,
+          context.headers,
+          email,
+          deps.canSignUpWithoutInvitation === true,
+          deps.publicSignup !== undefined,
+        )
+        if (cohort !== MEMBERSHIP_COHORT.public || deps.publicSignup === undefined)
+          return await adapter.create<T, R>(input)
+        const userId = await deps.publicSignup.reserve(email)
+        if (userId === null) throw publicAdmissionUnavailable()
+        holds.push({ email, userId })
+        try {
+          return await adapter.create<T, R>({
+            ...input,
+            data: { ...input.data, id: userId },
+            forceAllowId: true,
+          })
+        } catch (error) {
+          await deps.publicSignup.release(email, userId)
+          throw error
+        }
+      },
+    }
+  }
+  const database: DatabaseAdapter = (options) => {
+    const adapter = deps.database(options)
+    return {
+      ...guardedAdapter(adapter),
+      transaction: async (callback) => {
+        const holds: Hold[] = []
+        try {
+          return await adapter.transaction(
+            async (transaction) => await callback(guardedAdapter(transaction, holds)),
+          )
+        } catch (error) {
+          for (const hold of holds) await deps.publicSignup?.release(hold.email, hold.userId)
+          throw error
+        }
+      },
+    }
+  }
+  async function closeBillingForDeletion(userId: string) {
+    if (deps.closeBillingForDeletion === undefined) throw new APIError('SERVICE_UNAVAILABLE')
+    try {
+      await deps.closeBillingForDeletion(userId)
+    } catch (error) {
+      if (error instanceof APIError) throw error
+      throw new APIError('SERVICE_UNAVAILABLE', {
+        code: 'BILLING_CLOSURE_PENDING',
+        message: 'Billing closure could not be confirmed. Retry account removal.',
+      })
+    }
+  }
   async function requireSharedWorkspace({ organization }: { organization: { id: string } }) {
     if (await deps.accounts.isPrivateWorkspace(organization.id)) {
       throw new APIError('FORBIDDEN', {
@@ -117,7 +199,7 @@ export function buildAuthOptions(deps: AuthDependencies) {
     basePath: '/api/auth',
     secret: deps.secret,
     trustedOrigins: [appOrigin.origin],
-    database: deps.database,
+    database,
     socialProviders: accountSocialProviders(deps.accountOAuth),
     account: {
       encryptOAuthTokens: true,
@@ -133,9 +215,28 @@ export function buildAuthOptions(deps: AuthDependencies) {
       },
     },
     user: {
+      deleteUser: {
+        enabled: true,
+        beforeDelete: async (user) => {
+          const ownerId = await deps.accounts.siteOwnerId()
+          const cohort = membershipCohortSchema.safeParse(
+            'membershipCohort' in user ? user.membershipCohort : undefined,
+          )
+          if (
+            user.id === ownerId ||
+            !user.emailVerified ||
+            ('banned' in user && user.banned === true) ||
+            !cohort.success ||
+            cohort.data === MEMBERSHIP_COHORT.pending
+          )
+            throw new APIError('FORBIDDEN')
+          await closeBillingForDeletion(user.id)
+        },
+      },
       validateUserInfo: validateAccountAdmission(
         deps.accounts,
         deps.canSignUpWithoutInvitation === true,
+        deps.publicSignup,
       ),
       additionalFields: {
         membershipCohort: {
@@ -236,8 +337,10 @@ export function buildAuthOptions(deps: AuthDependencies) {
       user: {
         update: {
           after: async (user) => {
-            if ('banned' in user && user['banned'] === true)
+            if ('banned' in user && user['banned'] === true) {
               await deps.accounts.revokePendingAdmissions(user.id)
+              await deps.closeBillingAfterBan?.(user.id)
+            }
             if ('role' in user && user['role'] === SITE_ROLE.user)
               await deps.accounts.revokePendingAdministratorAdmissions(user.id)
           },
@@ -257,6 +360,7 @@ export function buildAuthOptions(deps: AuthDependencies) {
               deps.canSignUpWithoutInvitation === true
                 ? MEMBERSHIP_COHORT.private
                 : MEMBERSHIP_COHORT.public,
+              deps.publicSignup,
             )
             await deps.audit.append({
               actorUserId: user.id,
@@ -274,6 +378,21 @@ export function buildAuthOptions(deps: AuthDependencies) {
         ac: accessControl,
         roles,
         creatorRole: 'owner',
+        schema: {
+          organization: {
+            additionalFields: {
+              creationOwnerId: { type: 'string', required: false, input: false, returned: false },
+              creationKind: {
+                type: 'string',
+                required: true,
+                input: false,
+                returned: false,
+                defaultValue: WORKSPACE_CREATION_KIND.shared,
+                validator: { input: z.enum(WORKSPACE_CREATION_KIND) },
+              },
+            },
+          },
+        },
         invitationExpiresIn: INVITATION_TTL_SECONDS,
         cancelPendingInvitationsOnReInvite: true,
         requireEmailVerificationOnInvitation: true,
@@ -282,7 +401,7 @@ export function buildAuthOptions(deps: AuthDependencies) {
         // Delivery runs in our awaited after-hook: Better Auth's built-in
         // email callback swallows failures and otherwise returns false success.
         organizationHooks: {
-          beforeCreateOrganization: ({ organization }) => {
+          beforeCreateOrganization: async ({ organization, user }) => {
             const parsed = newOrganizationSchema.safeParse(organization)
             if (!parsed.success || parsed.data.slug.startsWith('personal-')) {
               throw new APIError('BAD_REQUEST', {
@@ -290,7 +409,18 @@ export function buildAuthOptions(deps: AuthDependencies) {
                 message: 'Use a valid workspace name and a non-reserved slug.',
               })
             }
-            return Promise.resolve()
+            if (!(await deps.accounts.canCreateSharedWorkspace(user.id)))
+              throw new APIError('FORBIDDEN', {
+                code: 'WORKSPACE_CREATION_QUOTA',
+                message: 'Shared workspace creation is unavailable for this account.',
+              })
+            return {
+              data: {
+                ...parsed.data,
+                creationOwnerId: user.id,
+                creationKind: WORKSPACE_CREATION_KIND.shared,
+              },
+            }
           },
           beforeAddMember: requireSharedWorkspace,
           beforeRemoveMember: requireSharedWorkspace,
@@ -401,7 +531,12 @@ export function buildAuthOptions(deps: AuthDependencies) {
       ...humanVerificationPlugins(deps.captcha, appOrigin.hostname),
     ],
     hooks: {
-      before: invitationAdmission(deps.accounts, deps.canSignUpWithoutInvitation === true),
+      before: invitationAdmission(
+        deps.accounts,
+        deps.canSignUpWithoutInvitation === true,
+        deps.publicSignup,
+        closeBillingForDeletion,
+      ),
       // Platform-admin actions are not covered by the organization hooks; record them here.
       after: createAuthMiddleware(async (ctx) => {
         if (

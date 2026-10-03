@@ -14,6 +14,7 @@ export interface FakeUser {
   name: string
   email: string
   emailVerified: boolean
+  membershipCohort?: 'pending' | 'public' | 'private'
   image: string | null
   /** Site role; independent of ownership or membership in a workspace. */
   role?: SiteRole
@@ -341,6 +342,7 @@ export function makeMember(
 }
 
 export const OWNER: FakeUser = {
+  membershipCohort: 'private',
   id: 'user-1',
   name: 'Olivia Owner',
   email: 'olivia@example.test',
@@ -349,6 +351,7 @@ export const OWNER: FakeUser = {
 }
 
 export const VIEWER: FakeUser = {
+  membershipCohort: 'private',
   id: 'user-2',
   name: 'Vic Viewer',
   email: 'vic@example.test',

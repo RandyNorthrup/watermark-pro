@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-03",
+  "source_boundary": "Current merged launch/editor/billing/budget/image/privacy/code-clone source; storage fence and AAC span remain isolated prototypes",
+  "canonical_runs": {
+    "first": "failed lint:dup; preserved initial19 clones",
+    "after_clone": "failed knip duplicate alias; SAST separatelypassed beforeconstantfix",
+    "post_alias": "passed static gates throughzero duplicates; publicationfailed syntheticfixture/fingerprint; exactfulltest/buildnotreached"
+  },
+  "subsequent_verification": {
+    "constant_image_cases": 48,
+    "deadcode_exit": 0,
+    "synthetic_credential_billing_cases": 89,
+    "targeted_gitleaks_findings": 0,
+    "publication": {
+      "exit": 0,
+      "candidate_checks": 15428,
+      "scanner_copies": 13176,
+      "raw_bytes": 553850535,
+      "unique_candidate_bytes": 254646607,
+      "archive_entries": 253,
+      "configured_private_values_compared": 0,
+      "existing_revoked_history_masked_occurrences": 5,
+      "existing_exact_historical_findings": 1
+    },
+    "audit": {
+      "exit": 1,
+      "high_findings": 7,
+      "advisory": "GHSA-vfj7-8cjw-p6xm",
+      "forced_downgrade_rejected": true
+    },
+    "sast_pre_constant_fix": {
+      "exit": 0,
+      "rules": 510,
+      "files": 2295,
+      "findings": 0
+    }
+  },
+  "full_quality_pass": false,
+  "m19_certified": false,
+  "production_opened": false,
+  "logs": {
+    "lumafoil-combined-security-quality-final.log": {
+      "sha256": "604affae88864bea2eb3e4ecdfec6659ad809b6725acb109affb09bd9e6abd31",
+      "bytes": 775
+    },
+    "lumafoil-combined-security-sast.log": {
+      "sha256": "f7478bcf6cb9058d1f7cb298b40e777a2e80d6faec986ee1549b5246d9d2e6e7",
+      "bytes": 2720
+    },
+    "lumafoil-combined-quality-post-alias.log": {
+      "sha256": "7c38bdd94c518f73dd2bbf9a78ec7ab2115904d69b8f6e0f4cd21f36ff402e5c",
+      "bytes": 7099
+    },
+    "lumafoil-publication-final.log": {
+      "sha256": "cb5186caba2f9d70a658c9141f9ee1ea2128ff85c04a62eb1401939383cd4935",
+      "bytes": 360
+    },
+    "lumafoil-audit-final.log": {
+      "sha256": "0a1cddcc732800b62abf353f99adad1e986af6ff96b542759311d3a310224eac",
+      "bytes": 1406
+    }
+  }
+}

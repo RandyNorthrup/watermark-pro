@@ -36,7 +36,9 @@
     "manageAccess": "管理访问权限",
     "supportPrompt": "如果 Lumafoil 对您有帮助，请考虑捐赠支持。",
     "donate": "捐赠",
-    "supportPayPal": "通过 PayPal 捐赠（新标签页）"
+    "supportPayPal": "通过 PayPal 捐赠（新标签页）",
+    "openNavigation": "打开导航",
+    "closeNavigation": "关闭导航"
   },
   "auth": {
     "backToSignIn": "返回登录",
@@ -90,10 +92,6 @@
       "roleLabel": "角色：",
       "decline": "拒绝",
       "accept": "接受邀请"
-    },
-    "inviteOnly": {
-      "title": "需要邀请",
-      "body": "Lumafoil目前仅限受邀用户使用。请打开邮件中的邀请链接创建账户。"
     },
     "humanCheck": {
       "label": "人机验证",
@@ -861,12 +859,11 @@
   "video": {
     "orgRequired": "创建或加入一个工作区，以为视频添加水印。",
     "heading": "视频",
-    "description": "预览视频，在不同时间点放置水印，添加淡入淡出效果，并保留音频导出。",
+    "description": "在视频和音频轨道上剪切、修剪多个片段。预览剪辑、添加水印，然后在设备上导出。",
     "checkingSupport": "正在检查视频支持",
     "unsupportedTitle": "此浏览器不支持视频",
     "unsupportedBody": "您的浏览器无法编码视频。Chrome、Edge 或 Safari 17 及更高版本可以。",
     "addVideo": "添加视频",
-    "dropHint": "将一个视频拖放到此处，或",
     "transcodingProgress": "转码进度",
     "progress": {},
     "cancel": "取消",
@@ -883,7 +880,6 @@
       "fit1080p": "适应 1080p",
       "fit720p": "适应 720p"
     },
-    "previewAlt": "视频某一帧上的水印",
     "timeline": {
       "heading": "时间与运动",
       "play": "播放",
@@ -898,12 +894,48 @@
       "updateKeyframe": "更新此处的关键帧",
       "removeKeyframe": "移除 {{time}} 处的关键帧",
       "hint": "添加关键帧，移动到另一时间点，然后拖动、缩放或旋转水印。Lumafoil 会生成关键帧之间的运动。",
-      "playbackFailed": "此浏览器无法播放所选视频。",
       "chooseVideo": "请先打开视频并添加有效的水印。",
       "waitPreview": "请等待水印预览显示后再添加关键帧。",
       "changed": "导出过程中，视频或水印发生了变化。请重新导出以使用当前的编辑内容。",
       "download": "导出视频",
       "cloudSaved": "带水印的视频已保存到你的云存储。"
+    },
+    "studio": {
+      "mediaPool": "媒体池",
+      "inspector": "检查器",
+      "clip": "片段",
+      "timeline": "时间线",
+      "output": "输出",
+      "importMedia": "导入媒体",
+      "emptyMedia": "导入视频或音频，开始剪辑。",
+      "emptyTimeline": "添加视频片段以开始时间线。",
+      "projectName": "项目",
+      "untitled": "未命名项目",
+      "sourceIn": "源入点（秒）",
+      "sourceOut": "源出点（秒）",
+      "track": "轨道",
+      "split": "在播放头处分割",
+      "removeClip": "移除片段",
+      "unlink": "取消音频链接",
+      "volume": "音量",
+      "showTrack": "显示{{track}}",
+      "hideTrack": "隐藏{{track}}",
+      "muteTrack": "静音{{track}}",
+      "unmuteTrack": "取消静音{{track}}",
+      "addClip": "将{{name}}添加到{{track}}",
+      "trimIn": "修剪{{track}}上{{name}}的开始",
+      "trimOut": "修剪{{track}}上{{name}}的结束",
+      "zoom": "时间线缩放",
+      "localSession": "文件保留在此设备上。关闭页面后不会保存本次编辑。",
+      "frameRate": "已编辑时间线：{{fps}} fps",
+      "sourceBounds": "超过媒体限制，或修剪超出源文件范围。",
+      "selectClip": "选择时间线中的片段以编辑。",
+      "timeReadout": "{{current}} / {{total}}",
+      "pictureMeta": "{{width}} × {{height}} · {{format}}",
+      "audioRequired": "需要音频编码器。请将音轨静音或使用兼容浏览器。",
+      "timing": "时间",
+      "transform": "变换",
+      "invalidEdit": "此编辑会与其他片段重叠或超出时间轴限制。请更改开始时间、源素材区间或轨道。"
     }
   },
   "documents": {
@@ -1040,7 +1072,7 @@
       },
       "sharing": {
         "title": "分享照片或工作空间",
-        "body": "为选定的照片创建可撤销、有期限的图库链接。所有者可通过链接、邮件邀请或直接添加现有用户来授予查看或编辑权限。工作空间权限与加入 Lumafoil 的邀请相互独立。"
+        "body": "每个账户都有独立工作区。除非明确共享，否则照片和预设互相隔离。访问工作区需要所有者授权。"
       },
       "offline": {
         "title": "离线工作，稍后同步",
@@ -1048,7 +1080,7 @@
       },
       "privacy": {
         "title": "你的账号，你的工作空间",
-        "body": "新用户需要网站邀请，并会获得独立的私密工作空间。网站邀请绝不会分享你的照片或预设。分享工作空间需要由所有者明确授予访问权限。"
+        "body": "每个账户都有独立工作区。除非明确共享，否则照片和预设互相隔离。访问工作区需要所有者授权。"
       },
       "languages": {
         "title": "12 种界面语言",
@@ -1063,7 +1095,6 @@
         "body": "连接 Google Drive、Dropbox 或 OneDrive，即可打开文件、选择导出文件夹，并创建服务商的分享链接。连接会一直保存，直到你主动断开或服务商要求重新授权。Google Drive 的访问范围仅限于你通过 Lumafoil 选择或创建的文件和文件夹。 工作或学校账号可能需要 Microsoft 管理员批准。"
       }
     },
-    "inviteHosting": "Lumafoil 仅限受邀用户使用。想自行托管？",
     "selfHost": "在 GitHub 免费获取源代码。",
     "featuresNav": "功能"
   },
@@ -1093,13 +1124,17 @@
       },
       "sharing": {
         "heading": "分享链接",
-        "p1": "任何持有 Lumafoil 图库链接的人都能查看选中的已保存照片，直到链接过期或被撤销。网站邀请用于创建独立的私人账号，不会分享邀请人的工作区或内容。",
+        "p1": "持有图库链接的人可查看所选照片，直到链接到期或被撤销。访问工作区需要所有者明确授权。",
         "p2": "云服务商的原生链接遵循其权限和撤销规则。撤销链接无法收回已经下载或复制的内容。"
       },
       "account": {
         "heading": "您的账户",
-        "p1": "新账号需要邀请和已验证的邮箱。可以使用密码或已配置的 Google/Microsoft 登录。已有账号不需要新的邀请。添加其他登录方式须在已认证账号中进行关联。",
-        "p2": "会话使用 HttpOnly、SameSite=Lax Cookie，并在 HTTPS 下设置 Secure。密码重置链接一小时后失效，使用后会撤销其他服务器会话。"
+        "p1": "账户注册取决于当前开放情况，且需要验证电子邮箱。可使用密码或已配置的Google/Microsoft登录。添加其他登录方式需要经过身份验证的账户关联。",
+        "p2": "会话使用 HttpOnly、SameSite=Lax Cookie，并在 HTTPS 下设置 Secure。密码重置链接一小时后失效，使用后会撤销其他服务器会话。 经授权的账户删除会首先仅为已确认您是唯一所有者和成员的个人工作区撤销链接并移除云端元数据。存储文件会进入后台清理队列，在重试完成前可能仍然保留。协作工作区、归属不明确的工作区、审计记录和账单凭据会保留。删除账号不会清除已下载的文件、其他设备上的副本或服务商的备份。账号设置也会在确认删除后清除此账号在当前设备上的本地数据。 如果清理已安排但确认失败，即使账户仍然保留，个人链接和元数据也可能已被移除；请重试删除账户。"
+      },
+      "billing": {
+        "heading": "付款",
+        "p1": "如果您使用付费方案的Checkout或账单门户，Stripe会提供这些页面，并处理您在其中输入的付款信息。Lumafoil会保存Stripe的客户、Checkout、订阅和发票ID、付款事件记录、订阅状态以及已付费有效期的截止日期，并将其关联到您的账户和计费工作空间。我们向Stripe发送计费引用信息和您选择的方案，但不会发送照片、视频、文档、标志或已保存的水印内容。Lumafoil不收集或保存完整的银行卡号。"
       },
       "analytics": {
         "heading": "Cookie 与外部服务",
@@ -1130,7 +1165,7 @@
       },
       "account": {
         "heading": "您的账户",
-        "p1": "目前仅受邀用户可使用，且需要已验证邮箱。可使用密码及已配置的 Google/Microsoft 登录。请保护登录凭据和服务商账号；你对自己账号的使用负责。",
+        "p1": "是否可以注册取决于当前开放情况。必须验证电子邮箱，可使用密码或已配置的Google/Microsoft登录。请保护登录凭证和提供商账户；你对账户使用负责。",
         "p2": "退出需要联网并解决待处理修改，之后会清除本浏览器的应用离线数据。密码重置会撤销其他服务器会话。离线设备可能保留本地副本，直到重新连接或清除浏览器数据。"
       },
       "content": {
@@ -1145,7 +1180,7 @@
       },
       "teams": {
         "heading": "私人工作区与协作",
-        "p1": "每个账号最初都有独立的私人工作区。网站邀请不会共享邀请人的内容。工作区所有者可以明确授予该工作区的查看或编辑权限。这不会共享其他工作区，也不会授予网站管理权限。"
+        "p1": "每个账户都有独立工作区。除非明确共享，否则照片和预设互相隔离。访问工作区需要所有者授权。"
       },
       "availability": {
         "heading": "可用性、担保与变更",
@@ -1519,7 +1554,67 @@
     },
     "workspace": {
       "title": "工作区与访问权限",
-      "body": "通过用户菜单切换工作区、邀请他人或管理访问。工作区所有者可授予查看或编辑权限。个人邀请链接不会分享你的内容。同步状态位于侧栏底部。"
+      "body": "通过用户菜单切换工作区或管理访问权限。工作区所有者可授予查看或编辑权限。其他工作区保持私密。同步状态显示此设备是否有等待上传的更改。"
     }
+  },
+  "pricing": {
+    "nav": "价格",
+    "heroTag": "你的作品，你的水印。",
+    "hosting": "想自行托管？",
+    "eyebrow": "月付方案 · 美元",
+    "heading": "免费开始，扩展存储空间。",
+    "intro": "所有方案均提供照片、PDF 和视频工具。付费方案增加照片存储空间和受控共享功能。",
+    "free": "免费",
+    "pro": "Pro",
+    "team": "Team",
+    "freeBody": "适合初次创作和小型图库。",
+    "proBody": "适合不断增长的照片库和品牌素材。",
+    "teamBody": "适合具有明确访问权限的共享工作区。",
+    "monthly": "美元 / 月",
+    "freeStorage": "500 MiB 照片存储",
+    "proStorage": "10 GiB 照片存储",
+    "teamStorage": "25 GiB 照片存储",
+    "freePhotos": "保存 100 张照片",
+    "paidPhotos": "保存 10,000 张照片",
+    "freeLogos": "10 个标志素材",
+    "proLogos": "50 个标志素材",
+    "teamLogos": "100 个标志素材",
+    "personal": "一个个人工作区",
+    "teamPeople": "包含所有者在内共三人",
+    "teamSharing": "共享图库和预设",
+    "start": "开始使用",
+    "soon": "订阅即将开放",
+    "scope": "所有方案均可在设备和文件限制内进行本地导出。Team 覆盖一个共享工作区；个人工作区保留各自的方案。视频项目保留在此设备上，不会保存到云端。",
+    "closedTitle": "注册即将开放",
+    "closedBody": "目前暂停新账户注册。你仍可登录已有账户。",
+    "accountHeading": "工作区方案",
+    "allowance": "当前云端限额",
+    "manage": "管理订阅",
+    "upgrade": "选择 Pro",
+    "createTeam": "创建 Team 工作区",
+    "sharedName": "新共享工作区名称",
+    "privateMember": "私人成员",
+    "storageAmount": "{{value}} MiB",
+    "redirectNotice": "打开账单页面时将离开Lumafoil。请先保存或导出未完成的工作。",
+    "refreshNotice": "刷新付款状态以查看当前方案。",
+    "resume": "继续付款",
+    "cancelCheckout": "取消付款",
+    "refresh": "刷新付款状态"
+  },
+  "accountRemoval": {
+    "heading": "删除账号",
+    "description": "删除账号及个人云端内容。共享工作空间内容和必要的支付、安全记录会保留。",
+    "ownerProtected": "网站所有者账号受到保护。",
+    "action": "删除账号",
+    "title": "删除您的 Lumafoil 账号？",
+    "consequences": "删除前将取消订阅。个人分享会停止，文件将进入清理队列。共享内容和支付、安全记录会保留。此设备上尚未同步的更改将被丢弃。此操作无法撤销。 即使确认失败，部分个人内容或链接也可能已被移除。",
+    "confirmLabel": "确认邮箱",
+    "confirmHint": "请准确输入账号邮箱以确认。",
+    "confirm": "永久删除",
+    "unconfirmed": "删除未获确认。您的设备数据尚未清除。",
+    "cleanupHeading": "已删除账号清理",
+    "cleanupPending": "正在清除此设备上保存的账号数据。",
+    "cleanupFailed": "设备清理未完成。请重试以清除已删除账号剩余的本地数据。",
+    "cleanupRetry": "重试设备清理"
   }
 }

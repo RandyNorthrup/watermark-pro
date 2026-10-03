@@ -1,6 +1,10 @@
 # Public plans, private membership and trust gates — M19
 
-Status: design and research completed on 2026-10-01. Human-verification runtime
+Status: design and research completed on 2026-10-01; current official competitor
+prices refreshed on 2026-10-02 without changing the selected $9/$24 launch prices.
+The isolated default-closed public-launch candidate now has focused admission,
+real D1 and locale/UI evidence, with complete certification still pending in
+`../verification/m19/public-launch-2026-10-02.md`. Human-verification runtime
 source `b908155` passed full quality, SAST and four-device browser gates on
 2026-10-02 in draft PR #12. Private cohort/two-invite runtime and its final
 documentation head passed all seven exact-commit CI jobs, including the expanded
@@ -32,6 +36,13 @@ Authorization remains explicit and separate from those signals.
 
 ## Selected launch plans
 
+Full editor/navigation source is integrated with this launch candidate as of
+2026-10-03. Isolated Linux native proof passed 18 cases; focused combined types,
+lint/editor and 31 actual admission/lifecycle/preset D1 cases pass. These do not
+enable public registration or subscriptions. Fresh rendered/global/provider
+gates, monthly operation abuse boundaries, actual image dimensions and the
+documented financial policies remain required.
+
 | Plan | Monthly USD | Cloud allowance                                                                         | Membership and sharing                                             |
 | ---- | ----------: | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Free |          $0 | 500 MiB photo/gallery storage, 100 photos and 10 logo assets                            | One private personal workspace; no new shared workspace            |
@@ -48,6 +59,15 @@ must say photo/gallery storage, rather than imply cloud video-project storage.
 There is no annual plan, metered overage, paid trial or Enterprise tier at launch.
 Additional seats are not sold until seat changes and their billing are implemented.
 Members' personal workspaces keep their own plan; Team covers its shared workspace.
+
+Saved cloud watermarks are separately bounded: Free 20, Pro 1,000 and Team 2,000
+per billed workspace. Private/retained grants allow 1,000. Migration 0025 and the
+existing atomic writer refuse additional objects above current capacity without
+deleting or preventing read/edit/delete of retained presets. Pricing/account UI
+now shows this allowance; final visual/integration certification remains pending.
+Browser-local processing is independent. Durable monthly cloud-operation budgets
+remain a launch blocker: storage/preset limits alone do not verify the compute
+allocation in the contribution model below.
 
 Existing private personal workspaces retain the current 2 GiB/10,000-photo/50-logo
 allowances. Existing explicit workspace grants are preserved. A pending
@@ -80,11 +100,38 @@ and contracted support that Lumafoil has not implemented.
 
 ## Unit economics and explicit assumptions
 
-The account country, negotiated Stripe fees, tax registrations and actual
-operating/support costs remain unverified. The existing CLI's test key is expired
-and its live key is rejected. A Stripe connection was offered; products, prices,
-portal configuration and webhook registration have not been created. Live billing
-cannot be certified until the intended account and its rates are read back.
+Official-rate refresh on 2026-10-03 confirmed the illustrative US domestic-card
+and Billing rates below and unchanged R2 Standard rates. These are published
+standard rates, not a verified Lumafoil negotiated contract. R2 bills aggregate
+usage rounded upward by storage/operation billing units; per-subscriber fractional
+allocations are a model, not an exact invoice allocation. Sources: [Stripe pricing](https://stripe.com/pricing),
+[R2 pricing](https://developers.cloudflare.com/r2/pricing/) and
+[Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/).
+
+The reviewed Wrangler configuration has no explicit CPU cap. On Workers Paid,
+the published default is 30,000 CPU milliseconds per invocation, with 128 MB per
+isolate shared by concurrent requests ([official limits](https://developers.cloudflare.com/workers/platform/limits/)).
+A product monthly operation counter does not bound CPU per invocation, denied
+traffic or exempt authentication/financial/cleanup traffic. Current provisional
+operation caps cannot substantiate the $0.15/$0.50 compute allocation alone.
+Actual near-limit upload/auth/list measurements and an explicit tested CPU
+policy are still required before claiming profitable usage bounds. Photos are
+cursor-paged; saved-preset listing still returns complete specifications, and
+historical over-limit data must be considered without deleting retained data.
+
+Root read back the separate Lumafoil account on 2026-10-03: US/USD,
+`acct_1UMNAoIWioJO0GIF`. Earlier disabled flags were superseded after the owner
+completed onboarding: fresh account/live-balance reads confirm enabled charges,
+payouts/submitted details and actual live authority. Active live prices were
+absent at readback; reviewed monthly catalog setup is underway. Test-only
+monthly Pro/Team prices and cancellation portal exist. Subsequent actual gateway
+sandbox verification created two test customers and a hosted Pro payment, then
+refunded that payment and canceled its subscription; the unpaid Team Checkout
+expired. No live payment, live webhook or production credential was created.
+The full application/D1 lifecycle remains unverified. Negotiated fees, tax
+registrations and actual operating/support costs remain unverified. Owner
+activation is complete; permanent credentials, account/rate/provider-lifecycle
+and release proof remain required before live billing.
 
 Illustrative US standard domestic-card model uses
 [Stripe Payments](https://stripe.com/us/pricing) at 2.9% + $0.30 and
@@ -114,8 +161,11 @@ are liabilities, not revenue. Disputes, transaction fees retained on refunds,
 email service, provider charges, marketing, operator pay and fixed costs need
 actual accounting. At a hypothetical $500/month fixed overhead, approximately
 95 Pro subscribers or 37 Team workspaces cover that overhead at these assumptions;
-acquisition and additional costs change that result. Enforced storage, object,
-member, admission, email and request bounds prevent unbounded free/private usage.
+acquisition and additional costs change that result. Current storage/object/member and request bounds limit each admitted workspace
+and public admission. They do not bound total private population, lifetime retained
+storage or all denied/control-plane costs. Paid request/storage headroom must be
+reserved before new charges; no paid-capacity guarantee or net-profit claim follows
+from the current shared site counter.
 Review actual cohort usage and margin after launch; update prices prospectively
 with notice rather than silently changing existing subscriptions.
 
@@ -219,8 +269,10 @@ account, not whichever account a local CLI profile happens to select. Read back
 and pin the actual account identifier and mode before provisioning any catalog,
 webhook, Checkout or portal resource. The first renewed CLI login reached an
 unrelated account; only sanitized account metadata was read, and no provider
-resources or payments were created. New-account Dashboard authentication remains
-pending. Official Stripe Codex plugin installation was verified on 2026-10-02;
+resources or payments were created. On 2026-10-03 root created and read back the separate Lumafoil account
+`acct_1UMNAoIWioJO0GIF` and test-only Pro/Team catalog and cancellation portal.
+The correct CLI profile is `lumafoil-launch`; business activation and live billing
+remain pending. Official Stripe Codex plugin installation was verified on 2026-10-02;
 installation is not proof of an authenticated Lumafoil connection. Local service
 credentials are owner-readable only and remain outside the public repository.
 
@@ -269,6 +321,22 @@ privacy notice, retention/deletion behavior, cancellation and support contact.
 Subscription identifiers may need limited financial retention after account
 deletion; content deletion and financial retention must be distinguished clearly.
 
+## Stripe backend candidate — 2026-10-02
+
+`codex/stripe-billing` adds official SDK 22.6.2/API 2026-08-26.dahlia, strict
+account/mode/catalog/portal authority, recent-proof owner Checkout/portal,
+bounded signed events and atomic D1 reconciliation/provisioning. New paid Team
+workspaces keep their distinct paid provenance, so cancellation does not grant
+private collaboration automatically. Chargeable payer removal/deletion is fenced
+until terminal cancellation. The detailed candidate and its first fixture-failure
+receipts are in `stripe-subscriptions.md`. A compact lifecycle delta closes
+self/admin deletion before auth removes credentials and uses immediate ban
+suspension plus existing cron closure retry; final proof remains pending.
+Full gates, live activation/catalog verification, sandbox lifecycle tests,
+financial transfer/retention policy and
+integrated public/account UI certification remain open. Existing checklist rows
+remain unchecked until those evidence requirements are satisfied.
+
 ## Implementation and certification checklist
 
 - [ ] Read back intended Stripe account, mode, fees, charges and payout capability;
@@ -315,7 +383,26 @@ verified for `08834df` in workflow `36992631513`. All 140 browser/axe cases
 ultimately passed; the unrelated iPhone gallery case used the existing retry.
 Recent credential proof is certified for runtime `77f6a9a`; three unrelated
 device journeys used existing retries and all new credential cases passed first
-attempts. Next implement authoritative plan quotas and payment state.
-Stripe account authentication remains unconfirmed; no catalog or charge has been
-created. Video/navigation regressions and full M19 release audits remain open.
+attempts. These checked rows retain their exact historical source boundaries;
+they do not certify the expanded current integration. Authoritative quotas,
+billing/entitlement reconciliation, account closure, personal-only cleanup and
+public/account UI are implemented. Combined covered 3,316, native 18, Workers
+158 and all script gates pass; full current four-device/release and strict audit
+certification remain open, so the unchecked end-to-end rows above stay open.
+
+The separate Lumafoil account and monthly test catalog/portal readback passed on
+2026-10-03. Seventeen actual gateway sandbox checks include a hosted Pro payment,
+linked paid period, refund and cancellation, plus unpaid Team expiration. Six
+actual provider-signed event types verify with replay/tamper negatives. Two test
+customers remain; the Pro payment is refunded, subscription canceled and Team
+Checkout expired. No live webhook, production credential or live payment was
+created. Full application/D1 provider lifecycle, 3DS/failure/renewal/portal,
+activation/fees/tax and retention remain launch work. See
+`../verification/m19/stripe-account-2026-10-03.md`.
+
+Fresh Cloudflare aggregate inventory is unverified because existing OAuth refresh
+returned 401 before D1 access. Counts/bytes remain unknown. Owner launch subsidy
+budget and authenticated inventory must support funded admission, reserved paid
+headroom and retained stock; no net-profit or capacity promise follows from the
+current shared counter. Video/navigation release audits and M19 remain open.
 No later milestone is started.

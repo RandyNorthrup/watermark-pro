@@ -50,6 +50,8 @@ test('audit inventory covers every actual leaf route with unique safe artifact n
   }
   assert.equal(requireSurface('designer-new').route, '/app/library/new')
   assert.equal(requireSurface('designer-edit').route, '/app/library/$watermarkId')
+  assert.equal(requireSurface('signup-closed').heading, 'pricing.closedTitle')
+  assert.throws(() => requireSurface('signup-invitation-required'), /Unknown audit surface/)
   for (const untrusted of ['../../private', 'share/secret-token', '/reset-password?token=private'])
     assert.throws(() => requireSurface(untrusted), /Unknown audit surface/)
 })

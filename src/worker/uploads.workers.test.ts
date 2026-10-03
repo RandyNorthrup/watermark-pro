@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers'
 
 import { eq, sql } from 'drizzle-orm'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import type { AuditEntry } from './audit'
 import {
@@ -25,27 +25,27 @@ import { PUBLIC_PLANS } from '../shared/plans'
 import { DEFAULT_STYLE, DEFAULT_TEXT_SPEC } from '../shared/watermark'
 
 const services = getServices(env)
-const actorId = 'upload-fixture-owner'
+let actorId: string
 let organizationId: string
 
-beforeAll(async () => {
+beforeEach(async () => {
+  actorId = crypto.randomUUID()
   await services.db.insert(user).values({
     id: actorId,
     name: 'Upload fixture',
-    email: 'uploads@example.test',
+    email: `${actorId}@example.test`,
     emailVerified: true,
     membershipCohort: 'private',
     createdAt: new Date(),
     updatedAt: new Date(),
   })
-})
-beforeEach(async () => {
   organizationId = crypto.randomUUID()
   await services.db.insert(organization).values({
     id: organizationId,
     name: 'Upload workspace',
     slug: organizationId,
     createdAt: new Date(),
+    creationOwnerId: actorId,
   })
   await services.db.insert(member).values({
     id: crypto.randomUUID(),
@@ -352,13 +352,13 @@ describe('atomic D1 upload admission and R2 recovery', () => {
         fingerprint: 'different',
       }),
     ).toBe('conflict')
-    expect(
-      await services.uploads.reserve({
+    await expect(
+      services.uploads.reserve({
         ...item.reservation,
         id: crypto.randomUUID(),
         userId: 'different-account',
       }),
-    ).toBe('conflict')
+    ).rejects.toMatchObject({ status: 403 })
     expect(await services.uploads.commit(item.reservation, item.record, item.audit)).toBe(true)
     expect(await services.uploads.reserve({ ...item.reservation, id: crypto.randomUUID() })).toBe(
       'existing',
@@ -408,8 +408,8 @@ describe('atomic D1 upload admission and R2 recovery', () => {
       ...services,
       objects: {
         ...services.objects,
-        async put(key: string, bytes: ArrayBuffer, contentType: string) {
-          await services.objects.put(key, bytes, contentType)
+        async put(key: string, bytes: ArrayBuffer, contentType: string, etag: string) {
+          await services.objects.put(key, bytes, contentType, etag)
           if (key === item.reservation.keys[0]) throw new Error('Lost R2 acknowledgment')
         },
         delete: () => Promise.reject(new Error('R2 temporarily unavailable')),
@@ -508,9 +508,23 @@ describe('atomic D1 upload admission and R2 recovery', () => {
     const logo = await services.assets.find(organizationId, item.reservation.uploadId)
     expect(marks.length === 0 || logo !== null).toBe(true)
     const foreignId = crypto.randomUUID()
-    await services.db
-      .insert(organization)
-      .values({ id: foreignId, name: 'Foreign workspace', slug: foreignId, createdAt: new Date() })
+    const foreignOwnerId = crypto.randomUUID()
+    await services.db.insert(user).values({
+      id: foreignOwnerId,
+      name: 'Foreign upload fixture',
+      email: `${foreignOwnerId}@example.test`,
+      emailVerified: true,
+      membershipCohort: 'private',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    await services.db.insert(organization).values({
+      id: foreignId,
+      name: 'Foreign workspace',
+      slug: foreignId,
+      createdAt: new Date(),
+      creationOwnerId: foreignOwnerId,
+    })
     await expect(
       services.watermarks.create({ ...mark, id: crypto.randomUUID(), organizationId: foreignId }),
     ).rejects.toThrow()

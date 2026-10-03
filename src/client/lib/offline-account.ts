@@ -1,9 +1,10 @@
 /** Account transitions invalidate private in-memory state before another identity can use it. */
 import type { QueryClient } from '@tanstack/react-query'
 
+import { describeError } from './errors'
 import { clearLaunchFiles, retainInitialLaunch } from './launch-files'
 import { currentOfflineUser, hasOfflineDatabase, setOfflineUser } from './offline-context'
-import { updateOfflineStatus } from './offline-status'
+import { offlineStatus, updateOfflineStatus } from './offline-status'
 import { clearPersistedQueries } from './persisted-shell-storage'
 import { clearSharedFiles } from './shared-files'
 
@@ -95,8 +96,12 @@ export async function activateOfflineAccount(
   })
 }
 
-/** Call after server sign-out succeeds and after the UI has checked for pending work. */
-export async function clearOfflineAccount(queryClient: QueryClient, userId: string): Promise<void> {
+/** Use erase-all only after confirmed account deletion; sign-out preserves concurrent pending saves. */
+export async function clearOfflineAccount(
+  queryClient: QueryClient,
+  userId: string,
+  policy: 'preserve-pending' | 'erase-all' = 'preserve-pending',
+): Promise<void> {
   const active = currentOfflineUser()
   if (active !== null && active !== userId)
     throw new Error('The signed-in account changed before sign-out cleanup.')
@@ -108,7 +113,7 @@ export async function clearOfflineAccount(queryClient: QueryClient, userId: stri
     }
 
     const { clearOfflineAccountData } = await import('./offline-database')
-    const { hasPendingWork } = await clearOfflineAccountData(userId)
+    const { hasPendingWork } = await clearOfflineAccountData(userId, policy)
     if (hasPendingWork && currentOfflineUser() === null)
       updateOfflineStatus({
         problem:
@@ -116,4 +121,21 @@ export async function clearOfflineAccount(queryClient: QueryClient, userId: stri
       })
     await clearSharedFiles(userId)
   })
+}
+
+/** Retry only device erasure acknowledged by deletion; account locking cannot hide its failure. */
+export async function didEraseRemovedAccountData(queryClient: QueryClient): Promise<boolean> {
+  const cleanup = offlineStatus().accountCleanup
+  if (cleanup === null || cleanup.pending) return false
+  updateOfflineStatus({ accountCleanup: { ...cleanup, pending: true, error: null } })
+  try {
+    await clearOfflineAccount(queryClient, cleanup.userId, 'erase-all')
+    updateOfflineStatus({ accountCleanup: null })
+    return true
+  } catch (error) {
+    updateOfflineStatus({
+      accountCleanup: { ...cleanup, pending: false, error: describeError(error) },
+    })
+    return false
+  }
 }

@@ -36,7 +36,9 @@
     "manageAccess": "Gérer les accès",
     "supportPrompt": "Si Lumafoil vous aide, pensez à faire un don.",
     "donate": "Faire un don",
-    "supportPayPal": "Faire un don avec PayPal (nouvel onglet)"
+    "supportPayPal": "Faire un don avec PayPal (nouvel onglet)",
+    "openNavigation": "Ouvrir la navigation",
+    "closeNavigation": "Fermer la navigation"
   },
   "auth": {
     "backToSignIn": "Retour à la connexion",
@@ -90,10 +92,6 @@
       "roleLabel": "Rôle :",
       "decline": "Refuser",
       "accept": "Accepter l'invitation"
-    },
-    "inviteOnly": {
-      "title": "Invitation requise",
-      "body": "Lumafoil est accessible uniquement sur invitation. Ouvrez le lien reçu par e-mail pour créer votre compte."
     },
     "humanCheck": {
       "label": "Vérification humaine",
@@ -885,12 +883,11 @@
   "video": {
     "orgRequired": "Créez ou rejoignez un espace de travail pour filigraner des vidéos.",
     "heading": "Vidéos",
-    "description": "Prévisualisez votre vidéo, placez des filigranes à différents instants, ajoutez des fondus et exportez avec le son.",
+    "description": "Coupez et rognez plusieurs clips sur des pistes vidéo et audio. Prévisualisez le montage, ajoutez des filigranes et exportez sur votre appareil.",
     "checkingSupport": "Vérification de la prise en charge vidéo",
     "unsupportedTitle": "La vidéo n'est pas prise en charge dans ce navigateur",
     "unsupportedBody": "Votre navigateur ne peut pas encoder de vidéo. Chrome, Edge ou Safari 17 et versions ultérieures le peuvent.",
     "addVideo": "Ajouter une vidéo",
-    "dropHint": "Déposez une vidéo ici, ou",
     "transcodingProgress": "Progression du transcodage",
     "progress": {},
     "cancel": "Annuler",
@@ -907,7 +904,6 @@
       "fit1080p": "Ajuster au 1080p",
       "fit720p": "Ajuster au 720p"
     },
-    "previewAlt": "Le filigrane sur une image de la vidéo",
     "timeline": {
       "heading": "Temps Et Mouvement",
       "play": "Lire",
@@ -922,12 +918,48 @@
       "updateKeyframe": "Actualiser L’Image Clé Ici",
       "removeKeyframe": "Supprimer L’Image Clé À {{time}}",
       "hint": "Ajoutez une image clé, passez à un autre instant, puis déplacez, redimensionnez ou faites pivoter le filigrane. Lumafoil crée le mouvement entre les images clés.",
-      "playbackFailed": "Ce navigateur n’a pas pu lire la vidéo sélectionnée.",
       "chooseVideo": "Ouvrez une vidéo et ajoutez d’abord un filigrane valide.",
       "waitPreview": "Attendez l’aperçu du filigrane avant d’ajouter une image clé.",
       "changed": "La vidéo ou le filigrane a changé pendant l’exportation. Exportez à nouveau pour utiliser les modifications actuelles.",
       "download": "Exporter La Vidéo",
       "cloudSaved": "La vidéo avec filigrane a été enregistrée dans votre stockage cloud."
+    },
+    "studio": {
+      "mediaPool": "Médias",
+      "inspector": "Inspecteur",
+      "clip": "Clip",
+      "timeline": "Montage",
+      "output": "Sortie",
+      "importMedia": "Importer des médias",
+      "emptyMedia": "Importez des vidéos ou du son pour créer votre montage.",
+      "emptyTimeline": "Ajoutez des clips vidéo pour commencer.",
+      "projectName": "Projet",
+      "untitled": "Projet sans titre",
+      "sourceIn": "Entrée source (s)",
+      "sourceOut": "Sortie source (s)",
+      "track": "Piste",
+      "split": "Couper au curseur",
+      "removeClip": "Supprimer le clip",
+      "unlink": "Dissocier le son",
+      "volume": "Volume",
+      "showTrack": "Afficher {{track}}",
+      "hideTrack": "Masquer {{track}}",
+      "muteTrack": "Couper le son de {{track}}",
+      "unmuteTrack": "Activer le son de {{track}}",
+      "addClip": "Ajouter {{name}} à {{track}}",
+      "trimIn": "Rogner le début de {{name}} sur {{track}}",
+      "trimOut": "Rogner la fin de {{name}} sur {{track}}",
+      "zoom": "Zoom du montage",
+      "localSession": "Les fichiers restent sur cet appareil. La session n’est pas enregistrée après fermeture de la page.",
+      "frameRate": "Montage modifié : {{fps}} ips",
+      "sourceBounds": "Limite des médias dépassée ou rognage hors de la source.",
+      "selectClip": "Sélectionnez un clip dans le montage pour le modifier.",
+      "timeReadout": "{{current}} / {{total}}",
+      "pictureMeta": "{{width}} × {{height}} · {{format}}",
+      "audioRequired": "Un encodeur audio est requis. Coupez les pistes ou utilisez un navigateur compatible.",
+      "timing": "Durée",
+      "transform": "Transformation",
+      "invalidEdit": "Cette modification chevaucherait un autre clip ou dépasserait les limites de la chronologie. Choisissez un autre début, intervalle source ou une autre piste."
     }
   },
   "documents": {
@@ -1068,7 +1100,7 @@
       },
       "sharing": {
         "title": "Partagez des photos ou un espace de travail",
-        "body": "Créez des liens de galerie révocables avec expiration pour les photos sélectionnées. Les propriétaires peuvent accorder un accès en lecture ou modification par lien, invitation par e-mail ou ajout direct d’un utilisateur existant. Cet accès est distinct d’une invitation à rejoindre Lumafoil."
+        "body": "Chaque compte possède son propre espace. Vos photos et préréglages restent séparés sauf partage explicite. L’accès nécessite une autorisation du propriétaire."
       },
       "offline": {
         "title": "Travaillez hors ligne, synchronisez plus tard",
@@ -1076,7 +1108,7 @@
       },
       "privacy": {
         "title": "Votre compte, votre espace de travail",
-        "body": "Les nouveaux utilisateurs ont besoin d’une invitation au site et reçoivent un espace de travail privé distinct. Une invitation au site ne partage jamais vos photos ni préréglages. Le partage d’un espace nécessite une autorisation explicite de son propriétaire."
+        "body": "Chaque compte possède son propre espace. Vos photos et préréglages restent séparés sauf partage explicite. L’accès nécessite une autorisation du propriétaire."
       },
       "languages": {
         "title": "12 langues d’interface",
@@ -1091,7 +1123,6 @@
         "body": "Connectez Google Drive, Dropbox ou OneDrive pour ouvrir des fichiers, choisir des dossiers d’export et créer des liens de partage du fournisseur. Les connexions restent enregistrées jusqu’à leur déconnexion ou à une nouvelle demande d’autorisation du fournisseur. Google Drive est limité aux fichiers et dossiers que vous sélectionnez ou créez avec Lumafoil. Les comptes professionnels ou scolaires peuvent nécessiter l’approbation de votre administrateur Microsoft."
       }
     },
-    "inviteHosting": "Lumafoil est accessible sur invitation. Vous préférez l’auto-héberger ?",
     "selfHost": "Obtenez gratuitement le code source sur GitHub.",
     "featuresNav": "Fonctionnalités"
   },
@@ -1121,13 +1152,17 @@
       },
       "sharing": {
         "heading": "Liens de partage",
-        "p1": "Toute personne disposant d’un lien de galerie Lumafoil peut voir les photos enregistrées sélectionnées jusqu’à son expiration ou sa révocation. Une invitation au site ouvre un compte privé distinct ; elle ne partage ni l’espace ni le contenu de l’invitant.",
+        "p1": "Toute personne possédant un lien de galerie peut voir les photos sélectionnées jusqu’à son expiration ou sa révocation. L’accès à un espace nécessite une autorisation explicite du propriétaire.",
         "p2": "Les liens des fournisseurs cloud suivent leurs propres règles d’accès et de révocation. Révoquer un lien ne récupère pas les téléchargements ou copies déjà effectués."
       },
       "account": {
         "heading": "Votre compte",
-        "p1": "Les nouveaux comptes exigent une invitation et une adresse e-mail vérifiée. Utilisez un mot de passe ou Google/Microsoft si configurés. Un compte existant ne nécessite pas de nouvelle invitation. Ajouter une méthode de connexion exige une association depuis une session authentifiée.",
-        "p2": "Les sessions utilisent des cookies HttpOnly, SameSite=Lax et Secure sous HTTPS. Les liens de réinitialisation expirent après une heure et révoquent les autres sessions serveur lorsqu’ils sont utilisés."
+        "p1": "Les inscriptions dépendent de la disponibilité et exigent une adresse e-mail vérifiée. Connectez-vous par mot de passe ou avec Google/Microsoft si configurés. Ajouter une méthode exige une liaison de compte authentifiée.",
+        "p2": "Les sessions utilisent des cookies HttpOnly, SameSite=Lax et Secure sous HTTPS. Les liens de réinitialisation expirent après une heure et révoquent les autres sessions serveur lorsqu’ils sont utilisés. La suppression autorisée du compte commence par la révocation des liens et la suppression des métadonnées cloud uniquement pour votre espace personnel vérifié dont vous êtes l’unique propriétaire et membre. Ses fichiers sont placés dans une file de nettoyage en arrière-plan et peuvent rester jusqu’à la fin des nouvelles tentatives. Les espaces collaboratifs ou de propriété ambiguë, les journaux d’audit et les reçus de facturation sont conservés. La suppression du compte n’efface pas les fichiers téléchargés, les copies sur d’autres appareils ni les sauvegardes du fournisseur. Les paramètres du compte effacent aussi ses données locales sur l’appareil actuel après confirmation de la suppression. Si la confirmation échoue après la préparation du nettoyage, vos liens et métadonnées personnels peuvent déjà avoir été supprimés alors que votre compte existe toujours ; réessayez la suppression du compte."
+      },
+      "billing": {
+        "heading": "Paiements",
+        "p1": "Si vous utilisez Checkout pour une offre payante ou le portail de facturation, Stripe héberge ces pages et traite les informations de paiement que vous y saisissez. Lumafoil conserve les identifiants Stripe de client, de Checkout, d’abonnement et de facture, les enregistrements d’événements de paiement, l’état de l’abonnement et les dates de fin des périodes payées, liés à votre compte et à l’espace de travail facturé. Nous envoyons les références de facturation et l’offre choisie à Stripe, mais ni photos, ni vidéos, ni documents, ni logos, ni contenu de filigranes enregistrés. Lumafoil ne collecte ni ne conserve de numéros de carte complets."
       },
       "analytics": {
         "heading": "Cookies et services externes",
@@ -1158,7 +1193,7 @@
       },
       "account": {
         "heading": "Votre compte",
-        "p1": "L’accès se fait actuellement sur invitation et exige une adresse e-mail vérifiée. La connexion par mot de passe ou Google/Microsoft configurés est disponible. Protégez vos identifiants et votre compte fournisseur ; vous êtes responsable de l’utilisation de votre compte.",
+        "p1": "Les inscriptions dépendent de la disponibilité. Une adresse e-mail vérifiée est obligatoire ; mot de passe et Google/Microsoft configurés sont disponibles. Protégez vos identifiants et votre compte fournisseur ; vous êtes responsable de votre compte.",
         "p2": "Se déconnecter exige une connexion et la résolution des changements en attente ; cela efface les données hors ligne de l’app dans ce navigateur. Une réinitialisation révoque les autres sessions serveur. Les appareils déconnectés peuvent conserver des copies jusqu’à leur reconnexion ou à l’effacement des données du navigateur."
       },
       "content": {
@@ -1173,7 +1208,7 @@
       },
       "teams": {
         "heading": "Espaces privés et collaboration",
-        "p1": "Chaque compte dispose au départ d’un espace de travail privé. Les invitations au site ne partagent pas le contenu de la personne qui invite. Le propriétaire d’un espace peut accorder explicitement un accès en Lecture ou en Modification à cet espace. Cela ne partage aucun autre espace et ne donne aucun droit d’administration du site."
+        "p1": "Chaque compte possède son propre espace. Vos photos et préréglages restent séparés sauf partage explicite. L’accès nécessite une autorisation du propriétaire."
       },
       "availability": {
         "heading": "Disponibilité, garantie et modifications",
@@ -1550,7 +1585,67 @@
     },
     "workspace": {
       "title": "Espaces Et Accès",
-      "body": "Le menu utilisateur permet de changer d’espace, inviter des personnes ou Gérer L’Accès. Les propriétaires accordent Lecture ou Modification. Les invitations personnelles ne partagent aucun contenu. La synchronisation apparaît au bas de la barre latérale."
+      "body": "Utilisez le menu utilisateur pour changer d’espace ou gérer l’accès. Les propriétaires accordent des droits de lecture ou de modification. Les autres espaces restent privés. L’état de synchronisation indique si des modifications sur cet appareil attendent d’être envoyées."
     }
+  },
+  "pricing": {
+    "nav": "Tarifs",
+    "heroTag": "Votre travail. Votre filigrane.",
+    "hosting": "Vous préférez héberger vous-même ?",
+    "eyebrow": "Abonnements mensuels · USD",
+    "heading": "Commencez gratuitement. Gagnez de la place.",
+    "intro": "Outils photo, PDF et vidéo dans chaque offre. Les offres payantes ajoutent du stockage photo et un partage contrôlé.",
+    "free": "Gratuit",
+    "pro": "Pro",
+    "team": "Team",
+    "freeBody": "Pour vos premiers projets et une petite galerie.",
+    "proBody": "Pour une photothèque et des éléments de marque grandissants.",
+    "teamBody": "Pour un espace partagé avec des droits clairs.",
+    "monthly": "USD / mois",
+    "freeStorage": "500 Mio de stockage photo",
+    "proStorage": "10 Gio de stockage photo",
+    "teamStorage": "25 Gio de stockage photo",
+    "freePhotos": "100 photos enregistrées",
+    "paidPhotos": "10 000 photos enregistrées",
+    "freeLogos": "10 logos",
+    "proLogos": "50 logos",
+    "teamLogos": "100 logos",
+    "personal": "Un espace personnel",
+    "teamPeople": "Trois personnes, propriétaire compris",
+    "teamSharing": "Galerie et préréglages partagés",
+    "start": "Commencer",
+    "soon": "Abonnements bientôt disponibles",
+    "scope": "Les exports locaux restent disponibles dans chaque offre dans les limites du fichier et de l’appareil. Team couvre un espace partagé ; les espaces personnels gardent leur propre offre. Les projets vidéo restent sur cet appareil et ne sont pas enregistrés dans le cloud.",
+    "closedTitle": "Les inscriptions ouvrent bientôt",
+    "closedBody": "Les nouvelles inscriptions sont fermées. Vous pouvez toujours vous connecter à un compte existant.",
+    "accountHeading": "Offre de l’espace",
+    "allowance": "Capacité cloud actuelle",
+    "manage": "Gérer l’abonnement",
+    "upgrade": "Choisir Pro",
+    "createTeam": "Créer un espace Team",
+    "sharedName": "Nom du nouvel espace partagé",
+    "privateMember": "Membre privé",
+    "storageAmount": "{{value}} Mio",
+    "redirectNotice": "Vous quitterez Lumafoil pour ouvrir la facturation. Enregistrez ou exportez d’abord le travail inachevé.",
+    "refreshNotice": "Actualisez le statut du paiement pour vérifier l’offre actuelle.",
+    "resume": "Reprendre le paiement",
+    "cancelCheckout": "Annuler le paiement",
+    "refresh": "Actualiser le statut du paiement"
+  },
+  "accountRemoval": {
+    "heading": "Supprimer le compte",
+    "description": "Supprimez votre compte et vos contenus personnels dans le cloud. Les contenus partagés et les données nécessaires de paiement et de sécurité sont conservés.",
+    "ownerProtected": "Le compte du propriétaire du site est protégé.",
+    "action": "Supprimer le compte",
+    "title": "Supprimer votre compte Lumafoil ?",
+    "consequences": "Les abonnements sont résiliés avant la suppression. Les partages personnels sont désactivés et les fichiers placés en attente de nettoyage. Les contenus partagés et les données de paiement et de sécurité sont conservés. Les modifications non synchronisées sur cet appareil sont supprimées. Cette action est irréversible. Si la confirmation échoue, certains contenus personnels ou liens peuvent déjà avoir été supprimés.",
+    "confirmLabel": "Confirmez votre adresse e-mail",
+    "confirmHint": "Saisissez exactement l’adresse e-mail de votre compte pour confirmer.",
+    "confirm": "Supprimer définitivement",
+    "unconfirmed": "La suppression n’a pas été confirmée. Les données de votre appareil n’ont pas été effacées.",
+    "cleanupHeading": "Nettoyage du compte supprimé",
+    "cleanupPending": "Les données de ce compte enregistrées sur cet appareil sont en cours de suppression.",
+    "cleanupFailed": "Le nettoyage de l’appareil n’est pas terminé. Réessayez pour effacer les données locales restantes du compte supprimé.",
+    "cleanupRetry": "Réessayer le nettoyage"
   }
 }

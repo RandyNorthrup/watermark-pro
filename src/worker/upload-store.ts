@@ -5,6 +5,9 @@ import type { AssetRecord, PhotoRecord, StorageUsage } from './stores'
 export const UPLOAD_POLICY = {
   leaseMs: 300_000,
   cleanupBatch: 20,
+  accountCleanupError: 'ACCOUNT_CLEANUP_PENDING',
+  /** SQL-generated opaque receipts retain 128 bits of entropy without loading every key into the Worker. */
+  receiptEntropyBytes: 16,
 } as const
 
 export interface UploadReservation {
@@ -28,7 +31,11 @@ export type ReservationResult =
 
 /** All ownership-changing writes use the unique reservation id as a fencing token. */
 export interface UploadStore {
+  /** Stage only proven personal content; existing cleanup remains durable after credential removal. */
+  stagePersonalDeletion(userId: string): Promise<void>
   reserve(reservation: UploadReservation): Promise<ReservationResult>
+  /** Recheck this exact pending lease and the live writer immediately before payload storage. */
+  isLeaseWritable(reservation: UploadReservation): Promise<boolean>
   commit(reservation: UploadReservation, record: UploadRecord, audit: AuditEntry): Promise<boolean>
   abandon(reservationId: string): Promise<void>
   cleanupCandidates(organizationId?: string): Promise<UploadReservation[]>

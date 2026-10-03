@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-03",
+  "scope": "Exact integrated conditional storage fence; AAC SDK remains previous guarded source",
+  "full_types_exit": 0,
+  "worker_unit_files": 7,
+  "worker_unit_cases": 118,
+  "worker_unit_exit": 0,
+  "sast": {
+    "exit": 0,
+    "rules": 510,
+    "files": 2299,
+    "findings": 0
+  },
+  "isolated_actual_d1_cases": 37,
+  "full_quality_pass": false,
+  "personal_cleanup_implemented": false,
+  "m19_certified": false,
+  "logs": {
+    "lumafoil-integrated-fence-types.log": {
+      "sha256": "04bdac9a60e8b0bd9c0155a60525826e72ecf4196c8054f1bcaf5f167d8fa507",
+      "bytes": 38
+    },
+    "lumafoil-integrated-fence-node.log": {
+      "sha256": "96030688c75192e8a3ee02ce4677b0b90e659d9c9f96ac9685f2cc19e608f593",
+      "bytes": 246
+    },
+    "lumafoil-integrated-fence-sast.log": {
+      "sha256": "c957c35e07abfd9feb6e9bde6e52eab796ee62116bcaafd86ac8c2b25af9f5c9",
+      "bytes": 2721
+    }
+  },
+  "integrated_actual_workers": {
+    "passed": 37,
+    "failed": 0,
+    "pending": 0,
+    "exit": 0,
+    "report_sha256": "34d9d4ff68375c13dc540624fade1fd3dd7ff4d9aa694a5e8a3dbb58428546a9",
+    "scope": "Unfiltered storage-producer-fence and uploads Workers files after shared fixture setup extraction"
+  },
+  "duplicate_gate_exit": 0,
+  "deadcode_gate_exit": 0
+}

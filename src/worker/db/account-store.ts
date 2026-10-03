@@ -12,14 +12,6 @@ import {
   type SQLWrapper,
 } from 'drizzle-orm'
 
-import {
-  MEMBERSHIP_COHORT,
-  privateInvitationBudgetSchema,
-  SITE_INVITATION_POLICY,
-} from '../../shared/api-accounts'
-import { SITE_ROLE } from '../../shared/site-roles'
-import type { AccountStore } from '../account-store'
-import { referralAdmissionHash } from '../referral'
 import type { Database } from './client'
 import {
   member,
@@ -30,6 +22,15 @@ import {
   siteOwner,
   user,
 } from './schema'
+import {
+  MEMBERSHIP_COHORT,
+  privateInvitationBudgetSchema,
+  SITE_INVITATION_POLICY,
+} from '../../shared/api-accounts'
+import { PRIVATE_PLAN_CAPACITY, WORKSPACE_CREATION_KIND } from '../../shared/plans'
+import { SITE_ROLE } from '../../shared/site-roles'
+import type { AccountStore } from '../account-store'
+import { referralAdmissionHash } from '../referral'
 
 const eligibleInviter = (id: SQLWrapper | string, role: SQLWrapper | string = SITE_ROLE.user) =>
   sql`
@@ -253,21 +254,40 @@ export function createDrizzleAccountStore(db: Database): AccountStore {
             name: 'My workspace',
             slug: organizationId,
             createdAt: new Date(),
+            creationOwnerId: userId,
+            creationKind: WORKSPACE_CREATION_KIND.personal,
           })
           .onConflictDoNothing(),
         db
           .insert(member)
-          .values({
-            id: organizationId,
-            organizationId,
-            userId,
-            role: 'owner',
-            createdAt: new Date(),
-          })
+          .select(
+            sql`
+              SELECT ${organizationId}, ${organizationId}, ${userId}, 'owner', ${Date.now()}
+              WHERE NOT EXISTS (
+                SELECT 1 FROM member
+                WHERE organization_id = ${organizationId} AND user_id = ${userId}
+              )
+            `,
+          )
           .onConflictDoNothing(),
         db.insert(privateWorkspace).values({ userId, organizationId }).onConflictDoNothing(),
       ])
       return organizationId
+    },
+    async canCreateSharedWorkspace(userId) {
+      const [eligible] = await db
+        .select({ id: user.id })
+        .from(user)
+        .where(
+          and(
+            eq(user.id, userId),
+            eq(user.membershipCohort, MEMBERSHIP_COHORT.private),
+            eq(user.emailVerified, true),
+            sql`coalesce(${user.banned}, 0) = 0`,
+            sql`(SELECT COUNT(*) FROM organization WHERE creation_owner_id = ${userId} AND creation_kind IN (${WORKSPACE_CREATION_KIND.shared}, ${WORKSPACE_CREATION_KIND.historical})) < ${PRIVATE_PLAN_CAPACITY.sharedWorkspaces}`,
+          ),
+        )
+      return eligible !== undefined
     },
     async isPrivateWorkspace(organizationId) {
       const [record] = await db

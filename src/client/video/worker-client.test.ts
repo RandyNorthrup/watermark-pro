@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { CancelledError } from './errors'
 import type { VideoWorkerRequest, VideoWorkerResponse } from './protocol'
 import { VideoTranscoder, VideoTranscodeError, type VideoTranscodeInput } from './worker-client'
+import { emptyVideoProject } from '../../shared/video-project'
 import { DEFAULT_TEXT_SPEC } from '../../shared/watermark'
 
 class WorkerBoundary extends EventTarget {
@@ -49,6 +50,22 @@ function fixture() {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('video worker client lifecycle', () => {
+  it('sends composition sources and timeline through the same cancellable worker boundary', async () => {
+    const { worker, client } = fixture()
+    const request = {
+      ...input(),
+      composition: {
+        project: emptyVideoProject('Worker project'),
+        sources: [{ id: 'media', source: new Blob(['local media']) }],
+      },
+    }
+    const pending = client.transcode(request)
+    expect(worker.messages[0]?.message).toEqual({ type: 'transcode', id: 1, ...request })
+    client.cancel()
+    worker.respond({ type: 'cancelled', id: 1 })
+    await expect(pending).rejects.toBeInstanceOf(CancelledError)
+    expect(worker.messages.at(-1)?.message).toEqual({ type: 'cancel', id: 1 })
+  })
   it('constructs the module worker and terminates its actual handle', () => {
     const created: { url: URL; options: WorkerOptions | undefined; worker: WorkerBoundary }[] = []
     class ConstructorBoundary extends WorkerBoundary {

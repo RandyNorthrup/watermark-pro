@@ -8,6 +8,7 @@
  */
 import { z } from 'zod'
 
+import { stripeConfigurationSchema } from '../shared/billing'
 import { APP_ENVIRONMENTS, AUTH_SECRET_MIN_LENGTH, EMAIL_PROVIDERS } from '../shared/constants'
 
 const bindingSchema = <T>(name: string) =>
@@ -28,6 +29,11 @@ const envSchema = z
     EMAIL_PROVIDER: z.enum(EMAIL_PROVIDERS),
     /** Sender address for transactional email; must belong to a zone in the Cloudflare account. */
     EMAIL_FROM: z.email(),
+    /** Release switch stays closed unless explicitly configured after certification. */
+    PUBLIC_SIGNUP_ENABLED: z
+      .enum(['false', 'true'])
+      .default('false')
+      .transform((value) => value === 'true'),
     DB: bindingSchema<D1Database>('DB'),
     BUCKET: bindingSchema<R2Bucket>('BUCKET'),
     AUTH_RATE_LIMITER: bindingSchema<RateLimit>('AUTH_RATE_LIMITER'),
@@ -54,6 +60,46 @@ const envSchema = z
     GOOGLE_PICKER_APP_ID: z.string().min(1).optional(),
     MICROSOFT_CLIENT_ID: z.string().min(1).optional(),
     DROPBOX_APP_KEY: z.string().min(1).optional(),
+    /** All billing settings are one server-only unit; partial configuration is rejected. */
+    STRIPE_ACCOUNT_ID: z.string().optional(),
+    STRIPE_MODE: z.enum(['test', 'live']).optional(),
+    STRIPE_SECRET_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    STRIPE_PRO_PRICE_ID: z.string().optional(),
+    STRIPE_TEAM_PRICE_ID: z.string().optional(),
+    STRIPE_PORTAL_CONFIGURATION_ID: z.string().optional(),
+  })
+  .superRefine((env, context) => {
+    const values = [
+      env.STRIPE_ACCOUNT_ID,
+      env.STRIPE_MODE,
+      env.STRIPE_SECRET_KEY,
+      env.STRIPE_WEBHOOK_SECRET,
+      env.STRIPE_PRO_PRICE_ID,
+      env.STRIPE_TEAM_PRICE_ID,
+      env.STRIPE_PORTAL_CONFIGURATION_ID,
+    ]
+    if (values.every((value) => value === undefined)) return
+    const parsed = stripeConfigurationSchema.safeParse({
+      accountId: env.STRIPE_ACCOUNT_ID,
+      liveMode: env.STRIPE_MODE === 'live',
+      secretKey: env.STRIPE_SECRET_KEY,
+      webhookSecret: env.STRIPE_WEBHOOK_SECRET,
+      proPriceId: env.STRIPE_PRO_PRICE_ID,
+      teamPriceId: env.STRIPE_TEAM_PRICE_ID,
+      portalConfigurationId: env.STRIPE_PORTAL_CONFIGURATION_ID,
+    })
+    if (
+      values.includes(undefined) ||
+      !parsed.success ||
+      (env.APP_ENV === 'production' && env.STRIPE_MODE !== 'live')
+    )
+      context.addIssue({
+        code: 'custom',
+        path: ['STRIPE_ACCOUNT_ID'],
+        message:
+          'Stripe requires complete valid account-pinned configuration and production live mode.',
+      })
   })
   .refine(
     (env) => (env.TURNSTILE_SITE_KEY === undefined) === (env.TURNSTILE_SECRET_KEY === undefined),
@@ -64,13 +110,14 @@ const envSchema = z
   )
   .refine(
     (env) =>
-      env.APP_ENV !== 'production' ||
+      (env.APP_ENV !== 'production' && !env.PUBLIC_SIGNUP_ENABLED) ||
       (env.TURNSTILE_SITE_KEY !== undefined &&
         env.TURNSTILE_SECRET_KEY !== undefined &&
         !turnstileTestKey.test(env.TURNSTILE_SITE_KEY) &&
         !turnstileTestKey.test(env.TURNSTILE_SECRET_KEY)),
     {
-      message: 'Production requires real TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY',
+      message:
+        'Production requires real TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY; public signup does too',
       path: ['TURNSTILE_SECRET_KEY'],
     },
   )

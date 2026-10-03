@@ -33,6 +33,8 @@ export interface AccountStore {
   revokePendingAdmissions(inviterId: string): Promise<void>
   revokePendingAdministratorAdmissions(inviterId: string): Promise<void>
   ensurePrivateWorkspace(userId: string): Promise<string>
+  /** Live private-cohort creation precheck; the organization INSERT enforces the atomic bound. */
+  canCreateSharedWorkspace(userId: string): Promise<boolean>
   isPrivateWorkspace(organizationId: string): Promise<boolean>
   findReferralLink(userId: string): Promise<ReferralLinkRecord | null>
   saveReferralLink(record: ReferralLinkRecord, shouldReplace: boolean): Promise<ReferralLinkRecord>

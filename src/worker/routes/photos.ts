@@ -13,14 +13,16 @@ import {
   photoListQuerySchema,
   photoListResponseSchema,
   photoUploadFieldsSchema,
+  type ImageDimensions,
   storageUsageSchema,
 } from '../../shared/api'
 import {
   HTTP_STATUS,
   MAX_PHOTO_BYTES,
+  MAX_PHOTO_SIDE,
   MAX_THUMBNAIL_BYTES,
-  PHOTO_CONTENT_TYPES,
   PHOTO_PAGE_SIZE,
+  THUMBNAIL_MAX_SIDE,
 } from '../../shared/constants'
 import { workspaceCapacity } from '../../shared/plans'
 import type { AppContext } from '../app-context'
@@ -32,7 +34,7 @@ import type { PhotoRecord, StoredObject } from '../stores'
 import { contentDigest, payloadFingerprint, syncOperationId } from '../sync'
 import { cleanupUploads, persistUpload } from '../upload-lifecycle'
 import { UPLOAD_POLICY } from '../upload-store'
-import { imageContentDisposition, SNIFF_LENGTH, sniffImageType } from '../uploads'
+import { imageContentDisposition, readImageUpload } from '../uploads'
 
 /** Offline copies are account-scoped in IndexedDB; the shared HTTP cache must not survive sign-out. */
 const PHOTO_CACHE_CONTROL = 'private, no-store'
@@ -46,12 +48,6 @@ function thumbnailKey(organizationId: string, photoId: string): string {
   return `org/${organizationId}/thumbnails/${photoId}`
 }
 
-function isPhotoType(
-  contentType: string | null,
-): contentType is (typeof PHOTO_CONTENT_TYPES)[number] {
-  return contentType !== null && (PHOTO_CONTENT_TYPES as readonly string[]).includes(contentType)
-}
-
 async function parseJson(request: Request): Promise<unknown> {
   try {
     return await request.json()
@@ -61,20 +57,22 @@ async function parseJson(request: Request): Promise<unknown> {
 }
 
 /** Reads a multipart file field, rejecting anything that is not a supported image. */
-async function imageField(form: FormData, field: string, maxBytes: number) {
+async function imageField(
+  form: FormData,
+  field: 'file' | 'thumbnail',
+  maxBytes: number,
+  claimed?: ImageDimensions,
+) {
   const file = form.get(field)
   if (!(file instanceof File)) {
     throw apiErrors.validation({ [field]: 'missing' })
   }
-  if (file.size > maxBytes) {
-    throw apiErrors.payloadTooLarge()
-  }
-  const bytes = await file.arrayBuffer()
-  const contentType = sniffImageType(new Uint8Array(bytes.slice(0, SNIFF_LENGTH)))
-  if (!isPhotoType(contentType)) {
-    throw apiErrors.unsupportedMedia()
-  }
-  return { bytes, contentType, name: file.name }
+  return await readImageUpload(
+    file,
+    maxBytes,
+    field === 'thumbnail' ? THUMBNAIL_MAX_SIDE : MAX_PHOTO_SIDE,
+    claimed,
+  )
 }
 
 function streamObject(stored: StoredObject, contentType: string, fileName: string): Response {
@@ -173,7 +171,7 @@ export const photoRoutes = new Hono<AppContext>()
         !(await services.folders.exists(organizationId, 'photo', fields.data.folderId))
       )
         throw apiErrors.conflict()
-      const image = await imageField(form, 'file', MAX_PHOTO_BYTES)
+      const image = await imageField(form, 'file', MAX_PHOTO_BYTES, fields.data)
       const thumbnail = await imageField(form, 'thumbnail', MAX_THUMBNAIL_BYTES)
       const preset =
         fields.data.presetId === undefined
@@ -186,7 +184,7 @@ export const photoRoutes = new Hono<AppContext>()
       const thumbnailDigest = await contentDigest(thumbnail.bytes)
       const key = `${photoKey(organizationId, id)}/${leaseId}/${digest}`
       const thumbKey = `${thumbnailKey(organizationId, id)}/${leaseId}/${thumbnailDigest}`
-      const uploadFields = fields.data
+      const uploadFields = { ...fields.data, width: image.width, height: image.height }
       function assertMatching(record: PhotoRecord) {
         if (
           record.createdBy !== session.user.id ||
@@ -216,15 +214,15 @@ export const photoRoutes = new Hono<AppContext>()
         contentType: image.contentType,
         size: image.bytes.byteLength,
         thumbnailSize: thumbnail.bytes.byteLength,
-        width: fields.data.width,
-        height: fields.data.height,
+        width: image.width,
+        height: image.height,
         presetId: preset?.id ?? null,
         presetName: preset?.name ?? null,
         folderId: fields.data.folderId,
         folderRevision: 0,
         createdBy: session.user.id,
       }
-      const { folderId, ...legacyFields } = fields.data
+      const { folderId, ...legacyFields } = uploadFields
       const fingerprint = await payloadFingerprint({
         digest,
         thumbnailDigest,

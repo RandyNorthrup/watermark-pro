@@ -86,6 +86,7 @@ export function RecentWork({ organizationId, organizationName, role, kind }: Rec
   const sync = useSyncExternalStore(subscribeOfflineStatus, offlineStatus)
   const [search, setSearch] = useState('')
   const [photo, setPhoto] = useState<PhotoDto | null>(null)
+  const [original, setOriginal] = useState<Blob | undefined>(undefined)
   const [openError, setOpenError] = useState<string | null>(null)
   const [opening, setOpening] = useState(false)
   const mode = preference.data ?? DEFAULT_RECENT_VIEW
@@ -114,6 +115,7 @@ export function RecentWork({ organizationId, organizationName, role, kind }: Rec
   useEffect(() => {
     const clear = () => {
       setPhoto(null)
+      setOriginal(undefined)
       setOpenError(null)
       setOpening(false)
       setSearch('')
@@ -142,6 +144,7 @@ export function RecentWork({ organizationId, organizationName, role, kind }: Rec
     mutationFn: (id: string) => deletePhotos(organizationId, [id]),
     onSuccess: () => {
       setPhoto(null)
+      setOriginal(undefined)
       void client.invalidateQueries({ queryKey: historyOptions.queryKey })
       void client.invalidateQueries({ queryKey: galleryQueryKey(organizationId) })
     },
@@ -152,9 +155,10 @@ export function RecentWork({ organizationId, organizationName, role, kind }: Rec
     setOpening(true)
     setOpenError(null)
     try {
-      await loadWorkspaceMedia(organizationId, photoFileUrl(organizationId, item.id))
+      const blob = await loadWorkspaceMedia(organizationId, photoFileUrl(organizationId, item.id))
       owner.assertCurrent()
       noteRecentWork(organizationId, { kind: 'photo', photo: item })
+      setOriginal(blob)
       setPhoto(item)
     } catch (error) {
       try {
@@ -396,15 +400,19 @@ export function RecentWork({ organizationId, organizationName, role, kind }: Rec
           </ul>
         ) : null}
       </div>
-      {photo === null || history.isError ? null : (
+      {photo?.organizationId !== organizationId || history.isError ? null : (
         <Suspense fallback={<Spinner label={t('recent.loading')} />}>
           <Viewer
             organizationId={organizationId}
             photo={photo}
+            original={original}
             canDelete={canRole(role, { photo: ['delete'] })}
             canShare={canRole(role, { share: ['create'] })}
             isDeleting={remove.isPending}
-            onClose={() => setPhoto(null)}
+            onClose={() => {
+              setPhoto(null)
+              setOriginal(undefined)
+            }}
             onDelete={(item) => remove.mutate(item.id)}
           />
         </Suspense>

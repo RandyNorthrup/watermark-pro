@@ -36,7 +36,9 @@
     "manageAccess": "Toegang beheren",
     "supportPrompt": "Helpt Lumafoil je? Overweeg dan een donatie.",
     "donate": "Doneren",
-    "supportPayPal": "Doneren met PayPal (nieuw tabblad)"
+    "supportPayPal": "Doneren met PayPal (nieuw tabblad)",
+    "openNavigation": "Navigatie openen",
+    "closeNavigation": "Navigatie sluiten"
   },
   "auth": {
     "backToSignIn": "Terug naar aanmelden",
@@ -90,10 +92,6 @@
       "roleLabel": "Rol:",
       "decline": "Weigeren",
       "accept": "Uitnodiging accepteren"
-    },
-    "inviteOnly": {
-      "title": "Uitnodiging vereist",
-      "body": "Lumafoil is alleen op uitnodiging beschikbaar. Open de uitnodigingslink in je e-mail om je account aan te maken."
     },
     "humanCheck": {
       "label": "Menselijke verificatie",
@@ -873,12 +871,11 @@
   "video": {
     "orgRequired": "Maak een werkruimte aan of word er lid van om video te watermerken.",
     "heading": "Video’s",
-    "description": "Bekijk je video, plaats watermerken op verschillende tijdstippen, voeg fades toe en exporteer met geluid.",
+    "description": "Knip en trim meerdere clips op video- en audiosporen. Bekijk je montage, voeg watermerken toe en exporteer op je apparaat.",
     "checkingSupport": "Videoondersteuning wordt gecontroleerd",
     "unsupportedTitle": "Video wordt niet ondersteund in deze browser",
     "unsupportedBody": "Je browser kan geen video coderen. Chrome, Edge of Safari 17 en nieuwer wel.",
     "addVideo": "Video toevoegen",
-    "dropHint": "Sleep hier één video, of",
     "transcodingProgress": "Transcoderingsvoortgang",
     "progress": {},
     "cancel": "Annuleren",
@@ -895,7 +892,6 @@
       "fit1080p": "Passend 1080p",
       "fit720p": "Passend 720p"
     },
-    "previewAlt": "Het watermerk op een frame van de video",
     "timeline": {
       "heading": "Tijd En Beweging",
       "play": "Afspelen",
@@ -910,12 +906,48 @@
       "updateKeyframe": "Hier Sleutelframe Bijwerken",
       "removeKeyframe": "Sleutelframe Op {{time}} Verwijderen",
       "hint": "Voeg een sleutelframe toe, ga naar een ander tijdstip en sleep, schaal of draai het watermerk. Lumafoil maakt de beweging tussen de sleutelframes.",
-      "playbackFailed": "Deze browser kon de geselecteerde video niet afspelen.",
       "chooseVideo": "Open eerst een video en voeg een geldig watermerk toe.",
       "waitPreview": "Wacht op de watermerkvoorvertoning voordat je een sleutelframe toevoegt.",
       "changed": "De video of het watermerk is tijdens het exporteren gewijzigd. Exporteer opnieuw om de huidige wijzigingen te gebruiken.",
       "download": "Video Exporteren",
       "cloudSaved": "De video met watermerk is opgeslagen in je cloudopslag."
+    },
+    "studio": {
+      "mediaPool": "Mediapool",
+      "inspector": "Inspector",
+      "clip": "Clip",
+      "timeline": "Tijdlijn",
+      "output": "Uitvoer",
+      "importMedia": "Media importeren",
+      "emptyMedia": "Importeer video of audio voor je montage.",
+      "emptyTimeline": "Voeg videoclips toe om te beginnen.",
+      "projectName": "Project",
+      "untitled": "Naamloos project",
+      "sourceIn": "Bronbegin (s)",
+      "sourceOut": "Broneinde (s)",
+      "track": "Spoor",
+      "split": "Splits bij afspeelkop",
+      "removeClip": "Clip verwijderen",
+      "unlink": "Audio loskoppelen",
+      "volume": "Volume",
+      "showTrack": "{{track}} tonen",
+      "hideTrack": "{{track}} verbergen",
+      "muteTrack": "{{track}} dempen",
+      "unmuteTrack": "{{track}} inschakelen",
+      "addClip": "{{name}} aan {{track}} toevoegen",
+      "trimIn": "Begin van {{name}} op {{track}} bijsnijden",
+      "trimOut": "Einde van {{name}} op {{track}} bijsnijden",
+      "zoom": "Tijdlijnzoom",
+      "localSession": "Bestanden blijven op dit apparaat. De sessie wordt niet opgeslagen na het sluiten van de pagina.",
+      "frameRate": "Bewerkte tijdlijn: {{fps}} fps",
+      "sourceBounds": "Medialimiet overschreden of bijsnijding buiten de bron.",
+      "selectClip": "Selecteer een clip in de tijdlijn om te bewerken.",
+      "timeReadout": "{{current}} / {{total}}",
+      "pictureMeta": "{{width}} × {{height}} · {{format}}",
+      "audioRequired": "Audio-encoder vereist. Demp tracks of gebruik een geschikte browser.",
+      "timing": "Timing",
+      "transform": "Transformatie",
+      "invalidEdit": "Deze bewerking zou een andere clip overlappen of de tijdlijnlimieten overschrijden. Kies een andere starttijd, broninterval of track."
     }
   },
   "documents": {
@@ -1054,7 +1086,7 @@
       },
       "sharing": {
         "title": "Deel foto’s of een werkruimte",
-        "body": "Maak intrekbare galerijlinks met een vervaldatum voor geselecteerde foto’s. Eigenaren kunnen lees- of bewerktoegang geven via een link, e-mailuitnodiging of directe toevoeging van een bestaande gebruiker. Toegang tot een werkruimte staat los van een uitnodiging voor Lumafoil."
+        "body": "Elk account heeft een eigen werkruimte. Foto’s en presets blijven apart totdat je ze uitdrukkelijk deelt. Toegang vereist toestemming van de eigenaar."
       },
       "offline": {
         "title": "Werk offline, synchroniseer later",
@@ -1062,7 +1094,7 @@
       },
       "privacy": {
         "title": "Jouw account, jouw werkruimte",
-        "body": "Nieuwe gebruikers hebben een site-uitnodiging nodig en krijgen een afzonderlijke privéwerkruimte. Een site-uitnodiging deelt nooit je foto’s of voorinstellingen. Voor het delen van een werkruimte moet de eigenaar uitdrukkelijk toegang verlenen."
+        "body": "Elk account heeft een eigen werkruimte. Foto’s en presets blijven apart totdat je ze uitdrukkelijk deelt. Toegang vereist toestemming van de eigenaar."
       },
       "languages": {
         "title": "12 interfacetalen",
@@ -1077,7 +1109,6 @@
         "body": "Verbind Google Drive, Dropbox of OneDrive om bestanden te openen, exportmappen te kiezen en deellinks van de aanbieder te maken. Verbindingen blijven bewaard totdat je ze verbreekt of de aanbieder opnieuw toestemming vraagt. Google Drive-toegang is beperkt tot bestanden en mappen die je met Lumafoil selecteert of maakt. Voor werk- of schoolaccounts kan goedkeuring van je Microsoft-beheerder nodig zijn."
       }
     },
-    "inviteHosting": "Lumafoil werkt alleen op uitnodiging. Wil je het zelf hosten?",
     "selfHost": "Download de broncode gratis op GitHub.",
     "featuresNav": "Functies"
   },
@@ -1107,13 +1138,17 @@
       },
       "sharing": {
         "heading": "Deellinks",
-        "p1": "Iedereen met een Lumafoil-galerielink kan de geselecteerde opgeslagen foto’s bekijken totdat de link verloopt of wordt ingetrokken. Een site-uitnodiging geeft toegang tot een afzonderlijk privéaccount; de werkruimte en inhoud van de uitnodiger worden niet gedeeld.",
+        "p1": "Iedereen met een galerijlink kan de geselecteerde foto’s bekijken totdat de link vervalt of wordt ingetrokken. Toegang tot een werkruimte vereist uitdrukkelijke toestemming van de eigenaar.",
         "p2": "Links van cloudproviders volgen hun eigen toegangs- en intrekkingsregels. Een link intrekken haalt eerder gemaakte downloads of kopieën niet terug."
       },
       "account": {
         "heading": "Je account",
-        "p1": "Nieuwe accounts vereisen een uitnodiging en geverifieerd e-mailadres. Meld je aan met een wachtwoord of ingestelde Google-/Microsoft-aanmelding. Bestaande accounts hebben geen nieuwe uitnodiging nodig. Een extra aanmeldmethode moet vanuit een aangemeld account worden gekoppeld.",
-        "p2": "Sessies gebruiken HttpOnly- en SameSite=Lax-cookies, met Secure op HTTPS. Wachtwoordresetlinks verlopen na een uur en trekken bij gebruik andere serversessies in."
+        "p1": "Registratie hangt af van beschikbaarheid en vereist een bevestigd e-mailadres. Log in met een wachtwoord of ingestelde Google/Microsoft-aanmelding. Een extra methode vereist geauthenticeerde accountkoppeling.",
+        "p2": "Sessies gebruiken HttpOnly- en SameSite=Lax-cookies, met Secure op HTTPS. Wachtwoordresetlinks verlopen na een uur en trekken bij gebruik andere serversessies in. Een bevoegde accountverwijdering begint met het intrekken van links en het verwijderen van cloudmetadata alleen voor je geverifieerde persoonlijke werkruimte waarvan je de enige eigenaar en het enige lid bent. Opgeslagen bestanden gaan naar de achtergrondopruiming en kunnen blijven staan terwijl nieuwe pogingen worden afgerond. Gezamenlijke werkruimten of werkruimten met onduidelijk eigendom, auditgegevens en betalingsbewijzen blijven behouden. Een account verwijderen wist geen gedownloade bestanden, kopieën op andere apparaten of back-ups van de provider. De accountinstellingen wissen na bevestigde verwijdering ook de lokale gegevens van dit account op het huidige apparaat. Als de bevestiging mislukt nadat de opruiming is voorbereid, kunnen persoonlijke links en metadata al verwijderd zijn terwijl je account nog bestaat; probeer het account opnieuw te verwijderen."
+      },
+      "billing": {
+        "heading": "Betalingen",
+        "p1": "Als je Checkout voor een betaald abonnement of het facturatieportaal gebruikt, host Stripe die pagina’s en verwerkt Stripe de betaalgegevens die je daar invoert. Lumafoil bewaart Stripe-ID’s voor klanten, Checkout, abonnementen en facturen, registraties van betalingsgebeurtenissen, de abonnementsstatus en einddatums van betaalde perioden, gekoppeld aan je account en de gefactureerde werkruimte. We sturen facturatiereferenties en het gekozen abonnement naar Stripe, maar geen foto’s, video’s, documenten, logo’s of inhoud van opgeslagen watermerken. Lumafoil verzamelt of bewaart geen volledige kaartnummers."
       },
       "analytics": {
         "heading": "Cookies en externe diensten",
@@ -1144,7 +1179,7 @@
       },
       "account": {
         "heading": "Je account",
-        "p1": "Toegang is momenteel op uitnodiging en vereist een geverifieerd e-mailadres. Wachtwoord en ingestelde Google-/Microsoft-aanmelding zijn beschikbaar. Beveilig je inloggegevens en provideraccount; je bent verantwoordelijk voor gebruik van je account.",
+        "p1": "Registratie hangt af van beschikbaarheid. Een bevestigd e-mailadres is vereist; wachtwoord en ingestelde Google/Microsoft-aanmelding zijn beschikbaar. Beveilig je inloggegevens en provideraccount; je bent verantwoordelijk voor je accountgebruik.",
         "p2": "Afmelden vereist verbinding en opgeloste wachtende wijzigingen; het wist offline-appgegevens in deze browser. Wachtwoordreset trekt andere serversessies in. Offlineapparaten kunnen kopieën bewaren tot ze verbinden of hun browsergegevens worden gewist."
       },
       "content": {
@@ -1159,7 +1194,7 @@
       },
       "teams": {
         "heading": "Privéwerkruimten en samenwerking",
-        "p1": "Elk account begint met een privéwerkruimte. Site-uitnodigingen delen geen inhoud van de uitnodiger. De eigenaar van een werkruimte kan expliciet toegang geven om die werkruimte te Bekijken of Bewerken. Dit deelt geen andere werkruimten en geeft geen rechten voor sitebeheer."
+        "p1": "Elk account heeft een eigen werkruimte. Foto’s en presets blijven apart totdat je ze uitdrukkelijk deelt. Toegang vereist toestemming van de eigenaar."
       },
       "availability": {
         "heading": "Beschikbaarheid, garantie en wijzigingen",
@@ -1534,7 +1569,67 @@
     },
     "workspace": {
       "title": "Werkruimten En Toegang",
-      "body": "Wissel van werkruimte, nodig mensen uit of beheer toegang via het gebruikersmenu. Eigenaren verlenen Kijk- of Bewerkrechten. Persoonlijke uitnodigingen delen geen inhoud. Synchronisatiestatus staat onderaan de zijbalk."
+      "body": "Wissel van werkruimte of beheer toegang via het gebruikersmenu. Eigenaren verlenen kijk- of bewerkrechten. Andere werkruimtes blijven privé. De synchronisatiestatus laat zien of wijzigingen op dit apparaat wachten op upload."
     }
+  },
+  "pricing": {
+    "nav": "Prijzen",
+    "heroTag": "Jouw werk. Jouw watermerk.",
+    "hosting": "Liever zelf hosten?",
+    "eyebrow": "Maandabonnementen · USD",
+    "heading": "Begin gratis. Maak ruimte voor meer.",
+    "intro": "Foto-, PDF- en videotools in elk abonnement. Betaalde abonnementen bieden foto-opslag en gecontroleerd delen.",
+    "free": "Gratis",
+    "pro": "Pro",
+    "team": "Team",
+    "freeBody": "Voor eerste projecten en een kleine galerij.",
+    "proBody": "Voor een groeiende fotobibliotheek en merkmateriaal.",
+    "teamBody": "Voor een gedeelde werkruimte met duidelijke rechten.",
+    "monthly": "USD / maand",
+    "freeStorage": "500 MiB foto-opslag",
+    "proStorage": "10 GiB foto-opslag",
+    "teamStorage": "25 GiB foto-opslag",
+    "freePhotos": "100 opgeslagen foto’s",
+    "paidPhotos": "10.000 opgeslagen foto’s",
+    "freeLogos": "10 logo’s",
+    "proLogos": "50 logo’s",
+    "teamLogos": "100 logo’s",
+    "personal": "Eén persoonlijke werkruimte",
+    "teamPeople": "Drie personen, inclusief eigenaar",
+    "teamSharing": "Gedeelde galerij en presets",
+    "start": "Beginnen",
+    "soon": "Abonnementen binnenkort beschikbaar",
+    "scope": "Lokale exports blijven beschikbaar in elk abonnement binnen apparaat- en bestandslimieten. Team omvat één gedeelde werkruimte; persoonlijke werkruimtes behouden hun eigen abonnement. Videoprojecten blijven op dit apparaat en worden niet in de cloud opgeslagen.",
+    "closedTitle": "Registratie opent binnenkort",
+    "closedBody": "Registratie van nieuwe accounts is gesloten. Je kunt nog steeds bij een bestaand account inloggen.",
+    "accountHeading": "Werkruimteabonnement",
+    "allowance": "Huidige cloudlimiet",
+    "manage": "Abonnement beheren",
+    "upgrade": "Kies Pro",
+    "createTeam": "Maak een Team-werkruimte",
+    "sharedName": "Naam van nieuwe gedeelde werkruimte",
+    "privateMember": "Privélid",
+    "storageAmount": "{{value}} MiB",
+    "redirectNotice": "Je verlaat Lumafoil om facturering te openen. Sla onvoltooid werk eerst op of exporteer het.",
+    "refreshNotice": "Vernieuw de betaalstatus om het huidige abonnement te bekijken.",
+    "resume": "Betaling hervatten",
+    "cancelCheckout": "Betaling annuleren",
+    "refresh": "Betaalstatus vernieuwen"
+  },
+  "accountRemoval": {
+    "heading": "Account verwijderen",
+    "description": "Verwijder je account en persoonlijke cloudinhoud. Gedeelde werkruimten en vereiste betaal- en beveiligingsgegevens blijven behouden.",
+    "ownerProtected": "Het account van de site-eigenaar is beschermd.",
+    "action": "Account verwijderen",
+    "title": "Je Lumafoil-account verwijderen?",
+    "consequences": "Abonnementen worden vóór verwijdering opgezegd. Persoonlijke links worden ingetrokken en bestanden worden voor opruiming klaargezet. Gedeelde inhoud en betaal- en beveiligingsgegevens blijven behouden. Niet-gesynchroniseerde wijzigingen op dit apparaat worden verwijderd. Dit kan niet ongedaan worden gemaakt. Als de bevestiging mislukt, kunnen sommige persoonlijke inhoud of links al verwijderd zijn.",
+    "confirmLabel": "Bevestig je e-mailadres",
+    "confirmHint": "Voer het e-mailadres van je account exact in ter bevestiging.",
+    "confirm": "Definitief verwijderen",
+    "unconfirmed": "De verwijdering is niet bevestigd. Je apparaatgegevens zijn niet gewist.",
+    "cleanupHeading": "Verwijderd account opruimen",
+    "cleanupPending": "De opgeslagen gegevens van dit account worden van dit apparaat gewist.",
+    "cleanupFailed": "Het opruimen van het apparaat is niet voltooid. Probeer opnieuw om resterende lokale gegevens van het verwijderde account te wissen.",
+    "cleanupRetry": "Opruimen opnieuw proberen"
   }
 }

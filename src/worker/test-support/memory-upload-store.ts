@@ -104,6 +104,8 @@ export function createMemoryUploadStore({
     records.set(cleanup.id, cleanup)
   }
   return {
+    // Real-auth Node tests spy this persistence boundary; actual D1/R2 tests certify set-based erasure.
+    stagePersonalDeletion: () => Promise.resolve(),
     hasContent(organizationId) {
       return locked(async () => {
         const [current, logos, marks] = await Promise.all([
@@ -160,6 +162,22 @@ export function createMemoryUploadStore({
         if (count >= maximum || current.bytes + input.bytes > capacity.storageBytes) return 'quota'
         records.set(input.id, { ...input, status: 'pending' })
         return 'reserved'
+      })
+    },
+    isLeaseWritable(input) {
+      // Named Node fixture models reservation identity; actual D1 tests certify the live writer predicate.
+      return locked(() => {
+        const stored = records.get(input.id)
+        return Promise.resolve(
+          stored?.status === 'pending' &&
+            stored.expiresAt.getTime() > Date.now() &&
+            stored.organizationId === input.organizationId &&
+            stored.userId === input.userId &&
+            stored.uploadId === input.uploadId &&
+            stored.kind === input.kind &&
+            stored.fingerprint === input.fingerprint &&
+            JSON.stringify(stored.keys) === JSON.stringify(input.keys),
+        )
       })
     },
     commit(input, record, entry) {

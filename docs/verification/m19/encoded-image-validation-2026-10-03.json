@@ -1,0 +1,221 @@
+{
+  "head": "c8fccc4f6e32459768043961963324331c52925c",
+  "seedManifestSha256": "07e9453bc40f5982f16d1c5e7e83101aa352bf68564f4e2bce80384d57c29c1d",
+  "branch": "codex/encoded-image-validation",
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "beforeSha256": "cab63d212bc2d60fe6999f2ed588e6a21be505c11aa7d5657ce95bd2dfedfd85",
+      "afterSha256": "db735441374982dcc2ef8825828a9ec2ef9bab13003ba6bfe40e5759dff235ff",
+      "beforeBytes": 127929,
+      "afterBytes": 129429,
+      "mode": "0o644"
+    },
+    {
+      "path": "PLAN.md",
+      "beforeSha256": "0d289af17dd0498a317f4fba2a4d5dc2356c6c8b55fa179e9658af3233e97cd4",
+      "afterSha256": "43e53d60e55cbba9413be92852ae3a9f51806be5dd8ea6d7b560f2d696807d57",
+      "beforeBytes": 321484,
+      "afterBytes": 322992,
+      "mode": "0o644"
+    },
+    {
+      "path": "SECURITY.md",
+      "beforeSha256": "ca8e24e8bb50915f9e1414c5851a6a1e84f71e79627b55dd943457ac15e07f8d",
+      "afterSha256": "6eb6c5c16691fd008ae9b2dba85a34f33204c1dc21fc0c4be1447b215727a72e",
+      "beforeBytes": 26391,
+      "afterBytes": 26955,
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/threat-model.md",
+      "beforeSha256": "a4952c8d55acdd33006a24acec20c44c4073548f9a2ecf2d1103b67d3cca504f",
+      "afterSha256": "6afe3d0888d44c224d67863e1245140edc500084b86b8d7dc38d16a62046e658",
+      "beforeBytes": 22205,
+      "afterBytes": 22614,
+      "mode": "0o644"
+    },
+    {
+      "path": "package-lock.json",
+      "beforeSha256": "96721742d896c48b987e4bdc50100c053be82075aa759962091739a4e3613bb4",
+      "afterSha256": "9e7f73f56802c10cb7dcc7e0e890071d0ff9ddac155b4992d9e19e5d9a054eaa",
+      "beforeBytes": 565653,
+      "afterBytes": 566195,
+      "mode": "0o644"
+    },
+    {
+      "path": "package.json",
+      "beforeSha256": "56876cd03f1f032437181dbb91ec48cf96df056e88ac56e7dc2cd0d098527fa4",
+      "afterSha256": "3eb843e0930022280620ac1bd2d0ece2054a639e08b51ffcec21639a242978af",
+      "beforeBytes": 9452,
+      "afterBytes": 9485,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/client/lib/thumbnail.browser.test.ts",
+      "beforeSha256": "511b3495830888f0b268bd21e66fd79341386fb9b6c282ea4558ede62299c24c",
+      "afterSha256": "a719bf241f6e7739e33da443ce3269103f7a06ef41ece0e3ed3da5b857fc5f02",
+      "beforeBytes": 2811,
+      "afterBytes": 2851,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/client/lib/thumbnail.ts",
+      "beforeSha256": "b03323a39187618337f0e4fa44b7ae68a0ad021ef9fcfadf22ecde39ea71a8df",
+      "afterSha256": "ab283bcfce60f0c23ea7c0880c10c95dd9f1ab89733e660bc60f76e7f700c000",
+      "beforeBytes": 1059,
+      "afterBytes": 988,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/shared/api.ts",
+      "beforeSha256": "cec300569363c141b71ac5b9c2933315b567c55cc0d7d7f0b80acd72e10e2c1f",
+      "afterSha256": "4ac6c73e75ea76ac5ecae9dfdfb32afb26429c745eeaa5e1311ba1cee1e62dc4",
+      "beforeBytes": 7573,
+      "afterBytes": 8209,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/shared/constants.ts",
+      "beforeSha256": "1bf4bc6de96063095a03c859acc56a0ce43ff1b2a71e8886d29b59dde154609f",
+      "afterSha256": "b9391c0bc57e6e982f6084a38252e6f3ffaccb80c47b3f4acfd227917443d5a3",
+      "beforeBytes": 16809,
+      "afterBytes": 17467,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/library.test.ts",
+      "beforeSha256": "dea3d9d00e613226dc4bd64c5a6ea9ab09a56a345f986820e17ad9657c13d871",
+      "afterSha256": "c8a0c1369c6f68fe680e3126974ef59b7dbd42b405e0aff2058d8bda4008d63e",
+      "beforeBytes": 16699,
+      "afterBytes": 16518,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/library.workers.test.ts",
+      "beforeSha256": "d424d70652e322b3c4d52aa66417b47635f791ac0d94b2e7d11fe3737a1c34b5",
+      "afterSha256": "bfc43249005fca491265bf90eaf1adb58de07a2815ea3bbc99a2d88f06d6d26f",
+      "beforeBytes": 8630,
+      "afterBytes": 8609,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/photos.test.ts",
+      "beforeSha256": "04ee16d1ded830dcb199e8ad0a66d25f80aaadeffbbabd89c82c63a64d509d98",
+      "afterSha256": "1fcc6a53aabb19a9f1fa076e39b03a26d7fc97ad6555ed3032586bb8ba952152",
+      "beforeBytes": 14279,
+      "afterBytes": 14164,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/routes/folders.workers.test.ts",
+      "beforeSha256": "ba86e1c58bd2e9a54b208718148a165e809c5eb05a12f024a5ce03d04f7cd804",
+      "afterSha256": "6e1b92997516671eded68fcc02a9a6a08550f196faecd4f2b7ec68b7b02d21b3",
+      "beforeBytes": 18460,
+      "afterBytes": 18475,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/routes/library.ts",
+      "beforeSha256": "c6fc883f6037a47482eb62c5dd67091016f1178b39169d5ec1564cdadc982451",
+      "afterSha256": "cb2b3de8800fce586376f1f8f73f1f2b16356b6f0897166aef4c68cebe849dd4",
+      "beforeBytes": 13564,
+      "afterBytes": 13410,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/routes/photos.ts",
+      "beforeSha256": "17a8234bca2f0b2e40cf8bdb1249b2f1a8e7ec7a1cc007ed962082fbc81d3750",
+      "afterSha256": "87ad3eff63ef0b6f7d7138583f5f96291b27a1664e0f215ed3a37c247a3cff1d",
+      "beforeBytes": 11643,
+      "afterBytes": 11379,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/shares.test.ts",
+      "beforeSha256": "6a863fef88a4893d6e2897c4cccccb0a69f2256bdf54b2708e85542ed4ed4a98",
+      "afterSha256": "30e1dfdee03cd75cfe409905d831d3a582f5f63378b7af1b15c88a5c9fed0ceb",
+      "beforeBytes": 10033,
+      "afterBytes": 10065,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/uploads.ts",
+      "beforeSha256": "2064318a4573666b2092394031a10821948bcbc99d36f0e31b11ee7dbc97d6eb",
+      "afterSha256": "d3f2381899d566a943c69f52d3a35cf73c4d92ba398daeea262289e144828c31",
+      "beforeBytes": 2388,
+      "afterBytes": 6053,
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/verification/m19/encoded-image-validation-2026-10-03.md",
+      "beforeSha256": null,
+      "afterSha256": "77d55177f8c1d39492214b8f5913af78ae50623cfa96c9f521fe19d1fb115215",
+      "beforeBytes": null,
+      "afterBytes": 6939,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/image-uploads.test.ts",
+      "beforeSha256": null,
+      "afterSha256": "445ee619b2e8d608d168ab1e22babcf93f1792777f06c1f643c5629e66b285e9",
+      "beforeBytes": null,
+      "afterBytes": 8642,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/image-validation.test.ts",
+      "beforeSha256": null,
+      "afterSha256": "24c60a003c9b5ade616ebf6d9abd7af7cf8edb138239605c188b2d36c40747c5",
+      "beforeBytes": null,
+      "afterBytes": 4513,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/image-validation.workers.test.ts",
+      "beforeSha256": null,
+      "afterSha256": "e5caeca84d0bc4ba6aa84628b20f8ca1126282109ec68e89554fbaf28afb6527",
+      "beforeBytes": null,
+      "afterBytes": 2673,
+      "mode": "0o644"
+    },
+    {
+      "path": "src/worker/test-support/image-fixtures.ts",
+      "beforeSha256": null,
+      "afterSha256": "74c5268d608336418b38c9cbef83ce8789c9a33a5952a063c12217dcec541ae8",
+      "beforeBytes": null,
+      "afterBytes": 329667,
+      "mode": "0o644"
+    }
+  ],
+  "proof": {
+    "affectedNode": {
+      "session": 69805,
+      "files": 7,
+      "cases": 91,
+      "exit": 0
+    },
+    "types": {
+      "session": 57341,
+      "exit": 0
+    },
+    "scopedLint": {
+      "session": 79625,
+      "files": 16,
+      "exit": 0
+    },
+    "workers": {
+      "session": 5110,
+      "cases": 4,
+      "exit": 0,
+      "scope": "actual module, two EXIF orientations, single near-limit File and malformed header only"
+    }
+  },
+  "limitations": [
+    "no measured peak memory or billed CPU receipt",
+    "full multipart/hash/R2/concurrent memory safety not proven",
+    "header dimensions only, no complete pixel decoding",
+    "full combined quality/SAST/browser/release gates remain required",
+    "existing seven-high development-tool audit blocker unwaived"
+  ]
+}

@@ -21,6 +21,9 @@ const options = buildAuthOptions({
   database: memoryAdapter({}),
   accounts: createMemoryAccountStore({ user: [], organization: [], member: [] }),
   plans: {
+    spendOperations() {
+      throw new Error('No cloud operation boundary fixture')
+    },
     get() {
       throw new Error('Schema-only fixture has no workspace records.')
     },

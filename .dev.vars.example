@@ -13,6 +13,7 @@ BETTER_AUTH_SECRET=
 # APP_URL=http://localhost:5273  # public origin used in auth links
 # EMAIL_PROVIDER=console         # console | cloudflare (console is refused in production)
 # EMAIL_FROM=no-reply@lumafoil.com
+# PUBLIC_SIGNUP_ENABLED=false    # true only after M19 certification and migration 0024; requires real Turnstile keys in every environment
 
 # Cloudflare Turnstile for signup, sign-in, password reset and verification resend.
 # Both required in production. Non-production fixtures may leave both unset.
@@ -61,3 +62,18 @@ BETTER_AUTH_SECRET=
 # DROPBOX_APP_SECRET=
 # Match the Dropbox developer-console access type; changing this does not expand an OAuth grant.
 # DROPBOX_ACCESS_TYPE=app_folder
+
+# Optional Stripe billing: all seven settings must be present together.
+# Create/verify the separate Lumafoil business account first. A CLI profile
+# name is not account authority. No AppBag credentials or account may be used.
+# Production requires live mode; isolated local/sandbox verification uses test.
+# STRIPE_ACCOUNT_ID=
+# STRIPE_MODE=test
+# STRIPE_SECRET_KEY=
+# STRIPE_WEBHOOK_SECRET=
+# STRIPE_PRO_PRICE_ID=
+# STRIPE_TEAM_PRICE_ID=
+# STRIPE_PORTAL_CONFIGURATION_ID=
+# Secret key and webhook signing secret are Worker secrets. Remaining settings
+# may be plain vars, but every value must come from the same verified account/mode.
+# No publishable key is needed for hosted Checkout/portal redirects.

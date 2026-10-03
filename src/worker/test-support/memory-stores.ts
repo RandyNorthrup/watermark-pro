@@ -5,6 +5,7 @@ import {
 } from '../../shared/constants'
 import { SITE_ROLE } from '../../shared/site-roles'
 import type { AuditStore } from '../audit'
+import { apiErrors } from '../errors'
 import type {
   AssetRecord,
   AssetStore,
@@ -45,6 +46,7 @@ export function createMemoryWatermarkStore(audit?: AuditStore): WatermarkStore {
       .filter((record) => record.organizationId === organizationId)
       .toArray()
   return {
+    countForOrganization: (organizationId) => Promise.resolve(scoped(organizationId).length),
     listForOrganization: (organizationId) => Promise.resolve(scoped(organizationId)),
     findMany: (organizationId, ids) =>
       Promise.resolve(scoped(organizationId).filter((record) => ids.includes(record.id))),
@@ -138,11 +140,22 @@ export function createMemoryAssetStore(): AssetStore {
 
 /** In-memory object store for Node tests. */
 export function createMemoryObjectStore(): ObjectStore & { keys(): string[] } {
-  const objects = new Map<string, { bytes: ArrayBuffer; contentType: string }>()
+  const objects = new Map<string, { bytes: ArrayBuffer; contentType: string; etag: string }>()
   return {
     keys: () => objects.keys().toArray(),
-    put(key, body, contentType) {
-      objects.set(key, { bytes: body, contentType })
+    preparePut(key) {
+      if (objects.has(key)) return Promise.reject(apiErrors.retryLater())
+      const etag = crypto.randomUUID()
+      objects.set(key, {
+        bytes: new Uint8Array().buffer,
+        contentType: 'application/octet-stream',
+        etag,
+      })
+      return Promise.resolve(etag)
+    },
+    put(key, body, contentType, etag) {
+      if (objects.get(key)?.etag !== etag) return Promise.reject(apiErrors.retryLater())
+      objects.set(key, { bytes: body, contentType, etag: crypto.randomUUID() })
       return Promise.resolve()
     },
     get(key) {

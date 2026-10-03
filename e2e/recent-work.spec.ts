@@ -140,6 +140,7 @@ test('recent work opens real content in three accessible views, survives offline
   await photo.click()
   await expectImage(viewer)
   await expectAccessible(page)
+  await viewer.screenshot({ path: testInfo.outputPath('recent-original-offline.png') })
   await viewer.getByRole('button', { name: 'Close' }).click()
   await page.reload()
   await expect(recents.getByRole('button', { name: 'List', exact: true })).toHaveAttribute(

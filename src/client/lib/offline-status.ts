@@ -7,6 +7,7 @@ interface OfflineStatus {
   isReady: boolean
   hasUpdate: boolean
   isOnline: boolean
+  accountCleanup: { userId: string; pending: boolean; error: string | null } | null
 }
 
 const state: { status: OfflineStatus } = {
@@ -18,6 +19,7 @@ const state: { status: OfflineStatus } = {
     isReady: false,
     hasUpdate: false,
     isOnline: typeof navigator === 'undefined' || navigator.onLine,
+    accountCleanup: null,
   },
 }
 const listeners = new Set<() => void>()

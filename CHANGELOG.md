@@ -7,11 +7,482 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Complete device recovery and verified Stripe activation — 2026-10-03
+
+- Complete unchanged matrix passes all 156 journeys, 39 per device, with zero
+  skips/flakiness or captured asset 500. Earlier failed runs remain recorded;
+  current recovery does not prove the intermittent transport cause or close M19.
+- Owner completed separate Lumafoil activation. Fresh account and live balance
+  reads verify charges/payouts/details enabled, US/USD and actual live authority.
+  No live price exists at readback; reviewed monthly catalog/portal setup is
+  underway without creating customers/payments or changing production flags.
+- Isolated 12-locale budget-disclosure candidate passes 96 tests/types/lint but
+  is not integrated/rendered. Upload copy/API assessment establishes supported
+  memory risks; no unsupported type cast, new cap or profit claim was introduced.
+
+### Current security and provider-preparation boundary — 2026-10-03
+
+- Post-diagnostic SAST passes 510 rules over 2,322 files with zero findings;
+  complete four-device rerun now runs unchanged. No complete recovery is inferred.
+- Prepared a protected one-run test config from the exact Lumafoil CLI profile,
+  without credential output, new key/login or provider request. Sandbox caller
+  API/SQL contracts were checked statically and terminal cleanup now gates its
+  result; actual application/payment proof remains unexecuted.
+- Read-only workflow/ref review identifies an existing registered native-codec
+  workflow for future exact-checkpoint Linux verification without main changes
+  or repeating the unchanged canonical audit. No ref or workflow mutation,
+  dispatch, publication or deployment occurred.
+
+### Fresh complete regression and bounded frame hint — 2026-10-03
+
+- One fresh `npm test` command passes every stage: 3,325 covered cases and all
+  floors, 18 native codecs, 158 Workers and all bootstrap/gate/performance/
+  publication/asset/vendor/CI controls. All ten static/publication stages and
+  510-rule SAST also pass at the recorded source boundary; the known strict
+  unpatched audit remains blocked, so full quality/release is not claimed.
+- Integrated the reviewed two-path static-500 frame hint only after that command
+  ended. Fixed enum never emits raw paths/messages/stacks/identifiers, preserves
+  bytes/routing and API/auth exclusion, and passes all 19 integrated gate
+  controls plus lint. Actual fault cause remains unproven; full matrix follows.
+- Separate Lumafoil Stripe onboarding reached the actual owner business-type
+  form without reusing AppBag identity or submitting legal/banking/tax/terms.
+  Missing protected sandbox config and caller contracts are under review before
+  any full-application payment attempt. M19 and live activation remain open.
+
+### Offline transport-fixture contract corrected — 2026-10-03
+
+- Disconnected proxy now refuses each newly accepted owned TCP socket before
+  request parsing; four added runtime lines. Actual no-request-byte regression
+  fails on stock while its connected control passes. Complete isolated pool
+  and canonical integrated pool each pass five cases; exact two-path root
+  integration hashes match. Matching iPhone/iPad Recents and conflict-preservation
+  journeys then all pass, four cases with zero skips/flakiness and axe violations.
+  Both actual offline original captures were viewed.
+- Fresh Blob-reuse WebKit run passes iPad's complete offline/account journey and
+  its original viewer capture was viewed. iPhone fails earlier, with its first
+  original preflight unfinished and no asset 500. No complete recovery is
+  inferred from that earlier run. The later four matching journeys supply the
+  focused recovery evidence; complete matrix/static failure remains open.
+
+### Loaded Recents original reused — 2026-10-03
+
+- Recents now passes its already-loaded, account-fenced original Blob to the
+  existing viewer URL lifecycle. It no longer repeats that load during an
+  outage. Current-workspace rendering, account clearing and URL disposal prevent
+  old loaded or pending content from appearing after identity/scope changes.
+- Exact five-path integration passes 22 unit-client cases, full types and scoped
+  lint. Nine new cases give three expected failures on exact prior runtime.
+  First root command selected an invalid project and ran no tests; corrected
+  canonical invocation supplies the passing evidence. Actual iPhone/iPad
+  offline-viewer/axe/screenshot proof and combined gates remain next.
+
+### Four-device result and bounded reassessment — 2026-10-03
+
+- Complete canonical device run finished with 149 passing, seven failing, zero
+  skipped/flaky journeys at original concurrency/deadlines. Seven bounded
+  downstream asset failures share the same network-lost classification/digest.
+- After that run ended, all six native/direct cancellation trials completed;
+  42 exact boot-asset reads and real fixture signups/documents passed. The fault
+  did not reproduce, so no transport change or complete recovery is claimed.
+- Corrected the account-removal test to await the actual localized login heading
+  before axe, matching resolved trace evidence. Scoped format/lint pass; matching
+  complete iPhone browser rerun passes with zero skips/flakiness or axe violations,
+  and its cleanup notice screenshot was viewed. Live GitHub controls pass all 13
+  endpoint checks. This does not replace the failed complete four-device result.
+- Separate Recents duplicate-original loading and iPad offline-conflict failures
+  remain open. M19 and strict dependency/release gates remain mandatory.
+
+### Current verification evidence reconciled — 2026-10-03
+
+- Current four-device run has six identical bounded asset-failure captures;
+  separate iPhone image-readiness failure remains under review. Resolved trace
+  snapshots and a viewed screenshot establish that the new account-removal
+  test started axe before login content mounted; an explicit rendered-heading
+  readiness assertion is next. No complete-run result or recovery is claimed.
+- Confirmed existing Chrome Stripe script access after the owner enabled it.
+  Corrected a stale billing-plan statement to record the actual two sandbox
+  customers, refunded Pro payment and expired Team Checkout. No live payment
+  or production activation is claimed; M19 remains open.
+
+### Full-device asset failure reproduced safely — 2026-10-03
+
+- Current complete run captured a 190-byte downstream asset 500 as network
+  connection lost, with fixed classification/digest and no raw exception/body.
+  Trace proves this failed context had successful signup and had not begun its
+  offline actions; its own teardown happened later. Source stays frozen and run
+  remains live; cross-context/native-RPC cause and device recovery are unproven.
+
+### Public billing plan reconciled — 2026-10-03
+
+- Reconciled the planning document with implemented quotas/closure/UI and actual
+  sandbox payment/refund/cancellation evidence. Historical certifications and
+  unchecked full launch requirements keep their source boundaries; no live or
+  full provider-flow certification was inferred. Inventory/funding/retention and
+  four-device/release obligations remain explicit.
+
+### Complete combined test-stage closure — 2026-10-03
+
+- Every test stage now passes on final code: covered 3,316, native 18, Workers 158,
+  bootstrap 40, gate 17, performance controls 36, publication 25, assets 5+19,
+  vendor 58 and CI policy 4. Preserved initial fixture failures and exact rerun
+  boundaries; no fresh one-command pass was claimed from cumulative stages.
+- Corrected obsolete signup audit label/preparation naming to the current neutral
+  closed-registration surface, with full route/locale and stale-name negatives.
+  All surfaces and thresholds retained. Full four-device E2E now runs; M19 open.
+
+### Complete Worker regression closure — 2026-10-03
+
+- Corrected only two old billing fixture contracts for empty personal-workspace
+  retirement, strengthening retained failure scope, gone successful scope,
+  missing-plan denial, old-session refusal and closed financial-reference proof.
+  Complete unfiltered Worker pool now passes 158/158; types/lint/format pass.
+  Runtime code and safeguards unchanged; remaining script/device/release gates
+  are still running or pending, and strict audit remains blocked.
+
+### Full covered/native and safe E2E diagnosis — 2026-10-03
+
+- Complete covered stage passes 3,316 cases and all coverage floors; native codec
+  stage passes 18. Worker pool has two stale deleted-plan expectations after 156
+  passing cases; reviewed test-only contract correction is pending, no ghost-plan
+  fallback or runtime patch.
+- Reassessed original full E2E evidence, enabled existing bounded static-500
+  classifier/digest in normal gate startup and added explicit auth-body canary
+  exclusion assertions. Exact two-file delta passes lint and 17 gate controls;
+  actual downstream failure remains unproven until full device rerun.
+
+### Aggregate inventory remains unverified — 2026-10-03
+
+- Bounded read-only D1 attempt stopped at existing OAuth refresh 401 before any
+  query reached D1. Aggregate counts/bytes remain unknown; no retry/login/mutation
+  or raw-user/object output. Private evidence permissions recorded. Funding and
+  authenticated headroom measurement remain launch work.
+
+### Combined covered regression checkpoint — 2026-10-03
+
+- Full covered stage passed 3,315 cases and every coverage floor; one old privacy
+  wording assertion failed after the device-scope clarification. Updated that
+  contract with current-device positive and old-wording negative assertions;
+  all four legal cases and scoped lint pass. Original AAC gap assertions now pass
+  in the complete covered stage. Complete corrected chain is running; no native/
+  Workers/script continuation or full test success was claimed from the failed run.
+
+### Final combined static/security checkpoint — 2026-10-03
+
+- Canonical quality passes every static gate and full source/history publication
+  (15,538 checks), then stops at seven unchanged unpatched high braces findings.
+  Final SAST passes 510 rules over 2,316 files, zero findings. No gate weakened.
+- Updated security commitments to the integrated AAC span, personal-only cleanup
+  and visible device-retry behavior, preserving explicit scope/retention/device
+  boundaries. Full test chain now runs independently; M19/release remain open.
+
+### Built removal/privacy and source-offer verification — 2026-10-03
+
+- Actual built desktop/Arabic-phone deletion and named device-failure/retry flows
+  pass, including real upload/share revocation, session removal, old-credential
+  denial and zero axe. Privacy passes both projects; six images reviewed/retained.
+  Fixed visible warning translucency with an opaque surface and reran both flows.
+- Corrected the producer's generated source-archive paths instead of exempting
+  them. Complete preferred offer has 78 entries, with all seven exact generated
+  artifacts reconstructable from the verified seed. All 42 built assertions,
+  bundle budgets and strict built publication pass.
+- Shipped 24 finite SDK contracts; vendor gate passes 58/58. Referenced identical
+  proof diagnostics instead of duplicating them; exact original values preserved,
+  unchanged duplicate gate zero. Test import/invocation/typing mistakes documented;
+  final full quality/security/device/release certification and M19 remain open.
+
+### Personal cleanup and mounted recovery integrated — 2026-10-03
+
+- Integrated nine source/test/receipt paths with exact hashes, plus only the owned
+  account-privacy key in twelve catalogues. Isolated real D1/R2 passes 16/16;
+  integrated real-auth units pass 39/39. Existing rate/counter/permission gates stay
+  intact. Reconciled current-device copy, including corrected Japanese/Korean
+  sentence selection so lost-confirmation warnings remain.
+- Fixed the mounted device-error gap that standalone mocks missed: generic root
+  notice survives account locking/login and retries local erasure without another
+  deletion API call. Final focused pool passes 43, types/lint/format pass. Its
+  acknowledgement remains transient; built UI/visual/full certification is open.
+
+### Guarded AAC correction integrated — 2026-10-03
+
+- Integrated exact eleven-path AAC source/test/source-offer delta with all pre/post
+  hashes matched. Normal offline guard corrected seven installed artifacts;
+  integrated vendor controls pass 34/34. Independent cold install/types/lint,
+  original native 18 and canonical both-engine 20 pass, no skips or weaker gates.
+- Complete deterministic MPL preferred-source offer now has 83 entries. Recorded
+  baseline upstream standalone compiler diagnostics and finite LC proof limits;
+  no generic codec or release certification is claimed.
+- Independent account-removal review found a real mounted device-cleanup failure
+  visibility/retry gap that isolated component mocks missed. Correction and a
+  real-router regression are underway; no completed removal claim is made.
+
+### Self-service account removal candidate — 2026-10-03
+
+- Added exact-email confirmation and protected-owner Account settings controls
+  using existing server/account/recent-auth gates. Successful deletion requests
+  account-scoped device erasure; failed/unconfirmed requests retain device data.
+- Added explicit pending-save erasure policy only for confirmed deletion, keeping
+  normal sign-out behavior and other owners' records. Expanded units pass 38;
+  actual Chromium IndexedDB passes all twelve, with one expected negative-control
+  failure without the erase branch and exact restoration. Types/scoped lint/
+  catalogue parity passed; built API/visual/full gates remain pending. Initial
+  project-selection/style mistakes were corrected without
+  weakening gates. Documentation remains explicit about queued physical cleanup
+  and retained collaborative/payment/security data; no production removal claim.
+
+- Verified the separate Lumafoil Stripe account again and passed seventeen actual
+  test-mode gateway checks: idempotent customer/Checkout creation, unpaid denial,
+  hosted USD 9 monthly payment, linked paid snapshot, identity negatives, portal
+  creation, paid period retention, refund revocation and provider-confirmed
+  cancellation, plus actual USD 24 unpaid Team authority rejection and idempotent
+  expiry. Six real provider-signed event types passed identity/replay and
+  raw-payload tamper negatives. The application/D1 sandbox flow, portal interaction
+  and live business activation remain open; no live funds or production changes.
+
+### Integrated storage verification — 2026-10-03
+
+- Extracted two repeated producer-test setup blocks without changing runtime or
+  race/role assertions. Unchanged duplicate and dead-code gates pass.
+- Integrated actual Worker rerun passed all 37 fence/upload regressions, no skips.
+  Earlier 118 units/types/current SAST evidence remains; full milestone open.
+
+### Team-name rendered verification — 2026-10-03
+
+- Fresh built desktop/Arabic-phone journeys passed retained closed/open Team
+  field/resume behavior with zero axe violations. All four actual section images
+  were viewed. Financial state is an explicit named schema-valid fixture; auth/
+  Worker remain real, and no provider mutation/payment is claimed. Full gates open.
+
+### Conditional storage fence integrated — 2026-10-03
+
+- Integrated exact seven-runtime/four-test/receipt delta; all twelve pre/post hashes
+  match. Conditional empty claims, live role/lease rechecks and ETag payload writes
+  block payload recreation after cleanup, without new tables/keys/jobs/dependencies.
+- Initial physical red retained. Isolated 55 Node and 37 actual Worker cases pass,
+  including eleven strengthened races and all prior twenty-six upload regressions.
+  Integrated full types and 118 Worker unit cases pass; exact current SAST passes
+  510 rules/2,299 files with zero findings. The isolated AAC prototype passed 20
+  actual Chromium/WebKit page/Worker cases; deterministic guard/source packaging
+  and broader native checks remain. Full combined gates, CPU/memory and personal-only
+  account cleanup remain open.
+  No personal purge, source publication or deployment is implied by integration.
+
+### Full publication and strict audit — 2026-10-03
+
+- Full source publication rescan passed 15,428 checks after shortening a named
+  synthetic credential and explicitly labelling source fingerprints. Original
+  proof values remain reconstructable; no exemption/rule/cap changed. 89 billing
+  cases and targeted Gitleaks pass.
+- Strict audit still fails seven cascading high braces findings. Forced downgrade
+  rejected; full canonical test/build and final release/provider gates remain.
+  Updated current planning and exact source/log boundaries; M19 stays open.
+
+### Combined gate checkpoint — 2026-10-03
+
+- Combined duplicate scan now passes zero. Canonical quality subsequently stopped
+  at one duplicate constant export; preserved 8,192 logo policy as independently
+  documented tunable rather than an alias. No ignore or gate change.
+- Exact pre-fix combined SAST completed with 510 rules over 2,295 files and zero
+  findings, exit zero. All 48 affected constant/image checks, scoped lint and
+  knip pass; canonical rerun remains. No
+  full quality/native/device/provider/release pass is claimed.
+
+### Encoded image candidate integrated — 2026-10-03
+
+- Applied twenty-one reviewed paths and independently installed exact pinned
+  image-dimensions 2.6.0 after peer/engine/age/integrity/advisory verification.
+  Resolved the sole import overlap while retaining operation policy and image
+  validation. PNG/JPEG/WebP encoded/display dimensions now precede storage work.
+- Isolated 91 Node cases, four actual Worker module cases and static checks pass;
+  full multipart/hash/concurrent CPU/memory and combined gates remain open.
+- Canonical quality passed static checks through cycles, then failed zero-duplicate
+  gate. Four code pairs are under small shared-helper repair. Repeated proof data
+  was normalized with exact-value reconstruction and original serialized backups;
+  no duplicate ignore, gate threshold or measurement was removed. The small
+  three-source/receipt repair now matches all integrated hashes; isolated 39 Node
+  and 34 real D1 cases pass, and combined duplicate scan finds zero.
+
+### Payment disclosure and closure review — 2026-10-03
+
+- Integrated the reviewed payment-data disclosure across all twelve catalogues,
+  the privacy page/date, a negative regression and its receipt; all fifteen
+  pre/post hashes match. Isolated 48 legal/catalogue cases, types/lint and 1,292
+  translation keys pass. Fresh combined build and actual desktop/Arabic-phone
+  privacy journeys pass zero axe/overflow; both payment sections were viewed.
+- Actual numeric AAC capture established a Chrome gap collapse and displaced
+  final tone; WebKit preserved both. Two earlier console-only attempts lacked
+  measurements and are not proof. Capture passed a small control before the actual
+  eight observations; product code and failing assertion remain unchanged.
+- Confirmed personal cloud content/public links are not removed by the current
+  credential-deletion hook. Retained audit and churned storage also require policy.
+  Recorded these as open boundaries; no erasure or profitability claim is made.
+
+### Public tour privacy correction — 2026-10-03
+
+- Found personal admission-link advertising in the common product-tour step.
+  Replaced it across all twelve locales with explicit workspace access/isolation
+  guidance and factual sync-state copy. Private admission functionality remains
+  separately gated; no permission or allowance changed.
+- Added a rendered-dialog negative regression; it failed on original wording.
+  All 58 guidance/catalogue cases, scoped lint and 1,290 translation keys pass.
+  Fresh build plus two actual desktop/Arabic-phone journeys passed all thirteen
+  tour steps with zero axe/overflow; both retained captures were viewed. Recorded missing payment-data disclosure and unresolved financial
+  policies as launch work instead of claiming complete privacy/legal coverage.
+
+### Review checkpoint — 2026-10-03
+
+- Full covered stage finished with 3,203 passing and six failing cases. All
+  coverage floors passed; the chain stopped before codecs/Workers/scripts.
+  Corrected four stale legal/config expectations with ten passing cases and
+  scoped lint. Two actual Chromium AAC gap checks remain under review. Full test
+  gate remains failed; no runtime assertion or threshold was weakened.
+- Integrated the exact reviewed five-file correction for historical nullable-ban
+  customer/checkout binding and retained-closed/orphaned Team retry. All pre/post
+  hashes match; isolated 110 Node and 21 actual D1 cases plus final static checks
+  pass, with initial failing proofs preserved. Rendered new-field and combined
+  global certification remain required.
+- Refreshed official Stripe/Cloudflare rates without changing selected pricing.
+  Recorded aggregate billing rounding and the unbounded default CPU/denied-traffic
+  gap; operation limits alone do not prove the compute allocation or net profit.
+- Reconciled current planning pointers with completed merged visual evidence;
+  earlier receipts remain historical, and M19 remains uncertified.
+
+### Operation budget source integrated — 2026-10-03
+
+- Applied the reviewed eighteen-file operation delta plus two dedicated docs;
+  every pre/post hash matched and current root documents were preserved.
+  Workspace/site debit rolls back together; durable singleton refuses deletion
+  and replacement while immutable site-owner guards stay unchanged.
+- Isolated 176 Node cases, 21 overlapping regressions, thirteen actual D1 cases
+  and final types/lint/format pass. Initial provider-fixture collision and singleton
+  replacement failures remain recorded; fixture authorities are retained.
+  Combined full types and 146 cases in nine Worker unit files pass, alongside
+  68 client cases in four files. Complete gates and cost/CPU/retained-storage
+  policy remain open.
+
+### Separate security slices — 2026-10-03
+
+- Confirmed delete/recreate and account rejoin reset workspace-only counters;
+  approved an atomic product/site aggregate with immutable owner guards preserved.
+  Actual implementation and role/D1 proof run in an isolated source checkout.
+- Verified image metadata reader version/age/peers/engines/integrity before its
+  exact isolated install. Existing stored formats and byte caps remain; encoded
+  dimensions/EXIF orientation and near-limit runtime behavior require proof.
+  A preliminary constructor/runtime probe produced no usable result and was
+  explicitly rejected as evidence; the existing Workers test pool will be used.
+- Started the complete global test chain on the merged, visually reviewed source.
+  Coverage, worker and script results are pending; no passing full gate claimed.
+
+### Merged editor visual proof — 2026-10-03
+
+- Fresh build passed unchanged app budget (138.9/140 kB gzip) and built publication.
+  Four real desktop/phone English-light/Arabic-dark editing/navigation journeys
+  passed with 20 zero-axe/overflow checks. Sixteen captures were viewed; four
+  representative images and a complete hash manifest are retained for review.
+- Retracted the narrow RTL-preview claim after original hash-matching PNG pixel
+  measurement and exact edited-project reproduction showed the correct full
+  aspect in six panel/menu states. No product patch or gate relaxation was needed.
+- Seeded isolated operation-budget and image-header hardening work from verified
+  current bytes. Those changes and complete release/provider gates remain open;
+  no production opening, migration or deployment occurred.
+
+### Editor and launch source combined — 2026-10-03
+
+- Integrated full multi-clip editor, renderer/mixer, inspector/timeline,
+  outside-canvas half-circle gooey navigation and Linux-proven SDK correction
+  with launch/lifecycle/preset source. Changed 113 files while preserving 21
+  protected paths, dependency pins, public privacy leaves and gate limits.
+- Types/lint/CSS, 44 controls and 302 editor/shared/shell units passed. Corrected
+  a test option unsupported by Testing Library; final types/lint and 46 affected
+  cases passed. Full combined source/visual/security/device gates remain open.
+- Actual pre-video pricing/account UI had 16 zero-axe/overflow captures. Visual
+  review found a photo label saying Title; fixed to existing Photos translations
+  with a negative regression. Seven account-card cases and lint pass. No
+  production opening, migration, main merge or deployment occurred.
+
+### Upload boundary review — 2026-10-03
+
+- Recorded a remaining verified boundary: upload routes sniff MIME and count
+  actual bytes, but width/height still come from validated client fields. Existing
+  tests prove signature/byte admission, not complete image-content/dimension
+  validation. Actual encoded-dimension/malformed-input proof remains a launch
+  hardening task. No runtime or deployed behavior changed in this review.
+
+### Current integrated verification — 2026-10-03
+
+- Combined actual D1 passed 31 cases after the public Free projection expectation
+  added preset capacity. Full types, scoped lint, 185 real-auth/shared and 13
+  corrected UI cases passed; rendered/global/security/device/release gates remain.
+- Isolated video `4ca0d8c` passed all 18 Linux WebKit native cases in workflow
+  37107837587, including original exact native/library waveform and presentation
+  assertions. It is not yet merged into the launch candidate.
+- Bounded probes did not reproduce static HTTP 500 responses. A selected original
+  run passed iPhone photo/Android bulk but omitted the desktop viewer's serial
+  setup. That failure is retained; the exact owner/viewer pair is being selected.
+  No dispatcher, deadline or assertion was changed.
+
+### Payer lifecycle integration — 2026-10-03 (candidate)
+
+- Merged the billing deletion/ban correction while retaining public admission
+  reservation, activation and failure cleanup. Auth now quiesces a payer before
+  credential removal, confirms provider closure, and retains credentials on
+  failure without undoing a concurrent moderation ban. Closed authorities permit
+  final deletion across late webhook/cron leases; live-owner fences prevent
+  subsequent grant/provisioning. Bans suspend immediately and use existing cron
+  retry for provider outages. No job/history/deletion-adapter framework was added.
+- Corrected source passed 17 isolated D1 cases, nine lifecycle regressions and
+  types/lint. Integrated real-auth/shared checks passed 185 cases. Combined D1
+  initially passed 30/31; its one public projection fixture expected four fields
+  before the new preset allowance. Updated that exact expected field; final
+  combined verification is running. Full provider/security/browser gates remain.
+
+### Saved-preset capacity — 2026-10-03 (candidate)
+
+- Bounded cloud saved presets at Free 20, Pro 1,000, Team 2,000 and private/retained
+  1,000 per workspace. Added indexed usage and live admission inside the existing
+  preset writer plus migration 0025 for direct INSERT/destination enforcement.
+  Existing data survives migration/downgrade; read, edit, delete and exact offline
+  replay remain available while additional creation is bounded.
+- Displayed the allowance on pricing/account cards using existing translations
+  and locale-aware numbers. Initial 47 real-auth/shared cases and six actual SQL
+  cases passed. UI/type checks caught a wrong locale key and DOM/Node URL fixture
+  mismatch; both were corrected. Final combined/visual gates are still pending.
+- Monthly cloud-operation budgets, actual economics and full M19 certification
+  remain open. No production flag, migration, secret or deployment changed.
+
+- Combined frozen creation, billing and public-admission changes against common
+  `c8fccc4` using three-way merges. Preserved source snapshots and their hashes;
+  resolved overlapping primary provisioning, service containers and fixture
+  dependencies without dropping an authority. This is an integration candidate;
+  combined executable/visual checks and full release gates remain pending. No
+  production flag, provider write, deployment or main publication was performed.
+  Independent installation succeeded with the known audit blocker. Combined types
+  passed after removing a duplicated fixture import; focused Node checks passed
+  147 cases and shared/UI contracts 44. Real combined workerd passed all 21 cases
+  across public admission, creation, billing and auth-flow files. The overlapping
+  device/lint runs do not certify timing. Complete static/visual/release checks
+  remain required. Integration review removed a duplicated quota error mapping;
+  deliberate HTTP responses keep their status while raw quota failures receive
+  409. Sixteen focused error cases, whole-tree formatting and all 69 changed code
+  paths under ESLint passed.
+
+- Prepared a real SDK native/direct asset comparison with fan-out, aborts, byte
+  integrity and refused body isolation. Safe diagnostics use finite classes only.
+  Syntax/scoped lint passed after test style corrections; runtime reproduction is
+  pending and the gate dispatcher remains unchanged. The original creation device
+  run ended 129 passed, 14 failed and one not run; it is not certification.
+
+- Imported the separate Lumafoil Stripe account receipt: the account, test monthly
+  Pro $9/Team $24 catalog and cancellation portal were verified. Live charges,
+  payouts and business details remain disabled; no customers, payments,
+  subscriptions, production webhook or Worker secrets were provisioned.
+
 - Hosted source `b616cd0` passed all 2,931 covered cases and retained coverage
   floors, but two D1 legacy account-isolation fixtures failed the new seat guard.
   Their setup now explicitly seeds the historical two-member grant before
   inserting that old roster. This keeps production admission strict and retains
-  the original migration/rollback assertions. Corrected D1 execution is pending.
+  the original migration/rollback assertions. Corrected execution passed all
+  eleven cutover/access D1 cases. Follow-up source `c8fccc4` passed its normal
+  publication hook and was pushed; complete hosted verification stopped at the dependency audit, as recorded above.
 
 - Added real-auth Node capacity negatives for a distinct fourth account: direct
   grant and bearer acceptance both refuse, current members retain reads and no

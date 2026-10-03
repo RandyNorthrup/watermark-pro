@@ -12,7 +12,9 @@ import {
   watermarkDtoSchema,
   watermarkListResponseSchema,
 } from '../../shared/api-watermark'
-import { HTTP_STATUS, LOGO_CONTENT_TYPES, MAX_LOGO_BYTES } from '../../shared/constants'
+import { CLOUD_OPERATION_POLICY } from '../../shared/cloud-operations'
+import { HTTP_STATUS, MAX_LOGO_BYTES, MAX_LOGO_SIDE } from '../../shared/constants'
+import { workspaceCapacity } from '../../shared/plans'
 import type { WatermarkSpec } from '../../shared/watermark'
 import type { AppContext } from '../app-context'
 import { assetToDto, watermarkToDto } from '../dto'
@@ -23,7 +25,7 @@ import type { AssetRecord, WatermarkRecord } from '../stores'
 import { contentDigest, payloadFingerprint, syncOperationId } from '../sync'
 import { cleanupUploads, persistUpload } from '../upload-lifecycle'
 import { UPLOAD_POLICY } from '../upload-store'
-import { SNIFF_LENGTH, sniffImageType } from '../uploads'
+import { readImageUpload } from '../uploads'
 
 const ASSET_CACHE_CONTROL = 'private, no-store'
 
@@ -114,6 +116,9 @@ export const libraryRoutes = new Hono<AppContext>()
         }
         return c.json(watermarkDtoSchema.parse(watermarkToDto(existing)), HTTP_STATUS.ok)
       }
+      const limit = workspaceCapacity(await c.get('services').plans.get(organizationId)).presets
+      if ((await watermarks.countForOrganization(organizationId)) >= limit)
+        throw apiErrors.quotaExceeded()
       const record = await watermarks.create(
         {
           id,
@@ -224,7 +229,7 @@ export const libraryRoutes = new Hono<AppContext>()
   .post(
     '/orgs/:orgId/assets',
     requireSession,
-    requirePermission({ watermark: ['create'] }),
+    requirePermission({ watermark: ['create'] }, CLOUD_OPERATION_POLICY.weights.upload),
     async (c) => {
       const organizationId = c.req.param('orgId')
       const services = c.get('services')
@@ -250,21 +255,15 @@ export const libraryRoutes = new Hono<AppContext>()
       if (!fields.success) {
         throw apiErrors.validation(fields.error.issues)
       }
-      const bytes = await file.arrayBuffer()
-      const contentType = sniffImageType(new Uint8Array(bytes.slice(0, SNIFF_LENGTH)))
-      if (
-        contentType === null ||
-        !(LOGO_CONTENT_TYPES as readonly string[]).includes(contentType)
-      ) {
-        throw apiErrors.unsupportedMedia()
-      }
+      const image = await readImageUpload(file, MAX_LOGO_BYTES, MAX_LOGO_SIDE, fields.data)
+      const { bytes, contentType } = image
       const session = c.get('session')
       const operationId = syncOperationId(c.req.raw)
       const id = operationId ?? crypto.randomUUID()
       const digest = await contentDigest(bytes)
       const leaseId = crypto.randomUUID()
       const key = logoKey(organizationId, id, `${leaseId}/${digest}`)
-      const uploadFields = fields.data
+      const uploadFields = { ...fields.data, width: image.width, height: image.height }
       function assertMatching(record: AssetRecord) {
         if (
           record.createdBy !== session.user.id ||
@@ -289,11 +288,11 @@ export const libraryRoutes = new Hono<AppContext>()
         key,
         contentType,
         size: bytes.byteLength,
-        width: fields.data.width,
-        height: fields.data.height,
+        width: image.width,
+        height: image.height,
         createdBy: session.user.id,
       }
-      const fingerprint = await payloadFingerprint({ digest, ...fields.data })
+      const fingerprint = await payloadFingerprint({ digest, ...uploadFields })
       const outcome = await persistUpload(
         services,
         {

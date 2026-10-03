@@ -91,16 +91,20 @@ passed exact-commit implementation quality, SAST and all 144 device journeys in
 workflow `37009328785`; final prompt captures were viewed. M19 release gates and
 deployment remain separate, and no production enforcement is claimed.
 
-### Stripe account boundary — 2026-10-02
+### Stripe account boundary — 2026-10-03
 
-Lumafoil must use a new separate Stripe business account under the owner's login.
+Lumafoil uses a new separate Stripe business account under the owner's login.
 The first renewed CLI authorization selected an unrelated account and performed
 readback only; no catalog, payments or remote secrets were provisioned there.
 A CLI project/profile name is a local credential label, not an account-creation
 operation. Verify the actual Lumafoil account ID and test/live mode before every
 provisioning batch; fail closed on mismatch. The official Stripe Codex plugin is
 installed and enabled, but that does not establish an authenticated Lumafoil
-connection. Dashboard sign-in/account creation is still pending at this checkpoint.
+connection. The separate account and test monthly catalog/portal are verified in
+[the current account receipt](verification/m19/stripe-account-2026-10-03.md).
+Live charges/payouts and submitted business details remain false. Complete actual
+business activation, fees/tax review, permanent scoped credentials and sandbox
+lifecycle verification before enabling billing. Public registration remains closed.
 
 Service keys remain outside the public repository and are never pasted into chat,
 CLI arguments, screenshots or logs. The local CLI credentials file is readable
@@ -146,6 +150,94 @@ For that legacy transition, apply the remote schema migrations separately,
 perform and verify the guarded private-workspace split, and only then run the
 deployment command. Do not let its automatic migration-and-publish sequence
 expose the new application before the required data split is complete.
+
+### Stripe subscription candidate and activation
+
+The backend candidate's exact API, account boundary, dependency version,
+reconciliation policy and remaining gates are recorded in
+[Stripe subscriptions](plans/stripe-subscriptions.md). It requires ordered
+migrations 0022 and 0023. Billing remains disabled when all Stripe variables are
+absent; partial configuration fails closed. No live setting has been provisioned.
+
+Before activation, authenticate the owner in Dashboard and create/verify the
+separate Lumafoil business account. Read its actual account ID, sandbox/live mode,
+charges/payouts capabilities, country/currency, fees, statement descriptor and
+support identity. A named CLI profile is not provider account verification. Never
+reuse the unrelated AppBag business account or its CLI keys. Do not print secrets.
+
+Only after account verification and successful sandbox lifecycle tests, create
+or verify exact active licensed monthly USD Pro $9 and Team $24 prices, and an
+active portal configuration with subscription updates disabled and cancellation
+at period end. No annual catalog, trials, coupon or extra-seat settings are
+supported. Exact-price reconciliation currently rejects tax-adjusted, credited,
+prorated and multi-payment invoices: certify the tax/credit policy before enabling
+any such catalog or account behavior.
+
+Register the self-account snapshot webhook at `/api/billing/stripe/webhook` with
+API 2026-08-26.dahlia. Subscribe only to checkout.session.completed,
+checkout.session.async_payment_succeeded, customer.subscription.created/updated/
+deleted, invoice.paid/payment_failed/payment_action_required, charge.refunded,
+and charge.dispute.created/updated/closed. Use that endpoint's signing secret;
+a local listener signing secret is not a production endpoint secret. Set only
+matching account/mode credentials; Worker secret storage holds the secret key and
+signing secret, while account/mode/price/portal IDs may be plain configuration.
+The CLI's temporary credential is not the long-lived production Worker secret.
+
+Account billing status is read-only at GET /api/me/billing. After returning to
+/app/account, the payer explicitly refreshes the relevant pro/team financial
+scope through POST /api/me/billing/reconcile. It uses current provider objects,
+the same lease and generation fencing as a verified webhook, and can recover a
+completed Team purchase without relying on a browser return as payment evidence.
+An open Checkout is resumed; a different name requires explicit provider-verified
+pending Checkout cancellation before replacement. Do not treat local expiry as
+proof that a session or subscription cannot charge.
+
+For delivery failure, inspect sanitized status and event IDs, verify account/mode
+and provider connectivity, then resend the same Stripe event. Receipts and leases
+make retries safe. Do not edit paid_plan or paid_through manually to unblock an
+invoice, and do not acknowledge a failed event as completed. A held lease returns
+503 and must be retried; expired leases are fenced from committing. Downgrades
+preserve data and existing membership; excess new writes or member admission are
+refused by existing atomic quota guards.
+
+The lifecycle candidate closes self/admin removal before Better Auth removes
+credential rows. It temporarily bans through a unique server-only banReason
+marker, closes pending Checkout or immediately cancels the bound subscription
+without a new invoice/proration, and verifies terminal chargeability under the
+existing fenced lease. A busy lease or provider failure returns
+`BILLING_CLOSURE_PENDING`; credentials remain and only the unchanged temporary
+marker is rolled back. Concurrent moderator bans are retained. Paid suspension
+and cleared local paidThrough remain after failed removal. Sign in, then use the
+account's explicit billing Refresh action (POST reconcile) to verify and recover
+a valid provider period, or retry removal. The isolated actual D1 cases prove
+this recovery; full integrated/provider gates remain open.
+
+A provider-confirmed closed payer can be deleted across a later webhook/cron
+lease. All financial acquire/commit operations require the bound live owner;
+late commits fail and removed-owner signed replay becomes an ignored receipt.
+Security bans suspend immediately and register provider closure in background
+work. Banned chargeable rows remain eligible for the existing cron retry. A
+provider outage can delay remote cancellation. Do not clear chargeability or
+delete payer rows to resolve that outage; restore configured account/mode/provider
+connectivity and let the fenced closure confirm terminal state.
+
+An unrelated local deletion failure after confirmed provider closure may leave
+`billing-account-removal-<uuid>` in banReason. Review provider-confirmed closure
+for every financial scope before clearing only that temporary marker and retrying
+local removal. Never clear a moderation reason or reinstate paid capacity through
+manual edits. Financial transfer and retention policy still need a reviewed
+workflow. The candidate is not claimed privacy-complete or production-certified.
+
+The original billing payer must keep owner membership while a subscription or
+live pending Checkout can charge. Ownership/workspace changes require terminal
+provider cancellation and reconciliation first. Account removal runs immediate
+closure in its guarded path; portal period-end cancellation is not immediate
+closure. A new owner cannot
+enter the previous payer's portal; validated financial ownership transfer and
+retention/deletion schedules remain open pre-launch decisions. No deletion script
+should remove billing receipts/customer/subscription references until financial
+retention obligations are explicitly decided. Application content deletion and
+Stripe financial retention are separate operations.
 
 ### Deploy
 

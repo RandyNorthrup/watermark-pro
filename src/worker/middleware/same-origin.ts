@@ -1,5 +1,6 @@
 import { createMiddleware } from 'hono/factory'
 
+import { BILLING_POLICY } from '../../shared/billing'
 import type { AppContext } from '../app-context'
 import { apiErrors } from '../errors'
 
@@ -17,7 +18,10 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
  * so this closes the remaining gap for JSON and text bodies.
  */
 export const requireSameOrigin = createMiddleware<AppContext>(async (c, next) => {
-  if (SAFE_METHODS.has(c.req.method)) {
+  if (
+    SAFE_METHODS.has(c.req.method) ||
+    (c.req.method === 'POST' && c.req.path === BILLING_POLICY.webhookPath)
+  ) {
     await next()
     return
   }

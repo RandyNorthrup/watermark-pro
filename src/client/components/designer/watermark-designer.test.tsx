@@ -50,6 +50,24 @@ it('inserts symbols at the text selection with undo and refuses to exceed the te
   expect(screen.getByText(/Text is full/)).toBeVisible()
 })
 
+it('shows a successfully saved preset even while a subsequent network refresh remains unresolved', async () => {
+  const user = userEvent.setup()
+  const { queryClient, router } = renderApp('/app/library/new')
+  const name = await screen.findByLabelText('Watermark name')
+  await user.type(name, 'Durably saved fixture')
+  const refresh = Promise.withResolvers<undefined>()
+  const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockReturnValue(refresh.promise)
+  await user.click(screen.getByRole('button', { name: 'Save watermark' }))
+  await waitFor(() => expect(router.state.location.pathname).toBe('/app/library'))
+  expect(
+    await screen.findByRole('link', { name: 'Open Durably saved fixture in the editor' }),
+  ).toBeVisible()
+  expect(invalidate).toHaveBeenCalled()
+  expect(screen.queryByRole('button', { name: 'Loading Save watermark' })).toBeNull()
+  expect(screen.queryByRole('link', { name: 'Open Unsaved fixture in the editor' })).toBeNull()
+  refresh.resolve(undefined)
+})
+
 it('undoes form/spec changes and supports native modifier shortcuts without losing kind drafts', async () => {
   const user = userEvent.setup()
   renderApp('/app/library/new')

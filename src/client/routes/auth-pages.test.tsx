@@ -36,7 +36,7 @@ describe('landing page', () => {
       screen
         .getAllByRole('link')
         .some((link) => link.getAttribute('href')?.startsWith('/signup') === true),
-    ).toBe(false)
+    ).toBe(true)
   })
 
   it('sends signed-in standard users straight to the editor', async () => {
@@ -55,7 +55,8 @@ describe('landing page', () => {
 describe('sign in', () => {
   it('does not offer public signup without an invitation return path', async () => {
     renderApp('/login')
-    expect(await screen.findByText(/Lumafoil is invite-only/)).toBeInTheDocument()
+    await screen.findByLabelText('Email')
+    expect(screen.queryByText(/invite-only/)).toBeNull()
     expect(screen.queryByRole('link', { name: 'Create an account' })).toBeNull()
   })
 

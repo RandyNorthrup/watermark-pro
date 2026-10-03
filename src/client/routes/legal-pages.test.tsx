@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { APP_SOURCE_URL, LEGAL_LINKS } from '../../shared/constants'
@@ -12,16 +12,74 @@ beforeEach(() => {
 })
 
 describe('factual privacy and terms', () => {
-  it('explains private admission, offline copies and chosen providers with usable private contact links', async () => {
+  it('describes staged personal cleanup and preserved collaborative/audit/billing records without immediate erasure', async () => {
+    renderApp('/privacy')
+    const account = await screen.findByRole('region', { name: 'Your account' })
+    expect(
+      within(account).getByText(/only for your verified sole-owner personal workspace/),
+    ).toBeInTheDocument()
+    expect(
+      within(account).getByText(
+        /files enter background cleanup and may remain while retries finish/,
+      ),
+    ).toBeInTheDocument()
+    expect(
+      within(account).getByText(
+        /Collaborative or ambiguous workspaces, audit records and billing receipts are preserved/,
+      ),
+    ).toBeInTheDocument()
+    expect(
+      within(account).getByText(
+        /does not erase downloaded files, copies on other devices or provider backups/,
+      ),
+    ).toBeInTheDocument()
+    expect(
+      within(account).getByText(/local saves on the current device after confirmed removal/),
+    ).toBeInTheDocument()
+    expect(
+      within(account).queryByText(/does not erase downloaded, offline/),
+    ).not.toBeInTheDocument()
+    expect(
+      within(account).getByText(/while your account remains; retry account removal/),
+    ).toBeInTheDocument()
+  })
+  it('discloses hosted Stripe billing references without collecting full cards or workspace content', async () => {
+    renderApp('/privacy')
+    const billing = await screen.findByRole('region', { name: 'Payments' })
+    expect(billing.querySelectorAll('p')).toHaveLength(1)
+    expect(within(billing).getByText(/Stripe hosts those pages/)).toBeInTheDocument()
+    expect(
+      within(billing).getByText(/customer, Checkout, subscription and invoice IDs/),
+    ).toBeInTheDocument()
+    expect(
+      within(billing).getByText(
+        /payment-event receipts, subscription status and paid-through dates/,
+      ),
+    ).toBeInTheDocument()
+    expect(
+      within(billing).getByText(/no photos, videos, documents, logos or saved watermark content/),
+    ).toBeInTheDocument()
+    expect(
+      within(billing).getByText(/Lumafoil does not collect or store full card numbers/),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/October 3, 2026/).closest('time')).toHaveAttribute(
+      'datetime',
+      '2026-10-03',
+    )
+  })
+  it('explains verified registration, offline copies and chosen providers with private contact links', async () => {
     renderApp('/privacy')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Privacy')
     expect(
-      screen.getByText(/New accounts require an invitation and a verified email/),
+      screen.getByText(
+        /Account registration depends on current availability and requires a verified email/,
+      ),
     ).toBeInTheDocument()
     expect(screen.getByText(/Account-scoped copies and queued edits/)).toBeInTheDocument()
     expect(
-      screen.getByText(/does not share the inviter’s workspace or content/),
+      screen.getByText(/Workspace access requires an explicit grant from its owner/),
     ).toBeInTheDocument()
+    expect(screen.queryByText(/invitation|inviter/i)).not.toBeInTheDocument()
     expect(screen.getByText(/includes no analytics beacon/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'support@lumafoil.com' })).toHaveAttribute(
       'href',
@@ -46,15 +104,17 @@ describe('factual privacy and terms', () => {
       screen.getByText(/selected cloud transfers and sharing send content/),
     ).toBeInTheDocument()
     expect(screen.getByText(/Disconnected devices can retain local copies/)).toBeInTheDocument()
-    expect(screen.getByText(/grants no site administration rights/)).toBeInTheDocument()
     expect(
-      screen.getByText(/explicitly grant View or Edit access to that workspace/),
+      screen.getByText(/Your photos and presets stay separate unless you explicitly share them/),
     ).toBeInTheDocument()
-    expect(screen.getByText(/This shares no other workspace/)).toBeInTheDocument()
+    expect(screen.getByText(/Workspace access requires a grant from its owner/)).toBeInTheDocument()
+    expect(screen.queryByText(/automatically.*(share|access)/i)).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'support@lumafoil.com' })).toHaveAttribute(
       'href',
       LEGAL_LINKS.support,
     )
     expect(screen.queryByText(/never.*shared with third parties/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Payments' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/Stripe hosts/)).not.toBeInTheDocument()
   })
 })
