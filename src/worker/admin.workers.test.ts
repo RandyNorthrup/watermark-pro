@@ -15,6 +15,7 @@ import { getServices } from './services'
 import { adminOrganizationListSchema } from '../shared/api'
 import { HTTP_STATUS } from '../shared/constants'
 import { joinAsMember, TestClient } from './test-support/client'
+import { createRetainedWorkspaceFixture } from './test-support/retained-workspace-fixture'
 
 const app = createApp()
 const owner = {
@@ -47,11 +48,13 @@ describe('platform administration over D1', () => {
     await client.signUpAndVerify(harness().mailbox, owner)
     studioId = await client.createOrganization('Admin Studio', 'admin-studio')
     await joinAsMember(harness(), client, studioId, editor, 'editor')
-    soloId = await client.createOrganization('Solo Org', 'solo-org')
+    const { db } = getServices(env)
+    const [actor] = await db.select({ id: user.id }).from(user).where(eq(user.email, owner.email))
+    if (actor === undefined) throw new Error('Admin fixture owner is missing')
+    soloId = await createRetainedWorkspaceFixture(db, actor.id, 'Solo Org', 'solo-org')
     // An organization with no members at all only exists through a direct
     // delete; it separates count(member.id) from a bare count() over the join.
-    emptyId = await client.createOrganization('Empty Org', 'empty-org')
-    const { db } = getServices(env)
+    emptyId = await createRetainedWorkspaceFixture(db, actor.id, 'Empty Org', 'empty-org')
     await db.delete(member).where(eq(member.organizationId, emptyId))
   })
 

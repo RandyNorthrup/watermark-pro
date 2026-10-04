@@ -15,6 +15,7 @@ import { createApp } from '../index'
 import { getServices } from '../services'
 import { TestClient } from '../test-support/client'
 import { responseJson, responseStatus } from '../test-support/response'
+import { createRetainedWorkspaceFixture } from '../test-support/retained-workspace-fixture'
 
 const ownerAccount = {
   name: 'D1 Folder Owner',
@@ -39,7 +40,12 @@ describe('folder transactions in real D1', () => {
     userId = sessionSchema.parse(await responseJson(client.get('/api/auth/get-session'))).user.id
   })
   async function workspace() {
-    const id = await client.createOrganization('Folders', `folders-${crypto.randomUUID()}`)
+    const id = await createRetainedWorkspaceFixture(
+      getServices(env).db,
+      userId,
+      'Folders',
+      'folders',
+    )
     return { id, path: `/api/orgs/${id}/folders` }
   }
   async function create(

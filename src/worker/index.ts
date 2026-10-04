@@ -17,6 +17,8 @@ import { EnvValidationError } from './env'
 import type { ApiError, HealthResponse } from '../shared/api'
 import { API_ERROR_CODE, HEALTH_PATH, HSTS_MAX_AGE_SECONDS, HTTP_STATUS } from '../shared/constants'
 import { authenticationDiagnostic } from './auth/logger'
+import { isWorkspaceCreationQuotaFailure } from './auth/workspace-creation'
+import { apiErrors } from './errors'
 import { limitApiRequestBody } from './middleware/body-limit'
 import { requireSameOrigin } from './middleware/same-origin'
 import { accountRoutes } from './routes/accounts'
@@ -156,6 +158,7 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
     if (error instanceof HTTPException) {
       return error.getResponse()
     }
+    if (isWorkspaceCreationQuotaFailure(error)) return apiErrors.conflict().getResponse()
     if (error instanceof EnvValidationError) {
       console.error(error.message)
       const body: ApiError = { error: API_ERROR_CODE.invalidConfiguration }

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
+import { privateWorkspaceSchema } from '../../shared/api-accounts'
 import {
   FOLDER_POLICY,
   folderListSchema,
@@ -225,10 +226,9 @@ describe('workspace folders through authenticated APIs', () => {
   it('moves presets atomically and refuses foreign items, stale versions and nonempty folders', async () => {
     const { owner, path, harness, ownerId, organizationId } = await fixture()
     const folder = await createFolder(owner, path, 'Presets')
-    const foreignId = await owner.createOrganization(
-      'Another Workspace',
-      'another-folder-workspace',
-    )
+    const foreignId = privateWorkspaceSchema.parse(
+      await responseJson(owner.post('/api/me/workspace', {})),
+    ).organizationId
     for (const [id, workspace] of [
       ['first', organizationId],
       ['second', organizationId],

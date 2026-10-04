@@ -50,8 +50,35 @@ describe('workspace access persists and authorizes atomically in D1', () => {
     ownerId = userSchema.parse(await responseJson(owner.get('/api/auth/get-session'))).user.id
     otherId = userSchema.parse(await responseJson(other.get('/api/auth/get-session'))).user.id
   })
-  async function workspace() {
-    const id = await owner.createOrganization('Access Proof', `access-${crypto.randomUUID()}`)
+  async function workspace(currentOwnerId = ownerId) {
+    const { db } = getServices(env)
+    const fixtureId = crypto.randomUUID()
+    await db.insert(user).values({
+      id: fixtureId,
+      name: 'Historical access creator',
+      email: `${fixtureId}@example.test`,
+      emailVerified: true,
+      membershipCohort: 'private',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    const id = crypto.randomUUID()
+    await db.insert(organization).values({
+      id,
+      name: 'Access Proof',
+      slug: `access-${fixtureId}`,
+      createdAt: new Date(),
+      creationOwnerId: fixtureId,
+    })
+    // These independent access cases retain multiple workspaces after ownership
+    // transfer; each historical creator used one slot and provenance stays fixed.
+    await db.insert(member).values({
+      id: crypto.randomUUID(),
+      organizationId: id,
+      userId: currentOwnerId,
+      role: 'owner',
+      createdAt: new Date(),
+    })
     return { id, path: `/api/orgs/${id}/access` }
   }
   async function seatCandidates(prefix: string) {
@@ -467,7 +494,7 @@ describe('workspace access persists and authorizes atomically in D1', () => {
     expect(chargesAfterDeletion).toHaveLength(WORKSPACE_ACCESS_POLICY.sendsPerWindow)
     const third = await workspace()
     expect(await responseStatus(owner.post(`${third.path}/members`, input))).toBe(429)
-    const otherWorkspace = await other.createOrganization('Other Sender', 'other-budget-sender')
+    const { id: otherWorkspace } = await workspace(otherId)
     expect(
       await responseStatus(
         other.post(`/api/orgs/${otherWorkspace}/access/members`, {

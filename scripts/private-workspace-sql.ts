@@ -36,8 +36,8 @@ SELECT CASE WHEN EXISTS (SELECT 1 FROM organization WHERE id = ${target})
   AND (SELECT COUNT(*) FROM photo) = 0
   AND (SELECT COUNT(*) FROM share) = 0
 THEN 1 ELSE 0 END;`,
-    `INSERT INTO organization (id, name, slug, created_at)
-SELECT 'personal-' || id, 'My workspace', 'personal-' || id, CAST(unixepoch('subsec') * 1000 AS INTEGER) FROM user;`,
+    `INSERT INTO organization (id, name, slug, created_at, creation_owner_id, creation_kind)
+SELECT 'personal-' || id, 'My workspace', 'personal-' || id, CAST(unixepoch('subsec') * 1000 AS INTEGER), id, 'personal' FROM user;`,
     `INSERT INTO member (id, organization_id, user_id, role, created_at)
 SELECT 'personal-' || id, 'personal-' || id, id, 'owner', CAST(unixepoch('subsec') * 1000 AS INTEGER) FROM user;`,
     "INSERT INTO private_workspace (user_id, organization_id) SELECT id, 'personal-' || id FROM user;",

@@ -4,11 +4,57 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-04 (workspace-capacity source-only restack preparation)
+Last updated: 2026-10-04 (workspace-creation aligned local gates)
 
 ---
 
 ## 1. Product summary
+
+### Workspace creation restack — 2026-10-04
+
+The next billing prerequisite is isolated above merged seat main `1a52fb2`,
+whose tree is identical to PR #25's reviewed `cfde1b7`. Metadata-only base
+alignment preserves all 28 candidate hashes. Twenty-one original runtime/test/SQL leaves apply cleanly, with all
+fourteen existing preimages exact; obsolete AGENTS/dependency/scanner changes
+are excluded. Authenticated creation uses live account grants and an atomic D1
+INSERT guard; immutable provenance preserves historical/private content and
+prevents role transfers from opening additional creation slots. Public paid
+creation remains the signed-billing writer's separate next requirement.
+
+Missing 0022 metadata is generated genuinely in scratch. The schema now records
+the index/kind check already enforced by authored SQL; metadata adds only two
+organization columns, their index, owner SET NULL foreign key and kind check.
+Every other table, old property and journal entry remains. Generated rebuild DDL
+reads absent new columns and omits backfill/triggers, so only metadata is copied;
+original SQL is preserved. The first absolute-output invocation's error/zero
+exit is retained and the corrected relative-output generation is verified.
+Current focused real-auth/schema tests pass 38 across five files, populated
+SQLite passes four and actual D1 passes 49 across six complete files. Forced
+full types and corrected scoped lint/format pass. Original template-indent
+lint failure and explicit unsupported-SQL formatter invocation remain failed
+setup history; no assertion, rule or deadline changes. One unchanged complete
+`npm run quality` now passes on the frozen 28 paths: 2,964 covered cases across
+264 files, 86 actual workerd cases across 21 files, every original coverage floor,
+all static/publication/audit/script/asset gates and the production build. Coverage
+is 92.59% statements, 85.50% branches, 92.40% functions and 93.52% lines; audit
+findings are zero. Pinned SAST passes 510 rules on 2,183 tracked files with zero
+findings; 15 oversized files are skipped. The known quality process group closes;
+later native child identities were not all sampled. Executable source hashes
+remain exact; only factual documentation is updated after these gates.
+Fresh canonical onboarding/private-account E2E passes 16 cases across all four
+devices with two workers, original waits, local zero retries and axe/reflow checks.
+Real personal preparation, shared creation, limited viewer access, separate private
+accounts and bounded invitation/revocation flows reach their assertions. Four
+quota PNGs are actually viewed by Root: error/actions/capacity copy are readable
+with no observed horizontal overflow. The existing iPhone full-page footer
+crosses the invitations heading; that visual limitation remains unresolved.
+Onboarding has no explicit success PNG, and no whole-UI certificate is inferred.
+All 18 captured IDs/five groups and the captured profile close, port 5273 is free,
+and only the verified fresh gate directory is removed; later child sampling limits
+remain. Next are Root's final source review, normal publication and new exact-head
+hosted gates; no provider action or public launch is included.
+M19 remains open; existing private access, public plans and all later additions
+remain required without opaque monthly units or a shared customer budget.
 
 ### Atomic workspace seats preparation — 2026-10-04
 

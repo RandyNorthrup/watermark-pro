@@ -4,6 +4,11 @@ import {
   SITE_INVITATION_POLICY,
   type MembershipCohort,
 } from '../../shared/api-accounts'
+import {
+  PRIVATE_PLAN_CAPACITY,
+  WORKSPACE_CREATION_KIND,
+  type WorkspaceCreationKind,
+} from '../../shared/plans'
 import { canManageSite, SITE_ROLE, type AssignableSiteRole } from '../../shared/site-roles'
 import type { AccountStore, ReferralLinkRecord, SiteInvitationRecord } from '../account-store'
 import { referralAdmissionHash } from '../referral'
@@ -17,7 +22,14 @@ interface AccountTables {
     banned?: boolean | null
     membershipCohort?: MembershipCohort
   }[]
-  organization: { id: string; name: string; slug: string; createdAt: Date }[]
+  organization: {
+    id: string
+    name: string
+    slug: string
+    createdAt: Date
+    creationOwnerId?: string | null
+    creationKind?: WorkspaceCreationKind
+  }[]
   member: { id: string; organizationId: string; userId: string; role: string; createdAt: Date }[]
 }
 
@@ -238,6 +250,8 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
           name: 'My workspace',
           slug: organizationId,
           createdAt: new Date(),
+          creationOwnerId: userId,
+          creationKind: WORKSPACE_CREATION_KIND.personal,
         })
         tables.member.push({
           id: organizationId,
@@ -249,6 +263,22 @@ export function createMemoryAccountStore(tables: AccountTables): AccountStore {
         workspaces.set(userId, organizationId)
       }
       return Promise.resolve(organizationId)
+    },
+    canCreateSharedWorkspace(userId) {
+      const isEligible = tables.user.some(
+        (person) =>
+          person.id === userId &&
+          person.membershipCohort === MEMBERSHIP_COHORT.private &&
+          person.emailVerified === true &&
+          person.banned !== true,
+      )
+      const created = tables.organization.filter(
+        (workspace) =>
+          workspace.creationOwnerId === userId &&
+          (workspace.creationKind === WORKSPACE_CREATION_KIND.shared ||
+            workspace.creationKind === WORKSPACE_CREATION_KIND.historical),
+      ).length
+      return Promise.resolve(isEligible && created < PRIVATE_PLAN_CAPACITY.sharedWorkspaces)
     },
     isPrivateWorkspace(organizationId) {
       return Promise.resolve(workspaces.values().toArray().includes(organizationId))
