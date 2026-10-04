@@ -145,7 +145,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
   }
   const accounts = createMemoryAccountStore(tables)
   const plans = createMemoryPlanStore(tables, accounts)
-  const workspaceAccess = createMemoryWorkspaceAccessStore(tables, audit)
+  const workspaceAccess = createMemoryWorkspaceAccessStore(tables, audit, plans)
   const assets = createMemoryAssetStore()
   const photos = createMemoryPhotoStore()
   const organizations = createMemoryOrganizationStore(tables)
@@ -164,6 +164,7 @@ export function createTestHarness(options: TestHarnessOptions = {}): TestHarness
     appUrl: config.APP_URL,
     email: mailbox,
     accounts,
+    plans,
     reserveWorkspaceInvitation: async (organizationId, actorId, invitationId) =>
       await workspaceAccess.reserveInvitationEmail(organizationId, actorId, invitationId),
     accountOAuth: options.accountOAuth,

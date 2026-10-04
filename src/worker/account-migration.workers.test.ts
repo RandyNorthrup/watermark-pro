@@ -31,6 +31,11 @@ beforeEach(async () => {
       'legacy-fixture',
       now,
     ),
+    // This fixture represents an existing roster from before plan admission,
+    // rather than a new public workspace buying a second seat.
+    env.DB.prepare(
+      "UPDATE workspace_plan SET base_plan = 'legacy', base_member_limit = 2, retained_member_limit = 2 WHERE organization_id = ?",
+    ).bind(LEGACY_ORGANIZATION),
     env.DB.prepare(
       'INSERT INTO member (id,organization_id,user_id,role,created_at) VALUES (?,?,?,?,?)',
     ).bind('legacy-member-a', LEGACY_ORGANIZATION, FIRST, 'owner', now),

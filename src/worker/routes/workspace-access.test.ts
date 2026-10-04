@@ -50,6 +50,41 @@ async function fixture() {
   return { harness, owner, other, organizationId, personal, otherPersonal, path }
 }
 describe('explicit workspace access with real authenticated accounts', () => {
+  it('refuses both a direct grant and a bearer for a distinct account when all private seats are occupied', async () => {
+    const { harness, owner, other, path, personal } = await fixture()
+    const second = new TestClient(harness.app, harness.env)
+    const denied = new TestClient(harness.app, harness.env)
+    await second.signUpAndVerify(harness.mailbox, NEW)
+    const third = { ...NEW, name: 'Capacity denied account', email: 'capacity-denied@example.test' }
+    await denied.signUpAndVerify(harness.mailbox, third)
+    for (const email of [OTHER.email, NEW.email]) {
+      expect(
+        await responseStatus(
+          owner.post(`${path}/members`, { email, role: 'viewer', notify: false }),
+        ),
+      ).toBe(204)
+    }
+    const link = workspaceLinkCreatedSchema.parse(
+      await responseJson(owner.post(`${path}/links`, { role: 'editor', days: 7 })),
+    )
+    const token = new URL(link.url).pathname.split('/').at(-1) ?? ''
+    expect(
+      await responseStatus(
+        owner.post(`${path}/members`, { email: third.email, role: 'editor', notify: false }),
+      ),
+    ).toBe(409)
+    expect(
+      await responseStatus(denied.post(`/api/me/workspace-invitations/${token}/accept`, {})),
+    ).toBe(404)
+    const access = workspaceAccessSchema.parse(await responseJson(owner.get(path)))
+    expect(access.members).toHaveLength(3)
+    expect(access.members.some((member) => member.email === third.email)).toBe(false)
+    expect(await responseStatus(other.get(`/api/orgs/${personal}/watermarks`))).toBe(200)
+    expect(await responseStatus(denied.get(`/api/orgs/${personal}/watermarks`))).toBe(403)
+    expect(
+      harness.audit.records.filter((record) => record.action === 'workspace_access.accepted'),
+    ).toEqual([])
+  })
   it('silently grants View, changes to Edit, revokes access, and never shares another workspace', async () => {
     const { harness, owner, other, path, personal, organizationId, otherPersonal } = await fixture()
     const before = harness.mailbox.messages().length

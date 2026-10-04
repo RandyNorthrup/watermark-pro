@@ -20,6 +20,11 @@ import { TEST_SECRET } from '../test-support/test-app'
 const options = buildAuthOptions({
   database: memoryAdapter({}),
   accounts: createMemoryAccountStore({ user: [], organization: [], member: [] }),
+  plans: {
+    get() {
+      throw new Error('Schema-only fixture has no workspace records.')
+    },
+  },
   hasWorkspaceContent: () => Promise.resolve(false),
   secret: TEST_SECRET,
   appUrl: 'http://localhost:5273',

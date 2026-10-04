@@ -7,6 +7,32 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Atomic workspace seats preparation — 2026-10-04
+
+- Prepared original PR17's two-commit atomic-seat/retained-roster delta above
+  merged capacity main `4e7dce7`, preserving prior branches/source. Excluded four
+  obsolete scanner changes and their unrelated layout receipt; original seat
+  behavior and meaningful permission/quota/race/rollback negatives remain.
+- Preserved current guards, role/recent proof, generation metadata and gate/
+  dependency controls. Three documentation conflicts retain current history.
+  Corrected original 0021 generation drift using only reviewed genuine Drizzle
+  snapshot/journal output. Old schema/journal chain remains; original authored
+  SQL/backfill/trigger is exact and generated rebuild SQL is not applied.
+- Retained both original PR17 CI failures: old cutover fixture rejection and
+  subsequent braces-audit refusal. Fresh owned installation passes with zero
+  audit findings. Corrected 25-path scoped format/lint/fresh types pass, followed
+  by 37 Node, four populated SQL and 37 actual D1 cases with zero failures/skips.
+  Both old cutover fixtures and meaningful race/denied-audit/rollback boundaries
+  reach assertions. Known runtime closes; short-run native child capture limits
+  remain explicit. Full quality then passes 2,955 covered and 82 workerd cases,
+  all original floors/gates/build and zero audit findings. Pinned SAST passes
+  510 rules on 2,174 tracked targets with zero findings and 15 oversized skips.
+- Canonical onboarding/recent-auth E2E passes 12 cases across four devices,
+  unchanged waits/local zero retries/axe/reflow. Root views all four fresh
+  credential dialogs; text/actions fit. Known processes/groups/port close and
+  only verified owned gate storage is removed. New hosted checks/publication
+  remain; original two CI failures, final Starter/Free policy and M19 stay open.
+
 ### Workspace-capacity alignment — 2026-10-04
 
 - Reapplied the reviewed 33-path foundation above merged main `3e7991a` in a new

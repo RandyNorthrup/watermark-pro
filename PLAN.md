@@ -10,6 +10,44 @@ Last updated: 2026-10-04 (workspace-capacity source-only restack preparation)
 
 ## 1. Product summary
 
+### Atomic workspace seats preparation — 2026-10-04
+
+Prepared original PR #17's exact `b616cd0` plus `c8fccc4` seat delta in a new
+owned tree above merged capacity main `4e7dce7` (tree identical to verified
+`23742a5`). The 28-path original scope becomes 23 paths after excluding four
+obsolete publication-scanner files and their unrelated layout receipt. Runtime/
+test/migration leaves preserve retained/private rosters, conditional D1 grants/
+acceptance, compatibility insert guard, actual membership-based receipts/audit
+and meaningful fourth-member/last-seat/expiry/rollback negatives. Only three
+documentation conflicts require resolution; current main history is preserved.
+Existing role, recent-proof, protected-field, startup/gate and dependency/scanner
+controls remain. Original PR17's two failed runs stay attributed to their hashes:
+`37081765884` hit historical cutover fixtures, and `37085396339` hit the later
+braces audit; neither is replaced by capacity PR24's passing checks.
+
+Migration 0021's original generation drift is corrected with real installed
+Drizzle output reviewed by Root. Only the genuine snapshot/journal extension is
+copied: one retained-member column/check, all older table definitions and 21
+journal entries unchanged, chained to the verified 0020 snapshot. Generated
+rebuild SQL selects the absent new column from the old table and omits authored
+backfill/trigger behavior; it is not executed or copied. Original SQL remains
+exact. Fresh normal owned installation passes with zero audit findings. The
+candidate now has 25 paths. Scoped format/lint and fresh full types pass.
+Complete real-role/shared-plan/schema proof passes 37 cases, populated actual
+SQL passes four and complete D1 access/cutover/upload proof passes 37 (zero
+failures/skips). Last-seat direct/bearer races, denied receipts/audits, auth
+rollback, paid suspension, retained rosters and both old cutover fixtures reach
+their assertions. Known runtime closes; native child identity capture is limited
+in the short run. Root then releases one unchanged complete quality command:
+2,955 covered cases, 82 workerd cases and all original floors/gates/build pass;
+full audit findings are zero. Pinned SAST passes 510 rules on 2,174 tracked targets
+with zero findings and 15 oversized skips. Canonical onboarding/recent-proof
+E2E passes 12 cases across four devices with original waits, local zero retries,
+axe/reflow and four fresh prompt captures actually viewed by Root. Known IDs/
+groups and port 5273 close; only verified owned gate storage is removed.
+Normal hooks/publication and new exact-head hosted checks remain before merge;
+provider/live activation, final Starter/Free policy and M19 remain open.
+
 ### Workspace-capacity alignment — 2026-10-04
 
 Reapplied only the reviewed 33-path capacity/metadata delta above protected main
@@ -261,7 +299,10 @@ Authorized members see limits without billing identifiers or private admission
 state. Upload admission reads authority inside the D1 write, and commit rechecks
 expiry/suspension before metadata, audit and lease completion. Historical data
 and grants are retained; no production migration or payment activation occurred.
-The current implementation and unexecuted test status are recorded in
+Source `fdd55f2` passed all seven exact-commit hosted jobs in run `37024827798`:
+2,926 covered cases, 78 workerd cases, retained coverage floors, SAST and all
+144 device journeys. One Android journey used existing retries. The implementation
+receipt and earlier failed attempts are recorded in
 `docs/verification/m19/workspace-capacity-2026-10-02.md`.
 
 Working private-sharing assumption, pending the owner's optional clarification:
