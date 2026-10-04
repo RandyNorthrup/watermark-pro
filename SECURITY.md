@@ -228,7 +228,7 @@ Only the `main` branch and the latest tagged release receive fixes.
   quality, SAST and the 136-journey four-device Playwright/axe matrix; local
   challenge cases and viewed English/Arabic light/dark auth captures passed.
   Live-provider verification and complete M19 release certification remain open.
-- Private membership (M19, final gates pending): server-owned membership is
+- Private membership (M19, exact-commit implementation gates passed; release/deployment pending): server-owned membership is
   independent of payment and workspace/site roles. Historical accounts retain
   their cohort and grants; new rows remain pending until server admission. A
   revoked-during-creation invitation cannot activate a pending account through
@@ -241,6 +241,19 @@ Only the `main` branch and the latest tagged release receive fixes.
   Unused rotation/revocation releases reservations; independent rate limits
   continue to bound repeated mail/link operations. Production public signup and
   billing entitlement enforcement have not yet launched.
+- Recent credential proof (M19 candidate; final certification/deployment pending):
+  a server session field with `input: false` records successful password or
+  validated identity sign-in. Nullable migration leaves old sessions unproved.
+  Sensitive custom invitation/access/share/deletion/admin and reserved billing
+  mutations, cloud credentials/connection changes and auth-plugin security
+  mutations require proof from the preceding ten minutes. Missing, malformed,
+  future or expired proof is refused. Verification, challenge success, payment,
+  profile/session fields and renewal do not establish or extend it. Ordinary
+  authorized reads/saves/editing remain available. Reauthentication never grants
+  a role or membership; selected workspaces are rechecked before carryover. Both
+  browser transports provide an account-bound prompt without automatic replay.
+  Full-page sign-in follows the session-only editor lifecycle; the prompt tells
+  users to save or export unfinished edits before leaving.
 - Platform administration (M8): a separate `admin` role checked server-side
   by `requirePlatformAdmin` on the organization and audit listing routes and
   by Better Auth's admin plugin on user management. Bans (with a mandatory

@@ -100,6 +100,12 @@
       "failed": "La verificación ha fallado. Recarga esta página e inténtalo de nuevo.",
       "unavailable": "La verificación no está disponible. Comprueba tu conexión y recarga esta página.",
       "retry": "Reintentar la verificación humana"
+    },
+    "recent": {
+      "title": "Vuelve a iniciar sesión",
+      "body": "Este cambio sensible no se aplicó. Vuelve a iniciar sesión y reinténtalo. Volverás a esta página. Guarda o exporta primero los cambios sin terminar.",
+      "cancel": "Seguir trabajando",
+      "signIn": "Iniciar sesión de nuevo"
     }
   },
   "dashboard": {

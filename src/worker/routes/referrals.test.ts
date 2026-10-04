@@ -46,6 +46,7 @@ async function fixture() {
     body: JSON.stringify(OWNER),
   })
   await owner.get(findLink(harness.mailbox, OWNER.email, '/api/auth/verify-email'))
+  await owner.signIn(OWNER)
   return { harness, owner }
 }
 
@@ -89,6 +90,7 @@ describe('reusable private referral links', () => {
     )
     expect(sent.invitations).toEqual([])
     await other.get(findLink(harness.mailbox, OTHER.email, '/api/auth/verify-email'))
+    await other.signIn(OTHER)
     const otherLink = referralLinkSchema.parse(
       await responseJson(other.post('/api/me/referral-link', {})),
     )

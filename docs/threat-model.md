@@ -41,7 +41,16 @@ added (a new binding, a new public route, a new third-party origin).
 The human-control runtime source passed full implementation gates in draft PR #12.
 The private-membership amendment remains under final verification; neither its
 migration nor a new production deployment is claimed. Private payment/cohort
-quotas and recent authentication remain tracked in `docs/plans/public-billing.md`.
+quotas and recent-authentication certification remain tracked in
+`docs/plans/public-billing.md`. The recent-credential candidate adds nullable
+server-owned session proof rather than trusting session creation time, browser
+dates, challenge success or payment. Email verification and renewal cannot
+advance it. Both custom sensitive APIs and auth-plugin mutation seams require
+proof from the preceding ten minutes; cloud token/connection operations share
+that boundary. Reauthentication retains only a still-authorized workspace and
+never replays a mutation. Missing/future/malformed/expired proof, role negatives,
+verification/renewal replay and account changes require real-auth/D1/browser
+evidence before this candidate is certified or deployed.
 
 ### Spoofing
 

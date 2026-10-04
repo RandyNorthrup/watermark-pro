@@ -2,8 +2,12 @@
 
 Status: design and research completed on 2026-10-01. Human-verification runtime
 source `b908155` passed full quality, SAST and four-device browser gates on
-2026-10-02 in draft PR #12. Private cohort/two-invite implementation is under final verification; paid
-quota and payment implementation remains open;
+2026-10-02 in draft PR #12. Private cohort/two-invite runtime and its final
+documentation head passed all seven exact-commit CI jobs, including the expanded
+140-journey device matrix. Recent credential proof passed complete local quality
+before its final save/export warning. Final wording passed focused/catalogue
+checks and all four dedicated browser/axe journeys with reviewed actual captures;
+the expanded 144-journey exact-commit matrix remains in progress. Paid quota and payment implementation remains open;
 public registration and subscriptions have not shipped.
 
 ## Owner decisions
@@ -156,7 +160,7 @@ provider bans to the launch flow without a concrete need and privacy review.
 
 ## Recent authentication requirements
 
-The next security slice uses a ten-minute server-owned credential proof tied to
+The current security candidate uses a ten-minute server-owned credential proof tied to
 the current session and account. Password sign-in and validated identity-provider
 sign-in may establish that proof. Challenge completion, email verification,
 session renewal, payment, profile updates and client timestamps cannot establish
@@ -188,8 +192,15 @@ Source verification on 2026-10-02: [Better Auth session freshness and updates](h
 [server database hooks and additional fields](https://better-auth.com/docs/concepts/database),
 the pinned `node_modules/better-auth/dist/api/routes/email-verification.mjs` and
 `session.mjs`, and [OWASP authentication guidance](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html).
-This section specifies pending implementation; no recent-authentication control
-is claimed as shipped or certified.
+The candidate implementation is on `codex/recent-authentication`. Complete local
+quality, real D1 wiring and four-device browser/axe with viewed prompt captures
+passed before the final save/export warning. That final wording passed focused
+prompt/catalogue checks and its fresh four-device visual/axe journey. Final SAST
+passed with zero findings; exact-commit hosted canonical quality/full device
+matrix remain in progress.
+No migration, release or production enforcement is claimed. Cloud connection,
+token retrieval and disconnection also require proof. Same-account sign-in retains
+only a selected workspace whose current membership still exists.
 
 ## Billing and tenant security
 
@@ -272,7 +283,8 @@ Human-verification implementation checks are complete for runtime source
 `b908155`; its draft PR remains unmerged. Private/public cohort boundaries and atomic two-new-invitation grants are
 verified for `08834df` in workflow `36992631513`. All 140 browser/axe cases
 ultimately passed; the unrelated iPhone gallery case used the existing retry.
-Next implement recent authentication, plan quotas and payment state.
+Finish recent authentication's final wording and exact-commit gates, then
+implement authoritative plan quotas and payment state.
 Stripe account authentication remains unconfirmed; no catalog or charge has been
 created. Video/navigation regressions and full M19 release audits remain open.
 No later milestone is started.

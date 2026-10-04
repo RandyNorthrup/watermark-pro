@@ -18,7 +18,10 @@ const PERSON = {
 const TOKEN = 'valid-oauth-admission-token'
 const AUTHORIZATION = z.object({ url: z.url() })
 const SESSION = z
-  .object({ user: z.object({ email: z.email(), emailVerified: z.boolean() }) })
+  .object({
+    user: z.object({ email: z.email(), emailVerified: z.boolean() }),
+    session: z.object({ credentialVerifiedAt: z.coerce.date().nullish() }),
+  })
   .nullable()
 const PROVIDERS = ['google', 'microsoft'] as const
 const LEGACY_USER_ID = 'legacy-oauth-user'
@@ -269,6 +272,7 @@ describe.each(PROVIDERS)('%s account OAuth admission', (provider) => {
     const completed = await client.get(flow.callback)
     expect(completed.headers.get('location')).toContain('/app')
     const currentSession = SESSION.parse(await responseJson(client.get('/api/auth/get-session')))
+    expect(currentSession?.session.credentialVerifiedAt).toBeInstanceOf(Date)
     expect(currentSession?.user.email).toBe(PERSON.email)
     expect(await context.adapter.count({ model: 'user' })).toBe(2)
     expect(await context.adapter.count({ model: 'member' })).toBe(0)
@@ -303,6 +307,7 @@ describe.each(PROVIDERS)('%s account OAuth admission', (provider) => {
     const returning = await start()
     expect(await responseStatus(client.get(returning.callback))).toBe(302)
     const returningSession = SESSION.parse(await responseJson(client.get('/api/auth/get-session')))
+    expect(returningSession?.session.credentialVerifiedAt).toBeInstanceOf(Date)
     expect(returningSession?.user.email).toBe(PERSON.email)
     expect(await context.adapter.count({ model: 'user' })).toBe(2)
   })
@@ -367,6 +372,7 @@ describe.each(PROVIDERS)('%s account OAuth admission', (provider) => {
     const verify = findLink(harness.mailbox, PERSON.email, '/api/auth/verify-email')
     expect(await responseStatus(client.get(verify))).toBeLessThan(400)
     const verifiedSession = SESSION.parse(await responseJson(client.get('/api/auth/get-session')))
+    expect(verifiedSession?.session.credentialVerifiedAt).toBeNull()
     expect(verifiedSession?.user.emailVerified).toBe(true)
   })
   it('does not implicitly attach an OAuth identity to an existing password account', async () => {

@@ -1,7 +1,7 @@
 /** Eager route metadata validates untrusted URLs without loading the application's form-schema framework. */
 import { z } from 'zod/mini'
 
-import { EMAIL_MAX_LENGTH, MAX_AUTH_ERROR_LENGTH } from './constants'
+import { EMAIL_MAX_LENGTH, MAX_AUTH_ERROR_LENGTH, MAX_AUTH_REDIRECT_LENGTH } from './constants'
 import { invitationIdSchema } from './invitation'
 
 const authCallbackErrorSchema = z.optional(z.string().check(z.maxLength(MAX_AUTH_ERROR_LENGTH)))
@@ -9,6 +9,7 @@ const authCallbackErrorSchema = z.optional(z.string().check(z.maxLength(MAX_AUTH
 const REDIRECT_STRIPPED_CHARACTERS = ['\r', '\n', '\t'] as const
 export const accountSearchSchema = z.object({ error: authCallbackErrorSchema })
 const redirectSchema = z.string().check(
+  z.maxLength(MAX_AUTH_REDIRECT_LENGTH),
   z.startsWith('/'),
   z.refine((path) => !path.startsWith('//') && !path.includes('\\')),
   z.refine((path) => REDIRECT_STRIPPED_CHARACTERS.every((character) => !path.includes(character))),

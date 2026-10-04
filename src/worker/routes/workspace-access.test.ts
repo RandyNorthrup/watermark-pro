@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
@@ -31,6 +31,7 @@ const NEW = {
 }
 const sessionSchema = z.object({ user: z.object({ id: z.string() }) })
 const permissionResultSchema = z.object({ success: z.boolean() })
+afterEach(() => vi.restoreAllMocks())
 async function fixture() {
   const harness = createTestHarness()
   const { client: owner, organizationId } = await signUpOwner(harness, OWNER, {
@@ -277,6 +278,7 @@ describe('explicit workspace access with real authenticated accounts', () => {
     )
     expect(observed8).toBe(200)
     await invited.get(findLink(harness.mailbox, NEW.email, '/api/auth/verify-email'))
+    await invited.signIn(NEW)
     expect(await responseStatus(invited.get(`/api/orgs/${personal}/watermarks`))).toBe(403)
     expect(
       await responseStatus(invited.post(`/api/me/workspace-invitations/${token}/accept`, {})),
@@ -305,6 +307,7 @@ describe('explicit workspace access with real authenticated accounts', () => {
     const token = new URL(created.url).pathname.split('/').at(-1) ?? ''
     const realNow = Date.now()
     vi.spyOn(Date, 'now').mockReturnValue(realNow + 2 * 86_400_000)
+    await other.signIn(OTHER)
     expect(
       await responseStatus(other.post(`/api/me/workspace-invitations/${token}/accept`, {})),
     ).toBe(404)
