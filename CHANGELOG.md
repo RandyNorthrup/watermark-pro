@@ -7,6 +7,33 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Workspace-capacity alignment — 2026-10-04
+
+- Reapplied the reviewed 33-path foundation above merged main `3e7991a` in a new
+  owned tree, preserving the old branch/source/patch/modules. Only additive
+  PLAN/CHANGELOG conflicts required resolution; new startup/gate/privacy source,
+  existing auth, current 0019 metadata and dependency controls remain intact.
+- Focused role/plan/upload proof passes 33 cases, populated actual migration
+  passes three and complete real D1 upload bindings pass 26, with zero failures/
+  skips. Existing configurations/deadlines remain. The captured runner and
+  candidate-CWD runtime are closed; native child identities were not captured
+  in the short run. Original `fdd55f2` hosted evidence remains historical;
+  new hosted gates still require Root review. No public launch or paid activation
+  is claimed.
+- One unchanged complete quality command passes 2,950 covered cases, all original
+  floors (85.47% branches), 78 real workerd cases and every static/source/audit/
+  script/asset/build gate. Full audit findings are zero. Pinned SAST passes 510
+  rules on 2,171 tracked targets with zero findings and 15 oversized skips.
+  Original source CI remains historical; this new aligned branch has no hosted
+  check or publication proof. M19 and final public/Starter policy remain open.
+- Fresh canonical gallery/share/onboarding E2E passes all 16 cases across four
+  devices, including real saved/downloaded image dimensions, role/visitor
+  refusal/revocation and existing zero-axe/reflow assertions. Waits and local
+  zero retries are unchanged. Captured processes/groups close and port 5273 is
+  free; one exact verified owned gate directory is removed after teardown.
+  Later Chromium/profile identities were not sampled; no whole-UI or hosted
+  certificate is inferred. Final source review precedes normal publication.
+
 ### Verified startup/transport/privacy correction — 2026-10-04
 
 - Complete combined quality passes 2,927 covered cases, 69 actual workerd cases
@@ -115,6 +142,25 @@ what was planned; superseded entries stay.
   main is still `10aae802`. This new combined source has no fresh installation,
   complete gates, build, preview, audit or publication proof at initial handoff.
   Next: Root manifest review, owned installation and released heavy verification.
+
+### Workspace-capacity restack preparation — 2026-10-04
+
+- Replayed original PR #16's single capacity commit above current main `8354602`
+  on a new owned branch. All original capacity behavior and meaningful role,
+  tenant, write-time quota, concurrency and retained-content tests remain.
+  Resolved only additive PLAN/CHANGELOG conflicts; old references are unchanged.
+- Preserved current auth/administrative guards, generated 0019 metadata and
+  dependency/publication controls. Package changes only add the existing plan
+  migration regression to the bootstrap command. Corrected original 0020
+  generation drift using reviewed real Drizzle output: only the eight-column
+  workspace-plan snapshot and journal extension are copied. All 26 old tables,
+  the 0019 chain, original SQL/backfill/three triggers and main data remain.
+- Original `fdd55f2` hosted green remains attributed to that hash. This preparation
+  now has a normal fresh owned install with zero audit findings and one successful
+  scratch generation; no tests, build, visual, new CI or publication proof.
+  Source preparation contains 33 paths after metadata correction. Alignment to
+  post-video/release main precedes executable gates; M19 and public-launch
+  certification stay open. Confirmed final Starter/media policy remains required.
 
 ### Recent Authentication Restack Preparation — 2026-10-03
 
@@ -264,8 +310,27 @@ what was planned; superseded entries stay.
   normal installation; this main-based tree has not been installed or certified.
   M19 and exact-source quality/security/device/merge gates remain open.
 
+### Workspace capacity — 2026-10-02 (unverified candidate)
+
+- Added explicit server plan records, historical-grant migration and member-only
+  capacity projection. Public plan limits remain separate from private access,
+  invitations, roles and organization metadata.
+- Upload admission and metadata commit now read live paid-period/suspension
+  authority inside their D1 conditions. Audit and completion are fenced by the
+  actual reservation-bound insert; pending cleanup continues to consume quota.
+- Added plan, authenticated role/tenant, concurrency, downgrade and recovery
+  regression cases. Focused shared/Node cases, real D1 admission and actual
+  migration checks passed. Canonical static/publication/dependency gates cleared;
+  2,925 covered cases passed with floors retained, while a cron fixture lacked
+  its new explicit plan record. Fixed that fixture and its twelve focused cases
+  passed. Complete final-source canonical/SAST certification remains pending.
+  No subscriptions, production migration or public launch occurred.
+
 ### Recent credential proof — 2026-10-02 (unreleased candidate)
 
+- Updated the implementation receipt, checklist and operations status after all
+  exact-commit gates passed. Corrected the threat model's obsolete tag-deployment
+  description to the current main-only, fully gated production policy.
 - Added save/export guidance before the full-page credential sign-in, since its
   navigation follows the existing session-only unfinished-edit lifecycle.
   All twelve prompt messages include it. The preceding complete local quality
@@ -273,7 +338,9 @@ what was planned; superseded entries stay.
   bundle floor retained. Final wording passed focused/catalogue checks and all
   four built browser/axe journeys; their actual captures were reviewed. Final
   SAST passed 510 rules over 2,152 files with zero findings. Exact-commit hosted
-  canonical quality and the full 144-journey matrix remain pending.
+  canonical quality and the full 144-journey matrix then passed for runtime
+  `77f6a9a` in CI `37009328785`. Three unrelated journeys used existing retries;
+  all new credential journeys passed first attempts. No merge or deployment occurred.
 - Visual review of the credential prompt found mobile background text visible
   through the glass surface. The dialog now uses an opaque theme surface;
   screenshot evidence captures its viewport. The initial new browser journey

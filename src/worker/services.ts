@@ -25,6 +25,7 @@ import {
 } from './db/library-stores'
 import { createDrizzleObservabilityStore } from './db/observability-store'
 import { createDrizzleOrganizationStore } from './db/organization-store'
+import { createDrizzlePlanStore } from './db/plan-store'
 import { createDrizzleRecentStore } from './db/recent-store'
 import * as schema from './db/schema'
 import { createDrizzleUploadStore } from './db/upload-store'
@@ -36,6 +37,7 @@ import type { EmailSender } from './email/sender'
 import { validateEnv, type ValidatedEnv } from './env'
 import type { FolderStore } from './folder-store'
 import type { GuidanceStore } from './guidance-store'
+import type { PlanStore } from './plan-store'
 import type { RecentStore } from './recent-store'
 import type {
   AssetStore,
@@ -51,6 +53,7 @@ import type { UploadStore } from './upload-store'
 import type { WorkspaceAccessStore } from './workspace-access-store'
 
 export interface Services {
+  plans: PlanStore
   uploads: UploadStore
   config: ValidatedEnv
   db: Database
@@ -110,6 +113,7 @@ export function buildServices(config: ValidatedEnv): Services {
   const db = createDatabase(config.DB)
   const audit = createDrizzleAuditStore(db)
   const accounts = createDrizzleAccountStore(db)
+  const plans = createDrizzlePlanStore(db)
   const workspaceAccess = createDrizzleWorkspaceAccessStore(db)
   const uploads = createDrizzleUploadStore(db)
   const { email, devMailbox } = createEmailSender(config)
@@ -162,6 +166,7 @@ export function buildServices(config: ValidatedEnv): Services {
     guidance: createDrizzleGuidanceStore(db),
     recents: createDrizzleRecentStore(db),
     uploads,
+    plans,
     audit,
     watermarks: createDrizzleWatermarkStore(db),
     assets: createDrizzleAssetStore(db),

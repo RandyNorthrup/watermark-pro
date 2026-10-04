@@ -4,11 +4,39 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-03 (recent-authentication restack complete local gates)
+Last updated: 2026-10-04 (workspace-capacity source-only restack preparation)
 
 ---
 
 ## 1. Product summary
+
+### Workspace-capacity alignment — 2026-10-04
+
+Reapplied only the reviewed 33-path capacity/metadata delta above protected main
+`3e7991a`, after PR #23 merged. A new owned tree and branch preserve the prior
+`8354602` preparation, patch and physical modules. Only PLAN/CHANGELOG preimages
+differ; additive resolution retains all new-main startup/gate/privacy history.
+Runtime/test/migration leaves and the generated 0020 correction remain exact to
+their review. New-main source outside that delta, current 0019 metadata,
+dependencies and lock remain preserved. Focused real-auth capacity/shared-plan/
+upload lifecycle passes all 33 cases, populated actual migration passes three,
+and complete real D1 upload bindings pass 26, with zero failures/skips under
+the existing configurations and deadlines. One unchanged complete quality run
+then passes 2,950 covered cases across 262 files, 78 actual workerd cases across
+20 files and every original coverage floor (85.47% branches). All static,
+publication, full audit, later script/asset and build gates pass; audit findings
+are zero. Pinned SAST passes 510 rules on 2,171 tracked targets with zero findings;
+15 oversized files are skipped. Known owned runtime is closed; native child
+identities were not captured during the short focused run. Root's final source/
+receipt review and new exact-head hosted checks remain before publication/merge.
+Fresh canonical gallery/sharing/onboarding E2E also passes all 16 cases across
+four devices with the existing waits, local zero retries, axe and reflow checks.
+Actual R2 save/download/delete, signed visitor refusal/revocation and limited
+viewer membership reach their assertions. Captured processes/groups and port
+5273 close; one verified owned gate directory is removed after teardown.
+Later browser/profile identities were not all sampled, so that capture limit is
+retained. Final Starter/Free launch policy remains required; no payer effect or
+public launch is enabled. M19 stays open.
 
 ### Verified bounded startup/transport/privacy slice — 2026-10-04
 
@@ -171,6 +199,36 @@ publication occurs during this preparation. M19 remains open; next certify this
 combined boundary, then use actual normal-trace evidence for the remaining
 Account/mobile/navigation/Android release failures and ordered billing/editor work.
 
+### Workspace-capacity restack preparation — 2026-10-04
+
+The original PR #16 capacity commit `fdd55f2` is replayed without committing on
+owned branch `codex/restack-workspace-capacity`, above current main `8354602`.
+Its 31-path delta adds only the existing server plan/capacity and conditional
+upload-write boundary, migration 0020 and meaningful role/tenant/race tests.
+Original parent `77f6a9a` and current main share ancestor `1811a4a`; 26 original
+preimages match, and the five differences are documentation/package history.
+Only PLAN/CHANGELOG have additive conflicts; both histories are retained.
+Current auth, the eight-field administrative guard, generated 0019 metadata,
+dependency and publication controls remain intact. The package change only adds
+the existing workspace-plan migration test to `test:bootstrap`.
+
+Original exact-head CI `37024827798` passed on `fdd55f2`; it does not certify this
+new tree. Fresh normal owned installation passes with zero audit findings.
+Actual installed Drizzle generation in isolated scratch adds only the eight-column
+workspace plan; all 26 prior tables and other metadata are exact. Root reviewed
+the generated SQL, chain and journal before copying only the genuine 0020
+snapshot/journal extension. Original SQL/backfill/three triggers and main's
+corrected 0019 files are preserved. This corrects the original generation drift
+without inventing metadata. The candidate now has 33 paths; no types, tests,
+build, browser, push or new CI has run. Align to actual post-video/release main
+before executable proof. Then run the complete existing real-role,
+conditional D1 upload and actual populated migration cases, followed by unchanged
+canonical/security/device gates. Public signup, subscription processing and the
+later seat/creation/Starter/media slices remain separate. Confirmed final policy
+still requires Starter USD 4, five Free image admissions per UTC day, no Free
+Video/Bulk and one-page Free PDFs; the foundation's old catalog does not replace
+that requirement or authorize public launch. M19 stays open.
+
 ### Revised private-admission verification — 2026-10-03
 
 The original private-membership delta is restacked above protected main
@@ -194,6 +252,25 @@ private-policy captures remain required before protected merge. Historical faile
 runs and stock mutation negatives stay recorded. No production activation or
 complete M19 certification is claimed, and feature expansion remains held.
 
+### Workspace-capacity slice — 2026-10-02 (verification pending)
+
+`codex/plan-entitlements` starts the next M19 billing foundation on certified
+credential-proof runtime `77f6a9a`. Shared plan records and migration `0020`
+separate Free, private/historical and time-bounded paid workspace capacity.
+Authorized members see limits without billing identifiers or private admission
+state. Upload admission reads authority inside the D1 write, and commit rechecks
+expiry/suspension before metadata, audit and lease completion. Historical data
+and grants are retained; no production migration or payment activation occurred.
+The current implementation and unexecuted test status are recorded in
+`docs/verification/m19/workspace-capacity-2026-10-02.md`.
+
+Working private-sharing assumption, pending the owner's optional clarification:
+keep one new shared workspace with three members for a private member. Existing
+shared workspaces and grants remain. Public Free/Pro users need Team for new
+shared workspaces. Storage-capacity verification comes first; atomic creation and
+seat limits, then signed subscription reconciliation and checkout/portal are the
+next slices. M19 remains open; no later milestone is started.
+
 ### Public billing and human-verification amendment — 2026-10-01
 
 The owner replaces invite-only public marketing with public Free and monthly USD
@@ -203,8 +280,13 @@ invitee receives two. Public accounts receive no private invitation privilege.
 Selected launch targets are Free, Pro at $9/month and Team at $24/month for three
 members, with explicit storage/member limits and cost assumptions recorded in
 `docs/plans/public-billing.md`. No Enterprise tier or simultaneous video-project
-editing is claimed. The existing Stripe CLI keys are expired/rejected; alternate
-Stripe connection and production billing provisioning remain unverified.
+editing is claimed. On 2026-10-02 the owner clarified that this requires a new
+Lumafoil Stripe account under the existing owner login. The first renewed CLI
+authorization selected an unrelated account; no products, prices, payments or
+remote secrets were created there. The official Stripe Codex plugin is installed
+and enabled, but Lumafoil Dashboard authentication, account creation/verification
+and production billing provisioning remain pending. Local CLI profile names are
+not provider account authority; pin and verify the actual intended account/mode.
 
 The owner explicitly requires privacy, human checks and account trust. A separate
 `codex/public-billing` checkout keeps this implementation isolated from the video
@@ -344,8 +426,10 @@ captures. The final twelve-locale save/export warning postdates that complete
 quality run; it subsequently passed focused prompt/catalogue checks and all four
 fresh built credential journeys with axe and viewed final-wording captures.
 Final SAST passed 510 rules over 2,152 files with zero findings.
-Exact-commit hosted canonical quality and the expanded 144-journey
-matrix remain required. Failed
+Runtime `77f6a9a` then passed all seven jobs in exact-commit CI `37009328785`:
+hosted canonical quality, SAST and the full 144-journey device matrix. Three
+unrelated journeys used existing retries; credential/private controls passed
+first attempts. Implementation certification is complete for this head. Failed
 attempts are recorded in the new receipt. No migration or production release is claimed.
 
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and

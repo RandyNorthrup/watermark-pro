@@ -1,9 +1,7 @@
-import {
-  MAX_LOGOS_PER_ORGANIZATION,
-  MAX_PHOTOS_PER_ORGANIZATION,
-  MAX_STORAGE_BYTES_PER_ORGANIZATION,
-} from '../../shared/constants'
+import { workspaceCapacity } from '../../shared/plans'
 import type { AuditEntry, AuditStore } from '../audit'
+import { apiErrors } from '../errors'
+import type { PlanStore } from '../plan-store'
 import type { AssetStore, OrganizationStore, PhotoStore, WatermarkStore } from '../stores'
 import { UPLOAD_POLICY, type UploadReservation, type UploadStore } from '../upload-store'
 
@@ -13,6 +11,7 @@ interface Dependencies {
   organizations: OrganizationStore
   audit: AuditStore
   watermarks: WatermarkStore
+  plans: PlanStore
 }
 type Reservation = UploadReservation & { status: 'pending' | 'cleanup' | 'committed' | 'deleted' }
 
@@ -23,6 +22,7 @@ export function createMemoryUploadStore({
   organizations,
   audit,
   watermarks,
+  plans,
 }: Dependencies): UploadStore {
   const records = new Map<string, Reservation>()
   const mutex = { tail: Promise.resolve() }
@@ -155,10 +155,9 @@ export function createMemoryUploadStore({
           scoped(input.organizationId).filter(
             (record) => record.kind === input.kind && isActive(record),
           ).length
-        const maximum =
-          input.kind === 'photo' ? MAX_PHOTOS_PER_ORGANIZATION : MAX_LOGOS_PER_ORGANIZATION
-        if (count >= maximum || current.bytes + input.bytes > MAX_STORAGE_BYTES_PER_ORGANIZATION)
-          return 'quota'
+        const capacity = workspaceCapacity(await plans.get(input.organizationId))
+        const maximum = input.kind === 'photo' ? capacity.photos : capacity.logos
+        if (count >= maximum || current.bytes + input.bytes > capacity.storageBytes) return 'quota'
         records.set(input.id, { ...input, status: 'pending' })
         return 'reserved'
       })
@@ -175,6 +174,21 @@ export function createMemoryUploadStore({
           record.kind !== input.kind
         )
           throw new Error('Invalid upload reservation commit')
+        const [current, logos, plan] = await Promise.all([
+          usage(input.organizationId),
+          assets.listForOrganization(input.organizationId, 'logo'),
+          plans.get(input.organizationId),
+        ])
+        const capacity = workspaceCapacity(plan)
+        const count =
+          (input.kind === 'photo' ? current.count : logos.length) +
+          scoped(input.organizationId).filter((item) => item.kind === input.kind && isActive(item))
+            .length
+        if (
+          count > (input.kind === 'photo' ? capacity.photos : capacity.logos) ||
+          current.bytes > capacity.storageBytes
+        )
+          throw apiErrors.quotaExceeded()
         if (record.kind === 'photo') await photos.create(record.value)
         else await assets.create(record.value)
         try {

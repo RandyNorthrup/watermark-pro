@@ -18,12 +18,11 @@ import {
 import {
   HTTP_STATUS,
   MAX_PHOTO_BYTES,
-  MAX_PHOTOS_PER_ORGANIZATION,
-  MAX_STORAGE_BYTES_PER_ORGANIZATION,
   MAX_THUMBNAIL_BYTES,
   PHOTO_CONTENT_TYPES,
   PHOTO_PAGE_SIZE,
 } from '../../shared/constants'
+import { workspaceCapacity } from '../../shared/plans'
 import type { AppContext } from '../app-context'
 import { photoToDto } from '../dto'
 import { apiErrors } from '../errors'
@@ -127,12 +126,18 @@ export const photoRoutes = new Hono<AppContext>()
     requireSession,
     requirePermission({ photo: ['read'] }),
     async (c) => {
-      const usage = await c.get('services').uploads.usage(c.req.param('orgId'))
+      const services = c.get('services')
+      const organizationId = c.req.param('orgId')
+      const [usage, record] = await Promise.all([
+        services.uploads.usage(organizationId),
+        services.plans.get(organizationId),
+      ])
+      const capacity = workspaceCapacity(record)
       return c.json(
         storageUsageSchema.parse({
           ...usage,
-          maxCount: MAX_PHOTOS_PER_ORGANIZATION,
-          maxBytes: MAX_STORAGE_BYTES_PER_ORGANIZATION,
+          maxCount: capacity.photos,
+          maxBytes: capacity.storageBytes,
         }),
         HTTP_STATUS.ok,
       )
