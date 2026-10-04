@@ -8,7 +8,11 @@ import { test } from 'node:test'
 
 import { zipSync } from 'fflate'
 
-import { auditPublication } from './lib/publication-audit.mjs'
+import {
+  auditPublication,
+  chargeUniqueCandidateBytes,
+  publicationCandidateFingerprint,
+} from './lib/publication-audit.mjs'
 import {
   isRetiredHistoryFinding,
   maskRetiredHistoricalSecrets,
@@ -62,7 +66,9 @@ async function fixture(run) {
   }
 }
 function scannerCanary() {
-  return 'test_' + randomBytes(32).toString('hex')
+  // Balanced entropy exceeds the pinned generic rule's 3.5-bit threshold;
+  // restricted letters avoid its dictionary stopwords (random hex can hit them).
+  return 'test_' + 'b6a204973815'.repeat(8)
 }
 
 function googleCanary() {
@@ -426,6 +432,105 @@ test('generic browser-test canary is red without a configured value and clears a
     await writeFile(filename, original)
     const restored = await auditPublication(root)
     assert.equal(restored.status, 'pass')
+  })
+})
+
+test('identical current and historical copies share staging only after every object is inspected', async () => {
+  await fixture(async (root) => {
+    const result = await auditPublication(root)
+    assert.equal(result.status, 'pass')
+    // Three files plus the commit message retain original and neutral copies.
+    // Both trees still receive inspection, without becoming scanner files.
+    assert.equal(result.scannerCopies, 8)
+    assert.equal(result.stats.historyObjects, 6)
+    assert.equal(result.stats.files, 12)
+    const currentFiles = ['.gitleaks.toml', '.gitignore', 'src/sample.browser.test.ts']
+    const current = await Promise.all(currentFiles.map((name) => readFile(path.join(root, name))))
+    const repeated = current.reduce((total, bytes) => total + bytes.length, 0) * 2
+    assert.equal(result.stats.bytes - result.stats.uniqueCandidateBytes, repeated)
+  })
+})
+
+test('different paths and changed bytes are distinct candidate charges', async () => {
+  await fixture(async (root) => {
+    const baseline = await auditPublication(root)
+    const original = await readFile(path.join(root, 'src/sample.browser.test.ts'))
+    await writeFile(path.join(root, 'src/other.browser.test.ts'), original)
+    const otherPath = await auditPublication(root)
+    assert.equal(
+      otherPath.stats.uniqueCandidateBytes - baseline.stats.uniqueCandidateBytes,
+      original.length,
+    )
+    const changed = Buffer.from('export const changed = true\n')
+    await writeFile(path.join(root, 'src/sample.browser.test.ts'), changed)
+    const differentBytes = await auditPublication(root)
+    assert.equal(
+      differentBytes.stats.uniqueCandidateBytes - otherPath.stats.uniqueCandidateBytes,
+      changed.length,
+    )
+    assert.equal(differentBytes.stats.files - otherPath.stats.files, 0)
+  })
+})
+
+test('distinct unique candidate bytes still reject above the unchanged aggregate cap', () => {
+  const stats = { uniqueCandidateBytes: 0 }
+  for (
+    let count = 0;
+    count < PUBLICATION_LIMITS.candidateBytes / PUBLICATION_LIMITS.fileBytes;
+    count += 1
+  )
+    chargeUniqueCandidateBytes(stats, PUBLICATION_LIMITS.fileBytes)
+  assert.equal(stats.uniqueCandidateBytes, PUBLICATION_LIMITS.candidateBytes)
+  assert.throws(() => chargeUniqueCandidateBytes(stats, 1), /Publication byte budget exceeded/u)
+})
+
+test('identical bytes never merge different paths or historical masking treatment', () => {
+  const bytes = Buffer.from('synthetic original publication bytes')
+  const original = publicationCandidateFingerprint('src/example.ts', bytes, 0)
+  assert.equal(publicationCandidateFingerprint('src/example.ts', Buffer.from(bytes), 0), original)
+  assert.notEqual(publicationCandidateFingerprint('src/other.ts', bytes, 0), original)
+  assert.notEqual(publicationCandidateFingerprint('src/example.ts', bytes, 1), original)
+  assert.notEqual(
+    publicationCandidateFingerprint('src/example.ts', Buffer.from('changed bytes'), 0),
+    original,
+  )
+})
+
+test('distinct archive members with the same path never overwrite an earlier unsafe scanner copy', async () => {
+  await fixture(async (root) => {
+    const built = path.join(root, 'dist', 'client')
+    await mkdir(built, { recursive: true })
+    const canary = randomBytes(32).toString('hex')
+    const memberPath = 'src/layout-proof.txt'
+    const config = path.join(root, '.gitleaks.toml')
+    // This path-only fixture rule cannot be satisfied by a neutral copy, so
+    // accidental overwriting of the original-path copy remains distinguishable.
+    await writeFile(
+      config,
+      `${await readFile(config, 'utf8')}\n[[rules]]\nid = "publication-layout-path-proof"\ndescription = "Original path preservation control"\nregex = '''scan-layout-record:([a-f0-9]{64})'''\npath = '''(?:^|/)src/layout-proof[.]txt$'''\nsecretGroup = 1\n`,
+    )
+    await writeFile(
+      path.join(built, 'a.zip'),
+      zip({ [memberPath]: `scan-layout-record:${canary}\n` }),
+    )
+    await writeFile(
+      path.join(built, 'b.zip'),
+      zip({ [memberPath]: 'export const harmless = true\n' }),
+    )
+    const red = await auditPublication(root, 'built')
+    assert.equal(red.status, 'fail')
+    assert.ok(
+      red.findings.some(
+        (finding) =>
+          finding.check === 'gitleaks' &&
+          finding.rule === 'publication-layout-path-proof' &&
+          finding.path === `build:a.zip!${memberPath}`,
+      ),
+    )
+    assert.equal(JSON.stringify(red).includes(canary), false)
+    await rm(path.join(built, 'a.zip'))
+    const green = await auditPublication(root, 'built')
+    assert.equal(green.status, 'pass')
   })
 })
 
