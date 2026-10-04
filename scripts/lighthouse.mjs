@@ -22,6 +22,7 @@ import path from 'node:path'
 
 import { chromium } from '@playwright/test'
 import lighthouse from 'lighthouse'
+import { MainThreadTasks } from 'lighthouse/core/computed/main-thread-tasks.js'
 import desktopConfig from 'lighthouse/core/config/desktop-config.js'
 
 import { prepareLighthouseSurfaces } from './fixtures/lighthouse-surfaces.mjs'
@@ -29,6 +30,7 @@ import { createAuditCertificate } from './lib/audit-certificate.mjs'
 import { launchAuditChrome } from './lib/audit-chrome.mjs'
 import { assertAuditContent } from './lib/audit-content.mjs'
 import { AUDIT_SURFACES } from './lib/audit-surfaces.mjs'
+import { CLIENT_DIR, readManifest } from './lib/bundle-sizes.mjs'
 import { startCompressingProxy } from './lib/compressing-proxy.mjs'
 import {
   budgetFailures,
@@ -68,6 +70,19 @@ const CATALOGUE = JSON.parse(
   await readFile(new URL('../src/client/locales/en/common.json', import.meta.url), 'utf8'),
 )
 
+// Generated source text remains in memory solely for verifying build-listed coordinates.
+const MANIFEST_CHUNKS = Object.values(readManifest())
+const ASSET_SOURCES = new Map(
+  await Promise.all(
+    MANIFEST_CHUNKS.filter((chunk) => /^assets\/[A-Za-z0-9_.-]+\.js$/.test(chunk.file)).map(
+      async (chunk) => [
+        '/' + chunk.file,
+        await readFile(path.join(CLIENT_DIR, chunk.file), 'utf8'),
+      ],
+    ),
+  ),
+)
+
 /**
  * Simulated throttling still starts from observed server timings, which
  * jitter on a workstation; the median of five runs per page is what
@@ -83,12 +98,6 @@ if (
   )
 }
 
-/** The run whose performance score is the median; ties go to the earlier run. */
-function medianRun(runs) {
-  const sorted = runs.toSorted((a, b) => a.scores.performance - b.scores.performance)
-  return sorted[Math.floor((sorted.length - 1) / 2)]
-}
-
 async function auditMedian(origin, chrome, surface) {
   const runs = []
   for (let run = 0; run < RUNS_PER_PAGE; run += 1) {
@@ -99,11 +108,9 @@ async function auditMedian(origin, chrome, surface) {
     }
   }
   const aggregate = summarizeRuns(runs, RUNS_PER_PAGE)
-  const chosen = medianRun(runs)
   await mkdir(REPORT_DIR, { recursive: true })
-  await writeFile(path.join(REPORT_DIR, `${chosen.slug}.html`), chosen.report)
   await writeFile(
-    path.join(REPORT_DIR, `${chosen.slug}.json`),
+    path.join(REPORT_DIR, `${surface.id}.json`),
     JSON.stringify(
       {
         mode: IS_SAMPLE ? 'diagnostic' : 'certification',
@@ -186,10 +193,14 @@ async function auditOwnedPage(origin, chrome, surface, attempt, page, inspection
       cause: contentFailure,
     })
   }
+  const executionTrace = result.artifacts?.Trace
+  const executionTasks =
+    Array.isArray(executionTrace?.traceEvents) && executionTrace.traceEvents.length > 0
+      ? await MainThreadTasks.request(executionTrace, { computedCache: new Map() })
+      : undefined
   const scores = Object.fromEntries(
     Object.entries(result.lhr.categories).map(([key, category]) => [key, category.score ?? 0]),
   )
-  const slug = surface.id
   const metrics = Object.fromEntries(
     Object.entries(LIGHTHOUSE_METRICS).map(([key, auditId]) => [
       key,
@@ -200,9 +211,11 @@ async function auditOwnedPage(origin, chrome, surface, attempt, page, inspection
     scores,
     metrics,
     protocols,
-    diagnostics: lighthouseDiagnostics(result.lhr),
-    slug,
-    report: result.report,
+    diagnostics: lighthouseDiagnostics(result.lhr, {
+      tasks: executionTasks,
+      origin,
+      assetSources: ASSET_SOURCES,
+    }),
   }
 }
 

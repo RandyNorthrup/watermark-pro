@@ -12,6 +12,7 @@ import {
   fixtureJson,
   fixtureLink,
 } from './audit-accounts.mjs'
+import { auditLabel } from '../lib/audit-surfaces.mjs'
 import { ensureTestSiteOwner } from '../lib/test-site-owner.ts'
 
 const PRESET_NAME = 'Studio signature'
@@ -173,6 +174,58 @@ export async function prepareLighthouseSurfaces(origin, surfaces) {
           surface.cookie = await auditCookies(collaborator.context)
           surface.headingText = `Join ${STUDIO_NAME}`
           surface.checks.push({ role: 'button', nameKey: 'auth.acceptInvitation.accept' })
+          break
+        }
+        case 'workspace-invitation': {
+          const sent = await studioContext.post(`/api/orgs/${studio.id}/access/members`, {
+            data: { email: collaborator.person.email, role: 'viewer', notify: true },
+          })
+          if (sent.status() !== 204) throw new Error('Audit workspace invitation was not sent')
+          const destination = new URL(
+            await fixtureLink(
+              collaborator.context,
+              base,
+              collaborator.person.email,
+              '/workspace-invitation/',
+            ),
+            base,
+          )
+          if (
+            destination.origin !== base ||
+            destination.username !== '' ||
+            destination.password !== '' ||
+            destination.search !== '' ||
+            destination.hash !== '' ||
+            !/^\/workspace-invitation\/[a-f0-9-]{72}$/.test(destination.pathname)
+          )
+            throw new Error('Audit workspace invitation returned an unexpected destination')
+          const token = destination.pathname.split('/').at(-1)
+          const previewPath = `/api/me/workspace-invitations/${token}`
+          const preview = await fixtureJson(await collaborator.context.get(previewPath))
+          const unrelatedPreview = await empty.context.get(previewPath)
+          if (
+            preview.workspaceName !== STUDIO_NAME ||
+            preview.role !== 'viewer' ||
+            preview.isMember !== false ||
+            unrelatedPreview.status() !== 404
+          )
+            throw new Error('Audit workspace invitation did not preserve recipient isolation')
+          const catalogue = JSON.parse(
+            await readFile(
+              new URL('../../src/client/locales/en/common.json', import.meta.url),
+              'utf8',
+            ),
+          )
+          surface.pathname = destination.pathname
+          surface.cookie = await auditCookies(collaborator.context)
+          surface.headingText = auditLabel(catalogue, 'workspaceAccess.joinTitle').replace(
+            '{{name}}',
+            () => STUDIO_NAME,
+          )
+          surface.checks.push(
+            { role: 'button', nameKey: 'workspaceAccess.join' },
+            { role: 'link', nameKey: 'workspaceAccess.cancel' },
+          )
           break
         }
         case 'share-public': {

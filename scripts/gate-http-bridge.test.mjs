@@ -4,11 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { request as httpRequest } from 'node:http'
 import { test } from 'node:test'
 
-import {
-  classifyGateFailure,
-  createGateBridge,
-  createNativeGateDispatcher,
-} from './lib/gate-http-bridge.mjs'
+import { classifyGateFailure, createGateBridge } from './lib/gate-http-bridge.mjs'
 import gateRouter from './lib/gate-router-worker.mjs'
 import { loopbackRequest as request } from './lib/test-http-request.mjs'
 
@@ -16,9 +12,8 @@ function expectedFailure() {
   // Intentional client aborts and gateway failures are asserted through their result and signal.
 }
 
-test('native listener restores trusted URL and preserves Origin, account, bytes and cookies while stripping forged routing headers', async () => {
+test('router restores trusted URL and preserves Origin, account, bytes and cookies while stripping forged routing headers', async () => {
   const bridge = await createGateBridge(0)
-  const listener = await createGateBridge(0)
   const cookies = ['first=1; Path=/; HttpOnly', 'second=2; Path=/; SameSite=Lax']
   const inspectRequest = (destination) => ({
     async fetch(request) {
@@ -34,6 +29,8 @@ test('native listener restores trusted URL and preserves Origin, account, bytes 
           origin: request.headers.get('origin'),
           account: request.headers.get('x-lumafoil-account-id'),
           cookie: request.headers.get('cookie'),
+          encoding: request.headers.get('accept-encoding'),
+          cacheControl: request.headers.get('cache-control'),
           internal: request.headers
             .keys()
             .filter((name) => name.startsWith('mf-'))
@@ -44,14 +41,13 @@ test('native listener restores trusted URL and preserves Origin, account, bytes 
       )
     },
   })
-  listener.ready((url, init) =>
+  bridge.ready((url, init) =>
     gateRouter.fetch(new Request(url, init), {
       GATE_ORIGIN: bridge.origin,
       APP: inspectRequest('worker'),
       ASSETS: inspectRequest('assets'),
     }),
   )
-  bridge.ready(createNativeGateDispatcher(listener.origin))
   try {
     for (const [pathname, destination] of [
       ['/api/echo?preserved=yes', 'worker'],
@@ -66,6 +62,7 @@ test('native listener restores trusted URL and preserves Origin, account, bytes 
             origin: 'https://foreign.example',
             'x-lumafoil-account-id': 'account-a',
             cookie: 'session=synthetic',
+            'cache-control': 'no-cache',
             'mf-original-url': 'https://forged.example/api/private',
             'mf-probe': 'untrusted',
             'mf-route-override': 'other-worker',
@@ -80,6 +77,8 @@ test('native listener restores trusted URL and preserves Origin, account, bytes 
         origin: 'https://foreign.example',
         account: 'account-a',
         cookie: 'session=synthetic',
+        encoding: 'identity',
+        cacheControl: 'no-cache',
         internal: [],
         body: 'Exact bytes \u{0} ©',
       })
@@ -88,25 +87,7 @@ test('native listener restores trusted URL and preserves Origin, account, bytes 
     }
   } finally {
     await bridge.close()
-    await listener.close()
   }
-})
-
-test('native listener refuses remote origins, credentials and non-origin URLs', () => {
-  const remote = new URL('http://127.0.0.1/')
-  remote.hostname = 'remote.example'
-  for (const url of [
-    'https://127.0.0.1/',
-    remote,
-    'http://user@127.0.0.1/',
-    'http://user:password@127.0.0.1/',
-    'http://127.0.0.1/path',
-    'http://127.0.0.1/?query=value',
-    'http://127.0.0.1/#fragment',
-  ])
-    assert.throws(() => createNativeGateDispatcher(url), /plain loopback HTTP origin/)
-  for (const url of ['http://127.0.0.1:1234/', 'http://localhost:1234/', 'http://[::1]:1234/'])
-    assert.equal(typeof createNativeGateDispatcher(url), 'function')
 })
 
 async function expectStatus(origin, pathname, status, options = {}, body) {
@@ -216,11 +197,10 @@ test('dispatcher exceptions and mislabeled encoded responses fail without killin
 test('response chunks stream before completion and an unread client cancellation cancels only that request', async (context) => {
   context.mock.method(console, 'error', expectedFailure)
   const bridge = await createGateBridge(0)
-  const listener = await createGateBridge(0)
   const streamed = Promise.withResolvers()
   const cancelled = Promise.withResolvers()
   let requestSignal
-  listener.ready(async (url, init) => {
+  bridge.ready(async (url, init) => {
     if (url.pathname === '/healthy') return new Response('still alive')
     requestSignal = init.signal
     return new Response(
@@ -235,7 +215,6 @@ test('response chunks stream before completion and an unread client cancellation
       }),
     )
   })
-  bridge.ready(createNativeGateDispatcher(listener.origin))
   try {
     const url = new URL(bridge.origin)
     const received = Promise.withResolvers()
@@ -260,17 +239,15 @@ test('response chunks stream before completion and an unread client cancellation
     assert.equal(healthy.bytes.toString(), 'still alive')
   } finally {
     await bridge.close()
-    await listener.close()
   }
 })
 
 test('an upload interrupted after dispatch aborts its body read and leaves the bridge usable', async (context) => {
   context.mock.method(console, 'error', expectedFailure)
   const bridge = await createGateBridge(0)
-  const listener = await createGateBridge(0)
   const entered = Promise.withResolvers()
   const failed = Promise.withResolvers()
-  listener.ready(async (url, init) => {
+  bridge.ready(async (url, init) => {
     if (url.pathname === '/healthy') return new Response('still alive')
     entered.resolve()
     try {
@@ -281,7 +258,6 @@ test('an upload interrupted after dispatch aborts its body read and leaves the b
       throw error
     }
   })
-  bridge.ready(createNativeGateDispatcher(listener.origin))
   try {
     const url = new URL(bridge.origin)
     const client = httpRequest({
@@ -299,7 +275,6 @@ test('an upload interrupted after dispatch aborts its body read and leaves the b
     await expectStatus(bridge.origin, '/healthy', 200)
   } finally {
     await bridge.close()
-    await listener.close()
   }
 })
 
