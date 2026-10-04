@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url'
 import { createTestHarness } from 'wrangler'
 import { z } from 'zod'
 
-import { createGateBridge, createNativeGateDispatcher } from './gate-http-bridge.mjs'
-import { GATE_WORKER_PATTERNS, isGateWorkerPath } from './gate-routing.mjs'
+import { createGateBridge } from './gate-http-bridge.mjs'
+import { GATE_WORKER_PATTERNS } from './gate-routing.mjs'
 
 const SECRET_BYTES = 48
 const GATE_PREFIX = 'run-'
@@ -171,21 +171,15 @@ export async function startGateServer({ root: requestedRoot = process.cwd(), por
       ],
     })
     console.info('Gate startup: starting isolated SDK runtime.')
-    const listener = await harness.listen()
+    await harness.listen()
     console.info('Gate startup: SDK ready; applying local migrations.')
     const worker = harness.getWorker(APP_WORKER_NAME)
     for (const database of config.d1_databases) await worker.applyD1Migrations(database.binding)
     console.info('Gate startup: migrations complete; checking built Worker health.')
-    const nativeDispatch = createNativeGateDispatcher(listener.url)
     const router = harness.getWorker(ROUTER_WORKER_NAME)
-    // Keep application requests and streamed uploads on the proven SDK path:
-    // the listener can poison its next response after an unread upload is refused.
-    // Bodyless static traffic uses pooled HTTP instead of resetting every socket.
-    const dispatch = (url, init) =>
-      init.body !== undefined || isGateWorkerPath(url.pathname)
-        ? router.fetch(url, init)
-        : nativeDispatch(url, init)
-    const health = await dispatch(new URL('/api/health', bridge.origin), {
+    // listen() exposes Wrangler's development proxy; the worker API targets the
+    // runtime directly while the router keeps native ASSETS behavior.
+    const health = await router.fetch(new URL('/api/health', bridge.origin), {
       headers: { 'accept-encoding': 'identity' },
       redirect: 'manual',
     })
@@ -196,7 +190,7 @@ export async function startGateServer({ root: requestedRoot = process.cwd(), por
       healthResult.environment !== 'test'
     )
       throw new Error('The built gate Worker did not report healthy isolated test state.')
-    bridge.ready(dispatch)
+    bridge.ready(router.fetch)
     console.info('Gate startup: built Worker healthy; HTTP bridge ready.')
     return { origin: bridge.origin, close, worker, directory }
   } catch (error) {

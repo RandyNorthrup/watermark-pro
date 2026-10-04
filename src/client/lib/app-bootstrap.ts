@@ -37,9 +37,52 @@ const ONLINE_ONLY_PATHS = [
   '/app/organizations',
 ]
 
-/** Validate the live account before any private cached workspace is admitted. */
-export async function loadAppContext(queryClient: QueryClient, pathname: string) {
+interface PendingBoot {
+  assertReusable: () => void
+  promise: ReturnType<typeof resolveAppContext>
+}
+const pendingBoots = new WeakMap<QueryClient, Map<string, PendingBoot>>()
+
+/** Share only an unfinished admission for the same route and current account epoch. */
+export function loadAppContext(queryClient: QueryClient, pathname: string) {
   installPrivateBoot(queryClient, pathname)
+  const routes = pendingBoots.get(queryClient) ?? new Map<string, PendingBoot>()
+  pendingBoots.set(queryClient, routes)
+  const previous = routes.get(pathname)
+  if (previous !== undefined) {
+    try {
+      previous.assertReusable()
+      return previous.promise
+    } catch {
+      // A newer epoch cannot join old discovery; its existing fences still reject.
+    }
+  }
+  let assertReusable = captureOfflineGeneration().assertCurrent
+  const receiveTransition = (assertCurrent: () => void) => {
+    assertReusable = assertCurrent
+  }
+  const request = resolveAppContext(queryClient, pathname, receiveTransition)
+  async function finishAdmission() {
+    try {
+      return await request
+    } finally {
+      if (routes.get(pathname) === flight) routes.delete(pathname)
+    }
+  }
+  const flight: PendingBoot = {
+    assertReusable: () => assertReusable(),
+    promise: finishAdmission(),
+  }
+  routes.set(pathname, flight)
+  return flight.promise
+}
+
+/** Validate the live account before any private cached workspace is admitted. */
+async function resolveAppContext(
+  queryClient: QueryClient,
+  pathname: string,
+  receiveTransition: (assertCurrent: () => void) => void,
+) {
   const admission = captureOfflineGeneration()
   let hasNetwork = navigator.onLine
   const isOnlineOnly = ONLINE_ONLY_PATHS.some((path) => pathname.startsWith(path))
@@ -85,7 +128,13 @@ export async function loadAppContext(queryClient: QueryClient, pathname: string)
     lockOfflineAccount(queryClient)
     throw redirect({ to: '/login', search: { redirect: pathname } })
   }
-  await activateOfflineAccount(queryClient, session.user.id)
+  let assertActivated = admission.assertCurrent
+  await activateOfflineAccount(queryClient, session.user.id, (assertCurrent) => {
+    assertActivated = assertCurrent
+    receiveTransition(assertCurrent)
+  })
+  // Synchronous account observers may lock or switch even after storage commits.
+  assertActivated()
   if (snapshot !== undefined) {
     seedBootstrapQueries(queryClient, snapshot)
     return {

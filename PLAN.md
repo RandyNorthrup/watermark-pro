@@ -10,6 +10,167 @@ Last updated: 2026-10-03 (recent-authentication restack complete local gates)
 
 ## 1. Product summary
 
+### Verified bounded startup/transport/privacy slice — 2026-10-04
+
+The combined source now passes complete quality (2,927 covered cases, 69 actual
+workerd cases, all original floors/static/publication/audit/script/build gates)
+and pinned SAST (510 rules/2,158 targets/zero findings/fifteen large-file skips).
+Actual Owner Admin content/axe passes with one bootstrap request; its default
+query still lacks a matching navigation Document, a separate open fixture issue.
+Canonical selected E2E passes 24 cases on four devices. Root views nine actual
+captures; existing iPhone invitation heading/dock overlap remains unresolved.
+One normal desktop Login audit passes all five H2/content/budget traces and
+JSON/summary-only privacy controls: scores 100/100/100, FCP 361.264 ms, LCP
+617.264 ms, CLS 0, TBT 36, twenty bounded generated coordinates per trace.
+This is selected proof, not the full UI/release matrix or producer attribution.
+
+Owned processes/gates close; verified generated E2E storage residue is removed
+with its cleanup assertion/sequence failure retained. No raw report is persisted;
+sanitized reports remain privately preserved. Code hashes stay exact after proof.
+Next publish this bounded correction normally, then resolve the separately
+observed Admin canonical fixture and remaining iPhone/full performance budgets.
+Public paid launch, original/additional feature work and M19 remain open; no
+production deployment or complete milestone certification is claimed.
+
+### Combined owned startup and release-gate source — 2026-10-04
+
+Combined prerequisite checks now pass scoped format/lint, fresh full types,
+zero-duplication scanning and all 53 real client cases. The two failed duplicate
+scans remain recorded: four platform setup clones, then one preparation clone.
+The single held-device-lock test fixture now shares both real timing/restore
+and repeated transport/admission rendezvous. Production code, named cases,
+assertions and existing guard/floor/deadline policies remain unchanged. One full
+combined canonical quality/SAST run is next, followed by actual repaired Admin
+and normal five-trace sanitized-output proof; no complete pass is claimed yet.
+
+The independently reviewed startup correction is now combined above protected
+main `8354602`: seventeen paths, comprising eleven existing code paths, five
+documentation paths and the unchanged .gitignore rule with its corrected comment.
+All three startup preimages match main and final code bytes match the frozen
+handoff; the eight gate/privacy code paths and auth/metadata/guard source remain
+preserved. The startup receipt is copied exactly, with no whole PLAN/CHANGELOG
+transplant. Source-only combination is not complete verification.
+
+Same-client/same-path startup shares only an unfinished admission, using the
+existing activation generation and offline fence published at its own reset/
+commit before callbacks. It does not adopt an unrelated ambient epoch. Transport,
+locks, account switches, stale failures and different-route online-only policy
+retain their authority. The loader verifies final owned validity before seeding;
+settled successes/failures are not cached. No dependency, third admission
+framework, production privilege or timing/coverage waiver is added.
+
+The isolated final three-file client proof passes 53 cases, scoped style, fresh
+full types, deadcode and locales. Existing real browser/IndexedDB proof passes
+11 cases before a reviewed cleanup-syntax-only correction; it is not rerun or
+presented as an exact final-source browser pass. Its short-run profile/PID capture
+limit remains explicit. Stock and intermediate 40/41, 44/45, 48/49 boundaries and
+authoring lint/type failures stay recorded. Actual prior Admin response ordering
+is unknown. Combined full quality/SAST, fresh artifact, actual Admin with original
+validation and normal five-trace JSON-only output integration remain unexecuted;
+Root must release those gates after the combined source manifest review. M19
+stays open; next certify this coherent startup/gate/privacy slice, then resume
+the ordered remaining release and public billing/editor requirements.
+
+### Actual release-fixture boundaries and privacy amendment — 2026-10-04
+
+The one reassessed fresh Admin-only probe returns 1 with actual finite `heading`
+classification. Owner/session and both bootstrap responses succeed; the known
+account-generation error hides the expected heading. Root views its failure PNG.
+The later default-section URL no longer matches any Document response, a separate
+observed canonicalization boundary. All nine captured identities/group and exact
+owned browser profile/gate close; no fourth probe or protection/pathname edit.
+The complete route/bootstrap/query/ownership lifecycle is now under read-only
+and meaningful-counterfactual review, retaining locks, switches, stale failures
+and foreign-actor refusals. New final writer/privacy and UI proof remain open.
+
+The recipient boundary passes actual pending viewer/non-member/404/content/axe
+proof on the identified built artifact. Two subsequent Admin observations fail:
+first readiness, then duplicate fixture preparation before browser launch. Their
+primary safe messages were discarded, so exact causes cannot be reconstructed;
+initial document matching does not prove later router behavior. Original failed
+results, exact owned closure and full two-attempt protocol reassessment stay
+recorded. Repeated preparation can consume eleven password sign-ins against the
+existing ten-per-minute path limit; this is a source-backed hypothesis without
+observed 429. Next prepare Admin once on a fresh gate with finite all-stage
+error/status capture, keeping the already proven unknown-route negative separate.
+No third probe, product fix or navigation relaxation precedes Root review.
+
+The normal driver also persists raw HTML/LHR locally despite CI already selecting
+only sanitized JSON/summary uploads. The approved smaller correction removes
+unused median/report/slug handling and the HTML write; the existing JSON/summary
+and every trace/metric/navigation/content budget remain. .gitignore changes only
+its explanatory comment. Earlier quality/SAST success precedes this privacy edit;
+final gates and normal five-trace sanitized-output integration remain required.
+Actual Admin/default-trace evidence and all M19 work remain open.
+
+### Release-gate source above recent authentication — 2026-10-03
+
+Current proof on 2026-10-04: the corrected unchanged complete `npm run quality`
+returns 0. All static/source/full-audit gates, 2,909 covered cases across 260
+files, 69 actual workerd cases across 20 files, 32 bootstrap/16 gate/49
+performance/25 publication/24 asset/4 CI cases and 42 build controls pass.
+Coverage is 92.54% statements, 85.42% branches, 92.37% functions and 93.48% lines;
+no floor changes. Pinned Semgrep 1.174.0 returns 0: 510 rules, 2,157 targets,
+zero findings, fifteen large-file skips. The original duplication failure remains.
+All 542 captured quality/SAST process identities and both groups close; owned
+gate/fixture storage is empty and port 5273 is free. Browser-profile snapshots
+captured no paths, so exhaustive profile cleanup is not asserted.
+
+Protected PR #22 merged as `83546028cc1236aec407f2425e5fbd9ca3dbb619` after
+all seven exact-head checks and policy verification passed. Its entire committed
+tree equals published `b8defd1`; the unpublished gate branch changes only its
+baseline via a soft reset after gates finish. Index and all 75 relevant working
+path hashes remain identical, with the old auth ref preserved. No app-source
+rerun or remote branch rewrite is needed for that exact tree identity.
+Actual built Worker SHA-256 is
+`021810ca8445aeff204238d0ef41301302b42a05f2a0cc2003eb0f64ec7a839f`,
+with 2,522 native assets and migrations `0000` through `0019`. This is artifact
+identification, not deployed migration proof. Actual recipient/Admin preview,
+normal default-trace integration, full device/release checks and M19 remain
+open; those exact-artifact boundaries are next before publication.
+
+The first auth-based canonical quality attempt returns 1 at the unchanged
+zero-duplication gate, after format/lint/CSS/workflows/types/deadcode/i18n/cycles
+pass and before publication, full audit, tests, build or SAST. It identifies one
+eight-line, 78-token repeated diagnostics-test options/assertion region. All 31
+captured processes and the owned group close; no preview runs. Root approves
+one small test-only `diagnosticsForTasks` helper to share actual repeated options
+while preserving every named case and assertion. Seven other code hashes and
+all auth/metadata/guard paths remain unchanged; no rule, threshold or deadline
+is adjusted. On 2026-10-04, corrected scoped format/lint and the unchanged zero-clone
+scanner pass; all fifteen diagnostics cases pass with zero skips/cancellations
+in 221.707 ms. One complete canonical retry follows that executed proof. The failure and correction are
+recorded in the amended gate-boundary receipt; prior independent proof stays
+historical, not a current complete pass.
+
+PR #22 publishes the recent-authentication source
+`b8defd1819f0b341c099115af40b3bc09f88efb8`. Its unchanged local quality and
+pinned SAST pass; fresh selected credential/private-policy journeys pass twelve
+cases across four devices and Root viewed eight captures. Hosted exact-head
+run `37183740478` remains in progress at this source-preparation checkpoint;
+protected main is still `10aae802`. This is not a merge, deployment or complete
+M19 certification claim.
+
+The existing release-gate candidate is restacked in a new owned worktree on
+exact published auth source before expensive combined verification. All eight
+code preimages match the earlier main-based candidate exactly. Only the reviewed
+SDK dispatch/fixture and existing-trace sanitizer/caller/tests are applied;
+both prior verification receipts are carried unchanged. All 55 non-planning
+paths in the 57-path auth delta remain byte-identical, including generated
+migration metadata, session policy and account guard interfaces. PLAN and
+CHANGELOG receive only additive entries; the old candidate and all prior failures
+remain preserved. No dependency, app UI, quota, gate floor or browser flag changes.
+
+Prior twelve-case SDK and independent fifteen-case diagnostics proofs remain
+limited to their recorded source phases. Fresh installation is authorized for
+this new tree, but has not run at initial handoff. Complete quality/SAST, exact
+new artifact, actual recipient isolation and finite Admin navigation observation
+await Root's new source-manifest review and closure of auth-owned resources.
+No producer performance correction, production migration, manual CI retry or
+publication occurs during this preparation. M19 remains open; next certify this
+combined boundary, then use actual normal-trace evidence for the remaining
+Account/mobile/navigation/Android release failures and ordered billing/editor work.
+
 ### Revised private-admission verification — 2026-10-03
 
 The original private-membership delta is restacked above protected main

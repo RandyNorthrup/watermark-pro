@@ -2,7 +2,12 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { clearLaunchFiles, retainInitialLaunch } from './launch-files'
-import { currentOfflineUser, hasOfflineDatabase, setOfflineUser } from './offline-context'
+import {
+  captureOfflineGeneration,
+  currentOfflineUser,
+  hasOfflineDatabase,
+  setOfflineUser,
+} from './offline-context'
 import { updateOfflineStatus } from './offline-status'
 import { clearPersistedQueries } from './persisted-shell-storage'
 import { clearSharedFiles } from './shared-files'
@@ -38,11 +43,16 @@ function announceAccount(userId: string | null): void {
   }
 }
 
-function resetAccountState(queryClient: QueryClient, retainLaunch?: () => void): number {
+function resetAccountState(
+  queryClient: QueryClient,
+  retainLaunch?: () => void,
+  receiveReset?: (generation: number) => void,
+): number {
   boundary.generation += 1
   const generation = boundary.generation
   if (retainLaunch === undefined) clearLaunchFiles()
   setOfflineUser(null)
+  receiveReset?.(generation)
   retainLaunch?.()
   clearPersistedQueries()
   queryClient.clear()
@@ -60,16 +70,31 @@ export function lockOfflineAccount(queryClient: QueryClient): void {
 export async function activateOfflineAccount(
   queryClient: QueryClient,
   userId: string,
+  receiveTransition?: (assertCurrent: () => void) => void,
 ): Promise<void> {
   const previous = currentOfflineUser()
-  const generation =
-    previous === userId
-      ? boundary.generation
-      : resetAccountState(queryClient, previous === null ? retainInitialLaunch() : undefined)
+  let generation = boundary.generation
   function assertTransition() {
     if (generation !== boundary.generation)
       throw new Error('The account changed while opening device storage. Sign in again.')
   }
+  let assertCurrent = assertTransition
+  function publishTransition(ownedGeneration: number) {
+    generation = ownedGeneration
+    const offline = captureOfflineGeneration()
+    assertCurrent = () => {
+      assertTransition()
+      offline.assertCurrent()
+    }
+    receiveTransition?.(assertCurrent)
+  }
+  if (previous === userId) publishTransition(generation)
+  else
+    resetAccountState(
+      queryClient,
+      previous === null ? retainInitialLaunch() : undefined,
+      publishTransition,
+    )
   await accountTransition(async () => {
     assertTransition()
     if (hasOfflineDatabase()) {
@@ -88,8 +113,11 @@ export async function activateOfflineAccount(
       }
     }
     assertTransition()
+    assertCurrent()
     const retainLaunch = retainInitialLaunch()
     setOfflineUser(userId)
+    // Publish the owned fence before any observer can initiate another transition.
+    publishTransition(generation)
     retainLaunch?.()
     if (previous !== userId) announceAccount(userId)
   })

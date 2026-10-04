@@ -4,10 +4,13 @@ import { mkdir, mkdtemp, readFile, readdir, realpath, rm, writeFile } from 'node
 import path from 'node:path'
 import { test } from 'node:test'
 
+import { createTestHarness } from 'wrangler'
+
 import { GATE_WORKER_PATTERNS } from './lib/gate-routing.mjs'
 import { startGateServer } from './lib/gate-runtime.mjs'
 
 const STREAM_OBSERVATION_TIMEOUT_MS = 5000
+const STATIC_RESPONSE_BYTES = 2 * 1024 * 1024
 
 const FIXTURE_WORKER = `export default {
   async fetch(request, env) {
@@ -51,6 +54,7 @@ const FIXTURE_WORKER = `export default {
 }`
 
 async function fixture(context, { invalidMigration = false } = {}) {
+  await mkdir('temp', { recursive: true })
   const parent = await realpath('temp')
   const root = await mkdtemp(path.join(parent, 'lumafoil-gate-fixture-'))
   context.after(async () => {
@@ -109,6 +113,62 @@ async function fixture(context, { invalidMigration = false } = {}) {
   await writeFile(configPath, JSON.stringify(config))
   return { root, config, configPath }
 }
+
+test('public SDK debug distinguishes a healthy proxy listener request from named runtime dispatch', async (context) => {
+  const { root, configPath } = await fixture(context)
+  const config = JSON.parse(await readFile(configPath, 'utf8'))
+  const workerName = 'sdk-contract-fixture'
+  // Only controlled fixture requests run here; all SDK debug output stays captured.
+  const output = context.mock.method(console, 'log', () => {
+    // SDK debug output is captured for assertions without publishing it.
+  })
+  process.env.CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV = 'false'
+  process.env.CLOUDFLARE_INCLUDE_PROCESS_ENV = 'false'
+  // Retain the fixture config's relative paths while refusing all remote bindings.
+  await writeFile(
+    configPath,
+    JSON.stringify({
+      ...config,
+      name: workerName,
+      vars: { APP_ENV: 'test' },
+      d1_databases: config.d1_databases.map((binding) => ({ ...binding, remote: false })),
+      r2_buckets: config.r2_buckets.map((binding) => ({ ...binding, remote: false })),
+    }),
+  )
+  const harness = createTestHarness({ root, workers: [{ configPath }] })
+  try {
+    const listener = await harness.listen()
+    const target = new URL('/api/health', listener.url).href
+    const proxy = await fetch(target, { redirect: 'manual' })
+    assert.equal(proxy.status, 200)
+    assert.deepEqual(await proxy.json(), { status: 'ok', environment: 'test' })
+    harness.debug()
+    const baseline = output.mock.calls.at(-1)?.arguments
+    assert.equal(baseline?.length, 1)
+    assert.equal(typeof baseline[0], 'string')
+    const workerTag = `[server] [${workerName}] `
+    const requestContext = `fetch - GET ${target}`
+    assert.equal(baseline[0].includes(workerTag + requestContext), false)
+    const direct = await harness.getWorker(workerName).fetch(target, { redirect: 'manual' })
+    assert.equal(direct.status, 200)
+    assert.deepEqual(await direct.json(), { status: 'ok', environment: 'test' })
+    harness.debug()
+    const completed = output.mock.calls.at(-1)?.arguments
+    assert.equal(completed?.length, 1)
+    assert.equal(typeof completed[0], 'string')
+    const requestEntries = completed[0]
+      .split('\n')
+      .filter((line) => line.includes(workerTag + requestContext))
+      .map((line) => line.slice(line.indexOf(workerTag)))
+    assert.deepEqual(requestEntries, [
+      `${workerTag}${requestContext} - started`,
+      `${workerTag}${requestContext} - 200`,
+    ])
+    assert.equal(completed[0].includes('synthetic-parent-canary'), false)
+  } finally {
+    await harness.close()
+  }
+})
 
 test('SDK gate uses real migrations, R2 and rate bindings with test-only configuration and owned cleanup', async (context) => {
   const { root } = await fixture(context)
@@ -226,6 +286,53 @@ test('SDK gate uses real migrations, R2 and rate bindings with test-only configu
     await readFile(path.join(root, '.dev.vars'), 'utf8'),
     'GOOGLE_AUTH_CLIENT_SECRET=synthetic-parent-canary\n',
   )
+})
+
+test('static asset cancellation leaves its sibling and following SDK responses intact', async (context) => {
+  // The deliberate client cancellation must not publish request details.
+  context.mock.method(console, 'error', () => {
+    // Suppress expected client-cancellation diagnostics to keep request details private.
+  })
+  const { root } = await fixture(context)
+  const assets = path.join(root, 'dist/client/assets')
+  await mkdir(assets)
+  const payload = Buffer.alloc(STATIC_RESPONSE_BYTES, 'gate static fixture')
+  await writeFile(path.join(assets, 'shared.bin'), payload)
+  const realFetch = fetch
+  const staticOrigins = []
+  // Observe actual transport calls without replacing responses or request options.
+  context.mock.method(globalThis, 'fetch', (input, init) => {
+    const url = new URL(typeof input === 'string' || input instanceof URL ? input : input.url)
+    if (url.pathname === '/assets/shared.bin') staticOrigins.push(url.origin)
+    return realFetch(input, init)
+  })
+  const gate = await startGateServer({ root, port: 0 })
+  try {
+    const target = gate.origin + '/assets/shared.bin'
+    const [cancelled, sibling] = await Promise.all([
+      fetch(target, { headers: { 'cache-control': 'no-cache', cookie: 'session=synthetic' } }),
+      fetch(target, { headers: { 'accept-encoding': 'identity' } }),
+    ])
+    assert.equal(cancelled.status, 200)
+    assert.equal(sibling.status, 200)
+    const reader = cancelled.body.getReader()
+    const first = await reader.read()
+    assert.equal(first.done, false)
+    assert.ok(first.value.byteLength < payload.length)
+    await reader.cancel()
+    const whole = Buffer.from(await sibling.arrayBuffer())
+    assert.equal(whole.length, payload.length)
+    assert.equal(Buffer.compare(whole, payload), 0)
+    const following = await fetch(target)
+    assert.equal(following.status, 200)
+    const followingBytes = Buffer.from(await following.arrayBuffer())
+    assert.equal(Buffer.compare(followingBytes, payload), 0)
+    // The removed listener path adds a second, distinct origin for each static call.
+    assert.deepEqual(staticOrigins, [gate.origin, gate.origin, gate.origin])
+  } finally {
+    await gate.close()
+  }
+  assert.deepEqual(await readdir(path.join(root, 'temp/lumafoil-gates')), [])
 })
 
 test('malformed or escaping build configuration fails before a gate can start', async (context) => {

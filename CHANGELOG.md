@@ -7,6 +7,115 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Verified startup/transport/privacy correction — 2026-10-04
+
+- Complete combined quality passes 2,927 covered cases, 69 actual workerd cases
+  and every unchanged static/audit/script/build gate. Pinned SAST passes 510
+  rules on 2,158 targets with zero findings; fifteen large files are skipped.
+- Actual verified Owner Admin renders with one bootstrap request and zero
+  content/axe/page errors. Canonical selected journeys pass 24/24 across four
+  devices; Root views eight fresh credential/private-limit captures plus Admin.
+  Default Admin query/Document matching and iPhone dock/heading polish remain open.
+- One normal five-trace desktop Login audit passes strict H2/content/budgets,
+  scores 100/100/100 and bounded nonempty generated attribution. Output is only
+  sanitized JSON/summary, without HTML/raw-LHR/Trace/URL/stack data; derived
+  evidence is preserved privately. Full release/UI certification stays open.
+- Owned processes/gates close. Kept the E2E storage cleanup assertion and shell
+  sequencing mistake; removed only its verified generated test residue, leaving
+  global browsers and baseline state untouched. No live browser overlap occurs.
+  Final source is unchanged; factual docs and bounded protected publication follow.
+
+### Combined owned startup source preparation — 2026-10-04
+
+- Combined scoped format/lint/fresh types and all 53 real client cases pass.
+  Preserved failed zero-duplication checks (four setup clones, then one repeated
+  preparation); one shared lock fixture removes that real duplication without
+  changing production guards, named cases, assertions, rules or thresholds.
+  One complete combined canonical execution follows these prerequisite passes.
+- Applied the exact reviewed three-codepath startup patch to the preserved
+  release-gate/privacy source. Its preimages and final source/proof hashes match;
+  copied the concise startup receipt exactly and added only planning/changelog
+  entries. Main auth/metadata/guard source and existing gate bytes remain.
+- Kept ephemeral same-route admission sharing under existing transition/offline
+  validity, including reset/final callback reentrancy guards and post-activation
+  validation before seeding. No settled cache, dependency, replay fallback or
+  new privilege/coverage/deadline allowance is added.
+- Final isolated client proof passes 53 cases, style, fresh full types, deadcode
+  and locales. Prior real browser proof passes 11 cases with its syntax/source
+  and process-capture limits retained. Stock/intermediate failed boundaries and
+  authoring failures remain failed. No combined gates, build, actual Admin,
+  Lighthouse, CI, push or deployment runs during this source preparation.
+
+### Actual fixture proof and local report privacy — 2026-10-04
+
+- The reassessed Admin-only fresh-gate observation returns finite heading
+  failure with verified Owner/session, two bootstrap 200s and no failed assets.
+  Root views the account-generation error PNG; later default-section URL differs
+  from its Document response. All nine identities/group/profile/gate close.
+  Stopped probes and started complete ownership-startup reassessment, retaining
+  every protection. No fourth attempt, source workaround or Lighthouse result.
+- Preserved the unsupported .gitignore formatter failure (terminal 2) and the
+  corrected supported-text formatting pass. No ignore or formatter rule changes.
+
+- Actual recipient preview remains pending viewer/non-member before and after
+  rendering, refuses an unrelated account with 404, and passes document/content/
+  axe with zero page errors. Root receives its private PNG for visual review.
+- Kept two failed Admin observations as failures, including their avoidable lost
+  safe error/status data. The second proves unknown-dynamic refusal but repeats
+  complete preparation and never launches its Admin browser. All thirteen/five
+  captured identities/groups and owned resources close. Full protocol review
+  identifies repeated sign-in work against unchanged real limits as a hypothesis,
+  not an observed 429; no product or validator fix is inferred.
+- Removed raw chosen-HTML report persistence and now-unused median/report/slug
+  handling from the normal Lighthouse driver. Existing stable-label sanitized
+  JSON/summary output, five-trace and measurement/validation/budget guards stay.
+  Corrected the existing .gitignore comment only; CI already excludes HTML from
+  uploads. No raw report is written then deleted. Final gates and actual normal
+  sanitized-output integration remain pending after this source privacy change.
+
+### Release-gate corrected canonical proof — 2026-10-04
+
+- The coherent test-options correction passes one complete canonical quality:
+  all original static/publication/full-audit gates, 2,909 covered tests (85.42%
+  branches), 69 actual workerd cases, every script/asset/CI suite and production
+  build controls. The initial duplication failure remains recorded; no rule,
+  coverage floor, deadline or application source changes to get green.
+- Pinned Semgrep 1.174.0 passes 510 rules on 2,157 targets with zero findings;
+  fifteen oversized files are skipped. All 542 captured quality/SAST identities
+  and both groups close; owned gate storage is empty and port 5273 is free.
+  Profile snapshots captured no paths; no exhaustive profile assertion is made.
+- PR #22 merges normally as `8354602`. Its complete committed tree is identical
+  to the verified auth base; a soft reset updates only the unpublished gate
+  branch ancestry while preserving index, all 75 relevant working path hashes
+  and the old auth ref. No remote rewrite or broad source-gate rerun occurs.
+- Identified the exact fresh Worker/artifact: SHA-256 `021810ca8445aeff`, 2,522
+  native assets and twenty migrations. Preview/default-trace/device/release
+  verification and production activation remain pending; M19 stays open.
+
+### Release-gate restack above published authentication — 2026-10-03
+
+- The first complete quality execution stops at the existing zero-duplication
+  gate after all earlier static checks pass: one eight-line/78-token repeated
+  diagnostics-test region. Publication/audit/tests/build/SAST are not reached.
+  Added one small task-options test helper, retaining all named cases/assertions;
+  no production source, dependency, deadline, rule or threshold changes.
+- On 2026-10-04, the coherent test-only batch passes scoped format/lint,
+  unchanged zero-duplication scanning and all fifteen diagnostics cases, with
+  zero skips/cancellations. The initial canonical failure remains recorded;
+  one complete corrected-source retry is next.
+
+- Prepared the exact eight-codepath gate/fixture/trace slice on published
+  recent-auth source `b8defd1` in a new owned worktree. Every code preimage matches;
+  both earlier receipts are retained exactly and the old gate tree is preserved.
+- Kept all 55 non-planning auth-delta paths byte-identical, including migration
+  metadata and credential/session controls. Added only PLAN/CHANGELOG records;
+  no prior whole-doc transplant, dependency, app UI or gate-policy change occurs.
+- Recent-auth local quality/SAST and twelve selected four-device journeys pass,
+  with eight viewed captures. Its hosted run `37183740478` remains in progress;
+  main is still `10aae802`. This new combined source has no fresh installation,
+  complete gates, build, preview, audit or publication proof at initial handoff.
+  Next: Root manifest review, owned installation and released heavy verification.
+
 ### Recent Authentication Restack Preparation — 2026-10-03
 
 - PR #21 merged as `10aae802` after all seven exact-head checks passed and a
