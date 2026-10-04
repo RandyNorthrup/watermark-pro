@@ -241,7 +241,15 @@ Only the `main` branch and the latest tagged release receive fixes.
   Unused rotation/revocation releases reservations; independent rate limits
   continue to bound repeated mail/link operations. Production public signup and
   billing entitlement enforcement have not yet launched.
-- Recent credential proof (M19 candidate; final certification/deployment pending):
+- Workspace capacity (M19 candidate under verification): server plan records
+  separate historical/private base grants from expiring, suspendable paid
+  periods. Member-visible responses omit billing identifiers and admission
+  state. Upload quota admission reads current authority inside the D1 write;
+  commit rechecks it before metadata/audit/completion. Downgrade retains stored
+  data, and outstanding cleanup continues to consume capacity. Metadata or
+  client plan names cannot activate paid access. Seat/creation gates and signed
+  payment reconciliation remain unimplemented; public signup stays closed.
+- Recent credential proof (M19 implementation gates passed; release/deployment pending):
   a server session field with `input: false` records successful password or
   validated identity sign-in. Nullable migration leaves old sessions unproved.
   Sensitive custom invitation/access/share/deletion/admin and reserved billing

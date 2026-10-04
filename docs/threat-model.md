@@ -29,7 +29,9 @@ added (a new binding, a new public route, a new third-party origin).
    static SPA.
 3. **Worker → Cloudflare services**: D1, R2, Rate Limiting, Email Sending,
    Turnstile siteverify (outbound HTTPS).
-4. **CI → Cloudflare**: `wrangler deploy` from a tag with a scoped API token.
+4. **CI → Cloudflare**: guarded deployment from current `main` after canonical
+   quality, SAST, every device journey and complete release audits. Credentials
+   are scoped to the production environment and withheld from earlier jobs.
 5. **Email → user**: verification, reset and invitation links.
 6. **Worker invocation → platform telemetry**: Cloudflare can enrich a sanitized
    application log with the original request URL, independently of the
@@ -39,8 +41,9 @@ added (a new binding, a new public route, a new third-party origin).
 ## Threats and mitigations (STRIDE)
 
 The human-control runtime source passed full implementation gates in draft PR #12.
-The private-membership amendment remains under final verification; neither its
-migration nor a new production deployment is claimed. Private payment/cohort
+The private-membership and recent-credential implementations passed complete
+exact-commit CI gates in draft PRs #13 and #14; neither migration
+nor a new production deployment is claimed. Private payment/cohort
 quotas and recent-authentication certification remain tracked in
 `docs/plans/public-billing.md`. The recent-credential candidate adds nullable
 server-owned session proof rather than trusting session creation time, browser
@@ -50,7 +53,8 @@ proof from the preceding ten minutes; cloud token/connection operations share
 that boundary. Reauthentication retains only a still-authorized workspace and
 never replays a mutation. Missing/future/malformed/expired proof, role negatives,
 verification/renewal replay and account changes require real-auth/D1/browser
-evidence before this candidate is certified or deployed.
+evidence. Those implementation negatives passed for credential runtime `77f6a9a`
+in workflow `37009328785`; full release certification and deployment remain open.
 
 ### Spoofing
 

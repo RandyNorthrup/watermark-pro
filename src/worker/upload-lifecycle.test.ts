@@ -5,6 +5,7 @@ import { createTestHarness } from './test-support/test-app'
 import { cleanupUploads, persistUpload } from './upload-lifecycle'
 import { UPLOAD_POLICY, type UploadRecord, type UploadReservation } from './upload-store'
 import { MAX_STORAGE_BYTES_PER_ORGANIZATION } from '../shared/constants'
+import { PRIVATE_PLAN_CAPACITY, PUBLIC_PLANS } from '../shared/plans'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -13,6 +14,16 @@ afterEach(() => {
 function fixture(kind: 'photo' | 'logo' = 'photo') {
   const harness = createTestHarness()
   const organizationId = 'fixture-workspace'
+  harness.plans.seed({
+    organizationId,
+    kind: 'shared',
+    basePlan: 'private',
+    baseMemberLimit: PRIVATE_PLAN_CAPACITY.sharedMembers,
+    paidPlan: null,
+    paidThrough: null,
+    paidAccessSuspended: false,
+    revision: 0,
+  })
   const id = crypto.randomUUID()
   const key = `org/${organizationId}/${id}`
   const keys = kind === 'photo' ? [key, `${key}-thumb`] : [key]
@@ -70,6 +81,36 @@ function fixture(kind: 'photo' | 'logo' = 'photo') {
 }
 
 describe('upload lifecycle failures and recovery', () => {
+  it.each(['expired', 'suspended'] as const)(
+    'cleans written objects when a paid grant becomes %s before commit',
+    async (change) => {
+      const f = fixture()
+      const baseline = await f.plans.get(f.organizationId)
+      const paid = {
+        ...baseline,
+        kind: 'personal' as const,
+        basePlan: 'free' as const,
+        baseMemberLimit: 1,
+        paidPlan: 'pro' as const,
+        paidThrough: new Date(Date.now() + UPLOAD_POLICY.leaseMs),
+      }
+      f.plans.seed(paid)
+      f.reservation.bytes = PUBLIC_PLANS.free.storageBytes + 1
+      const original = f.objects.put.bind(f.objects)
+      vi.spyOn(f.objects, 'put').mockImplementation(async (...args) => {
+        await original(...args)
+        f.plans.seed({
+          ...paid,
+          ...(change === 'expired' ? { paidThrough: new Date(0) } : { paidAccessSuspended: true }),
+        })
+      })
+      await expect(f.save()).rejects.toMatchObject({ status: 400 })
+      expect(f.objects.keys()).toEqual([])
+      expect(await f.services.photos.find(f.organizationId, f.reservation.uploadId)).toBeNull()
+      expect(await f.services.uploads.usage(f.organizationId)).toEqual({ count: 0, bytes: 0 })
+      expect(await f.services.audit.listForOrganization(f.organizationId)).toEqual([])
+    },
+  )
   it.each(['photo', 'logo'] as const)(
     'saves %s once and preserves files on replay',
     async (kind) => {

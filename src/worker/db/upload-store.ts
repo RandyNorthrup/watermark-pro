@@ -1,17 +1,13 @@
 import { and, eq, inArray, lte, sql, type SQL } from 'drizzle-orm'
 import { SQLiteSyncDialect } from 'drizzle-orm/sqlite-core'
 
-import {
-  MAX_LOGOS_PER_ORGANIZATION,
-  MAX_PHOTOS_PER_ORGANIZATION,
-  MAX_STORAGE_BYTES_PER_ORGANIZATION,
-} from '../../shared/constants'
 import type { AuditEntry } from '../audit'
 import type { StorageUsage } from '../stores'
 import { UPLOAD_POLICY, type UploadReservation, type UploadStore } from '../upload-store'
 import type { Database } from './client'
 import { folderDestination, workspaceWriter } from './folder-guards'
 import { apiErrors } from '../errors'
+import { workspaceCapacitySql } from './plan-capacity'
 import { asset, organization, photo, uploadReservation } from './schema'
 
 function ticket(row: typeof uploadReservation.$inferSelect): UploadReservation {
@@ -27,6 +23,15 @@ function usageBytes(organizationId: string): SQL {
     (SELECT COALESCE(SUM(size + thumbnail_size), 0) FROM photo WHERE organization_id = ${organizationId})
         + (SELECT COALESCE(SUM(size), 0) FROM asset WHERE organization_id = ${organizationId})
         + (SELECT COALESCE(SUM(bytes), 0) FROM upload_reservation WHERE organization_id = ${organizationId} AND status IN ('pending', 'cleanup'))
+  `
+}
+
+function uploadCount(organizationId: string, kind: 'photo' | 'logo'): SQL {
+  const records = kind === 'photo' ? photo : asset
+  return sql`
+    (SELECT COUNT(*) FROM ${records} WHERE organization_id = ${organizationId})
+        + (SELECT COUNT(*) FROM upload_reservation WHERE organization_id = ${organizationId}
+          AND kind = ${kind} AND status IN ('pending', 'cleanup'))
   `
 }
 
@@ -100,8 +105,12 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
     },
     async reserve(input) {
       const records = input.kind === 'photo' ? photo : asset
-      const maxCount =
-        input.kind === 'photo' ? MAX_PHOTOS_PER_ORGANIZATION : MAX_LOGOS_PER_ORGANIZATION
+      const now = Date.now()
+      const maxCount = workspaceCapacitySql(
+        input.organizationId,
+        input.kind === 'photo' ? 'photos' : 'logos',
+        now,
+      )
       const rows = await db.all<{
         id: string
       }>(sql`
@@ -109,9 +118,8 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
                 SELECT ${input.id}, ${input.organizationId}, ${input.uploadId}, ${input.kind}, ${input.userId}, ${input.fingerprint}, ${JSON.stringify(input.keys)}, ${input.bytes}, 'pending', ${input.expiresAt.getTime()}
                 WHERE NOT EXISTS (SELECT 1 FROM ${records} WHERE organization_id = ${input.organizationId} AND id = ${input.uploadId})
                 AND NOT EXISTS (SELECT 1 FROM upload_reservation WHERE organization_id = ${input.organizationId} AND kind = ${input.kind} AND upload_id = ${input.uploadId} AND status IN ('committed', 'deleted'))
-                AND (SELECT COUNT(*) FROM ${records} WHERE organization_id = ${input.organizationId})
-                  + (SELECT COUNT(*) FROM upload_reservation WHERE organization_id = ${input.organizationId} AND kind = ${input.kind} AND status IN ('pending', 'cleanup')) < ${maxCount}
-                AND ${usageBytes(input.organizationId)} + ${input.bytes} <= ${MAX_STORAGE_BYTES_PER_ORGANIZATION}
+                AND ${uploadCount(input.organizationId, input.kind)} < ${maxCount}
+                AND ${usageBytes(input.organizationId)} + ${input.bytes} <= ${workspaceCapacitySql(input.organizationId, 'storageBytes', now)}
                 ON CONFLICT DO NOTHING RETURNING id
       `)
       if (rows.length > 0) return 'reserved'
@@ -135,7 +143,13 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
           ? folderDestination(input.organizationId, 'photo', record.value.folderId ?? null)
           : sql`1`
       const permission = workspaceWriter(input.organizationId, input.userId)
-      const ready = sql`EXISTS (SELECT 1 FROM upload_reservation WHERE id = ${input.id} AND organization_id = ${input.organizationId} AND status = 'pending' AND expires_at > ${Date.now()}) AND ${permission} AND ${destination}`
+      const now = Date.now()
+      const pending = sql`EXISTS (SELECT 1 FROM upload_reservation WHERE id = ${input.id} AND organization_id = ${input.organizationId} AND status = 'pending' AND expires_at > ${now})`
+      const capacity = sql`
+        ${uploadCount(input.organizationId, input.kind)} <= ${workspaceCapacitySql(input.organizationId, input.kind === 'photo' ? 'photos' : 'logos', now)}
+                AND ${usageBytes(input.organizationId)} <= ${workspaceCapacitySql(input.organizationId, 'storageBytes', now)}
+      `
+      const ready = sql`${pending} AND ${permission} AND ${destination} AND ${capacity}`
       const value = record.value
       if (
         value.id !== input.uploadId ||
@@ -160,10 +174,18 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
                     SELECT ${item.id}, ${item.organizationId}, ${item.kind}, ${item.name}, ${item.key}, ${item.contentType}, ${item.size}, ${item.width}, ${item.height}, ${item.createdBy}, ${Date.now()} WHERE ${ready} RETURNING id
         `
       }
+      const records = input.kind === 'photo' ? photo : asset
+      // The reservation remains counted until completion. Reusing the admission
+      // condition after INSERT would count the new metadata a second time.
+      const completed = sql`
+        ${pending} AND EXISTS (SELECT 1 FROM ${records}
+                WHERE id = ${input.uploadId} AND organization_id = ${input.organizationId}
+                  AND key = ${value.key} AND created_by = ${input.userId})
+      `
       const [created] = await batch([
         insert,
-        auditInsert(audit, ready),
-        sql`UPDATE upload_reservation SET status = 'committed' WHERE id = ${input.id} AND ${ready}`,
+        auditInsert(audit, completed),
+        sql`UPDATE upload_reservation SET status = 'committed' WHERE id = ${input.id} AND ${completed}`,
       ])
       if (created === undefined) throw new Error('Upload commit returned no result')
       if (created.results.length === 0) {
@@ -171,6 +193,8 @@ export function createDrizzleUploadStore(db: Database): UploadStore {
         if (writer.length === 0) throw apiErrors.forbidden()
         const target = await db.all(sql`SELECT 1 WHERE ${destination}`)
         if (target.length === 0) throw apiErrors.conflict()
+        const permittedCapacity = await db.all(sql`SELECT 1 WHERE ${capacity}`)
+        if (permittedCapacity.length === 0) throw apiErrors.quotaExceeded()
       }
       return created.results.length > 0
     },

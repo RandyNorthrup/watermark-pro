@@ -1,5 +1,14 @@
 # Public plans, private membership and trust gates — M19
 
+Restack scope, 2026-10-04: this branch prepares only original workspace-capacity
+source above main `8354602`. Its original Free/Pro/Team limits are a foundation,
+not the later confirmed Starter/media launch implementation. Final requirements
+remain Starter USD 4 monthly, five Free image admissions per UTC day, no Free
+Video/Bulk and one-page Free PDFs. Historical all-tools-Free wording below is
+superseded for launch. Provider and branch status below is dated evidence;
+fresh owned installation and reviewed generated 0020 metadata now exist, but
+no payment, public activation or new runtime certification has occurred here.
+
 Status: design and research completed on 2026-10-01. Human-verification runtime
 source `b908155` passed full quality, SAST and four-device browser gates on
 2026-10-02 in draft PR #12. Private cohort/two-invite runtime and its final
@@ -7,14 +16,18 @@ documentation head passed all seven exact-commit CI jobs, including the expanded
 140-journey device matrix. Recent credential proof passed complete local quality
 before its final save/export warning. Final wording passed focused/catalogue
 checks and all four dedicated browser/axe journeys with reviewed actual captures;
-the expanded 144-journey exact-commit matrix remains in progress. Paid quota and payment implementation remains open;
-public registration and subscriptions have not shipped.
+runtime `77f6a9a` then passed canonical quality, SAST and all 144 journeys in
+exact-commit CI `37009328785`. Workspace storage capacity is under verification on
+`codex/plan-entitlements`; creation/seat gates and payment reconciliation remain
+open. Public registration and subscriptions have not shipped.
 
 ## Owner decisions
 
 Public Free and paid subscriptions will run alongside the existing private
-membership cohort. Prices are USD and monthly only. Use the owner's existing
-Stripe account. Existing private members keep their current access and receive
+membership cohort. Prices are USD and monthly only. On 2026-10-02 the owner
+clarified that Lumafoil needs a new, separate Stripe account under the existing
+owner login; the unrelated account selected by the first CLI authorization must
+not receive Lumafoil products, payments or credentials. Existing private members keep their current access and receive
 two new invitations each; each newly admitted private member receives two. Public
 accounts receive no private invitation rights. Private membership and donations
 are absent from public marketing; donations remain available to private members.
@@ -45,9 +58,14 @@ Additional seats are not sold until seat changes and their billing are implement
 Members' personal workspaces keep their own plan; Team covers its shared workspace.
 
 Existing private personal workspaces retain the current 2 GiB/10,000-photo/50-logo
-allowances. Existing explicit workspace grants are preserved. Migration must
-identify these before applying limits and must not silently remove access or
-delete content. New paid shared workspaces use Team. A private member can purchase
+allowances. Existing explicit workspace grants are preserved. A pending
+clarification asks whether private members retain limited free collaboration.
+After an opportunity to reply, the working assumption is one additional shared
+workspace with three members using the existing private allowance; historical
+workspaces and grants remain intact even when above new creation/member bounds.
+Public Free/Pro users require Team for new shared workspaces. Migration must
+identify historical grants before applying limits and must not silently remove
+access or delete content. New paid shared workspaces use Team. A private member can purchase
 Pro or Team while retaining their separate private membership status.
 
 ## Competitive research
@@ -197,12 +215,30 @@ quality, real D1 wiring and four-device browser/axe with viewed prompt captures
 passed before the final save/export warning. That final wording passed focused
 prompt/catalogue checks and its fresh four-device visual/axe journey. Final SAST
 passed with zero findings; exact-commit hosted canonical quality/full device
-matrix remain in progress.
+matrix passed for `77f6a9a` in workflow `37009328785`.
 No migration, release or production enforcement is claimed. Cloud connection,
 token retrieval and disconnection also require proof. Same-account sign-in retains
 only a selected workspace whose current membership still exists.
 
 ## Billing and tenant security
+
+Provider account boundary: the intended account is the new Lumafoil business
+account, not whichever account a local CLI profile happens to select. Read back
+and pin the actual account identifier and mode before provisioning any catalog,
+webhook, Checkout or portal resource. The first renewed CLI login reached an
+unrelated account; only sanitized account metadata was read, and no provider
+resources or payments were created. New-account Dashboard authentication remains
+pending. Official Stripe Codex plugin installation was verified on 2026-10-02;
+installation is not proof of an authenticated Lumafoil connection. Local service
+credentials are owner-readable only and remain outside the public repository.
+
+The capacity foundation has explicit workspace plan authority and a member-only
+limits projection. Migration `0020` preserves historical content/membership;
+upload reservation and commit resolve the live paid period and suspension inside
+D1. Focused Node cases and real D1 upload integration passed, but canonical quality
+and security certification remain pending. See
+`../verification/m19/workspace-capacity-2026-10-02.md`. This does not activate
+subscriptions or replace the remaining creation/member-seat gates.
 
 Checkout and portal endpoints require a verified signed-in workspace owner,
 same-origin requests, recent authentication and bounded request schemas. The
@@ -253,9 +289,11 @@ deletion; content deletion and financial retention must be distinguished clearly
       from private membership and explicit workspace access.
 - [ ] Enforce plan quotas atomically on uploads, asset writes, offline replay,
       shared workspace creation, member acceptance and competing requests.
-- [ ] Implement and certify session-bound recent credential proof, protecting
+- [x] Implement and certify session-bound recent credential proof, protecting
       sensitive custom APIs and auth-plugin seams; email verification, renewal
       and client session updates cannot refresh the proof.
+      Runtime `77f6a9a` passed full exact-commit quality/SAST, real D1 wiring and
+      all 144 browser/axe journeys; final prompt captures were viewed.
 - [x] Certify implemented two-new-admission controls, including reusable links,
       concurrency, revocation/expiry, historical spend and recipient deletion.
       Cutover retains at most two oldest live pending offers per issuer and
@@ -283,8 +321,9 @@ Human-verification implementation checks are complete for runtime source
 `b908155`; its draft PR remains unmerged. Private/public cohort boundaries and atomic two-new-invitation grants are
 verified for `08834df` in workflow `36992631513`. All 140 browser/axe cases
 ultimately passed; the unrelated iPhone gallery case used the existing retry.
-Finish recent authentication's final wording and exact-commit gates, then
-implement authoritative plan quotas and payment state.
+Recent credential proof is certified for runtime `77f6a9a`; three unrelated
+device journeys used existing retries and all new credential cases passed first
+attempts. Next implement authoritative plan quotas and payment state.
 Stripe account authentication remains unconfirmed; no catalog or charge has been
 created. Video/navigation regressions and full M19 release audits remain open.
 No later milestone is started.

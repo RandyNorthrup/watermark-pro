@@ -119,13 +119,30 @@ sign-in, following the existing session-only media-project lifecycle.
 - Final `npm run security:sast` passed: 510 executed rules across 2,152 targets,
   zero findings. The standard scan excluded fifteen files larger than its
   one-megabyte limit; no new exception or rule suppression was introduced.
+- Historical checkpoint, 2026-10-02: runtime head
+  `77f6a9a6c4965cee59fd6d8ce5c44e173a5471d3` passed every job in
+  [exact-commit CI 37009328785](https://github.com/RandyNorthrup/watermark-pro/actions/runs/37009328785).
+  Hosted canonical quality covered the final twelve-locale warning: 2,903 cases
+  across 260 files; 92.55% statements, 85.43% branches, 92.36% functions and
+  93.48% lines; 69 workerd cases across 20 files. Hosted SAST passed 510 rules
+  over 2,152 targets with zero findings. All 144 Playwright/axe journeys
+  ultimately passed. iPhone and iPad each passed 36 first attempts; Android
+  passed 34 first attempts plus existing retries for licensed QR/sticker reuse
+  and offline saves; desktop passed 35 first attempts plus an existing retry
+  for owner collaboration onboarding. The new recent-credential journeys and
+  private cohort controls passed first attempts. No retry/deadline or floor was
+  changed. All seven exact-commit check runs were read back successful.
+  Draft [PR #14](https://github.com/RandyNorthrup/watermark-pro/pull/14) is stacked
+  on private admissions; manual dispatch does not populate the main-only
+  required pull-request summary. No main merge, remote migration or deployment
+  occurred at that checkpoint. The later protected recent-auth restack is already
+  included in main `8354602`; this capacity preparation does not change its code
+  or reuse original-source CI as a fresh restack certificate.
 
 ## Remaining gates and next slice
 
-Run exact-commit hosted canonical
-quality plus the complete 144-journey matrix. Real-auth/D1, bounded-return,
-membership-revocation, provider-failure and account-switch negatives already
-passed and remain in those complete gates. Public quotas, authoritative billing state, Stripe
+Implementation certification passed for runtime `77f6a9a`. Public quotas,
+authoritative billing state, Stripe
 Checkout/webhooks, public marketing/private navigation and full M19 release
 audits remain subsequent slices. Production registration remains closed.
 

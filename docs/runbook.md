@@ -86,8 +86,29 @@ proof. Operators must not backfill timestamps or repair refusals by changing
 session dates. Complete the normal challenged sign-in; roles and membership
 remain server checked afterward. Same-account sign-in retains a selection only
 after current membership is checked. The dialog returns to a bounded internal
-page and never automatically retries the refused mutation. This candidate still
-requires final gates; no production enforcement is claimed.
+page and never automatically retries the refused mutation. Runtime `77f6a9a`
+passed exact-commit implementation quality, SAST and all 144 device journeys in
+workflow `37009328785`; final prompt captures were viewed. M19 release gates and
+deployment remain separate, and no production enforcement is claimed.
+
+### Stripe account boundary — 2026-10-02
+
+Lumafoil must use a new separate Stripe business account under the owner's login.
+The first renewed CLI authorization selected an unrelated account and performed
+readback only; no catalog, payments or remote secrets were provisioned there.
+A CLI project/profile name is a local credential label, not an account-creation
+operation. Verify the actual Lumafoil account ID and test/live mode before every
+provisioning batch; fail closed on mismatch. The official Stripe Codex plugin is
+installed and enabled, but that does not establish an authenticated Lumafoil
+connection. Dashboard sign-in/account creation is still pending at this checkpoint.
+
+Service keys remain outside the public repository and are never pasted into chat,
+CLI arguments, screenshots or logs. The local CLI credentials file is readable
+only by its owner. Expiring interactive CLI keys are not production Worker
+credentials. Use a dedicated restricted server key and endpoint signing secret
+through Worker secrets after account and sandbox verification. Catalog IDs are
+public identifiers; they must still be pinned server-side and bound to the intended
+account. No successful redirect or client-selected plan establishes paid access.
 
 For a new database, follow [self-hosting](self-hosting.md). The first-owner tool
 creates an unverified account with global role `owner`, without generating a
