@@ -1,8 +1,8 @@
 # Threat model
 
 Scope: Lumafoil as deployed at `lumafoil.com` on Cloudflare
-Workers (single Worker, D1, R2, Rate Limiting, Email Sending, optional
-Turnstile). Reviewed 2026-09-06 for milestone M8 against the controls listed
+Workers (single Worker, D1, R2, Rate Limiting, Email Sending and
+Turnstile). Admission/cohort amendments reviewed 2026-10-02 within open milestone M19 against the controls listed
 in [SECURITY.md](../SECURITY.md); the platform-telemetry boundary was reviewed
 again on 2026-09-09 for M19. Re-review when a new trust boundary is
 added (a new binding, a new public route, a new third-party origin).
@@ -38,14 +38,21 @@ added (a new binding, a new public route, a new third-party origin).
 
 ## Threats and mitigations (STRIDE)
 
+The human-control runtime source passed full implementation gates in draft PR #12.
+The private-membership amendment remains under final verification; neither its
+migration nor a new production deployment is claimed. Private payment/cohort
+quotas and recent authentication remain tracked in `docs/plans/public-billing.md`.
+
 ### Spoofing
 
-| Threat                                 | Mitigation                                                                                                                                                                  | Evidence                                                                  |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Credential stuffing, password guessing | 10 credential attempts / minute / address (Rate Limiting binding); 12–128 character passwords; mandatory email verification; Turnstile on sign-up and reset when configured | `auth-flow.test.ts` (429 with `X-Retry-After`), `admin.test.ts` (captcha) |
-| Session theft                          | HttpOnly, SameSite=Lax, Secure cookies; sessions revoked on password reset and by admins                                                                                    | cookie flag test in `auth-flow.test.ts`                                   |
-| Forged share tokens                    | HMAC-SHA-256 over `<id>.<expiry>` with a key derived from the application secret, verified in constant time; mismatched expiry refused                                      | `share-token.test.ts`, `shares.test.ts`                                   |
-| Invitation hijack                      | Invitations are single-use, expire, and require a verified email matching the invitee                                                                                       | `auth-lifecycle.test.ts`                                                  |
+| Threat                                      | Mitigation                                                                                                                                                                                                                                                        | Evidence                                                                  |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Credential stuffing, password guessing      | 10 credential attempts / minute / address (Rate Limiting binding); 12–128 character passwords; mandatory email verification; Required production Turnstile with exact hostname/action for signup, password/social entry and recovery; provider errors fail closed | `auth-flow.test.ts` (429 with `X-Retry-After`), `admin.test.ts` (captcha) |
+| Forged private membership / revocation race | New account defaults to pending; only server admission activates its cohort. Client cohort fields cannot grant privileges. Pending accounts remain blocked after email verification.                                                                              | `private-membership.test.ts`, `private-membership.workers.test.ts`        |
+| Unbounded private invite chain              | Two new admissions per private user; pending email/reusable reservations share one atomic budget. Historical accepted spend excluded; new accepted spend survives deletion/rotation. Public roles never confer private invitation rights.                         | Migration tests; real-auth role negatives; concurrent D1 tests            |
+| Session theft                               | HttpOnly, SameSite=Lax, Secure cookies; sessions revoked on password reset and by admins                                                                                                                                                                          | cookie flag test in `auth-flow.test.ts`                                   |
+| Forged share tokens                         | HMAC-SHA-256 over `<id>.<expiry>` with a key derived from the application secret, verified in constant time; mismatched expiry refused                                                                                                                            | `share-token.test.ts`, `shares.test.ts`                                   |
+| Invitation hijack                           | Invitations are single-use, expire, and require a verified email matching the invitee                                                                                                                                                                             | `auth-lifecycle.test.ts`                                                  |
 
 ### Tampering
 

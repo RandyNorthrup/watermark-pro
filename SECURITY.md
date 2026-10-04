@@ -19,6 +19,13 @@ Only the `main` branch and the latest tagged release receive fixes.
 
 ## Controls in place
 
+- Candidate account-state protection: generic administrative editing and account
+  creation reject protected identity, admission, recovery and moderation fields.
+  The existing profile, role and moderation flows retain their authority. Actual
+  stored-state negative and normal-operation positive tests pass; full revised
+  restack and production certification remain pending. See the
+  [verification receipt](docs/verification/m19/private-membership-2026-10-02.md).
+
 - Bulk CSV reports escape delimiters/quotes and prefix spreadsheet-like text
   values so imported file names, preset names and error strings are not emitted
   as formulas. This is an export safeguard, not a guarantee about later editing,
@@ -221,6 +228,19 @@ Only the `main` branch and the latest tagged release receive fixes.
   quality, SAST and the 136-journey four-device Playwright/axe matrix; local
   challenge cases and viewed English/Arabic light/dark auth captures passed.
   Live-provider verification and complete M19 release certification remain open.
+- Private membership (M19, final gates pending): server-owned membership is
+  independent of payment and workspace/site roles. Historical accounts retain
+  their cohort and grants; new rows remain pending until server admission. A
+  revoked-during-creation invitation cannot activate a pending account through
+  later email verification. Public accounts have no private invitation rights;
+  both API and D1 inviter eligibility enforce the cohort, verification and ban.
+  Two new admissions are reserved atomically across targeted/reusable requests;
+  accepted spend survives recipient deletion and token/link changes. The cutover
+  retains at most two oldest live promises per inviter and revokes excess
+  pending promises. Historical accepted invitations are excluded from new spend.
+  Unused rotation/revocation releases reservations; independent rate limits
+  continue to bound repeated mail/link operations. Production public signup and
+  billing entitlement enforcement have not yet launched.
 - Platform administration (M8): a separate `admin` role checked server-side
   by `requirePlatformAdmin` on the organization and audit listing routes and
   by Better Auth's admin plugin on user management. Bans (with a mandatory

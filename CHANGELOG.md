@@ -7,6 +7,47 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Private-admission administrative boundary — 2026-10-03
+
+- Preserved the original private-membership restack and its new-main auth,
+  dependency and publication controls. Fresh scoped admission, actual-D1 and
+  migration proofs pass 165, 13 and 32 cases respectively.
+- Reused the existing account-field guard to protect server-owned identity,
+  admission, recovery and moderation state at administrative boundaries. Four
+  complete real-auth files pass 101 cases after meaningful stored-state negative
+  controls on stock source. Normal profile and supported management flows pass.
+- Scoped lint and forced full types pass. The revised 41-path candidate then
+  passes one unchanged complete `npm run quality`: 2,847 covered cases across
+  257 files, all original coverage floors (85.35% branches), 68 actual workerd
+  cases, every static/source/audit/script/asset gate and production build.
+  Full audit reports zero vulnerabilities. Existing Python 3.13.7 is selected
+  through command PATH; no global launcher or source workaround is added.
+- Pinned SAST passes 510 rules across 2,143 tracked targets with zero findings;
+  13 oversized files are skipped. All owned processes, six browser profiles,
+  port 5273 and gate storage are closed. Original failed CI/local attempts and
+  uncorrected stored-state negatives remain preserved. New exact-head hosted
+  full-device/aggregate checks, fresh private-policy visuals and production
+  activation remain pending; M19 stays open and feature expansion remains held.
+
+### Private Admission Restack Preparation — 2026-10-03
+
+- PR #20 merged as `0b0c9c2` after its exact-head required checks passed. Fresh
+  local human-verification proof passed eight four-device cases with axe; all
+  four fixture captures were viewed. This proves the named fixture lifecycle,
+  not live Cloudflare verification or production activation.
+- Prepared the original four-commit PR #13 private-admission delta above that
+  protected main on a new owned branch. Only additive PLAN/CHANGELOG conflicts
+  required manual resolution. Dependency pins, Node floor, Stylelint policy,
+  publication controls and existing human controls remain preserved; the only
+  package script change adds the existing membership migration regression to
+  `test:bootstrap`. Original and later stack references remain untouched.
+- Kept original failed bootstrap-fixture CI and local browser timeout/retry
+  history. Original branch CI metadata records one failed run followed by three
+  successful runs; those results do not certify this new restack. No new install,
+  test, build, browser run, push, CI, remote migration or deployment has occurred
+  for this candidate. M19 remains open; the next slice is Root review and fresh
+  real-auth role, actual-D1 and migration proof after the native lane is released.
+
 ### Protected Main Gate Boundary and Human Restack Preparation — 2026-10-03
 
 - PR #18 merged as `7a3b4a5` after exact-head hosted Quality, SAST, four devices
@@ -75,6 +116,62 @@ what was planned; superseded entries stay.
   source proof passes 38 behavior cases, current CSS, full audit and fresh
   normal installation; this main-based tree has not been installed or certified.
   M19 and exact-source quality/security/device/merge gates remain open.
+
+### Private membership and bounded admissions — 2026-10-02 (unreleased)
+
+- Added server-owned pending/public/private membership. Migration preserves
+  historical private accounts and workspace grants. New private admission
+  consumes its email-bound offer and activates its role/cohort transactionally;
+  revocation races leave the candidate pending, even after email verification.
+  Client cohort fields cannot grant private membership.
+- Public accounts cannot list, issue, revoke or rotate private invitations/links,
+  regardless of workspace role. Pending accounts cannot reach custom workspace
+  APIs or privileged auth-plugin endpoints. Production public signup stays closed.
+- Added a lifetime grant of two new successful admissions, shared by targeted
+  email invites and reusable links. Pending offers reserve capacity; unused
+  revocation/expiry releases it. Accepted spend survives recipient deletion and
+  rotation. The send-rate budget remains independent.
+- Migration retains the two oldest live pending offers per inviter, revoking
+  excess reservations without removing admitted users or workspace access.
+  Historical accepted offers do not consume the new grant. Link rotation/revoke
+  now also revokes its unused email reservations, freeing their slots.
+- Corrected initial-owner bootstrap for the new pending-by-default schema: it
+  explicitly grants private membership while preserving mandatory email
+  verification. The real full-migration bootstrap test protects this path.
+- Full hosted coverage found that the separate real-auth owner-bootstrap
+  fixture still omitted the newly explicit private membership. Corrected that
+  fixture to match the tested production bootstrap SQL; pending accounts remain
+  refused. The failing run passed the other 2,840 covered tests and all coverage
+  floors, but correctly blocked the browser matrix and is not a quality pass.
+- Local browser verification timed out within the unchanged 60-second journey
+  limit. Split quota/refusal/revocation proof into its own real journey while
+  preserving the existing account/workspace isolation assertions and all
+  deadlines. No case, role, device or accessibility assertion was removed.
+- Added an own-account budget response and distinct quota-conflict error so a
+  spent lifetime allowance is not reported as a temporary email-rate limit.
+  The separate real quota journey exercises two reservations, refusal of a
+  third, unused revocation and replacement. It passed locally with axe on all
+  four devices; all four quota-error captures were opened and reviewed. The
+  existing iPad isolation journey timed out at its final denial screen, leaving
+  the local expanded batch at 7/8. An isolated recheck also timed out before the
+  Members dialog while the independent publication scanner consumed about seven
+  CPU cores. Both failures remain recorded; browser deadlines were not changed.
+- Hosted run `36989072536` passed all seven gates for source `e83ae04`:
+  canonical quality (2,841 covered tests, unchanged global floors, 68 workerd
+  tests, script checks and build), SAST (510 rules, 2,141 files, zero findings)
+  and all 136 existing Playwright/axe cases. Desktop sharing and iPad isolation
+  used the existing retry and remain recorded as flaky. The new separate quota
+  journey still needs the expanded 140-case hosted matrix. No deployment or
+  full M19 certification is claimed.
+- Expanded exact-source workflow `36992631513` passed every gate for `08834df`:
+  2,841 covered tests, unchanged floors, 68 workerd tests, complete script/build
+  gates, zero-finding SAST and all 140 Playwright/axe cases. All four devices
+  passed private isolation and quota/refusal/revocation/replacement. The iPhone
+  gallery journey passed on the existing retry and is recorded as flaky.
+  Membership verification is complete; public signup, recent authentication,
+  plan quotas, payments, public navigation and complete M19 release audits remain
+  unfinished. The next recent-authentication requirements explicitly distinguish
+  credential presentation from email verification and session renewal.
 
 ### Human verification evidence — 2026-10-02
 

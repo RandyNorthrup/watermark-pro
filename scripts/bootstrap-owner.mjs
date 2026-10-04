@@ -38,8 +38,8 @@ export function ownerInsert(input, id = randomUUID(), now = Date.now()) {
   const owner = ownerSchema.parse(input)
   return {
     id,
-    sql: `INSERT INTO user (id, name, email, email_verified, created_at, updated_at, role)
-SELECT ${sqlString(id)}, ${sqlString(owner.name)}, ${sqlString(owner.email)}, 0, ${String(now)}, ${String(now)}, 'owner'
+    sql: `INSERT INTO user (id, name, email, email_verified, created_at, updated_at, role, membership_cohort)
+SELECT ${sqlString(id)}, ${sqlString(owner.name)}, ${sqlString(owner.email)}, 0, ${String(now)}, ${String(now)}, 'owner', 'private'
 WHERE NOT EXISTS (SELECT 1 FROM user)
 RETURNING id;`,
   }

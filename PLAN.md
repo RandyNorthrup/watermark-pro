@@ -4,11 +4,34 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-03 (protected main gate boundary and human-verification restack proof)
+Last updated: 2026-10-03 (private-admission restack preparation above protected human controls)
 
 ---
 
 ## 1. Product summary
+
+### Revised private-admission verification — 2026-10-03
+
+The original private-membership delta is restacked above protected main
+`0b0c9c2`, preserving its new auth and dependency/publication controls. Fresh
+scoped real-auth, actual-D1 and SQLite/bootstrap proof passes 165, 13 and 32
+cases. Whole-interface review adds the existing protected-account-field guard
+at administrative boundaries before publication. Its meaningful stored-state
+negative controls and 101 complete corrected real-auth cases pass, alongside
+scoped lint and forced full types. Ordinary profile and established management
+flows remain supported; no quota or gate changes. The frozen 41-path candidate
+now passes one complete unchanged `npm run quality` on Node 24.18.0 with the
+existing Python 3.13.7 launcher in command PATH: 2,847 covered tests across
+257 files, coverage 92.50% statements / 85.35% branches / 92.33% functions /
+93.44% lines, and 68 actual workerd cases across 19 files. Every static, source
+publication, full audit, script/asset and production build gate passes; audit
+findings are zero. Pinned Semgrep passes 510 rules across 2,143 tracked targets,
+with zero findings and 13 oversized files skipped. Owned processes, six browser
+profiles, port 5273 and gate storage are closed. Final factual docs and exact-head
+publication review come next; the new full four-device/aggregate matrix and fresh
+private-policy captures remain required before protected merge. Historical failed
+runs and stock mutation negatives stay recorded. No production activation or
+complete M19 certification is claimed, and feature expansion remains held.
 
 ### Public billing and human-verification amendment — 2026-10-01
 
@@ -73,6 +96,60 @@ Public/private admission, two-invite quotas, Stripe checkout/portal/webhooks,
 entitlements, paid collaboration and public landing remain the next parts of this
 M19 slice. No later milestone is started, and production release audits remain
 required before deployment.
+
+### Private membership implementation — 2026-10-02
+
+The next M19 admission slice is isolated on `codex/private-admissions`, stacked
+on the verified human-control source and its result documentation. It introduces
+a server-owned `membership_cohort`: historical accounts migrate to `private`,
+new rows start `pending`, and only server admission activates them. Valid private
+admission atomically consumes its invitation and grants its cohort/site role.
+An invitation revoked during creation leaves an unadmitted account pending;
+even later email verification cannot unlock custom or organization/admin APIs.
+Client signup/profile fields cannot select a cohort. Public accounts have no
+private invitation/list/referral privileges regardless of workspace role.
+The existing console-mailbox/test-only uninvited bypass creates disposable
+private fixtures; it does not enable public production registration.
+
+Migration `0018_private-membership.sql` preserves all historical identities,
+verification states, content, explicit workspace grants and accepted invitations.
+Historical accepted admissions use grant version 0 and do not spend the new
+allowance. At cutover, up to two live pending invitations per sender are retained
+oldest-first (creation time, then ID) and reserve the two-new-admission allowance;
+excess pending promises are revoked and can be reissued after capacity is freed.
+Expired/revoked promises are not revived. Reusable links continue to work within
+the same allowance. Accepted version-1 admissions remain spent after recipient
+deletion, expiry or link rotation. Rotation/revocation releases unused referral
+reservations; send/abuse rate budgets remain independent and cannot be reset by
+revoking/issuing repeatedly. One conditional D1 insert reserves capacity across
+competing email and reusable-link requests. The own-account budget API exposes
+used/reserved/available counts; exhausting capacity has a distinct conflict code,
+without a misleading retry-after deadline.
+
+Hosted run `36989072536` passed canonical quality for `e83ae04`: 2,841 covered
+tests, unchanged coverage floors, 68 workerd tests, script checks and build.
+SAST passed 510 rules on 2,141 files with zero findings. All 136 existing browser
+journeys ultimately passed; desktop sharing and iPad private isolation required
+the existing retry and remain recorded as flaky. The new separate quota journey
+passed locally with axe on all four devices; its actual quota-error screenshots
+were opened and reviewed. Expanded workflow `36992631513` passed all seven
+gates for `08834df`, including all 140 browser/axe cases, canonical quality
+(2,841 covered tests, 68 workerd tests, unchanged floors and complete build)
+and zero-finding SAST. The iPhone gallery case used the existing retry; private
+isolation and quota/refusal/revocation/replacement passed on all four devices.
+This admission slice is verified, with the prior failed attempts retained in
+its receipt. The initial local expanded batch was 7/8,
+with existing iPad isolation timing out at its final denial screen. An isolated
+iPad recheck also timed out before the Members dialog; concurrent publication
+scanning used about seven CPU cores, but no sole-cause claim is made. Full
+Lighthouse/screenshot audits and live-provider proof remain release gates;
+no remote migration or deployment is claimed. See the private-membership receipt
+for exact source, failed attempts and completed evidence.
+Recent-authentication policy, public plan quotas, billing state and public
+landing/private-member navigation remain separate unfinished controls. Next
+implement session-bound recent credential proof, quotas and Stripe
+checkout/webhook ownership before opening public signup. M19 and video/release blockers
+stay open; no M20 work begins.
 
 Lumafoil is an MIT-licensed web application for watermarking photos, videos and
 PDF documents. The hosted service is invitation-only; each admitted user gets
@@ -563,6 +640,28 @@ and expensive to block on. If any is wrong, say so and the plan will be revised.
 ## 3. Resolved decisions
 
 ### 3.1 Stack
+
+**Private-admission restack preparation, 2026-10-03:** protected PR #20 merged as
+`0b0c9c2` after its exact-head required gates passed. Its fresh local four-device
+human challenge proof passes eight cases with axe, and all four named-fixture
+captures were viewed; live provider and production activation remain unproved.
+The original four PR #13 commits are prepared as their existing 39-path delta on
+owned branch `codex/restack-private-admissions` above this main. Thirty-six
+preimages match the original base; PLAN/CHANGELOG require additive resolution,
+while the package's sole test-script extension merges without replacing any
+new-main dependencies, engine policy or gate scripts. Original/later references
+remain intact. Historical CI includes one failed owner-bootstrap fixture and
+three subsequent successful exact-source runs; local timeout/flaky/interrupted
+history stays recorded and is not reset by restacking. No new runtime gate pass
+is claimed. A source-only formatter call cannot resolve the absent candidate-
+local Tailwind plugin; formatting waits for the normal candidate install. Review
+the complete delta, then fresh normal installation, real-auth
+owner/admin/editor/viewer/non-member/anonymous boundaries, actual-D1 shared-slot
+concurrency/lifetime refusals and legacy migration/bootstrap preservation.
+Canonical quality, SAST and four-device/aggregate gates still require new exact-
+head proof before protected merge. The native lane is currently owned by a
+separate diagnostic; no candidate runtime has started. M19 remains open and
+feature expansion remains held. See the private-membership receipt.
 
 **Protected main and restack checkpoint, 2026-10-03:** PR #18's exact head
 `ad390d5` passed hosted Quality/SAST/all four devices/aggregate E2E and merged as

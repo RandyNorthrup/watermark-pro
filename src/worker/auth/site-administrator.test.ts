@@ -113,6 +113,10 @@ describe('protected site owner', () => {
       { email: OWNER.email },
       { emailVerified: true },
       { id: ownerId },
+      { membershipCohort: 'public' },
+      { banned: true },
+      { banReason: 'Generic update must not bypass moderation' },
+      { banExpires: Date.now() },
     ]) {
       expect(
         await responseStatus(owner.post('/api/auth/admin/update-user', { userId: otherId, data })),
@@ -127,6 +131,98 @@ describe('protected site owner', () => {
       ),
     ).toBe(403)
   })
+  it.each([
+    ['owner', 'self'],
+    ['owner', 'other'],
+    ['admin', 'self'],
+    ['admin', 'other'],
+  ] as const)(
+    '%s keeps public membership unchanged for %s through a generic profile update',
+    async (role, target) => {
+      if (role === 'admin')
+        expect(
+          await responseStatus(owner.post('/api/auth/admin/set-role', { userId: otherId, role })),
+        ).toBe(200)
+      const context = await harness.services.auth.$context
+      const manager = role === 'owner' ? owner : other
+      let targetClient = target === 'self' ? manager : other
+      let targetId = target === 'self' && role === 'owner' ? ownerId : otherId
+      if (role === 'admin' && target === 'other') {
+        targetClient = new TestClient(harness.app, harness.env)
+        await targetClient.signUpAndVerify(harness.mailbox, {
+          name: 'Public target',
+          email: 'public-target@example.test',
+          password: 'a separate public target passphrase',
+        })
+        targetId = sessionIdSchema.parse(
+          await responseJson(targetClient.get('/api/auth/get-session')),
+        ).user.id
+      }
+      await context.adapter.update({
+        model: 'user',
+        where: [{ field: 'id', value: targetId }],
+        update: { membershipCohort: 'public' },
+      })
+      expect(await responseStatus(targetClient.get('/api/me/invitations'))).toBe(403)
+      expect(
+        await responseStatus(
+          manager.post('/api/auth/admin/update-user', {
+            userId: targetId === ownerId ? otherId : targetId,
+            data: { name: 'Allowed administrative profile edit' },
+          }),
+        ),
+      ).toBe(200)
+      const response = await manager.post('/api/auth/admin/update-user', {
+        userId: targetId,
+        data: { membershipCohort: 'private' },
+      })
+      // Check storage first so the uncorrected handler proves a mutation,
+      // rather than stopping at a successful HTTP response.
+      expect(
+        await context.adapter.findOne({ model: 'user', where: [{ field: 'id', value: targetId }] }),
+      ).toMatchObject({ membershipCohort: 'public' })
+      expect(response.status).toBe(403)
+      expect(await responseStatus(targetClient.get('/api/me/invitations'))).toBe(403)
+      expect(await harness.services.accounts.listInvitations(targetId)).toEqual([])
+      expect(await harness.services.accounts.findReferralLink(targetId)).toBeNull()
+    },
+  )
+  it.each(['owner', 'admin'] as const)(
+    '%s creates no credentials or verified identity through administrative account creation',
+    async (role) => {
+      if (role === 'admin')
+        expect(
+          await responseStatus(owner.post('/api/auth/admin/set-role', { userId: otherId, role })),
+        ).toBe(200)
+      const manager = role === 'owner' ? owner : other
+      const context = await harness.services.auth.$context
+      const before = await context.adapter.count({ model: 'user' })
+      for (const fields of [
+        { password: 'A manager must not assign this password' },
+        { data: { emailVerified: true } },
+        { password: 'A manager must not assign this password', data: { emailVerified: true } },
+        { data: { membershipCohort: 'private' } },
+        { data: { banned: true, banReason: 'Use the audited moderation endpoint' } },
+      ])
+        expect(
+          await responseStatus(
+            manager.post('/api/auth/admin/create-user', {
+              name: 'Protected creation',
+              email: 'protected-creation@example.test',
+              ...fields,
+            }),
+          ),
+        ).toBe(403)
+      expect(await context.adapter.count({ model: 'user' })).toBe(before)
+      const created = await manager.post('/api/auth/admin/create-user', {
+        name: 'Unverified account',
+        email: 'unverified-creation@example.test',
+        role: 'user',
+      })
+      expect(created.status).toBe(200)
+      expect(await created.json()).toMatchObject({ user: { emailVerified: false, role: 'user' } })
+    },
+  )
   it('cannot demote, ban, remove, or re-identify the sole owner', async () => {
     for (const [path, body] of [
       ['/api/auth/admin/set-role', { userId: ownerId, role: 'user' }],

@@ -184,6 +184,7 @@ export const API_ERROR_CODE = {
   payloadTooLarge: 'payload_too_large',
   unsupportedMedia: 'unsupported_media_type',
   quotaExceeded: 'quota_exceeded',
+  invitationQuotaExceeded: 'invitation_quota_exceeded',
   unsupportedUrl: 'unsupported_url',
 } as const
 
