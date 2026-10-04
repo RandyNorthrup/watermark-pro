@@ -10,13 +10,13 @@
 import type { BetterAuthOptions } from 'better-auth'
 import type { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
-import { captcha } from 'better-auth/plugins'
 import { admin } from 'better-auth/plugins/admin'
 import { adminAc, userAc } from 'better-auth/plugins/admin/access'
 import { organization } from 'better-auth/plugins/organization'
 import { z } from 'zod'
 
 import type { AccountStore } from '../account-store'
+import { humanVerificationPlugins } from './human-verification'
 import {
   acceptSiteAdmission,
   invitationAdmission,
@@ -50,9 +50,6 @@ import type { WorkspaceAccessStore } from '../workspace-access-store'
 /** Adapter factory shape shared by every Better Auth adapter package. */
 export type DatabaseAdapter = ReturnType<typeof drizzleAdapter>
 
-/** Better Auth endpoints that must carry a Turnstile token when captcha is enabled. */
-export const CAPTCHA_PROTECTED_ENDPOINTS = ['/sign-up/email', '/request-password-reset']
-
 /**
  * The user's saved interface language (M18). Validated against the shipped
  * locales so `updateUser` (via `PATCH /api/me`) can never persist free text.
@@ -84,7 +81,7 @@ export interface AuthDependencies {
   appUrl: string
   email: EmailSender
   rateLimit: RateLimitStorage
-  /** Present when Turnstile is configured; verification runs before sign-up and password reset. */
+  /** Mandatory in production; binds admission/recovery challenges to canonical hostname and action. */
   captcha?: { secretKey: string; siteVerifyUrl?: string | undefined } | undefined
   audit: AuditStore
   /** Rate limiting is disabled only for the Node unit tests, which have no binding. */
@@ -348,18 +345,7 @@ export function buildAuthOptions(deps: AuthDependencies) {
         adminRoles: [SITE_ROLE.owner, SITE_ROLE.admin],
         roles: { owner: adminAc, admin: adminAc, user: userAc },
       }),
-      ...(deps.captcha === undefined
-        ? []
-        : [
-            captcha({
-              provider: 'cloudflare-turnstile',
-              secretKey: deps.captcha.secretKey,
-              endpoints: CAPTCHA_PROTECTED_ENDPOINTS,
-              ...(deps.captcha.siteVerifyUrl !== undefined && {
-                siteVerifyURLOverride: deps.captcha.siteVerifyUrl,
-              }),
-            }),
-          ]),
+      ...humanVerificationPlugins(deps.captcha, appOrigin.hostname),
     ],
     hooks: {
       before: invitationAdmission(deps.accounts, deps.canSignUpWithoutInvitation === true),

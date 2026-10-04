@@ -15,6 +15,9 @@ const bindingSchema = <T>(name: string) =>
     message: `${name} binding is missing; check wrangler.jsonc`,
   })
 
+/** Cloudflare's documented dummy keys must never make a production gate always pass. */
+const turnstileTestKey = /^[123]x0+(?:AA|AB|BB|FF)$/
+
 const envSchema = z
   .object({
     APP_ENV: z.enum(APP_ENVIRONMENTS),
@@ -31,9 +34,9 @@ const envSchema = z
     API_RATE_LIMITER: bindingSchema<RateLimit>('API_RATE_LIMITER'),
     IMPORT_RATE_LIMITER: bindingSchema<RateLimit>('IMPORT_RATE_LIMITER'),
     SEND_EMAIL: bindingSchema<SendEmail>('SEND_EMAIL').optional(),
-    /** Cloudflare Turnstile: set both keys to protect sign-up and password reset; leave both unset to disable. */
-    TURNSTILE_SITE_KEY: z.string().min(1).optional(),
-    TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+    /** Mandatory production Turnstile pair; optional only in isolated non-production environments. */
+    TURNSTILE_SITE_KEY: z.string().trim().min(1).optional(),
+    TURNSTILE_SECRET_KEY: z.string().trim().min(1).optional(),
     /** Dedicated confidential OAuth clients for account identity, independent from file providers. */
     GOOGLE_AUTH_CLIENT_ID: z.string().min(1).optional(),
     GOOGLE_AUTH_CLIENT_SECRET: z.string().min(1).optional(),
@@ -59,6 +62,22 @@ const envSchema = z
       path: ['TURNSTILE_SECRET_KEY'],
     },
   )
+  .refine(
+    (env) =>
+      env.APP_ENV !== 'production' ||
+      (env.TURNSTILE_SITE_KEY !== undefined &&
+        env.TURNSTILE_SECRET_KEY !== undefined &&
+        !turnstileTestKey.test(env.TURNSTILE_SITE_KEY) &&
+        !turnstileTestKey.test(env.TURNSTILE_SECRET_KEY)),
+    {
+      message: 'Production requires real TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY',
+      path: ['TURNSTILE_SECRET_KEY'],
+    },
+  )
+  .refine((env) => env.APP_ENV !== 'production' || /^https:\/\//i.test(env.APP_URL), {
+    message: 'Production APP_URL must use HTTPS',
+    path: ['APP_URL'],
+  })
   .refine(
     (env) =>
       (env.GOOGLE_AUTH_CLIENT_ID === undefined) === (env.GOOGLE_AUTH_CLIENT_SECRET === undefined),

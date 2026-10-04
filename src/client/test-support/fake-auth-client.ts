@@ -109,6 +109,7 @@ export function createFakeAuthClient() {
       return ok({ success: true })
     }),
     signIn: {
+      social: vi.fn(() => ok({ url: 'https://accounts.google.com/fixture', redirect: true })),
       email: vi.fn((input: { email: string; password: string }) => {
         if (state.nextSignInError !== null) {
           const error = state.nextSignInError

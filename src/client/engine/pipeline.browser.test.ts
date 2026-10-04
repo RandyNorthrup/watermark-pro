@@ -262,17 +262,44 @@ describe('applyWatermark', () => {
     ).toBeGreaterThan(100)
     expect(countRed(redPixels)).toBeGreaterThan(50)
 
+    const boxedSpec: WatermarkSpec = {
+      ...textSpec,
+      text: 'TWO\nLINES',
+      placement: { mode: 'anchor', anchor: 'center' },
+      contrast: { mode: 'manual', variant: 'light', outline: 0 },
+      style: { ...textSpec.style, scale: 0.5, backdrop: { enabled: true, opacity: 1 } },
+    }
     const boxed = await applyWatermark(
+      {
+        source: await splitBitmap(300, 300, '#ffffff', '#ffffff'),
+        marks: [{ spec: boxedSpec }],
+        output: { format: 'image/png', quality: 1 },
+      },
+      offscreenBackend,
+    )
+    // Two lines make the mark about as tall as it is wide instead of a thin strip.
+    const boxedPlacement = boxed.marks[0]?.placement
+    if (boxedPlacement === undefined) throw new Error('The text backdrop has no placement.')
+    expect(boxedPlacement.height).toBeGreaterThan(boxedPlacement.width * 0.6)
+    const boxedPixels = await pixelsOf(boxed.blob)
+    // Sample padding above the actual glyph bounds; white glyphs are deliberately
+    // excluded from a dark-background assertion, regardless of system font metrics.
+    const box = {
+      x: Math.ceil(boxedPlacement.centreX - boxedPlacement.width / 2),
+      y: Math.ceil(boxedPlacement.centreY - boxedPlacement.height / 2 - boxedPlacement.height / 10),
+      width: Math.floor(boxedPlacement.width),
+      height: Math.floor(boxedPlacement.height / 20),
+    }
+    expect(countChanged(boxedPixels, box, WHITE)).toBeGreaterThan(box.width * box.height * 0.8)
+    expect(countChanged(boxedPixels, { x: 0, y: 0, width: 20, height: 20 }, WHITE)).toBe(0)
+    const glyphsOnly = await applyWatermark(
       {
         source: await splitBitmap(300, 300, '#ffffff', '#ffffff'),
         marks: [
           {
             spec: {
-              ...textSpec,
-              text: 'TWO\nLINES',
-              placement: { mode: 'anchor', anchor: 'center' },
-              contrast: { mode: 'manual', variant: 'light', outline: 0 },
-              style: { ...textSpec.style, scale: 0.5, backdrop: { enabled: true, opacity: 1 } },
+              ...boxedSpec,
+              style: { ...boxedSpec.style, backdrop: { enabled: false, opacity: 1 } },
             },
           },
         ],
@@ -280,13 +307,7 @@ describe('applyWatermark', () => {
       },
       offscreenBackend,
     )
-    // Two lines make the mark about as tall as it is wide instead of a thin strip.
-    const boxedPlacement = boxed.marks[0]?.placement
-    expect(boxedPlacement?.height).toBeGreaterThan((boxedPlacement?.width ?? 0) * 0.6)
-    const boxedPixels = await pixelsOf(boxed.blob)
-    // The dark box covers the whole mark area, well beyond the glyph strokes.
-    const box = { x: 90, y: 90, width: 120, height: 120 }
-    expect(countChanged(boxedPixels, box, WHITE)).toBeGreaterThan(box.width * box.height * 0.8)
+    expect(countChanged(await pixelsOf(glyphsOnly.blob), box, WHITE)).toBe(0)
 
     const qr = await applyWatermark(
       {

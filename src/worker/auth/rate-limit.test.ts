@@ -9,16 +9,20 @@ function fakeLimiter(isAllowed: boolean) {
 const rule = { window: 10, max: 100 }
 
 describe('createBindingRateLimitStorage', () => {
-  it('sends credential endpoints to the strict limiter', async () => {
-    const strict = fakeLimiter(true)
-    const general = fakeLimiter(true)
-    const storage = createBindingRateLimitStorage(strict, general)
+  it.each(['/sign-in/email', '/request-password-reset', '/sign-in/social'])(
+    'sends %s to the strict limiter',
+    async (path) => {
+      const strict = fakeLimiter(true)
+      const general = fakeLimiter(true)
+      const storage = createBindingRateLimitStorage(strict, general)
 
-    await storage.consume('203.0.113.9|/sign-in/email', rule)
+      const key = `203.0.113.9|${path}`
+      await storage.consume(key, rule)
 
-    expect(strict.limit).toHaveBeenCalledWith({ key: '203.0.113.9|/sign-in/email' })
-    expect(general.limit).not.toHaveBeenCalled()
-  })
+      expect(strict.limit).toHaveBeenCalledWith({ key })
+      expect(general.limit).not.toHaveBeenCalled()
+    },
+  )
 
   it('sends everything else to the general limiter', async () => {
     const strict = fakeLimiter(true)

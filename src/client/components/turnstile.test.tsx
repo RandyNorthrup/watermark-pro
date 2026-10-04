@@ -1,11 +1,14 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { userEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const SCRIPT_SELECTOR = 'script[src^="https://challenges.cloudflare.com/turnstile/"]'
 
 interface RenderOptions {
   sitekey: string
+  action: string
   theme: string
+  size: 'normal' | 'compact'
   callback: (token: string) => void
   'expired-callback': () => void
   'error-callback': () => void
@@ -50,6 +53,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  vi.restoreAllMocks()
   window.localStorage.clear()
 })
 
@@ -59,7 +63,7 @@ describe('Turnstile', () => {
     const fake = fakeApi()
     const onToken = vi.fn()
     const view = render(<Turnstile siteKey="site-key" onToken={onToken} />)
-    expect(screen.getByLabelText('Bot check')).toBeInTheDocument()
+    expect(screen.getByLabelText('Human verification')).toBeInTheDocument()
     const script = scriptElement()
     expect(script.async).toBe(true)
     // A second widget while the script is still loading must not add another tag.
@@ -76,7 +80,10 @@ describe('Turnstile', () => {
       throw new Error('widget was not rendered')
     }
     expect(options.sitekey).toBe('site-key')
+    expect(options.action).toBe('account_admission')
     expect(options.theme).toBe('auto')
+    expect(options.size).toBe('compact')
+    expect(screen.getAllByLabelText('Human verification')[0]).toHaveStyle({ minHeight: '140px' })
     options.callback('fresh-token')
     expect(onToken).toHaveBeenCalledWith('fresh-token')
     options['expired-callback']()
@@ -107,7 +114,7 @@ describe('Turnstile', () => {
     act(() => {
       fake.calls[0]?.['error-callback']()
     })
-    expect(await screen.findByRole('alert')).toHaveTextContent('The bot check failed to load')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Human verification failed')
     expect(onToken).toHaveBeenCalledWith(null)
   })
 
@@ -117,7 +124,17 @@ describe('Turnstile', () => {
     act(() => {
       scriptElement().dispatchEvent(new Event('error'))
     })
-    expect(await screen.findByRole('alert')).toHaveTextContent('Turnstile could not be loaded')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Human verification is unavailable')
+    expect(document.head.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(0)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Retry human verification' }))
+    expect(document.head.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1)
+    const fake = fakeApi()
+    vi.stubGlobal('turnstile', fake.api)
+    act(() => {
+      scriptElement().dispatchEvent(new Event('load'))
+    })
+    await waitFor(() => expect(fake.api.render).toHaveBeenCalledOnce())
+    expect(screen.queryByRole('alert')).toBeNull()
   })
 
   it('reports a script that loads without defining the API', async () => {
@@ -126,7 +143,7 @@ describe('Turnstile', () => {
     act(() => {
       scriptElement().dispatchEvent(new Event('load'))
     })
-    expect(await screen.findByRole('alert')).toHaveTextContent('Turnstile did not initialise')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Human verification is unavailable')
   })
 
   it('does not render into a container after unmounting mid-load', async () => {
@@ -144,5 +161,75 @@ describe('Turnstile', () => {
     })
     expect(fake.api.render).not.toHaveBeenCalled()
     expect(fake.remove).not.toHaveBeenCalled()
+  })
+
+  it('binds recovery to its own action and ignores callbacks after the widget is removed', async () => {
+    const fake = fakeApi()
+    vi.stubGlobal('turnstile', fake.api)
+    const Turnstile = await loadComponent()
+    const onToken = vi.fn()
+    const view = render(
+      <Turnstile siteKey="site-key" action="password_recovery" onToken={onToken} />,
+    )
+    await waitFor(() => expect(fake.api.render).toHaveBeenCalledOnce())
+    expect(fake.calls[0]?.action).toBe('password_recovery')
+    onToken.mockClear()
+    view.unmount()
+    act(() => {
+      fake.calls[0]?.callback('late-token')
+      fake.calls[0]?.['expired-callback']()
+      fake.calls[0]?.['error-callback']()
+    })
+    expect(onToken).not.toHaveBeenCalled()
+    expect(fake.remove).toHaveBeenCalledOnce()
+  })
+
+  it('switches sizing when available width changes and invalidates the removed widget token', async () => {
+    let width = 360
+    let resized: () => void = vi.fn()
+    const disconnect = vi.fn()
+    vi.spyOn(globalThis, 'ResizeObserver').mockImplementation(
+      class {
+        disconnect = disconnect
+        observe = vi.fn()
+        unobserve = vi.fn()
+        constructor(callback: ResizeObserverCallback) {
+          resized = vi.fn(() => callback([], this))
+        }
+      },
+    )
+    const bounds = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(() => new DOMRect(0, 0, width, 0))
+    const fake = fakeApi()
+    vi.stubGlobal('turnstile', fake.api)
+    const Turnstile = await loadComponent()
+    const onToken = vi.fn()
+    const view = render(<Turnstile siteKey="site-key" onToken={onToken} />)
+    await waitFor(() => expect(fake.calls.at(-1)?.size).toBe('normal'))
+    expect(screen.getByLabelText('Human verification')).toHaveStyle({ minHeight: '65px' })
+    const old = fake.calls.at(-1)
+    act(() => old?.callback('wide-widget-token'))
+    expect(onToken).toHaveBeenLastCalledWith('wide-widget-token')
+    const before = fake.calls.length
+    width = 280
+    act(() => {
+      resized()
+    })
+    await waitFor(() => expect(fake.calls.length).toBe(before + 1))
+    expect(fake.calls.at(-1)?.size).toBe('compact')
+    expect(screen.getByLabelText('Human verification')).toHaveStyle({ minHeight: '140px' })
+    expect(fake.remove).toHaveBeenCalled()
+    expect(onToken).toHaveBeenLastCalledWith(null)
+    onToken.mockClear()
+    act(() => old?.callback('stale-wide-token'))
+    expect(onToken).not.toHaveBeenCalled()
+    act(() => {
+      resized()
+    })
+    expect(fake.calls.length).toBe(before + 1)
+    view.unmount()
+    expect(disconnect).toHaveBeenCalledOnce()
+    bounds.mockRestore()
   })
 })

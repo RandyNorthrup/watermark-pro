@@ -5,7 +5,7 @@ import { SYNC_OPERATION_HEADER } from '../../shared/sync'
 import type { AppContext } from '../app-context'
 import { apiErrors } from '../errors'
 
-/** Rejects unauthenticated requests with a JSON 401 and exposes the session to handlers. */
+/** Requires a verified cookie session before exposing custom account or workspace APIs. */
 export const requireSession = createMiddleware<AppContext>(async (c, next) => {
   // This middleware owns custom API binding errors. Read the authoritative
   // cookie session first so the auth endpoint's APIError cannot bypass the
@@ -16,6 +16,7 @@ export const requireSession = createMiddleware<AppContext>(async (c, next) => {
   if (session === null) {
     throw apiErrors.unauthenticated()
   }
+  if (!session.user.emailVerified || session.user.banned === true) throw apiErrors.forbidden()
   const expectedAccount = c.req.header(ACCOUNT_ID_HEADER)
   if (expectedAccount !== undefined) {
     const parsed = accountIdSchema.safeParse(expectedAccount)

@@ -96,19 +96,28 @@ function errorField(error, field) {
 }
 
 class GateRequestError extends Error {
-  constructor(status) {
+  constructor(status, reason) {
     super('The gate request cannot be forwarded.')
     this.status = status
+    this.reason = reason
   }
 }
 
 function requestTarget(request, origin) {
   const target = request.url
-  if (typeof target !== 'string' || !target.startsWith('/') || target.startsWith('//'))
-    throw new GateRequestError(BAD_REQUEST)
+  // A proxy CONNECT client can retain absolute-form after a redirect. HTTP
+  // origins must accept it, but it grants no authority beyond this exact gate.
+  if (
+    typeof target !== 'string' ||
+    (!target.startsWith('/') && !target.startsWith('http://')) ||
+    target.startsWith('//')
+  )
+    throw new GateRequestError(BAD_REQUEST, 'request_target_invalid')
   const url = new URL(target, origin)
-  if (url.origin !== origin || url.hash !== '' || request.headers.host !== url.host)
-    throw new GateRequestError(BAD_REQUEST)
+  if (url.origin !== origin || url.hash !== '' || url.username !== '' || url.password !== '')
+    throw new GateRequestError(BAD_REQUEST, 'request_origin_invalid')
+  if (request.headers.host !== url.host)
+    throw new GateRequestError(BAD_REQUEST, 'request_host_invalid')
   return url
 }
 
@@ -168,7 +177,7 @@ export function classifyGateFailure(error) {
     if (errorField(value, 'name') === 'AbortError') return 'abort_error'
     if (errorField(value, 'name') === 'TimeoutError') return 'timeout_error'
   }
-  if (error instanceof GateRequestError) return 'request_rejected'
+  if (error instanceof GateRequestError) return error.reason
   if (error instanceof TypeError) return 'type_error'
   return 'unclassified'
 }
@@ -216,8 +225,8 @@ export async function createGateBridge(port) {
         (request.headers['transfer-encoding'] !== undefined ||
           Number(request.headers['content-length'] ?? 0) > 0)
       )
-        throw new GateRequestError(BAD_REQUEST)
-      if (state.dispatch === null) throw new GateRequestError(UNAVAILABLE)
+        throw new GateRequestError(BAD_REQUEST, 'request_body_forbidden')
+      if (state.dispatch === null) throw new GateRequestError(UNAVAILABLE, 'runtime_not_ready')
       stage = 'runtime_dispatch'
       const result = await state.dispatch(url, {
         method: request.method,

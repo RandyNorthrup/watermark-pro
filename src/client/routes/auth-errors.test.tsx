@@ -29,6 +29,7 @@ const failure = (message: string) =>
 
 beforeEach(() => {
   installFakeAuth()
+  installLibraryApi()
 })
 
 afterEach(() => {
@@ -63,7 +64,9 @@ describe('error paths on public pages', () => {
   it('validates the forgot-password form and reports server failures', async () => {
     const user = userEvent.setup()
     renderApp('/forgot-password')
-    await user.click(await screen.findByRole('button', { name: 'Send reset link' }))
+    const submit = await screen.findByRole('button', { name: 'Send reset link' })
+    await waitFor(() => expect(submit).toBeEnabled())
+    await user.click(submit)
     expect(await screen.findByText('Enter a valid email address')).toBeInTheDocument()
 
     client().requestPasswordReset.mockImplementationOnce(() => failure('Too many requests'))
