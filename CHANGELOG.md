@@ -7,6 +7,48 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Exact Main Quality Failure Boundary — 2026-10-03
+
+- Canonical corrected source publication and unchanged full audit pass; audit
+  reports zero vulnerabilities. The complete quality command then fails at
+  covered tests: 2,765 passed, 24 failed across ten of 253 files, with branch
+  coverage 84.8% below the unchanged 85% floor. Later integration/scripts/build
+  stages did not run. Both local failed quality boundaries remain recorded.
+- Application, Worker, test and runtime configuration source remain exact main;
+  no tests, thresholds, deadlines or assertions were weakened. Updated tooling
+  influence remains unknown. A reviewed draft and one exact-head Linux control
+  can record this boundary; no merge-ready, M19 or deployment claim is made.
+
+### Publication Byte Accounting Correction — 2026-10-03
+
+- Preserved the initial main full-quality failure at the publication gate.
+  Duplicate working/index/history occurrences were charged before dedup despite
+  requiring no distinct scanner work; ordinary bytes already exceeded the
+  unchanged 512 MiB cap before archive expansion.
+- Reused the reviewed existing scanner correction: every original occurrence
+  retains path/private-value/LFS checks, while exact filename/bytes/actual-mask
+  candidates share one charge. Same-path changed versions use disjoint scanner
+  files. All history, rules, exceptions, archive bounds and budgets remain intact.
+- Actual main scanner regressions pass 24 cases. Full source publication passes
+  15,576 checks with 552,520,986 raw/260,328,234 distinct bytes. Fresh normal
+  main installation also passes with zero vulnerabilities. Full quality
+  re-execution and required security/device/exact-head CI remain pending;
+  no commit, protected merge, deployment or feature expansion is claimed.
+
+### Stylelint Audit Remediation Preparation — 2026-10-03
+
+- Pinned the exact official Stylelint source archive that removes the vulnerable
+  micromatch/braces chain, preserving its unmodified upstream metadata and honest
+  URL/integrity. This is unreleased development source, not a patched npm release.
+- Preserved standard config 40.0.0 and all existing settings; added
+  `value-no-invalid` to retain the parse/math checks moved by upstream. Raised
+  the Node minimum to 24.15.0 while retaining the existing Node 24 CI selector.
+- Prepared only the main-based dependency/configuration delta. Main scripts,
+  unrelated dependencies and install hooks remain intact. Separate isolated
+  source proof passes 38 behavior cases, current CSS, full audit and fresh
+  normal installation; this main-based tree has not been installed or certified.
+  M19 and exact-source quality/security/device/merge gates remain open.
+
 ### CI/CD And Repository Protection — 2026-10-01
 
 - Added automatic PR quality/Semgrep/four-device checks and automatic main

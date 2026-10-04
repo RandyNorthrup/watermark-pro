@@ -28,6 +28,18 @@ const TOOL_TIMEOUT_MS = 120_000
 const ENV_EXAMPLES = new Set(['.env.example', '.dev.vars.example'])
 const LFS_PREFIX = 'version https://git-lfs.github.com/spec/v1'
 
+/** Enforce the unchanged aggregate cap for candidates admitted by the exact existing dedup key. */
+export function chargeUniqueCandidateBytes(stats, bytes) {
+  stats.uniqueCandidateBytes += bytes
+  if (stats.uniqueCandidateBytes > PUBLICATION_LIMITS.candidateBytes)
+    throw new Error('Publication byte budget exceeded')
+}
+
+/** Keep the existing scanner identity: original path, original bytes and historical masking treatment. */
+export function publicationCandidateFingerprint(filename, bytes, maskedOccurrences) {
+  return `${maskedOccurrences === 0 ? 'unmasked' : 'retired-history'}:${filename}:${createHash('sha256').update(bytes).digest('hex')}`
+}
+
 function isPrivateVariable(name) {
   return SECRET_NAME.test(name) || SECRET_KEYS.has(name)
 }
@@ -285,9 +297,11 @@ export async function auditPublication(root, mode = 'source') {
   const findings = []
   const sourceMap = new Map()
   const seen = new Set()
+  const scannerVersions = new Map()
   const stats = {
     files: 0,
     bytes: 0,
+    uniqueCandidateBytes: 0,
     archiveEntries: 0,
     expandedBytes: 0,
     historyObjects: 0,
@@ -307,10 +321,7 @@ export async function auditPublication(root, mode = 'source') {
   ) {
     stats.files += 1
     stats.bytes += bytes.length
-    if (
-      bytes.length > PUBLICATION_LIMITS.fileBytes ||
-      stats.bytes > PUBLICATION_LIMITS.candidateBytes
-    )
+    if (bytes.length > PUBLICATION_LIMITS.fileBytes)
       throw new Error('Publication byte budget exceeded')
     let problem
     try {
@@ -331,16 +342,24 @@ export async function auditPublication(root, mode = 'source') {
         path: safeLabel(label, patterns),
         reason: 'Git LFS content must be materialized and inspected before publication',
       })
-    // A masked historical copy must never replace a current candidate with
-    // identical original bytes; their scanner treatment is deliberately different.
-    const fingerprint = `${origin === 'history-blob' ? 'history' : 'current'}:${createHash('sha256').update(bytes).digest('hex')}`
+    // Only identical paths and bytes with identical scanner treatment can share
+    // a copy. A retired-history exception must never suppress a current file.
+    const scannerCopy = maskRetiredHistoricalSecrets(bytes, origin)
+    const fingerprint = publicationCandidateFingerprint(filename, bytes, scannerCopy.occurrences)
     if (seen.has(fingerprint)) return
+    // The bounded staging/ZIP work already shares only exact path/byte/treatment
+    // copies. Charge that work once; retain raw bytes and all occurrence checks.
+    chargeUniqueCandidateBytes(stats, bytes.length)
     seen.add(fingerprint)
     if (shouldStage && problem !== 'Unsafe publication path' && names.length === 0) {
-      const scannerCopy = maskRetiredHistoricalSecrets(bytes, origin)
       stats.retiredHistoryMaskedOccurrences += scannerCopy.occurrences
       sequence += 1
-      const safeName = `${sequence}/${safePublicationPath(filename)}`
+      // Share directory trees across different paths; repeated versions of one
+      // path still receive separate copies, preserving filename rules and bytes.
+      const scannerPath = safePublicationPath(filename)
+      const version = scannerVersions.get(scannerPath) ?? 0
+      scannerVersions.set(scannerPath, version + 1)
+      const safeName = `${version}/${scannerPath}`
       await mkdir(path.dirname(path.join(stage, 'candidate', safeName)), { recursive: true })
       await writeFile(path.join(stage, 'candidate', safeName), scannerCopy.bytes)
       sourceMap.set(safeName, label)
@@ -520,6 +539,7 @@ export async function auditPublication(root, mode = 'source') {
       mode,
       status: uniqueFindings.length === 0 ? 'pass' : 'fail',
       stats,
+      scannerCopies: sequence * 2,
       knownSecretScope:
         secrets.length === 0
           ? 'No configured private values available; pattern/path/archive checks still ran'

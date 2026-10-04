@@ -4,7 +4,7 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-01 (automatic CI/CD and GitHub repository protection)
+Last updated: 2026-10-03 (main-based dependency and publication gate correction)
 
 ---
 
@@ -499,6 +499,58 @@ and expensive to block on. If any is wrong, say so and the plan will be revised.
 ## 3. Resolved decisions
 
 ### 3.1 Stack
+
+**Corrected main quality result, 2026-10-03:** the unchanged complete command
+passes canonical source publication and full audit with zero vulnerabilities,
+then fails covered tests: 2,765 pass/24 fail (253 files, ten failed) and branch
+coverage 84.8% below the unchanged 85% floor. Workerd/later scripts/build are not
+reached. Application/test/config source matches exact main; updated CSS/tooling
+transitives have unknown influence until matching proof. No tests, deadlines,
+coverage floors or source assertions are changed. Preserve both local failed
+quality boundaries and use one justified exact-head Linux canonical control
+before any merge-ready claim; no third local quality retry. Root's main SAST passes 510 rules/2,127 files with zero findings (13 oversized
+files skipped); required exact-head hosted/device checks remain pending. M19 remains open.
+
+**Main verification reassessment, 2026-10-03:** fresh normal main `npm ci`
+passes with zero vulnerabilities. The first unchanged full quality command
+passes format/lint/CSS/workflows/types/dead-code/locales/cycles/duplication, then
+fails publication because its old aggregate charges repeated working/index/
+history occurrences before dedup. Actual ordinary accounting is 543,857,309
+bytes, including 146,814,818 identical working/index bytes charged again,
+against the unchanged 536,870,912-byte cap. Reuse the reviewed `c358434` scanner
+correction: strengthen original filename/bytes/actual retired-mask identity,
+charge distinct candidates once, keep raw counters and all path/private/LFS/
+history/archive/individual/aggregate limits, and preserve changed same-path
+versions in separate scanner files. Actual main regression proof is 24 passes;
+source publication passes with 552,520,986 raw/260,328,234 distinct bytes.
+No rule, historical exception, deadline or cap is weakened. The initial failed
+full-quality run remains recorded; full canonical re-execution, SAST/device and
+exact-head required CI remain pending. M19 stays open. See the
+[publication receipt](docs/verification/m19/publication-main-byte-accounting-2026-10-03.md).
+
+**Stylelint advisory correction, 2026-10-03 (prepared; verification pending on
+this main-based tree):** pin the unmodified official Stylelint source archive
+at commit `12c034f5db042b474126b36231bd4ffe0ccc6e8d`
+([upstream commit](https://github.com/stylelint/stylelint/commit/12c034f5db042b474126b36231bd4ffe0ccc6e8d),
+[immutable archive](https://codeload.github.com/stylelint/stylelint/tar.gz/12c034f5db042b474126b36231bd4ffe0ccc6e8d)).
+This is unreleased v18 development source whose honest upstream package metadata
+still says `17.15.0`, not the published npm 17.15.0 release. Archive SHA-256 is
+`f9f4d07dc8a8a8a3df8410c460a5e5994ccd547ef9775cc1eb9d70aadfeab3ea`;
+the ordinary lock records
+`sha512-kWAVd1mTQkx+vED+V1dbVANwN1CPts+B+LMDr2mpX9dMJFwa6m/CxFpkfzWOtfQv66IvKjWxzsTaJGM8lERjug==`.
+The source removes the actual micromatch/braces chain rather than changing
+package identity or suppressing its advisory. Retain standard config 40.0.0
+(peer `stylelint: ^17.0.0`, verified from exact registry metadata on 2026-10-03)
+and all existing settings/Tailwind exceptions; add `value-no-invalid: true`
+because upstream moves parse/math validation to that rule. Raise the application
+Node floor to `>=24.15.0`; upstream requires
+`^22.22.2 || ^24.15.0 || >=26.0.0`, and existing CI selects Node 24. Keep the
+strict peer, seven-day package-age, full audit and coverage policies unchanged.
+The isolated Root-seeded source passes 38 actual behavior cases, current CSS,
+full audit with zero findings and fresh normal `npm ci`; these do not certify
+this different main-based package. Its exact install, quality, SAST and required
+device checks remain pending. M19 stays open. See the
+[main preparation receipt](docs/verification/m19/stylelint-main-audit-remediation-2026-10-03.md).
 
 | Layer           | Choice                                                                                            | Pinned version                                  | Source of verification                                                                                                                                                                                                                                                                                                                                                                                      |
 | --------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

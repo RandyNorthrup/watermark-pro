@@ -13,7 +13,7 @@
     }
   },
   "engines": {
-    "node": ">=24.0.0",
+    "node": ">=24.15.0",
     "npm": ">=11.0.0"
   },
   "scripts": {
@@ -178,7 +178,7 @@
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
     "sharp": "0.35.4",
-    "stylelint": "17.15.0",
+    "stylelint": "https://codeload.github.com/stylelint/stylelint/tar.gz/12c034f5db042b474126b36231bd4ffe0ccc6e8d",
     "stylelint-config-standard": "40.0.0",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",

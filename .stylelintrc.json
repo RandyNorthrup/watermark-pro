@@ -18,6 +18,7 @@
         ]
       }
     ],
-    "import-notation": "string"
+    "import-notation": "string",
+    "value-no-invalid": true
   }
 }
