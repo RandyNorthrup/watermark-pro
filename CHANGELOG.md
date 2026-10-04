@@ -7,6 +7,44 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Recent Authentication Restack Preparation — 2026-10-03
+
+- PR #21 merged as `10aae802` after all seven exact-head checks passed and a
+  fresh 13-endpoint policy check completed. Its local private-policy journey
+  passed eight cases across four devices with axe and viewed quota captures;
+  the existing iPhone fixed navigation/heading overlap remains unresolved polish.
+- Prepared original PR #14's single-commit, 55-path recent-credential delta on
+  a new owned branch above this main. Only an additive CHANGELOG conflict
+  required resolution; PLAN/SECURITY merged without source conflicts. Private
+  cohort/ledger and the eight-field administrative guard, human controls,
+  dependency pins and publication safeguards remain preserved. Original and
+  later stack references are unchanged.
+- Original recent-auth CI metadata contains one successful attempt; local
+  fixture, lint, timing and browser failures remain recorded separately. Four
+  retained PNGs are historical captures, not fresh restack evidence. No candidate
+  modules, install, tests, build, browser run, push or CI have occurred. Next
+  review the complete auth/session/client contract, then fresh real-role and D1
+  proof under unchanged gates. M19 stays open; feature expansion remains held.
+- Corrected the original migration-generation metadata gap using actual
+  installed Drizzle output from an isolated scratch copy. The generated SQL
+  adds only the nullable integer credential column; all older journal entries
+  and snapshot structure remain unchanged. Copied only the verified journal
+  extension and 0019 snapshot, retaining the original SQL/policy comments.
+  Fresh normal installation passes with zero vulnerabilities; the revised
+  57-path candidate still requires its own scoped and complete gates.
+- Preserved an avoidable scoped formatter invocation failure: four historical
+  PNGs and the SQL file were passed to a parser that does not support them.
+  Corrected only the supported-text selection, without changing artifacts,
+  SQL, rules or source; scoped format/lint then pass. Complete real-auth/client
+  proof passes 284 cases and actual migrated D1 proof passes 12 cases.
+- One unchanged complete `npm run quality` now passes: 2,909 covered cases,
+  all original coverage floors (85.44% branches), 69 actual workerd cases,
+  every static/source/audit/script/asset gate and production build. Audit reports
+  zero vulnerabilities. Pinned SAST passes 510 rules on 2,155 tracked targets
+  with zero findings; 15 oversized files are skipped. Owned resources close.
+  New exact-head hosted full-device checks and fresh credential/private-policy
+  visuals remain required before merge; M19 and production gates stay open.
+
 ### Private-admission administrative boundary — 2026-10-03
 
 - Preserved the original private-membership restack and its new-main auth,
@@ -116,6 +154,43 @@ what was planned; superseded entries stay.
   source proof passes 38 behavior cases, current CSS, full audit and fresh
   normal installation; this main-based tree has not been installed or certified.
   M19 and exact-source quality/security/device/merge gates remain open.
+
+### Recent credential proof — 2026-10-02 (unreleased candidate)
+
+- Added save/export guidance before the full-page credential sign-in, since its
+  navigation follows the existing session-only unfinished-edit lifecycle.
+  All twelve prompt messages include it. The preceding complete local quality
+  run passed 2,903 covered cases and 69 workerd cases, with every coverage and
+  bundle floor retained. Final wording passed focused/catalogue checks and all
+  four built browser/axe journeys; their actual captures were reviewed. Final
+  SAST passed 510 rules over 2,152 files with zero findings. Exact-commit hosted
+  canonical quality and the full 144-journey matrix remain pending.
+- Visual review of the credential prompt found mobile background text visible
+  through the glass surface. The dialog now uses an opaque theme surface;
+  screenshot evidence captures its viewport. The initial new browser journey
+  passed two of four devices; the corrected capture/layout run passed all four,
+  retaining refusal, actual sign-in, explicit retry and axe checks. All four
+  actual prompt captures were opened and reviewed. Full matrix certification
+  remains pending.
+- Added server-owned session credential proof, with a nullable migration for
+  historical sessions. Successful password/validated identity sign-in creates
+  proof; email verification, challenge completion, renewal and browser fields
+  cannot. Sensitive custom APIs and organization/admin/account-security plugin
+  mutations refuse proof older than ten minutes, absent proof or future dates.
+  Ordinary permitted editing, saving, reads and personal bootstrap remain usable.
+- Added cloud credential/connection checks and reserved the billing subtree.
+  Fresh proof never replaces role, cohort, verified-email or account binding.
+  Same-account sign-in retains a selected workspace only if membership remains;
+  a new account or revoked membership cannot inherit it.
+- Added a lazy, account-generation-bound re-sign-in dialog in all twelve locales
+  and a bounded internal return route. Denied mutations are not silently replayed.
+  Established-user fixtures use real password sign-in; verification-only negatives
+  still exercise an unproved session.
+- The initial server-focused suite passed 84 cases. Expanded tests found case
+  mismatches in new dialog-name assertions and a renewal fixture that aged only
+  `updatedAt`; the pinned auth library renews based on expiry. Corrected both,
+  retaining the negative proof assertions and forcing an actual renewal.
+  Final complete gates and production enforcement remain pending.
 
 ### Private membership and bounded admissions — 2026-10-02 (unreleased)
 

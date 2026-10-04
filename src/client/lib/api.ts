@@ -1,6 +1,7 @@
 import type { ZodType } from 'zod'
 
 import { captureOfflineOwner, currentOfflineUser } from './offline-context'
+import { requestRecentAuthentication } from './recent-authentication'
 import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
 import { apiErrorSchema } from '../../shared/api-core'
 import { API_ERROR_CODE, HTTP_STATUS } from '../../shared/constants'
@@ -18,6 +19,8 @@ const ERROR_MESSAGES: Partial<Record<string, string>> = {
   [API_ERROR_CODE.quotaExceeded]: 'The limit for this workspace has been reached.',
   [API_ERROR_CODE.invitationQuotaExceeded]:
     'Your two private invitations are reserved or used. Revoke an unused invitation to free a slot.',
+  [API_ERROR_CODE.recentAuthenticationRequired]:
+    'Sign in again before making this sensitive change.',
 }
 
 const ACCOUNT_API_PREFIXES = ['/api/orgs', '/api/me', '/api/admin']
@@ -111,7 +114,12 @@ export async function apiRequest(
   try {
     const response = await fetch(path, { ...init, headers })
     owner?.assertCurrent()
-    if (!response.ok) throw await toRequestError(path, response)
+    if (!response.ok) {
+      const error = await toRequestError(path, response)
+      if (owner !== undefined && error.code === API_ERROR_CODE.recentAuthenticationRequired)
+        requestRecentAuthentication(owner)
+      throw error
+    }
     return response
   } catch (error) {
     owner?.assertCurrent()

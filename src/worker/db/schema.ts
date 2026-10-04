@@ -87,6 +87,7 @@ export const session = sqliteTable(
     token: text('token').notNull(),
     createdAt: createdAtColumn(),
     updatedAt: updatedAtColumn({ hasInsertDefault: false }),
+    credentialVerifiedAt: integer('credential_verified_at', { mode: 'timestamp_ms' }),
     ipAddress: text('ip_address'),
     userAgent: text('user_agent'),
     userId: text('user_id')

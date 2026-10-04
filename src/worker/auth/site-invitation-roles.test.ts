@@ -40,6 +40,7 @@ async function setup(role: AssignableSiteRole) {
   })
   expect(registered.status).toBe(200)
   await actor.get(findLink(harness.mailbox, 'manager@example.test', '/api/auth/verify-email'))
+  await actor.signIn({ email: 'manager@example.test', password })
   const actorId = sessionSchema.parse(await responseJson(actor.get('/api/auth/get-session'))).user
     .id
   return { harness, context, actor, actorId }

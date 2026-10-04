@@ -100,6 +100,12 @@
       "failed": "Human verification failed. Reload this page and try again.",
       "unavailable": "Human verification is unavailable. Check your connection and reload this page.",
       "retry": "Retry human verification"
+    },
+    "recent": {
+      "title": "Sign in again",
+      "body": "This sensitive change was not applied. Sign in again, then retry it. You will return to this page. Save or export unfinished edits first.",
+      "cancel": "Keep working",
+      "signIn": "Sign in again"
     }
   },
   "dashboard": {

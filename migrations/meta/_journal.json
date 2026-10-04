@@ -134,6 +134,13 @@
       "when": 1790928915854,
       "tag": "0018_private-membership",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1791093693357,
+      "tag": "0019_recent-authentication",
+      "breakpoints": true
     }
   ]
 }

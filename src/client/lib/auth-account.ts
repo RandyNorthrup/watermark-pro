@@ -6,7 +6,9 @@ import {
   captureOfflineOwner,
   currentOfflineUser,
 } from './offline-context'
+import { requestRecentAuthentication } from './recent-authentication'
 import { ACCOUNT_ID_HEADER } from '../../shared/account-identity'
+import { AUTH_RECENT_AUTHENTICATION_REQUIRED } from '../../shared/constants'
 
 const AUTH_ACCOUNT_PATHS = new Set([
   '/account-info',
@@ -170,7 +172,10 @@ export function createAuthAccountHooks(): Pick<
   FetchHooks,
   'onRequest' | 'onResponse' | 'onSuccess' | 'onError'
 > {
-  const owners = new WeakMap<object, { assertCurrent: () => void; sessionUserId?: string | null }>()
+  const owners = new WeakMap<
+    object,
+    { assertCurrent: () => void; userId?: string; sessionUserId?: string | null }
+  >()
   return {
     onRequest(context) {
       const path = authPath(String(context.url))
@@ -197,7 +202,7 @@ export function createAuthAccountHooks(): Pick<
       const expected = context.headers.get(ACCOUNT_ID_HEADER)
       if (expected !== null && expected !== owner.userId)
         throw new Error('The signed-in account changed before this request started.')
-      owners.set(context, { assertCurrent: owner.assertCurrent })
+      owners.set(context, owner)
       context.headers.set(ACCOUNT_ID_HEADER, owner.userId)
       owner.assertCurrent()
     },
@@ -212,7 +217,11 @@ export function createAuthAccountHooks(): Pick<
       owners.delete(context.request)
     },
     onError(context) {
-      owners.get(context.request)?.assertCurrent()
+      const owner = owners.get(context.request)
+      owner?.assertCurrent()
+      const code: unknown = context.error['code']
+      if (code === AUTH_RECENT_AUTHENTICATION_REQUIRED && owner?.userId !== undefined)
+        requestRecentAuthentication({ userId: owner.userId, assertCurrent: owner.assertCurrent })
       owners.delete(context.request)
     },
   }
