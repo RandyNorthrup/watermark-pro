@@ -4,11 +4,197 @@ Living planning document. Decisions, assumptions, open questions, architecture,
 milestones, and certification gates. Update it whenever a decision changes.
 `CHANGELOG.md` records what happened; this file records what is intended and why.
 
-Last updated: 2026-10-04 (right-toolbox/rounded-menu and creation source joined; final gates pending)
+Last updated: 2026-10-04 (Account correction aligned to merged editor; four-device proof green)
 
 ---
 
 ## 1. Product summary
+
+### Current Account verification and header policy — 2026-10-04
+
+Account correction is isolated above merged editor main `ff409947`. All four
+runtime/config patches apply cleanly; current video, right-side toolboxes,
+rounded labeled navigation, generated migrations and native patch stay intact.
+Fresh normal installation passes with zero audit findings and verifies/corrects
+the seven existing native SDK artifacts. Scoped lint, forced full types, fixture
+discovery and all seven cloud-card unit cases pass on this aligned source.
+
+The reassessed real-account E2E passes all four devices: desktop 19.1s, iPhone
+28.7s, iPad 20.9s and Android 16.7s, with the original two workers, zero local
+retries, sixty-second test and ten-second assertion limits. Every pending
+identity/action negative, exact before/after card/following-card geometry and
+axe/reflow predicate reaches its assertion. Root views all four actual ready
+captures. Phone full-page capture places fixed navigation at the original
+viewport boundary; its pixel overlap is retained as a capture limitation,
+not represented as a universal visual certificate. Sanitized teardown abort
+diagnostics remain; transient process/profile identities were not sampled.
+
+Normal unchanged five-trace desktop Account audit passes 99/100/100, FCP
+421.7722ms, LCP 662.8322ms, CLS 0.00000850 and TBT 19ms. Mobile finishes all five
+traces but fails performance/LCP/TBT: 89/100/100, FCP 1801.5495ms, LCP 2795.3093ms,
+CLS 0.00827389 and TBT 233ms. Both layout medians meet the original 0.02 cap;
+mobile startup remains separate unresolved work. Four raw numeric JSON/summary
+outputs are preserved privately with verified hashes after duplicate trace blocks
+trip jscpd; no rule/ignore changes. Corrected source duplication passes zero.
+Full current quality/SAST and protected publication remain required. Older local
+eight failures and the first two-device failure are retained rather than
+rewritten as successful proof. No production Account correction is deployed.
+
+Latest owner instruction: content scrolling above the application header must
+stop displaying. The frontend owner will enforce a real clipped content region
+below the retained header across desktop and touch layouts, preserving navigation
+and right-side editing controls. Use existing layout/scroll authorities; do not
+hide content merely behind translucent chrome. Scrolled four-device hit/pixel/
+accessibility proof is required. This supersedes the earlier coarse-pointer
+document-flow preference where those requirements conflict. M19 remains open.
+
+### Account action owner-boundary regression — 2026-10-04
+
+Review of the existing action handler finds a concrete owner race: it captures
+the current local owner but does not compare that owner with the Account card's
+displayed user before requesting connect/disconnect. The existing refresh path
+already makes this comparison. An actual component regression renders the old
+owner's controls, changes the real offline-owner context before UI cleanup and
+clicks both controls. Unchanged source fails: disconnect is called once for
+OneDrive despite the displayed owner mismatch. Original seven cases still pass.
+
+One explicit comparison inside the existing action try/catch now refuses that
+request before either cloud mutation. Existing owner-generation, mounted and
+revision guards stay unchanged; no new authority or wrapper is added. The
+matching complete eight-case file now passes with original seven cases and both
+stale mutation negatives intact. Final exact-head security/static/hosted gates
+remain next. Previous layout/audit proofs precede this security correction; do not
+claim they cover the changed handler. Header/startup work remains separate.
+
+### Account layout-shift producer confirmation — 2026-10-04
+
+An isolated candidate starts from merged main `8df277a`. Fresh normal install
+and the original build pass. A bounded
+existing-gate/real-account probe holds only the actual same-origin cloud-status
+response, validates its genuine three-provider DTO, then forwards that exact
+response unchanged. No status/configuration/account data is fabricated and no
+document or provider action is performed.
+
+On desktop the Cloud Connections card changes from 114px to 636px high and the
+following tour card moves from y=600 to y=1122: both deltas are exactly 522px.
+On phone the cloud card changes from 134px to 772px and the tour moves from
+y=825 to y=1463: both deltas are exactly 638px. Both real pages have zero axe
+violations and recorded page errors. This confirms the spinner-to-provider-row
+expansion producer; the null lazy-import boundary remains separate. Numeric
+evidence and synthetic pending/ready PNGs are private local artifacts. The probe
+uses no new Lighthouse sampler, retries, timeout changes or mocked response.
+Its browser/account/gate close in finally; transient process identities were
+not sampled, a retained observation limit. Original release failures remain.
+
+The corrective source now reserves the actual three known provider rows while
+status is pending. Those structural rows are invisible, hidden from accessibility
+and have disabled controls; only the loading status is exposed. Real status
+retains a row for its connection notice. Public permission-link rendering is
+shared between pending and loaded geometry. The Account route imports its cloud
+card directly, removing the null lazy boundary without changing public Login
+boot. Existing ownership, refresh, configuration, cancellation and error guards
+remain. No guessed fixed card height, fabricated DTO or additional cache authority
+is introduced.
+
+A unit regression requires pending status to expose neither identities nor
+actions, then requires genuine resolved controls. A four-device E2E regression
+holds and forwards the unchanged real status response and compares card height
+and following-card position before/after, with axe/reflow checks and synthetic
+captures. These new checks have not yet completed. Initial scoped lint fails on
+a nested conditional; automatic fixing and formatting left one rule conflict,
+so a small existing-state notice function removes that expression. Both failures
+remain recorded; unit/build stages did not run after those lint failures.
+The new E2E caller also initially uses a forbidden void type and then omits
+the required undefined resolver argument; both lint/type failures remain, with
+no browser stage reached. Corrected scoped lint and seven unit cases pass;
+fresh forced types, dead-code, all 1,217 referenced translation keys and the
+duplicate-code gate pass. Fresh production build passes every unchanged bundle
+limit, including the 138.0 kB app shell against 140.0 kB, and built publication
+passes. SAST runs 510 rules on 2,184 files with zero findings and 15 oversized
+skips. Initial scanner signal-handler warnings remain; its terminal exit is zero.
+The first fresh-source actual geometry probe is negative: desktop reaches its
+equality assertions, but phone changes from 876px pending to 772px loaded. This
+104px mismatch comes from differently sized status strings making the same
+flex-wrapped header select different row arrangements. Original capture/logs
+remain; the probe exits one, and no complete two-device or phone axe result is
+claimed. Its browser/account/gate close in finally. Full quality is stopped at
+source publication using the verified owned process group; static stages pass
+but no covered tests or final quality result are inferred (exit 143).
+
+One coherent correction uses the same responsive grid in pending and real row
+headers: one column on narrow screens, label plus action columns from small
+screens upward. Truncated status text cannot select a different wrap structure.
+No guessed height, minimum-height workaround or altered assertion is used.
+Corrected source build/unit checks and actual geometry must run again, then
+four-device E2E, unchanged normal five-trace Account audits and complete quality
+remain required before publication or any release claim.
+
+The responsive-grid unit/build checks pass. Its first private diagnostic probe
+preserves another exit-one caller failure: the card is 636px before and after,
+but a newly added element screenshot scrolls the viewport by 198px between
+position measurements (both cloud and tour y change by exactly 198px). This
+does not establish a new product layout shift. Remove that premature scrolling
+capture and retain it only after assertions; use the ordinary full-page capture
+for pending state. Production source and equality assertions remain unchanged.
+Four-device canonical E2E has not yet run, and full quality is still required.
+
+Whole-case reassessment separates the other asynchronous sign-in-methods card
+from cloud expansion. In a second grid probe, cloud height is unchanged on
+both devices, while the phone's cloud and tour positions both move 20px before
+the credential row settles. The private probe now waits for that real credential
+label before holding/releasing cloud status. This preserves the exact assertions
+and isolates their intended producer; it does not claim the other initial-load
+shift is fixed. The settled probe passes: desktop cloud is 636px and tour y=1122
+before/after; phone cloud is 876px and tour y=1567 before/after. Both have zero
+axe violations and page errors. Two sanitized client-disconnect diagnostics at
+closure remain; no fix or broader performance certificate is inferred.
+
+The first canonical E2E invocation discovers no tests because native Node JSON
+imports require an explicit attribute. Adding that attribute changes only the
+new E2E caller; separate listing now discovers all four device cases. Corrected
+caller lint/types and execution are in progress. Current full quality passed
+static/publication/audit and remains in covered tests; an unchanged Editor-page
+case has failed, with the final stack/results still pending. No passing full
+quality or release readiness is claimed. Normal Account audits remain next.
+
+Current full quality now terminates one: 2,957/2,965 covered cases pass across
+264 files (four files fail). Coverage floors still pass at 92.46% statements,
+85.37% branches, 92.31% functions and 93.42% lines. Actual failures include
+unchanged real-auth five-second deadlines and the Editor's missing watermark
+position group; their causal relation to concurrent workloads is unproven.
+No later workerd/scripts/build stages execute in this command. The separate
+corrected four-device E2E run terminates one: desktop and iPhone pass geometry,
+privacy and axe; Android fails the existing onboarding heading wait and iPad
+exceeds the original sixty-second test deadline with cloud response disposal
+during teardown. Its truncated/missing trace limits exact stage attribution.
+No assertions, retries or deadlines are changed. Reassess the complete Account
+test setup and actual full failures before another attempt; isolate the Account
+case using existing real account preparation rather than unnecessary image
+onboarding. The production Cloud correction remains unmerged and uncertified.
+M19 and all other scope remain open.
+
+### Account verification whole-case correction — 2026-10-04
+
+The new layout case unnecessarily repeated image onboarding before reaching
+Account. Android failed in that unrelated prerequisite; iPad exhausted its
+original deadline after reaching pending Account. The complete-case correction
+reuses existing `createAuditAccount`: real Better Auth signup, mailbox
+verification, password authentication and private-workspace preparation against
+the guarded loopback gate. Genuine session cookies move only in memory into
+the test's own browser context; the API context is disposed. A precise Node
+declaration, included explicitly like the existing proxy declaration, lets the
+JavaScript fixture serve typed E2E without a wrapper, cast or dependency.
+Existing onboarding journeys retain their UI coverage.
+
+The Account case waits for its real credential label before cloud measurement.
+Pending identity/action negatives, exact geometry, unchanged real response, two
+workers, local zero retries and original sixty/ten-second deadlines remain.
+Visual review found the inherited spinner only a tiny border in reserved space;
+an existing size utility gives it a visible 24px diameter. No private status is
+shown before response. Initial fixture lint reports await-member access and the
+declaration missing from the Node project; both are corrected without suppressions.
+Fresh static/discovery and four-device execution are next. Full local failures
+remain retained and unproven; M19 and release readiness remain open.
 
 ### Executed project-completion proof and draft status — 2026-10-04
 

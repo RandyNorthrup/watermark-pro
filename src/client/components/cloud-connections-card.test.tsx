@@ -47,6 +47,26 @@ beforeEach(() => {
 afterEach(() => vi.resetAllMocks())
 
 describe('account cloud connections', () => {
+  it('reserves provider structure while status loads without exposing identities or actionable controls', async () => {
+    const pending = Promise.withResolvers<{ connections: CloudConnectionDto[] }>()
+    vi.mocked(cloudConnections).mockReturnValueOnce(pending.promise)
+    render(<CloudConnectionsCard userId="owner" />)
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+    expect(screen.queryByText('cloud-owner@example.test')).not.toBeInTheDocument()
+    expect(connectCloudProvider).not.toHaveBeenCalled()
+    expect(disconnectCloudProvider).not.toHaveBeenCalled()
+    await act(async () => {
+      pending.resolve({ connections: [CONNECTED, AVAILABLE] })
+      await pending.promise
+    })
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Disconnect' })).toBeEnabled()
+    expect(screen.getByText('cloud-owner@example.test')).toBeInTheDocument()
+  })
+
   it('shows durable account status and separates explicit disconnect from provider permission removal', async () => {
     const user = userEvent.setup()
     render(<CloudConnectionsCard userId="owner" />)
@@ -117,6 +137,18 @@ describe('account cloud connections', () => {
     render(<CloudConnectionsCard userId="another-account" />)
     expect(await screen.findByText('The signed-in account changed.')).toBeInTheDocument()
     expect(cloudConnections).not.toHaveBeenCalled()
+  })
+
+  it('refuses both displayed cloud actions when account ownership changes before UI cleanup', async () => {
+    const user = userEvent.setup()
+    render(<CloudConnectionsCard userId="owner" />)
+    const disconnect = await screen.findByRole('button', { name: 'Disconnect' })
+    const connect = screen.getByRole('button', { name: 'Connect Google Drive' })
+    setOfflineUser('other')
+    await user.click(disconnect)
+    await user.click(connect)
+    expect(disconnectCloudProvider).not.toHaveBeenCalled()
+    expect(connectCloudProvider).not.toHaveBeenCalled()
   })
 
   it('cancels an explicit reconnect without reporting a confirmed cancellation as an error', async () => {

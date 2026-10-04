@@ -16,6 +16,7 @@
     "playwright.config.ts",
     "drizzle.config.ts",
     "e2e",
+    "scripts/fixtures/audit-accounts.d.mts",
     "scripts/lib/bundle-inventory.ts",
     "scripts/lib/route-preloads.ts",
     "scripts/lib/test-site-owner.ts",
