@@ -1,5 +1,11 @@
 # Public plans, private membership and trust gates — M19
 
+Atomic-seat preparation, 2026-10-04: the new isolated candidate above merged
+capacity main `4e7dce7` retains historical/private rosters and fences new member
+inserts. It has no executable proof or public activation. Its missing generated
+0021 metadata requires review. The final Starter and Free media policy below
+remains required; capacity source CI does not certify this seat delta.
+
 Restack scope, 2026-10-04: this branch prepares only original workspace-capacity
 source above main `8354602`. Its original Free/Pro/Team limits are a foundation,
 not the later confirmed Starter/media launch implementation. Final requirements
@@ -18,7 +24,8 @@ before its final save/export warning. Final wording passed focused/catalogue
 checks and all four dedicated browser/axe journeys with reviewed actual captures;
 runtime `77f6a9a` then passed canonical quality, SAST and all 144 journeys in
 exact-commit CI `37009328785`. Workspace storage capacity is under verification on
-`codex/plan-entitlements`; creation/seat gates and payment reconciliation remain
+`codex/plan-entitlements`; its storage-capacity source `fdd55f2` now passed all
+seven hosted jobs, including 144 browser/axe journeys. Creation/seat gates and payment reconciliation remain
 open. Public registration and subscriptions have not shipped.
 
 ## Owner decisions
@@ -235,8 +242,8 @@ credentials are owner-readable only and remain outside the public repository.
 The capacity foundation has explicit workspace plan authority and a member-only
 limits projection. Migration `0020` preserves historical content/membership;
 upload reservation and commit resolve the live paid period and suspension inside
-D1. Focused Node cases and real D1 upload integration passed, but canonical quality
-and security certification remain pending. See
+D1. Exact-source canonical quality, SAST and all four device jobs passed for
+`fdd55f2` in workflow `37024827798`. See
 `../verification/m19/workspace-capacity-2026-10-02.md`. This does not activate
 subscriptions or replace the remaining creation/member-seat gates.
 

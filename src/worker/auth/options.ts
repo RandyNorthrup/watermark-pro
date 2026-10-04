@@ -22,8 +22,10 @@ import {
   validateAccountAdmission,
 } from './invitation-admission'
 import { authenticationLogger } from './logger'
+import type { RateLimitStorage } from './rate-limit'
 import { credentialProofForNewSession } from './recent-authentication'
 import { accountSocialProviders, type AccountOAuthConfiguration } from './social-providers'
+import { invitationEmail, resetPasswordEmail, verificationEmail } from './templates'
 import { MEMBERSHIP_COHORT, membershipCohortSchema } from '../../shared/api-accounts'
 import {
   APP_NAME,
@@ -39,14 +41,14 @@ import {
 } from '../../shared/constants'
 import { LOCALE_CODES } from '../../shared/locales'
 import { accessControl, roles } from '../../shared/permissions'
+import { workspaceCapacity } from '../../shared/plans'
 import { SITE_ROLE } from '../../shared/site-roles'
 import { newOrganizationSchema } from '../../shared/validation'
 import { WORKSPACE_ACCESS_POLICY } from '../../shared/workspace-access'
 import type { AccountStore } from '../account-store'
 import type { AuditStore } from '../audit'
-import type { RateLimitStorage } from './rate-limit'
-import { invitationEmail, resetPasswordEmail, verificationEmail } from './templates'
 import type { EmailSender } from '../email/sender'
+import type { PlanStore } from '../plan-store'
 import type { WorkspaceAccessStore } from '../workspace-access-store'
 
 /** Adapter factory shape shared by every Better Auth adapter package. */
@@ -76,6 +78,7 @@ export interface AuthDependencies {
   /** Better Auth database adapter: drizzle over D1 in production, memory in Node tests. */
   accountOAuth?: AccountOAuthConfiguration | undefined
   accounts: AccountStore
+  plans: PlanStore
   hasWorkspaceContent: (organizationId: string) => Promise<boolean>
   database: DatabaseAdapter
   secret: string
@@ -274,6 +277,8 @@ export function buildAuthOptions(deps: AuthDependencies) {
         invitationExpiresIn: INVITATION_TTL_SECONDS,
         cancelPendingInvitationsOnReInvite: true,
         requireEmailVerificationOnInvitation: true,
+        membershipLimit: async (_user, organization) =>
+          workspaceCapacity(await deps.plans.get(organization.id)).members,
         // Delivery runs in our awaited after-hook: Better Auth's built-in
         // email callback swallows failures and otherwise returns false success.
         organizationHooks: {

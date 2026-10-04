@@ -74,6 +74,7 @@ export const workspacePlanRecordSchema = z
     kind: workspaceKindSchema,
     basePlan: workspaceBasePlanSchema,
     baseMemberLimit: z.number().int().positive(),
+    retainedMemberLimit: z.number().int().positive(),
     paidPlan: paidPlanSchema.nullable(),
     paidThrough: z.date().nullable(),
     paidAccessSuspended: z.boolean(),
@@ -122,18 +123,28 @@ export function workspaceCapacity(
   now = Date.now(),
 ): WorkspaceCapacity {
   const trusted = workspacePlanRecordSchema.parse(record)
+  const baseMembers = Math.max(
+    trusted.retainedMemberLimit,
+    trusted.basePlan === WORKSPACE_BASE_PLAN.free
+      ? PUBLIC_PLANS.free.members
+      : Math.max(trusted.baseMemberLimit, PRIVATE_PLAN_CAPACITY.sharedMembers),
+  )
   if (
     trusted.paidPlan !== null &&
     !trusted.paidAccessSuspended &&
     trusted.paidThrough !== null &&
     trusted.paidThrough.getTime() > now
   )
-    return limits(PUBLIC_PLANS[trusted.paidPlan])
-  if (trusted.basePlan === WORKSPACE_BASE_PLAN.free) return limits(PUBLIC_PLANS.free)
+    return {
+      ...limits(PUBLIC_PLANS[trusted.paidPlan]),
+      members: Math.max(PUBLIC_PLANS[trusted.paidPlan].members, baseMembers),
+    }
+  if (trusted.basePlan === WORKSPACE_BASE_PLAN.free)
+    return { ...limits(PUBLIC_PLANS.free), members: baseMembers }
   return {
     storageBytes: PRIVATE_PLAN_CAPACITY.storageBytes,
     photos: PRIVATE_PLAN_CAPACITY.photos,
     logos: PRIVATE_PLAN_CAPACITY.logos,
-    members: trusted.baseMemberLimit,
+    members: baseMembers,
   }
 }

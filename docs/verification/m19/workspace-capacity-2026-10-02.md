@@ -177,6 +177,16 @@ until physical object recovery releases their reservation.
 
 ## Verification status
 
+Exact-commit hosted run `37024827798` passed all seven jobs: canonical quality,
+SAST, every device and the fail-closed aggregate. It executed 2,926 covered cases
+across 262 files and 78 real workerd cases across twenty files. Coverage was
+92.56% statements, 85.45% branches, 92.37% functions and 93.50% lines. The full
+144-journey Playwright/axe matrix passed; one Android journey used the existing
+retry policy. All new capacity tests passed. This certifies the storage-capacity
+implementation, not public launch, Stripe processing or the separate video/UI
+candidate. Draft PR: https://github.com/RandyNorthrup/watermark-pro/pull/16.
+CI: https://github.com/RandyNorthrup/watermark-pro/actions/runs/37024827798.
+
 New tests cover strict plan records, Free versus private limits, exact paid-period
 expiry, suspension, member and tenant isolation, writable-metadata forgery,
 concurrent final slots, byte boundaries, commit-time authority changes, audit

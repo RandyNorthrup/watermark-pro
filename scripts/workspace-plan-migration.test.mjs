@@ -6,6 +6,10 @@ import { afterEach, describe, it } from 'node:test'
 
 const directory = new URL('../migrations/', import.meta.url)
 const migration = readFileSync(new URL('0020_workspace_plans.sql', directory), 'utf8')
+const memberMigration = readFileSync(
+  new URL('0021_workspace_member_capacity.sql', directory),
+  'utf8',
+)
 const databases = []
 
 function database() {
@@ -82,6 +86,67 @@ describe('workspace plan migration and server-only grants', () => {
     assert.equal(plan(db, 'historical-shared').base_member_limit, 7)
     assert.deepEqual(db.prepare('SELECT * FROM member ORDER BY id').all(), members)
     assert.deepEqual(db.prepare('SELECT * FROM watermark').all(), content)
+    db.exec(memberMigration)
+    assert.equal(plan(db, 'historical-shared').retained_member_limit, 7)
+    assert.deepEqual(db.prepare('SELECT * FROM member ORDER BY id').all(), members)
+    person(db, 'excess-member')
+    assert.throws(
+      () =>
+        db.exec(
+          "INSERT INTO member(id,organization_id,user_id,role,created_at) VALUES('excess','historical-shared','excess-member','viewer',1)",
+        ),
+      /workspace_member_quota/,
+    )
+  })
+  it('retains historical public and private primary rosters without opening additional seats', () => {
+    const db = database()
+    person(db, 'public-owner', 'public')
+    person(db, 'private-owner')
+    workspace(db, 'public-primary', 'public-owner')
+    workspace(db, 'private-primary', 'private-owner')
+    db.exec(
+      "INSERT INTO private_workspace(user_id,organization_id) VALUES('public-owner','public-primary'),('private-owner','private-primary')",
+    )
+    person(db, 'existing-public-member', 'public')
+    db.exec(
+      "INSERT INTO member(id,organization_id,user_id,role,created_at) VALUES('public-existing','public-primary','existing-public-member','viewer',1)",
+    )
+    for (const index of [0, 1, 2, 3]) {
+      const id = `private-existing-${index}`
+      person(db, id)
+      db.prepare(
+        'INSERT INTO member(id,organization_id,user_id,role,created_at) VALUES(?,?,?,?,?)',
+      ).run(id, 'private-primary', id, 'viewer', 1)
+    }
+    const members = db.prepare('SELECT * FROM member ORDER BY id').all()
+    db.exec(migration)
+    db.exec(memberMigration)
+    assert.equal(plan(db, 'public-primary').retained_member_limit, 2)
+    assert.equal(plan(db, 'private-primary').retained_member_limit, 5)
+    assert.deepEqual(db.prepare('SELECT * FROM member ORDER BY id').all(), members)
+    person(db, 'next-member')
+    const insert = db.prepare(
+      'INSERT INTO member(id,organization_id,user_id,role,created_at) VALUES(?,?,?,?,?)',
+    )
+    for (const id of ['public-primary', 'private-primary']) {
+      assert.throws(
+        () => insert.run(`new-${id}`, id, 'next-member', 'viewer', 1),
+        /workspace_member_quota/,
+      )
+    }
+    db.exec("DELETE FROM member WHERE id='public-existing'")
+    insert.run('replacement-public', 'public-primary', 'next-member', 'viewer', 1)
+    assert.equal(
+      db.prepare("SELECT COUNT(*) AS n FROM member WHERE organization_id='public-primary'").get().n,
+      2,
+    )
+    assert.throws(
+      () =>
+        db.exec(
+          "UPDATE workspace_plan SET retained_member_limit=0 WHERE organization_id='public-primary'",
+        ),
+      /CHECK constraint failed/,
+    )
   })
   it('assigns future capacity by server identity and purpose, never organization metadata', () => {
     const db = database()

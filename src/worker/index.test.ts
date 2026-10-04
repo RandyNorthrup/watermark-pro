@@ -111,6 +111,7 @@ describe('default worker handler', () => {
       kind: 'shared',
       basePlan: 'free',
       baseMemberLimit: 1,
+      retainedMemberLimit: 1,
       paidPlan: null,
       paidThrough: null,
       paidAccessSuspended: false,

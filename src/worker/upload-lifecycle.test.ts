@@ -19,6 +19,7 @@ function fixture(kind: 'photo' | 'logo' = 'photo') {
     kind: 'shared',
     basePlan: 'private',
     baseMemberLimit: PRIVATE_PLAN_CAPACITY.sharedMembers,
+    retainedMemberLimit: 1,
     paidPlan: null,
     paidThrough: null,
     paidAccessSuspended: false,

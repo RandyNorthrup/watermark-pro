@@ -166,6 +166,7 @@ export const workspacePlan = sqliteTable(
     kind: text('kind').$type<WorkspacePlanRecord['kind']>().notNull(),
     basePlan: text('base_plan').$type<WorkspacePlanRecord['basePlan']>().notNull(),
     baseMemberLimit: integer('base_member_limit').notNull(),
+    retainedMemberLimit: integer('retained_member_limit').default(1).notNull(),
     paidPlan: text('paid_plan').$type<WorkspacePlanRecord['paidPlan']>(),
     paidThrough: integer('paid_through', { mode: 'timestamp_ms' }),
     paidAccessSuspended: integer('paid_access_suspended', { mode: 'boolean' })
@@ -177,6 +178,10 @@ export const workspacePlan = sqliteTable(
     check('workspace_plan_kind', sql`${table.kind} IN ('personal', 'shared')`),
     check('workspace_plan_base', sql`${table.basePlan} IN ('free', 'private', 'legacy')`),
     check('workspace_plan_members', sql`${table.baseMemberLimit} >= 1`),
+    check(
+      'workspace_plan_retained_members',
+      sql`typeof(${table.retainedMemberLimit}) = 'integer' AND ${table.retainedMemberLimit} >= 1`,
+    ),
     check(
       'workspace_plan_paid',
       sql`${table.paidPlan} IS NULL OR ${table.paidPlan} IN ('pro', 'team')`,
