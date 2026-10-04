@@ -127,6 +127,13 @@
       "when": 1789247300898,
       "tag": "0017_workspace_folders",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1790928915854,
+      "tag": "0018_private-membership",
+      "breakpoints": true
     }
   ]
 }

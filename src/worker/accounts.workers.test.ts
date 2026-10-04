@@ -47,6 +47,7 @@ describe('private account D1 wiring', () => {
       email: 'd1-abuse-inviter@example.test',
       emailVerified: true,
       role: 'user',
+      membershipCohort: 'private',
       createdAt: new Date(),
       updatedAt: new Date(),
     })
@@ -219,7 +220,7 @@ describe('private account D1 wiring', () => {
       expect(memberships.filter((member) => member.userId === invitedUser?.id)).toEqual([])
     },
   )
-  it('enforces the send quota atomically for concurrent D1 inserts', async () => {
+  it('reserves only two new private admissions under concurrent D1 inserts', async () => {
     const ownerUser = await services.db.query.user.findFirst({
       where: (user, { eq }) => eq(user.email, OTHER.email),
     })
@@ -227,7 +228,7 @@ describe('private account D1 wiring', () => {
     const excessRequests = 3
     const results = await Promise.all(
       Array.from(
-        { length: SITE_INVITATION_POLICY.sendsPerWindow + excessRequests },
+        { length: SITE_INVITATION_POLICY.newAdmissions + excessRequests },
         async () =>
           await services.accounts.createInvitation({
             role: 'user',
@@ -243,7 +244,7 @@ describe('private account D1 wiring', () => {
           }),
       ),
     )
-    expect(results.filter(Boolean)).toHaveLength(SITE_INVITATION_POLICY.sendsPerWindow)
+    expect(results.filter(Boolean)).toHaveLength(SITE_INVITATION_POLICY.newAdmissions)
     expect(results.filter((wasCreated) => !wasCreated)).toHaveLength(excessRequests)
   })
 })

@@ -86,3 +86,56 @@ test('site invitations create separate private workspaces and protect account to
   await expect(page.getByText('Registered accounts', { exact: true })).toHaveCount(0)
   await expectAccessible(page)
 })
+
+test('private invitation slots are bounded and unused revocation permits a replacement', async ({
+  page,
+  request,
+}, testInfo) => {
+  const suffix = crypto.randomUUID()
+  const actor = {
+    name: 'Private quota fixture',
+    email: `private-quota-${suffix}@example.test`,
+    password: 'a private quota fixture passphrase',
+  }
+  await signUpAndVerify(page, request, actor)
+  await navigateTo(page, 'Invite people')
+  for (const index of [1, 2]) {
+    await page
+      .getByLabel('Email address')
+      .fill(`private-child-${String(index)}-${suffix}@example.test`)
+    await page.getByRole('button', { name: 'Send invitation', exact: true }).click()
+    await expect(page.getByText('Invitation sent. It expires in seven days.')).toBeVisible()
+  }
+  await page.getByLabel('Email address').fill(`private-child-overflow-${suffix}@example.test`)
+  await page.getByRole('button', { name: 'Send invitation', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText(
+    'Your two private invitations are reserved or used. Revoke an unused invitation to free a slot.',
+  )
+  const budget = await page.request.get('/api/me/private-invitation-budget')
+  expect(budget.status()).toBe(200)
+  expect(await budget.json()).toEqual({ limit: 2, used: 0, reserved: 2, available: 0 })
+  await expectAccessible(page)
+  await page.screenshot({
+    path: testInfo.outputPath('private-invitation-limit.png'),
+    fullPage: true,
+  })
+
+  await page
+    .getByRole('button', {
+      name: `Revoke invitation to private-child-1-${suffix}@example.test`,
+      exact: true,
+    })
+    .click()
+  const reservedRow = page
+    .getByRole('listitem')
+    .filter({ hasText: `private-child-1-${suffix}@example.test` })
+  await expect(reservedRow).toContainText('Revoked')
+  const released = await page.request.get('/api/me/private-invitation-budget')
+  expect(await released.json()).toEqual({ limit: 2, used: 0, reserved: 1, available: 1 })
+  await page.getByRole('button', { name: 'Send invitation', exact: true }).click()
+  await expect(page.getByText('Invitation sent. It expires in seven days.')).toBeVisible()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  const replacement = await page.request.get('/api/me/private-invitation-budget')
+  expect(await replacement.json()).toEqual({ limit: 2, used: 0, reserved: 2, available: 0 })
+  await expectAccessible(page)
+})

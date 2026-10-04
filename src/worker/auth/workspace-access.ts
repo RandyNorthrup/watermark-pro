@@ -3,6 +3,7 @@ import { APIError, getSessionFromCtx } from 'better-auth/api'
 import { z } from 'zod'
 
 import { ACCOUNT_ID_HEADER, accountIdSchema } from '../../shared/account-identity'
+import { MEMBERSHIP_COHORT, membershipCohortSchema } from '../../shared/api-accounts'
 
 const PRIVATE_READ_PATHS = new Set([
   '/organization/get-organization',
@@ -67,9 +68,15 @@ export async function enforceAuthPrivacy(
     return
   const session = await getSessionFromCtx(ctx)
   if (session === null) return
+  const cohort = membershipCohortSchema.safeParse(
+    'membershipCohort' in session.user ? session.user['membershipCohort'] : undefined,
+  )
   if (
     isPrivileged &&
-    (!session.user.emailVerified || ('banned' in session.user && session.user['banned'] === true))
+    (!session.user.emailVerified ||
+      ('banned' in session.user && session.user['banned'] === true) ||
+      !cohort.success ||
+      cohort.data === MEMBERSHIP_COHORT.pending)
   )
     throw denied()
   if (expected != null) {

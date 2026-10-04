@@ -45,6 +45,7 @@ const STATUS_BY_CODE: Record<keyof typeof API_ERROR_CODE, number> = {
   payloadTooLarge: HTTP_STATUS.payloadTooLarge,
   unsupportedMedia: HTTP_STATUS.unsupportedMediaType,
   quotaExceeded: HTTP_STATUS.badRequest,
+  invitationQuotaExceeded: HTTP_STATUS.conflict,
   unsupportedUrl: HTTP_STATUS.badRequest,
 }
 

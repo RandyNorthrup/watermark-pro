@@ -8,9 +8,19 @@ import type { AccountStore } from '../account-store'
 const adminInputSchema = z.object({
   userId: z.string().optional(),
   role: z.unknown().optional(),
+  password: z.unknown().optional(),
   data: z.record(z.string(), z.unknown()).optional(),
 })
-const IDENTITY_FIELDS = ['id', 'email', 'emailVerified']
+const PROTECTED_ACCOUNT_FIELDS = [
+  'id',
+  'email',
+  'emailVerified',
+  'membershipCohort',
+  'password',
+  'banned',
+  'banReason',
+  'banExpires',
+]
 const READ_ONLY_ADMIN_PATHS = new Set([
   '/admin/get-user',
   '/admin/list-users',
@@ -46,7 +56,7 @@ export async function enforceSiteAdministrator(
   if (PRIVATE_SESSION_PATHS.has(path)) throw denied()
   const input = adminInputSchema.safeParse(ctx.body ?? {})
   if (!input.success) throw denied()
-  const { userId, role, data } = input.data
+  const { userId, role, password, data } = input.data
   if (userId === ownerId && !READ_ONLY_ADMIN_PATHS.has(path)) throw denied()
   const requestedRole = role ?? data?.['role']
   if (
@@ -56,14 +66,18 @@ export async function enforceSiteAdministrator(
   )
     throw denied()
   if (role !== undefined && data?.['role'] !== undefined && role !== data['role']) throw denied()
+  const hasProtectedAccountFields = PROTECTED_ACCOUNT_FIELDS.some(
+    (field) => data !== undefined && Object.hasOwn(data, field),
+  )
   if (
     path === '/admin/set-user-password' ||
-    (path === '/admin/update-user' &&
-      IDENTITY_FIELDS.some((field) => data !== undefined && Object.hasOwn(data, field)))
+    (hasProtectedAccountFields && ['/admin/update-user', '/admin/create-user'].includes(path)) ||
+    (path === '/admin/create-user' && password !== undefined)
   ) {
     throw new APIError('FORBIDDEN', {
       code: 'ACCOUNT_IDENTITY_PROTECTED',
-      message: 'Account identity and password recovery require the account owner.',
+      message:
+        'Account identity, admission, recovery and moderation require their protected flows.',
     })
   }
 }
