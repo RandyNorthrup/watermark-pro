@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import type { TFunction } from 'i18next'
 import { KeyRound } from 'lucide-react'
-import { lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { accountSearchSchema } from '../../../shared/client-search'
 import { SITE_ROLE } from '../../../shared/site-roles'
+import { CloudConnectionsCard } from '../../components/cloud-connections-card'
 import { requestProductTour } from '../../components/guidance/product-tour'
 import { ProviderLogo } from '../../components/provider-logo'
 import { SocialAuth } from '../../components/social-auth'
@@ -37,11 +37,6 @@ function siteRoleName(role: unknown, t: TFunction): string {
   if (role === SITE_ROLE.admin) return t('siteRoles.admin')
   return t('siteRoles.user')
 }
-
-const CloudConnectionsCard = lazy(async () => {
-  const module = await import('../../components/cloud-connections-card')
-  return { default: module.CloudConnectionsCard }
-})
 
 function AccountPage() {
   const { t } = useTranslation()
@@ -135,9 +130,7 @@ function AccountPage() {
           <SocialAuth mode="link" />
         </Card>
       </div>
-      <Suspense fallback={null}>
-        <CloudConnectionsCard key={session.user.id} userId={session.user.id} />
-      </Suspense>
+      <CloudConnectionsCard key={session.user.id} userId={session.user.id} />
       <Card className="flex flex-col gap-3 p-6">
         <h2 className="text-xl font-semibold">{t('tour.settingsTitle')}</h2>
         <p className="text-sm text-ink-muted">{t('tour.settingsBody')}</p>

@@ -7,6 +7,97 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Displayed Account action owner guard — 2026-10-04
+
+- Reproduced stale displayed-account action using actual component/context:
+  switching owner before UI cleanup still called OneDrive disconnect. Seven
+  old cases passed while the new negative failed.
+- Added the same displayed/current owner comparison already used by refresh
+  before connect/disconnect. Existing catch/generation/mounted controls remain;
+  no new state authority. Matching eight-case and final gates are pending.
+- Matching complete eight-case file passes after the owner guard; the actual
+  stale-action negative fails before it. Final exact-head CI quality/SAST remain
+  required; earlier layout and scanner evidence is qualified by source scope.
+
+### Aligned Account device proof — 2026-10-04
+
+- Applied Account correction cleanly above merged editor `ff409947`, preserving
+  current video/menu/toolbox/security/migration controls. Fresh install, scoped
+  lint, forced types, seven unit cases and fixture discovery pass.
+- Real unchanged-response geometry/privacy/axe case passes all four devices
+  with original waits, two workers and zero retries. Root views every ready
+  capture; fixed-navigation full-page capture and process-sampling limitations
+  remain explicit. Normal five-trace audits and full final gates are next.
+- Recorded the owner's header rule: scrolled content must be clipped below
+  retained header, including touch layouts. Frontend owns the coherent layout
+  correction and actual scroll/hit/visual regression; it is not yet certified.
+- Normal five-trace desktop Account passes 99/100/100 with near-zero layout
+  shift. Mobile layout meets its cap but performance/LCP/TBT still fail at
+  89/2795.3093ms/233ms. Preserved complete numeric reports privately with hashes
+  after repeated trace blocks fail duplication; corrected source scan has zero
+  clones and no ignore/rule change. M19 and production remain uncertified.
+
+### Account verification reassessment — 2026-10-04
+
+- Reused real loopback account fixture instead of repeating image onboarding in
+  cloud layout case. Added precise Node declaration/config inclusion; cookies
+  stay in test context and API context closes. No auth/mock bypass or dependency.
+- Waited for genuine credential row before measurements; retained geometry/
+  privacy predicates and deadlines. Enlarged existing spinner after actual
+  visual review found it too small. Initial fixture lint rejects await-member
+  access and missing declaration project; both corrected without suppressions.
+- Current matching static/device proof is pending. Previous eight full-quality
+  and two device failures remain; no timeout or coverage floor is changed.
+
+### Account layout producer proof — 2026-10-04
+
+- Used a real local account and held/forwarded unchanged cloud-status response
+  to prove the pending card's expansion moves the following tour card: 522px
+  desktop and 638px phone. Existing ownership, actual DTO and axe checks remain.
+- Fresh install/build and bounded baseline geometry probe pass. Corrective source
+  now reserves inaccessible pending provider structure and removes Account's
+  null lazy-card boundary. Existing private-status and account guards remain.
+- Added pending privacy/action negatives and a real-response four-device layout
+  regression. Initial lint rejects a nested conditional; automatic fixes plus
+  formatting still leave that rule conflict. A small state-notice function
+  replaces it. Both red attempts remain; their dependent unit/build steps never
+  ran. Corrected source verification and normal Lighthouse audits remain pending.
+- Corrected E2E caller void/resolver lint/type failures before running browsers.
+  Scoped lint, seven unit cases, forced types, dead-code, translations and
+  duplication checks pass. Fresh build passes unchanged bundle/publication
+  limits; SAST passes 510 rules across 2,184 files with zero findings and 15
+  oversized skips. Four-device real geometry, normal five-trace Account audits
+  and complete quality remain required; no production release is claimed.
+- Actual corrected-source probe exposes a remaining 104px phone shrink caused
+  by loading/loaded text choosing different flex-wrapped header arrangements.
+  Preserved the failed log/captures; stopped owned quality at source publication
+  (exit 143), without claiming later tests. Both headers now use the same
+  responsive grid instead of text-dependent wrapping. Assertions and release
+  thresholds remain unchanged; new geometry/build/gates are pending.
+- Responsive-grid unit/build pass. A new private element capture then scrolls
+  between geometry measurements: card height remains 636px, while both y
+  coordinates move 198px. Preserved that caller failure and moved its scrolling
+  capture after assertions. No additional production fix or passing geometry
+  certificate is claimed; real-response and canonical device proofs remain next.
+- Reassessed the full diagnostic case: a separate loading sign-in-method row
+  explains a 20px whole-page movement while cloud heights stay equal. Waiting
+  for that real credential row isolates cloud response without changing exact
+  assertions. Desktop/phone probe now passes zero geometry deltas and zero axe/
+  page errors. Viewed actual cloud capture; disconnect diagnostics remain.
+- Corrected native Node JSON-import setup after canonical E2E found no tests;
+  separate listing discovers all four cases. Corrected execution remains
+  pending. Full quality is still running covered tests with one unchanged
+  Editor-page failure observed; no complete quality or release claim is made.
+- Current complete quality terminates one with 2,957/2,965 covered cases passing
+  and eight failures across four unchanged integration files; coverage floors
+  remain green. Later stages do not run. Concurrent workload causality remains
+  unproven, and no timeout/rule is weakened.
+- Corrected four-device E2E terminates one: desktop/iPhone pass; Android fails
+  onboarding's heading wait and iPad exceeds the original test deadline. Trace
+  disposal/truncation limits are retained. Full setup/failure reassessment is
+  next; Account correction is unmerged and no certificate is claimed.
+
+
 ### Executed project-completion proof and draft status — 2026-10-04
 
 Intentional actual-source negative87719 exits one at the SAME final bounded Play
