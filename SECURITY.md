@@ -19,6 +19,14 @@ Only the `main` branch and the latest tagged release receive fixes.
 
 ## Controls in place
 
+- The unmerged workspace-creation candidate binds creation provenance to the
+  authenticated account, checks live private admission and fences the shared
+  creation allowance inside D1 INSERT. Client metadata, workspace roles and paid
+  plan names cannot authorize additional creation. Historical/private rosters
+  remain intact, and provenance cannot be reassigned to free another account's
+  slot. Paid creation requires a separate verified billing writer; no public
+  activation or production deployment is claimed by this candidate.
+
 - Candidate account-state protection: generic administrative editing and account
   creation reject protected identity, admission, recovery and moderation fields.
   The existing profile, role and moderation flows retain their authority. Actual

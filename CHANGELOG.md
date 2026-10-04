@@ -7,6 +7,37 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Workspace creation restack — 2026-10-04
+
+- Applied only the existing creation/retained-roster prerequisite above reviewed
+  seat head `cfde1b7`, then aligned metadata-only to merged main `1a52fb2` after
+  verifying entire parent-tree equality and all 28 candidate hashes. Newer main
+  controls and old source/evidence remain preserved.
+- Corrected omitted 0022 metadata and represented the already-authored index/
+  kind check in the schema. Reviewed genuine generation's exact additions;
+  preserved original ALTER/backfill/triggers instead of unsafe scratch rebuild
+  SQL. Recorded the first absolute-output error despite its zero CLI exit.
+- Current real-auth/schema checks pass 38, populated SQLite passes four, actual
+  D1 passes 49 across six complete files and forced full types pass. Corrected
+  scoped lint/format pass; original template indentation and unsupported-SQL
+  formatter failures remain.
+- One unchanged complete quality command passes 2,964 covered cases across 264
+  files, 86 actual workerd cases across 21 files and every original floor,
+  static/publication/audit/script/asset/build gate. Audit findings are zero.
+  Pinned SAST passes 510 rules on 2,183 tracked files with zero findings and 15
+  oversized skips. All 28 hashes match the gate freeze before this factual
+  documentation update; the known quality process group closes, with later
+  native child sampling limits retained.
+- Fresh canonical onboarding/private-account E2E passes all 16 cases on four
+  devices with unchanged waits, two workers, zero local retries and axe/reflow
+  checks. Root views all four quota captures: copy/actions are readable without
+  observed horizontal overflow. The existing iPhone footer/heading overlap
+  remains unresolved; onboarding has no explicit success PNG. All captured
+  IDs/groups/profile close, port 5273 is free and only
+  verified owned gate storage is removed. Normal publication and exact-head
+  hosted checks remain; no public billing, production migration, deployment or
+  M19 completion is claimed.
+
 ### Atomic workspace seats preparation — 2026-10-04
 
 - Prepared original PR17's two-commit atomic-seat/retained-roster delta above

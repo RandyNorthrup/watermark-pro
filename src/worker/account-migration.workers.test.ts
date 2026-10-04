@@ -20,17 +20,14 @@ beforeEach(async () => {
   const now = Date.now()
   await env.DB.batch([
     env.DB.prepare(
-      'INSERT INTO user (id,name,email,email_verified,created_at,updated_at) VALUES (?,?,?,?,?,?)',
+      "INSERT INTO user (id,name,email,email_verified,created_at,updated_at,membership_cohort) VALUES (?,?,?,?,?,?,'private')",
     ).bind(FIRST, 'Fixture A', 'fixture-a@example.test', 1, now, now),
     env.DB.prepare(
       'INSERT INTO user (id,name,email,email_verified,created_at,updated_at) VALUES (?,?,?,?,?,?)',
     ).bind(SECOND, 'Fixture B', 'fixture-b@example.test', 0, now, now),
-    env.DB.prepare('INSERT INTO organization (id,name,slug,created_at) VALUES (?,?,?,?)').bind(
-      LEGACY_ORGANIZATION,
-      'Legacy fixture',
-      'legacy-fixture',
-      now,
-    ),
+    env.DB.prepare(
+      'INSERT INTO organization (id,name,slug,created_at,creation_owner_id) VALUES (?,?,?,?,?)',
+    ).bind(LEGACY_ORGANIZATION, 'Legacy fixture', 'legacy-fixture', now, FIRST),
     // This fixture represents an existing roster from before plan admission,
     // rather than a new public workspace buying a second seat.
     env.DB.prepare(

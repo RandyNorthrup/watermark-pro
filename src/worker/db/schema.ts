@@ -29,7 +29,7 @@ import type {
   CloudProvider,
 } from '../../shared/cloud-connections'
 import type { GuidanceTopic } from '../../shared/guidance'
-import type { WorkspacePlanRecord } from '../../shared/plans'
+import type { WorkspaceCreationKind, WorkspacePlanRecord } from '../../shared/plans'
 import type { RecentActivity, RecentView } from '../../shared/recent-work'
 import type { AssignableSiteRole } from '../../shared/site-roles'
 import type { WatermarkSpec } from '../../shared/watermark'
@@ -152,8 +152,17 @@ export const organization = sqliteTable(
     logo: text('logo'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
     metadata: text('metadata'),
+    creationOwnerId: text('creation_owner_id').references(() => user.id, { onDelete: 'set null' }),
+    creationKind: text('creation_kind').$type<WorkspaceCreationKind>().notNull().default('shared'),
   },
-  (table) => [uniqueIndex('organization_slug_unique').on(table.slug)],
+  (table) => [
+    uniqueIndex('organization_slug_unique').on(table.slug),
+    index('organization_creation_owner_kind_idx').on(table.creationOwnerId, table.creationKind),
+    check(
+      'organization_creation_kind_check',
+      sql`${table.creationKind} IN ('personal', 'shared', 'historical', 'paid')`,
+    ),
+  ],
 )
 
 /** Capacity belongs to a server-owned workspace grant, independently of private admission. */

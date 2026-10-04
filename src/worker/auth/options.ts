@@ -41,7 +41,7 @@ import {
 } from '../../shared/constants'
 import { LOCALE_CODES } from '../../shared/locales'
 import { accessControl, roles } from '../../shared/permissions'
-import { workspaceCapacity } from '../../shared/plans'
+import { WORKSPACE_CREATION_KIND, workspaceCapacity } from '../../shared/plans'
 import { SITE_ROLE } from '../../shared/site-roles'
 import { newOrganizationSchema } from '../../shared/validation'
 import { WORKSPACE_ACCESS_POLICY } from '../../shared/workspace-access'
@@ -274,6 +274,21 @@ export function buildAuthOptions(deps: AuthDependencies) {
         ac: accessControl,
         roles,
         creatorRole: 'owner',
+        schema: {
+          organization: {
+            additionalFields: {
+              creationOwnerId: { type: 'string', required: false, input: false, returned: false },
+              creationKind: {
+                type: 'string',
+                required: true,
+                input: false,
+                returned: false,
+                defaultValue: WORKSPACE_CREATION_KIND.shared,
+                validator: { input: z.enum(WORKSPACE_CREATION_KIND) },
+              },
+            },
+          },
+        },
         invitationExpiresIn: INVITATION_TTL_SECONDS,
         cancelPendingInvitationsOnReInvite: true,
         requireEmailVerificationOnInvitation: true,
@@ -282,7 +297,7 @@ export function buildAuthOptions(deps: AuthDependencies) {
         // Delivery runs in our awaited after-hook: Better Auth's built-in
         // email callback swallows failures and otherwise returns false success.
         organizationHooks: {
-          beforeCreateOrganization: ({ organization }) => {
+          beforeCreateOrganization: async ({ organization, user }) => {
             const parsed = newOrganizationSchema.safeParse(organization)
             if (!parsed.success || parsed.data.slug.startsWith('personal-')) {
               throw new APIError('BAD_REQUEST', {
@@ -290,7 +305,18 @@ export function buildAuthOptions(deps: AuthDependencies) {
                 message: 'Use a valid workspace name and a non-reserved slug.',
               })
             }
-            return Promise.resolve()
+            if (!(await deps.accounts.canCreateSharedWorkspace(user.id)))
+              throw new APIError('FORBIDDEN', {
+                code: 'WORKSPACE_CREATION_QUOTA',
+                message: 'Shared workspace creation is unavailable for this account.',
+              })
+            return {
+              data: {
+                ...parsed.data,
+                creationOwnerId: user.id,
+                creationKind: WORKSPACE_CREATION_KIND.shared,
+              },
+            }
           },
           beforeAddMember: requireSharedWorkspace,
           beforeRemoveMember: requireSharedWorkspace,

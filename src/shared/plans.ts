@@ -62,6 +62,16 @@ export const PRIVATE_PLAN_CAPACITY = {
   sharedWorkspaces: 1,
 } as const
 
+/** Server-owned creation provenance is immutable across client metadata and membership changes. */
+export const WORKSPACE_CREATION_KIND = {
+  personal: 'personal',
+  shared: 'shared',
+  historical: 'historical',
+  paid: 'paid',
+} as const
+export type WorkspaceCreationKind =
+  (typeof WORKSPACE_CREATION_KIND)[keyof typeof WORKSPACE_CREATION_KIND]
+
 const WORKSPACE_BASE_PLAN = { free: 'free', private: 'private', legacy: 'legacy' } as const
 const workspaceBasePlanSchema = z.enum(WORKSPACE_BASE_PLAN)
 const paidPlanSchema = z.enum(['pro', 'team'])
