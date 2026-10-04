@@ -7,6 +7,598 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Executed project-completion proof and draft status — 2026-10-04
+
+Intentional actual-source negative87719 exits one at the SAME final bounded Play
+predicate after only terminal onPlaying(false) is withheld; the prior native-ended
+and error assertions pass. Four unrelated cases are filtered. ProjectPreview
+restores byte-exact SHA6e49651d7d67f2244f204d67cc341d52d261f944e6be4b59e9683beddaa0118c
+in finally. With that callback restored, the original complete five-case browser
+file87536 exits zero in4.78s. All original native/pixel/error/ended assertions and
+deadlines remain; only the final control observer uses existing bounded waitFor.
+This tests actual project-clock/React publication, not a simulated playback model
+or a codec/production timing fix. Full quality84989 remains failed3084/3085 and
+its coverage record remains; no SAST or later-stage pass is invented.
+
+The actual returned positive rootPID13249/group closes independently. Short
+Chrome descendant/profile identities were missed, so no complete lifecycle
+history or unidentified profile-absence claim is made. Browser lane returns to
+Root's Account/notification queue. The fully reviewed source above actualmain8df
+now prepares a normal-hook DRAFT PR: hosted Linux may verify independently while
+complete local quality/SAST and original screenshot/release gates remain pending.
+Thirteen original PR15 CI failures persist across restacks, with the declared AAC
+frame-span cause/correction, meaningful native/waveform/frame regressions and all
+later artifact/UI observer failures recorded. No ready/merge/deploy or M19
+completion claim is made. Next is draft publication and remaining final gates.
+
+### Actual project-clock completion observer — 2026-10-04
+
+Quality 84989 exits one: 277 of278 covered files and3,084 of3,085 cases pass.
+Coverage passes92.76 statements/85.84 branches/92.51 functions/93.71 lines. The
+sole failure is VideoViewer's real native retry test: native currentTime advances,
+both error negatives and cleared alert pass, then native video.ended becomes true
+while the accessible control is still Pause. Its final synchronous Play lookup
+fails. No following codec/workerd/script/build/SAST stage executes.
+
+Whole playback contract review proves that ProjectPreview publishes onPlaying
+false when its requestAnimationFrame project clock reaches projectDuration;
+HTMLMediaElement.ended is not that authority. VideoViewer renders Play after
+that callback commits React state. The caller now awaits the SAME final Play
+predicate with existing bounded waitFor, preserving native-ended3000ms and all
+original playback/error/pixel assertions. No production timer, threshold, decoder
+or callback changes. A test-only real-source counterfactual omits only terminal
+onPlaying(false) publication and must fail this predicate; exact production
+source is restored before the unchanged complete five-case file. Root releases
+that focused browser lane. Draft publication follows coherent proof through
+normal hooks, with local complete quality/SAST still pending. No ready/merge/
+deployment claim or thirteen-failure reset is made; M19 stays open.
+
+### Matching publication artifact-layout proof — 2026-10-04
+
+Source publication 48834 exits zero under the unchanged scanner: 15,922 candidate/
+object checks, 13,582 scanner copies, 571,148,687 raw bytes and 267,140,669 unique
+candidate bytes, 331 archive entries. The same 512MiB aggregate cap now passes
+with all 372 exact raw certification artifacts retained privately. Five revoked
+historical occurrences are masked and one exact historical finding is accepted;
+zero configured private values are available, so no live-secret comparison is
+claimed. Scanner processes close. This real positive follows actual budget failure
+54616 and proves the coherent artifact-layout correction without ignoring or
+deleting source/customer data, raising a bound or changing scanner behavior.
+Executable/UI/native bytes are unchanged. Next is frozen complete quality, SAST
+only on zero, then remaining original screenshot/API/device release gates. M19
+and thirteen original CI failures remain open; four-device current navigation
+is4/4 with real inspected PNGs, while earlier failed receipts remain failed.
+
+### Private certification artifact layout and retained failure — 2026-10-04
+
+Quality 54616 exits one at source publication after format, ESLint, CSS, workflow,
+types, knip, i18n, cycles and duplication pass. Tests, build and SAST never run.
+The existing source scanner includes untracked Git candidates and keeps its
+512MiB unique-candidate cap. Actual working candidates total 1,086,787,902 bytes;
+two owned untracked CLI output directories contribute 930,042,107 bytes across
+372 files. They are unpublished local certification/failed-diagnostic evidence,
+not reviewed source or customer files. Existing publication policy and Git-ignore
+comments reserve local verification output for private storage; no scanner limit,
+path rule, deadline or ignore entry changes.
+
+All 372 original files move byte-for-byte into outside-repository private storage
+`/private/tmp/lumafoil-video-certification-private-2026-10-04`, with directories
+0700 and files0600. Every source/destination size and SHA-256 is verified; nothing
+is deleted. Inventory SHA-256 is
+`78d1e53cba8bb69bf387cf9188a1c2bc5fd7a742009d73221a54c59618a4399f`.
+It preserves both named milestone trees, including the old failed receipt and
+its previously retained pre-format bytes. Current UI PNGs remain separate private
+Playwright output. This compact receipt keeps provenance in source without
+publishing raw local artifacts. No customer or unidentified tracked file moves.
+All executable/config/native/test hashes stay exact; the failed gate remains
+failed. Next is one matching unchanged publication scan, then full quality only
+after that guard passes. Four-device navigation remains4/4; M19 stays open.
+
+### Final union formatting receipt — 2026-10-04
+
+Final joined quality 21276 exits one at its first format check, naming only the
+preserved desktop failed-navigation-dark.json screenshot receipt. No tests or
+SAST execute. Original JSON bytes are saved privately with their digest before
+mechanical Prettier formatting; the parsed diagnostic remains identical. No
+production/UI/assertion/deadline change is involved. Current four-device 47983
+pass and all older failures remain. Next is complete format check followed by
+the corrected full quality gate, then SAST only on zero; M19 remains open.
+
+### Current right-toolbox and rounded-arc device proof — 2026-10-04
+
+Corrected canonical navigation 47983 exits zero: four cases on desktop Chrome,
+iPhone, iPad and Android, with original two workers, sixty-second test/ten-second
+expect deadlines and zero local retries. Image, Video and Documents RIGHT-side
+bounds pass wherever their responsive grids have side columns. Actual six-pill
+rounded arrangement, positive/equal gaps, visible icon/label containment and one
+themed surface pass alongside axe, focus, routing and reduced-motion guards.
+Durations are 15.0, 20.6, 37.6 and 27.0 seconds. Current source hashes do not change
+during the run. Four fresh expanded PNGs and desktop Image/Documents captures
+are visually inspected: labels are readable, destinations remain separate, the
+Inspector/toolbox is RIGHT, and the collapsed half-circle stays outside canvas.
+These selected images show an actual sample Image and empty Video/Documents;
+they do not independently certify populated exports, dark/RTL or the full matrix.
+
+All fourteen sampled process identities/groups and one sampled profile close;
+port5273 is free. Only the verified current gate residue is removed, preserving
+two prior baseline directories. Complete later transient child history is not
+claimed. Failures 36882, 62804 and 84084 remain unchanged, and historical stacked
+captures do not certify the current design. Creation main8df is already joined.
+Next is one final complete quality/security gate on this exact source, then
+original four-profile screenshots and combined API/UI release proof. M19 and
+thirteen original PR15 CI failures stay open; no production launch is claimed.
+
+### Existing Documents selector correction — 2026-10-04
+
+Navigation 84084 is terminal one with four failed cases. Each reaches Documents
+after the current RIGHT Image/Video bounds and settled rounded-pill/label checks
+pass. The newly added caller used `.media-editor-layout`, which actual restored
+MediaEditorLayout never renders: its utility grid directly contains reader and
+MediaTools. The actual Documents heading is present in all four failure records.
+The complete caller/markup review retains all geometry/arc/axe guards, awaits
+real Documents heading/toolbox, and reads the existing toolbox parent grid and
+first child. No production layout, timeout or retry changes. Existing screenshots
+show current arc/right layout only; the four journeys remain failed. Six sampled
+PIDs close, port5273 is free, latest verified owned gate residue is removed, and
+two prior baseline directories remain. Later Chrome/profile sampling is incomplete.
+Next is one corrected four-device journey, then complete final gates; M19 stays
+open with every failed receipt and original thirteen PR15 CI failures retained.
+
+### Preparation and scoped result — 2026-10-04
+
+Scoped formatting, ESLint and CSS finish zero. Creation join reaches main8df
+metadata before its final all-file hash verification rejects a concurrently edited
+receipt; that sequencing mistake is retained, with the first preserved-source
+check already passed. Independent readback confirms all 24 creation leaves exact,
+three additive docs and only the bootstrap test argument. No product source was
+edited during a runtime gate. Current four-device navigation proof is next; M19
+and final complete gates remain open.
+
+### Correct right toolboxes and navigation proof caller — 2026-10-04
+
+- Corrected the preceding left-side interpretation to the owner's explicit RIGHT
+  toolbox placement for Image, Documents and Video. Responsive narrow flow stays.
+- Replaced three invalid string-arrow Locator evaluations with browser IIFEs and
+  corrected real geometry assertions/capture names to RIGHT. Responsive controls
+  are awaited without changing deadlines. Failed rounded-menu 36882 (iPad caller
+  readiness) and 62804 (all four undefined computed-grid results) remain recorded;
+  prior stacked 60425 is historical proof only.
+- Joined exact creation main 8df277a before final gates, preserving all other video,
+  native, menu and guard bytes. Three docs merge additively; package metadata adds
+  only the existing creation migration test argument. Source preflight's changed
+  Last-updated line failed before writes and is retained. New final-source visual
+  and complete gates remain pending.
+
+### Unified labelled navigation pills — 2026-10-04
+
+- Corrected the stacked interpretation: restored the rounded arc while retaining
+  separate icon/text pills, uniform gaps and RTL mirroring. Added a rendered arc
+  assertion; previous stacked captures are historical, new verification pending.
+
+- Applied the owner's subsequent separation/spacing correction: six individual
+  pills with a single uniform-gap layout. Removed the joining SVG/filter layer
+  and obsolete constants/styles; preserved soft motion, RTL and the half-circle.
+  Added actual settled gap assertions. Scoped checks and three component cases
+  pass; canonical navigation passes four device cases with axe/routing/focus.
+  Root views all four fresh separate-pill captures. Full later-source gates
+  remain pending; the earlier connected design is superseded.
+
+- Changed each expanded gooey destination into one rose pill containing its
+  icon and visible text. Removed separate label surfaces and moved hover/current
+  styling to the entire control while preserving existing navigation and trigger.
+- Added real four-device navigation assertions for visible text/icon containment,
+  one shared text color and pill background. Corrected scoped CSS/lint/format
+  passes, and canonical navigation passes four cases on all four devices with
+  axe/routing/focus/motion checks. Root views all four fresh expanded-pill
+  captures; full final gates remain pending. Preserved the first scoped CSS
+  failure, old-design screenshot diagnostic and its failures.
+
+### Old-design desktop diagnostic and explicit pill requirement — 2026-10-04
+
+The fresh joined-main build `26534` is observed terminal zero and is not restarted
+after interruption. Worker is
+`4fa1aa226072ebd931a20212ea14df80e6af7822d535fbcb2b8f0d67c039b661`;
+client manifest remains `55e7ddcecea360bec81acf76264ad6717d05ea05dd9eefe655a8e64dc83ff2a8`.
+The one original desktop diagnostic `20049` uses that artifact and exits 1 after
+50 captures. It does not reproduce the prior pending-worker settlement failure.
+Instead the existing gallery recent-photo visibility assertion fails in Arabic/
+light after a rendered first-party bootstrap dynamic-import failure. The HTTP
+status and true producer remain unknown: this outer locator assertion occurs
+outside the guard's evidence writer, so no finite failure JSON is emitted.
+No asset-500, timing/resource, tracker-defect or product-fix claim is made.
+
+Original failure 25082, desktop113 and independently complete phone208 remain.
+The owned diagnostic/gate end; gate termination is 143, known roots/groups and
+port 5273 are absent, and one verified exact generated residue is hashed/checked/
+removed. Complete transient browser/profile history is limited. No replay occurs.
+
+The owner explicitly clarifies the design: every expanded destination must show
+its icon and visible text inside one themed pill, rather than a circle plus a
+separate white label chip. Root owns only gooey markup/CSS and existing related
+tests for that coherent correction. The current diagnostic remains an old-design
+artifact; source/asset hashes are separately preserved before those edits. The
+existing visible labels are not sufficient to certify the new pill design.
+Phone visual proof stays held until Root's fresh pill build; labels, clipping,
+expanded motion, dark/RTL and outside-canvas half-circle boundaries must be
+verified with actual persisted images. No accessibility-only labels substitute.
+M19, exact new-source gates and thirteen PR #15 failures remain tracked.
+
+### Approved finite screenshot diagnostic source — 2026-10-04
+
+Root reviews and authorizes the existing-helper-only metadata correction. It now
+sets current/next fixed surface IDs and phase before settlement, retains capture
+ID, and records bounded pending-request category, owning-frame state and numeric
+response status in the same pending map/listeners. Written failure evidence omits
+URL/query/body/header and browser-message data, retaining finite error classes.
+The original thirty-second/500-millisecond predicate and profile order are exact.
+No cache, fallback, new observer framework or product timing change is introduced.
+
+Scoped formatting/ESLint and forced full main-1a52 types pass. Two mechanical
+lint failures remain recorded: iterator conversion placement and a nested real
+URL expression; the first correction missed the latter before the final local
+variable extraction. No rule is suppressed. This source prepares evidence only;
+no new browser/full-gate/build or producer-fix proof has run. VideoTool/AppShell
+and all native bytes remain frozen while the independent notification hook
+contract is reviewed.
+
+Next one original desktop-profile diagnostic waits for creation-quality's owned
+runtime closure and an explicitly fresh joined build. The old main-4e artifact,
+failed 25082 matrix, independently passing phone profile and original thirteen
+PR #15 failures remain preserved. M19 and exact joined-main certification stay
+open; no automatic replay or threshold change occurs.
+
+### Seat-main source alignment and request-tracker review — 2026-10-04
+
+PR #25's actual protected main `1a52fb2` has the reviewed tree
+`e4f27e04542e3327e03f0ce2a18ce6c096ededee`. All 25 published seat afterimages match
+the manifest. Twenty-two own preimages match exactly; PLAN/CHANGELOG/public-billing
+merge additively. No runtime/video/native/screenshot-helper contract overlaps.
+Only those exact main leaves are copied, and the local baseline is adjusted with
+all current files preserved. Original 0020/older metadata and the reviewed 0021
+extension remain. Existing native/UI/certificate bytes and the failed screenshot
+receipt remain untouched; no whole-tree overwrite, dependency or provider change.
+
+This new backend union has no new combined executable gate yet. Prior full
+quality/SAST/UI results keep their main-4e scope. Creation-quality currently owns
+the runtime lane, so source-only work continues without any browser/full-gate run.
+
+Installed Playwright source associates dedicated worker network sessions with
+the owning frame, uses the same Request object through loading-finished/failed,
+and dispatches context events with page association. The existing pending-map
+object identity is appropriate; the current failure does not prove an ownership
+or asset-transport defect. Existing screenshot state records navigation only
+after settlement and misses direct-link transitions, so its retained navigation
+cannot identify the true next surface. The last capture/source inference still
+places the failure before gallery hard navigation with one worker-script request.
+
+Next Root reviews one minimal existing-helper diagnostic proposal: retain fixed
+current/next surface and phase before settlement, plus bounded request category,
+response status and owning-frame state inside existing listeners. The original
+pending predicate, thirty-second guard, quiet window and profile order remain.
+No new observer framework, cache, fallback, timer change or unapproved replay is
+introduced. The whole-change reassessment and thirteen PR #15 failures persist;
+M19 and exact new-main publication certification remain open.
+
+### Original four-profile screenshot failure retained — 2026-10-04
+
+Fresh-union screenshot command `25082` exits 1 under the unchanged original
+profiles, two-profile batching, waits, axe/reflow and inventory assertions. Phone
+completes 208 captures. Desktop produces 113 before the request-settle guard
+fails; the existing runner rejects that batch, so tablet/Android never start and
+the full inventory is not certified. The earlier verification-only workspace
+setup boundary is passed using the real password fixture; this later failure
+is separate. Current empty-video images prove shell layout only, with actual
+edit/export/native and loaded-media evidence retained in its independent scope.
+
+Finite existing evidence shows desktop dark, last completed capture
+`editor-adjust-applied/en/dark`, one pending same-origin GET worker-script request,
+two earlier aborted API requests and zero browser errors. The only next source
+call is the gallery hard navigation, so failure is inferred at the preceding
+settle guard; the current receipt did not directly retain surface/next-destination
+identity, and its navigation field describes the previous successful navigation.
+No worker HTTP status, decoder, resource/concurrency or product cause is inferred.
+
+The screenshot process closes. The owned built gate receives SIGTERM and ends
+143; its handler uses awaited close but no explicit shutdown-completion marker
+exists. Independent known-resource readback finds sampled thirteen identities/
+groups, one profile and port 5273 closed. One exact verified generated gate residue
+is hashed, checked for open files and removed; storage is zero. Complete transient
+process history remains limited. Source remains the exact tested 122-path union.
+
+M19 and thirteen historical PR #15 CI failures remain open. Full quality and
+SAST stay green in their exact scope, while this screenshot gate remains failed.
+Next Root reviews the whole existing caller/request contract and, only if needed,
+one minimal fixed surface/phase/category diagnostic before any new attempt.
+No delay, threshold, cache, observer framework or automatic retry is introduced.
+
+### Complete final quality on protected-main video union — 2026-10-04
+
+After the seat-E2E queue closes, canonical `11182` exits zero on the frozen
+122-path main-`4e7dce7` union. It passes 3,071 covered cases across 276 files,
+coverage 92.75/85.84/92.51/93.69, native 18, actual workerd 78, bootstrap 35,
+gate 16, performance 49, publication 25, vendor 34, CI 4+42 and every original
+asset/build/source/built-publication/audit/bundle gate. All original floors,
+deadlines and assertions remain. The earlier 61622 failure and static-only 143
+interruption remain preserved; the intermittent CDP producer remains unresolved.
+Independent pinned SAST already passes 510 rules/2,223 targets/zero findings
+with fifteen configured large-file skips on identical code.
+
+All fifteen sampled identities/groups, one captured profile and the actual
+returned certificate Chrome/profile are absent afterward; port 5273 is free and
+owned gate/TLS storage is empty. Full historical process capture remains limited.
+Source hashes stay exact. Fresh built Worker is
+`7f2b16820da0a3ec50bfc7392fc897b7e3a5c6abdd75533159769f39efd6c803`;
+client manifest is
+`55e7ddcecea360bec81acf76264ad6717d05ea05dd9eefe655a8e64dc83ff2a8`.
+
+M19 and original thirteen PR #15 failures remain tracked. Next the existing
+canonical built gate serves this artifact for the original four-profile screenshot
+command, followed by actual inspection and remaining exact-source publication
+checks. No complete screenshot/UI/Linux/hosted or public-launch certificate is
+claimed by these local quality/security results.
+
+### Independent final-source security result — 2026-10-04
+
+The separately released pinned SAST command `57364` exits zero: Semgrep 1.174.0
+runs 510 rules on 2,223 configured tracked-source targets with zero findings;
+fifteen files exceed the standard one-megabyte limit and are skipped. This is
+not exhaustive coverage of every file. The short scan completes before its
+process identity snapshot, so no historical PID inventory is claimed. No new
+product code or source instrumentation changes during the scan.
+
+The failed full quality result remains failed. The independently green 49-case
+performance observation and SAST do not replace a fresh terminal-zero complete
+quality command. Next that canonical command starts only after billing's
+covered/native lane closes, then the original four-profile screenshot and final
+publication checks. M19 and original thirteen PR #15 failures remain open.
+
+### Certificate observation and canonical performance proof — 2026-10-04
+
+The original final-quality failure remains terminal 1. The scoped certificate
+observation `64981` subsequently passes 1/1 in 2.79 seconds with every original
+TLS/H2/wrong-key/reload assertion. It was launched prematurely after scoped
+ESLint had failed `preserve-caught-error`; that procedural error and lint failure
+remain recorded, not relabelled green. Root corrects only the catch to rethrow
+the original error after the finite stage/name marker. Formatting/ESLint and diff
+checks then pass. Root executes the complete original performance command at
+unchanged concurrency two: `2549` exits zero, 49/49 in 28.414 seconds. The prior
+WebSocket-open failure is intermittent and unresolved; no product or TLS fix is
+claimed. Known scoped browser/root identities and TLS directories close.
+
+M19 and thirteen original PR #15 CI failures remain. Source now includes only
+the minimal existing certificate-test diagnostics in addition to the reviewed
+union. Next pinned SAST runs independently; final full quality must pass after
+coordinating billing's existing covered/native lane, then the original four
+screenshot profiles and remaining exact-source publication checks. No extra
+instrumentation, changed deadline, sandbox relaxation or rule suppression occurs.
+
+### Final quality failure retained — 2026-10-04
+
+Final canonical quality `61622` exits 1. Covered tests pass 3,071/3,071 with
+92.75% statements, 85.84% branches, 92.51% functions and 93.69% lines. Native
+codecs pass 18/18, actual workerd passes 78, bootstrap passes 35 and gate passes
+16. Performance controls pass 48/49; the unchanged certificate browser test
+fails its original 30-second CDP connection before TLS/H2/wrong-key assertions.
+Installed source and the failure log establish a WebSocket-open timeout after
+HTTP debugger discovery, not a certificate or product failure. Cause remains
+unknown. Later publication/assets/vendor/CI/build stages and SAST are not run.
+Frozen source is unchanged through failure; sampled identities/groups and current
+native/browser markers close, port 5273 is free, TLS and gate storage are empty.
+Transient browser/profile history is incomplete and is not claimed otherwise.
+
+M19 remains open. Root authorizes one minimal existing certificate-file stage/
+finite-error-name observation with unchanged launcher flags, deadline and TLS
+assertions, then reviews its actual result before any whole-performance or full
+quality retry. No source feature, timeout, sandbox or rule changes are allowed;
+original thirteen PR #15 failures and prior local receipts remain preserved.
+
+### Final main-based video/source union — 2026-10-04
+
+PR #24 merges normally as `4e7dce7` after all seven exact-head checks and the fresh
+thirteen-endpoint policy check. Its complete tree is identical to reviewed capacity
+commit `23742a56`. The unpublished video branch now uses that actual main baseline;
+all 149 inventoried changed-file bytes survive the metadata-only alignment, with
+current phone/Admin/native corrections and exact capacity leaves retained.
+
+The last bounded screenshot-fixture correction carries only the reviewed setup
+delta into the video-owned helper: bind its existing password and perform real
+same-account sign-in after verification, before guidance/reload. No application
+credential guard, deadline, validator or account authority is relaxed. Peer scoped
+style/types and the existing 48 real recent-auth cases pass; the four original
+screenshot failures retain their uncaptured HTTP-cause boundary. The independent fresh SDK counterfactual now passes: verification-only workspace
+creation is 403 with the known code and unchanged list; real same-account
+password sign-in is 200, then creation is 200 and the list grows by one. Its first
+400 invalid-slug control failure remains preserved. Full four-device screenshot
+proof stays pending, and the original job statuses are not retroactively inferred. The exact new receipt is retained with the Admin five-trace receipt.
+
+Final union full formatting and fresh forced full types pass; the isolated MJS
+fixture delta also passes scoped formatting/ESLint. Generated local hook files are
+present. No new combined full-quality/SAST, full screenshot/performance matrix,
+new Linux native or hosted video certificate has run yet. Earlier thirteen PR #15
+failures and exact-source independent/failed proofs remain preserved. Next Root
+reviews the single final union manifest and releases one final quality/SAST on
+this source, followed by the remaining exact-source audit/publication gates.
+M19 and public payment/launch work remain open; feature expansion stays frozen.
+
+### Executed phone correction and source-only capacity union — 2026-10-04
+
+The one intentional old-CSS iPhone journey fails the direct initial Play hit
+assertion with valid real media (`hitSelf=false`, fixed dock top 608). Exact
+reviewed CSS is then restored; all five corrective source hashes match before
+the current canonical video/navigation run. That unchanged four-device scope
+passes 16/16 in 3.5 minutes, retaining actual codec refusal/edit/export/axe
+assertions. Current iPhone Play spans y=409..445 with a flow footer at 2226.3125;
+the 24-pixel half-circle stays before the 32-pixel viewer edge, and Play/video
+centre hits are self. The full viewer precedes the footer. Android guards pass.
+
+Current actual viewport caller `97383` completes with sixteen persisted captures,
+settled radial labels, dark/Arabic RTL and zero page-error events under the finite
+name/category/operation observer. Root views four current images. Earlier menu
+crowding is a transitional capture, so geometry is unchanged. The historical
+unclassified iPhone event is not reproduced and remains unexplained; no producer
+fix is claimed. English restoration reaches real HTTP 200. Owned known runtime
+closes, port 5273 is free and gate storage is empty. Only twelve canonical runner
+identities and one viewport root were sampled; complete ephemeral browser/profile
+history is not claimed. The old negative and both failed callers remain preserved.
+
+The exact reviewed Admin fixture independently passes its original five-trace
+strict final Document/H2/content/privacy/budget audit, scores 100/100/100, CLS
+0.00204195 and TBT 0. Its final receipt is copied exactly; this proves that fixture
+slice, not this full unpublished union or the complete M19 matrix.
+
+Capacity commit `23742a56` is integrated source-only above current base `3e7991a`.
+All 33 committed after-hashes match the published manifest; 28 own preimages are
+exact and copied without runtime edits. PLAN/CHANGELOG/SECURITY/public-billing
+histories merge additively. Package changes only add the existing capacity
+migration case to the bootstrap test command; native installer/codecs/vendor
+scripts and the lockfile remain unchanged. Migration 0020, the 0019 chain and all
+current five correction/native bytes are preserved. No payment, provider,
+public-launch, new UI feature or dependency work is introduced.
+
+Planning assessment: M19 and original thirteen PR #15 CI failures remain open.
+UI/native evidence above retains its exact pre-capacity backend scope. Next
+scoped full formatting/types and Root's single union review precede one final
+combined quality/SAST command. Actual PR #24 squash alignment later must retain
+these exact combined bytes; no blind main reset or hosted/release claim is made.
+
+### Minimal video phone layout and canonical Admin corrective batch — 2026-10-04
+
+The actual viewport receipt proves initial iPhone Play occlusion; moving Play alone
+would move the picture farther behind the fixed dock. The same bounded source
+batch instead makes the existing phone tab bar participate in document flow only
+while the video workbench is present, exposes the existing half-circle navigation,
+and reserves the existing desktop 2rem leading gutter. The header menu remains;
+other mobile routes retain their current fixed tab bar. Playback controls precede
+the tall phone preview, with no viewport observer, resize state, guessed global
+padding or new navigation framework.
+
+The existing real-supported video E2E now resets initial scroll, records actual
+Play/dock/viewer/half-circle coordinates, asserts Play and video centre hits,
+verifies the full viewer ends before the flow tab bar, and checks that the collapsed
+half-circle stays outside the viewer. The older layout must produce a negative
+initial Play hit. All codec, capability-refusal, edit/export, waveform and axe
+assertions/deadlines remain. Existing navigation screenshots now use bounded real
+Animation play-state polling and a persisted path; geometry is not changed based
+on the earlier transitional expanded image.
+
+The exact reviewed `f2ab71b1422ce3f129953fe46dc3ab7cf1b30b6f59933989353ab283e6d178e2`
+Admin fixture and its verification receipt are carried from the independent main
+candidate. This uses the shared canonical default URL without relaxing the final
+Document/H2 validator or changing production auth/UI. Private caller error
+observation retains an allowlisted true exception name/category plus fixed
+operation; the previous unclassified iPhone error remains preserved, not resolved.
+
+Scoped format, ESLint and CSS checks pass. The first ESLint run failed with 33
+errors because Node-only E2E types cannot type direct browser-DOM callbacks;
+correction uses the existing typed browser-expression interface, without casts,
+suppressions or simulated responses. No new browser/full-quality gate has run on
+this corrective source. All other tested native/auth/dependency/scanner bytes are
+unchanged; original thirteen PR #15 CI failures remain. Next Root reviews the
+five-codepath delta, then releases one actual old-layout negative and restored
+current-source proof plus final quality/security/device/visual audits. M19 stays open.
+
+### Executed viewport, radial menu, dark and RTL observation — 2026-10-04
+
+One coherent private-caller correction was reviewed and executed on the same
+actual-main production bytes. It waits for and declines the first fresh account's
+actual tour invitation before media intake, reuses the canonical six-link,
+visible-Videos and bounded CSS assertions, and restores English through the real
+LanguageMenu (account save HTTP 200, `lang=en`, `dir=ltr`) before the remaining
+contexts. No product code, style, dependency, deadline or fake response changed.
+
+Caller `47206` completed with exit 0 and persisted sixteen viewport PNGs: top,
+centred-transport and bottom on desktop/iPhone/iPad/Android, desktop and iPad
+expanded menus, and desktop dark/Arabic RTL. Real sample media is visible on all
+four contexts. The later iPad navigation record contains six links and a
+336-by-0-pixel landmark, directly demonstrating why landmark-box visibility was
+the wrong observation assertion. Prior caller failures `50372` and `17600` remain
+preserved and are not relabelled green.
+
+The actual iPhone 390-by-664 viewport proves a limited layout issue at scroll 0:
+Play occupies y=640.1875..676.1875 while the fixed dock occupies y=608..664;
+its centre hits another element. Scrolling the transport into view (scroll 320)
+places Play at y=320.1875..356.1875 and its centre hits itself. The video centre
+hits itself at both positions. Android top and centred Play/video hits are also
+self. The desktop 24-pixel rail remains outside the video canvas; dark and RTL
+states retain readable loaded media. The expanded desktop image shows crowded
+lower navigation labels, which remains visual polish to review rather than a
+certified pristine menu.
+
+One iPhone `pageerror` event was recorded only as a fixed class. Its true
+exception name, method and producer were not retained, so it remains unexplained
+and this observational exit 0 is not an error-free UI certificate. The earlier
+canonical sixteen journeys independently passed real edit/export/capability and
+axe assertions; this caller did not repeat those certification assertions.
+
+All existing helper closes were awaited. Independent post-terminal readback
+finds no owned/native/browser markers, port 5273 free and zero owned gate
+folders. The attached identity snapshot ran after the short caller had already
+completed, yielding zero captured identities/profiles; complete historical
+PID-group/profile closure is therefore not claimed. Source checks retain all
+107 protected product/test/native hashes with zero mismatches.
+
+Planning assessment: M19 remains open; no automatic rerun or UI fix was made.
+Next Root reviews the concrete mobile scroll/occlusion and crowded radial-menu
+findings, the unexplained iPhone page error, and the separately reviewed minimal
+Admin fixture before a coherent corrective source union. Full exact-source
+quality/security/device/performance/screenshots and current Linux native proof
+remain required for the unpublished video change. Original thirteen PR #15 CI
+failures and all failed local receipts remain part of the complete reassessment.
+
+### Partial viewport observation and caller reassessment — 2026-10-04
+
+The unpublished branch now uses merged main `3e7991a`; all tested production,
+video and native bytes remain unchanged. The same-code canonical video/navigation
+journeys already passed 16/16 across four devices, including four real edited
+exports and four deliberate capability refusals. Their full-page mobile images
+do not establish viewport occlusion, and body-only expanded-menu/audio-capability
+attachments were not persisted by the list reporter.
+
+Two bounded private viewport callers failed and remain preserved (`50372`, then
+`17600`). The corrected caller reached the exact `desktop-navigation-visible`
+assertion after three actual desktop viewport captures. Canvas and play-button
+centres hit their own elements at scroll positions 0, 100 and 191. The collapsed
+rail is 24 pixels wide, outside the media rectangle. The newer images also show
+an asynchronously arriving first-use tour invitation; the caller's single early
+`isVisible()` check did not establish its dismissal.
+
+The failed assertion asks the navigation container itself to be visible. Its
+children are absolutely positioned, and installed Playwright requires a positive
+container box; the already-passing canonical navigation test instead checks six
+links, the visible Videos link and the real `gooey-spread` CSS. This is a
+source-backed caller-contract mismatch, not a demonstrated product defect; menu
+box dimensions were not retained in the failed run. No UI/style/product change,
+new timeout, automatic retry or complete visual pass is claimed.
+
+Both callers await their browser/context/fixture/gate cleanup. Independent
+readback finds no owned runtime/native/browser markers and port 5273 free. One
+verified stale generated gate directory predating both callers is hashed, checked
+for open-file PIDs and removed; the current owned gate-directory count is zero.
+Attached process/profile identities were not captured before these short failed
+callers exited, so a complete historical identity inventory is not claimed.
+
+Planning assessment: M19 remains open and the original thirteen PR #15 CI
+failures remain unchanged. Next review one coherent private-caller correction:
+wait for and decline the actual first-use invitation, reuse the canonical link/CSS
+assertions, and retain bounded primitive menu dimensions. Phone viewport/hit-test,
+expanded, dark and RTL evidence still must be completed before any mobile style
+correction. The separate reviewed Admin audit fixture and full release/UI/Linux
+certification remain required; no further runtime is launched without Root review.
+
+### Protected-main alignment — 2026-10-04
+
+PR #23 merged normally as `3e7991a` after all seven required checks and the fresh
+13-endpoint policy check passed. Its full tree matches the reviewed `0370bd7`
+release source. The unpublished video branch now uses that actual main baseline
+with every tested production/video/native byte preserved. Final main verification
+receipts are retained exactly; video/native and earlier failed histories remain
+additive. Combined local quality/SAST and sixteen actual device journeys passed
+on the same production code. Viewport/scroll/hit-test, expanded/dark/RTL proof
+comes next; no style change or complete M19/UI/release certificate is claimed.
+
+
+
+
 ### Workspace creation restack — 2026-10-04
 
 - Applied only the existing creation/retained-roster prerequisite above reviewed
@@ -109,6 +701,37 @@ what was planned; superseded entries stay.
   global browsers and baseline state untouched. No live browser overlap occurs.
   Final source is unchanged; factual docs and bounded protected publication follow.
 
+
+### Reviewed video, release-gate and owned-startup source union — 2026-10-04
+
+Combined the independently reviewed release seventeen-path slice with the
+verified video/native candidate above exact protected base `8354602`. Eleven
+code paths and three receipts use verified preimages; .gitignore changes only
+its legacy-report comment. PLAN and CHANGELOG preserve both histories additively.
+Video/native/scanner/account bytes remain, except the expressly reviewed gate
+and startup corrections. No new feature, dependency, threshold or authority
+is introduced. No runtime or certification applies to this new source union yet.
+
+The earlier video source independently passed complete quality/SAST and Mac
+Chromium ten/WebKit eighteen. The release/startup source independently passed
+complete quality with 2,927 covered/69 workerd cases and SAST with 510 rules,
+2,158 targets and zero findings. Its actual Admin content/bootstrap/heading/axe
+observation passed with one admission, while a canonical document/query mismatch
+remains distinct and open. Independent canonical 24 journeys now pass on all
+four devices; Root viewed eight fresh prompt/private captures and Admin. The
+iPhone fixed dock still overlaps Your Invitations; Android's full-page dock
+fits. This remains visual polish to check in the combined video/shell source,
+without a style change or pristine-UI claim. These receipts certify prior sources,
+not this new union or M19. Original thirteen video CI failures remain.
+
+Next Root reviews exact union hashes and current interfaces, then aligns the
+byte-identical squash base and releases fresh combined gates. Actual native
+Linux/device/edit-export/UI/Lighthouse/release proof and protected publication
+remain required. No runtime, push or source expansion is authorized during this
+preparation. The imported entries below preserve preparation history; current
+executed results are stated above and retained in the verification receipts.
+
+
 ### Combined owned startup source preparation — 2026-10-04
 
 - Combined scoped format/lint/fresh types and all 53 real client cases pass.
@@ -199,6 +822,77 @@ what was planned; superseded entries stay.
   main is still `10aae802`. This new combined source has no fresh installation,
   complete gates, build, preview, audit or publication proof at initial handoff.
   Next: Root manifest review, owned installation and released heavy verification.
+
+### Video/Native Restack Preparation — 2026-10-04
+
+- Prepared the complete existing multi-track video editor, cuts/trims, linked
+  and independent audio, shared undo, ownership-safe delivery and outside-canvas
+  gooey navigation above the protected recent-auth main source.
+- Retained exact original two-file AAC clock correction/source offer; current
+  package pins, recent-auth bootstrap and all existing gates are preserved.
+  Excluded the old deadline increase, already-identical gate bytes and the
+  later seven-file SDK variant from `c358434`.
+- Preserved current factual dependency/auth receipts; old audit and publication
+  allocation records are explicitly historical. The scanner retains 300,000 ms.
+- Original 13 canonical failures and exact `4ca0d8c` Linux 18-case proof remain separate.
+- Adjusted unpublished local HEAD to the byte-identical protected PR #22 squash
+  reference after proving all 297 inventoried/protected before-and-after hashes.
+- Fresh normal installation passes with zero audit findings; the seven pending
+  dependency-install-script warnings remain. Scoped formatting, ESLint, CSS,
+  forced full types, knip and locale checks pass. All 11 actual-artifact vendor
+  controls pass with their source/provenance/cache negative cases retained.
+- Complete Mac WebKit proof passes all 18 cases. The unchanged canonical quality
+  run then fails two Chromium page/Worker timestamp-gap assertions; 3,028 covered
+  cases pass and all original coverage floors hold. Static/publication/full-audit
+  gates pass, but later workerd/script/build phases are not reached. This failed
+  run remains failed; no exact gap value or producer cause is inferred.
+- Added an approved test-only real SDK timestamp-setter observer that delegates
+  the original method, retains fixed numeric records before assertions and changes
+  no production decoder, threshold, deadline or lifecycle authority. Scoped
+  formatting passes. Two initial lint attempts failed fixture style rules; the
+  coherent mechanical corrections pass without suppression. The one original
+  10-case Chromium observation then passes eight and preserves both gap failures.
+  Numeric records prove the input discontinuity remains while native-derived
+  samples are continuous before the SDK setter. No full quality retry occurred.
+- Reviewed the existing seven-artifact AAC span correction and MPL source offer
+  read-only. No production bytes, constructor, dependencies or stock baseline
+  were changed. The current observer assumes one setter call per emitted sample;
+  reuse must explicitly account for the span mapper's two calls rather than
+  copying an invalid gate. Root source/regression review comes next.
+- Prepared the approved six preferred-source/guard/source-offer paths exactly
+  from the existing correction, without importing its constructor-proxy test
+  helper. The current fixture describes setter events accurately and preserves
+  all original gap, waveform and time bounds, adding real inserted-gap silence,
+  post-gap/final tone and exact coded-frame extent controls. No new installation,
+  runtime, stock comparison or full quality retry occurred on this source.
+- SAST, E2E and release proof remain open. Real edit/export/device visuals and
+  the existing mobile dock overlap remain to verify. No push or protected merge
+  of this video source occurred; the original 13 CI failures remain unchanged.
+
+
+### Seven-artifact native regression proof — 2026-10-04
+
+- Fresh normal own installation verifies the seven corrected artifact hashes,
+  with zero audit findings and pending script-review warnings unchanged.
+- Scoped static gates and all 34 installer controls pass. Original Chromium ten
+  and complete Mac WebKit 18 cases pass under unchanged bounds; the added real
+  gap-silence, post-gap/tail audio and emitted-frame controls pass.
+- Retained the earlier two Chromium failures and original 13 CI failures. No
+  new Linux, complete-quality/SAST/device/UI/export/release certification is
+  claimed. Full quality then pinned SAST is next, before protected publication.
+
+### Complete local video quality and SAST — 2026-10-04
+
+- One unchanged quality run passes 3,030 covered and 69 actual workerd cases,
+  all original coverage floors, complete native codecs and every static,
+  source/built publication, audit, script and production-build gate.
+- Pinned Semgrep 1.174.0 passes 510 rules on 2,205 targets with zero findings;
+  15 oversized files are skipped. Owned captured resources close independently.
+- Retained original 13 CI failures and earlier local gap/lint/read failures.
+  Mac engine/local gates do not certify new Linux, full device/edit-export/UI
+  or production release. Exact reviewed release/startup source integration is
+  next; no push, protected merge or feature expansion occurred.
+
 
 ### Workspace-capacity restack preparation — 2026-10-04
 

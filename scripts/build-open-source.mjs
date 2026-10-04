@@ -4,6 +4,10 @@ import path from 'node:path'
 
 import { zipSync } from 'fflate'
 
+import { patchMediabunny } from './lib/mediabunny-patch.mjs'
+
+await patchMediabunny(process.cwd())
+
 const PACKAGE = 'mediabunny'
 const root = path.join('node_modules', PACKAGE)
 const project = JSON.parse(await readFile('package.json', 'utf8'))
@@ -22,6 +26,20 @@ const entries = {}
 for (const filename of ['LICENSE', 'README.md', 'package.json']) {
   entries[filename] = await readFile(path.join(root, filename))
 }
+entries['LUMAFOIL-PATCH.mjs'] = await readFile('scripts/lib/mediabunny-patch.mjs')
+const seedPath = 'docs/licenses/mediabunny-1.55.6-sdk-patch.json'
+const seedBytes = await readFile(seedPath)
+const seed = JSON.parse(seedBytes.toString('utf8'))
+entries[seedPath] = seedBytes
+for (const [name, source] of Object.entries(seed.sharedPreferredSource)) {
+  entries[name] = Buffer.from(source.source)
+}
+// The parser preferred source is added by the guard; transitive originals come
+// from the verified offline upstream seed instead of the incomplete npm src tree.
+entries['shared/aac-misc.ts'] = await readFile(path.join(root, 'shared/aac-misc.ts'))
+// The seed carries exact compiled/declaration/map bytes and their installed paths.
+// Keep the preferred-source archive free of generated dist directories, as the
+// publication policy requires; every matching artifact remains reconstructable.
 const source = path.join(root, 'src')
 const sourceEntries = await readdir(source, { recursive: true, withFileTypes: true })
 for (const entry of sourceEntries) {

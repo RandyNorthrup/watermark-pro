@@ -19,6 +19,7 @@ import { renderApp } from '../../test-support/render-app'
 import type { VideoCapability } from '../../video/capabilities'
 import { CancelledError } from '../../video/errors'
 import { probeVideo, sampleFrame } from '../../video/probe'
+import type * as ProjectMedia from '../../video/project-media'
 import type { VideoTranscoder } from '../../video/worker-client'
 
 const capability = vi.hoisted(() => ({ value: null as VideoCapability | null }))
@@ -31,6 +32,18 @@ vi.mock('../../lib/auth-client', () => import('../../test-support/fake-auth-modu
 vi.mock('../../lib/download', () => import('../../test-support/fake-download'))
 vi.mock('../../lib/share-file', () => ({ canShareFiles: vi.fn(), shareFile: vi.fn() }))
 vi.mock('../../video/probe', () => ({ probeVideo: vi.fn(), sampleFrame: vi.fn() }))
+vi.mock('../../video/project-media', async (original) => {
+  const actual = await original<typeof ProjectMedia>()
+  return {
+    ...actual,
+    probeProjectMedia: async (file: File) => ({
+      kind: 'video' as const,
+      probe: await probeVideo(file),
+      poster: await sampleFrame(file, 0),
+      map: { width: 1, height: 1, values: new Float32Array([0.5]) },
+    }),
+  }
+})
 vi.mock('../../video/capabilities', () => ({ useVideoCapability: () => capability.value }))
 vi.mock('../../video/worker-client', () => ({
   VideoTranscoder: class {
@@ -101,6 +114,14 @@ vi.mock('../../components/video/video-viewer', () => ({
   },
 }))
 
+const PROBE = {
+  width: 1920,
+  height: 1080,
+  durationSeconds: 10,
+  videoCodec: 'avc',
+  audioCodec: 'aac',
+} as const
+
 const SUPPORTED: VideoCapability = {
   supported: true,
   videoCodec: 'avc',
@@ -130,6 +151,7 @@ async function loadVideo(user: ReturnType<typeof userEvent.setup>) {
   const file = new File(['video fixture'], 'vacation.mov', { type: 'video/quicktime' })
   await user.upload(screen.getByLabelText('Add a video'), file)
   await screen.findByRole('region', { name: 'Video Preview' })
+  await user.click(screen.getByRole('tab', { name: 'Watermark' }))
   return file
 }
 async function selectOption(
@@ -147,13 +169,9 @@ beforeEach(() => {
   encoder.transcode.mockReset().mockResolvedValue(new Blob(['encoded'], { type: 'video/mp4' }))
   encoder.cancel.mockReset()
   encoder.terminate.mockReset()
-  vi.mocked(probeVideo).mockReset().mockResolvedValue({
-    width: 1920,
-    height: 1080,
-    durationSeconds: 10,
-    videoCodec: 'avc',
-    audioCodec: 'aac',
-  })
+  vi.mocked(probeVideo)
+    .mockReset()
+    .mockResolvedValue({ ...PROBE })
   vi.mocked(sampleFrame)
     .mockReset()
     .mockResolvedValue(new Blob(['frame'], { type: 'image/png' }))
@@ -174,6 +192,108 @@ afterEach(() => {
 })
 
 describe('inline Video page', () => {
+  it('imports multiple sources, cuts linked sound, trims, unlinks and exports the edited timeline', async () => {
+    const { user, input } = await openVideo()
+    await loadVideo(user)
+    await user.upload(input, new File(['second'], 'second.mp4', { type: 'video/mp4' }))
+    const timeline = screen.getByRole('region', { name: 'Timeline' })
+    expect(within(timeline).getAllByRole('button', { name: /^V1:/ })).toHaveLength(2)
+    expect(within(timeline).getAllByRole('button', { name: /^A1:/ })).toHaveLength(2)
+    await user.click(within(timeline).getByRole('button', { name: /^V1: vacation/ }))
+    fireEvent.change(screen.getByRole('slider', { name: 'Test Playhead' }), {
+      target: { value: '5' },
+    })
+    await user.click(screen.getByRole('button', { name: 'Split at playhead' }))
+    expect(within(timeline).getAllByRole('button', { name: /^V1:/ })).toHaveLength(3)
+    expect(within(timeline).getAllByRole('button', { name: /^A1:/ })).toHaveLength(3)
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Source out (s)' }), {
+      target: { value: '4' },
+    })
+    expect(
+      within(timeline).getByRole('button', { name: 'V1: vacation.mov, 0.000 s – 4.000 s' }),
+    ).toBeVisible()
+    expect(
+      within(timeline).getByRole('button', { name: 'A1: vacation.mov, 0.000 s – 4.000 s' }),
+    ).toBeVisible()
+    await user.click(
+      within(timeline).getByRole('button', { name: 'A1: vacation.mov, 0.000 s – 4.000 s' }),
+    )
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Volume' }), {
+      target: { value: '.4' },
+    })
+    await user.click(screen.getByRole('button', { name: 'Unlink audio' }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Start' }), { target: { value: '1' } })
+    expect(
+      within(timeline).getByRole('button', { name: 'V1: vacation.mov, 0.000 s – 4.000 s' }),
+    ).toBeVisible()
+    expect(
+      within(timeline).getByRole('button', { name: 'A1: vacation.mov, 1.000 s – 5.000 s' }),
+    ).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
+    await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
+    const request = encoder.transcode.mock.calls[0]?.[0]
+    expect(request?.composition?.project.clips).toHaveLength(6)
+    expect(request?.composition?.sources).toHaveLength(2)
+    expect(request?.composition?.project.clips).toContainEqual(
+      expect.objectContaining({ kind: 'audio', gain: 0.4, start: 1, linkedVideoId: null }),
+    )
+    expect(request?.plan.audio).toMatchObject({ mode: 'reencode', codec: 'aac' })
+    expect(request?.marks).toHaveLength(1)
+  })
+  it('rejects source bounds and overlap, groups edits into undo, and preserves imported clips on watermark clear', async () => {
+    const { user } = await openVideo()
+    await loadVideo(user)
+    const timeline = screen.getByRole('region', { name: 'Timeline' })
+    await user.click(within(timeline).getByRole('button', { name: /^V1:/ }))
+    expect(screen.getByRole('button', { name: 'Split at playhead' })).toBeDisabled()
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Source out (s)' }), {
+      target: { value: '11' },
+    })
+    expect(screen.getByRole('alert')).toHaveTextContent('trim extends outside')
+    expect(screen.getByRole('spinbutton', { name: 'Source out (s)' })).toHaveValue(10)
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Source out (s)' }), {
+      target: { value: '4' },
+    })
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
+    expect(screen.getByRole('spinbutton', { name: 'Source out (s)' })).toHaveValue(10)
+    await user.click(screen.getByRole('button', { name: 'Redo' }))
+    expect(screen.getByRole('spinbutton', { name: 'Source out (s)' })).toHaveValue(4)
+    await user.click(screen.getByRole('button', { name: 'Clear canvas' }))
+    expect(within(timeline).getAllByRole('button', { name: /^V1:/ })).toHaveLength(1)
+    await user.click(screen.getByRole('button', { name: 'Add vacation.mov to V2' }))
+    expect(within(timeline).getAllByRole('button', { name: /^V2:/ })).toHaveLength(1)
+    await user.click(within(timeline).getByRole('button', { name: /^V1:/ }))
+    await selectOption(user, 'Track', 'V2')
+    expect(screen.getByRole('alert')).toHaveTextContent('That edit would overlap')
+    expect(screen.getByRole('alert')).not.toHaveTextContent('"code"')
+    expect(within(timeline).getAllByRole('button', { name: /^V1:/ })).toHaveLength(1)
+    await user.click(screen.getByRole('button', { name: 'Remove clip' }))
+    expect(within(timeline).queryByRole('button', { name: /^V1:/ })).not.toBeInTheDocument()
+    expect(within(timeline).queryByRole('button', { name: /^A1:/ })).not.toBeInTheDocument()
+  })
+  it('hides panels and rejects an edited audible export without an audio encoder; explicit mute succeeds', async () => {
+    const { user } = await openVideo({ ...SUPPORTED, canEncodeAudio: false })
+    await loadVideo(user)
+    await user.click(screen.getByRole('button', { name: 'Media pool' }))
+    expect(screen.queryByRole('region', { name: 'Media pool' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Media pool' }))
+    const timeline = screen.getByRole('region', { name: 'Timeline' })
+    await user.click(within(timeline).getByRole('button', { name: /^A1:/ }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Volume' }), {
+      target: { value: '.5' },
+    })
+    await user.click(screen.getByRole('button', { name: 'Inspector' }))
+    expect(screen.queryByRole('region', { name: 'Inspector' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('cannot encode edited audio')
+    expect(encoder.transcode).not.toHaveBeenCalled()
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Mute A1' }))
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
+    await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
+    expect(encoder.transcode.mock.calls[0]?.[0].plan.audio).toEqual({ mode: 'none' })
+    expect(encoder.transcode.mock.calls[0]?.[0].composition?.project.mutedAudio[0]).toBe(true)
+  })
   it.each(['static', 'fading', 'keyed'] as const)(
     'exports a %s canvas gesture and groups it into one undo entry',
     async (mode) => {
@@ -251,6 +371,7 @@ describe('inline Video page', () => {
     expect(screen.getByRole('button', { name: 'Export Video' })).toBeDisabled()
     const file = await loadVideo(user)
     await selectSavedWatermarks(user, ['wm-2', 'wm-1'])
+    await user.click(screen.getByRole('tab', { name: 'Output' }))
     await selectOption(user, 'Resolution', 'Fit 720p')
     await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
@@ -349,16 +470,36 @@ describe('inline Video page', () => {
       videoCodec: 'avc',
       audioCodec: null,
     })
+    await user.click(screen.getByRole('button', { name: 'New' }))
     const short = new File(['shorter clip'], 'short.mp4', { type: 'video/mp4' })
     await user.upload(input, short)
-    await screen.findByText('short.mp4')
+    await screen.findByText('short.mp4', { selector: '.studio-media p[title]' })
+    await user.click(screen.getByRole('tab', { name: 'Watermark' }))
     expect(screen.getByRole('slider', { name: 'Start' })).toHaveValue('0')
     expect(screen.getByRole('slider', { name: 'End' })).toHaveValue('2')
     expect(screen.queryByRole('list', { name: 'Keyframes' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeEnabled()
     await user.click(screen.getByRole('button', { name: 'Export Video' }))
     await waitFor(() => expect(encoder.transcode).toHaveBeenCalledOnce())
     expect(encoder.transcode.mock.calls[0]?.[0]).toMatchObject({ source: short, motions: [null] })
+  })
+  it('refuses to drop untouched camera audio when container conversion lacks an encoder', async () => {
+    const { user } = await openVideo({
+      ...SUPPORTED,
+      supported: true,
+      videoCodec: 'vp9',
+      container: 'webm',
+      audioCodec: 'opus',
+      canEncodeAudio: false,
+      label: 'Saves as WebM (VP9)',
+    })
+    await loadVideo(user)
+    await user.click(screen.getByRole('tab', { name: 'Output' }))
+    expect(screen.getByText(/Audio encoder required/)).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Export Video' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('cannot encode edited audio')
+    expect(encoder.transcode).not.toHaveBeenCalled()
+    expect(downloads).not.toHaveBeenCalled()
   })
   it('shares a WebM result and keeps the cached output after sharing fails', async () => {
     vi.mocked(canShareFiles).mockReturnValue(true)
@@ -370,13 +511,16 @@ describe('inline Video page', () => {
       canEncodeAudio: false,
       label: 'Saves as WebM (VP9)',
     })
+    vi.mocked(probeVideo).mockResolvedValue({ ...PROBE, audioCodec: 'opus' })
     const output = new Blob(['webm'], { type: 'video/webm' })
     encoder.transcode.mockResolvedValue(output)
     await loadVideo(user)
+    await user.click(screen.getByRole('tab', { name: 'Output' }))
     await user.click(screen.getByRole('button', { name: 'Share' }))
     await waitFor(() => expect(shareFile).toHaveBeenCalledWith(output, 'vacation-watermarked.webm'))
-    expect(encoder.transcode.mock.calls[0]?.[0].plan.audio).toEqual({ mode: 'none' })
+    expect(encoder.transcode.mock.calls[0]?.[0].plan.audio).toEqual({ mode: 'copy', codec: 'opus' })
     vi.mocked(shareFile).mockRejectedValueOnce(new Error('Share refused'))
+    await user.click(screen.getByRole('tab', { name: 'Output' }))
     await user.click(screen.getByRole('button', { name: 'Share' }))
     expect(await screen.findByText('Share refused')).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Export Video' }))

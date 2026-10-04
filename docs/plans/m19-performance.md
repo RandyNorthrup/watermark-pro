@@ -2,6 +2,29 @@
 
 ## Goal
 
+### Video/native restack scoped verification — 2026-10-04
+
+The complete Resolve-style video/navigation delta is prepared above protected
+recent-auth source `b8defd1`, using its true `1811a4a` common ancestor with
+`4ca0d8c`. PR #22's merged `8354602` tree matches this base.
+Current human/private/field/credential guards, migrations, dependency pins and
+scanner/gate controls remain. All requested two-video/four-audio-track editing,
+cuts, trims, audio mixing, transforms and undo
+and flush-edge half-circle navigation outside canvas remain; no feature is added
+or reduced. The exact verified two-file native clock patch and MPL source offer
+are retained. Original PR #15 has 13 failed canonical runs; the 18-case Linux
+native success at exact `4ca0d8c` certifies only that clock boundary, not this
+restack. Root reviewed the complete source inventory. Local HEAD now names the
+identical protected squash reference, with 297 before-and-after hashes matching.
+Fresh normal installation, scoped format/ESLint/CSS, forced full types, knip,
+locale extraction and all 11 vendor controls pass. Existing dependency pins and
+protected account/migration/scanner controls remain. No native browser, full
+quality, E2E, push or release audit has been run for this source. M19 stays open.
+Next release the exact-source native/full gates after the independent release
+fixture/audit lane closes, then verify real edit/export visuals and the recorded
+mobile dock overlap. See the
+[existing video verification receipt](../verification/m19/video-editor-2026-10-01.md).
+
 ### Public plans and human gates — 2026-10-01
 
 The owner selected public Free and monthly USD paid subscriptions alongside the

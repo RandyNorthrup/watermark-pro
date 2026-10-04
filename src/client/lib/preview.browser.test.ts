@@ -17,6 +17,7 @@ import { loadFont } from '../fonts/load'
 
 const LOGO_SIZE = 64
 const PREVIEW_TIMEOUT_MS = 20_000
+const FONT_LOAD_BATCH_SIZE = 8
 /** Mean channel difference JPEG compression may introduce over a flat region. */
 const JPEG_TOLERANCE = 6
 
@@ -84,12 +85,18 @@ describe('font loading', () => {
   it(
     'bundles a stylesheet and a latin file for every family and weight in the catalogue',
     async () => {
-      for (const font of FONT_CATALOGUE) {
-        for (const weight of font.weights) {
-          const resource = await loadFont(font.family, weight)
-          expect(resource.weight).toBe(weight)
-          expect(resource.url.endsWith('.woff2')).toBe(true)
-        }
+      const faces = FONT_CATALOGUE.flatMap((font) =>
+        font.weights.map((weight) => ({ family: font.family, weight })),
+      )
+      // Verify every face under the existing deadline without serial network waits.
+      for (let offset = 0; offset < faces.length; offset += FONT_LOAD_BATCH_SIZE) {
+        await Promise.all(
+          faces.slice(offset, offset + FONT_LOAD_BATCH_SIZE).map(async ({ family, weight }) => {
+            const resource = await loadFont(family, weight)
+            expect(resource.weight).toBe(weight)
+            expect(resource.url.endsWith('.woff2')).toBe(true)
+          }),
+        )
       }
     },
     PREVIEW_TIMEOUT_MS,

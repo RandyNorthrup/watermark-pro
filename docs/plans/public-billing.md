@@ -334,3 +334,10 @@ attempts. Next implement authoritative plan quotas and payment state.
 Stripe account authentication remains unconfirmed; no catalog or charge has been
 created. Video/navigation regressions and full M19 release audits remain open.
 No later milestone is started.
+
+### Video restack boundary — 2026-10-04
+
+The existing video/navigation/native-clock change is prepared separately above
+protected recent-auth source. It preserves this plan and all current cohort,
+human, credential and field protections; no quota/payment activation follows.
+Original clock proof is narrower than full current-source release certification.

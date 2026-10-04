@@ -5,6 +5,7 @@ import path from 'node:path'
 import { binOf, runNode } from './lib/cli.mjs'
 
 const vite = binOf('vite', 'vite')
+runNode('scripts/patch-mediabunny.mjs')
 runNode('scripts/build-open-source.mjs')
 runNode(vite, ['build'])
 runNode(vite, ['build', '--config', 'vite.prerender.config.ts'])

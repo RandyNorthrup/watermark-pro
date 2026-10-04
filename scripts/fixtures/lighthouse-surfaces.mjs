@@ -12,6 +12,7 @@ import {
   fixtureJson,
   fixtureLink,
 } from './audit-accounts.mjs'
+import { parseAdminSection } from '../../src/shared/admin-sections.ts'
 import { auditLabel } from '../lib/audit-surfaces.mjs'
 import { ensureTestSiteOwner } from '../lib/test-site-owner.ts'
 
@@ -241,6 +242,7 @@ export async function prepareLighthouseSurfaces(origin, surfaces) {
         }
         case 'admin-users': {
           surface.cookie = owner.cookie
+          surface.pathname = `${surface.route}?${new URLSearchParams({ section: parseAdminSection({}) })}`
           break
         }
         case 'members':

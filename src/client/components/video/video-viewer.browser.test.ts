@@ -6,11 +6,12 @@ import { afterAll, afterEach, beforeAll, expect, it, vi } from 'vitest'
 import { userEvent } from 'vitest/browser'
 
 import { VideoViewer } from './video-viewer'
+import { appendProjectClip, emptyVideoProject } from '../../../shared/video-project'
 import { DEFAULT_SHAPE_SPEC, type WatermarkSpec } from '../../../shared/watermark'
 import type { MarkOutcome } from '../../engine/pipeline'
 import { MarkResources } from '../../lib/mark-resources'
 import en from '../../locales/en/common.json'
-import { mockElementBounds } from '../../test-support/mock-element-bounds'
+import '../../styles/app.css'
 import { createVideoMotion } from '../../video/motion'
 import { probeVideo, type VideoProbe } from '../../video/probe'
 import { encodeTestClip } from '../../video/test-support/clip'
@@ -37,9 +38,28 @@ function Player({ driverRef, dimensions }: { driverRef: Driver; dimensions: Vide
   const scene = useMediaScene(true)
   const [time, setTime] = useState(0)
   useImperativeHandle(driverRef, () => ({ scene, seek: setTime }), [scene])
+  const [project] = useState(() =>
+    appendProjectClip(emptyVideoProject('Native viewer', dimensions.width, dimensions.height), {
+      id: 'native-video',
+      kind: 'video',
+      duration: dimensions.durationSeconds,
+      hasAudio: false,
+    }),
+  )
   return createElement(VideoViewer, {
     organizationId: 'viewer-fixture',
-    url,
+    project,
+    mediaAssets: [
+      {
+        id: 'native-video',
+        kind: 'video',
+        file,
+        url,
+        probe: dimensions,
+        map: { width: 1, height: 1, values: new Float32Array([0.5]) },
+        poster: url,
+      },
+    ],
     file,
     probe: dimensions,
     outputSize: { width: dimensions.width, height: dimensions.height },
@@ -59,9 +79,7 @@ function controls(driverRef: Driver) {
   return driverRef.current
 }
 async function mount(dimensions = probe) {
-  // The native decoder and canvas remain real; a fixed viewport isolates the
-  // player behavior from the utility-CSS build tested separately in Playwright.
-  mockElementBounds()
+  // Native decoding, canvas pixels and control geometry use the real stylesheet.
   const driverRef = createRef<NonNullable<Driver['current']>>()
   const view = render(
     createElement(I18nextProvider, { i18n }, createElement(Player, { driverRef, dimensions })),
@@ -122,6 +140,7 @@ it('decodes and plays real frames, paints the watermark, pauses and seeks withou
   await waitFor(() => expect(video.currentTime).toBeCloseTo(0.5))
   expect(video.paused).toBe(true)
   const frame = screen.getByRole('group', { name: /Watermark position/ })
+  expect(getComputedStyle(frame).backgroundColor).toBe('rgba(0, 0, 0, 0)')
   fireEvent.focus(frame)
   fireEvent.keyDown(frame, { key: 'ArrowRight' })
   expect(gestures).toHaveBeenCalledWith('draft', expect.objectContaining({ phase: 'commit' }))
@@ -132,6 +151,7 @@ it('decodes and plays real frames, paints the watermark, pauses and seeks withou
     }),
   )
   expect(screen.queryByRole('group', { name: /Watermark position/ })).toBeNull()
+  await user.click(screen.getByText(en.editor.view.label, { selector: 'summary' }))
   await user.click(screen.getByRole('switch', { name: 'Grid' }))
   await user.click(screen.getByRole('switch', { name: 'Snap To Grid' }))
   fireEvent.change(screen.getByRole('slider', { name: 'Grid spacing' }), {
@@ -182,13 +202,13 @@ it('reports playback failures and clears them after a successful native retry', 
   play.mockRestore()
   fireEvent.error(video)
   expect(screen.getByRole('alert').textContent).toContain(
-    'This browser could not play the selected video.',
+    'This browser cannot play the selected media.',
   )
   await user.click(screen.getByRole('button', { name: 'Play' }))
   await waitFor(() => expect(video.currentTime).toBeGreaterThan(0))
   expect(screen.queryByRole('alert')).toBeNull()
   await waitFor(() => expect(video.ended).toBe(true), { timeout: 3000 })
-  expect(screen.getByRole('button', { name: 'Play' })).toBeDefined()
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Play' })).toBeDefined())
 })
 
 it('maps a bounded preview back into original-resolution placement coordinates', async () => {

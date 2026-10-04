@@ -26,6 +26,7 @@ test('owned Chromium accepts the pinned HTTP2 certificate and rejects a differen
   const wrongProxy = await startCompressingProxy({ upstream: origin, port: 0, tls: wrong })
   let browser
   let chrome
+  let stage = 'chrome-launch'
   try {
     assert.notEqual(trusted.browserFlag, wrong.browserFlag)
     assert.match(trusted.browserFlag, /^--ignore-certificate-errors-spki-list=/)
@@ -36,7 +37,10 @@ test('owned Chromium accepts the pinned HTTP2 certificate and rejects a differen
       chromePath: chromium.executablePath(),
       chromeFlags: ['--headless=new', trusted.browserFlag],
     })
+    console.info('Audit certificate owned browser:', JSON.stringify({ pid: chrome.pid, profile }))
+    stage = 'cdp-connect'
     browser = await chromium.connectOverCDP('http://127.0.0.1:' + String(chrome.port))
+    stage = 'tls-assertions'
     const context = browser.contexts()[0]
     assert.ok(context)
     const page = await context.newPage()
@@ -52,6 +56,14 @@ test('owned Chromium accepts the pinned HTTP2 certificate and rejects a differen
     await rejected.close()
     const back = await page.reload()
     assert.equal(back.status(), 200)
+  } catch (error) {
+    const name = ['Error', 'AssertionError', 'TimeoutError', 'TypeError', 'RangeError'].includes(
+      error.name,
+    )
+      ? error.name
+      : 'unknown-error'
+    console.error('Audit certificate observation:', JSON.stringify({ stage, name }))
+    throw error
   } finally {
     await browser?.close()
     await chrome?.kill()

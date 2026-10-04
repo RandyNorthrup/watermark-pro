@@ -17,6 +17,28 @@ an acknowledgement within three business days.
 
 Only the `main` branch and the latest tagged release receive fixes.
 
+## Historical dependency blocker — 2026-10-02
+
+The required full dependency audit rejected GHSA-vfj7-8cjw-p6xm
+([GitHub advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)), a stack-exhaustion
+availability vulnerability affecting `braces` through 3.0.3. The installed path is
+Stylelint 17.15.0 → micromatch 4.0.8 → braces 3.0.3 at that checkpoint. At verification, the latest
+braces registry release was still 3.0.3, no patched version was listed, and latest
+Stylelint 17.16.0 still depended on micromatch 4.0.8. These are development-tool
+findings; a separate production-only audit returned zero findings. That narrower
+result does not satisfy or replace the full release gate. No advisory waiver,
+forced downgrade or dependency substitution was applied at that checkpoint. See the
+[release-blocker receipt](docs/verification/m19/release-blockers-2026-10-02.md).
+
+The current main-based source retains the exact official Stylelint archive
+`12c034f5db042b474126b36231bd4ffe0ccc6e8d`, its reviewed lock graph and existing
+CSS controls. That remediation removes the affected chain; the current auth
+base's full quality/audit passed. This video restack's fresh normal installation
+reports zero audit findings, and scoped static/vendor checks pass. Native,
+complete quality, security/device and release certification remain required.
+Historical failures do not replace those gates.
+See the [remediation receipt](docs/verification/m19/stylelint-main-audit-remediation-2026-10-03.md).
+
 ## Controls in place
 
 - The unmerged workspace-creation candidate binds creation provenance to the
@@ -134,7 +156,11 @@ Only the `main` branch and the latest tagged release receive fixes.
   compares configured private values against original bytes and does not trust
   generic repository ignore files. One revoked historical Picker key has an
   exact immutable finding/digest exception; current and built copies receive no
-  exception. See [the retirement record](docs/verification/m19/picker-key-rotation.md).
+  exception. The aggregate candidate cap charges only the existing exact
+  original-path/byte/historical-treatment dedup identity; raw occurrence bytes
+  remain reported. Every original path/private-value/file-size/LFS check and all
+  history/archive bounds remain enforced before or alongside that sharing.
+  See [the retirement record](docs/verification/m19/picker-key-rotation.md).
 - Dependency vulnerability audit in CI at the `high` level.
 - Static analysis with semgrep (`p/default`, `p/typescript`, `p/react`,
   `p/secrets`) locally and in CI.
@@ -202,6 +228,21 @@ Only the `main` branch and the latest tagged release receive fixes.
   (`MAX_VIDEO_BYTES`, `MAX_VIDEO_SECONDS`, `MAX_VIDEO_SIDE`) are enforced from
   the file's metadata before any frame is decoded, and the watermarked file is
   downloaded through a same-origin object URL; the gallery does not store videos.
+  Multi-clip projects are Zod-validated, bounded to 32 source assets and 64 clips,
+  two video/four audio tracks and ten minutes of timeline duration. Aggregate
+  source bytes retain the 2 GiB cap. Native demuxing and decoding determine media
+  kind and source bounds, regardless of claimed MIME or extension. Worker export
+  rechecks source identities, dimensions, duration and decode support; audio is
+  mixed in bounded chunks rather than loading complete source PCM. Edited audible
+  tracks are refused when their target encoder is unavailable. Sources, project
+  state and pending outputs retain account/workspace-generation guards and are
+  disposed on a new project, identity change or unmount. Native audio decoding retains
+  the stock SDK capability/queue/error/flush/close authority. A guarded downstream
+  correction translates negative native input timestamps while its existing
+  output handler restores presentation. Installation/build/native gates check
+  exact original package/lock provenance and source hashes; unknown vendor source
+  fails explicitly. This remains an unmerged candidate pending complete native/
+  Linux and release verification.
 - PDF watermarking (M17) runs entirely in the browser: `pdf-lib` parses the
   chosen documents' untrusted bytes in the page, while PDF.js supplies a
   dedicated local parsing/rendering worker. There is no upload unless the user
