@@ -94,6 +94,12 @@
     "inviteOnly": {
       "title": "Uitnodiging vereist",
       "body": "Lumafoil is alleen op uitnodiging beschikbaar. Open de uitnodigingslink in je e-mail om je account aan te maken."
+    },
+    "humanCheck": {
+      "label": "Menselijke verificatie",
+      "failed": "De verificatie is mislukt. Herlaad deze pagina en probeer opnieuw.",
+      "unavailable": "De verificatie is niet beschikbaar. Controleer je verbinding en herlaad deze pagina.",
+      "retry": "Menselijke verificatie opnieuw proberen"
     }
   },
   "dashboard": {
@@ -1106,7 +1112,7 @@
       "analytics": {
         "heading": "Cookies en externe diensten",
         "p1": "Lumafoil bevat geen analysebeacon of advertentiecookies. Essentiële cookies houden sessies bij; apparaatopslag bewaart instellingen, offlinekopieën en wachtende wijzigingen.",
-        "p2": "Indien ingeschakeld controleert Cloudflare Turnstile accountverzoeken op bots; zie de <turnstile>privacyverklaring</turnstile>. Google/Microsoft verzorgen de gekozen aanmelding. Google Drive, Dropbox en OneDrive ontvangen verzoeken via cloudfuncties die je kiest; hun eigen privacybeleid geldt."
+        "p2": "Cloudflare Turnstile controleert registratie, aanmelden en accountherstel op bots. De widget maakt verbinding met Cloudflare, dat browser- en netwerkinformatie ontvangt. Onze server verstuurt alleen het challengetoken en de verificatiesleutel. Zie de <turnstile>privacyverklaring</turnstile>. Google/Microsoft verzorgen de gekozen aanmelding. Google Drive, Dropbox en OneDrive ontvangen verzoeken via cloudfuncties die je kiest; hun eigen privacybeleid geldt."
       },
       "audit": {
         "heading": "Auditspoor",

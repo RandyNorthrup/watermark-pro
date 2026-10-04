@@ -66,7 +66,8 @@ export const API_RATE_LIMIT = { windowSeconds: 60, max: 120 } as const
 export const SENSITIVE_AUTH_PATHS = [
   '/sign-in/email',
   '/sign-up/email',
-  '/forget-password',
+  '/request-password-reset',
+  '/sign-in/social',
   '/reset-password',
   '/send-verification-email',
   '/verify-email',

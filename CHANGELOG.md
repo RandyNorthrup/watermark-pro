@@ -7,6 +7,33 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Protected Main Gate Boundary and Human Restack Preparation — 2026-10-03
+
+- PR #18 merged as `7a3b4a5` after exact-head hosted Quality, SAST, four devices
+  and aggregate E2E passed. Linux Quality passed all 2,789 covered tests and 63
+  workerd cases; branch coverage was 85.28%, with zero audit vulnerabilities.
+  The earlier local 24 failures/84.8% branch coverage remain failed history;
+  their cause is not assigned from the Linux pass.
+- Prepared the original two PR #12 commits on a new owned branch above that
+  main boundary, preserving its dependency and publication corrections. Only
+  planning/changelog overlaps required manual resolution. No original/later
+  stack branch was rewritten. Fresh normal restack installation passes with
+  zero vulnerabilities; 153 focused real-auth/client cases, one actual-D1 case,
+  eight bridge cases and four native-browser cases pass.
+- The unchanged restack quality command passes 2,830 covered tests and all
+  coverage floors (85.31% branches), 64 workerd cases, source publication,
+  full audit and subsequent Node suites, then exits 127 at the existing asset
+  script because the command PATH cannot find `python`. This failed terminal
+  result remains recorded; no full local quality pass is claimed.
+- Adding the existing Python 3.13.7 libexec directory only to the remaining
+  commands' PATH passes 24 asset tests, four CI policy tests, the production
+  build and 42 artifact controls, plus built publication. SAST passes 510 rules
+  across 2,137 tracked targets with zero findings; 13 oversized files are skipped.
+  No source/global launcher change or broad suite retry was needed. New exact-head
+  hosted canonical/security/device checks and protected merge remain required;
+  production human-gate activation is not claimed. M19 remains open, feature
+  expansion is held, and failed main release UI audits still block deployment.
+
 ### Exact Main Quality Failure Boundary — 2026-10-03
 
 - Canonical corrected source publication and unchanged full audit pass; audit
@@ -48,6 +75,88 @@ what was planned; superseded entries stay.
   source proof passes 38 behavior cases, current CSS, full audit and fresh
   normal installation; this main-based tree has not been installed or certified.
   M19 and exact-source quality/security/device/merge gates remain open.
+
+### Human verification evidence — 2026-10-02
+
+- Pushed runtime source `b908155` in draft PR #12. Hosted run `36976426895`
+  passed canonical quality, exact-source SAST and all 136 four-device
+  Playwright/axe journeys. Quality included 2,830 covered tests, all coverage
+  floors, 64 workerd tests, script checks and production build. SAST ran 510
+  rules across 2,135 targets with zero findings.
+- Stopped the duplicate local quality process tree after verifying its ownership
+  and the hosted pass. It exited 130 during covered tests; no local full-quality
+  pass is claimed. Earlier local lint/native/fixture failures remain recorded.
+- Passed eight local challenge lifecycle/configuration-failure cases with axe,
+  reviewed all four widget-fixture captures and actual English desktop/Arabic
+  phone auth renders in light/dark, and found no clipping or browser errors.
+  Named fixtures do not prove live provider verification.
+- Reviewed planning: M19 remains open. Public/private cohort admission, atomic
+  two-invite grants, Stripe ownership/webhooks/entitlements and paid workspace
+  policies are the next slice. Video regressions, live provider verification
+  and unchanged Lighthouse/screenshot release audits still block deployment.
+
+### Human verification follow-up — 2026-10-01
+
+- Added human challenges to password sign-in and verification-email resend, shared
+  one admission challenge between email and OAuth controls, and rejected existing
+  unverified or banned sessions before custom account/workspace reads and writes.
+- Siteverify now validates bounded JSON with Zod and exact boolean success,
+  hostname and action. Verification has a ten-second deadline, refuses redirects,
+  sends no user identifiers, email or IP, and returns fixed errors without logging
+  provider credentials or response bodies.
+- Added translated retry controls after widget/script failure and removed failed
+  script tags before retry. Responsive sizing uses the provider's actual 300×65
+  or 150×140 dimensions and reserves space before loading. Size changes invalidate
+  the previous widget and ignore its late callbacks.
+- Existing unverified/banned sessions are refused before Better Auth organization
+  and admin plugin endpoints as well as custom APIs. Focused verification passed
+  101 tests; real workerd/D1 admission wiring passed one integration test. Added
+  explicit browser lifecycle fixtures for expiry, retry, configuration failure
+  and bounds. Complete quality, SAST, four-device and visual gates remain pending.
+- Replaced temporary shared dependency links with an independent `npm ci`:
+  786 packages installed and zero audit findings. Restricted Vitest concurrency
+  and sequenced native browser files after Node suites without changing any
+  assertion deadline, coverage floor or performance budget.
+- Replaced expired Cloudflare OAuth through owner-completed browser login.
+  Readback confirmed the existing managed Turnstile widget covers `lumafoil.com`
+  and production already has its verification secret. No duplicate widget,
+  credential rotation or production deployment was needed. Live verification of
+  the new implementation and release certification remain unclaimed.
+- Corrected the native QR backdrop test after a full quality run exposed an
+  assumption that glyph pixels should have the backdrop color. It now samples
+  actual placement padding and compares an unboxed negative control, retaining
+  the original color threshold. All 21 native pipeline tests passed afterward;
+  the next full run passed all 2,830 covered tests and all 64 workerd integration
+  tests, but the performance harness exposed a separate 100 ms asynchronous
+  heading fixture race. A focused rerun reproduced the same test-only bound
+  failing for already-loaded headings. Content fixture assertions now exercise
+  the existing production readiness bound, with wrong-screen/content/view checks
+  and a never-completing image decode as negative controls. Production readiness
+  deadlines and Lighthouse budgets are unchanged. After lint rejected an empty
+  callback in the stalled-decode fixture, replaced it with a standard pending
+  promise. Focused lint and all four native content tests passed. Another
+  complete quality run is required before certification.
+- Updated the privacy date and all twelve locales to disclose browser/network
+  information processed by Cloudflare's widget, separately from the minimal
+  server verification body, and linked the provider's privacy addendum.
+
+### Human Verification — 2026-10-01
+
+- Added mandatory real production Turnstile keys and HTTPS-origin validation.
+  Bound signup/OAuth entry and password recovery to distinct form actions and the
+  canonical hostname, through a narrowly scoped Better Auth plugin. Tokens are
+  schema-bounded before provider calls; unsupported/failing verification does not
+  create an account. Challenges remain separate from email verification and roles.
+- Corrected strict rate-limit routing from the obsolete `/forget-password` name
+  to `/request-password-reset`, and included OAuth entry. Added negative regressions
+  for dummy keys, missing/oversized/forged/expired/replayed challenges, wrong host
+  and action, and provider failure. Their first execution remains pending while
+  the separate video checkout completes its four-device verification.
+- Held protected client controls while configuration is unknown, refreshed
+  single-use challenges after each request, shared one signup challenge between
+  email/OAuth controls, and translated human-verification guidance in all locales.
+  These changes are implemented in an isolated worktree; no production human-gate
+  configuration or completed UI/security certification is claimed yet.
 
 ### CI/CD And Repository Protection — 2026-10-01
 

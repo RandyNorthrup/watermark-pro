@@ -282,7 +282,11 @@ describe('Turnstile on sign-up', () => {
         if (url.startsWith('https://verify.test/') && typeof init?.body === 'string') {
           const body = JSON.parse(init.body) as { secret: string; response: string }
           verifyCalls.push(body)
-          return Response.json({ success: body.response === 'good-token' })
+          return Response.json({
+            success: body.response === 'good-token',
+            action: 'account_admission',
+            hostname: 'localhost',
+          })
         }
         return await realFetch(input, init)
       }),
@@ -318,7 +322,7 @@ describe('Turnstile on sign-up', () => {
     expect(good.status).toBe(HTTP_STATUS.ok)
     expect(verifyCalls.map((call) => call.secret)).toEqual(['secret-key', 'secret-key'])
 
-    // Password reset is protected too; sign-in is not.
+    // Direct recovery and sign-in must also present a fresh challenge.
     const reset = await client.post('/api/auth/request-password-reset', {
       email: other.email,
       redirectTo: '/reset-password',
@@ -328,7 +332,7 @@ describe('Turnstile on sign-up', () => {
       email: other.email,
       password: other.password,
     })
-    expect(signIn.status).not.toBe(HTTP_STATUS.badRequest)
+    expect(signIn.status).toBe(HTTP_STATUS.badRequest)
   })
 
   it('is disabled when no keys are configured', async () => {

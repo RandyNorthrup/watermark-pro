@@ -62,9 +62,16 @@ export async function enforceAuthPrivacy(
   const expected = ctx.headers?.get(ACCOUNT_ID_HEADER)
   const isAccountBound =
     path.startsWith('/organization/') || path.startsWith('/admin/') || SIGNED_IN_PATHS.has(path)
-  if (!isPrivateRead && !isOwnerMutation && (!isAccountBound || expected == null)) return
+  const isPrivileged = path.startsWith('/organization/') || path.startsWith('/admin/')
+  if (!isPrivateRead && !isOwnerMutation && !isPrivileged && (!isAccountBound || expected == null))
+    return
   const session = await getSessionFromCtx(ctx)
   if (session === null) return
+  if (
+    isPrivileged &&
+    (!session.user.emailVerified || ('banned' in session.user && session.user['banned'] === true))
+  )
+    throw denied()
   if (expected != null) {
     const parsed = accountIdSchema.safeParse(expected)
     if (!parsed.success || parsed.data !== session.user.id) {

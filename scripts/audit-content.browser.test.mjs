@@ -6,9 +6,10 @@ import { chromium } from '@playwright/test'
 import { assertAuditContent } from './lib/audit-content.mjs'
 import { requireSurface } from './lib/audit-surfaces.mjs'
 
-const ASSERTION_TIMEOUT_MS = 100
 const DELAYED_CONTENT_MS = 10
-const QUICK_ASSERTION = { timeout: ASSERTION_TIMEOUT_MS }
+
+// Exercise production's existing readiness deadline. A test-only 100 ms bound
+// raced browser transport and Playwright polling even for already-loaded headings.
 
 test('default designer audit rejects the distinct QR creation screen', async () => {
   const browser = await chromium.launch()
@@ -17,12 +18,9 @@ test('default designer audit rejects the distinct QR creation screen', async () 
     const catalogue = { library: { newPreset: 'New preset' } }
     const surface = requireSurface('designer-new')
     await page.setContent('<h1>New preset</h1>')
-    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await assertAuditContent(page, surface, catalogue)
     await page.setContent('<h1>New QR code</h1>')
-    await assert.rejects(
-      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
-      /expected heading/,
-    )
+    await assert.rejects(assertAuditContent(page, surface, catalogue), /expected heading/)
   } finally {
     await browser.close()
   }
@@ -44,7 +42,7 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
     const good =
       '<h1>Watermark library</h1><section aria-label="Recent work">Studio signature<button aria-pressed="true">Details</button></section>'
     await page.setContent(good)
-    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await assertAuditContent(page, surface, catalogue)
     for (const [html, failure] of [
       [good.replace('Watermark library', 'Something went wrong'), /expected heading/],
       [good.replace('Studio signature', 'No saved work'), /fixture content/],
@@ -52,7 +50,7 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
       [good.replace('<section', '<section hidden'), /required state/],
     ]) {
       await page.setContent(html)
-      await assert.rejects(assertAuditContent(page, surface, catalogue, QUICK_ASSERTION), failure)
+      await assert.rejects(assertAuditContent(page, surface, catalogue), failure)
     }
     await page.setContent(good)
     await page.evaluate(async () => {
@@ -68,7 +66,7 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
         await image.decode()
       }
     })
-    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await assertAuditContent(page, surface, catalogue)
     await page.evaluate(() => {
       const broken = globalThis.document.createElement('img')
       broken.src = 'data:image/png,broken'
@@ -77,20 +75,17 @@ test('rendered audit checks refuse successful HTTP error screens, missing conten
       broken.id = 'broken-audit-image'
       globalThis.document.body.append(broken)
     })
-    await assert.rejects(
-      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
-      /undecoded visible image/,
-    )
+    await assert.rejects(assertAuditContent(page, surface, catalogue), /undecoded visible image/)
     await page.locator('#broken-audit-image').evaluate((image) => {
       image.hidden = true
     })
-    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await assertAuditContent(page, surface, catalogue)
     await page.locator('#broken-audit-image').evaluate((image) => {
       image.hidden = false
       image.loading = 'lazy'
       image.style.cssText = 'position:absolute;top:10000px'
     })
-    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await assertAuditContent(page, surface, catalogue)
   } finally {
     await browser.close()
   }
@@ -112,13 +107,10 @@ test('waits for the final asynchronous heading but still refuses the wrong scree
       },
       { delay: DELAYED_CONTENT_MS, heading: catalogue.library.newPreset },
     )
-    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await assertAuditContent(page, surface, catalogue)
 
     await page.setContent('<h1>New QR code</h1>')
-    await assert.rejects(
-      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
-      /expected heading/,
-    )
+    await assert.rejects(assertAuditContent(page, surface, catalogue), /expected heading/)
   } finally {
     await browser.close()
   }
@@ -146,15 +138,13 @@ test('waits for a visible image to decode and still rejects a decode timeout', a
         })
       }
     }, DELAYED_CONTENT_MS)
-    await assertAuditContent(page, surface, catalogue, QUICK_ASSERTION)
+    await assertAuditContent(page, surface, catalogue)
 
-    await page.locator('#preview').evaluate((image, delay) => {
-      image.decode = async () => await new Promise((resolve) => setTimeout(resolve, delay))
-    }, ASSERTION_TIMEOUT_MS * 2)
-    await assert.rejects(
-      assertAuditContent(page, surface, catalogue, QUICK_ASSERTION),
-      /undecoded visible image/,
-    )
+    await page.locator('#preview').evaluate((image) => {
+      // A stalled decode must be refused by the actual production readiness bound.
+      image.decode = () => Promise.withResolvers().promise
+    })
+    await assert.rejects(assertAuditContent(page, surface, catalogue), /undecoded visible image/)
   } finally {
     await browser.close()
   }

@@ -94,6 +94,12 @@
     "inviteOnly": {
       "title": "Convite necessário",
       "body": "O Lumafoil funciona apenas por convite. Abra o link do convite no seu e-mail para criar sua conta."
+    },
+    "humanCheck": {
+      "label": "Verificação humana",
+      "failed": "A verificação falhou. Recarregue esta página e tente novamente.",
+      "unavailable": "A verificação está indisponível. Confira sua conexão e recarregue esta página.",
+      "retry": "Tentar novamente a verificação humana"
     }
   },
   "dashboard": {
@@ -1120,7 +1126,7 @@
       "analytics": {
         "heading": "Cookies e serviços externos",
         "p1": "O Lumafoil não inclui beacons de análise nem cookies publicitários. Cookies essenciais mantêm sessões; o armazenamento do dispositivo guarda preferências, cópias offline e alterações pendentes.",
-        "p2": "Quando ativo, o Cloudflare Turnstile verifica solicitações de conta contra bots; consulte seu <turnstile>aviso de privacidade</turnstile>. Google/Microsoft gerenciam a entrada escolhida. Google Drive, Dropbox e OneDrive recebem solicitações pelas funções de nuvem que você escolhe; suas próprias políticas se aplicam."
+        "p2": "O Cloudflare Turnstile verifica cadastro, login e recuperação de conta para detectar bots. O widget se conecta à Cloudflare, que recebe informações do navegador e da rede. Nosso servidor envia apenas o token do desafio e a chave de verificação. Consulte o <turnstile>aviso de privacidade</turnstile>. Google/Microsoft gerenciam a entrada escolhida. Google Drive, Dropbox e OneDrive recebem solicitações pelas funções de nuvem que você escolhe; suas próprias políticas se aplicam."
       },
       "audit": {
         "heading": "Trilha de auditoria",

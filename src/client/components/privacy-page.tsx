@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { LegalPage, type LegalSection } from './legal-page'
 
-const LAST_UPDATED = '2026-09-09'
+const LAST_UPDATED = '2026-10-01'
 
 export function PrivacyPage() {
   const { t } = useTranslation()

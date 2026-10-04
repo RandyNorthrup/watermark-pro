@@ -94,6 +94,12 @@
     "inviteOnly": {
       "title": "招待が必要です",
       "body": "Lumafoilは招待制です。メールの招待リンクを開いてアカウントを作成してください。"
+    },
+    "humanCheck": {
+      "label": "人間であることの確認",
+      "failed": "確認に失敗しました。ページを再読み込みして、もう一度お試しください。",
+      "unavailable": "確認を利用できません。接続を確認し、ページを再読み込みしてください。",
+      "retry": "人間認証を再試行"
     }
   },
   "dashboard": {
@@ -1092,7 +1098,7 @@
       "analytics": {
         "heading": "Cookieと外部サービス",
         "p1": "Lumafoilには分析用ビーコンや広告Cookieを組み込んでいません。必須Cookieがセッションを維持し、端末のストレージに設定、オフラインコピー、未送信の変更を保存します。",
-        "p2": "有効な場合、Cloudflare Turnstileがアカウント関連のリクエストをボット対策のため確認します。<turnstile>プライバシー通知</turnstile>をご覧ください。Google/Microsoftは選択したサインインを処理します。選択したクラウド機能はGoogle Drive、Dropbox、OneDriveへリクエストを送り、各社のポリシーが適用されます。"
+        "p2": "Cloudflare Turnstile は登録、ログイン、アカウント復旧時にボットを検出します。ウィジェットは Cloudflare に接続し、ブラウザーやネットワークの情報を送信します。当社のサーバーはチャレンジトークンと検証キーのみを送信します。<turnstile>プライバシー通知</turnstile>をご覧ください。をご覧ください。Google/Microsoftは選択したサインインを処理します。選択したクラウド機能はGoogle Drive、Dropbox、OneDriveへリクエストを送り、各社のポリシーが適用されます。"
       },
       "audit": {
         "heading": "監査証跡",
