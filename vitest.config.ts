@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { playwright } from '@vitest/browser-playwright'
@@ -54,7 +55,7 @@ export default defineConfig({
       {
         // Canvas rendering, encoding and the Web Worker run in a real
         // Chromium; jsdom has no 2D context worth testing against.
-        plugins: [pdfjsAssetsPlugin()],
+        plugins: [pdfjsAssetsPlugin(), tailwindcss()],
         optimizeDeps: { include: ['zod/mini'] },
         test: {
           name: 'browser',

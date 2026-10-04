@@ -565,7 +565,7 @@ describe('editor page', () => {
     const designer = screen.getByRole('tabpanel', { name: 'Watermark' })
     expect(within(designer).queryByLabelText('Watermark name')).not.toBeInTheDocument()
     await user.clear(within(designer).getByRole('textbox', { name: 'Text' }))
-    await user.type(within(designer).getByRole('textbox', { name: 'Text' }), '© My first photo')
+    await user.paste('© My first photo')
     const save = within(designer).getByRole('button', { name: 'Save' })
     expect(save.parentElement).toHaveClass('justify-center')
     await user.click(save)

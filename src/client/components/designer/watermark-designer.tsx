@@ -25,7 +25,7 @@ import {
   type WatermarkSpec,
 } from '../../../shared/watermark'
 import { describeError } from '../../lib/errors'
-import { createWatermark, updateWatermark } from '../../lib/library'
+import { createWatermark, updateWatermark, watermarksQueryOptions } from '../../lib/library'
 import { captureOfflineOwner } from '../../lib/offline-context'
 import {
   blankSpec,
@@ -202,9 +202,15 @@ function WatermarkDesignerSession({
       account.assertCurrent()
       return saved
     },
-    onSuccess: async (saved) => {
-      await queryClient.invalidateQueries({ queryKey: ['organization', organizationId] })
+    onSuccess: (saved) => {
       account.assertCurrent()
+      // A durable local save has already succeeded. Network refresh must not
+      // keep the user in the designer while a flaky connection is unavailable.
+      queryClient.setQueryData(watermarksQueryOptions(organizationId).queryKey, (previous) => [
+        saved,
+        ...(previous ?? []).filter((preset) => preset.id !== saved.id),
+      ])
+      void queryClient.invalidateQueries({ queryKey: ['organization', organizationId] })
       setBaseline(saved)
       setIsNameDialogOpen(false)
       onSaved(saved)

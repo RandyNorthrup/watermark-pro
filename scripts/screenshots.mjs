@@ -110,10 +110,42 @@ function diagnosticMessage(value) {
 
 function navigationEvidence(state) {
   return {
-    navigation: state.navigation,
-    pendingRequests: state.pending.values().toArray(),
-    failedRequests: state.failedRequests,
-    browserErrors: state.browserErrors,
+    phase: state.phase,
+    currentSurfaceId: state.currentSurfaceId,
+    nextSurfaceId: state.nextSurfaceId,
+    lastCaptureId: state.lastCaptureId,
+    pendingRequests: state.pending
+      .values()
+      .map((request) => ({
+        method: request.method,
+        resourceType: request.resourceType,
+        sameOrigin: request.sameOrigin,
+        requestCategory: request.requestCategory,
+        ownerFrame: request.ownerFrame,
+        responseStatus: request.responseStatus,
+      }))
+      .toArray(),
+    failedRequests: state.failedRequests.map((request) => ({
+      method: request.method,
+      resourceType: request.resourceType,
+      sameOrigin: request.sameOrigin,
+      requestCategory: request.requestCategory,
+      aborted: request.error?.includes('ERR_ABORTED') === true,
+    })),
+    browserErrors: state.browserErrors.map((error) => ({
+      name: [
+        'Error',
+        'TypeError',
+        'RangeError',
+        'ReferenceError',
+        'SyntaxError',
+        'AbortError',
+      ].includes(error.name)
+        ? error.name
+        : 'unknown-error',
+      phase: error.phase,
+      captureId: error.captureId,
+    })),
   }
 }
 
@@ -121,6 +153,13 @@ function navigationEvidence(state) {
 async function settleBeforeNavigation(page, destination) {
   const state = NAVIGATION_STATE.get(page)
   if (state === undefined) throw new Error('Screenshot navigation tracking is not installed')
+  state.phase = 'pre-navigation-settle'
+  state.currentSurfaceId =
+    WORKSPACE_SURFACES.find((surface) => surface.route === new URL(page.url()).pathname)?.id ??
+    'other'
+  state.nextSurfaceId =
+    WORKSPACE_SURFACES.find((surface) => surface.route === new URL(destination, BASE_URL).pathname)
+      ?.id ?? 'other'
   if (page.url() !== 'about:blank') {
     try {
       await expect
@@ -227,7 +266,21 @@ async function captureNormalGlass(page, context, browserType, colorScheme, shoot
   }
 }
 
-/** Reaches a destination the way a user of this layout would: sidebar, tab bar, or the menu sheet. */
+/** Filters translated links by their route so matching admin/workspace labels stay distinct. */
+async function followVisibleDestination(scope, destinationLabel, expectedHref) {
+  const destinations = await scope.getByRole('link', { name: destinationLabel, exact: true }).all()
+  for (const destination of destinations) {
+    const isMatchesDestination =
+      expectedHref === undefined || (await destination.getAttribute('href')) === expectedHref
+    if (isMatchesDestination && (await destination.isVisible())) {
+      await destination.click()
+      return true
+    }
+  }
+  return false
+}
+
+/** Reaches a destination the way a user of this layout would: radial menu, tab bar, or the menu sheet. */
 async function navigateTo(page, destinationLabel, expectedHref) {
   const locale = await page.locator('html').getAttribute('lang')
   if (!LOCALES.includes(locale)) throw new Error('Unsupported navigation locale')
@@ -237,17 +290,19 @@ async function navigateTo(page, destinationLabel, expectedHref) {
   })
   if (await access.isVisible())
     await access.getByRole('button', { name: label(locale, 'gallery.close'), exact: true }).click()
-  const links = await page
-    .getByRole('navigation')
-    .getByRole('link', { name: destinationLabel, exact: true })
-    .all()
-  for (const link of links) {
-    const isMatchesDestination =
-      expectedHref === undefined || (await link.getAttribute('href')) === expectedHref
-    if (isMatchesDestination && (await link.isVisible())) {
-      await link.click()
+  if (await followVisibleDestination(page.getByRole('navigation'), destinationLabel, expectedHref))
+    return
+  const radial = page.getByRole('button', {
+    name: label(locale, 'shell.openNavigation'),
+    exact: true,
+  })
+  if (await radial.isVisible()) {
+    await radial.click()
+    if (
+      await followVisibleDestination(page.getByRole('navigation'), destinationLabel, expectedHref)
+    )
       return
-    }
+    await page.keyboard.press('Escape')
   }
   // The active navigation is authoritative: translated Admin and workspace
   // labels can coincide, while the account menu targets a different section.
@@ -256,17 +311,9 @@ async function navigateTo(page, destinationLabel, expectedHref) {
   if (await menu.isVisible()) {
     await menu.click()
     const dialog = page.getByRole('dialog', { name: menuLabel, exact: true })
-    const destinations = await dialog
-      .getByRole('link', { name: destinationLabel, exact: true })
-      .all()
-    for (const destination of destinations) {
-      const isMatchesDestination =
-        expectedHref === undefined || (await destination.getAttribute('href')) === expectedHref
-      if (isMatchesDestination && (await destination.isVisible())) {
-        await destination.click()
-        await expect(dialog).toHaveCount(0)
-        return
-      }
+    if (await followVisibleDestination(dialog, destinationLabel, expectedHref)) {
+      await expect(dialog).toHaveCount(0)
+      return
     }
     await dialog
       .getByRole('button', { name: label(locale, 'shell.closeMenu'), exact: true })
@@ -300,6 +347,10 @@ function createCapture(page, outputDir, profileName, colorScheme) {
     outputDir,
     colorScheme,
     browserErrors,
+    phase: 'capture-setup',
+    currentSurfaceId: 'other',
+    nextSurfaceId: 'other',
+    lastCaptureId: null,
     pending: new Map(),
     failedRequests: [],
     lastActivity: Date.now(),
@@ -308,13 +359,28 @@ function createCapture(page, outputDir, profileName, colorScheme) {
   NAVIGATION_STATE.set(page, state)
   page.on('request', (request) => {
     state.lastActivity = Date.now()
+    let ownerFrame = 'unavailable'
+    try {
+      ownerFrame = request.frame() === page.mainFrame() ? 'main' : 'child'
+    } catch {
+      // Requests owned outside a frame remain explicit, not a settled success.
+    }
+    const pathname = new URL(request.url()).pathname
     state.pending.set(request, {
       at: new Date().toISOString(),
       url: diagnosticUrl(request.url()),
       method: request.method(),
       resourceType: request.resourceType(),
+      requestCategory: /\/assets\/worker-[^/]+\.js$/.test(pathname) ? 'worker-script' : 'other',
+      ownerFrame,
+      responseStatus: null,
       sameOrigin: new URL(request.url()).origin === new URL(BASE_URL).origin,
     })
+  })
+  page.on('response', (response) => {
+    const request = response.request()
+    const pending = state.pending.get(request)
+    if (pending !== undefined) pending.responseStatus = response.status()
   })
   page.on('requestfinished', (request) => {
     state.pending.delete(request)
@@ -333,13 +399,14 @@ function createCapture(page, outputDir, profileName, colorScheme) {
   page.on('pageerror', (error) => {
     browserErrors.push({
       at: new Date().toISOString(),
-      name: diagnosticMessage(error.name),
-      message: diagnosticMessage(`${error.name}:${error.message}`),
-      document: diagnosticUrl(page.url()),
-      navigation: state.navigation,
+      name: error.name,
+      phase: state.phase,
+      captureId: state.lastCaptureId,
     })
   })
   return async (name, { isFullPage = true, locale: expectedLocale } = {}) => {
+    state.phase = 'capture-readiness'
+    state.lastCaptureId = name
     await imagesReady(page)
     if (browserErrors.length > 0) {
       await writeFile(
@@ -425,12 +492,13 @@ async function captureProfile(profileName) {
 
       const runId = `${Date.now().toString(36)}-${profileName}-${colorScheme}`
       const email = `shots-${runId}@example.test`
+      const password = 'screenshot session passphrase'
       const signup = await context.request.post(`${BASE_URL}/api/auth/sign-up/email`, {
         headers: { origin: BASE_URL },
         data: {
           name: 'Sam Screenshot',
           email,
-          password: 'screenshot session passphrase',
+          password,
           callbackURL: '/app',
         },
       })
@@ -452,6 +520,12 @@ async function captureProfile(profileName) {
       )
       await gotoPage(page, link)
       await page.waitForURL('**/app/editor')
+      await fixtureJson(
+        await context.request.post(`${BASE_URL}/api/auth/sign-in/email`, {
+          headers: { origin: BASE_URL },
+          data: { email, password },
+        }),
+      )
       await prepareReturningUser(context.request)
       await reloadPage(page, { waitUntil: 'networkidle' })
       await page.getByRole('heading', { level: 1, name: 'Images' }).waitFor()

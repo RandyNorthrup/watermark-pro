@@ -119,11 +119,11 @@ export async function latestLinkFor(
   return `${parsed.pathname}${parsed.search}`
 }
 
-const SIDEBAR_SELECTOR = 'aside nav'
+const SIDEBAR_SELECTOR = '[data-workspace-navigation]'
 
 /**
- * Follows a primary navigation link. Wide layouts show every destination in
- * the sidebar; phones show the four tools in the tab bar and the rest behind
+ * Follows a primary navigation link. Wide layouts expand a radial menu;
+ * phones show the four tools in the tab bar and the rest behind
  * the "Menu" sheet, so the helper opens that when it has to.
  */
 export async function navigateTo(page: Page, label: string) {
@@ -136,9 +136,7 @@ export async function navigateTo(page: Page, label: string) {
     exact: true,
   })
   const tabBar = page.getByRole('navigation', { name: 'Tools' })
-  // Both navigations are always in the document; CSS decides which one shows.
-  // Waiting for the sidebar to exist means the shell has rendered (a CSS
-  // locator, because role locators skip elements hidden by `display: none`).
+  // The collapsed button stays mounted; its destinations exist only while open.
   await page.locator(SIDEBAR_SELECTOR).waitFor({ state: 'attached' })
   for (const container of [sidebar, adminSidebar, tabBar]) {
     const link = container.getByRole('link', { name: label, exact: true })
@@ -146,6 +144,18 @@ export async function navigateTo(page: Page, label: string) {
       await link.click()
       return
     }
+  }
+  const radial = page.getByRole('button', { name: 'Open navigation', exact: true })
+  if (await radial.isVisible()) {
+    await radial.click()
+    for (const container of [sidebar, adminSidebar]) {
+      const target = container.getByRole('link', { name: label, exact: true })
+      if (await target.isVisible()) {
+        await target.click()
+        return
+      }
+    }
+    await page.keyboard.press('Escape')
   }
   const accountMenu = page.getByRole('button', { name: /^Account menu for / })
   await accountMenu.click()
@@ -169,7 +179,10 @@ export async function navigateTo(page: Page, label: string) {
   // Desktop account routes intentionally replace workspace tools with a
   // contextual rail. Return through the role-appropriate workspace link, then
   // use the fresh workspace rail for the requested tool.
-  await sidebar.getByRole('link', { name: /^(Images|Overview)$/ }).click()
+  await radial.click()
+  const back = page.getByRole('link', { name: /^(Images|Overview|Account settings)$/ }).first()
+  await back.click()
+  await page.getByRole('button', { name: 'Open navigation', exact: true }).click()
   const workspaceTarget = page
     .getByRole('navigation', { name: 'Primary', exact: true })
     .getByRole('link', { name: label, exact: true })
@@ -180,6 +193,9 @@ export async function navigateTo(page: Page, label: string) {
 /** Asserts a destination is absent from the navigation, opening the phone menu when needed. */
 export async function expectNoNavLink(page: Page, label: string) {
   await page.locator(SIDEBAR_SELECTOR).waitFor({ state: 'attached' })
+  const radial = page.getByRole('button', { name: 'Open navigation', exact: true })
+  const isRadial = await radial.isVisible()
+  if (isRadial) await radial.click()
   const menu = page.getByRole('button', { name: 'Menu', exact: true })
   const isPhoneMenu = await menu.isVisible()
   if (isPhoneMenu) {
@@ -191,6 +207,7 @@ export async function expectNoNavLink(page: Page, label: string) {
     await page.getByRole('button', { name: 'Close menu' }).click()
     await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
   }
+  if (isRadial) await page.keyboard.press('Escape')
   await page.getByRole('button', { name: /^Account menu for / }).click()
   await expect(page.getByRole('menuitem', { name: label, exact: true })).toHaveCount(0)
   await page.keyboard.press('Escape')

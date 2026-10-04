@@ -52,16 +52,16 @@
 
 ## What Lumafoil does
 
-| Area                    | Shipped behavior                                                                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **Images**              | Edit one image or a batch; add layered marks; crop, resize, rotate, and adjust color; export PNG, JPEG, or WebP.                     |
-| **PDFs**                | Preview pages, position marks, and export a watermarked PDF. Encrypted PDFs are refused, and documented size/page limits apply.      |
-| **Videos**              | Place marks on a timeline with keyframes and fades. Export depends on browser WebCodecs and source/target codec support.             |
-| **Reusable designs**    | Start from included presets or save custom text, logo, signature, shape, sticker, and QR designs in folders.                         |
-| **Bulk work**           | Process mixed supported files, keep failures visible, and save outputs separately or together where the format permits.              |
-| **Storage and sharing** | Optionally save finished images to a private workspace, organize them in folders, and create expiring or revocable links.            |
-| **Cloud connections**   | Preview integrations for Google Drive, Dropbox, and OneDrive can open permitted files and save exports after explicit authorization. |
-| **Interface**           | Light and dark themes, responsive layouts, twelve interface languages, and right-to-left Arabic.                                     |
+| Area                    | Implemented behavior                                                                                                                            |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Images**              | Edit one image or a batch; add layered marks; crop, resize, rotate, and adjust color; export PNG, JPEG, or WebP.                                |
+| **PDFs**                | Preview pages, position marks, and export a watermarked PDF. Encrypted PDFs are refused, and documented size/page limits apply.                 |
+| **Videos**              | Edit multiple clips on two video and four audio tracks: cut, trim, move, mix audio and animate marks. Export requires supported browser codecs. |
+| **Reusable designs**    | Start from included presets or save custom text, logo, signature, shape, sticker, and QR designs in folders.                                    |
+| **Bulk work**           | Process mixed supported files, keep failures visible, and save outputs separately or together where the format permits.                         |
+| **Storage and sharing** | Optionally save finished images to a private workspace, organize them in folders, and create expiring or revocable links.                       |
+| **Cloud connections**   | Preview integrations for Google Drive, Dropbox, and OneDrive can open permitted files and save exports after explicit authorization.            |
+| **Interface**           | Light and dark themes, responsive layouts, twelve interface languages, and right-to-left Arabic.                                                |
 
 Core editing and export run in the browser. Network features are explicit:
 sign-in, workspace storage, link imports, cloud transfers, invitations, and
@@ -86,8 +86,16 @@ changed.
   Full two-deployment upgrade/reconnect certification remains open.
 - **Cloud storage:** integrations are marked preview. Core live provider flows
   have evidence, but the final native Google Picker wiring check remains open.
-- **Video:** accepted containers, codecs, audio preservation, and output options
-  depend on browser capabilities. Browser support is checked at runtime.
+- **Video:** [the multi-clip editor](docs/video-editor.md) supports real cuts,
+  trims, picture layers, linked camera audio and independent sound. Projects and
+  source files stay in the current local session; reload or identity changes
+  clear them. Native decoding/encoding capabilities determine accepted formats
+  and export support. Edited audible tracks require an audio encoder; an
+  unavailable encoder produces an explicit error. The exact original AAC clock
+  correction passed 18 Linux WebKit checks, including library waveform decoding.
+  [Native verification evidence](docs/verification/m19/video-editor-2026-10-01.md)
+  distinguishes that original-source result from this unmerged restack's still
+  required full quality, native, device and release certification.
 - **Accessibility:** responsive controls, keyboard paths, axe checks, and
   light/dark themes exist. Lumafoil does not claim complete WCAG certification
   while the current full UI matrix and contrast review remain open.

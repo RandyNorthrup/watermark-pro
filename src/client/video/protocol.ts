@@ -5,6 +5,7 @@
  */
 import type { VideoMotion } from './motion'
 import type { TranscodePlan } from './plan'
+import type { ProjectComposition } from './project-transcode'
 import type { FontResource, MarkInput } from '../engine/protocol'
 
 export interface TranscodeStartMessage {
@@ -17,6 +18,7 @@ export interface TranscodeStartMessage {
   fonts: FontResource[]
   plan: TranscodePlan
   motions?: readonly (VideoMotion | null)[] | undefined
+  composition?: ProjectComposition | undefined
 }
 
 export interface CancelRequestMessage {

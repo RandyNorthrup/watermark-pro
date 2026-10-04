@@ -1,0 +1,28 @@
+name: Native codec diagnostics
+
+on:
+  push:
+    branches: [codex/resolve-video-editor]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-codecs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-codecs:
+    name: WebKit codec contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node-gitleaks
+      # Diagnostic checks never substitute for the required canonical quality/device gates.
+      - name: Verify the native WebKit timestamp and waveform contract
+        run: npm run test:codecs

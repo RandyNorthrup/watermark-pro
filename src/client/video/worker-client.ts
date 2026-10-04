@@ -6,6 +6,7 @@
 import { CancelledError } from './errors'
 import type { VideoMotion } from './motion'
 import type { TranscodePlan } from './plan'
+import type { ProjectComposition } from './project-transcode'
 import type { CancelRequestMessage, TranscodeStartMessage, VideoWorkerResponse } from './protocol'
 import type { FontResource, MarkInput } from '../engine/protocol'
 
@@ -20,6 +21,7 @@ export interface VideoTranscodeInput {
   fonts: FontResource[]
   plan: TranscodePlan
   motions?: readonly (VideoMotion | null)[] | undefined
+  composition?: ProjectComposition | undefined
 }
 
 export interface VideoTranscodeCallbacks {
