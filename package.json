@@ -139,7 +139,7 @@
     "react-dom": "19.2.8",
     "react-i18next": "17.0.13",
     "tailwind-merge": "3.6.0",
-    "zod": "4.5.4"
+    "zod": "4.6.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
