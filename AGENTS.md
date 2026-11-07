@@ -29,6 +29,18 @@ machine-wide instructions from this repository.
   passing when it was never executed is the single failure this project is
   designed to prevent.
 
+## UI invariants
+
+- Scrolled workspace content must stop painting and receiving pointer input above
+  the retained application header, on desktop and touch layouts. Clip the content
+  region below the header; translucent chrome does not satisfy this requirement.
+- Canvas editing toolboxes stay on the right in Images, Documents and Video.
+  Preserve this placement during layout and navigation changes.
+- Expanded navigation keeps separate themed pills with an icon and visible
+  label, a rounded arrangement and uniform gaps. Do not stack or merge the pills.
+- The collapsed navigation handle is a half circle outside the canvas. It must
+  not cover the editing surface.
+
 ## Failed CI and implementation reassessment
 
 - After three failed CI runs on a PR, stop the incremental patch/push loop.

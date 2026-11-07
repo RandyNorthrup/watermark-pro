@@ -17,6 +17,22 @@ an acknowledgement within three business days.
 
 Only the `main` branch and the latest tagged release receive fixes.
 
+## Dependency audit — 2026-11-06
+
+Main `7c2ee21` failed the full `npm audit --audit-level=high` gate with 35
+findings, including Better Auth GHSA-965c-763c-88jm (critical) and
+GHSA-r4xp-prcw-77qf (high). Both require the Magic Link or OAuth Proxy plugin,
+which this app does not enable. Zod GHSA-mrhx-c7xc-m3w5 was reachable: Zod
+validates every API input. The remediation in `PLAN.md` §3.1 upgrades the
+affected packages; the full gate passes with 17 moderate findings, all in
+development tooling. The full gate, including development dependencies, stays
+the release requirement. The paragraphs below are historical.
+
+Known low-severity item: a workspace owner can add an existing account without
+sending email (`notify: false`), and the 204/409 answer reveals whether that
+email is registered. The path has no per-owner budget yet. Planned fix: charge
+silent additions against a per-owner rate limit.
+
 ## Historical dependency blocker — 2026-10-02
 
 The required full dependency audit rejected GHSA-vfj7-8cjw-p6xm
