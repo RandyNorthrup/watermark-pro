@@ -10,6 +10,7 @@ describe('assertImportableUrl', () => {
     expect(assertImportableUrl('https://sub.example.com:8443/a.png').hostname).toBe(
       'sub.example.com',
     )
+    expect(assertImportableUrl('https://example.com./photo.jpg').hostname).toBe('example.com.')
   })
 
   it.each([
@@ -27,6 +28,10 @@ describe('assertImportableUrl', () => {
     ['the decimal form of an IP', 'https://2130706433/a.jpg'],
     ['the hex form of an IP', 'https://0x7f000001/a.jpg'],
     ['a single-label host', 'https://intranet/a.jpg'],
+    ['localhost with a trailing dot', 'https://localhost./a.jpg'],
+    ['an .internal host with a trailing dot', 'https://metadata.google.internal./a.jpg'],
+    ['a .local host with trailing dots', 'https://printer.local../a.jpg'],
+    ['a single-label host with a trailing dot', 'https://intranet./a.jpg'],
   ])('rejects %s', (_label, raw) => {
     expect(() => assertImportableUrl(raw)).toThrow(UnsupportableUrlError)
   })

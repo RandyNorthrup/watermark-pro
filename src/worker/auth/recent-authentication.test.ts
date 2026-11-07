@@ -69,7 +69,8 @@ describe('recent credential proof', () => {
     ['PATCH', '/api/admin/users/user'],
     ['POST', '/api/orgs/workspace/access/links'],
     ['POST', '/api/orgs/workspace/shares'],
-    ['DELETE', '/api/orgs/workspace/photos/photo'],
+    ['DELETE', '/api/orgs/workspace/watermarks/mark'],
+    ['POST', '/api/orgs/workspace/photos/delete'],
   ])('protects %s %s', (method, path) => {
     expect(requiresRecentAuthentication(method, path)).toBe(true)
   })
@@ -84,6 +85,8 @@ describe('recent credential proof', () => {
     ['PUT', '/api/orgs/workspace/watermarks/mark'],
     ['POST', '/api/me/invitations-forged'],
     ['POST', '/api/orgs/workspace/access-forged'],
+    ['POST', '/api/orgs/workspace/photos/delete-forged'],
+    ['GET', '/api/orgs/workspace/photos/delete'],
   ])('retains ordinary-session behavior for %s %s', (method, path) => {
     expect(requiresRecentAuthentication(method, path)).toBe(false)
   })

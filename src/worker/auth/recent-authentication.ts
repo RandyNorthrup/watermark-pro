@@ -28,6 +28,8 @@ const SENSITIVE_API_PREFIXES = [
 ]
 const SENSITIVE_WORKSPACE_PATH = /^\/api\/orgs\/[^/]+\/(?:access|shares)(?:\/|$)/
 const SENSITIVE_CLOUD_PATH = /^\/api\/me\/cloud\/[^/]+\/(?:connect|token|disconnect)$/
+/** Bulk deletion is a POST because it carries a list of ids, but it destroys data like DELETE. */
+const SENSITIVE_WORKSPACE_BULK_DELETION_PATH = /^\/api\/orgs\/[^/]+\/photos\/delete$/
 
 /** Ordinary reads, saving, rendering, and personal-workspace bootstrap retain their session. */
 export function requiresRecentAuthentication(method: string, path: string): boolean {
@@ -36,6 +38,7 @@ export function requiresRecentAuthentication(method: string, path: string): bool
     SENSITIVE_API_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`)) ||
     SENSITIVE_WORKSPACE_PATH.test(path) ||
     SENSITIVE_CLOUD_PATH.test(path) ||
+    (method === 'POST' && SENSITIVE_WORKSPACE_BULK_DELETION_PATH.test(path)) ||
     (method === 'DELETE' && path.startsWith('/api/orgs/'))
   )
 }
