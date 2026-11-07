@@ -57,3 +57,37 @@ and the earlier run history is gone. CI attempt 2 carries only the failure-1
 correction, so it shows whether failure 2 recurs unchanged. If it recurs, the next
 step is a Linux WebKit reproduction on main versus this branch (Playwright's
 1.63.0 Linux image), not another CI attempt.
+
+## CI attempt 2 — run 42358751808
+
+Every check passed: Quality gates, semgrep, desktop-chrome, android, iPad and
+iPhone, and the required End-to-end aggregate. `e2e/video.spec.ts:281` passed on
+both WebKit devices. On iPhone, four tests failed once and passed on retry:
+`documents.spec.ts:88`, `documents.spec.ts:157`, `library.spec.ts:49` (failure 2)
+and `offline.spec.ts:17`. They span unrelated journeys, and #40 changes no client
+source, so this is recorded as iPhone WebKit runner instability to investigate
+separately, not as a defect of this change.
+
+## Production pre-merge checks — 2026-11-07
+
+Merging to main runs `scripts/deploy.mjs`, which applies pending migrations to
+production D1 before the Worker deploy. Production had applied migrations through
+`0017_workspace_folders`, so this merge applies `0018`–`0022` from main as well as
+`0023`. Read-only checks on production D1 (dashboard console and
+`wrangler d1 migrations list --remote`):
+
+| Check                                          | Result                                                          |
+| ---------------------------------------------- | --------------------------------------------------------------- |
+| Duplicate `(provider_id, account_id)` pairs    | None                                                            |
+| `account` indexes                              | `account_issuer_account_id_unique` present, as `0023` expects   |
+| Objects created by `0018`–`0022`               | None present, so no migration collides with existing schema     |
+| Pending remote migrations                      | `0018`–`0023`, in order                                         |
+| Worker secrets required by `src/worker/env.ts` | All present, including the Turnstile and sign-in provider pairs |
+
+Following the runbook's schema-change steps, a private D1 export and the current
+Time Travel bookmark were captured outside the repository first. All six
+migrations then applied cleanly to a copy of that export (SQLite 3.43.2, foreign
+keys on): `foreign_key_check` empty, `integrity_check` ok, every workspace and
+linked sign-in account preserved, every existing account kept in the private
+cohort. No existing session carries credential proof after `0019`, so each user
+re-enters credentials once before a sensitive action, as designed.
