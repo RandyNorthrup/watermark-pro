@@ -326,7 +326,10 @@ test.describe('native video editing', () => {
     await page.getByLabel('Add a video').setInputFiles(AUDIO_PATH)
     await expect(timeline.getByRole('button', { name: /^A3:/ })).toHaveCount(1)
     await page.getByRole('spinbutton', { name: 'Volume', exact: true }).fill('0.5')
-    await page.getByRole('textbox', { name: 'Project', exact: true }).fill('Track edit')
+    // Linux WebKit, which the iPhone and iPad projects run, rewrites spaces in a
+    // download's suggested name (`Track_edit`); macOS WebKit and Chromium keep them. A
+    // space-free project name keeps the filename assertion exact on every engine.
+    await page.getByRole('textbox', { name: 'Project', exact: true }).fill('Track-edit')
     await page.getByRole('button', { name: 'Clear canvas', exact: true }).click()
     await expect(timeline.getByRole('button', { name: /^V1:/ })).toHaveCount(2)
     await expectAccessible(page)
@@ -360,7 +363,7 @@ test.describe('native video editing', () => {
     const pending = page.waitForEvent('download', { timeout: TRANSCODE_TIMEOUT_MS })
     await page.getByRole('button', { name: 'Export Video', exact: true }).click()
     const download = await pending
-    expect(download.suggestedFilename()).toBe(`Track edit-watermarked.${container}`)
+    expect(download.suggestedFilename()).toBe(`Track-edit-watermarked.${container}`)
     const output = await clipInfo(await downloadBytes(download))
     const original = await clipInfo(bytes)
     expect(output.seconds).toBeCloseTo(original.seconds * 2, 1)

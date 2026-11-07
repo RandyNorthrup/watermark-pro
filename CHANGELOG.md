@@ -33,6 +33,12 @@ what was planned; superseded entries stay.
 - **API headers.** API responses sent `X-Frame-Options: SAMEORIGIN` while static
   responses send `DENY`; they now match. The API's stricter
   `Cross-Origin-Opener-Policy: same-origin` is kept and documented.
+- **WebKit video export test.** Linux WebKit, used by the iPhone and iPad CI projects,
+  rewrites spaces in download names, so the multi-clip export test (named `Track edit`
+  since #28) could not pass there. The test now names the project `Track-edit`; the
+  application's naming is unchanged. An iPhone WebKit renderer crash in the library
+  journey is recorded, cause not yet established, in
+  `docs/verification/m19/security-remediation-2026-11-07.md`.
 - **Project rules.** Recorded the owner's UI invariants (header clipping, right-side
   toolboxes, separate labeled navigation pills, half-circle handle) in `AGENTS.md`.
 
