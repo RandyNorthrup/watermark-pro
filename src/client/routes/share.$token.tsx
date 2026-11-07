@@ -15,6 +15,7 @@ import { buttonVariants } from '../components/ui/button-variants'
 import { Spinner } from '../components/ui/spinner'
 import { ApiRequestError } from '../lib/api'
 import { describeError } from '../lib/errors'
+import { formatLongDate } from '../lib/format-date'
 import { publicShareQueryOptions, sharedPhotoUrl, shareLink } from '../lib/shares'
 
 /**
@@ -27,8 +28,6 @@ export const Route = createFileRoute('/share/$token')({
 })
 
 type SharedPhoto = PublicShare['photos'][number]
-
-const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'long' })
 
 function SharePage() {
   const { t } = useTranslation()
@@ -81,7 +80,7 @@ function SharePage() {
                   {share.data.expiresAt === null
                     ? ''
                     : t('share.availableUntil', {
-                        date: dateFormatter.format(new Date(share.data.expiresAt)),
+                        date: formatLongDate(new Date(share.data.expiresAt)),
                       })}
                 </p>
               </div>

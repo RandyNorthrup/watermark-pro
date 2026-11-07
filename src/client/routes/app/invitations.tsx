@@ -20,7 +20,7 @@ import { Field } from '../../components/ui/field'
 import { Input } from '../../components/ui/input'
 import { inviteToSite, revokeSiteInvitation, siteInvitationsQueryOptions } from '../../lib/accounts'
 import { describeError } from '../../lib/errors'
-import { dateTimeFormatter } from '../../lib/format-date'
+import { formatDateTime } from '../../lib/format-date'
 
 export const Route = createFileRoute('/app/invitations')({ component: InvitationsPage })
 const STATUS_LABELS = {
@@ -138,7 +138,7 @@ function InvitationsPage() {
                 <Badge>{t(`siteRoles.${invitation.role}`)}</Badge>
                 <p className="text-sm text-ink-muted">
                   {t(STATUS_LABELS[invitation.status])} ·{' '}
-                  {dateTimeFormatter.format(new Date(invitation.expiresAt))}
+                  {formatDateTime(new Date(invitation.expiresAt))}
                 </p>
               </div>
               {invitation.status === 'pending' ? (

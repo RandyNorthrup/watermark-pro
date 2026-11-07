@@ -24,7 +24,7 @@ import {
 import { apiRequest, fetchJson } from '../lib/api'
 import { authClient } from '../lib/auth-client'
 import { describeAuthError, describeError } from '../lib/errors'
-import { dateTimeFormatter } from '../lib/format-date'
+import { formatDateTime } from '../lib/format-date'
 import { captureOfflineOwner } from '../lib/offline-context'
 import { ORGANIZATION_QUERY_KEY } from '../lib/queries'
 
@@ -481,7 +481,7 @@ function LinkControls({
                 <p className="truncate text-sm">{link.email ?? t('workspaceAccess.inviteLink')}</p>
                 <p className="text-xs text-ink-muted">
                   {t(link.role === 'editor' ? 'workspaceAccess.edit' : 'workspaceAccess.view')} ·{' '}
-                  {dateTimeFormatter.format(new Date(link.expiresAt))}
+                  {formatDateTime(new Date(link.expiresAt))}
                 </p>
               </div>
               <Button

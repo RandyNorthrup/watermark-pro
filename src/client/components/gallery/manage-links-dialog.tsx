@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import type { ShareDto } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
-import { dateTimeFormatter } from '../../lib/format-date'
+import { formatDateTime } from '../../lib/format-date'
 import {
   copyLink,
   revokeShare,
@@ -142,12 +142,12 @@ function ShareRow({
             <p className="text-sm text-ink-muted">
               {t('shares.rowCreated', {
                 count: share.photoCount,
-                created: dateTimeFormatter.format(new Date(share.createdAt)),
+                created: formatDateTime(new Date(share.createdAt)),
               })}
               {share.expiresAt === null
                 ? t('shares.neverExpires')
                 : t('shares.expiresOn', {
-                    expires: dateTimeFormatter.format(new Date(share.expiresAt)),
+                    expires: formatDateTime(new Date(share.expiresAt)),
                   })}
             </p>
           </div>

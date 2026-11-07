@@ -21,7 +21,7 @@ import type { PhotoDto } from '../../../shared/api'
 import { describeError } from '../../lib/errors'
 import { movePhotos } from '../../lib/folders'
 import { formatBytes } from '../../lib/format-bytes'
-import { dateTimeFormatter } from '../../lib/format-date'
+import { formatDateTime } from '../../lib/format-date'
 import {
   deletePhotos,
   galleryQueryKey,
@@ -496,14 +496,14 @@ export function GalleryLightbox({
                           width: photo.width,
                           height: photo.height,
                           size: formatBytes(photo.size),
-                          date: dateTimeFormatter.format(new Date(photo.createdAt)),
+                          date: formatDateTime(new Date(photo.createdAt)),
                         })
                       : t('gallery.lightboxMetaWithPreset', {
                           width: photo.width,
                           height: photo.height,
                           size: formatBytes(photo.size),
                           preset: photo.presetName,
-                          date: dateTimeFormatter.format(new Date(photo.createdAt)),
+                          date: formatDateTime(new Date(photo.createdAt)),
                         })}
                   </Dialog.Description>
                 </div>

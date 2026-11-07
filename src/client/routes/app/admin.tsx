@@ -32,7 +32,7 @@ import {
 } from '../../lib/admin'
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
-import { dateTimeFormatter } from '../../lib/format-date'
+import { formatDateTime } from '../../lib/format-date'
 import { resetShellQueries } from '../../lib/queries'
 
 export const Route = createFileRoute('/app/admin')({
@@ -194,7 +194,7 @@ function UserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
             </p>
             <p className="truncate text-sm text-ink-muted">{user.email}</p>
             <p className="text-xs text-ink-muted">
-              {t('admin.joined', { date: dateTimeFormatter.format(user.createdAt) })}
+              {t('admin.joined', { date: formatDateTime(user.createdAt) })}
               {user.emailVerified ? '' : t('admin.emailNotVerified')}
             </p>
           </div>
@@ -413,7 +413,7 @@ function OrganizationsPanel() {
               <td className="px-4 py-3">{String(organization.photoCount)}</td>
               <td className="px-4 py-3">{formatBytes(organization.storageBytes)}</td>
               <td className="px-4 py-3 whitespace-nowrap">
-                {dateTimeFormatter.format(new Date(organization.createdAt))}
+                {formatDateTime(new Date(organization.createdAt))}
               </td>
             </tr>
           ))}
@@ -497,7 +497,7 @@ function HealthPanel() {
             {checks.data.map((check) => (
               <tr key={check.id} className="border-t border-line">
                 <td className="px-4 py-3 whitespace-nowrap">
-                  {dateTimeFormatter.format(new Date(check.createdAt))}
+                  {formatDateTime(new Date(check.createdAt))}
                 </td>
                 <td className="px-4 py-3">
                   {check.ok ? (
@@ -550,7 +550,7 @@ function ClientErrorsPanel() {
                 route: error.route ?? t('admin.clientErrors.unknownRoute'),
               })}
               {' · '}
-              {dateTimeFormatter.format(new Date(error.createdAt))}
+              {formatDateTime(new Date(error.createdAt))}
               {error.requestId === null ? null : (
                 <>
                   {' · '}

@@ -34,6 +34,7 @@ import { useActiveOrganization } from '../../../lib/active-organization'
 import { downloadBlob } from '../../../lib/download'
 import { describeError } from '../../../lib/errors'
 import { movePresets } from '../../../lib/folders'
+import { formatMediumDate } from '../../../lib/format-date'
 import {
   assetFileUrl,
   assetsQueryOptions,
@@ -54,8 +55,6 @@ export const Route = createFileRoute('/app/library/')({
 })
 
 const KIND_ICONS = { text: Type, symbol: Stamp, shape: Shapes, image: Image, qr: QrCode } as const
-
-const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' })
 
 /** Characters of an ISO timestamp that make up the `YYYY-MM-DD` date stamp. */
 const DATE_STAMP_LENGTH = 10
@@ -471,7 +470,7 @@ function PresetCard({ preset, organizationId, canManage, onExport }: PresetCardP
           </span>
           <span aria-hidden="true">·</span>
           <time dateTime={preset.updatedAt}>
-            {t('library.updated', { date: dateFormatter.format(new Date(preset.updatedAt)) })}
+            {t('library.updated', { date: formatMediumDate(new Date(preset.updatedAt)) })}
           </time>
         </div>
         {remove.isError ? <Alert tone="error">{describeError(remove.error)}</Alert> : null}

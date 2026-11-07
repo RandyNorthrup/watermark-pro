@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 
 import type { auditEntrySchema } from '../../shared/api'
-import { dateTimeFormatter } from '../lib/format-date'
+import { formatDateTime } from '../lib/format-date'
 import { Card } from './ui/card'
 
 export type AuditEntry = z.infer<typeof auditEntrySchema>
@@ -52,9 +52,7 @@ export function AuditTable({ caption, entries, detailHeading, renderDetail }: Au
           {entries.map((entry) => (
             <tr key={entry.id} className="border-t border-line">
               <td className="px-3 py-3 whitespace-nowrap md:px-4">
-                <time dateTime={entry.createdAt}>
-                  {dateTimeFormatter.format(new Date(entry.createdAt))}
-                </time>
+                <time dateTime={entry.createdAt}>{formatDateTime(new Date(entry.createdAt))}</time>
               </td>
               <td className="px-3 py-3 md:px-4">{entry.actorName ?? 'System'}</td>
               <td className="px-3 py-3 font-mono text-xs md:px-4">{entry.action}</td>

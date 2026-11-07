@@ -98,10 +98,10 @@ if (
   )
 }
 
-async function auditMedian(origin, chrome, surface) {
+async function auditMedian(origin, surface) {
   const runs = []
   for (let run = 0; run < RUNS_PER_PAGE; run += 1) {
-    const sample = await audit(origin, chrome, surface)
+    const sample = await audit(origin, surface)
     if (sample !== null) {
       runs.push(sample)
       console.info(`${FORM_FACTOR} ${surface.id}: trace ${run + 1}/${RUNS_PER_PAGE}`)
@@ -130,13 +130,45 @@ async function auditMedian(origin, chrome, surface) {
   return aggregate
 }
 
-async function audit(origin, chrome, surface, attempt = 1) {
-  const result = await withLighthousePage(
-    chrome.port,
-    async (page, inspectionPage) =>
-      await auditOwnedPage(origin, chrome, surface, attempt, page, inspectionPage),
+/**
+ * Every trace gets its own browser and profile, so each one is a first visit.
+ * A renderer reused across runs keeps the earlier pages' scripts and heap:
+ * Lighthouse's debugger attach then walks that leftover heap inside the
+ * measured load (400–690 ms of simulated blocking on CI, growing with each
+ * run), while V8's warm compilation cache hides the cold start a visitor pays.
+ */
+async function withAuditBrowser(surface, run) {
+  const profile = await createAuditProfile()
+  let chrome
+  try {
+    chrome = await launchAuditChrome({
+      userDataDir: profile.directory,
+      chromePath: chromium.executablePath(),
+      chromeFlags: ['--headless=new', '--no-first-run', '--disable-gpu', certificate.browserFlag],
+    })
+    await setAuditCookies(chrome.port, proxy.origin, surface.cookie)
+    return await run(chrome)
+  } finally {
+    try {
+      await chrome?.kill()
+      await removeAuditProfile(profile)
+    } catch {
+      console.warn('Lighthouse-owned browser cleanup failed.')
+    }
+  }
+}
+
+async function audit(origin, surface, attempt = 1) {
+  const result = await withAuditBrowser(
+    surface,
+    async (chrome) =>
+      await withLighthousePage(
+        chrome.port,
+        async (page, inspectionPage) =>
+          await auditOwnedPage(origin, chrome, surface, attempt, page, inspectionPage),
+      ),
   )
-  return result === RETRY_TRACE ? await audit(origin, chrome, surface, attempt + 1) : result
+  return result === RETRY_TRACE ? await audit(origin, surface, attempt + 1) : result
 }
 
 async function auditOwnedPage(origin, chrome, surface, attempt, page, inspectionPage) {
@@ -252,28 +284,19 @@ async function removeAuditProfile(profile) {
   const cleanup = { maxRetries: 10, retryDelay: 100 }
   await rm(actual, { recursive: true, force: true, ...cleanup })
 }
-let chrome
 let proxy
-let profile
 let certificate
 let fixtures
 try {
   fixtures = await prepareLighthouseSurfaces(BASE_URL, selected)
   certificate = await createAuditCertificate()
   proxy = await startCompressingProxy({ upstream: BASE_URL, port: PROXY_PORT, tls: certificate })
-  profile = await createAuditProfile()
-  chrome = await launchAuditChrome({
-    userDataDir: profile.directory,
-    chromePath: chromium.executablePath(),
-    chromeFlags: ['--headless=new', '--no-first-run', '--disable-gpu', certificate.browserFlag],
-  })
   const rows = []
   async function runPage(surface) {
     const isAuthenticated = surface.cookie !== ''
     await fixtures.before(surface)
-    await setAuditCookies(chrome.port, proxy.origin, surface.cookie)
     console.info(`Auditing ${FORM_FACTOR} ${surface.id}`)
-    const result = await auditMedian(proxy.origin, chrome, surface)
+    const result = await auditMedian(proxy.origin, surface)
     rows.push({
       pathname: surface.id,
       ...result,
@@ -284,7 +307,7 @@ try {
   const summary = [
     `# M19 ${FORM_FACTOR} ${IS_SAMPLE ? 'diagnostic sample - not certification' : 'certification'}`,
     '',
-    `Runs per page: ${RUNS_PER_PAGE}. Performance and timing use medians; accessibility and best practices use the lowest observed score. Origin storage and HTTP cache are cold for each trace.`,
+    `Runs per page: ${RUNS_PER_PAGE}. Performance and timing use medians; accessibility and best practices use the lowest observed score. Each trace runs in a new browser and profile, so storage, HTTP cache and the renderer process are cold.`,
     '',
     `Transport: ${TRANSPORT}. Normal hosted TLS and deployment performance remain separate release evidence.`,
     '',
@@ -304,12 +327,5 @@ try {
 } finally {
   await fixtures?.dispose()
   await proxy?.close()
-  try {
-    await chrome?.kill()
-    if (profile !== undefined) await removeAuditProfile(profile)
-  } catch {
-    console.warn('Lighthouse-owned browser cleanup failed.')
-  } finally {
-    await certificate?.dispose()
-  }
+  await certificate?.dispose()
 }

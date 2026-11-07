@@ -16,6 +16,27 @@ what was planned; superseded entries stay.
   UI audit measured 600–750 ms mobile Total Blocking Time on every page that
   boots the application against the 150 ms budget, so this is the first step,
   not the fix. Budgets are unchanged.
+- **The first render waits for the route load.** React renders a
+  `useSyncExternalStore` update synchronously even inside a transition, so a
+  route load finishing after mount rendered the whole page in one blocking task
+  (about 230 ms on a throttled phone trace for the sign-in page). The router now
+  commits its matches before React mounts; the static skeleton stays painted
+  until then.
+- **Less work inside startup tasks.** The root route's not-found page loads on
+  demand like every other page, taking it and the button-variant helpers out of
+  the application shell (139.2 kB of the 140 kB gzip budget; `main` had 71 bytes
+  of margin). Date formatters are created on first use instead of while a
+  page's code evaluates (the first one loads locale data: 41 ms in one library
+  trace). A fresh document's first render skips the router's scroll reset, which
+  only forced a full layout inside the commit; reloads and history traversals
+  still restore scroll positions.
+- **Each Lighthouse trace runs in a new browser.** The audit reused one renderer
+  across a page's five runs, so Lighthouse's debugger attach walked the earlier
+  runs' leftover heap inside the measured load, adding an "unattributable" 400–690
+  ms simulated task to about half of all mobile runs, including prerendered pages
+  that run no application script, while V8's warm compilation cache hid the cold
+  start a visitor pays. Budgets and run counts are unchanged. Audit run
+  `42423811769` (before this change) passed 36/36 desktop and 5/36 mobile surfaces.
 
 ### Security remediation — 2026-11-06
 

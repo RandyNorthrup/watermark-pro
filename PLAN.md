@@ -1602,6 +1602,18 @@ on source `172128c` and no `v2.0.0` tag or GitHub release was created.
       Thresholds were not lowered. Complete bulk/video benchmarks, including the
       60-second 1080p export target and an actual iPhone encoding check; browser
       emulation is not physical-device proof.
+      **2026-11-07 (branch `perf/mobile-boot`):** the first render now waits for
+      the route load, so pages mount in one time-sliced transition instead of a
+      synchronous router-store render; date formatters and the first-load scroll
+      pass no longer run inside startup tasks. Audit run `42423811769` passed
+      36/36 desktop surfaces (both editor states had scored 93 on `main`) and
+      5/36 mobile. **Harness decision:** each Lighthouse trace now runs in a new
+      browser and profile. The audit had reused one renderer across a page's five
+      runs; Lighthouse's debugger attach then walked the earlier runs' leftover
+      heap inside the measured load (an "unattributable" 400–690 ms simulated
+      task in about half the runs, even on prerendered pages with no app script),
+      while V8's warm compilation cache hid the cold start a first visit pays.
+      Fresh browsers remove both effects; budgets and run counts are unchanged.
 - [ ] Verify offline service-worker upgrade behavior across two deployments,
       including retained pending work, reconnect, conflicts and account isolation.
 - [ ] Finish older deferred symbol refinements: full icon-catalog search,
