@@ -40,13 +40,41 @@ const launchWindow = window as unknown as {
 }
 
 /**
- * Startup runs as short tasks rather than one: router construction, the route
- * code and image requests, then the session check and the first render. Each
- * yield lets a phone paint and respond in between (PLAN.md §5.5 mobile
- * blocking-time budget). Every request still starts before the language
- * catalogue arrives.
+ * Whether the interface can render: its catalogue loaded, or English already
+ * did. Rendering regardless of the outcome means a catalogue hiccup cannot
+ * leave a blank page (i18next falls back to English on its own).
+ */
+async function canRenderInterface(): Promise<boolean> {
+  try {
+    await initI18n()
+    return true
+  } catch {
+    return hasInterfaceLanguage()
+  }
+}
+
+/**
+ * Settles once the route load does. A failed load still renders (the router
+ * loads again on mount) and reaches the global error handlers like any
+ * uncaught error.
+ */
+async function settleRouteLoad(router: ReturnType<typeof createAppRouter>): Promise<void> {
+  try {
+    await router.load()
+  } catch (error) {
+    globalThis.reportError(error)
+  }
+}
+
+/**
+ * Startup runs as short tasks rather than one: module evaluation, router
+ * construction, the route code and image requests, then the session check and
+ * the first render. Each yield lets a phone paint and respond in between
+ * (PLAN.md §5.5 mobile blocking-time budget). Every request still starts
+ * before the language catalogue arrives.
  */
 async function boot(rootElement: Element): Promise<void> {
+  await yieldToMain()
   const queryClient = createQueryClient()
   // The private route installs offline services before admission, including an
   // in-app navigation from sign-in. Public startup does not restore private data.
@@ -68,7 +96,7 @@ async function boot(rootElement: Element): Promise<void> {
 
   // Route admission does not depend on translated UI. Start its session and data
   // requests while the language catalogue loads, retaining the same route guards.
-  void router.load()
+  const routeSettled = settleRouteLoad(router)
 
   // Web Share Target (Android): a single-purpose service worker receives shared
   // photos and hands them to /app/bulk. Registered under its own scope so it
@@ -96,17 +124,17 @@ async function boot(rootElement: Element): Promise<void> {
   }
 
   // Load the interface language before the first paint so it never flashes
-  // English; render regardless of the outcome so a catalogue hiccup cannot leave
-  // a blank page (i18next falls back to English on its own).
-  void initI18n()
-    .then(renderApp)
-    .catch(() => {
-      if (hasInterfaceLanguage()) {
-        renderApp()
-        return
-      }
-      showBootFailure(rootElement)
-    })
+  // English. The first render also waits for the route load. Matches the router
+  // has already committed mount inside the one time-sliced transition above; a load
+  // that finished after mount would reach React through the router's store,
+  // which always renders synchronously and blocked a phone for the whole page
+  // (PLAN.md §5.5). The static skeleton stays painted until then.
+  const [canRender] = await Promise.all([canRenderInterface(), routeSettled])
+  if (canRender) {
+    renderApp()
+    return
+  }
+  showBootFailure(rootElement)
 }
 
 // A startup failure reaches the production error reporter as an unhandled rejection.
