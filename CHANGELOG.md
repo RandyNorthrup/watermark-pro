@@ -7,6 +7,16 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Mobile boot blocking time — 2026-11-07
+
+- **Startup runs as short tasks.** Router construction, the route-code and image
+  requests, and the session check with the first render now run in separate
+  main-thread tasks (`src/client/lib/yield-to-main.ts`), and the first render is
+  a React transition so it yields between components. The 2026-11-07 deploy run's
+  UI audit measured 600–750 ms mobile Total Blocking Time on every page that
+  boots the application against the 150 ms budget, so this is the first step,
+  not the fix. Budgets are unchanged.
+
 ### Security remediation — 2026-11-06
 
 - **Dependencies.** Main failed its own `npm audit --audit-level=high` gate with 35
