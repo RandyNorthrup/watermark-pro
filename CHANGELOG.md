@@ -7,6 +7,41 @@ what was planned; superseded entries stay.
 
 ## [Unreleased]
 
+### Security remediation — 2026-11-06
+
+- **Dependencies.** Main failed its own `npm audit --audit-level=high` gate with 35
+  findings (1 critical, 10 high), so every Dependabot PR failed Quality. Upgraded
+  Better Auth and its core to 1.7.14, Zod 4.6.7, Vite 8.3.5, Hono 4.13.14, Vitest
+  4.1.12, sharp 0.35.5 and Lighthouse 13.6.0; moved the miniflare Undici override to
+  7.30.1 and refreshed jsdom's Undici and the router's seroval within range. The
+  gate now passes; 17 moderate development-tool findings remain and are recorded in
+  `PLAN.md` §3.1. The Better Auth takeover advisories needed plugins this app does
+  not enable, so they were not exploitable here.
+- **Account schema migration `0023_account_provider_key`.** Better Auth 1.7.3 reverted
+  the 1.7.0–1.7.2 `account.issuer` schema and now refuses a schema with required
+  columns it never writes, so every D1 sign-up failed with a 500 after the upgrade
+  (the Node tier's memory adapter skips that check; the workerd tier caught it: 15 of
+  21 files). The migration drops the `(issuer, account_id)` index, then the column,
+  per the upstream 1.7 upgrade guide, and keeps `(provider_id, account_id)` unique.
+- **Fresh sign-in for bulk photo deletion.** `POST /api/orgs/:orgId/photos/delete`
+  did not require credential proof from the last ten minutes, although
+  `SECURITY.md` promised it for deletions: only `DELETE` requests were matched. It
+  now does; a real-session test shows a stale session is refused and the photo kept.
+- **URL import.** Hostnames with a trailing dot (`localhost.`,
+  `metadata.google.internal.`) passed the import denylist. The policy now checks the
+  name without trailing dots.
+- **API headers.** API responses sent `X-Frame-Options: SAMEORIGIN` while static
+  responses send `DENY`; they now match. The API's stricter
+  `Cross-Origin-Opener-Policy: same-origin` is kept and documented.
+- **WebKit video export test.** Linux WebKit, used by the iPhone and iPad CI projects,
+  rewrites spaces in download names, so the multi-clip export test (named `Track edit`
+  since #28) could not pass there. The test now names the project `Track-edit`; the
+  application's naming is unchanged. An iPhone WebKit renderer crash in the library
+  journey is recorded, cause not yet established, in
+  `docs/verification/m19/security-remediation-2026-11-07.md`.
+- **Project rules.** Recorded the owner's UI invariants (header clipping, right-side
+  toolboxes, separate labeled navigation pills, half-circle handle) in `AGENTS.md`.
+
 ### Displayed Account action owner guard — 2026-10-04
 
 - Reproduced stale displayed-account action using actual component/context:

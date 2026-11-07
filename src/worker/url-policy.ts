@@ -19,6 +19,11 @@ const DENIED_HOST_SUFFIXES = ['.local', '.internal', '.arpa', '.localhost'] as c
 const IPV4_LITERAL = /^\d{1,3}(\.\d{1,3}){3}$/
 /** An all-numeric or 0x-hex host with no dots — the decimal/hex forms of an IP. */
 const NUMERIC_HOST = /^(?:0x)?[0-9a-f]+$/
+/**
+ * DNS treats `localhost.` and `localhost` as the same name, and `URL` keeps the
+ * trailing dot, so the checks run on the name without it.
+ */
+const TRAILING_DOTS = /\.+$/
 
 /**
  * Validates `raw` and returns the parsed URL, or throws `UnsupportableUrlError`.
@@ -37,7 +42,7 @@ export function assertImportableUrl(raw: string): URL {
   if (url.username !== '' || url.password !== '') {
     throw new UnsupportableUrlError('A link that carries credentials cannot be imported.')
   }
-  const host = url.hostname.toLowerCase()
+  const host = url.hostname.toLowerCase().replace(TRAILING_DOTS, '')
   if (DENIED_HOSTS.has(host) || DENIED_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix))) {
     throw new UnsupportableUrlError('That host is not allowed.')
   }

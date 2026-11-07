@@ -107,8 +107,6 @@ export const account = sqliteTable(
   'account',
   {
     id: text('id').primaryKey(),
-    /** Identity provider issuer; scopes accountId since Better Auth 1.7. */
-    issuer: text('issuer').notNull(),
     accountId: text('account_id').notNull(),
     providerId: text('provider_id').notNull(),
     userId: text('user_id')
@@ -126,7 +124,9 @@ export const account = sqliteTable(
   },
   (table) => [
     index('account_user_id_idx').on(table.userId),
-    uniqueIndex('account_issuer_account_id_unique').on(table.issuer, table.accountId),
+    // Better Auth 1.7.3 restored the 1.6 identity key (providerId, accountId) and
+    // rejects a lookup that matches more than one row, so keep it unique here.
+    uniqueIndex('account_provider_id_account_id_unique').on(table.providerId, table.accountId),
   ],
 )
 

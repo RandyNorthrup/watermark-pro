@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
 import { errorCodeOf, joinAsMember, signUpOwner, TestClient } from './test-support/client'
 import { createTestHarness, type TestHarness } from './test-support/test-app'
@@ -18,6 +19,7 @@ import {
   MAX_PHOTOS_PER_ORGANIZATION,
   MAX_STORAGE_BYTES_PER_ORGANIZATION,
   PHOTO_PAGE_SIZE,
+  RECENT_AUTHENTICATION_WINDOW_MS,
 } from '../shared/constants'
 import { shellSessionSchema } from '../shared/shell-cache'
 import { SYNC_OPERATION_HEADER } from '../shared/sync'
@@ -33,6 +35,8 @@ const viewer = {
   email: 'vera@example.test',
   password: 'viewers long password',
 }
+
+const sessionIdSchema = z.object({ session: z.object({ id: z.string() }) })
 
 const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0])
 const JPEG_BYTES = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -315,6 +319,28 @@ describe('photo storage', () => {
     expect(empty.status).toBe(HTTP_STATUS.badRequest)
     const nothing = await ownerClient.post(base('/photos/delete'), { ids: ['ghost'] })
     expect(photoDeleteResponseSchema.parse(await nothing.json())).toEqual({ deleted: 0 })
+  })
+
+  it('refuses bulk deletion from a session without recent credential proof', async () => {
+    const photo = await uploadPhoto('Kept')
+    const sessionResponse = await ownerClient.get('/api/auth/get-session')
+    const session = sessionIdSchema.parse(await sessionResponse.json())
+    const context = await harness.services.auth.$context
+    await context.adapter.update({
+      model: 'session',
+      where: [{ field: 'id', value: session.session.id }],
+      update: { credentialVerifiedAt: new Date(Date.now() - RECENT_AUTHENTICATION_WINDOW_MS) },
+    })
+
+    const stale = await ownerClient.post(base('/photos/delete'), { ids: [photo.id] })
+    expect(stale.status).toBe(HTTP_STATUS.forbidden)
+    expect(await errorCodeOf(stale)).toBe(API_ERROR_CODE.recentAuthenticationRequired)
+    const kept = await ownerClient.get(base(`/photos/${photo.id}/file`))
+    expect(kept.status).toBe(HTTP_STATUS.ok)
+
+    await ownerClient.signIn(owner)
+    const fresh = await ownerClient.post(base('/photos/delete'), { ids: [photo.id] })
+    expect(photoDeleteResponseSchema.parse(await fresh.json())).toEqual({ deleted: 1 })
   })
 })
 

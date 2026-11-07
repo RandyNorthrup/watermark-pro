@@ -85,6 +85,12 @@ export function createApp(options: CreateAppOptions = {}): Hono<AppContext> {
         formAction: ["'none'"],
       },
       strictTransportSecurity: `max-age=${String(HSTS_MAX_AGE_SECONDS)}; includeSubDomains`,
+      // Matches public/_headers. Hono's default is SAMEORIGIN, which drifted
+      // from the static policy; frame-ancestors 'none' already forbids framing.
+      xFrameOptions: 'DENY',
+      // Hono's default `same-origin` stays deliberately stricter than the
+      // static `same-origin-allow-popups`: only SPA pages open OAuth and
+      // picker popups, and a JSON response never does.
       referrerPolicy: 'strict-origin',
       permissionsPolicy: {
         camera: [],
