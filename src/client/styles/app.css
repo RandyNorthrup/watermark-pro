@@ -21,10 +21,13 @@
  * and offset to Inter's advance widths and vertical metrics, so the swap
  * moves nothing. Values are the published Inter/Arial overrides (fontaine,
  * capsize). Without this the swap shifted long lists by 0.16 CLS on phones.
+ * local() matches exact installed names, so Linux and ChromeOS, which ship
+ * Arial's metric-compatible Liberation Sans and Arimo instead, name them too;
+ * without them the sign-up form still shifted 0.033 on Linux Chrome.
  */
 @font-face {
   font-family: 'Inter Fallback';
-  src: local('Arial');
+  src: local('Arial'), local('Liberation Sans'), local('Arimo');
   size-adjust: 107.12%;
   ascent-override: 90.44%;
   descent-override: 22.52%;

@@ -35,6 +35,11 @@ what was planned; superseded entries stay.
   loads on hover, focus or press and opens already focused (the first language
   when opened from the keyboard). The sign-in and sign-up pages' route code fell
   from 96.8 to 64.3 kB gzip.
+- **The metric-matched Inter fallback also names Liberation Sans and Arimo.**
+  `local()` matches exact installed font names, so the Arial-based fallback never
+  applied on Linux or ChromeOS, where Arial's metric-compatible equivalents ship
+  instead; the sign-up form with an invitation shifted 0.033 (budget 0.02) when
+  Inter arrived.
 - **Each Lighthouse trace runs in a new browser.** The audit reused one renderer
   across a page's five runs, so Lighthouse's debugger attach walked the earlier
   runs' leftover heap inside the measured load, adding an "unattributable" 400–690
