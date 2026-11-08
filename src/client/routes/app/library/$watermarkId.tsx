@@ -16,10 +16,7 @@ import { noteRecentWork } from '../../../lib/recent-work-events'
 import { canRole } from '../../../lib/roles'
 
 export const Route = createFileRoute('/app/library/$watermarkId')({
-  loader: async ({ context }) => {
-    watermarkDesigner.preload()
-    return await readActiveMemberRole(context.queryClient)
-  },
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: EditPresetPage,
 })
 

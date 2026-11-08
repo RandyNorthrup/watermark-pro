@@ -15,10 +15,7 @@ import { blankSpec, defaultSpecFor } from '../../../lib/spec-edit'
 export const Route = createFileRoute('/app/library/new')({
   validateSearch: newPresetSearchSchema,
   staticData: { preloadImages: [SAMPLE_SCENE_PATH] },
-  loader: async ({ context }) => {
-    watermarkDesigner.preload()
-    return await readActiveMemberRole(context.queryClient)
-  },
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: NewPresetPage,
 })
 

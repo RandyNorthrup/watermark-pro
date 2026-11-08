@@ -19,10 +19,7 @@ import { canRole } from '../../lib/roles'
 export const Route = createFileRoute('/app/editor')({
   validateSearch: editorSearchSchema,
   staticData: { preloadImages: [SAMPLE_SCENE_PATH] },
-  loader: async ({ context }) => {
-    editorTool.preload()
-    return await readActiveMemberRole(context.queryClient)
-  },
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: EditorPage,
 })
 

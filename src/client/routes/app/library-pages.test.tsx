@@ -264,6 +264,8 @@ describe('preset designer', () => {
     const api = installLibraryApi()
     const { router } = renderApp('/app/library/new')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('New watermark')
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     expect(await screen.findByRole('img', { name: /Watermark preview/ })).toBeInTheDocument()
     expect(screen.getByText('Placed bottom right, dark ink.')).toBeInTheDocument()
 
@@ -315,6 +317,8 @@ describe('preset designer', () => {
     installLibraryApi()
     renderApp('/app/library/new')
     await screen.findByRole('heading', { level: 1 })
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     await user.clear(screen.getByRole('textbox', { name: 'Text' }))
     await user.type(screen.getByRole('textbox', { name: 'Text' }), 'Draft text')
 
@@ -348,6 +352,8 @@ describe('preset designer', () => {
     const api = installLibraryApi({ assets: [makeAsset()] })
     renderApp('/app/library/new')
     await screen.findByRole('heading', { level: 1 })
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     await user.click(screen.getByRole('tab', { name: 'Logo' }))
     expect(await screen.findByRole('button', { name: 'Logo Brand mark' })).toBeInTheDocument()
     expect(screen.getByText('Choose or upload a logo to see the preview.')).toBeInTheDocument()
@@ -392,6 +398,8 @@ describe('preset designer', () => {
     const api = installLibraryApi({ assets: [] })
     renderApp('/app/library/new')
     await screen.findByRole('heading', { level: 1 })
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     await user.click(screen.getByRole('tab', { name: 'Logo' }))
 
     await user.upload(
@@ -420,6 +428,8 @@ describe('preset designer', () => {
     const api = installLibraryApi({ assets: [] })
     renderApp('/app/library/new')
     await screen.findByRole('heading', { level: 1 })
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     await user.click(screen.getByRole('tab', { name: 'Logo' }))
     await user.click(screen.getByRole('button', { name: 'Draw a signature' }))
     const dialog = await screen.findByRole('dialog', { name: 'Draw a signature' })
@@ -484,6 +494,8 @@ describe('preset designer', () => {
     })
     renderApp('/app/library/new')
     await screen.findByRole('heading', { level: 1 })
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     await user.click(screen.getByRole('tab', { name: 'Logo' }))
     await user.click(await screen.findByRole('button', { name: 'Delete logo Brand mark' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('This item is still in use.')
@@ -495,6 +507,8 @@ describe('preset designer', () => {
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     const { router, unmount } = renderApp('/app/library/wm-1')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Studio signature')
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     expect(screen.getByLabelText('Watermark name')).toHaveValue('Studio signature')
     await user.clear(screen.getByLabelText('Watermark name'))
     await user.type(screen.getByLabelText('Watermark name'), 'Renamed')
@@ -506,6 +520,8 @@ describe('preset designer', () => {
     client().state.user = VIEWER
     renderApp('/app/library/wm-1')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Renamed')
+    // The designer loads after the page heading paints.
+    await screen.findByLabelText('Watermark name')
     expect(screen.getByText('Read-only view.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
   })

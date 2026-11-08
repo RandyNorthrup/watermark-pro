@@ -41,8 +41,9 @@ what was planned; superseded entries stay.
   before asserting that a destination is absent.
 - **Tool pages paint their heading before their tool loads.** The image,
   documents, video, bulk and watermark-designer tools load beside their routes
-  (`components/tool-modules.ts`): each route loader starts the download and the
-  page shows its heading with a labelled spinner meanwhile. The image editor's
+  (`components/tool-modules.ts`): the page paints its heading with a labelled
+  spinner first and the tool's download starts after that paint, so the page's
+  own code is not competing with the tool's for bandwidth. The image editor's
   loading view is its own first frame, the sample scene in its preview area.
   Those pages' critical path fell from 250–290 kB to 78–92 kB gzip; their
   largest paint (the heading text, or the editor's sample scene) had waited for

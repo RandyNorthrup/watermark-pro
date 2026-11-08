@@ -1,9 +1,9 @@
 /**
- * The image, document, video, bulk and watermark-designer tools load beside their
- * routes rather than inside them: each page paints its heading while its
- * tool's code downloads, and the route loader starts that download once the
- * page's own code is under way (PLAN.md §5.5). The tools were the largest
- * element of their pages' critical path on a phone.
+ * The image, document, video, bulk and watermark-designer tools load beside
+ * their routes rather than inside them: each page paints its heading first and
+ * the tool's code downloads after that paint (`tool-suspense.tsx`, PLAN.md
+ * §5.5). The tools were the largest part of their pages' critical path on a
+ * phone.
  */
 import { deferredComponent } from '../lib/deferred-component'
 

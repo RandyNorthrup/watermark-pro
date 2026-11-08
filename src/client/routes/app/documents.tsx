@@ -9,10 +9,7 @@ import { readActiveMemberRole } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
 
 export const Route = createFileRoute('/app/documents')({
-  loader: async ({ context }) => {
-    documentsTool.preload()
-    return await readActiveMemberRole(context.queryClient)
-  },
+  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
   component: DocumentsPage,
 })
 
