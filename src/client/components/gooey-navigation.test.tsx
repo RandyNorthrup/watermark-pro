@@ -30,16 +30,17 @@ const items = [
 describe('gooey navigation', () => {
   it('keeps destinations out of the tab order when collapsed and restores focus on Escape', async () => {
     const user = userEvent.setup()
-    render(<GooeyNavigation items={items} label="Primary" />)
+    const { container } = render(<GooeyNavigation items={items} label="Primary" />)
     expect(screen.queryByRole('link', { name: 'Videos' })).toBeNull()
-    const trigger = screen.getByRole('button', { name: 'Open navigation' })
-    trigger.focus()
+    screen.getByRole('button', { name: 'Open navigation' }).focus()
     await user.keyboard('{Enter}')
     const nav = await screen.findByRole('navigation', { name: 'Primary' })
     expect(within(nav).getByRole('link', { name: 'Documents' })).toHaveAttribute(
       'href',
       '/app/documents',
     )
+    // The handle is hidden from assistive technology while the panel's own close button leads.
+    const trigger = container.querySelector('.gooey-trigger')
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByRole('button', { name: 'Close navigation' })).toBeVisible()
     await user.keyboard('{Escape}')
@@ -57,7 +58,7 @@ describe('gooey navigation', () => {
       </>,
     )
     await user.click(screen.getByRole('button', { name: 'Open navigation' }))
-    await user.click(screen.getByRole('button', { name: 'Close navigation' }))
+    await user.click(await screen.findByRole('button', { name: 'Close navigation' }))
     expect(screen.queryByRole('link', { name: 'Videos' })).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Open navigation' }))
     const navigation = screen.getByRole('navigation', { name: 'Primary' })
@@ -70,7 +71,7 @@ describe('gooey navigation', () => {
     const user = userEvent.setup()
     render(<GooeyNavigation items={items} label="Primary" />)
     await user.click(screen.getByRole('button', { name: 'Open navigation' }))
-    await user.click(screen.getByRole('link', { name: 'Documents' }))
+    await user.click(await screen.findByRole('link', { name: 'Documents' }))
     expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument()
     await user.click(screen.getByRole('link', { name: 'Videos' }))
     expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull()

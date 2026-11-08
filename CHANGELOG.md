@@ -30,11 +30,13 @@ what was planned; superseded entries stay.
   trace). A fresh document's first render skips the router's scroll reset, which
   only forced a full layout inside the commit; reloads and history traversals
   still restore scroll positions.
-- **The language menu loads on first intent.** Its trigger is a plain announced
-  menu button; the Radix menu with its focus, positioning and dismissal code
-  loads on hover, focus or press and opens already focused (the first language
-  when opened from the keyboard). The sign-in and sign-up pages' route code fell
-  from 96.8 to 64.3 kB gzip.
+- **Closed chrome overlays load on first intent.** The language menu, account
+  menu, workspace switcher, phone navigation sheet and floating desktop
+  navigation render plain announced triggers (`ui/deferred-overlay.ts`); each
+  real Radix menu, sheet or popover loads on hover, focus or press and mounts
+  already open, focusing the first item when opened from the keyboard. The
+  sign-in and sign-up pages' route code fell from 96.8 to 64.3 kB gzip and the
+  authenticated shell's from 109.9 to 73.7 kB.
 - **The metric-matched Inter fallback also names Liberation Sans and Arimo.**
   `local()` matches exact installed font names, so the Arial-based fallback never
   applied on Linux or ChromeOS, where Arial's metric-compatible equivalents ship

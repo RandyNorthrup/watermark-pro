@@ -131,7 +131,9 @@ describe('authenticated layout', () => {
       expect(screen.queryByRole('region', { name: 'Recent work' })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: 'Tools' })).not.toBeInTheDocument()
       await userEvent.setup().click(screen.getByRole('button', { name: 'Open navigation' }))
-      const tools = within(screen.getByRole('navigation', { name: 'Primary' })).getAllByRole('link')
+      const tools = within(await screen.findByRole('navigation', { name: 'Primary' })).getAllByRole(
+        'link',
+      )
       expect(tools.map((link) => link.textContent)).toEqual([
         'Images',
         'Documents',

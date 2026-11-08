@@ -282,7 +282,7 @@ describe('application shell', () => {
     await user.click(await screen.findByRole('menuitem', { name: 'Account settings' }))
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/account'))
     await user.click(screen.getByRole('button', { name: 'Open navigation' }))
-    const settingsNav = screen.getByRole('navigation', { name: 'Primary' })
+    const settingsNav = await screen.findByRole('navigation', { name: 'Primary' })
     expect(within(settingsNav).getByRole('link', { name: 'Account settings' })).toBeInTheDocument()
     expect(within(settingsNav).getByRole('link', { name: 'Invite people' })).toBeInTheDocument()
     expect(within(settingsNav).queryByRole('link', { name: 'Saved Watermarks' })).toBeNull()
@@ -302,7 +302,7 @@ describe('application shell', () => {
     await screen.findByRole('heading', { level: 1, name: 'Administration' })
 
     await user.click(screen.getByRole('button', { name: 'Open navigation' }))
-    const adminNav = screen.getByRole('navigation', { name: 'Administration sections' })
+    const adminNav = await screen.findByRole('navigation', { name: 'Administration sections' })
     expect(within(adminNav).getByRole('link', { name: 'Users' })).toHaveAttribute(
       'aria-current',
       'page',
@@ -318,7 +318,7 @@ describe('application shell', () => {
     await waitFor(() => expect(router.state.location.search).toEqual({ section: 'health' }))
     await user.click(screen.getByRole('button', { name: 'Open navigation' }))
     expect(
-      within(screen.getByRole('navigation', { name: 'Administration sections' })).getByRole(
+      within(await screen.findByRole('navigation', { name: 'Administration sections' })).getByRole(
         'link',
         { name: 'Health' },
       ),
