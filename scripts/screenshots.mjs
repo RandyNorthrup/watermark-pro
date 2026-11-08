@@ -296,8 +296,11 @@ async function navigateTo(page, destinationLabel, expectedHref) {
     name: label(locale, 'shell.openNavigation'),
     exact: true,
   })
+  // Overlays load on first use; each branch waits for what it opened before reading it.
+  const menuLabel = label(locale, 'shell.menu')
   if (await radial.isVisible()) {
     await radial.click()
+    await page.getByRole('dialog', { name: menuLabel, exact: true }).waitFor()
     if (
       await followVisibleDestination(page.getByRole('navigation'), destinationLabel, expectedHref)
     )
@@ -306,11 +309,11 @@ async function navigateTo(page, destinationLabel, expectedHref) {
   }
   // The active navigation is authoritative: translated Admin and workspace
   // labels can coincide, while the account menu targets a different section.
-  const menuLabel = label(locale, 'shell.menu')
   const menu = page.getByRole('button', { name: menuLabel, exact: true })
   if (await menu.isVisible()) {
     await menu.click()
     const dialog = page.getByRole('dialog', { name: menuLabel, exact: true })
+    await dialog.waitFor()
     if (await followVisibleDestination(dialog, destinationLabel, expectedHref)) {
       await expect(dialog).toHaveCount(0)
       return
@@ -324,6 +327,7 @@ async function navigateTo(page, destinationLabel, expectedHref) {
     throw new Error(`No visible navigation destination: ${destinationLabel}`)
   const accountMenu = page.locator('header button[aria-haspopup="menu"]').last()
   await accountMenu.click()
+  await page.getByRole('menu').waitFor()
   const accountDestination = page.getByRole('menuitem', {
     name:
       destinationLabel === label(locale, 'shell.nav.members')

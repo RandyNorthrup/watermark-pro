@@ -148,6 +148,8 @@ export async function navigateTo(page: Page, label: string) {
   const radial = page.getByRole('button', { name: 'Open navigation', exact: true })
   if (await radial.isVisible()) {
     await radial.click()
+    // Overlays load on first use; wait for the opened rail before reading it.
+    await sidebar.or(adminSidebar).waitFor()
     for (const container of [sidebar, adminSidebar]) {
       const target = container.getByRole('link', { name: label, exact: true })
       if (await target.isVisible()) {
@@ -159,6 +161,7 @@ export async function navigateTo(page: Page, label: string) {
   }
   const accountMenu = page.getByRole('button', { name: /^Account menu for / })
   await accountMenu.click()
+  await page.getByRole('menu').waitFor()
   const accountDestination = page.getByRole('menuitem', {
     name: label === 'Members' ? 'Manage Access' : label,
     exact: true,
@@ -195,7 +198,14 @@ export async function expectNoNavLink(page: Page, label: string) {
   await page.locator(SIDEBAR_SELECTOR).waitFor({ state: 'attached' })
   const radial = page.getByRole('button', { name: 'Open navigation', exact: true })
   const isRadial = await radial.isVisible()
-  if (isRadial) await radial.click()
+  if (isRadial) {
+    await radial.click()
+    // Absence is only meaningful once the opened rail has rendered.
+    await page
+      .getByRole('navigation', { name: 'Primary', exact: true })
+      .or(page.getByRole('navigation', { name: 'Administration sections', exact: true }))
+      .waitFor()
+  }
   const menu = page.getByRole('button', { name: 'Menu', exact: true })
   const isPhoneMenu = await menu.isVisible()
   if (isPhoneMenu) {
@@ -209,6 +219,7 @@ export async function expectNoNavLink(page: Page, label: string) {
   }
   if (isRadial) await page.keyboard.press('Escape')
   await page.getByRole('button', { name: /^Account menu for / }).click()
+  await page.getByRole('menu').waitFor()
   await expect(page.getByRole('menuitem', { name: label, exact: true })).toHaveCount(0)
   await page.keyboard.press('Escape')
 }

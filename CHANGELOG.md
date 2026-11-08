@@ -36,7 +36,9 @@ what was planned; superseded entries stay.
   real Radix menu, sheet or popover loads on hover, focus or press and mounts
   already open, focusing the first item when opened from the keyboard. The
   sign-in and sign-up pages' route code fell from 96.8 to 64.3 kB gzip and the
-  authenticated shell's from 109.9 to 73.7 kB.
+  authenticated shell's from 109.9 to 73.7 kB. The e2e and screenshot navigation
+  helpers now wait for the menu, sheet or rail they open before reading it, and
+  before asserting that a destination is absent.
 - **The metric-matched Inter fallback also names Liberation Sans and Arimo.**
   `local()` matches exact installed font names, so the Arial-based fallback never
   applied on Linux or ChromeOS, where Arial's metric-compatible equivalents ship
