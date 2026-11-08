@@ -1,6 +1,7 @@
 import { type QueryClient, queryOptions } from '@tanstack/react-query'
 
 import { ApiRequestError, fetchJson, isTransportFailure } from './api'
+import { loadAuthClient } from './load-auth-client'
 import { captureOfflineGeneration, captureOfflineOwner } from './offline-context'
 import { auditListResponseSchema, publicConfigSchema } from '../../shared/api-core'
 import type { BootstrapSnapshot } from '../../shared/bootstrap'
@@ -29,16 +30,6 @@ function unwrap<T>(path: string, result: AuthResult<T>): T | null {
     throw new ApiRequestError(path, result.error.status ?? 0, result.error.message)
   }
   return result.data
-}
-
-/**
- * The Better Auth client loads with the first request that needs it. Signed-in
- * pages start from the bootstrap snapshot, so it stays off their critical path
- * (PLAN.md §5.5).
- */
-async function loadAuthClient() {
-  const { authClient } = await import('./auth-client')
-  return authClient
 }
 
 export const sessionQueryOptions = queryOptions({

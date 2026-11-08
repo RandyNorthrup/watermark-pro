@@ -22,9 +22,9 @@ import {
   type WorkspaceLinkDto,
 } from '../../shared/workspace-access'
 import { apiRequest, fetchJson } from '../lib/api'
-import { authClient } from '../lib/auth-client'
 import { describeAuthError, describeError } from '../lib/errors'
 import { formatDateTime } from '../lib/format-date'
+import { loadAuthClient } from '../lib/load-auth-client'
 import { captureOfflineOwner } from '../lib/offline-context'
 import { ORGANIZATION_QUERY_KEY } from '../lib/queries'
 
@@ -149,6 +149,7 @@ function LegacyInvitations({
 }) {
   const { t } = useTranslation()
   const cancel = useAccessMutation(organization.id, userId, async (invitationId: string) => {
+    const authClient = await loadAuthClient()
     const result = await authClient.organization.cancelInvitation({ invitationId })
     const failure = describeAuthError(result.error)
     if (failure !== null) throw new Error(failure)

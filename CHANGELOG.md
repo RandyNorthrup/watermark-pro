@@ -49,7 +49,8 @@ what was planned; superseded entries stay.
   the whole tool.
 - **The auth client loads with the first request that needs it.** Signed-in
   pages start from the bootstrap snapshot, so `lib/queries.ts` imports Better
-  Auth inside its query functions and the chrome's site-admin check lives in
+  Auth inside its query functions (`lib/load-auth-client.ts`, also used by the
+  members page's invitation actions) and the chrome's site-admin check lives in
   `lib/platform-admin.ts`, apart from the administration API. The shared
   authenticated route code fell from 73.7 to 54.9 kB gzip.
 - **The metric-matched Inter fallback also names Liberation Sans and Arimo.**
