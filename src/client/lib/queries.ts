@@ -1,7 +1,6 @@
 import { type QueryClient, queryOptions } from '@tanstack/react-query'
 
 import { ApiRequestError, fetchJson, isTransportFailure } from './api'
-import { authClient } from './auth-client'
 import { captureOfflineGeneration, captureOfflineOwner } from './offline-context'
 import { auditListResponseSchema, publicConfigSchema } from '../../shared/api-core'
 import type { BootstrapSnapshot } from '../../shared/bootstrap'
@@ -32,11 +31,22 @@ function unwrap<T>(path: string, result: AuthResult<T>): T | null {
   return result.data
 }
 
+/**
+ * The Better Auth client loads with the first request that needs it. Signed-in
+ * pages start from the bootstrap snapshot, so it stays off their critical path
+ * (PLAN.md §5.5).
+ */
+async function loadAuthClient() {
+  const { authClient } = await import('./auth-client')
+  return authClient
+}
+
 export const sessionQueryOptions = queryOptions({
   queryKey: ['session'],
   queryFn: async () => {
     const generation = captureOfflineGeneration()
     try {
+      const authClient = await loadAuthClient()
       const result = await authClient.getSession()
       generation.assertCurrent()
       const response = unwrap('/api/auth/get-session', result)
@@ -50,15 +60,18 @@ export const sessionQueryOptions = queryOptions({
 
 export const organizationsQueryOptions = queryOptions({
   queryKey: ['organizations'],
-  queryFn: async () =>
-    shellOrganizationsSchema.parse(
+  queryFn: async () => {
+    const authClient = await loadAuthClient()
+    return shellOrganizationsSchema.parse(
       unwrap('/api/auth/organization/list', await authClient.organization.list()) ?? [],
-    ),
+    )
+  },
 })
 
 export const activeOrganizationQueryOptions = queryOptions({
   queryKey: ['organization', 'active'],
   queryFn: async () => {
+    const authClient = await loadAuthClient()
     const result = unwrap(
       '/api/auth/organization/get-full-organization',
       await authClient.organization.getFullOrganization(),
@@ -70,6 +83,7 @@ export const activeOrganizationQueryOptions = queryOptions({
 export const activeMemberRoleQueryOptions = queryOptions({
   queryKey: ['organization', 'active', 'role'],
   queryFn: async () => {
+    const authClient = await loadAuthClient()
     const result = unwrap(
       '/api/auth/organization/get-active-member-role',
       await authClient.organization.getActiveMemberRole(),

@@ -14,10 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { isPlatformAdmin } from '../lib/admin'
 import { type ActiveOrganization, authClient, type SessionData } from '../lib/auth-client'
 import { clearOfflineAccount } from '../lib/offline-account'
 import { currentOfflineUser, hasOfflineDatabase } from '../lib/offline-context'
+import { isPlatformAdmin } from '../lib/platform-admin'
 
 const WorkspaceAccessDialog = lazy(async () => {
   const module = await import('./workspace-access-dialog')

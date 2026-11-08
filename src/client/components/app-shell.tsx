@@ -33,12 +33,12 @@ import { SupportPrompt } from './support-prompt'
 import { ThemeToggle } from './theme-toggle'
 import { useDeferredOverlay } from './ui/deferred-overlay'
 import { ADMIN_SECTIONS, adminSearchSchema, type AdminSection } from '../../shared/admin-sections'
-import { isPlatformAdmin } from '../lib/admin'
 import type { ActiveOrganization, SessionData } from '../lib/auth-client'
 import { cn } from '../lib/cn'
 import { deferredComponent } from '../lib/deferred-component'
 import { hasOfflineDatabase } from '../lib/offline-context'
 import { offlineStatus, subscribeOfflineStatus } from '../lib/offline-status'
+import { isPlatformAdmin } from '../lib/platform-admin'
 
 const OfflinePanel = lazy(async () => {
   const module = await import('./offline-panel')

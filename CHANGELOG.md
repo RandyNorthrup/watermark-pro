@@ -47,6 +47,11 @@ what was planned; superseded entries stay.
   Those pages' critical path fell from 250–290 kB to 78–92 kB gzip; their
   largest paint (the heading text, or the editor's sample scene) had waited for
   the whole tool.
+- **The auth client loads with the first request that needs it.** Signed-in
+  pages start from the bootstrap snapshot, so `lib/queries.ts` imports Better
+  Auth inside its query functions and the chrome's site-admin check lives in
+  `lib/platform-admin.ts`, apart from the administration API. The shared
+  authenticated route code fell from 73.7 to 54.9 kB gzip.
 - **The metric-matched Inter fallback also names Liberation Sans and Arimo.**
   `local()` matches exact installed font names, so the Arial-based fallback never
   applied on Linux or ChromeOS, where Arial's metric-compatible equivalents ship

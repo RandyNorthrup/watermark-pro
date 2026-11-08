@@ -13,7 +13,7 @@ import {
   adminOrganizationListSchema,
   auditListResponseSchema,
 } from '../../shared/api'
-import { canManageSite, siteRoleSchema, type AssignableSiteRole } from '../../shared/site-roles'
+import { siteRoleSchema, type AssignableSiteRole } from '../../shared/site-roles'
 
 export const ADMIN_USER_PAGE_SIZE = 50
 
@@ -31,11 +31,6 @@ export const adminUserSchema = z.object({
 export type AdminUser = z.infer<typeof adminUserSchema>
 
 const userListSchema = z.object({ users: z.array(adminUserSchema), total: z.number() })
-
-/** Site management comes from the account role, never workspace ownership. */
-export function isPlatformAdmin(user: { role?: string | null | undefined }): boolean {
-  return canManageSite(user.role)
-}
 
 export const ADMIN_QUERY_KEY = ['admin'] as const
 

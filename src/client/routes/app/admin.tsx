@@ -25,7 +25,6 @@ import {
   type AdminUser,
   adminUsersQueryOptions,
   banUser,
-  isPlatformAdmin,
   revokeUserSessions,
   setUserRole,
   unbanUser,
@@ -33,6 +32,7 @@ import {
 import { describeError } from '../../lib/errors'
 import { formatBytes } from '../../lib/format-bytes'
 import { formatDateTime } from '../../lib/format-date'
+import { isPlatformAdmin } from '../../lib/platform-admin'
 import { resetShellQueries } from '../../lib/queries'
 
 export const Route = createFileRoute('/app/admin')({

@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest'
 
-import { adminUserSchema, isPlatformAdmin } from './admin'
+import { adminUserSchema } from './admin'
+import { isPlatformAdmin } from './platform-admin'
 
 const account = {
   id: 'account',
