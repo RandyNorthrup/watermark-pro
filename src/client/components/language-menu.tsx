@@ -1,72 +1,79 @@
 import { useQuery } from '@tanstack/react-query'
 import { Languages } from 'lucide-react'
+import { type ButtonHTMLAttributes, lazy, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { type Locale, SUPPORTED_LOCALES } from '../../shared/locales'
-import { setLocale, useLocale } from '../i18n'
-import { saveLocale } from '../lib/locale-api'
-import { captureOfflineGeneration } from '../lib/offline-context'
 import { sessionQueryOptions } from '../lib/queries'
 import { Button } from './ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu'
+
+async function loadDropdown() {
+  return await import('./language-dropdown')
+}
+
+function preloadDropdown(): void {
+  void loadDropdown()
+}
+
+const LanguageDropdown = lazy(async () => {
+  const { LanguageDropdown: dropdown } = await loadDropdown()
+  return { default: dropdown }
+})
+
+/** Keys that open a menu button, as the loaded menu's own trigger handles them. */
+const OPENING_KEYS = new Set(['Enter', ' ', 'ArrowDown'])
+
+function LanguageTrigger(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  const { t } = useTranslation()
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      aria-label={t('language.menuLabel')}
+      {...props}
+    >
+      <Languages aria-hidden />
+    </Button>
+  )
+}
 
 /**
- * Picks the interface language (M18). Shows every supported locale by its
- * native name; choosing one applies immediately, persists to `localStorage`,
- * and updates `<html lang>`/`dir`. Signed-in callers additionally save it to the
- * account. Reached from the app chrome and the signed-out landing/auth pages,
- * so the account save only runs when there is a session.
+ * Picks the interface language (M18), from the app chrome and the signed-out
+ * landing/auth pages; the account save only runs when there is a session. The
+ * menu's focus, positioning and dismissal code loads when someone first
+ * reaches for the trigger (hover, focus or press) rather than with the page:
+ * evaluating it for a closed menu was 40 % of the sign-in page's route-code task
+ * on a phone (PLAN.md §5.5).
  */
 export function LanguageMenu() {
-  const { t } = useTranslation()
-  const active = useLocale()
   const { data: session } = useQuery(sessionQueryOptions)
+  const [opening, setOpening] = useState<{ isKeyboardOpen: boolean } | null>(null)
 
-  async function choose(locale: Locale): Promise<void> {
-    // Bind the user's action before a catalogue download can yield to an
-    // account change. Public/local language choices need no private owner.
-    const account =
-      session === undefined || session === null
-        ? null
-        : {
-            userId: session.user.id,
-            sessionId: session.session.id,
-            ...captureOfflineGeneration(),
-          }
-    await setLocale(locale)
-    if (account !== null) {
-      try {
-        await saveLocale(locale, account)
-      } catch {
-        // The language already switched locally and is saved in localStorage;
-        // the account copy is best-effort and retried on the next change.
-      }
-    }
+  if (opening === null) {
+    return (
+      <LanguageTrigger
+        aria-haspopup="menu"
+        aria-expanded={false}
+        onPointerEnter={preloadDropdown}
+        onFocus={preloadDropdown}
+        onPointerDown={(event) => {
+          if (event.button === 0 && !event.ctrlKey) setOpening({ isKeyboardOpen: false })
+        }}
+        onKeyDown={(event) => {
+          if (!OPENING_KEYS.has(event.key)) return
+          event.preventDefault()
+          setOpening({ isKeyboardOpen: true })
+        }}
+      />
+    )
   }
-
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button type="button" variant="ghost" size="icon" aria-label={t('language.menuLabel')}>
-          <Languages aria-hidden />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" landmarkLabel={t('language.menuLabel')}>
-        {SUPPORTED_LOCALES.map((locale) => (
-          <DropdownMenuItem
-            key={locale.code}
-            onSelect={() => void choose(locale.code)}
-            aria-current={locale.code === active}
-          >
-            {locale.name}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Suspense fallback={<LanguageTrigger aria-haspopup="menu" aria-expanded={false} aria-busy />}>
+      <LanguageDropdown
+        trigger={<LanguageTrigger />}
+        session={session}
+        isKeyboardOpen={opening.isKeyboardOpen}
+      />
+    </Suspense>
   )
 }

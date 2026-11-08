@@ -46,7 +46,7 @@ async function mountMenu(
 async function pickLanguage(nativeName: string): Promise<void> {
   const user = userEvent.setup()
   await user.click(screen.getByRole('button', { name: 'Change language' }))
-  await user.click(within(screen.getByRole('menu')).getByText(nativeName))
+  await user.click(within(await screen.findByRole('menu')).getByText(nativeName))
 }
 
 /** The JSON body of a captured `fetch` call, narrowed off `BodyInit`. */
@@ -121,26 +121,55 @@ describe('LanguageMenu', () => {
   it('keeps the page accessible while choosing a language and restores focus on Escape', async () => {
     await mountMenu(false)
     const user = userEvent.setup()
-    const trigger = screen.getByRole('button', { name: 'Change language' })
-    trigger.focus()
+    screen.getByRole('button', { name: 'Change language' }).focus()
     await user.keyboard('{ArrowDown}')
-    const region = screen.getByRole('region', { name: 'Change language' })
+    const region = await screen.findByRole('region', { name: 'Change language' })
     expect(within(region).getByRole('menu')).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Account settings' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Continue editing' })).toBeVisible()
-    expect(within(region).getByRole('menuitem', { name: 'English' })).toHaveFocus()
+    await waitFor(() =>
+      expect(within(region).getByRole('menuitem', { name: 'English' })).toHaveFocus(),
+    )
     await user.keyboard('{End}')
     expect(within(region).getByRole('menuitem', { name: 'العربية' })).toHaveFocus()
     await user.keyboard('{Escape}')
-    await waitFor(() => expect(trigger).toHaveFocus())
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Change language' })).toHaveFocus(),
+    )
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
     expect(document.documentElement.lang).toBe('en')
+  })
+
+  it('renders only an announced menu button until someone reaches for it', async () => {
+    await mountMenu(false)
+    const trigger = screen.getByRole('button', { name: 'Change language' })
+    expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+
+  it('opens normally again after the first load', async () => {
+    await mountMenu(false)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Change language' }))
+    await screen.findByRole('menu')
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
+    const trigger = screen.getByRole('button', { name: 'Change language' })
+    expect(trigger).toHaveFocus()
+    await user.keyboard('{ArrowDown}')
+    const menu = await screen.findByRole('menu')
+    await waitFor(() =>
+      expect(within(menu).getByRole('menuitem', { name: 'English' })).toHaveFocus(),
+    )
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('allows an outside control to dismiss the chooser without stealing its focus', async () => {
     await mountMenu(false)
     const user = userEvent.setup()
     await user.click(screen.getByRole('button', { name: 'Change language' }))
+    await screen.findByRole('menu')
     const outside = screen.getByRole('button', { name: 'Continue editing' })
     await user.click(outside)
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())

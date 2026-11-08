@@ -30,6 +30,11 @@ what was planned; superseded entries stay.
   trace). A fresh document's first render skips the router's scroll reset, which
   only forced a full layout inside the commit; reloads and history traversals
   still restore scroll positions.
+- **The language menu loads on first intent.** Its trigger is a plain announced
+  menu button; the Radix menu with its focus, positioning and dismissal code
+  loads on hover, focus or press and opens already focused (the first language
+  when opened from the keyboard). The sign-in and sign-up pages' route code fell
+  from 96.8 to 64.3 kB gzip.
 - **Each Lighthouse trace runs in a new browser.** The audit reused one renderer
   across a page's five runs, so Lighthouse's debugger attach walked the earlier
   runs' leftover heap inside the measured load, adding an "unattributable" 400–690
