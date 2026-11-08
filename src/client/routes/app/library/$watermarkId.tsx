@@ -3,7 +3,8 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { WatermarkDesigner } from '../../../components/designer/watermark-designer'
+import { watermarkDesigner } from '../../../components/tool-modules'
+import { ToolSuspense } from '../../../components/tool-suspense'
 import { Alert } from '../../../components/ui/alert'
 import { Spinner } from '../../../components/ui/spinner'
 import { useActiveOrganization } from '../../../lib/active-organization'
@@ -15,7 +16,10 @@ import { noteRecentWork } from '../../../lib/recent-work-events'
 import { canRole } from '../../../lib/roles'
 
 export const Route = createFileRoute('/app/library/$watermarkId')({
-  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
+  loader: async ({ context }) => {
+    watermarkDesigner.preload()
+    return await readActiveMemberRole(context.queryClient)
+  },
   component: EditPresetPage,
 })
 
@@ -65,16 +69,18 @@ function EditPresetPage() {
           {t(canManage ? 'library.editSubtitleManage' : 'library.editSubtitleReadOnly')}
         </p>
       </header>
-      <WatermarkDesigner
-        key={preset.id}
-        organizationId={organization.id}
-        initial={preset}
-        canManage={canManage}
-        canManageLogos={canRole(membership?.role, { watermark: ['create'] })}
-        onSaved={() => {
-          void navigate({ to: '/app/library' })
-        }}
-      />
+      <ToolSuspense>
+        <watermarkDesigner.Component
+          key={preset.id}
+          organizationId={organization.id}
+          initial={preset}
+          canManage={canManage}
+          canManageLogos={canRole(membership?.role, { watermark: ['create'] })}
+          onSaved={() => {
+            void navigate({ to: '/app/library' })
+          }}
+        />
+      </ToolSuspense>
     </div>
   )
 }

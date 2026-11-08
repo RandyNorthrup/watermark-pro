@@ -1,7 +1,8 @@
 import { Suspense } from 'react'
 
 import { type GooeyDestination, GooeyTrigger } from './shell-triggers'
-import { deferredComponent, useDeferredOverlay } from './ui/deferred-overlay'
+import { useDeferredOverlay } from './ui/deferred-overlay'
+import { deferredComponent } from '../lib/deferred-component'
 
 const { Component: GooeyPanel, preload: preloadPanel } = deferredComponent(async () => {
   const { GooeyPanel: panel } = await import('./gooey-panel')

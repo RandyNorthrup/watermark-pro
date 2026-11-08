@@ -3,9 +3,10 @@ import { Languages } from 'lucide-react'
 import { type ButtonHTMLAttributes, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { deferredComponent } from '../lib/deferred-component'
 import { sessionQueryOptions } from '../lib/queries'
 import { Button } from './ui/button'
-import { deferredComponent, useDeferredOverlay } from './ui/deferred-overlay'
+import { useDeferredOverlay } from './ui/deferred-overlay'
 
 const { Component: LanguageDropdown, preload: preloadDropdown } = deferredComponent(async () => {
   const { LanguageDropdown: dropdown } = await import('./language-dropdown')

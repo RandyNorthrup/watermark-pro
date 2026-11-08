@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { newPresetSearchSchema } from '../../../../shared/client-search'
 import { SAMPLE_SCENE_PATH } from '../../../../shared/constants'
 import { watermarkTemplate } from '../../../../shared/watermark-templates'
-import { WatermarkDesigner } from '../../../components/designer/watermark-designer'
+import { watermarkDesigner } from '../../../components/tool-modules'
+import { ToolSuspense } from '../../../components/tool-suspense'
 import { Alert } from '../../../components/ui/alert'
 import { useActiveOrganization } from '../../../lib/active-organization'
 import { readActiveMemberRole } from '../../../lib/queries'
@@ -14,7 +15,10 @@ import { blankSpec, defaultSpecFor } from '../../../lib/spec-edit'
 export const Route = createFileRoute('/app/library/new')({
   validateSearch: newPresetSearchSchema,
   staticData: { preloadImages: [SAMPLE_SCENE_PATH] },
-  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
+  loader: async ({ context }) => {
+    watermarkDesigner.preload()
+    return await readActiveMemberRole(context.queryClient)
+  },
   component: NewPresetPage,
 })
 
@@ -42,20 +46,22 @@ function NewPresetPage() {
         </h1>
         <p className="mt-1 text-sm text-ink-muted">{t('library.newPresetSubtitle')}</p>
       </header>
-      <WatermarkDesigner
-        key={template?.id ?? kind ?? 'text'}
-        organizationId={organization.id}
-        initialSpec={
-          template?.spec ?? (kind === 'qr' ? defaultSpecFor('qr', blankSpec()) : undefined)
-        }
-        initialName={template === undefined ? undefined : t(template.label)}
-        initialFolderId={folderId ?? null}
-        canManage
-        canManageLogos
-        onSaved={(saved) => {
-          void navigate({ to: '/app/library', search: { folderId: saved.folderId ?? undefined } })
-        }}
-      />
+      <ToolSuspense>
+        <watermarkDesigner.Component
+          key={template?.id ?? kind ?? 'text'}
+          organizationId={organization.id}
+          initialSpec={
+            template?.spec ?? (kind === 'qr' ? defaultSpecFor('qr', blankSpec()) : undefined)
+          }
+          initialName={template === undefined ? undefined : t(template.label)}
+          initialFolderId={folderId ?? null}
+          canManage
+          canManageLogos
+          onSaved={(saved) => {
+            void navigate({ to: '/app/library', search: { folderId: saved.folderId ?? undefined } })
+          }}
+        />
+      </ToolSuspense>
     </div>
   )
 }

@@ -3,6 +3,7 @@
     "menuLabel": "Taal wijzigen"
   },
   "shell": {
+    "loadingTools": "Hulpmiddelen worden geladen",
     "nav": {
       "library": "Opgeslagen Watermerken",
       "editor": "Afbeeldingen",

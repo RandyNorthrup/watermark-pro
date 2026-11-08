@@ -3,6 +3,7 @@
     "menuLabel": "언어 변경"
   },
   "shell": {
+    "loadingTools": "도구를 불러오는 중",
     "nav": {
       "library": "저장된 워터마크",
       "editor": "이미지",

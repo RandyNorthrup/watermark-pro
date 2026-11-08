@@ -218,7 +218,7 @@ describe('preset designer', () => {
     const api = installLibraryApi({ watermarks: [makeWatermark()] })
     const { router } = renderApp('/app/library/new?kind=qr')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('New QR code')
-    await user.type(screen.getByLabelText('Watermark name'), 'Portfolio QR')
+    await user.type(await screen.findByLabelText('Watermark name'), 'Portfolio QR')
     await user.clear(screen.getByLabelText('QR code content'))
     await user.paste('https://example.com/portfolio')
     await user.click(screen.getByRole('button', { name: 'Save watermark' }))

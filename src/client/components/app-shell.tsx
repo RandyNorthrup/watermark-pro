@@ -31,11 +31,12 @@ import {
 } from './shell-triggers'
 import { SupportPrompt } from './support-prompt'
 import { ThemeToggle } from './theme-toggle'
-import { deferredComponent, useDeferredOverlay } from './ui/deferred-overlay'
+import { useDeferredOverlay } from './ui/deferred-overlay'
 import { ADMIN_SECTIONS, adminSearchSchema, type AdminSection } from '../../shared/admin-sections'
 import { isPlatformAdmin } from '../lib/admin'
 import type { ActiveOrganization, SessionData } from '../lib/auth-client'
 import { cn } from '../lib/cn'
+import { deferredComponent } from '../lib/deferred-component'
 import { hasOfflineDatabase } from '../lib/offline-context'
 import { offlineStatus, subscribeOfflineStatus } from '../lib/offline-status'
 

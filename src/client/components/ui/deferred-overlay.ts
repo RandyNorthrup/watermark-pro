@@ -1,29 +1,8 @@
-import {
-  type ComponentType,
-  type FocusEvent,
-  type KeyboardEvent,
-  lazy,
-  type PointerEvent,
-  useRef,
-  useState,
-} from 'react'
+import { type FocusEvent, type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
 
 /** How someone first reached for an overlay whose code had not loaded yet. */
 export interface OverlayOpening {
   isKeyboardOpen: boolean
-}
-
-/**
- * A lazily loaded overlay component with a preload that starts its download
- * early; both share the browser's single module fetch.
- */
-export function deferredComponent<Props extends object>(load: () => Promise<ComponentType<Props>>) {
-  return {
-    preload: (): void => {
-      void load()
-    },
-    Component: lazy(async () => ({ default: await load() })),
-  }
 }
 
 /** Keys that open a menu button, as Radix's menu trigger handles them. */

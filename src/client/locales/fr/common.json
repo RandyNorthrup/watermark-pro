@@ -3,6 +3,7 @@
     "menuLabel": "Changer de langue"
   },
   "shell": {
+    "loadingTools": "Chargement des outils",
     "nav": {
       "library": "Filigranes Enregistrés",
       "editor": "Images",

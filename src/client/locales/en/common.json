@@ -3,6 +3,7 @@
     "menuLabel": "Change language"
   },
   "shell": {
+    "loadingTools": "Loading tools",
     "nav": {
       "library": "Saved Watermarks",
       "editor": "Images",

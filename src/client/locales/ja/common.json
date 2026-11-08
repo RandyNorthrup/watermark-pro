@@ -3,6 +3,7 @@
     "menuLabel": "言語を変更"
   },
   "shell": {
+    "loadingTools": "ツールを読み込み中",
     "nav": {
       "library": "保存した透かし",
       "editor": "画像",

@@ -3,6 +3,7 @@
     "menuLabel": "Mudar idioma"
   },
   "shell": {
+    "loadingTools": "Carregando ferramentas",
     "nav": {
       "library": "Marcas D’Água Salvas",
       "editor": "Imagens",

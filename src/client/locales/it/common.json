@@ -3,6 +3,7 @@
     "menuLabel": "Cambia lingua"
   },
   "shell": {
+    "loadingTools": "Caricamento degli strumenti",
     "nav": {
       "library": "Filigrane Salvate",
       "editor": "Immagini",

@@ -3,6 +3,7 @@
     "menuLabel": "Sprache ändern"
   },
   "shell": {
+    "loadingTools": "Werkzeuge werden geladen",
     "nav": {
       "library": "Gespeicherte Wasserzeichen",
       "editor": "Bilder",

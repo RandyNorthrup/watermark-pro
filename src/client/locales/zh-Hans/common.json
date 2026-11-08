@@ -3,6 +3,7 @@
     "menuLabel": "切换语言"
   },
   "shell": {
+    "loadingTools": "正在加载工具",
     "nav": {
       "library": "已保存的水印",
       "editor": "图像",

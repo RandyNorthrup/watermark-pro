@@ -1,14 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
+import { videoTool } from '../../components/tool-modules'
+import { ToolSuspense } from '../../components/tool-suspense'
 import { Alert } from '../../components/ui/alert'
-import { VideoTool } from '../../components/video/video-tool'
 import { useActiveOrganization } from '../../lib/active-organization'
 import { readActiveMemberRole } from '../../lib/queries'
 import { canRole } from '../../lib/roles'
 
 export const Route = createFileRoute('/app/video')({
-  loader: async ({ context }) => await readActiveMemberRole(context.queryClient),
+  loader: async ({ context }) => {
+    videoTool.preload()
+    return await readActiveMemberRole(context.queryClient)
+  },
   component: VideoPage,
 })
 
@@ -25,10 +29,12 @@ function VideoPage() {
         <h1 className="text-xl font-semibold tracking-tight">{t('video.heading')}</h1>
         <p className="text-xs text-ink-muted">{t('video.description')}</p>
       </header>
-      <VideoTool
-        organizationId={organization.id}
-        canCreatePresets={canRole(membership?.role, { watermark: ['create'] })}
-      />
+      <ToolSuspense>
+        <videoTool.Component
+          organizationId={organization.id}
+          canCreatePresets={canRole(membership?.role, { watermark: ['create'] })}
+        />
+      </ToolSuspense>
     </div>
   )
 }
