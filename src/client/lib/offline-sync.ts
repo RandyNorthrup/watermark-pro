@@ -12,6 +12,7 @@ import {
 import { pendingOperations, updatePendingOperation } from './offline-database'
 import { replayFolderChange } from './offline-folder-replay'
 import type { OfflineChange, PendingOperation } from './offline-model'
+import { refreshOfflineStatus } from './offline-pending'
 import { updateOfflineStatus } from './offline-status'
 import { assetDtoSchema, photoDeleteResponseSchema, photoDtoSchema } from '../../shared/api'
 import { type WatermarkDto, watermarkDtoSchema } from '../../shared/api-watermark'
@@ -154,18 +155,6 @@ async function rebaseFollowingEdits(
       },
     })
   }
-}
-
-/** Refresh the status even when offline, so restored work is visible before a network request. */
-export async function refreshOfflineStatus(): Promise<number> {
-  const owner = captureOfflineOwner()
-  const operations = await pendingOperations(owner.userId)
-  owner.assertCurrent()
-  updateOfflineStatus({
-    pending: operations.length,
-    blocked: operations.filter((op) => op.state !== 'pending').length,
-  })
-  return operations.length
 }
 
 async function drain(queryClient: QueryClient): Promise<void> {

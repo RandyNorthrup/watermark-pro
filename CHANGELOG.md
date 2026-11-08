@@ -53,7 +53,10 @@ what was planned; superseded entries stay.
   Auth inside its query functions (`lib/load-auth-client.ts`, also used by the
   members page's invitation actions) and the chrome's site-admin check lives in
   `lib/platform-admin.ts`, apart from the administration API. The shared
-  authenticated route code fell from 73.7 to 54.9 kB gzip.
+  authenticated route code fell from 73.7 to 54.9 kB gzip. The offline status
+  recount moved to `lib/offline-pending.ts`, so saving locally no longer loads
+  the synchronization code and the auth client; the library, gallery and
+  members pages' critical path fell by 17 kB each.
 - **The metric-matched Inter fallback also names Liberation Sans and Arimo.**
   `local()` matches exact installed font names, so the Arial-based fallback never
   applied on Linux or ChromeOS, where Arial's metric-compatible equivalents ship

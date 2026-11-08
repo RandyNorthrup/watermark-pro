@@ -9,8 +9,9 @@ import {
   offlineOperations,
   pendingOperations,
 } from './offline-database'
+import { refreshOfflineStatus } from './offline-pending'
 import { offlineStatus } from './offline-status'
-import { installOfflineSync, refreshOfflineStatus, synchronizeOfflineWork } from './offline-sync'
+import { installOfflineSync, synchronizeOfflineWork } from './offline-sync'
 import { fakeAuth, installFakeAuth } from '../test-support/fake-auth-module'
 import {
   OFFLINE_USER,

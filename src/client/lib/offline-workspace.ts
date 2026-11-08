@@ -2,7 +2,7 @@
 import { captureOfflineOwner, offlineUserId } from './offline-context'
 import { commitOfflineChange, offlineOperations } from './offline-database'
 import type { OfflineChange, PendingOperation } from './offline-model'
-import { refreshOfflineStatus } from './offline-sync'
+import { refreshOfflineStatus } from './offline-pending'
 import { photoDtoSchema, type AssetDto, type PhotoDto } from '../../shared/api'
 import {
   type SaveWatermarkRequest,

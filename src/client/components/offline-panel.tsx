@@ -11,6 +11,7 @@ import {
   updatePendingOperation,
 } from '../lib/offline-database'
 import type { PendingOperation } from '../lib/offline-model'
+import { refreshOfflineStatus } from '../lib/offline-pending'
 import { prepareWorkspaceOffline } from '../lib/offline-preparation'
 import {
   applyOfflineUpdate,
@@ -18,11 +19,7 @@ import {
   retryOfflineWorker,
 } from '../lib/offline-registration'
 import { offlineStatus, subscribeOfflineStatus } from '../lib/offline-status'
-import {
-  installOfflineSync,
-  refreshOfflineStatus,
-  synchronizeOfflineWork,
-} from '../lib/offline-sync'
+import { installOfflineSync, synchronizeOfflineWork } from '../lib/offline-sync'
 import { savePresetLocally } from '../lib/offline-workspace'
 import { Alert } from './ui/alert'
 import { Button } from './ui/button'

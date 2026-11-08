@@ -7,7 +7,7 @@ import {
 } from './offline-database'
 import { replayFolderChange } from './offline-folder-replay'
 import { offlineChangeSchema } from './offline-model'
-import { refreshOfflineStatus } from './offline-sync'
+import { refreshOfflineStatus } from './offline-pending'
 import { mergeLocalPhotos, mergeLocalPresets } from './offline-workspace'
 import { photoListResponseSchema, type PhotoDto } from '../../shared/api'
 import { watermarkListResponseSchema, type WatermarkDto } from '../../shared/api-watermark'
