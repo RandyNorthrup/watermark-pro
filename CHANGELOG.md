@@ -39,12 +39,14 @@ what was planned; superseded entries stay.
   authenticated shell's from 109.9 to 73.7 kB. The e2e and screenshot navigation
   helpers now wait for the menu, sheet or rail they open before reading it, and
   before asserting that a destination is absent.
-- **Tool pages paint their heading before their tool loads.** The documents,
-  video, bulk and watermark-designer tools load beside their routes
+- **Tool pages paint their heading before their tool loads.** The image,
+  documents, video, bulk and watermark-designer tools load beside their routes
   (`components/tool-modules.ts`): each route loader starts the download and the
-  page shows its heading with a labelled spinner meanwhile. Those pages'
-  critical path fell from 250–290 kB to 78–92 kB gzip; their largest paint is
-  the heading text, which had waited for the whole tool.
+  page shows its heading with a labelled spinner meanwhile. The image editor's
+  loading view is its own first frame, the sample scene in its preview area.
+  Those pages' critical path fell from 250–290 kB to 78–92 kB gzip; their
+  largest paint (the heading text, or the editor's sample scene) had waited for
+  the whole tool.
 - **The metric-matched Inter fallback also names Liberation Sans and Arimo.**
   `local()` matches exact installed font names, so the Arial-based fallback never
   applied on Linux or ChromeOS, where Arial's metric-compatible equivalents ship

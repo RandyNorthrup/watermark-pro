@@ -112,6 +112,7 @@ import { TakePhotoButton } from '../import/take-photo-button'
 import { UrlImportDialog } from '../import/url-import-dialog'
 import { PresetTemplates } from '../presets/preset-templates'
 import { SampleScene } from '../sample-scene'
+import { PREVIEW_GRID_CLASS, PREVIEW_REGION_CLASS, SAMPLE_PREVIEW_CLASS } from './preview-layout'
 import { Alert } from '../ui/alert'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
@@ -228,7 +229,7 @@ function PendingPreview({ hasPhoto }: { hasPhoto: boolean }) {
   return hasPhoto ? (
     <Spinner className="size-6" label={t('editor.renderingPreview')} />
   ) : (
-    <SampleScene className="max-h-[42svh] lg:max-h-[70vh] lg:max-w-none" />
+    <SampleScene className={SAMPLE_PREVIEW_CLASS} />
   )
 }
 
@@ -986,9 +987,9 @@ function EditorSession({
             event.preventDefault()
           }}
           onDrop={onDrop}
-          className="app-scroll-region relative h-[50svh] min-h-64 touch-none overflow-auto rounded-card border border-line bg-[repeating-conic-gradient(var(--color-line)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] lg:h-[calc(100svh-18rem)] lg:min-h-96"
+          className={PREVIEW_REGION_CLASS}
         >
-          <div className="grid h-max min-h-full w-max min-w-full place-items-center p-3">
+          <div className={PREVIEW_GRID_CLASS}>
             {result === null ? (
               <PendingPreview hasPhoto={photo !== null} />
             ) : (

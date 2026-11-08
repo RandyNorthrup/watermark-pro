@@ -1,11 +1,16 @@
 /**
- * The document, video, bulk and watermark-designer tools load beside their
+ * The image, document, video, bulk and watermark-designer tools load beside their
  * routes rather than inside them: each page paints its heading while its
  * tool's code downloads, and the route loader starts that download once the
  * page's own code is under way (PLAN.md §5.5). The tools were the largest
  * element of their pages' critical path on a phone.
  */
 import { deferredComponent } from '../lib/deferred-component'
+
+export const editorTool = deferredComponent(async () => {
+  const { Editor } = await import('./editor/editor')
+  return Editor
+})
 
 export const documentsTool = deferredComponent(async () => {
   const { DocumentsTool } = await import('./documents/documents-tool')
